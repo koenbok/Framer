@@ -36,6 +36,7 @@ class View extends Frame
 			@_insertElement()
 		
 		@_subViews = []
+		@_animations = []
 		
 		# Override this prototype to change all behaviour
 		@_postCreate()
@@ -209,6 +210,10 @@ class View extends Frame
 		get: -> @computedStyle["-webkit-transition-timing-function"]
 		set: (value) -> @style["-webkit-transition-timing-function"] = value
 
+	@define "_animationTransformOrigin"
+		get: -> @computedStyle["-webkit-transform-origin"]
+		set: (value) -> @style["-webkit-transform-origin"] = value
+	
 	animate: (args, callback) =>
 		args.view = @
 		animation = new Animation args

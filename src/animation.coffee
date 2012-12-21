@@ -3,7 +3,7 @@
 
 require "./utils"
 
-PROPERTIES = ["view", "curve", "time"]
+PROPERTIES = ["view", "curve", "time", "origin"]
 
 parseCurve = (a) ->
 
@@ -32,6 +32,7 @@ class exports.Animation extends EventEmitter
 	start: (callback) =>
 		
 		@beginProperties = @view.properties
+		@view._animationTransformOrigin = @origin
 		setTimeout =>
 			@_start callback
 		, 0
@@ -42,16 +43,19 @@ class exports.Animation extends EventEmitter
 	
 	_end: (callback) =>
 		@emit "end", @
+		utils.remove @view._animations, @
 		callback?()
 	
 	_start: (callback) =>
 		
 		@emit "start", @
+		@view._animations.push @
 		
 		@_stop = false
 		
 		time = @time or 300
 		curve = @curve or "linear" 
+		
 		# linear, ease, ease-in, ease-out, ease-in-out
 		# cubic-bezier(0.76, 0.18, 0.25, 0.75)
 		# spring(tension, friction, velocity)
@@ -119,7 +123,7 @@ class exports.Animation extends EventEmitter
 		# @view._animated = true
 		@view._animationDuration = time
 		@view._animationTimingFunction = curve
-
+		
 		# FIX: we should probarbly do it like this: 
 		# http://stackoverflow.com/questions/2087510/callback-on-css-transition
 

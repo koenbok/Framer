@@ -564,6 +564,7 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
         this._insertElement();
       }
       this._subViews = [];
+      this._animations = [];
       this._postCreate();
     }
 
@@ -781,6 +782,15 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
       },
       set: function(value) {
         return this.style["-webkit-transition-timing-function"] = value;
+      }
+    });
+
+    View.define("_animationTransformOrigin", {
+      get: function() {
+        return this.computedStyle["-webkit-transform-origin"];
+      },
+      set: function(value) {
+        return this.style["-webkit-transform-origin"] = value;
       }
     });
 
@@ -1405,7 +1415,7 @@ require.define("/animation.coffee",function(require,module,exports,__dirname,__f
 
   require("./utils");
 
-  PROPERTIES = ["view", "curve", "time"];
+  PROPERTIES = ["view", "curve", "time", "origin"];
 
   parseCurve = function(a) {
     a = a.replace("spring", "");
@@ -1446,6 +1456,7 @@ require.define("/animation.coffee",function(require,module,exports,__dirname,__f
     Animation.prototype.start = function(callback) {
       var _this = this;
       this.beginProperties = this.view.properties;
+      this.view._animationTransformOrigin = this.origin;
       return setTimeout(function() {
         return _this._start(callback);
       }, 0);
@@ -1457,6 +1468,7 @@ require.define("/animation.coffee",function(require,module,exports,__dirname,__f
 
     Animation.prototype._end = function(callback) {
       this.emit("end", this);
+      utils.remove(this.view._animations, this);
       return typeof callback === "function" ? callback() : void 0;
     };
 
@@ -1464,6 +1476,7 @@ require.define("/animation.coffee",function(require,module,exports,__dirname,__f
       var curve, options, time, values,
         _this = this;
       this.emit("start", this);
+      this.view._animations.push(this);
       this._stop = false;
       time = this.time || 300;
       curve = this.curve || "linear";
@@ -1726,7 +1739,7 @@ require.define("/init.coffee",function(require,module,exports,__dirname,__filena
   Global.ViewList = ViewList;
 
   if (window) {
-    window.Prothese = Global;
+    window.Framer = Global;
     for (k in Global) {
       v = Global[k];
       window[k] = v;
