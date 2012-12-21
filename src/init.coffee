@@ -25,7 +25,7 @@ Global.utils = utils
 Global.ViewList = ViewList
 
 if window
-	window.Prothese = Global
+	window.Framer = Global
 	
 	for k, v of Global
 		window[k] = v
