@@ -40,6 +40,9 @@ class exports.Animation extends EventEmitter
 	
 	stop: ->
 		@_stop = true
+		@_end()
+		@view.style.webkitTransform = @view.computedStyle.webkitTransform
+		# console.log "Animation.stop", @
 	
 	_end: (callback) =>
 		@emit "end", @

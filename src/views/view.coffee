@@ -75,6 +75,8 @@ class View extends Frame
 		set: (value) -> 
 			@_x = value
 			@_matrix = utils.extend @_matrix, {m41: value}
+			@emit "change:x"
+			@emit "change:frame"
 	
 	@define "y"
 		get: ->
@@ -83,6 +85,8 @@ class View extends Frame
 		set: (value) -> 
 			@_y = value
 			@_matrix = utils.extend @_matrix, {m42: value}
+			@emit "change:y"
+			@emit "change:frame"
 	
 	# @define "z"
 	# 	get: -> @_matrix.m43
@@ -95,6 +99,8 @@ class View extends Frame
 		set: (value) -> 
 			@_width = value
 			@_element.style.width = "#{value}px"
+			@emit "change:width"
+			@emit "change:frame"
 
 	@define "height"
 		get: -> 
@@ -103,6 +109,8 @@ class View extends Frame
 		set: (value) -> 
 			@_height = value
 			@_element.style.height = "#{value}px"
+			@emit "change:height"
+			@emit "change:frame"
 	
 	@define "_matrix"
 		get: -> 
@@ -138,6 +146,7 @@ class View extends Frame
 		set: (value) -> 
 			@_opacity = value
 			@style["opacity"] = value
+			@emit "change:opacity"
 	
 	@define "scale"
 		get: -> 
@@ -147,6 +156,7 @@ class View extends Frame
 			@_scale = value
 			@_matrix = utils.extend @_matrix, 
 				{m11:value, m22:value, m33:value}
+			@emit "change:scale"
 	
 	@define "clip"
 		get: ->
@@ -155,6 +165,7 @@ class View extends Frame
 			@_clip = value
 			@style.overflow = "hidden" if value is true
 			@style.overflow = "visible" if value is false
+			@emit "change:clip"
 
 	# Hierarchy
 	
@@ -176,6 +187,7 @@ class View extends Frame
 				value._subViews.push @
 			
 			@_superView = value
+			@emit "change:superView"
 	
 	@define "subViews"
 		get: -> @_subViews
@@ -219,6 +231,10 @@ class View extends Frame
 		animation = new Animation args
 		animation.start callback
 		return animation
+	
+	animateStop: ->
+		@_animations.map (animation) ->
+			animation.stop()
 
 
 
@@ -226,11 +242,15 @@ class View extends Frame
 
 	@define "html"
 		get: -> @_element.innerHTML
-		set: (value) -> @_element.innerHTML = value
+		set: (value) -> 
+			@_element.innerHTML = value
+			@emit "change:html"
 
 	@define "style"
 		get: -> @_element.style
-		set: (value) -> utils.extend @_element.style, value
+		set: (value) -> 
+			utils.extend @_element.style, value
+			@emit "change:style"
 
 	@define "computedStyle"
 		get: -> document.defaultView.getComputedStyle @_element
@@ -248,11 +268,13 @@ class View extends Frame
 
 	addClass: (className) ->
 		@_element.className += " #{className}"
+		@emit "change:class"
 
 	removeClass: (className) ->
 		values = for item in @_element.classList
 			item if item and item isnt className
 		@_element.className = values.join " "
+		@emit "change:class"
 
 	_insertElement: ->
 		document.body.appendChild @_element
@@ -261,16 +283,14 @@ class View extends Frame
 	# Dom element events
 
 	addListener: (event, listener) ->
-		if EventTypes[event]
-			@_element.addEventListener event, listener
-		else
-			super
+		super
+		# if EventTypes[event]
+		@_element.addEventListener event, listener
 
 	removeListener: (event, listener) ->
-		if EventTypes[event]
-			@_element.removeEventListener event, listener
-		else
-			super
+		super
+		# if EventTypes[event]
+		@_element.removeEventListener event, listener
 
 	on: @::addListener
 	off: @::removeListener

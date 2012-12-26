@@ -716,9 +716,11 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
       },
       set: function(value) {
         this._x = value;
-        return this._matrix = utils.extend(this._matrix, {
+        this._matrix = utils.extend(this._matrix, {
           m41: value
         });
+        this.emit("change:x");
+        return this.emit("change:frame");
       }
     });
 
@@ -728,9 +730,11 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
       },
       set: function(value) {
         this._y = value;
-        return this._matrix = utils.extend(this._matrix, {
+        this._matrix = utils.extend(this._matrix, {
           m42: value
         });
+        this.emit("change:y");
+        return this.emit("change:frame");
       }
     });
 
@@ -740,7 +744,9 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
       },
       set: function(value) {
         this._width = value;
-        return this._element.style.width = "" + value + "px";
+        this._element.style.width = "" + value + "px";
+        this.emit("change:width");
+        return this.emit("change:frame");
       }
     });
 
@@ -750,7 +756,9 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
       },
       set: function(value) {
         this._height = value;
-        return this._element.style.height = "" + value + "px";
+        this._element.style.height = "" + value + "px";
+        this.emit("change:height");
+        return this.emit("change:frame");
       }
     });
 
@@ -776,7 +784,8 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
       },
       set: function(value) {
         this._opacity = value;
-        return this.style["opacity"] = value;
+        this.style["opacity"] = value;
+        return this.emit("change:opacity");
       }
     });
 
@@ -786,11 +795,12 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
       },
       set: function(value) {
         this._scale = value;
-        return this._matrix = utils.extend(this._matrix, {
+        this._matrix = utils.extend(this._matrix, {
           m11: value,
           m22: value,
           m33: value
         });
+        return this.emit("change:scale");
       }
     });
 
@@ -804,8 +814,9 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
           this.style.overflow = "hidden";
         }
         if (value === false) {
-          return this.style.overflow = "visible";
+          this.style.overflow = "visible";
         }
+        return this.emit("change:clip");
       }
     });
 
@@ -829,7 +840,8 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
           value._element.appendChild(this._element);
           value._subViews.push(this);
         }
-        return this._superView = value;
+        this._superView = value;
+        return this.emit("change:superView");
       }
     });
 
@@ -887,12 +899,19 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
       return animation;
     };
 
+    View.prototype.animateStop = function() {
+      return this._animations.map(function(animation) {
+        return animation.stop();
+      });
+    };
+
     View.define("html", {
       get: function() {
         return this._element.innerHTML;
       },
       set: function(value) {
-        return this._element.innerHTML = value;
+        this._element.innerHTML = value;
+        return this.emit("change:html");
       }
     });
 
@@ -901,7 +920,8 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
         return this._element.style;
       },
       set: function(value) {
-        return utils.extend(this._element.style, value);
+        utils.extend(this._element.style, value);
+        return this.emit("change:style");
       }
     });
 
@@ -924,7 +944,8 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
     };
 
     View.prototype.addClass = function(className) {
-      return this._element.className += " " + className;
+      this._element.className += " " + className;
+      return this.emit("change:class");
     };
 
     View.prototype.removeClass = function(className) {
@@ -943,7 +964,8 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
         }
         return _results;
       }).call(this);
-      return this._element.className = values.join(" ");
+      this._element.className = values.join(" ");
+      return this.emit("change:class");
     };
 
     View.prototype._insertElement = function() {
@@ -951,19 +973,13 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
     };
 
     View.prototype.addListener = function(event, listener) {
-      if (EventTypes[event]) {
-        return this._element.addEventListener(event, listener);
-      } else {
-        return View.__super__.addListener.apply(this, arguments);
-      }
+      View.__super__.addListener.apply(this, arguments);
+      return this._element.addEventListener(event, listener);
     };
 
     View.prototype.removeListener = function(event, listener) {
-      if (EventTypes[event]) {
-        return this._element.removeEventListener(event, listener);
-      } else {
-        return View.__super__.removeListener.apply(this, arguments);
-      }
+      View.__super__.removeListener.apply(this, arguments);
+      return this._element.removeEventListener(event, listener);
     };
 
     View.prototype.on = View.prototype.addListener;
@@ -1548,7 +1564,9 @@ require.define("/animation.coffee",function(require,module,exports,__dirname,__f
     };
 
     Animation.prototype.stop = function() {
-      return this._stop = true;
+      this._stop = true;
+      this._end();
+      return this.view.style.webkitTransform = this.view.computedStyle.webkitTransform;
     };
 
     Animation.prototype._end = function(callback) {
