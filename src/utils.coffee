@@ -33,16 +33,6 @@ exports.filter = (a, f) ->
 exports.union = ->
 	Array.prototype.concat.apply Array.prototype, arguments
 
-# exports.extend = (a, b) ->
-# 	for key of b 
-# 		a[key] = b[key]
-# 	return a
-# 
-# exports.update = (a, b) ->
-# 	for key of a 
-# 		a[key] = b[key] if b[key]
-# 	return a
-# 
 exports.toggle = ->
 	args = Array.prototype.slice.call arguments
 	curr = -1
@@ -62,10 +52,38 @@ exports.delay = (time, f) ->
 	window._delayTimers.push timer
 	return timer
 
+exports.interval = (time, f) ->
+	timer = setInterval f, time
+	window._delayIntervals ?= []
+	window._delayIntervals.push timer
+	return timer
+
 exports.remove = (a, e) -> 
 	a.splice(t,1)[0] if (t = a.indexOf(e)) > -1
 	a
 
+
+exports.debounce = (func, threshold, execAsap) ->
+	timeout = null
+	(args...) ->
+		obj = this
+		delayed = ->
+			func.apply(obj, args) unless execAsap
+			timeout = null
+		if timeout
+			clearTimeout(timeout)
+		else if (execAsap)
+			func.apply(obj, args)
+		timeout = setTimeout delayed, threshold || 100
+
+exports.throttle = (fn, delay) ->
+	return fn if delay is 0
+	timer = false
+	return ->
+		return if timer
+		timer = true
+		setTimeout (-> timer = false), delay unless delay is -1
+		fn arguments...
 
 
 # exports.copy = (a, propertyList) ->
@@ -91,21 +109,21 @@ exports.remove = (a, e) ->
 # console.log exports.filter a, (k, v) -> k in ["x"]
 
 
-# Array::max = ->
-# 	for n in @
-# 		if !max or n > max then max = n
-# 	max
+exports.max = (obj) ->
+	for n in obj
+		if !max or n > max then max = n
+	max
 
-# Array::min = ->
-# 	for n in @
-# 		if !min or n < min then min = n
-# 	min
+exports.min = (obj) ->
+	for n in obj
+		if !min or n < min then min = n
+	min
 
-# Array::sum = ->
-# 	if @length > 0
-# 		@reduce (x, y) -> x + y
-# 	else
-# 		0
+exports.sum = (a) ->
+	if a.length > 0
+		a.reduce (x, y) -> x + y
+	else
+		0
 	
 # exports.clone = (obj) ->
 # 	if not obj? or typeof obj isnt 'object'
