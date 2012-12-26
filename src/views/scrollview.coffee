@@ -14,7 +14,7 @@ class exports.ScrollView extends View
 		# startY = startTopScroll = deltaY = undefined
 		# 
 		# @on "touchstart", =>
-		# 	el = @layer.element
+		# 	el = @_element
 		# 	startY = event.touches[0].pageY
 		# 	startTopScroll = el.scrollTop
 		# 	if startTopScroll <= 0
@@ -36,29 +36,29 @@ class exports.ScrollView extends View
 			@style["overflow-x"] = if value then "scroll" else "hidden"
 
 	scrollToTop: ->
-		@layer.element.scrollTop = 0
+		@_element.scrollTop = 0
 	
 	scrollToBottom: ->
 		setTimeout =>
-			@scrollPoint = @layer.element.scrollHeight - @frame.height
+			@scrollPoint = @_element.scrollHeight - @frame.height
 		, 0
 	
 	@define "scrollPoint"
 		get: ->
-			@layer.element.scrollTop
+			@_element.scrollTop
 		set: (value) ->
-			@layer.element.scrollTop = value
+			@_element.scrollTop = value
 
 	@define "scrollFrame"
 		get: ->
 			return new Frame {
-				x: @layer.element.scrollLeft
-				y: @layer.element.scrollTop
+				x: @_element.scrollLeft
+				y: @_element.scrollTop
 				width: @width
 				height: @height
 			}
 		set: (frame) ->
-			@layer.element.scrollLeft = frame.x
-			@layer.element.scrollTop = frame.y
-			# @layer.element.innerWidth = frame.width
-			# @layer.element.innerHeight = frame.height
+			@_element.scrollLeft = frame.x
+			@_element.scrollTop = frame.y
+			# @_element.innerWidth = frame.width
+			# @_element.innerHeight = frame.height
