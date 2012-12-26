@@ -11,6 +11,7 @@ utils = require "./utils"
 {Animation} = require "./animation"
 
 {Frame} = require "./primitives/frame"
+{Spring} = require "./primitives/spring"
 
 Global = {}
 Global.View = View
@@ -20,6 +21,7 @@ Global.ImageView = ImageView
 # Global.TextView = TextView
 Global.Animation = Animation
 Global.Frame = Frame
+Global.Spring = Spring
 
 Global.utils = utils
 Global.ViewList = ViewList
