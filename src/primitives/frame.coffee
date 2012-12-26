@@ -21,7 +21,7 @@ class Frame extends EventEmitter
 		set: (args) ->
 			
 			for key, value of Frame.Properties
-				@[key] = args[key] if args[key]
+				@[key] = args[key] if args[key] not in [null, undefined]
 			
 			for key, value of Frame.CalculatedProperties
 				@[key] = args[key] if args[key] not in [null, undefined]
