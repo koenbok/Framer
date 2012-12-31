@@ -277,7 +277,8 @@ class View extends Frame
 		@emit "change:class"
 
 	_insertElement: ->
-		document.body.appendChild @_element
+		document.addEventListener "DOMContentLoaded", =>
+			document.body.appendChild @_element
 
 
 	# Dom element events

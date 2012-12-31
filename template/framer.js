@@ -969,7 +969,10 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
     };
 
     View.prototype._insertElement = function() {
-      return document.body.appendChild(this._element);
+      var _this = this;
+      return document.addEventListener("DOMContentLoaded", function() {
+        return document.body.appendChild(_this._element);
+      });
     };
 
     View.prototype.addListener = function(event, listener) {
@@ -1516,7 +1519,7 @@ require.define("/animation.coffee",function(require,module,exports,__dirname,__f
 
   require("./utils");
 
-  PROPERTIES = ["view", "curve", "time", "origin"];
+  PROPERTIES = ["view", "curve", "time", "origin", "tolerance"];
 
   parseCurve = function(a) {
     a = a.replace("spring", "");
@@ -1565,7 +1568,6 @@ require.define("/animation.coffee",function(require,module,exports,__dirname,__f
 
     Animation.prototype.stop = function() {
       this._stop = true;
-      this._end();
       return this.view.style.webkitTransform = this.view.computedStyle.webkitTransform;
     };
 
@@ -1592,7 +1594,8 @@ require.define("/animation.coffee",function(require,module,exports,__dirname,__f
           tension: values[0],
           friction: values[1],
           velocity: values[2],
-          speed: 1 / 60
+          speed: 1 / 60,
+          tolerance: this.tolerance || 0.01
         };
         this._startSpring(options, callback);
         return;
@@ -1620,13 +1623,13 @@ require.define("/animation.coffee",function(require,module,exports,__dirname,__f
           return _this._end(callback);
         }
         value = _this.spring.next();
-        if (_this.modifiers[k]) {
-          value = _this.modifiers[k](value);
-        }
         nextState = {};
         for (k in beginState) {
           v = beginState[k];
           nextState[k] = (deltas[k] * value) + beginState[k];
+          if (_this.modifiers[k]) {
+            nextState[k] = _this.modifiers[k](nextState[k]);
+          }
         }
         return _this._animate(nextState, "linear", _this.spring.speed, run);
       };
