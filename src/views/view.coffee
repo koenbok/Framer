@@ -203,6 +203,7 @@ class View extends Frame
 
 			# @addClass "animated" if value is true
 			# @removeClass "animated" if value is false
+			
 			@__animated = value
 
 			# Small hack to go to next event tick and make sure
@@ -248,7 +249,7 @@ class View extends Frame
 
 	@define "style"
 		get: -> @_element.style
-		set: (value) -> 
+		set: (value) ->
 			utils.extend @_element.style, value
 			@emit "change:style"
 

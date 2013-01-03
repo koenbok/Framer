@@ -3,7 +3,7 @@
 
 require "./utils"
 
-PROPERTIES = ["view", "curve", "time", "origin"]
+PROPERTIES = ["view", "curve", "time", "origin", "tolerance"]
 
 parseCurve = (a) ->
 
@@ -45,6 +45,8 @@ class exports.Animation extends EventEmitter
 		# console.log "Animation.stop", @
 	
 	_end: (callback) =>
+		# @view._animated = false
+		@view._animationDuration = 0
 		@emit "end", @
 		utils.remove @view._animations, @
 		callback?()
@@ -74,6 +76,7 @@ class exports.Animation extends EventEmitter
 				friction: values[1]
 				velocity: values[2]
 				speed: 1/60
+				tolerance: @tolerance or 0.01
 				
 			@_startSpring options, callback
 			
@@ -102,9 +105,6 @@ class exports.Animation extends EventEmitter
 			
 			value = @spring.next()
 			
-			if @modifiers[k]
-				value = @modifiers[k](value)
-
 			nextState = {}
 			
 			for k, v of beginState
@@ -116,6 +116,9 @@ class exports.Animation extends EventEmitter
 				# for designers, but you lose some control wit this magic added.
 				# if k in ["x", "y", "z", "width", "height"]
 				# 	nextState[k] = parseInt nextState[k]
+
+				if @modifiers[k]
+					nextState[k] = @modifiers[k](nextState[k])
 			
 			@_animate nextState, "linear", @spring.speed, run
 	

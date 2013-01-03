@@ -90,6 +90,7 @@ class Spring
 		# See if we reached the end state
 		netValueIsLow = Math.abs(netFloat) < @tolerance
 		netVelocityIsLow = Math.abs(net1DVelocity) < @tolerance
+				
 		stopSpring = netValueIsLow and netVelocityIsLow
 
 		@moving = !stopSpring

@@ -1568,10 +1568,12 @@ require.define("/animation.coffee",function(require,module,exports,__dirname,__f
 
     Animation.prototype.stop = function() {
       this._stop = true;
+      this._end();
       return this.view.style.webkitTransform = this.view.computedStyle.webkitTransform;
     };
 
     Animation.prototype._end = function(callback) {
+      this.view._animationDuration = 0;
       this.emit("end", this);
       utils.remove(this.view._animations, this);
       return typeof callback === "function" ? callback() : void 0;
