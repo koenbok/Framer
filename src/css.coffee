@@ -22,6 +22,7 @@ addStyle "
 	overflow: visible;
 	z-index:0;
 	opacity:1;
+	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 }
 .uilayer.textureBacked {
