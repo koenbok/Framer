@@ -1,6 +1,7 @@
 require "./css"
 
 utils = require "./utils"
+debug = require "./debug"
 
 {View} = require "./views/view"
 {ViewList} = require "./views/view"
@@ -31,28 +32,3 @@ if window
 	
 	for k, v of Global
 		window[k] = v
-
-
-
-Global.debug = (value) ->
-	for view in ViewList
-		if value is true
-			colorValue = -> parseInt(Math.random() * 255)
-			debugStyle = 
-				backgroundImage: ""
-				backgroundColor: "rgba(0,100,255,0.2)"
-				# border: "2px solid rgba(0,100,255,0.1)"
-			view._debugStyle = {}
-			for key of debugStyle
-				view._debugStyle[key] = view.style[key]
-			view.style = debugStyle
-		else if value is false
-			view.style = view._debugStyle
-		else return
-	Global._debug = value
-
-toggler = utils.toggle true, false
-
-window.addEventListener "keydown", (e) ->
-	if e.keyCode is 68 and e.shiftKey
-		Global.debug toggler()
