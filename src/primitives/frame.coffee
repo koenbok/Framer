@@ -58,6 +58,14 @@ class Frame extends EventEmitter
 			throw Error "Width is zero" if @height is 0
 			@y = value - @height
 
+	merge: (r2) ->
+		r1 = @
+		frame = 
+			x: Math.min(r1.x, r2.x)
+			y: Math.min(r1.y, r2.y)
+			width: Math.max(r1.width, r2.width)
+			height: Math.max(r1.height, r2.height)
+		return new Frame frame
 
 Frame.Properties =
 	x: 0

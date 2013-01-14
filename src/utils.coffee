@@ -1,5 +1,5 @@
 Function::define = (prop, desc) ->
-	Object.defineProperty(@prototype, prop, desc)
+	Object.defineProperty @prototype, prop, desc
 	Object.__
 
 exports.keys = (a) ->
@@ -61,8 +61,7 @@ exports.interval = (time, f) ->
 exports.remove = (a, e) -> 
 	a.splice(t,1)[0] if (t = a.indexOf(e)) > -1
 	a
-
-
+	
 exports.debounce = (func, threshold, execAsap) ->
 	timeout = null
 	(args...) ->
@@ -85,29 +84,46 @@ exports.throttle = (fn, delay) ->
 		setTimeout (-> timer = false), delay unless delay is -1
 		fn arguments...
 
+exports.convertPoint = (point, view1, view2) ->
+	
+	point = exports.extend {}, point
+	
+	traverse = (view) ->
+	
+		currentView = view
+		superViews = []
+	
+		while currentView and currentView.superView
+			superViews.push currentView.superView
+			currentView = currentView.superView
+	
+		return superViews
+	
+	superViews1 = traverse view1
+	superViews2 = traverse view2
+	
+	superViews2.push view2 if view2
+	
+	for view in superViews1
+		point.x += view.x
+		point.y += view.y
 
-# exports.copy = (a, propertyList) ->
-# 	b = {}
-# 	if propertyList
-# 		for key in propertyList
-# 			b[key] = a[key] if a[key] isnt null
-# 	else
-# 		for key, value of a
-# 			b[key] = value if value isnt null
-# 	return b
+		if view.scrollFrame
+			point.x -= view.scrollFrame.x
+			point.y -= view.scrollFrame.y
 
-# a =
-# 	x: 0
-# 	y: 0
-# 
-# b =
-# 	x: 10
-# 	
-# c =
-# 	y: 10
-# 
-# console.log exports.filter a, (k, v) -> k in ["x"]
-
+	for view in superViews2
+		point.x -= view.x
+		point.y -= view.y
+		
+		if view.scrollFrame
+			point.x += view.scrollFrame.x
+			point.y += view.scrollFrame.y
+	
+	# console.log "superViewsB1", (v.name for v in superViews1)
+	# console.log "superViewsB2", (v.name for v in superViews2)
+	
+	return point
 
 exports.max = (obj) ->
 	for n in obj
@@ -124,25 +140,3 @@ exports.sum = (a) ->
 		a.reduce (x, y) -> x + y
 	else
 		0
-	
-# exports.clone = (obj) ->
-# 	if not obj? or typeof obj isnt 'object'
-# 		return obj
-
-# 	if obj instanceof Date
-# 		return new Date(obj.getTime()) 
-
-# 	if obj instanceof RegExp
-# 		flags = ''
-# 		flags += 'g' if obj.global?
-# 		flags += 'i' if obj.ignoreCase?
-# 		flags += 'm' if obj.multiline?
-# 		flags += 'y' if obj.sticky?
-# 		return new RegExp(obj.source, flags) 
-
-# 	newInstance = new obj.constructor()
-
-# 	for key of obj
-# 		newInstance[key] = exports.clone obj[key]
-
-# 	return newInstance

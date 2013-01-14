@@ -28,9 +28,9 @@ class View extends Frame
 		# @addClass "textureBacked"
 		# @addClass "animated"
 		
-		@properties = args
+		@clip = args.clip or View.Properties.clip
 		
-		@clip = true
+		@properties = args
 		
 		if not args.superView
 			@_insertElement()
@@ -44,7 +44,15 @@ class View extends Frame
 	_postCreate: ->
 	
 	# Helpers
-	
+
+	@define "name"
+		get: ->
+			@_name or @id
+			
+		set: (value) ->
+			@_name = value
+			@_element.setAttribute "name", @_name
+
 	@define "properties"
 		get: ->
 			p = {}
@@ -55,7 +63,8 @@ class View extends Frame
 		set: (args) ->
 			
 			for key, value of View.Properties
-				@[key] = args[key] if args[key]
+				if args[key] not in [null, undefined]
+					@[key] = args[key] 
 			
 			for key, value of Frame.CalculatedProperties
 				@[key] = args[key] if args[key] not in [null, undefined]
@@ -65,6 +74,7 @@ class View extends Frame
 	@define "frame"
 		get: -> new Frame {x:@x, y:@y, width:@width, height:@height}
 		set: (value) ->
+			return if not value
 			for p in ["x", "y", "width", "height"]
 				@[p] = value[p]
 	
@@ -135,7 +145,15 @@ class View extends Frame
 			@__matrix = m
 
 			return @_element.style.webkitTransform = value
-	
+
+	convertPoint: (point) ->
+		# Convert a point on screen to this views coordinate system
+		utils.convertPoint point, null, @
+		
+	screenFrame: ->
+		# Get this views absolute frame on the screen
+		utils.convertPoint @frame, @, null
+
 	# Scale, Opacity
 	
 	@define "opacity"
@@ -160,22 +178,34 @@ class View extends Frame
 	
 	@define "clip"
 		get: ->
-			@_clip or true
-		set: (value) -> 
+			@_clip
+		set: (value) ->
 			@_clip = value
 			@style.overflow = "hidden" if value is true
 			@style.overflow = "visible" if value is false
 			@emit "change:clip"
+	
+	@define "visible"
+		get: ->
+			@_visible
+		set: (value) -> 
+			@_visible = value
+			@style.display = "block" if value is true
+			@style.display = "none" if value is false
+			@emit "change:visible"
 
 	# Hierarchy
 	
 	removeFromSuperview: ->
-		@_superView = null
+		@superView = null
 	
 	@define "superView"
 		get: -> @_superView or null
 		set: (value) ->
+			
 			return if value is @_superView
+			
+			document.removeEventListener "DOMContentLoaded", @__insertElement
 			
 			# Remove from previous superview subviews
 			if @_superView
@@ -185,6 +215,8 @@ class View extends Frame
 			if value
 				value._element.appendChild @_element
 				value._subViews.push @
+			else
+				@__insertElement()
 			
 			@_superView = value
 			@emit "change:superView"
@@ -278,8 +310,10 @@ class View extends Frame
 		@emit "change:class"
 
 	_insertElement: ->
-		document.addEventListener "DOMContentLoaded", =>
-			document.body.appendChild @_element
+		document.addEventListener "DOMContentLoaded", @__insertElement
+
+	__insertElement: =>
+		document.body.appendChild @_element
 
 
 	# Dom element events
@@ -305,6 +339,7 @@ class View extends Frame
 
 View.Properties = utils.extend Frame.Properties,
 	frame: null
+	clip: true
 	scale: 1.0
 	opacity: 1.0
 	rotation: 0
@@ -312,6 +347,7 @@ View.Properties = utils.extend Frame.Properties,
 	html: null
 	class: ""
 	superView: null
+	visible: true
 
 View.Views = []
 
