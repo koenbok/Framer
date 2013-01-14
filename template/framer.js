@@ -409,7 +409,7 @@ require.define("/css.coffee",function(require,module,exports,__dirname,__filenam
     return head.appendChild(baseStyle);
   };
 
-  addStyle(".uilayer {	display: block;	visibility: visible;	position: absolute;	top:auto; right:auto; bottom:auto; left:auto;	width:auto; height:auto;	overflow: visible;	z-index:0;	opacity:1;	-webkit-box-sizing: border-box;}.uilayer.textureBacked {	-webkit-transform: matrix3d(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);	-webkit-transform-origin: 50% 50% 0%;	-webkit-backface-visibility: hidden;	-webkit-transform-style: flat;}.uilayer.animated {	-webkit-transition-duration: 500ms;	-webkit-transition-timing-function: linear;	-webkit-transition-delay: 0;	-webkit-transition-property: none;}");
+  addStyle(".uilayer {	display: block;	visibility: visible;	position: absolute;	top:auto; right:auto; bottom:auto; left:auto;	width:auto; height:auto;	overflow: visible;	z-index:0;	opacity:1;	box-sizing: border-box;	-webkit-box-sizing: border-box;}.uilayer.textureBacked {	-webkit-transform: matrix3d(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);	-webkit-transform-origin: 50% 50% 0%;	-webkit-backface-visibility: hidden;	-webkit-transform-style: flat;}.uilayer.animated {	-webkit-transition-duration: 500ms;	-webkit-transition-timing-function: linear;	-webkit-transition-delay: 0;	-webkit-transition-property: none;}");
 
 }).call(this);
 
@@ -569,6 +569,45 @@ require.define("/utils.coffee",function(require,module,exports,__dirname,__filen
     };
   };
 
+  exports.convertPoint = function(point, view1, view2) {
+    var superViews1, superViews2, traverse, view, _i, _j, _len, _len1;
+    point = exports.extend({}, point);
+    traverse = function(view) {
+      var currentView, superViews;
+      currentView = view;
+      superViews = [];
+      while (currentView && currentView.superView) {
+        superViews.push(currentView.superView);
+        currentView = currentView.superView;
+      }
+      return superViews;
+    };
+    superViews1 = traverse(view1);
+    superViews2 = traverse(view2);
+    if (view2) {
+      superViews2.push(view2);
+    }
+    for (_i = 0, _len = superViews1.length; _i < _len; _i++) {
+      view = superViews1[_i];
+      point.x += view.x;
+      point.y += view.y;
+      if (view.scrollFrame) {
+        point.x -= view.scrollFrame.x;
+        point.y -= view.scrollFrame.y;
+      }
+    }
+    for (_j = 0, _len1 = superViews2.length; _j < _len1; _j++) {
+      view = superViews2[_j];
+      point.x -= view.x;
+      point.y -= view.y;
+      if (view.scrollFrame) {
+        point.x += view.scrollFrame.x;
+        point.y += view.scrollFrame.y;
+      }
+    }
+    return point;
+  };
+
   exports.max = function(obj) {
     var max, n, _i, _len;
     for (_i = 0, _len = obj.length; _i < _len; _i++) {
@@ -605,6 +644,82 @@ require.define("/utils.coffee",function(require,module,exports,__dirname,__filen
 
 });
 
+require.define("/debug.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+  var utils;
+
+  utils = require("../utils");
+
+  window.document.onkeydown = function(event) {
+    var color, node, view, _i, _len, _ref, _results;
+    if (event.keyCode === 27) {
+      _ref = View.Views;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        view = _ref[_i];
+        if (view._debug) {
+          view._element.removeChild(view._debug.node);
+          view.style = view._debug.style;
+          view.clip = view._debug.clip;
+          _results.push(delete view._debug);
+        } else {
+          color = "rgba(50,150,200,.35)";
+          node = document.createElement("div");
+          node.innerHTML = "" + (view.name || view.id);
+          if (view.superView) {
+            node.innerHTML += " <span style='opacity:.5'>in " + (view.superView.name || view.superView.id) + "</span>";
+          }
+          node.style.position = "absolute";
+          node.style.padding = "3px";
+          view._debug = {
+            style: utils.extend({}, view.style),
+            node: node,
+            clip: view.clip
+          };
+          view._element.appendChild(node);
+          view.style = {
+            color: "white",
+            margin: "-1px",
+            font: "10px/1em Monaco",
+            backgroundColor: "" + color,
+            border: "1px solid " + color,
+            backgroundImage: null
+          };
+          _results.push(view.clip = false);
+        }
+      }
+      return _results;
+    }
+  };
+
+  window.onerror = function(e) {
+    var errorView;
+    errorView = new View({
+      x: 20,
+      y: 20,
+      width: 350,
+      height: 60
+    });
+    errorView.html = "<b>Javascript Error</b><br>Inspect the error console for more info.";
+    errorView.style = {
+      font: "13px/1.3em Menlo, Monaco",
+      backgroundColor: "rgba(255,0,0,0.5)",
+      padding: "12px",
+      border: "1px solid rgba(255,0,0,0.5)",
+      borderRadius: "5px"
+    };
+    errorView.scale = 0.5;
+    return errorView.animate({
+      properties: {
+        scale: 1.0
+      },
+      curve: "spring(150,8,1500)"
+    });
+  };
+
+}).call(this);
+
+});
+
 require.define("/views/view.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
   var Animation, EventClass, EventEmitter, EventTypes, Frame, Rotation, Spring, View, utils,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -634,6 +749,8 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
     __extends(View, _super);
 
     function View(args) {
+      this.__insertElement = __bind(this.__insertElement, this);
+
       this.animate = __bind(this.animate, this);
       if (args == null) {
         args = {};
@@ -643,8 +760,8 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
       this._element = document.createElement("div");
       this._element.id = this.id;
       this.addClass("uilayer textureBacked");
+      this.clip = args.clip || View.Properties.clip;
       this.properties = args;
-      this.clip = true;
       if (!args.superView) {
         this._insertElement();
       }
@@ -654,6 +771,16 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
     }
 
     View.prototype._postCreate = function() {};
+
+    View.define("name", {
+      get: function() {
+        return this._name || this.id;
+      },
+      set: function(value) {
+        this._name = value;
+        return this._element.setAttribute("name", this._name);
+      }
+    });
 
     View.define("properties", {
       get: function() {
@@ -667,19 +794,19 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
         return p;
       },
       set: function(args) {
-        var key, value, _ref, _ref1, _ref2, _results;
+        var key, value, _ref, _ref1, _ref2, _ref3, _results;
         _ref = View.Properties;
         for (key in _ref) {
           value = _ref[key];
-          if (args[key]) {
+          if ((_ref1 = args[key]) !== null && _ref1 !== (void 0)) {
             this[key] = args[key];
           }
         }
-        _ref1 = Frame.CalculatedProperties;
+        _ref2 = Frame.CalculatedProperties;
         _results = [];
-        for (key in _ref1) {
-          value = _ref1[key];
-          if ((_ref2 = args[key]) !== null && _ref2 !== (void 0)) {
+        for (key in _ref2) {
+          value = _ref2[key];
+          if ((_ref3 = args[key]) !== null && _ref3 !== (void 0)) {
             _results.push(this[key] = args[key]);
           } else {
             _results.push(void 0);
@@ -700,6 +827,9 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
       },
       set: function(value) {
         var p, _i, _len, _ref, _results;
+        if (!value) {
+          return;
+        }
         _ref = ["x", "y", "width", "height"];
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -709,6 +839,14 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
         return _results;
       }
     });
+
+    View.prototype.convertPoint = function(point) {
+      return utils.convertPoint(point, null, this);
+    };
+
+    View.prototype.screenFrame = function() {
+      return utils.convertPoint(this.frame, this, null);
+    };
 
     View.define("x", {
       get: function() {
@@ -806,7 +944,7 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
 
     View.define("clip", {
       get: function() {
-        return this._clip || true;
+        return this._clip;
       },
       set: function(value) {
         this._clip = value;
@@ -820,8 +958,24 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
       }
     });
 
+    View.define("visible", {
+      get: function() {
+        return this._visible;
+      },
+      set: function(value) {
+        this._visible = value;
+        if (value === true) {
+          this.style.display = "block";
+        }
+        if (value === false) {
+          this.style.display = "none";
+        }
+        return this.emit("change:visible");
+      }
+    });
+
     View.prototype.removeFromSuperview = function() {
-      return this._superView = null;
+      return this.superView = null;
     };
 
     View.define("superView", {
@@ -832,6 +986,7 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
         if (value === this._superView) {
           return;
         }
+        document.removeEventListener("DOMContentLoaded", this.__insertElement);
         if (this._superView) {
           this._superView._element.removeChild(this._element);
           utils.remove(this._superView._subViews, this);
@@ -839,6 +994,8 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
         if (value) {
           value._element.appendChild(this._element);
           value._subViews.push(this);
+        } else {
+          this.__insertElement();
         }
         this._superView = value;
         return this.emit("change:superView");
@@ -969,10 +1126,11 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
     };
 
     View.prototype._insertElement = function() {
-      var _this = this;
-      return document.addEventListener("DOMContentLoaded", function() {
-        return document.body.appendChild(_this._element);
-      });
+      return document.addEventListener("DOMContentLoaded", this.__insertElement);
+    };
+
+    View.prototype.__insertElement = function() {
+      return document.body.appendChild(this._element);
     };
 
     View.prototype.addListener = function(event, listener) {
@@ -995,13 +1153,15 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
 
   View.Properties = utils.extend(Frame.Properties, {
     frame: null,
+    clip: true,
     scale: 1.0,
     opacity: 1.0,
     rotation: 0,
     style: null,
     html: null,
     "class": "",
-    superView: null
+    superView: null,
+    visible: true
   });
 
   View.Views = [];
@@ -1128,6 +1288,18 @@ require.define("/primitives/frame.coffee",function(require,module,exports,__dirn
         return this.y = value - this.height;
       }
     });
+
+    Frame.prototype.merge = function(r2) {
+      var frame, r1;
+      r1 = this;
+      frame = {
+        x: Math.min(r1.x, r2.x),
+        y: Math.min(r1.y, r2.y),
+        width: Math.max(r1.width, r2.width),
+        height: Math.max(r1.height, r2.height)
+      };
+      return new Frame(frame);
+    };
 
     return Frame;
 
@@ -1812,11 +1984,13 @@ require.define("/views/imageview.coffee",function(require,module,exports,__dirna
 });
 
 require.define("/init.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Animation, Frame, Global, ImageView, ScrollView, Spring, View, ViewList, k, toggler, utils, v;
+  var Animation, Frame, Global, ImageView, ScrollView, Spring, View, ViewList, debug, k, utils, v;
 
   require("./css");
 
   utils = require("./utils");
+
+  debug = require("./debug");
 
   View = require("./views/view").View;
 
@@ -1857,40 +2031,6 @@ require.define("/init.coffee",function(require,module,exports,__dirname,__filena
       window[k] = v;
     }
   }
-
-  Global.debug = function(value) {
-    var colorValue, debugStyle, key, view, _i, _len;
-    for (_i = 0, _len = ViewList.length; _i < _len; _i++) {
-      view = ViewList[_i];
-      if (value === true) {
-        colorValue = function() {
-          return parseInt(Math.random() * 255);
-        };
-        debugStyle = {
-          backgroundImage: "",
-          backgroundColor: "rgba(0,100,255,0.2)"
-        };
-        view._debugStyle = {};
-        for (key in debugStyle) {
-          view._debugStyle[key] = view.style[key];
-        }
-        view.style = debugStyle;
-      } else if (value === false) {
-        view.style = view._debugStyle;
-      } else {
-        return;
-      }
-    }
-    return Global._debug = value;
-  };
-
-  toggler = utils.toggle(true, false);
-
-  window.addEventListener("keydown", function(e) {
-    if (e.keyCode === 68 && e.shiftKey) {
-      return Global.debug(toggler());
-    }
-  });
 
 }).call(this);
 
