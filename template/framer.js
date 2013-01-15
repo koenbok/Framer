@@ -659,7 +659,6 @@ require.define("/debug.coffee",function(require,module,exports,__dirname,__filen
         if (view._debug) {
           view._element.removeChild(view._debug.node);
           view.style = view._debug.style;
-          view.clip = view._debug.clip;
           _results.push(delete view._debug);
         } else {
           color = "rgba(50,150,200,.35)";
@@ -672,19 +671,17 @@ require.define("/debug.coffee",function(require,module,exports,__dirname,__filen
           node.style.padding = "3px";
           view._debug = {
             style: utils.extend({}, view.style),
-            node: node,
-            clip: view.clip
+            node: node
           };
           view._element.appendChild(node);
-          view.style = {
+          _results.push(view.style = {
             color: "white",
             margin: "-1px",
             font: "10px/1em Monaco",
             backgroundColor: "" + color,
             border: "1px solid " + color,
             backgroundImage: null
-          };
-          _results.push(view.clip = false);
+          });
         }
       }
       return _results;
@@ -840,14 +837,6 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
       }
     });
 
-    View.prototype.convertPoint = function(point) {
-      return utils.convertPoint(point, null, this);
-    };
-
-    View.prototype.screenFrame = function() {
-      return utils.convertPoint(this.frame, this, null);
-    };
-
     View.define("x", {
       get: function() {
         return this._x || 0;
@@ -915,6 +904,14 @@ require.define("/views/view.coffee",function(require,module,exports,__dirname,__
         return this._element.style.webkitTransform = value;
       }
     });
+
+    View.prototype.convertPoint = function(point) {
+      return utils.convertPoint(point, null, this);
+    };
+
+    View.prototype.screenFrame = function() {
+      return utils.convertPoint(this.frame, this, null);
+    };
 
     View.define("opacity", {
       get: function() {

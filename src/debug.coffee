@@ -9,7 +9,7 @@ window.document.onkeydown = (event) ->
 			if view._debug
 				view._element.removeChild view._debug.node
 				view.style = view._debug.style
-				view.clip = view._debug.clip
+				# view.clip = view._debug.clip
 				
 				delete view._debug
 				
@@ -28,7 +28,7 @@ window.document.onkeydown = (event) ->
 				view._debug =
 					style: utils.extend {}, view.style
 					node: node
-					clip: view.clip
+					# clip: view.clip
 					
 				view._element.appendChild node
 				view.style =
@@ -39,7 +39,7 @@ window.document.onkeydown = (event) ->
 					# boxShadow: "inset 0 0 1px rgba(50,150,200,.8)";
 					border: "1px solid #{color}"
 					backgroundImage: null
-				view.clip = false
+				# view.clip = false
 
 
 window.onerror = (e) ->
