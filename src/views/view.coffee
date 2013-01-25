@@ -1,4 +1,5 @@
 utils = require "../utils"
+_ = require "underscore"
 
 {Frame} = require "../primitives/frame"
 {Rotation} = require "../primitives/rotation"
@@ -299,15 +300,34 @@ class View extends Frame
 
 		return value
 
+	# Class helpers
+
+	@define "class"
+		get: -> 
+			@_element.className
+		set: (value) ->
+			@_element.className = value
+			@emit "change:class"
+
+	@define "classes"
+		get: ->
+			classes = @class.split " "
+			classes = _(classes).filter (item) -> item not in ["", null]
+			classes = _(classes).unique()
+			classes
+		set: (value) ->
+			@class = value.join " "
+
 	addClass: (className) ->
-		@_element.className += " #{className}"
-		@emit "change:class"
+		classes = @classes
+		classes.push className
+		@classes = classes
 
 	removeClass: (className) ->
-		values = for item in @_element.classList
-			item if item and item isnt className
-		@_element.className = values.join " "
-		@emit "change:class"
+		classes = @classes
+		if className in classes
+			classes.remove className
+		@classes = classes
 
 	_insertElement: ->
 		document.addEventListener "DOMContentLoaded", @__insertElement
