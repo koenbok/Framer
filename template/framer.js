@@ -974,6 +974,17 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       }
     });
 
+    View.define("rotateX", {
+      get: function() {
+        return this._rotateX || 0;
+      },
+      set: function(value) {
+        this._rotateX = value;
+        this.style["opacity"] = value;
+        return this.emit("change:opacity");
+      }
+    });
+
     View.prototype.removeFromSuperview = function() {
       return this.superView = null;
     };
@@ -2949,6 +2960,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       }
       this.modifiers = args.modifiers || {};
       this.endProperties = args.properties;
+      this.originalProperties = this.view.properties;
     }
 
     Animation.prototype.start = function(callback) {
@@ -3052,9 +3064,18 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       return _results;
     };
 
-    Animation.prototype.pause = function() {};
-
-    Animation.prototype.revert = function() {};
+    Animation.prototype.reverse = function() {
+      var options, p, _i, _len;
+      options = {
+        view: this.view,
+        properties: this.originalProperties
+      };
+      for (_i = 0, _len = PROPERTIES.length; _i < _len; _i++) {
+        p = PROPERTIES[_i];
+        options[p] = this[p];
+      }
+      return new Animation(options);
+    };
 
     return Animation;
 

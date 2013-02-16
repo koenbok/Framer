@@ -28,6 +28,7 @@ class exports.Animation extends EventEmitter
 		
 		@modifiers = args.modifiers or {}
 		@endProperties = args.properties
+		@originalProperties = @view.properties
 	
 	start: (callback) =>
 		
@@ -142,8 +143,13 @@ class exports.Animation extends EventEmitter
 		for k, v of properties
 			if k in ["rotation", "opacity", "scale", "x", "y", "z", "width", "height"]
 				@view[k] = properties[k]
-
-
-	pause: ->
 		
-	revert: ->
+	reverse: ->
+		options =
+			view: @view
+			properties: @originalProperties
+		
+		for p in PROPERTIES
+			options[p] = @[p]
+			
+		return new Animation options
