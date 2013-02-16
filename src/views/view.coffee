@@ -2,7 +2,7 @@ utils = require "../utils"
 _ = require "underscore"
 
 {Frame} = require "../primitives/frame"
-{Rotation} = require "../primitives/rotation"
+# {Rotation} = require "../primitives/rotation"
 {Spring} = require "../primitives/spring"
 {EventTypes} = require "../primitives/events"
 {EventClass} = require "../primitives/events"
@@ -194,7 +194,18 @@ class View extends Frame
 			@style.display = "block" if value is true
 			@style.display = "none" if value is false
 			@emit "change:visible"
-
+	
+	# # Rotation
+	# 
+	# @define "rotateX"
+	# 	get: ->
+	# 		@_rotateX or 0
+	# 	set: (value) -> 
+	# 		@_rotateX = value
+	# 		@style["opacity"] = value
+	# 		@emit "change:opacity"
+	
+	
 	# Hierarchy
 	
 	removeFromSuperview: ->
@@ -330,7 +341,12 @@ class View extends Frame
 		@classes = classes
 
 	_insertElement: ->
-		document.addEventListener "DOMContentLoaded", @__insertElement
+		
+		# If we are loaded we insert the node immediately, if not we wait
+		if document.readyState is "complete" or document.readySate is "loaded"
+			@__insertElement()
+		else
+			document.addEventListener "DOMContentLoaded", @__insertElement
 
 	__insertElement: =>
 		document.body.appendChild @_element
@@ -362,7 +378,7 @@ View.Properties = utils.extend Frame.Properties,
 	clip: true
 	scale: 1.0
 	opacity: 1.0
-	rotation: 0
+	# rotation: 0
 	style: null
 	html: null
 	class: ""

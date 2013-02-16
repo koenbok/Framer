@@ -1153,7 +1153,11 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     };
 
     View.prototype._insertElement = function() {
-      return document.addEventListener("DOMContentLoaded", this.__insertElement);
+      if (document.readyState === "complete" || document.readySate === "loaded") {
+        return this.__insertElement();
+      } else {
+        return document.addEventListener("DOMContentLoaded", this.__insertElement);
+      }
     };
 
     View.prototype.__insertElement = function() {
