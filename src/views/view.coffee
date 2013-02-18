@@ -217,6 +217,7 @@ class View extends Frame
 			
 			return if value is @_superView
 			
+			# Cancel previous pending insertions
 			document.removeEventListener "DOMContentLoaded", @__insertElement
 			
 			# Remove from previous superview subviews
@@ -224,6 +225,7 @@ class View extends Frame
 				@_superView._element.removeChild @_element
 				utils.remove @_superView._subViews, @
 			
+			# Either insert the element to the new superview or into dom
 			if value
 				value._element.appendChild @_element
 				value._subViews.push @

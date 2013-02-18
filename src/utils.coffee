@@ -140,3 +140,14 @@ exports.sum = (a) ->
 		a.reduce (x, y) -> x + y
 	else
 		0
+
+exports.isWebKit = ->
+	
+	isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)
+	isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor)
+
+	return true in [isChrome, isSafari]
+	
+	
+	
+	

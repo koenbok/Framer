@@ -32,3 +32,10 @@ if window
 	
 	for k, v of Global
 		window[k] = v
+
+console.log "Webkit", utils.isWebKit()
+
+# Alert if not WebKit
+if not utils.isWebKit()
+	alert "Sorry, only WebKit browsers are currently supported. \
+See https://github.com/koenbok/Framer/issues/2 for more info."

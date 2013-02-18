@@ -640,6 +640,13 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
     }
   };
 
+  exports.isWebKit = function() {
+    var isChrome, isSafari;
+    isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+    isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
+    return true === isChrome || true === isSafari;
+  };
+
 }).call(this);
 
 });
@@ -718,7 +725,7 @@ require.define("/src/debug.coffee",function(require,module,exports,__dirname,__f
 });
 
 require.define("/src/views/view.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Animation, EventClass, EventEmitter, EventTypes, Frame, Rotation, Spring, View, utils, _,
+  var Animation, EventClass, EventEmitter, EventTypes, Frame, Spring, View, utils, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -729,8 +736,6 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
   _ = require("underscore");
 
   Frame = require("../primitives/frame").Frame;
-
-  Rotation = require("../primitives/rotation").Rotation;
 
   Spring = require("../primitives/spring").Spring;
 
@@ -974,17 +979,6 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       }
     });
 
-    View.define("rotateX", {
-      get: function() {
-        return this._rotateX || 0;
-      },
-      set: function(value) {
-        this._rotateX = value;
-        this.style["opacity"] = value;
-        return this.emit("change:opacity");
-      }
-    });
-
     View.prototype.removeFromSuperview = function() {
       return this.superView = null;
     };
@@ -1187,7 +1181,6 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     clip: true,
     scale: 1.0,
     opacity: 1.0,
-    rotation: 0,
     style: null,
     html: null,
     "class": "",
@@ -2660,64 +2653,6 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
 
 });
 
-require.define("/src/primitives/rotation.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-
-  exports.Rotation = (function() {
-
-    function Rotation(layer) {
-      this.layer = layer;
-    }
-
-    Rotation.define("x", {
-      get: function() {
-        return this.layer.rotation.x;
-      },
-      set: function(value) {
-        return this.layer.rotation.x = value;
-      }
-    });
-
-    Rotation.define("y", {
-      get: function() {
-        return this.layer.rotation.y;
-      },
-      set: function(value) {
-        return this.layer.rotation.y = value;
-      }
-    });
-
-    Rotation.define("z", {
-      get: function() {
-        return this.layer.rotation.z;
-      },
-      set: function(value) {
-        return this.layer.rotation.z = value;
-      }
-    });
-
-    Rotation.prototype.update = function(values) {
-      var p, _i, _len, _ref, _ref1, _results;
-      _ref = ["x", "y", "z"];
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        p = _ref[_i];
-        if ((_ref1 = values[p]) !== null && _ref1 !== (void 0)) {
-          _results.push(this[p] = values[p]);
-        } else {
-          _results.push(void 0);
-        }
-      }
-      return _results;
-    };
-
-    return Rotation;
-
-  })();
-
-}).call(this);
-
-});
-
 require.define("/src/primitives/spring.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
   var Spring, defaults, springAccelerationForState, springEvaluateState, springEvaluateStateWithDerivative, springIntegrateState,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -3277,6 +3212,12 @@ require.define("/src/init.coffee",function(require,module,exports,__dirname,__fi
       v = Global[k];
       window[k] = v;
     }
+  }
+
+  console.log("Webkit", utils.isWebKit());
+
+  if (!utils.isWebKit()) {
+    alert("Sorry, only WebKit browsers are currently supported. \See https://github.com/koenbok/Framer/issues/2 for more info.");
   }
 
 }).call(this);
