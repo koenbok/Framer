@@ -195,15 +195,13 @@ class View extends Frame
 			@style.display = "none" if value is false
 			@emit "change:visible"
 	
-	# # Rotation
-	# 
-	# @define "rotateX"
-	# 	get: ->
-	# 		@_rotateX or 0
-	# 	set: (value) -> 
-	# 		@_rotateX = value
-	# 		@style["opacity"] = value
-	# 		@emit "change:opacity"
+	@define "rotation"
+		get: ->
+			@_rotation or 0
+		set: (value) ->
+			@_rotation = value
+			@_matrix = @_matrix.rotate 0,0,@_rotation
+			@emit "change:rotation"
 	
 	
 	# Hierarchy
