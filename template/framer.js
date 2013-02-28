@@ -1025,8 +1025,16 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return this._rotation || 0;
       },
       set: function(value) {
-        this._rotation = value;
-        this._matrix = this._matrix.rotate(0, 0, this._rotation);
+        if (typeof value === 'number') {
+          this._rotation = {
+            x: 0,
+            y: 0,
+            z: value
+          };
+        } else {
+          this._rotation = value;
+        }
+        this._matrix = this._matrix.rotate(this._rotation.x, this._rotation.y, this._rotation.z);
         return this.emit("change:rotation");
       }
     });

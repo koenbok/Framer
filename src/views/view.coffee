@@ -198,9 +198,15 @@ class View extends Frame
 	@define "rotation"
 		get: ->
 			@_rotation or 0
+		# Rotation can be defined as a single integer, or a hash in the form {x:1, y:2, z:3}
+		# If defined as a single integer, rotation will occur along the z-axis
+		# If defined as a hash, rotation will occur along each specified axis
 		set: (value) ->
-			@_rotation = value
-			@_matrix = @_matrix.rotate 0,0,@_rotation
+			if typeof value == 'number'
+			  @_rotation = { x:0, y:0, z:value }
+			else
+			  @_rotation = value
+			@_matrix = @_matrix.rotate @_rotation.x, @_rotation.y, @_rotation.z
 			@emit "change:rotation"
 	
 	
