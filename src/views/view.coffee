@@ -384,7 +384,7 @@ View.Properties = utils.extend Frame.Properties,
 	clip: true
 	scale: 1.0
 	opacity: 1.0
-	# rotation: 0
+	rotation: {x:0, y:0, z:0}
 	style: null
 	html: null
 	class: ""

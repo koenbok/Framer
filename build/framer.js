@@ -1241,6 +1241,11 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     clip: true,
     scale: 1.0,
     opacity: 1.0,
+    rotation: {
+      x: 0,
+      y: 0,
+      z: 0
+    },
     style: null,
     html: null,
     "class": "",
