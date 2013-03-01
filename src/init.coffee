@@ -26,14 +26,13 @@ Global.Spring = Spring
 
 Global.utils = utils
 Global.ViewList = ViewList
+Global.debug = debug.debug
 
 if window
 	window.Framer = Global
 	
 	for k, v of Global
 		window[k] = v
-
-console.log "Webkit", utils.isWebKit()
 
 # Alert if not WebKit
 if not utils.isWebKit()
