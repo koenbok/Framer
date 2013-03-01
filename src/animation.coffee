@@ -32,7 +32,7 @@ class exports.Animation extends EventEmitter
 	
 	start: (callback) =>
 		
-		@beginProperties = @view.properties
+		@beginProperties = @originalProperties
 		@view._animationTransformOrigin = @origin
 		setTimeout =>
 			@_start callback
@@ -67,10 +67,10 @@ class exports.Animation extends EventEmitter
 		# spring(tension, friction, velocity)
 		
 		if curve[..5] == "spring"
-			
+
 			if @time
 				console.log "view.animate: ignoring time for spring"
-			
+
 			values = parseCurve curve
 			options = 
 				tension: values[0]
@@ -78,26 +78,26 @@ class exports.Animation extends EventEmitter
 				velocity: values[2]
 				speed: 1/60
 				tolerance: @tolerance or 0.01
-				
+
 			@_startSpring options, callback
 			
 			return
-		
+
 		@_animate @endProperties, curve, time, =>
 			@_end callback
 
 
 	_startSpring: (options, callback) =>
-	
+
 		@spring = new Spring options
 	
 		beginState = {}
 		deltas = {}
-		
+
 		for k, v of @endProperties
 			deltas[k] = (@endProperties[k] - @beginProperties[k]) / 100.0
 			beginState[k] = @beginProperties[k]
-	
+
 		run = =>
 			
 			# If the spring stopped moving we can stop
@@ -141,7 +141,7 @@ class exports.Animation extends EventEmitter
 		, time
 
 		for k, v of properties
-			if k in ["rotation", "opacity", "scale", "x", "y", "z", "width", "height"]
+			if k in ["rotateX", "rotateY", "rotateZ", "opacity", "scale", "x", "y", "z", "width", "height"]
 				@view[k] = properties[k]
 		
 	reverse: ->

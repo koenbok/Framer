@@ -195,17 +195,33 @@ class View extends Frame
 			@style.display = "none" if value is false
 			@emit "change:visible"
 	
-	# # Rotation
-	# 
-	# @define "rotateX"
-	# 	get: ->
-	# 		@_rotateX or 0
-	# 	set: (value) -> 
-	# 		@_rotateX = value
-	# 		@style["opacity"] = value
-	# 		@emit "change:opacity"
+	@define "rotateX"
+		get: ->
+			@_rotateX or 0
+		set: (value) ->
+			@_rotateX = value
+			@_matrix = @_matrix.rotate @_rotateX,@_rotateY,@_rotateZ
+			@emit "change:rotateX"
+			@emit "change:frame"
 	
+	@define "rotateY"
+		get: ->
+			@_rotateY or 0
+		set: (value) ->
+			@_rotateY = value
+			@_matrix = @_matrix.rotate @_rotateX,@_rotateY,@_rotateZ
+			@emit "change:rotateY"
+			@emit "change:frame"
 	
+	@define "rotateZ"
+		get: ->
+			@_rotateZ or 0
+		set: (value) ->
+			@_rotateZ = value
+			@_matrix = @_matrix.rotate 0,0,@_rotateZ
+			@emit "change:rotateZ"
+			@emit "change:frame"
+
 	# Hierarchy
 	
 	removeFromSuperview: ->
@@ -380,7 +396,9 @@ View.Properties = utils.extend Frame.Properties,
 	clip: true
 	scale: 1.0
 	opacity: 1.0
-	# rotation: 0
+	rotateX: 0.0
+	rotateY: 0.0
+	rotateZ: 0.0
 	style: null
 	html: null
 	class: ""

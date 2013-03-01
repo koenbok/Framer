@@ -8,9 +8,9 @@
     "url": "https://github.com/koenbok/Framer.git"
   },
   "dependencies": {
-    "underscore": "1.*",
-    "browserify": "1.*",
-    "coffee-script": "1.4.*"
+    "underscore": "1.x",
+    "browserify": "1.x",
+    "coffee-script": "1.4.x"
   },
   "license": "MIT"
 }
