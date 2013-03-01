@@ -111,12 +111,6 @@ class exports.Animation extends EventEmitter
 			for k, v of beginState
 
 				nextState[k] = (deltas[k] * value) + beginState[k]
-				
-				# Let's round some variables to pixels to avoid pixel cracks. So not scale
-				# and opacity, but basically all others. I think it makes sense to avoid these
-				# for designers, but you lose some control wit this magic added.
-				# if k in ["x", "y", "z", "width", "height"]
-				# 	nextState[k] = parseInt nextState[k]
 
 				if @modifiers[k]
 					nextState[k] = @modifiers[k](nextState[k])

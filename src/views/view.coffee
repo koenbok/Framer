@@ -199,8 +199,9 @@ class View extends Frame
 		get: ->
 			@_rotateX or 0
 		set: (value) ->
+			oldValue = @rotateX
 			@_rotateX = value
-			@_matrix = @_matrix.rotate @_rotateX,@_rotateY,@_rotateZ
+			@_matrix = @_matrix.rotate @_rotateX - oldValue, @_rotateY, @_rotateZ
 			@emit "change:rotateX"
 			@emit "change:frame"
 	
@@ -208,8 +209,9 @@ class View extends Frame
 		get: ->
 			@_rotateY or 0
 		set: (value) ->
+			oldValue = @rotateY
 			@_rotateY = value
-			@_matrix = @_matrix.rotate @_rotateX,@_rotateY,@_rotateZ
+			@_matrix = @_matrix.rotate @_rotateX, @_rotateY - oldValue, @_rotateZ
 			@emit "change:rotateY"
 			@emit "change:frame"
 	
@@ -217,8 +219,9 @@ class View extends Frame
 		get: ->
 			@_rotateZ or 0
 		set: (value) ->
+			oldValue = @rotateZ
 			@_rotateZ = value
-			@_matrix = @_matrix.rotate 0,0,@_rotateZ
+			@_matrix = @_matrix.rotate @_rotateX, @_rotateY, @_rotateZ - oldValue
 			@emit "change:rotateZ"
 			@emit "change:frame"
 
