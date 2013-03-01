@@ -1020,22 +1020,39 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       }
     });
 
-    View.define("rotation", {
+    View.define("rotateX", {
       get: function() {
-        return this._rotation || 0;
+        return this._rotateX || 0;
       },
       set: function(value) {
-        if (typeof value === 'number') {
-          this._rotation = {
-            x: 0,
-            y: 0,
-            z: value
-          };
-        } else {
-          this._rotation = value;
-        }
-        this._matrix = this._matrix.rotate(this._rotation.x, this._rotation.y, this._rotation.z);
-        return this.emit("change:rotation");
+        this._rotateX = value;
+        this._matrix = this._matrix.rotate(this._rotateX, this._rotateY, this._rotateZ);
+        this.emit("change:rotateX");
+        return this.emit("change:frame");
+      }
+    });
+
+    View.define("rotateY", {
+      get: function() {
+        return this._rotateY || 0;
+      },
+      set: function(value) {
+        this._rotateY = value;
+        this._matrix = this._matrix.rotate(this._rotateX, this._rotateY, this._rotateZ);
+        this.emit("change:rotateY");
+        return this.emit("change:frame");
+      }
+    });
+
+    View.define("rotateZ", {
+      get: function() {
+        return this._rotateZ || 0;
+      },
+      set: function(value) {
+        this._rotateZ = value;
+        this._matrix = this._matrix.rotate(0, 0, this._rotateZ);
+        this.emit("change:rotateZ");
+        return this.emit("change:frame");
       }
     });
 
@@ -1241,11 +1258,9 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     clip: true,
     scale: 1.0,
     opacity: 1.0,
-    rotation: {
-      x: 0,
-      y: 0,
-      z: 0
-    },
+    rotateX: 0.0,
+    rotateY: 0.0,
+    rotateZ: 0.0,
     style: null,
     html: null,
     "class": "",
@@ -2995,7 +3010,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     Animation.prototype.start = function(callback) {
       var _this = this;
-      this.beginProperties = this.view.properties;
+      this.beginProperties = this.originalProperties;
       this.view._animationTransformOrigin = this.origin;
       return setTimeout(function() {
         return _this._start(callback);
@@ -3085,7 +3100,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       _results = [];
       for (k in properties) {
         v = properties[k];
-        if (k === "rotation" || k === "opacity" || k === "scale" || k === "x" || k === "y" || k === "z" || k === "width" || k === "height") {
+        if (k === "rotateX" || k === "rotateY" || k === "rotateZ" || k === "opacity" || k === "scale" || k === "x" || k === "y" || k === "z" || k === "width" || k === "height") {
           _results.push(this.view[k] = properties[k]);
         } else {
           _results.push(void 0);
