@@ -2,8 +2,8 @@ utils = require "../utils"
 _ = require "underscore"
 
 {Frame} = require "../primitives/frame"
-# {Rotation} = require "../primitives/rotation"
-{Spring} = require "../primitives/spring"
+{Matrix} = require "../primitives/matrix"
+
 {EventTypes} = require "../primitives/events"
 {EventClass} = require "../primitives/events"
 
@@ -11,7 +11,6 @@ _ = require "underscore"
 {Animation} = require "../animation"
 
 exports.ViewList = []
-
 
 class View extends Frame
 	
@@ -25,7 +24,7 @@ class View extends Frame
 		@_element = document.createElement "div"
 		@_element.id = @id
 		
-		@addClass "uilayer textureBacked"
+		@addClass "uilayer"
 		# @addClass "textureBacked"
 		# @addClass "animated"
 		
@@ -81,71 +80,166 @@ class View extends Frame
 	
 	@define "x"
 		get: ->
-			@_x or 0  
-			# @_matrix.m41
+			new Matrix(@_matrix).x
 		set: (value) -> 
-			@_x = value
-			@_matrix = utils.extend @_matrix, {m41: value}
+			m = new Matrix(@_matrix)
+			m.x = value
+			m.set @
+
 			@emit "change:x"
 			@emit "change:frame"
 	
 	@define "y"
 		get: ->
-			@_y or 0 
-			# @_matrix.m42
+			new Matrix(@_matrix).y
 		set: (value) -> 
-			@_y = value
-			@_matrix = utils.extend @_matrix, {m42: value}
+			m = new Matrix(@_matrix)
+			m.y = value
+			m.set @
+
 			@emit "change:y"
 			@emit "change:frame"
+
 	
-	# @define "z"
-	# 	get: -> @_matrix.m43
-	# 	set: (value) ->  @_matrix = utils.extend @_matrix, {m43: value}
+	@define "z"
+		get: ->
+			new Matrix(@_matrix).z
+		set: (value) -> 
+			m = new Matrix(@_matrix)
+			m.z = value
+			m.set @
+
+			@emit "change:z"
+			@emit "change:frame"
+
+	@define "scaleX"
+		get: ->
+			new Matrix(@_matrix).scaleX
+		set: (value) ->
+			m = new Matrix(@_matrix)
+			m.scaleX = value
+			m.set @
+
+			@emit "change:scaleX"
+			@emit "change:scale"
+	
+	@define "scaleY"
+		get: ->
+			new Matrix(@_matrix).scaleY
+		set: (value) ->
+			m = new Matrix(@_matrix)
+			m.scaleY = value
+			m.set @
+
+			@emit "change:scaleY"
+			@emit "change:scale"
+	
+	@define "scaleZ"
+		get: ->
+			new Matrix(@_matrix).scaleZ
+		set: (value) ->
+			m = new Matrix(@_matrix)
+			m.scaleZ = value
+			m.set @
+
+			@emit "change:scaleZ"
+			@emit "change:scale"
+
+	@define "scale"
+		get: ->
+			new Matrix(@_matrix).scale
+		set: (value) ->
+			m = new Matrix(@_matrix)
+			m.scale = value
+			m.set @
+
+			@emit "change:scale"
+
+	@define "rotateX"
+		get: ->
+			new Matrix(@_matrix).rotateX
+		set: (value) -> 
+			m = new Matrix(@_matrix)
+			m.rotateX = value
+			m.set @
+			
+			@emit "change:rotateX"
+			@emit "change:rotate"
+	
+	@define "rotateY"
+		get: ->
+			new Matrix(@_matrix).rotateY
+		set: (value) -> 
+			m = new Matrix(@_matrix)
+			m.rotateY = value
+			m.set @
+
+			@emit "change:rotateX"
+			@emit "change:rotate"
+
+	@define "rotateZ"
+		get: ->
+			new Matrix(@_matrix).rotateZ
+		set: (value) -> 
+			m = new Matrix(@_matrix)
+			m.rotateZ = value
+			m.set @
+
+			@emit "change:rotateZ"
+			@emit "change:rotate"
+
+	@define "rotate"
+		get: ->
+			new Matrix(@_matrix).rotate
+		set: (value) -> 
+			m = new Matrix(@_matrix)
+			m.rotate = value
+			m.set @
+
+			@emit "change:rotate"
+
+
 
 	@define "width"
 		get: -> 
-			@_width or 0
-			# @_getPropertyCSSValue("width").getFloatValue CSSPrimitiveValue.CSS_NUMBER
+			@style.width
 		set: (value) -> 
-			@_width = value
-			@_element.style.width = "#{value}px"
+			@style.width = "#{value}px"
 			@emit "change:width"
-			@emit "change:frame"
+			@emit "change:frame"	
 
 	@define "height"
 		get: -> 
-			@_height or 0
-			# @_getPropertyCSSValue("height").getFloatValue CSSPrimitiveValue.CSS_NUMBER
+			@style.height
 		set: (value) -> 
-			@_height = value
-			@_element.style.height = "#{value}px"
+			@style.height = "#{value}px"
 			@emit "change:height"
 			@emit "change:frame"
-	
+
+
+
 	@define "_matrix"
 		get: -> 
-			return @__matrix or @__matrix = new WebKitCSSMatrix @_element.style.webkitTransform
+			if not @__matrix
+				@__matrix = new WebKitCSSMatrix @_element.style.webkitTransform
+			return @__matrix
 			
-		set: (value) ->
-		
-			m = value or @_matrix
+			# return new WebKitCSSMatrix @_element.style.webkitTransform
+			# return new WebKitCSSMatrix window.getComputedStyle(@._element).webkitTransform
 			
-			# Blue pill
-			if not m instanceof WebKitCSSMatrix
-				return @_element.style.webkitTransform = null
+		set: (m) ->
 			
-			# Red pill
-			values = "
-				matrix3d(
-					#{m.m11}, #{m.m12}, #{m.m13}, #{m.m14}, 
-					#{m.m21}, #{m.m22}, #{m.m23}, #{m.m24}, 
-					#{m.m31}, #{m.m32}, #{m.m33}, #{m.m34}, 
-					#{m.m41}, #{m.m42}, #{m.m43}, #{m.m44})"
+			m ?= @__matrix
 			
-			@__matrix = m
-
-			return @_element.style.webkitTransform = value
+			if not m instanceof Matrix
+				@__matrix = null
+				@element_.style.webkitTransform = null
+				return
+			else
+				@__matrix = m
+			
+			@_element.style.webkitTransform = @__matrix.cssValues() 
+			
 
 	convertPoint: (point) ->
 		# Convert a point on screen to this views coordinate system
@@ -167,15 +261,20 @@ class View extends Frame
 			@style["opacity"] = value
 			@emit "change:opacity"
 	
-	@define "scale"
-		get: -> 
-			@_scale
-			# @_matrix.m11
-		set: (value) ->  
-			@_scale = value
-			@_matrix = utils.extend @_matrix, 
-				{m11:value, m22:value, m33:value}
-			@emit "change:scale"
+	# @define "scale"
+	# 	get: -> 
+	# 		@_scale
+	# 		# @_matrix.m11
+	# 	set: (value) ->  
+	# 		@_scale = value
+	# 		@_matrix = utils.extend @_matrix, 
+	# 			{m11:value, m22:value, m33:value}
+	# 		@emit "change:scale"
+
+
+
+
+
 	
 	@define "clip"
 		get: ->
@@ -195,35 +294,6 @@ class View extends Frame
 			@style.display = "none" if value is false
 			@emit "change:visible"
 	
-	@define "rotateX"
-		get: ->
-			@_rotateX or 0
-		set: (value) ->
-			oldValue = @rotateX
-			@_rotateX = value
-			@_matrix = @_matrix.rotate @_rotateX - oldValue, @_rotateY, @_rotateZ
-			@emit "change:rotateX"
-			@emit "change:frame"
-	
-	@define "rotateY"
-		get: ->
-			@_rotateY or 0
-		set: (value) ->
-			oldValue = @rotateY
-			@_rotateY = value
-			@_matrix = @_matrix.rotate @_rotateX, @_rotateY - oldValue, @_rotateZ
-			@emit "change:rotateY"
-			@emit "change:frame"
-	
-	@define "rotateZ"
-		get: ->
-			@_rotateZ or 0
-		set: (value) ->
-			oldValue = @rotateZ
-			@_rotateZ = value
-			@_matrix = @_matrix.rotate @_rotateX, @_rotateY, @_rotateZ - oldValue
-			@emit "change:rotateZ"
-			@emit "change:frame"
 
 	# Hierarchy
 	
@@ -325,8 +395,14 @@ class View extends Frame
 
 	_getPropertyCSSValue: (name) ->
 		
-		value = @computedStyle.getPropertyCSSValue name
-
+		cs = @_element.style
+		# cs = @computedStyle
+		
+		value = cs.getPropertyCSSValue name
+		
+		# console.log cs["width"]
+		# console.log "_getPropertyCSSValue", name, value
+		
 		if value instanceof CSSValueList
 			return value[value.length - 1]
 
@@ -356,10 +432,7 @@ class View extends Frame
 		@classes = classes
 
 	removeClass: (className) ->
-		classes = @classes
-		if className in classes
-			classes.remove className
-		@classes = classes
+		@classes = _.filter @classes, (item) -> item isnt className
 
 	_insertElement: ->
 		
@@ -397,11 +470,14 @@ class View extends Frame
 View.Properties = utils.extend Frame.Properties,
 	frame: null
 	clip: true
-	scale: 1.0
+	# scale: 1.0
 	opacity: 1.0
-	rotateX: 0.0
-	rotateY: 0.0
-	rotateZ: 0.0
+	rotateX: 0
+	rotateY: 0
+	rotateZ: 0
+	scaleX: 1.0
+	scaleY: 1.0
+	scaleZ: 1.0
 	style: null
 	html: null
 	class: ""

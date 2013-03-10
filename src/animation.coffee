@@ -1,15 +1,17 @@
-{Spring} = require "./primitives/spring"
+utils = require "../utils"
+css = require "../css"
+
 {EventEmitter} = require "./eventemitter"
+{Matrix} = require "../primitives/matrix"
 
-require "./utils"
+spring = require "../curves/spring"
+bezier = require "../curves/bezier"
 
-PROPERTIES = ["view", "curve", "time", "origin", "tolerance"]
-
-parseCurve = (a) ->
+parseCurve = (a, prefix) ->
 
 	# "spring(1, 2, 3)" -> 1, 2, 3
 
-	a = a.replace "spring", ""
+	a = a.replace prefix, ""
 	a = a.replace /\s+/g, ""
 	a = a.replace "(", ""
 	a = a.replace ")", ""
@@ -18,132 +20,185 @@ parseCurve = (a) ->
 	return a.map (i) -> parseFloat i
 
 
-class exports.Animation extends EventEmitter
+class Animation extends EventEmitter
+	
+	AnimationProperties: ["view", "curve", "time", "origin", "tolerance", "precision"]
+	AnimatableProperties: ["x", "y", "z", "scale", "scaleX", "scaleY", "scaleZ", "rotate", "rotateX", "rotateY", "rotateZ"] # z, width, height, opacity
+	
+	TransformPropertyMap:
+		x: {name: "translateX", unit: "px"}
+		y: {name: "translateY", unit: "px"}
+		z: {name: "translateZ", unit: "px"}
+		rotateX: {name: "rotateX", unit: "deg"}
+		rotateY: {name: "rotateY", unit: "deg"}
+		rotateZ: {name: "rotateZ", unit: "deg"}
+		scaleX: {name: "scaleX", unit: ""}
+		scaleY: {name: "scaleY", unit: ""}
+		scaleZ: {name: "scaleZ", unit: ""}
+		# scale: {name: "scale", unit: ""}
 	
 	constructor: (args) ->
-		super
 		
-		for p in PROPERTIES
+		# Set all properties
+		for p in @AnimationProperties
 			@[p] = args[p]
 		
-		@modifiers = args.modifiers or {}
-		@endProperties = args.properties
-		@originalProperties = @view.properties
+		# Set all the defaults
+		
+		@time ?= 1000
+		@curve ?= "linear"
+		@precision ?= 30
+		
+		
+		@curveValues = @_parseCurve @curve
+		
+		@animationName = "framer-animation-#{utils.uuid()[..8]}"
+		
+		
+		# Clean up the animation wishes
+		
+		# TODO: test if we are trying to animate something that cannot animate
+		
+		propertiesA = @view.properties
+		propertiesB = args.properties
+		
+		@propertiesA = {}
+		@propertiesB = {}
+		
+		for k in @AnimatableProperties 
+			
+			@propertiesA[k] = propertiesA[k]
+			
+			if propertiesB.hasOwnProperty k
+				@propertiesB[k] = propertiesB[k]
+			else
+				@propertiesB[k] = propertiesA[k]
+			
+			#console.log "#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
+		
+		@keyFrameAnimationCSS = @_css()
 	
 	start: (callback) =>
 		
-		@beginProperties = @originalProperties
-		@view._animationTransformOrigin = @origin
-		setTimeout =>
-			@_start callback
-		, 0
-		# @_start callback
-	
-	stop: ->
-		@_stop = true
-		@_end()
-		@view.style.webkitTransform = @view.computedStyle.webkitTransform
-		# console.log "Animation.stop", @
-	
-	_end: (callback) =>
-		# @view._animated = false
-		@view._animationDuration = 0
-		@emit "end", @
-		utils.remove @view._animations, @
-		callback?()
-	
-	_start: (callback) =>
+		# console.log "Animation.start #{@animationName}"
 		
-		@emit "start", @
-		@view._animations.push @
+		# console.log @keyFrameAnimationCSS
 		
-		@_stop = false
 		
-		time = @time or 300
-		curve = @curve or "linear" 
+		# TODO: see if other animations are running and cancel them
 		
-		# linear, ease, ease-in, ease-out, ease-in-out
-		# cubic-bezier(0.76, 0.18, 0.25, 0.75)
-		# spring(tension, friction, velocity)
 		
-		if curve[..5] == "spring"
-
-			if @time
-				console.log "view.animate: ignoring time for spring"
-
-			values = parseCurve curve
-			options = 
-				tension: values[0]
-				friction: values[1]
-				velocity: values[2]
-				speed: 1/60
-				tolerance: @tolerance or 0.01
-
-			@_startSpring options, callback
-			
-			return
-
-		@_animate @endProperties, curve, time, =>
-			@_end callback
-
-
-	_startSpring: (options, callback) =>
-
-		@spring = new Spring options
-	
-		beginState = {}
-		deltas = {}
-
-		for k, v of @endProperties
-			deltas[k] = (@endProperties[k] - @beginProperties[k]) / 100.0
-			beginState[k] = @beginProperties[k]
-
-		run = =>
-			
-			# If the spring stopped moving we can stop
-			if not @spring.moving or @_stop
-				return @_end callback
-			
-			value = @spring.next()
-			
-			nextState = {}
-			
-			for k, v of beginState
-
-				nextState[k] = (deltas[k] * value) + beginState[k]
-
-				if @modifiers[k]
-					nextState[k] = @modifiers[k](nextState[k])
-			
-			@_animate nextState, "linear", @spring.speed, run
-	
-		run()
-
-	_animate: (properties, curve, time, callback) =>
-
-		# @view._animated = true
-		@view._animationDuration = time
-		@view._animationTimingFunction = curve
 		
-		# FIX: we should probarbly do it like this: 
-		# http://stackoverflow.com/questions/2087510/callback-on-css-transition
+		css.addStyle "
+			#{@keyFrameAnimationCSS}
+		
+			.#{@animationName} {
+				-webkit-animation-duration: #{@time/1000}s;
+				-webkit-animation-name: #{@animationName};
+				-webkit-animation-timing-function: linear;
+				-webkit-animation-fill-mode: both;
+			
+			}"
 
-		@timer = setTimeout =>
-			# @view._animated = false
-			# @view._animationDuration = 0
+		@view.class += " #{@animationName}"
+			
+		finalize = =>
+			# console.log "Animation.end #{@animationName}"
+			
+			@view._element.removeEventListener "webkitAnimationEnd", finalize
+			
+			@view.removeClass @animationName
+			# 
+			for k, v of @propertiesB
+				# console.log "#{k} #{@propertiesB[k]}"
+				@view[k] = @propertiesB[k]
+			
+			# @view._matrix.logValues()
+			
+			
+			
+			
+			# console.log "@propertiesB", @propertiesB
+			
+			
+			# @view.properties = @propertiesB
+
+			
+			
+			@emit "end"
 			callback?()
-		, time
+		
+		@view._element.addEventListener "webkitAnimationEnd", finalize
+		
 
-		for k, v of properties
-			if k in ["rotateX", "rotateY", "rotateZ", "opacity", "scale", "x", "y", "z", "width", "height"]
-				@view[k] = properties[k]
 		
-	reverse: ->
-		options =
-			view: @view
-			properties: @originalProperties
+	
+	stop: =>
+		@view.style["-webkit-animation-play-state"] = "paused"
+		@view._matrix = new WebKitCSSMatrix @view.computedStyle["-webkit-transform"]
+		@view.removeClass @keyFrameAnimation.name
 		
-		for p in PROPERTIES
-			options[p] = @[p]
+	_css: ->
+		
+		animationName = @animationName
+		
+		stepIncrement = 0
+		stepDelta = 100 / (@curveValues.length - 1)
+		
+		cssString = []
+		cssString.push "@-webkit-keyframes #{animationName} {\n"
+		
+		deltas = {}
+		
+		for propertyName, value of @propertiesA
+			deltas[propertyName] = (@propertiesB[propertyName] - @propertiesA[propertyName]) / 100.0
+		
+		@curveValues.map (springValue) =>
 			
-		return new Animation options
+			position = stepIncrement * stepDelta
+
+			cssString.push "\t#{position.toFixed(2)}%\t{ -webkit-transform: "
+			
+			m = new Matrix()
+			
+			for propertyName, value of @propertiesA
+				m[propertyName] = springValue * deltas[propertyName] + @propertiesA[propertyName]
+				
+			cssString.push m.matrix().cssValues() + "; }\n"
+			
+			stepIncrement++
+			
+
+		cssString.push "}\n"
+		
+		return cssString.join ""
+
+	_parseCurve: (curve) ->
+		
+		curve ?= ""
+		curve = curve.toLowerCase()
+		
+		if curve in ["linear"]
+			return bezier.defaults.Linear @precision, @time
+		else if curve in ["ease"]
+			return bezier.defaults.Ease @precision, @time
+		else if curve in ["ease-in"]
+			return bezier.defaults.EaseIn @precision, @time
+		else if curve in ["ease-out"]
+			return bezier.defaults.EaseOut @precision, @time
+		else if curve in ["ease-in-out"]
+			return bezier.defaults.EaseInOut @precision, @time
+		else if curve[.."cubic-bezier".length-1] is "cubic-bezier"
+			v = parseCurve curve, "cubic-bezier"
+			return bezier.BezierCurve v[0], v[1], v[2], v[3], @precision, @time
+		else if curve[.."spring".length-1] is "spring"
+			v = parseCurve curve, "spring"
+			return spring.SpringCurve v[0], v[1], v[2], @precision
+		else
+
+			# The default curve is linear
+			console.log "Animation.parseCurve: could not parse curve '#{curve}'"
+			return bezier.defaults.Linear @precision, @time
+
+
+exports.Animation = Animation

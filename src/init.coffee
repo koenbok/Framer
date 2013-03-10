@@ -1,5 +1,4 @@
-require "./css"
-
+css = require "./css"
 utils = require "./utils"
 debug = require "./debug"
 
@@ -12,7 +11,6 @@ debug = require "./debug"
 {Animation} = require "./animation"
 
 {Frame} = require "./primitives/frame"
-{Spring} = require "./primitives/spring"
 
 Global = {}
 Global.View = View
@@ -22,11 +20,11 @@ Global.ImageView = ImageView
 # Global.TextView = TextView
 Global.Animation = Animation
 Global.Frame = Frame
-Global.Spring = Spring
 
 Global.utils = utils
 Global.ViewList = ViewList
 Global.debug = debug.debug
+Global.css = css
 
 if window
 	window.Framer = Global
