@@ -11,6 +11,7 @@ debug = require "./debug"
 {Animation} = require "./animation"
 
 {Frame} = require "./primitives/frame"
+{Matrix} = require "./primitives/matrix"
 
 Global = {}
 Global.View = View
@@ -20,6 +21,7 @@ Global.ImageView = ImageView
 # Global.TextView = TextView
 Global.Animation = Animation
 Global.Frame = Frame
+Global.Matrix = Matrix
 
 Global.utils = utils
 Global.ViewList = ViewList

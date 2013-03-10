@@ -470,11 +470,12 @@ class View extends Frame
 View.Properties = utils.extend Frame.Properties,
 	frame: null
 	clip: true
-	# scale: 1.0
 	opacity: 1.0
 	rotateX: 0
 	rotateY: 0
 	rotateZ: 0
+	rotate: 0
+	scale: 1.0
 	scaleX: 1.0
 	scaleY: 1.0
 	scaleZ: 1.0

@@ -23,20 +23,12 @@ parseCurve = (a, prefix) ->
 class Animation extends EventEmitter
 	
 	AnimationProperties: ["view", "curve", "time", "origin", "tolerance", "precision"]
-	AnimatableProperties: ["x", "y", "z", "scale", "scaleX", "scaleY", "scaleZ", "rotate", "rotateX", "rotateY", "rotateZ"] # z, width, height, opacity
-	
-	TransformPropertyMap:
-		x: {name: "translateX", unit: "px"}
-		y: {name: "translateY", unit: "px"}
-		z: {name: "translateZ", unit: "px"}
-		rotateX: {name: "rotateX", unit: "deg"}
-		rotateY: {name: "rotateY", unit: "deg"}
-		rotateZ: {name: "rotateZ", unit: "deg"}
-		scaleX: {name: "scaleX", unit: ""}
-		scaleY: {name: "scaleY", unit: ""}
-		scaleZ: {name: "scaleZ", unit: ""}
-		# scale: {name: "scale", unit: ""}
-	
+	AnimatableProperties: [
+		"x", "y", "z", 
+		"scaleX", "scaleY", "scaleZ", #"scale",  
+		"rotateX", "rotateY", "rotateZ", #"rotate"
+	] # width, height, opacity
+
 	constructor: (args) ->
 		
 		# Set all properties
@@ -49,11 +41,9 @@ class Animation extends EventEmitter
 		@curve ?= "linear"
 		@precision ?= 30
 		
-		
 		@curveValues = @_parseCurve @curve
 		
 		@animationName = "framer-animation-#{utils.uuid()[..8]}"
-		
 		
 		# Clean up the animation wishes
 		
@@ -61,6 +51,15 @@ class Animation extends EventEmitter
 		
 		propertiesA = @view.properties
 		propertiesB = args.properties
+		
+		# Set the derived properties scale and rotation
+		if propertiesB.scale
+			propertiesB.scaleX = propertiesB.scale
+			propertiesB.scaleY = propertiesB.scale
+		
+		if propertiesB.rotate
+			propertiesB.rotateZ = propertiesB.rotate
+			
 		
 		@propertiesA = {}
 		@propertiesB = {}
@@ -74,7 +73,7 @@ class Animation extends EventEmitter
 			else
 				@propertiesB[k] = propertiesA[k]
 			
-			#console.log "#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
+			# console.log "#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
 		
 		@keyFrameAnimationCSS = @_css()
 	
@@ -82,12 +81,7 @@ class Animation extends EventEmitter
 		
 		# console.log "Animation.start #{@animationName}"
 		
-		# console.log @keyFrameAnimationCSS
-		
-		
 		# TODO: see if other animations are running and cancel them
-		
-		
 		
 		css.addStyle "
 			#{@keyFrameAnimationCSS}
@@ -103,27 +97,16 @@ class Animation extends EventEmitter
 		@view.class += " #{@animationName}"
 			
 		finalize = =>
-			# console.log "Animation.end #{@animationName}"
 			
 			@view._element.removeEventListener "webkitAnimationEnd", finalize
-			
 			@view.removeClass @animationName
-			# 
+			
+			m = new Matrix()
+			
 			for k, v of @propertiesB
-				# console.log "#{k} #{@propertiesB[k]}"
-				@view[k] = @propertiesB[k]
+				m[k] = @propertiesB[k]
 			
-			# @view._matrix.logValues()
-			
-			
-			
-			
-			# console.log "@propertiesB", @propertiesB
-			
-			
-			# @view.properties = @propertiesB
-
-			
+			m.set @view
 			
 			@emit "end"
 			callback?()

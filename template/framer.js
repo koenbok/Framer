@@ -1309,6 +1309,8 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     rotateX: 0,
     rotateY: 0,
     rotateZ: 0,
+    rotate: 0,
+    scale: 1.0,
     scaleX: 1.0,
     scaleY: 1.0,
     scaleZ: 1.0,
@@ -2791,8 +2793,11 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
   _ = require("underscore");
 
   WebKitCSSMatrix.prototype.cssValues = function() {
-    var values;
-    return values = "		matrix3d(			" + this.m11 + ", " + this.m12 + ", " + this.m13 + ", " + this.m14 + ", 			" + this.m21 + ", " + this.m22 + ", " + this.m23 + ", " + this.m24 + ", 			" + this.m31 + ", " + this.m32 + ", " + this.m33 + ", " + this.m34 + ", 			" + this.m41 + ", " + this.m42 + ", " + this.m43 + ", " + this.m44 + ")";
+    var r, values;
+    r = function(v) {
+      return v.toFixed(3);
+    };
+    return values = "		matrix3d(			" + (r(this.m11)) + ", " + (r(this.m12)) + ", " + (r(this.m13)) + ", " + (r(this.m14)) + ", 			" + (r(this.m21)) + ", " + (r(this.m22)) + ", " + (r(this.m23)) + ", " + (r(this.m24)) + ", 			" + (r(this.m31)) + ", " + (r(this.m32)) + ", " + (r(this.m33)) + ", " + (r(this.m34)) + ", 			" + (r(this.m41)) + ", " + (r(this.m42)) + ", " + (r(this.m43)) + ", " + (r(this.m44)) + ")";
   };
 
   Matrix = (function() {
@@ -2832,7 +2837,7 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
 
     Matrix.define("scaleX", {
       get: function() {
-        return this._scaleX || 0;
+        return this._scaleX || 1;
       },
       set: function(value) {
         return this._scaleX = value;
@@ -2841,7 +2846,7 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
 
     Matrix.define("scaleY", {
       get: function() {
-        return this._scaleY || 0;
+        return this._scaleY || 1;
       },
       set: function(value) {
         return this._scaleY = value;
@@ -2850,7 +2855,7 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
 
     Matrix.define("scaleZ", {
       get: function() {
-        return this._scaleZ || 0;
+        return this._scaleZ || 1;
       },
       set: function(value) {
         return this._scaleZ = value;
@@ -2896,10 +2901,10 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
 
     Matrix.define("rotate", {
       get: function() {
-        return this._rotateZ || 0;
+        return this.rotateZ;
       },
       set: function(value) {
-        return this._rotateZ = value;
+        return this.rotateZ = value;
       }
     });
 
@@ -3071,46 +3076,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     Animation.prototype.AnimationProperties = ["view", "curve", "time", "origin", "tolerance", "precision"];
 
-    Animation.prototype.AnimatableProperties = ["x", "y", "z", "scale", "scaleX", "scaleY", "scaleZ", "rotate", "rotateX", "rotateY", "rotateZ"];
-
-    Animation.prototype.TransformPropertyMap = {
-      x: {
-        name: "translateX",
-        unit: "px"
-      },
-      y: {
-        name: "translateY",
-        unit: "px"
-      },
-      z: {
-        name: "translateZ",
-        unit: "px"
-      },
-      rotateX: {
-        name: "rotateX",
-        unit: "deg"
-      },
-      rotateY: {
-        name: "rotateY",
-        unit: "deg"
-      },
-      rotateZ: {
-        name: "rotateZ",
-        unit: "deg"
-      },
-      scaleX: {
-        name: "scaleX",
-        unit: ""
-      },
-      scaleY: {
-        name: "scaleY",
-        unit: ""
-      },
-      scaleZ: {
-        name: "scaleZ",
-        unit: ""
-      }
-    };
+    Animation.prototype.AnimatableProperties = ["x", "y", "z", "scaleX", "scaleY", "scaleZ", "rotateX", "rotateY", "rotateZ"];
 
     function Animation(args) {
       this.stop = __bind(this.stop, this);
@@ -3136,6 +3102,13 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       this.animationName = "framer-animation-" + (utils.uuid().slice(0, 9));
       propertiesA = this.view.properties;
       propertiesB = args.properties;
+      if (propertiesB.scale) {
+        propertiesB.scaleX = propertiesB.scale;
+        propertiesB.scaleY = propertiesB.scale;
+      }
+      if (propertiesB.rotate) {
+        propertiesB.rotateZ = propertiesB.rotate;
+      }
       this.propertiesA = {};
       this.propertiesB = {};
       _ref4 = this.AnimatableProperties;
@@ -3157,14 +3130,16 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.time / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;						}");
       this.view["class"] += " " + this.animationName;
       finalize = function() {
-        var k, v, _ref;
+        var k, m, v, _ref;
         _this.view._element.removeEventListener("webkitAnimationEnd", finalize);
         _this.view.removeClass(_this.animationName);
+        m = new Matrix();
         _ref = _this.propertiesB;
         for (k in _ref) {
           v = _ref[k];
-          _this.view[k] = _this.propertiesB[k];
+          m[k] = _this.propertiesB[k];
         }
+        m.set(_this.view);
         _this.emit("end");
         return typeof callback === "function" ? callback() : void 0;
       };
@@ -3646,7 +3621,7 @@ require.define("/src/views/imageview.coffee",function(require,module,exports,__d
 });
 
 require.define("/src/init.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Animation, Frame, Global, ImageView, ScrollView, View, ViewList, css, debug, k, utils, v;
+  var Animation, Frame, Global, ImageView, Matrix, ScrollView, View, ViewList, css, debug, k, utils, v;
 
   css = require("./css");
 
@@ -3666,6 +3641,8 @@ require.define("/src/init.coffee",function(require,module,exports,__dirname,__fi
 
   Frame = require("./primitives/frame").Frame;
 
+  Matrix = require("./primitives/matrix").Matrix;
+
   Global = {};
 
   Global.View = View;
@@ -3677,6 +3654,8 @@ require.define("/src/init.coffee",function(require,module,exports,__dirname,__fi
   Global.Animation = Animation;
 
   Global.Frame = Frame;
+
+  Global.Matrix = Matrix;
 
   Global.utils = utils;
 
