@@ -256,7 +256,25 @@ class View extends Frame
 	
 	@define "subViews"
 		get: -> @_subViews
+
+	@define "index"
+	  get: -> @_index or 0
+	  set: (value) ->
+	    @_index = value
+	    @style['z-index'] = value
+	    @emit "change:index"
 	
+	placeBefore: (view) ->
+	  @index = view.index + 1
+
+	placeBehind: (view) ->
+	  @index = view.index - 1
+
+	switchPlaces: (view) ->
+	  our_i      = @index
+	  their_i    = view.index
+	  view.index = our_i
+	  @index     = their_i
 
 	# Animation
 
@@ -407,6 +425,7 @@ View.Properties = utils.extend Frame.Properties,
 	class: ""
 	superView: null
 	visible: true
+	index: 0
 
 View.Views = []
 
