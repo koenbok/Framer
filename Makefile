@@ -14,4 +14,4 @@ test:
 clean:
 	rm -rf dist
 
-.PHONY: build clean
+.PHONY: build test clean
