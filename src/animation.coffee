@@ -1,3 +1,4 @@
+_ = require "underscore"
 utils = require "../utils"
 css = require "../css"
 
@@ -76,12 +77,21 @@ class Animation extends EventEmitter
 			# console.log "#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
 		
 		@keyFrameAnimationCSS = @_css()
+		
+		# console.log @keyFrameAnimationCSS
 	
 	start: (callback) =>
 		
 		# console.log "Animation.start #{@animationName}"
 		
-		# TODO: see if other animations are running and cancel them
+		# We stop all other animations on this view. Maybe we should revisit
+		# this or give an option to disable it, but for now it makes sens because 1)
+		# you almost always want this and 2) we don't support simultaneous animations.
+		
+		# TODO: This breaks stuff.
+		# @view.animateStop()
+		
+		@view._currentAnimations.push @
 		
 		css.addStyle "
 			#{@keyFrameAnimationCSS}
@@ -94,42 +104,45 @@ class Animation extends EventEmitter
 			
 			}"
 
-		@view.class += " #{@animationName}"
+		@view.addClass @animationName
 			
 		finalize = =>
+			# Copy over the end state properties for this animation so we can safely
+			# remove the animation.
+			@view._matrix = utils.extend new Matrix(), @propertiesB
 			
-			@view._element.removeEventListener "webkitAnimationEnd", finalize
-			@view.removeClass @animationName
-			
-			m = new Matrix()
-			
-			for k, v of @propertiesB
-				m[k] = @propertiesB[k]
-			
-			m.set @view
-			
-			@emit "end"
 			callback?()
+			@cleanup()
 		
-		@view._element.addEventListener "webkitAnimationEnd", finalize
-		
+		@view.once "webkitAnimationEnd", finalize
 
-		
 	
 	stop: =>
 		@view.style["-webkit-animation-play-state"] = "paused"
-		@view._matrix = new WebKitCSSMatrix @view.computedStyle["-webkit-transform"]
-		@view.removeClass @keyFrameAnimation.name
+		
+		# Copy over the calculated properties at this point in the animation so
+		# we can safely remove it without the element jumping around.
+		@view._matrix = @view._computedMatrix()
+		
+		@cleanup()
+	
+	cleanup: =>
+		
+		# Remove this animation from the current ones for this view
+		@view._currentAnimations = _.without @view._currentAnimations, [@]
+		@view.removeClass @animationName
+		@emit "end"
 		
 	_css: ->
 		
-		animationName = @animationName
+		# Build the css for the keyframe animation. I wish there was a nicer
+		# way to do this, but this will work for now.
 		
 		stepIncrement = 0
 		stepDelta = 100 / (@curveValues.length - 1)
 		
 		cssString = []
-		cssString.push "@-webkit-keyframes #{animationName} {\n"
+		cssString.push "@-webkit-keyframes #{@animationName} {\n"
 		
 		deltas = {}
 		
