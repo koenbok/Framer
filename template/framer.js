@@ -404,7 +404,7 @@ require.define("/src/css.coffee",function(require,module,exports,__dirname,__fil
     return _STYLESHEET.innerHTML += css;
   };
 
-  exports.addStyle(".uilayer {	display: block;	visibility: visible;	position: absolute;	top:auto; right:auto; bottom:auto; left:auto;	width:auto; height:auto;	overflow: visible;	z-index:0;	opacity:1;	box-sizing: border-box;	-webkit-box-sizing: border-box;}.uilayer.textureBacked {	-webkit-transform: matrix3d(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);	-webkit-transform-origin: 50% 50% 0%;	-webkit-backface-visibility: preserve-3d;	-webkit-transform-style: flat;}.uilayer.animated {	-webkit-transition-duration: 500ms;	-webkit-transition-timing-function: linear;	-webkit-transition-delay: 0;	-webkit-transition-property: none;}");
+  exports.addStyle(".uilayer {	display: block;	visibility: visible;	position: absolute;	top:auto; right:auto; bottom:auto; left:auto;	width:auto; height:auto;	overflow: visible;	z-index:0;	opacity:1;	box-sizing: border-box;	-webkit-box-sizing: border-box;}.uilayer.textureBacked {	-webkit-transform: matrix3d(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);	-webkit-transform-origin: 50% 50% 0%;	-webkit-backface-visibility: hidden;	-webkit-transform-style: flat;}.uilayer.animated {	-webkit-transition-duration: 500ms;	-webkit-transition-timing-function: linear;	-webkit-transition-delay: 0;	-webkit-transition-property: none;}");
 
 }).call(this);
 
@@ -3010,7 +3010,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     __extends(Animation, _super);
 
-    Animation.prototype.AnimationProperties = ["view", "curve", "time", "origin", "tolerance", "precision"];
+    Animation.prototype.AnimationProperties = ["view", "properties", "curve", "time", "origin", "tolerance", "precision"];
 
     Animation.prototype.AnimatableCSSProperties = {
       opacity: "",
@@ -3021,13 +3021,16 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     Animation.prototype.AnimatableMatrixProperties = ["x", "y", "z", "scaleX", "scaleY", "scaleZ", "rotateX", "rotateY", "rotateZ"];
 
     function Animation(args) {
-      this.cleanup = __bind(this.cleanup, this);
+      this._cleanup = __bind(this._cleanup, this);
+
+      this.reverse = __bind(this.reverse, this);
 
       this.stop = __bind(this.stop, this);
 
       this.start = __bind(this.start, this);
 
-      var k, p, propertiesA, propertiesB, v, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
+      var p, _i, _len, _ref, _ref1, _ref2, _ref3;
+      console.log("Animation.constructor", args);
       _ref = this.AnimationProperties;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         p = _ref[_i];
@@ -3043,9 +3046,18 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         this.precision = 30;
       }
       this.curveValues = this._parseCurve(this.curve);
-      this.animationName = "framer-animation-" + (utils.uuid().slice(0, 9));
+      this.count = 0;
+      this.animationId = utils.uuid().slice(0, 9);
+    }
+
+    Animation.prototype.start = function(callback) {
+      var finalize, k, propertiesA, propertiesB, v, _i, _len, _ref, _ref1,
+        _this = this;
+      this.count++;
+      this.animationName = "framer-animation-" + this.animationId + "-" + this.count;
+      console.log("Animation.start " + this.animationName);
       propertiesA = this.view.properties;
-      propertiesB = args.properties;
+      propertiesB = this.properties;
       if (propertiesB.scale) {
         propertiesB.scaleX = propertiesB.scale;
         propertiesB.scaleY = propertiesB.scale;
@@ -3055,9 +3067,9 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       }
       this.propertiesA = {};
       this.propertiesB = {};
-      _ref4 = this.AnimatableMatrixProperties;
-      for (_j = 0, _len1 = _ref4.length; _j < _len1; _j++) {
-        k = _ref4[_j];
+      _ref = this.AnimatableMatrixProperties;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        k = _ref[_i];
         this.propertiesA[k] = propertiesA[k];
         if (propertiesB.hasOwnProperty(k)) {
           this.propertiesB[k] = propertiesB[k];
@@ -3065,41 +3077,32 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
           this.propertiesB[k] = propertiesA[k];
         }
       }
-      _ref5 = this.AnimatableCSSProperties;
-      for (k in _ref5) {
-        v = _ref5[k];
+      _ref1 = this.AnimatableCSSProperties;
+      for (k in _ref1) {
+        v = _ref1[k];
         if (propertiesB.hasOwnProperty(k)) {
           this.propertiesA[k] = propertiesA[k];
           this.propertiesB[k] = propertiesB[k];
         }
       }
       this.keyFrameAnimationCSS = this._css();
-    }
-
-    Animation.prototype.start = function(callback) {
-      var finalize, k,
-        _this = this;
-      console.log("Animation.start " + this.animationName);
-      for (k in this.propertiesA) {
-        console.log(" ." + k + " " + this.propertiesA[k] + " -> " + this.propertiesB[k]);
-      }
       this.view._currentAnimations.push(this);
       css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.time / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;			}");
       this.view.addClass(this.animationName);
       finalize = function() {
-        var calculatedStyles, v, _ref;
+        var calculatedStyles, _ref2;
         _this.view._matrix = utils.extend(new Matrix(), _this.propertiesB);
         calculatedStyles = {};
-        _ref = _this.AnimatableCSSProperties;
-        for (k in _ref) {
-          v = _ref[k];
+        _ref2 = _this.AnimatableCSSProperties;
+        for (k in _ref2) {
+          v = _ref2[k];
           calculatedStyles[k] = _this.propertiesB[k] + v;
         }
         _this.view.style = calculatedStyles;
         if (typeof callback === "function") {
           callback();
         }
-        return _this.cleanup();
+        return _this._cleanup();
       };
       return this.view.once("webkitAnimationEnd", finalize);
     };
@@ -3116,10 +3119,27 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         calculatedStyles[k] = computedStyles;
       }
       this.view.style = calculatedStyles;
-      return this.cleanup();
+      return this._cleanup();
     };
 
-    Animation.prototype.cleanup = function() {
+    Animation.prototype.reverse = function() {
+      var k, options, p, v, _i, _len, _ref, _ref1;
+      options = {};
+      _ref = this.AnimationProperties;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        p = _ref[_i];
+        options[p] = this[p];
+      }
+      options.properties = {};
+      _ref1 = this.properties;
+      for (k in _ref1) {
+        v = _ref1[k];
+        options.properties[k] = this.view[k];
+      }
+      return new Animation(options);
+    };
+
+    Animation.prototype._cleanup = function() {
       this.view._currentAnimations = _.without(this.view._currentAnimations, [this]);
       this.view.removeClass(this.animationName);
       return this.emit("end");

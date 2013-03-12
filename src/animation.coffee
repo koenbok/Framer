@@ -23,7 +23,10 @@ parseCurve = (a, prefix) ->
 
 class Animation extends EventEmitter
 	
-	AnimationProperties: ["view", "curve", "time", "origin", "tolerance", "precision"]
+	AnimationProperties: [
+		"view", "properties", "curve", "time", 
+		"origin", "tolerance", "precision"
+	]
 	AnimatableCSSProperties: {
 		opacity: "",
 		width: "px",
@@ -37,26 +40,31 @@ class Animation extends EventEmitter
 
 	constructor: (args) ->
 		
+		console.log "Animation.constructor", args
+		
 		# Set all properties
 		for p in @AnimationProperties
 			@[p] = args[p]
 		
 		# Set all the defaults
-		
 		@time ?= 1000
 		@curve ?= "linear"
 		@precision ?= 30
-		
 		@curveValues = @_parseCurve @curve
+		@count = 0
+		@animationId = utils.uuid()[..8]
+
+	start: (callback) =>
 		
-		@animationName = "framer-animation-#{utils.uuid()[..8]}"
+		@count++
+		@animationName = "framer-animation-#{@animationId}-#{@count}"
 		
-		# Clean up the animation wishes
+		console.log "Animation.start #{@animationName}"
 		
 		# TODO: test if we are trying to animate something that cannot animate
 		
 		propertiesA = @view.properties
-		propertiesB = args.properties
+		propertiesB = @properties
 		
 		# Set the derived properties scale and rotation
 		if propertiesB.scale
@@ -66,10 +74,8 @@ class Animation extends EventEmitter
 		if propertiesB.rotate
 			propertiesB.rotateZ = propertiesB.rotate
 			
-		
 		@propertiesA = {}
 		@propertiesB = {}
-		
 		
 		# Build up the matrix animation properties
 		
@@ -89,18 +95,11 @@ class Animation extends EventEmitter
 			if propertiesB.hasOwnProperty k
 				@propertiesA[k] = propertiesA[k]
 				@propertiesB[k] = propertiesB[k]
-			
 		
 		@keyFrameAnimationCSS = @_css()
 		
-		# console.log @keyFrameAnimationCSS
-	
-	start: (callback) =>
-		
-		console.log "Animation.start #{@animationName}"
-		
-		for k of @propertiesA
-			console.log " .#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
+		# for k of @propertiesA
+		# 	console.log " .#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
 		
 		# We stop all other animations on this view. Maybe we should revisit
 		# this or give an option to disable it, but for now it makes sens because 1)
@@ -136,7 +135,7 @@ class Animation extends EventEmitter
 			@view.style = calculatedStyles
 			
 			callback?()
-			@cleanup()
+			@_cleanup()
 		
 		@view.once "webkitAnimationEnd", finalize
 
@@ -155,9 +154,25 @@ class Animation extends EventEmitter
 			calculatedStyles[k] = computedStyles 
 		@view.style = calculatedStyles
 		
-		@cleanup()
+		@_cleanup()
 	
-	cleanup: =>
+	reverse: =>
+		
+		# Return the inverse of this animation
+
+		options = {}
+		
+		for p in @AnimationProperties
+			options[p] = @[p]
+		
+		options.properties = {}
+
+		for k, v of @properties
+			options.properties[k] = @view[k]
+			
+		return new Animation options
+	
+	_cleanup: =>
 		
 		# Remove this animation from the current ones for this view
 		@view._currentAnimations = _.without @view._currentAnimations, [@]
