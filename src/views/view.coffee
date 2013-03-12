@@ -247,7 +247,7 @@ class View extends Frame
 	
 	@define "opacity"
 		get: -> 
-			@style.opacity or 1
+			parseFloat @style.opacity or 1
 		set: (value) -> 
 			@style.opacity = value
 			@style["opacity"] = value

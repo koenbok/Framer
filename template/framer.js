@@ -404,7 +404,7 @@ require.define("/src/css.coffee",function(require,module,exports,__dirname,__fil
     return _STYLESHEET.innerHTML += css;
   };
 
-  exports.addStyle(".uilayer {	display: block;	visibility: visible;	position: absolute;	top:auto; right:auto; bottom:auto; left:auto;	width:auto; height:auto;	overflow: visible;	z-index:0;	opacity:1;	box-sizing: border-box;	-webkit-box-sizing: border-box;}.uilayer.textureBacked {	-webkit-transform: matrix3d(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);	-webkit-transform-origin: 50% 50% 0%;	-webkit-backface-visibility: hidden;	-webkit-transform-style: flat;}.uilayer.animated {	-webkit-transition-duration: 500ms;	-webkit-transition-timing-function: linear;	-webkit-transition-delay: 0;	-webkit-transition-property: none;}");
+  exports.addStyle(".uilayer {	display: block;	visibility: visible;	position: absolute;	top:auto; right:auto; bottom:auto; left:auto;	width:auto; height:auto;	overflow: visible;	z-index:0;	opacity:1;	box-sizing: border-box;	-webkit-box-sizing: border-box;}.uilayer.textureBacked {	-webkit-transform: matrix3d(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);	-webkit-transform-origin: 50% 50% 0%;	-webkit-backface-visibility: preserve-3d;	-webkit-transform-style: flat;}.uilayer.animated {	-webkit-transition-duration: 500ms;	-webkit-transition-timing-function: linear;	-webkit-transition-delay: 0;	-webkit-transition-property: none;}");
 
 }).call(this);
 
@@ -1050,7 +1050,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
 
     View.define("opacity", {
       get: function() {
-        return this.style.opacity || 1;
+        return parseFloat(this.style.opacity || 1);
       },
       set: function(value) {
         this.style.opacity = value;
@@ -3012,7 +3012,13 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     Animation.prototype.AnimationProperties = ["view", "curve", "time", "origin", "tolerance", "precision"];
 
-    Animation.prototype.AnimatableProperties = ["x", "y", "z", "scaleX", "scaleY", "scaleZ", "rotateX", "rotateY", "rotateZ"];
+    Animation.prototype.AnimatableCSSProperties = {
+      opacity: "",
+      width: "px",
+      height: "px"
+    };
+
+    Animation.prototype.AnimatableMatrixProperties = ["x", "y", "z", "scaleX", "scaleY", "scaleZ", "rotateX", "rotateY", "rotateZ"];
 
     function Animation(args) {
       this.cleanup = __bind(this.cleanup, this);
@@ -3021,7 +3027,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
       this.start = __bind(this.start, this);
 
-      var k, p, propertiesA, propertiesB, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3, _ref4;
+      var k, p, propertiesA, propertiesB, v, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
       _ref = this.AnimationProperties;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         p = _ref[_i];
@@ -3049,7 +3055,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       }
       this.propertiesA = {};
       this.propertiesB = {};
-      _ref4 = this.AnimatableProperties;
+      _ref4 = this.AnimatableMatrixProperties;
       for (_j = 0, _len1 = _ref4.length; _j < _len1; _j++) {
         k = _ref4[_j];
         this.propertiesA[k] = propertiesA[k];
@@ -3059,17 +3065,37 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
           this.propertiesB[k] = propertiesA[k];
         }
       }
+      _ref5 = this.AnimatableCSSProperties;
+      for (k in _ref5) {
+        v = _ref5[k];
+        if (propertiesB.hasOwnProperty(k)) {
+          this.propertiesA[k] = propertiesA[k];
+          this.propertiesB[k] = propertiesB[k];
+        }
+      }
       this.keyFrameAnimationCSS = this._css();
     }
 
     Animation.prototype.start = function(callback) {
-      var finalize,
+      var finalize, k,
         _this = this;
+      console.log("Animation.start " + this.animationName);
+      for (k in this.propertiesA) {
+        console.log(" ." + k + " " + this.propertiesA[k] + " -> " + this.propertiesB[k]);
+      }
       this.view._currentAnimations.push(this);
-      css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.time / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;						}");
+      css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.time / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;			}");
       this.view.addClass(this.animationName);
       finalize = function() {
+        var calculatedStyles, v, _ref;
         _this.view._matrix = utils.extend(new Matrix(), _this.propertiesB);
+        calculatedStyles = {};
+        _ref = _this.AnimatableCSSProperties;
+        for (k in _ref) {
+          v = _ref[k];
+          calculatedStyles[k] = _this.propertiesB[k] + v;
+        }
+        _this.view.style = calculatedStyles;
         if (typeof callback === "function") {
           callback();
         }
@@ -3079,8 +3105,17 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     };
 
     Animation.prototype.stop = function() {
+      var calculatedStyles, computedStyles, k, v, _ref;
       this.view.style["-webkit-animation-play-state"] = "paused";
       this.view._matrix = this.view._computedMatrix();
+      calculatedStyles = {};
+      computedStyles = this.view.computedStyles;
+      _ref = this.AnimatableCSSProperties;
+      for (k in _ref) {
+        v = _ref[k];
+        calculatedStyles[k] = computedStyles;
+      }
+      this.view.style = calculatedStyles;
       return this.cleanup();
     };
 
@@ -3104,16 +3139,24 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         deltas[propertyName] = (this.propertiesB[propertyName] - this.propertiesA[propertyName]) / 100.0;
       }
       this.curveValues.map(function(springValue) {
-        var m, position, _ref1;
+        var m, position, unit, _i, _len, _ref1, _ref2;
         position = stepIncrement * stepDelta;
         cssString.push("\t" + (position.toFixed(2)) + "%\t{ -webkit-transform: ");
         m = new Matrix();
-        _ref1 = _this.propertiesA;
-        for (propertyName in _ref1) {
-          value = _ref1[propertyName];
-          m[propertyName] = springValue * deltas[propertyName] + _this.propertiesA[propertyName];
+        _ref1 = _this.AnimatableMatrixProperties;
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          propertyName = _ref1[_i];
+          value = springValue * deltas[propertyName] + _this.propertiesA[propertyName];
+          m[propertyName] = value;
         }
-        cssString.push(m.matrix().cssValues() + "; }\n");
+        cssString.push(m.matrix().cssValues() + "; ");
+        _ref2 = _this.AnimatableCSSProperties;
+        for (propertyName in _ref2) {
+          unit = _ref2[propertyName];
+          value = springValue * deltas[propertyName] + _this.propertiesA[propertyName];
+          cssString.push("" + propertyName + ":" + (value.toFixed(5)) + unit + "; ");
+        }
+        cssString.push("}\n");
         return stepIncrement++;
       });
       cssString.push("}\n");

@@ -24,10 +24,15 @@ parseCurve = (a, prefix) ->
 class Animation extends EventEmitter
 	
 	AnimationProperties: ["view", "curve", "time", "origin", "tolerance", "precision"]
-	AnimatableProperties: [
+	AnimatableCSSProperties: {
+		opacity: "",
+		width: "px",
+		height: "px",
+	}
+	AnimatableMatrixProperties: [
 		"x", "y", "z", 
-		"scaleX", "scaleY", "scaleZ", #"scale",  
-		"rotateX", "rotateY", "rotateZ", #"rotate"
+		"scaleX", "scaleY", "scaleZ", # "scale",  
+		"rotateX", "rotateY", "rotateZ", # "rotate"
 	] # width, height, opacity
 
 	constructor: (args) ->
@@ -65,7 +70,10 @@ class Animation extends EventEmitter
 		@propertiesA = {}
 		@propertiesB = {}
 		
-		for k in @AnimatableProperties 
+		
+		# Build up the matrix animation properties
+		
+		for k in @AnimatableMatrixProperties 
 			
 			@propertiesA[k] = propertiesA[k]
 			
@@ -74,7 +82,14 @@ class Animation extends EventEmitter
 			else
 				@propertiesB[k] = propertiesA[k]
 			
-			# console.log "#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
+		# Build up the css animation properties
+		
+		for k, v of @AnimatableCSSProperties
+			
+			if propertiesB.hasOwnProperty k
+				@propertiesA[k] = propertiesA[k]
+				@propertiesB[k] = propertiesB[k]
+			
 		
 		@keyFrameAnimationCSS = @_css()
 		
@@ -82,7 +97,10 @@ class Animation extends EventEmitter
 	
 	start: (callback) =>
 		
-		# console.log "Animation.start #{@animationName}"
+		console.log "Animation.start #{@animationName}"
+		
+		for k of @propertiesA
+			console.log " .#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
 		
 		# We stop all other animations on this view. Maybe we should revisit
 		# this or give an option to disable it, but for now it makes sens because 1)
@@ -101,15 +119,21 @@ class Animation extends EventEmitter
 				-webkit-animation-name: #{@animationName};
 				-webkit-animation-timing-function: linear;
 				-webkit-animation-fill-mode: both;
-			
 			}"
 
 		@view.addClass @animationName
 			
 		finalize = =>
+			
 			# Copy over the end state properties for this animation so we can safely
 			# remove the animation.
 			@view._matrix = utils.extend new Matrix(), @propertiesB
+			
+			# Copy over the end state css properties
+			calculatedStyles = {}
+			for k, v of @AnimatableCSSProperties
+				calculatedStyles[k] = @propertiesB[k] + v
+			@view.style = calculatedStyles
 			
 			callback?()
 			@cleanup()
@@ -123,6 +147,13 @@ class Animation extends EventEmitter
 		# Copy over the calculated properties at this point in the animation so
 		# we can safely remove it without the element jumping around.
 		@view._matrix = @view._computedMatrix()
+		
+		# Copy over the end state css properties
+		calculatedStyles = {}
+		computedStyles = @view.computedStyles
+		for k, v of @AnimatableCSSProperties
+			calculatedStyles[k] = computedStyles 
+		@view.style = calculatedStyles
 		
 		@cleanup()
 	
@@ -155,16 +186,24 @@ class Animation extends EventEmitter
 
 			cssString.push "\t#{position.toFixed(2)}%\t{ -webkit-transform: "
 			
+			# Add the matrix based values
+			
 			m = new Matrix()
 			
-			for propertyName, value of @propertiesA
-				m[propertyName] = springValue * deltas[propertyName] + @propertiesA[propertyName]
+			for propertyName in @AnimatableMatrixProperties
+				value = springValue * deltas[propertyName] + @propertiesA[propertyName]
+				m[propertyName] = value
+			
+			cssString.push m.matrix().cssValues() + "; "
+			
+			for propertyName, unit of @AnimatableCSSProperties
+				value = springValue * deltas[propertyName] + @propertiesA[propertyName]
+				cssString.push "#{propertyName}:#{value.toFixed 5}#{unit}; "
 				
-			cssString.push m.matrix().cssValues() + "; }\n"
+			cssString.push "}\n"
 			
 			stepIncrement++
 			
-
 		cssString.push "}\n"
 		
 		return cssString.join ""
