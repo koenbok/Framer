@@ -411,8 +411,11 @@ require.define("/src/css.coffee",function(require,module,exports,__dirname,__fil
 });
 
 require.define("/src/utils.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
+  var _,
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     __slice = [].slice;
+
+  _ = require("underscore");
 
   Function.prototype.define = function(prop, desc) {
     Object.defineProperty(this.prototype, prop, desc);
@@ -472,9 +475,21 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
     return Array.prototype.concat.apply(Array.prototype, arguments);
   };
 
+  exports.remove = function(a, e) {
+    var t;
+    if ((t = a.indexOf(e)) > -1) {
+      a.splice(t, 1)[0];
+    }
+    return a;
+  };
+
   exports.toggle = function() {
     var args, curr;
-    args = Array.prototype.slice.call(arguments);
+    if (_.isArray(arguments[0])) {
+      args = arguments[0];
+    } else {
+      args = Array.prototype.slice.call(arguments);
+    }
     curr = -1;
     return function() {
       curr++;
@@ -512,14 +527,6 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
     }
     window._delayIntervals.push(timer);
     return timer;
-  };
-
-  exports.remove = function(a, e) {
-    var t;
-    if ((t = a.indexOf(e)) > -1) {
-      a.splice(t, 1)[0];
-    }
-    return a;
   };
 
   exports.debounce = function(func, threshold, execAsap) {
@@ -657,607 +664,6 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
     isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
     return true === isChrome || true === isSafari;
   };
-
-}).call(this);
-
-});
-
-require.define("/src/debug.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var utils;
-
-  utils = require("./utils");
-
-  exports.debug = function() {
-    if (document._togglingDebug === true) {
-      return;
-    }
-    document._togglingDebug = true;
-    View.Views.map(function(view, i) {
-      var color, node;
-      if (view._debug) {
-        view._element.removeChild(view._debug.node);
-        view.style = view._debug.style;
-        return delete view._debug;
-      } else {
-        color = "rgba(50,150,200,.35)";
-        node = document.createElement("div");
-        node.innerHTML = "" + (view.name || view.id);
-        if (view.superView) {
-          node.innerHTML += " <span style='opacity:.5'>in " + (view.superView.name || view.superView.id) + "</span>";
-        }
-        node.style.position = "absolute";
-        node.style.padding = "3px";
-        view._debug = {
-          style: utils.extend({}, view.style),
-          node: node
-        };
-        view._element.appendChild(node);
-        return view.style = {
-          color: "white",
-          margin: "-1px",
-          font: "10px/1em Monaco",
-          backgroundColor: "" + color,
-          border: "1px solid " + color,
-          backgroundImage: null
-        };
-      }
-    });
-    return document._togglingDebug = false;
-  };
-
-  window.document.onkeydown = function(event) {
-    if (event.keyCode === 27) {
-      return exports.debug();
-    }
-  };
-
-  window.onerror = function(e) {
-    var errorView;
-    errorView = new View({
-      x: 20,
-      y: 20,
-      width: 350,
-      height: 60
-    });
-    errorView.html = "<b>Javascript Error</b><br>Inspect the error console for more info.";
-    errorView.style = {
-      font: "13px/1.3em Menlo, Monaco",
-      backgroundColor: "rgba(255,0,0,0.5)",
-      padding: "12px",
-      border: "1px solid rgba(255,0,0,0.5)",
-      borderRadius: "5px"
-    };
-    errorView.scale = 0.5;
-    return errorView.animate({
-      properties: {
-        scale: 1.0
-      },
-      curve: "spring(150,8,1500)"
-    });
-  };
-
-}).call(this);
-
-});
-
-require.define("/src/views/view.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Animation, EventClass, EventEmitter, EventTypes, Frame, Matrix, View, utils, _,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  utils = require("../utils");
-
-  _ = require("underscore");
-
-  Frame = require("../primitives/frame").Frame;
-
-  Matrix = require("../primitives/matrix").Matrix;
-
-  EventTypes = require("../primitives/events").EventTypes;
-
-  EventClass = require("../primitives/events").EventClass;
-
-  EventEmitter = require("../eventemitter").EventEmitter;
-
-  Animation = require("../animation").Animation;
-
-  exports.ViewList = [];
-
-  View = (function(_super) {
-
-    __extends(View, _super);
-
-    function View(args) {
-      this.__insertElement = __bind(this.__insertElement, this);
-
-      this.animate = __bind(this.animate, this);
-      if (args == null) {
-        args = {};
-      }
-      View.Views.push(this);
-      this.id = View.Views.length;
-      this._element = document.createElement("div");
-      this._element.id = this.id;
-      this.addClass("uilayer");
-      this.clip = args.clip || View.Properties.clip;
-      this.properties = args;
-      if (!args.superView) {
-        this._insertElement();
-      }
-      this._subViews = [];
-      this._currentAnimations = [];
-      this._postCreate();
-    }
-
-    View.prototype._postCreate = function() {};
-
-    View.define("name", {
-      get: function() {
-        return this._name || this.id;
-      },
-      set: function(value) {
-        this._name = value;
-        return this._element.setAttribute("name", this._name);
-      }
-    });
-
-    View.define("properties", {
-      get: function() {
-        var key, p, value, _ref;
-        p = {};
-        _ref = View.Properties;
-        for (key in _ref) {
-          value = _ref[key];
-          p[key] = this[key] || View.Properties[key];
-        }
-        return p;
-      },
-      set: function(args) {
-        var key, value, _ref, _ref1, _ref2, _ref3, _results;
-        _ref = View.Properties;
-        for (key in _ref) {
-          value = _ref[key];
-          if ((_ref1 = args[key]) !== null && _ref1 !== (void 0)) {
-            this[key] = args[key];
-          }
-        }
-        _ref2 = Frame.CalculatedProperties;
-        _results = [];
-        for (key in _ref2) {
-          value = _ref2[key];
-          if ((_ref3 = args[key]) !== null && _ref3 !== (void 0)) {
-            _results.push(this[key] = args[key]);
-          } else {
-            _results.push(void 0);
-          }
-        }
-        return _results;
-      }
-    });
-
-    View.define("frame", {
-      get: function() {
-        return new Frame({
-          x: this.x,
-          y: this.y,
-          width: this.width,
-          height: this.height
-        });
-      },
-      set: function(value) {
-        var p, _i, _len, _ref, _results;
-        if (!value) {
-          return;
-        }
-        _ref = ["x", "y", "width", "height"];
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          p = _ref[_i];
-          _results.push(this[p] = value[p]);
-        }
-        return _results;
-      }
-    });
-
-    View.prototype.convertPoint = function(point) {
-      return utils.convertPoint(point, null, this);
-    };
-
-    View.prototype.screenFrame = function() {
-      return utils.convertPoint(this.frame, this, null);
-    };
-
-    View.define("width", {
-      get: function() {
-        return parseFloat(this.style.width);
-      },
-      set: function(value) {
-        this.style.width = "" + value + "px";
-        this.emit("change:width");
-        return this.emit("change:frame");
-      }
-    });
-
-    View.define("height", {
-      get: function() {
-        return parseFloat(this.style.height);
-      },
-      set: function(value) {
-        this.style.height = "" + value + "px";
-        this.emit("change:height");
-        return this.emit("change:frame");
-      }
-    });
-
-    View.define("x", {
-      get: function() {
-        return this._matrix.x;
-      },
-      set: function(value) {
-        this._matrix.x = value;
-        this._matrix = this._matrix;
-        this.emit("change:x");
-        return this.emit("change:frame");
-      }
-    });
-
-    View.define("y", {
-      get: function() {
-        return this._matrix.y;
-      },
-      set: function(value) {
-        this._matrix.y = value;
-        this._matrix = this._matrix;
-        this.emit("change:y");
-        return this.emit("change:frame");
-      }
-    });
-
-    View.define("z", {
-      get: function() {
-        return this._matrix.z;
-      },
-      set: function(value) {
-        this._matrix.z = value;
-        this._matrix = this._matrix;
-        this.emit("change:z");
-        return this.emit("change:frame");
-      }
-    });
-
-    View.define("scale", {
-      get: function() {
-        return this._matrix.scale;
-      },
-      set: function(value) {
-        this._matrix.scale = value;
-        this._matrix = this._matrix;
-        return this.emit("change:scale");
-      }
-    });
-
-    View.define("scaleX", {
-      get: function() {
-        return this._matrix.scaleX;
-      },
-      set: function(value) {
-        this._matrix.scaleX = value;
-        this._matrix = this._matrix;
-        this.emit("change:scaleX");
-        return this.emit("change:scale");
-      }
-    });
-
-    View.define("scaleY", {
-      get: function() {
-        return this._matrix.scaleY;
-      },
-      set: function(value) {
-        this._matrix.scaleY = value;
-        this._matrix = this._matrix;
-        this.emit("change:scaleY");
-        return this.emit("change:scale");
-      }
-    });
-
-    View.define("scaleZ", {
-      get: function() {
-        return this._matrix.scaleZ;
-      },
-      set: function(value) {
-        this._matrix.scaleZ = value;
-        this._matrix = this._matrix;
-        this.emit("change:scaleZ");
-        return this.emit("change:scale");
-      }
-    });
-
-    View.define("rotate", {
-      get: function() {
-        return this._matrix.rotate;
-      },
-      set: function(value) {
-        this._matrix.rotate = value;
-        this._matrix = this._matrix;
-        return this.emit("change:rotate");
-      }
-    });
-
-    View.define("rotateX", {
-      get: function() {
-        return this._matrix.rotateX;
-      },
-      set: function(value) {
-        this._matrix.rotateX = value;
-        this._matrix = this._matrix;
-        this.emit("change:rotateX");
-        return this.emit("change:rotate");
-      }
-    });
-
-    View.define("rotateY", {
-      get: function() {
-        return this._matrix.rotateY;
-      },
-      set: function(value) {
-        this._matrix.rotateY = value;
-        this._matrix = this._matrix;
-        this.emit("change:rotateX");
-        return this.emit("change:rotate");
-      }
-    });
-
-    View.define("rotateZ", {
-      get: function() {
-        return this._matrix.rotateZ;
-      },
-      set: function(value) {
-        this._matrix.rotateZ = value;
-        this._matrix = this._matrix;
-        this.emit("change:rotateZ");
-        return this.emit("change:rotate");
-      }
-    });
-
-    View.define("_matrix", {
-      get: function() {
-        if (!this.__matrix) {
-          this.__matrix = new Matrix(new WebKitCSSMatrix(this._element.style.webkitTransform));
-        }
-        return this.__matrix;
-      },
-      set: function(matrix) {
-        if (!matrix) {
-          this.__matrix = null;
-          this.style.webkitTransform = null;
-          return;
-        }
-        if (matrix instanceof WebKitCSSMatrix) {
-          matrix = new Matrix(matrix);
-        }
-        if (!matrix instanceof Matrix) {
-          throw Error("View._matrix.set should be Matrix not " + (typeof matrix));
-        }
-        this.__matrix = matrix;
-        return this.style.webkitTransform = this.__matrix.matrix().cssValues();
-      }
-    });
-
-    View.prototype._computedMatrix = function() {
-      return new WebKitCSSMatrix(this.computedStyle.webkitTransform);
-    };
-
-    View.define("opacity", {
-      get: function() {
-        return parseFloat(this.style.opacity || 1);
-      },
-      set: function(value) {
-        this.style.opacity = value;
-        this.style["opacity"] = value;
-        return this.emit("change:opacity");
-      }
-    });
-
-    View.define("clip", {
-      get: function() {
-        return this._clip;
-      },
-      set: function(value) {
-        this._clip = value;
-        if (value === true) {
-          this.style.overflow = "hidden";
-        }
-        if (value === false) {
-          this.style.overflow = "visible";
-        }
-        return this.emit("change:clip");
-      }
-    });
-
-    View.define("visible", {
-      get: function() {
-        return this._visible;
-      },
-      set: function(value) {
-        this._visible = value;
-        if (value === true) {
-          this.style.display = "block";
-        }
-        if (value === false) {
-          this.style.display = "none";
-        }
-        return this.emit("change:visible");
-      }
-    });
-
-    View.prototype.removeFromSuperview = function() {
-      return this.superView = null;
-    };
-
-    View.define("superView", {
-      get: function() {
-        return this._superView || null;
-      },
-      set: function(value) {
-        if (value === this._superView) {
-          return;
-        }
-        document.removeEventListener("DOMContentLoaded", this.__insertElement);
-        if (this._superView) {
-          this._superView._element.removeChild(this._element);
-          utils.remove(this._superView._subViews, this);
-        }
-        if (value) {
-          value._element.appendChild(this._element);
-          value._subViews.push(this);
-        } else {
-          this.__insertElement();
-        }
-        this._superView = value;
-        return this.emit("change:superView");
-      }
-    });
-
-    View.define("subViews", {
-      get: function() {
-        return this._subViews;
-      }
-    });
-
-    View.prototype.animate = function(args, callback) {
-      var animation;
-      args.view = this;
-      animation = new Animation(args);
-      animation.start(callback);
-      return animation;
-    };
-
-    View.prototype.animateStop = function() {
-      return this._currentAnimations.map(function(animation) {
-        return animation.stop();
-      });
-    };
-
-    View.define("html", {
-      get: function() {
-        return this._element.innerHTML;
-      },
-      set: function(value) {
-        this._element.innerHTML = value;
-        return this.emit("change:html");
-      }
-    });
-
-    View.define("style", {
-      get: function() {
-        return this._element.style;
-      },
-      set: function(value) {
-        utils.extend(this._element.style, value);
-        return this.emit("change:style");
-      }
-    });
-
-    View.define("computedStyle", {
-      get: function() {
-        return document.defaultView.getComputedStyle(this._element);
-      },
-      set: function(value) {
-        throw Error("computedStyle is readonly");
-      }
-    });
-
-    View.define("class", {
-      get: function() {
-        return this._element.className;
-      },
-      set: function(value) {
-        this._element.className = value;
-        return this.emit("change:class");
-      }
-    });
-
-    View.define("classes", {
-      get: function() {
-        var classes;
-        classes = this["class"].split(" ");
-        classes = _(classes).filter(function(item) {
-          return item !== "" && item !== null;
-        });
-        classes = _(classes).unique();
-        return classes;
-      },
-      set: function(value) {
-        return this["class"] = value.join(" ");
-      }
-    });
-
-    View.prototype.addClass = function(className) {
-      var classes;
-      classes = this.classes;
-      classes.push(className);
-      return this.classes = classes;
-    };
-
-    View.prototype.removeClass = function(className) {
-      return this.classes = _.filter(this.classes, function(item) {
-        return item !== className;
-      });
-    };
-
-    View.prototype._insertElement = function() {
-      if (document.readyState === "complete" || document.readySate === "loaded") {
-        return this.__insertElement();
-      } else {
-        return document.addEventListener("DOMContentLoaded", this.__insertElement);
-      }
-    };
-
-    View.prototype.__insertElement = function() {
-      return document.body.appendChild(this._element);
-    };
-
-    View.prototype.addListener = function(event, listener) {
-      View.__super__.addListener.apply(this, arguments);
-      return this._element.addEventListener(event, listener);
-    };
-
-    View.prototype.removeListener = function(event, listener) {
-      View.__super__.removeListener.apply(this, arguments);
-      return this._element.removeEventListener(event, listener);
-    };
-
-    View.prototype.on = View.prototype.addListener;
-
-    View.prototype.off = View.prototype.removeListener;
-
-    return View;
-
-  })(Frame);
-
-  View.Properties = utils.extend(Frame.Properties, {
-    frame: null,
-    clip: true,
-    opacity: 1.0,
-    rotateX: 0,
-    rotateY: 0,
-    rotateZ: 0,
-    rotate: 0,
-    scale: 1.0,
-    scaleX: 1.0,
-    scaleY: 1.0,
-    scaleZ: 1.0,
-    style: null,
-    html: null,
-    "class": "",
-    superView: null,
-    visible: true
-  });
-
-  View.Views = [];
-
-  exports.View = View;
 
 }).call(this);
 
@@ -2464,6 +1870,607 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
     }
 
   });
+
+}).call(this);
+
+});
+
+require.define("/src/debug.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+  var utils;
+
+  utils = require("./utils");
+
+  exports.debug = function() {
+    if (document._togglingDebug === true) {
+      return;
+    }
+    document._togglingDebug = true;
+    View.Views.map(function(view, i) {
+      var color, node;
+      if (view._debug) {
+        view._element.removeChild(view._debug.node);
+        view.style = view._debug.style;
+        return delete view._debug;
+      } else {
+        color = "rgba(50,150,200,.35)";
+        node = document.createElement("div");
+        node.innerHTML = "" + (view.name || view.id);
+        if (view.superView) {
+          node.innerHTML += " <span style='opacity:.5'>in " + (view.superView.name || view.superView.id) + "</span>";
+        }
+        node.style.position = "absolute";
+        node.style.padding = "3px";
+        view._debug = {
+          style: utils.extend({}, view.style),
+          node: node
+        };
+        view._element.appendChild(node);
+        return view.style = {
+          color: "white",
+          margin: "-1px",
+          font: "10px/1em Monaco",
+          backgroundColor: "" + color,
+          border: "1px solid " + color,
+          backgroundImage: null
+        };
+      }
+    });
+    return document._togglingDebug = false;
+  };
+
+  window.document.onkeydown = function(event) {
+    if (event.keyCode === 27) {
+      return exports.debug();
+    }
+  };
+
+  window.onerror = function(e) {
+    var errorView;
+    errorView = new View({
+      x: 20,
+      y: 20,
+      width: 350,
+      height: 60
+    });
+    errorView.html = "<b>Javascript Error</b><br>Inspect the error console for more info.";
+    errorView.style = {
+      font: "13px/1.3em Menlo, Monaco",
+      backgroundColor: "rgba(255,0,0,0.5)",
+      padding: "12px",
+      border: "1px solid rgba(255,0,0,0.5)",
+      borderRadius: "5px"
+    };
+    errorView.scale = 0.5;
+    return errorView.animate({
+      properties: {
+        scale: 1.0
+      },
+      curve: "spring(150,8,1500)"
+    });
+  };
+
+}).call(this);
+
+});
+
+require.define("/src/views/view.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+  var Animation, EventClass, EventEmitter, EventTypes, Frame, Matrix, View, utils, _,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  utils = require("../utils");
+
+  _ = require("underscore");
+
+  Frame = require("../primitives/frame").Frame;
+
+  Matrix = require("../primitives/matrix").Matrix;
+
+  EventTypes = require("../primitives/events").EventTypes;
+
+  EventClass = require("../primitives/events").EventClass;
+
+  EventEmitter = require("../eventemitter").EventEmitter;
+
+  Animation = require("../animation").Animation;
+
+  exports.ViewList = [];
+
+  View = (function(_super) {
+
+    __extends(View, _super);
+
+    function View(args) {
+      this.__insertElement = __bind(this.__insertElement, this);
+
+      this.animate = __bind(this.animate, this);
+      if (args == null) {
+        args = {};
+      }
+      View.Views.push(this);
+      this.id = View.Views.length;
+      this._element = document.createElement("div");
+      this._element.id = this.id;
+      this.addClass("uilayer");
+      this.clip = args.clip || View.Properties.clip;
+      this.properties = args;
+      if (!args.superView) {
+        this._insertElement();
+      }
+      this._subViews = [];
+      this._currentAnimations = [];
+      this._postCreate();
+    }
+
+    View.prototype._postCreate = function() {};
+
+    View.define("name", {
+      get: function() {
+        return this._name || this.id;
+      },
+      set: function(value) {
+        this._name = value;
+        return this._element.setAttribute("name", this._name);
+      }
+    });
+
+    View.define("properties", {
+      get: function() {
+        var key, p, value, _ref;
+        p = {};
+        _ref = View.Properties;
+        for (key in _ref) {
+          value = _ref[key];
+          p[key] = this[key] || View.Properties[key];
+        }
+        return p;
+      },
+      set: function(args) {
+        var key, value, _ref, _ref1, _ref2, _ref3, _results;
+        _ref = View.Properties;
+        for (key in _ref) {
+          value = _ref[key];
+          if ((_ref1 = args[key]) !== null && _ref1 !== (void 0)) {
+            this[key] = args[key];
+          }
+        }
+        _ref2 = Frame.CalculatedProperties;
+        _results = [];
+        for (key in _ref2) {
+          value = _ref2[key];
+          if ((_ref3 = args[key]) !== null && _ref3 !== (void 0)) {
+            _results.push(this[key] = args[key]);
+          } else {
+            _results.push(void 0);
+          }
+        }
+        return _results;
+      }
+    });
+
+    View.define("frame", {
+      get: function() {
+        return new Frame({
+          x: this.x,
+          y: this.y,
+          width: this.width,
+          height: this.height
+        });
+      },
+      set: function(value) {
+        var p, _i, _len, _ref, _results;
+        if (!value) {
+          return;
+        }
+        _ref = ["x", "y", "width", "height"];
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          p = _ref[_i];
+          _results.push(this[p] = value[p]);
+        }
+        return _results;
+      }
+    });
+
+    View.prototype.convertPoint = function(point) {
+      return utils.convertPoint(point, null, this);
+    };
+
+    View.prototype.screenFrame = function() {
+      return utils.convertPoint(this.frame, this, null);
+    };
+
+    View.define("width", {
+      get: function() {
+        return parseFloat(this.style.width);
+      },
+      set: function(value) {
+        this.style.width = "" + value + "px";
+        this.emit("change:width");
+        return this.emit("change:frame");
+      }
+    });
+
+    View.define("height", {
+      get: function() {
+        return parseFloat(this.style.height);
+      },
+      set: function(value) {
+        this.style.height = "" + value + "px";
+        this.emit("change:height");
+        return this.emit("change:frame");
+      }
+    });
+
+    View.define("x", {
+      get: function() {
+        return this._matrix.x;
+      },
+      set: function(value) {
+        this._matrix.x = value;
+        this._matrix = this._matrix;
+        this.emit("change:x");
+        return this.emit("change:frame");
+      }
+    });
+
+    View.define("y", {
+      get: function() {
+        return this._matrix.y;
+      },
+      set: function(value) {
+        this._matrix.y = value;
+        this._matrix = this._matrix;
+        this.emit("change:y");
+        return this.emit("change:frame");
+      }
+    });
+
+    View.define("z", {
+      get: function() {
+        return this._matrix.z;
+      },
+      set: function(value) {
+        this._matrix.z = value;
+        this._matrix = this._matrix;
+        this.emit("change:z");
+        return this.emit("change:frame");
+      }
+    });
+
+    View.define("scale", {
+      get: function() {
+        return this._matrix.scale;
+      },
+      set: function(value) {
+        this._matrix.scale = value;
+        this._matrix = this._matrix;
+        return this.emit("change:scale");
+      }
+    });
+
+    View.define("scaleX", {
+      get: function() {
+        return this._matrix.scaleX;
+      },
+      set: function(value) {
+        this._matrix.scaleX = value;
+        this._matrix = this._matrix;
+        this.emit("change:scaleX");
+        return this.emit("change:scale");
+      }
+    });
+
+    View.define("scaleY", {
+      get: function() {
+        return this._matrix.scaleY;
+      },
+      set: function(value) {
+        this._matrix.scaleY = value;
+        this._matrix = this._matrix;
+        this.emit("change:scaleY");
+        return this.emit("change:scale");
+      }
+    });
+
+    View.define("scaleZ", {
+      get: function() {
+        return this._matrix.scaleZ;
+      },
+      set: function(value) {
+        this._matrix.scaleZ = value;
+        this._matrix = this._matrix;
+        this.emit("change:scaleZ");
+        return this.emit("change:scale");
+      }
+    });
+
+    View.define("rotate", {
+      get: function() {
+        return this._matrix.rotate;
+      },
+      set: function(value) {
+        this._matrix.rotate = value;
+        this._matrix = this._matrix;
+        return this.emit("change:rotate");
+      }
+    });
+
+    View.define("rotateX", {
+      get: function() {
+        return this._matrix.rotateX;
+      },
+      set: function(value) {
+        this._matrix.rotateX = value;
+        this._matrix = this._matrix;
+        this.emit("change:rotateX");
+        return this.emit("change:rotate");
+      }
+    });
+
+    View.define("rotateY", {
+      get: function() {
+        return this._matrix.rotateY;
+      },
+      set: function(value) {
+        this._matrix.rotateY = value;
+        this._matrix = this._matrix;
+        this.emit("change:rotateX");
+        return this.emit("change:rotate");
+      }
+    });
+
+    View.define("rotateZ", {
+      get: function() {
+        return this._matrix.rotateZ;
+      },
+      set: function(value) {
+        this._matrix.rotateZ = value;
+        this._matrix = this._matrix;
+        this.emit("change:rotateZ");
+        return this.emit("change:rotate");
+      }
+    });
+
+    View.define("_matrix", {
+      get: function() {
+        if (!this.__matrix) {
+          this.__matrix = new Matrix(new WebKitCSSMatrix(this._element.style.webkitTransform));
+        }
+        return this.__matrix;
+      },
+      set: function(matrix) {
+        if (!matrix) {
+          this.__matrix = null;
+          this.style.webkitTransform = null;
+          return;
+        }
+        if (matrix instanceof WebKitCSSMatrix) {
+          matrix = new Matrix(matrix);
+        }
+        if (!matrix instanceof Matrix) {
+          throw Error("View._matrix.set should be Matrix not " + (typeof matrix));
+        }
+        this.__matrix = matrix;
+        return this.style.webkitTransform = this.__matrix.matrix().cssValues();
+      }
+    });
+
+    View.prototype._computedMatrix = function() {
+      return new WebKitCSSMatrix(this.computedStyle.webkitTransform);
+    };
+
+    View.define("opacity", {
+      get: function() {
+        return parseFloat(this.style.opacity || 1);
+      },
+      set: function(value) {
+        this.style.opacity = value;
+        this.style["opacity"] = value;
+        return this.emit("change:opacity");
+      }
+    });
+
+    View.define("clip", {
+      get: function() {
+        return this._clip;
+      },
+      set: function(value) {
+        this._clip = value;
+        if (value === true) {
+          this.style.overflow = "hidden";
+        }
+        if (value === false) {
+          this.style.overflow = "visible";
+        }
+        return this.emit("change:clip");
+      }
+    });
+
+    View.define("visible", {
+      get: function() {
+        return this._visible;
+      },
+      set: function(value) {
+        this._visible = value;
+        if (value === true) {
+          this.style.display = "block";
+        }
+        if (value === false) {
+          this.style.display = "none";
+        }
+        return this.emit("change:visible");
+      }
+    });
+
+    View.prototype.removeFromSuperview = function() {
+      return this.superView = null;
+    };
+
+    View.define("superView", {
+      get: function() {
+        return this._superView || null;
+      },
+      set: function(value) {
+        if (value === this._superView) {
+          return;
+        }
+        document.removeEventListener("DOMContentLoaded", this.__insertElement);
+        if (this._superView) {
+          this._superView._element.removeChild(this._element);
+          utils.remove(this._superView._subViews, this);
+        }
+        if (value) {
+          value._element.appendChild(this._element);
+          value._subViews.push(this);
+        } else {
+          this.__insertElement();
+        }
+        this._superView = value;
+        return this.emit("change:superView");
+      }
+    });
+
+    View.define("subViews", {
+      get: function() {
+        return this._subViews;
+      }
+    });
+
+    View.prototype.animate = function(args, callback) {
+      var animation;
+      args.view = this;
+      animation = new Animation(args);
+      animation.start(callback);
+      return animation;
+    };
+
+    View.prototype.animateStop = function() {
+      return this._currentAnimations.map(function(animation) {
+        return animation.stop();
+      });
+    };
+
+    View.define("html", {
+      get: function() {
+        return this._element.innerHTML;
+      },
+      set: function(value) {
+        this._element.innerHTML = value;
+        return this.emit("change:html");
+      }
+    });
+
+    View.define("style", {
+      get: function() {
+        return this._element.style;
+      },
+      set: function(value) {
+        utils.extend(this._element.style, value);
+        return this.emit("change:style");
+      }
+    });
+
+    View.define("computedStyle", {
+      get: function() {
+        return document.defaultView.getComputedStyle(this._element);
+      },
+      set: function(value) {
+        throw Error("computedStyle is readonly");
+      }
+    });
+
+    View.define("class", {
+      get: function() {
+        return this._element.className;
+      },
+      set: function(value) {
+        this._element.className = value;
+        return this.emit("change:class");
+      }
+    });
+
+    View.define("classes", {
+      get: function() {
+        var classes;
+        classes = this["class"].split(" ");
+        classes = _(classes).filter(function(item) {
+          return item !== "" && item !== null;
+        });
+        classes = _(classes).unique();
+        return classes;
+      },
+      set: function(value) {
+        return this["class"] = value.join(" ");
+      }
+    });
+
+    View.prototype.addClass = function(className) {
+      var classes;
+      classes = this.classes;
+      classes.push(className);
+      return this.classes = classes;
+    };
+
+    View.prototype.removeClass = function(className) {
+      return this.classes = _.filter(this.classes, function(item) {
+        return item !== className;
+      });
+    };
+
+    View.prototype._insertElement = function() {
+      if (document.readyState === "complete" || document.readySate === "loaded") {
+        return this.__insertElement();
+      } else {
+        return document.addEventListener("DOMContentLoaded", this.__insertElement);
+      }
+    };
+
+    View.prototype.__insertElement = function() {
+      return document.body.appendChild(this._element);
+    };
+
+    View.prototype.addListener = function(event, listener) {
+      View.__super__.addListener.apply(this, arguments);
+      return this._element.addEventListener(event, listener);
+    };
+
+    View.prototype.removeListener = function(event, listener) {
+      View.__super__.removeListener.apply(this, arguments);
+      return this._element.removeEventListener(event, listener);
+    };
+
+    View.prototype.on = View.prototype.addListener;
+
+    View.prototype.off = View.prototype.removeListener;
+
+    return View;
+
+  })(Frame);
+
+  View.Properties = utils.extend(Frame.Properties, {
+    frame: null,
+    clip: true,
+    opacity: 1.0,
+    rotateX: 0,
+    rotateY: 0,
+    rotateZ: 0,
+    rotate: 0,
+    scale: 1.0,
+    scaleX: 1.0,
+    scaleY: 1.0,
+    scaleZ: 1.0,
+    style: null,
+    html: null,
+    "class": "",
+    superView: null,
+    visible: true
+  });
+
+  View.Views = [];
+
+  exports.View = View;
 
 }).call(this);
 

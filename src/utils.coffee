@@ -1,6 +1,11 @@
+_ = require "underscore"
+
 Function::define = (prop, desc) ->
 	Object.defineProperty @prototype, prop, desc
 	Object.__
+
+
+# BEGIN TODO: Replace these with underscore equivalents
 
 exports.keys = (a) ->
 	for key of a
@@ -19,7 +24,6 @@ exports.update = (a, b) ->
 	exports.extend a, (exports.filter b, (k) -> k in keys)
 	a
 		
-
 exports.copy = (a) ->
 	exports.extend {}, a
 
@@ -33,8 +37,20 @@ exports.filter = (a, f) ->
 exports.union = ->
 	Array.prototype.concat.apply Array.prototype, arguments
 
+exports.remove = (a, e) -> 
+	a.splice(t,1)[0] if (t = a.indexOf(e)) > -1
+	a
+
+# END TODO
+
+
 exports.toggle = ->
-	args = Array.prototype.slice.call arguments
+	
+	if _.isArray arguments[0]
+		args = arguments[0]
+	else
+		args = Array.prototype.slice.call arguments
+	
 	curr = -1
 	return ->
 		curr++
@@ -58,9 +74,7 @@ exports.interval = (time, f) ->
 	window._delayIntervals.push timer
 	return timer
 
-exports.remove = (a, e) -> 
-	a.splice(t,1)[0] if (t = a.indexOf(e)) > -1
-	a
+
 	
 exports.debounce = (func, threshold, execAsap) ->
 	timeout = null
