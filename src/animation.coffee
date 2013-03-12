@@ -40,7 +40,7 @@ class Animation extends EventEmitter
 
 	constructor: (args) ->
 		
-		console.log "Animation.constructor", args
+		# console.log "Animation.constructor", args
 		
 		# Set all properties
 		for p in @AnimationProperties
@@ -59,8 +59,26 @@ class Animation extends EventEmitter
 		@count++
 		@animationName = "framer-animation-#{@animationId}-#{@count}"
 		
-		console.log "Animation.start #{@animationName}"
+		# console.log "Animation.start #{@animationName}"
 		
+		# See if we have other animations running on this view
+		if @view._currentAnimations.length > 0
+			console.log "Warning: Animation.start #{@animationName} already animations running on view #{@view.name}"
+		
+		
+		# We stop all other animations on this view. Maybe we should revisit
+		# this or give an option to disable it, but for now it makes sens because 1)
+		# you almost always want this and 2) we don't support simultaneous animations.
+		
+		# TODO: This breaks stuff
+		# @view.animateStop()
+		@view._currentAnimations.push @
+		
+		if @_running is true
+			throw Error "Animation.start #{@animationName} already running"
+		
+		@_running = true
+
 		# TODO: test if we are trying to animate something that cannot animate
 		
 		propertiesA = @view.properties
@@ -99,16 +117,8 @@ class Animation extends EventEmitter
 		@keyFrameAnimationCSS = @_css()
 		
 		# for k of @propertiesA
-		# 	console.log " .#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
-		
-		# We stop all other animations on this view. Maybe we should revisit
-		# this or give an option to disable it, but for now it makes sens because 1)
-		# you almost always want this and 2) we don't support simultaneous animations.
-		
-		# TODO: This breaks stuff.
-		# @view.animateStop()
-		
-		@view._currentAnimations.push @
+		# 	if @propertiesA[k] isnt @propertiesB[k]
+		# 		console.log " .#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
 		
 		css.addStyle "
 			#{@keyFrameAnimationCSS}
@@ -141,6 +151,11 @@ class Animation extends EventEmitter
 
 	
 	stop: =>
+		
+		# console.log "Animation.stop #{@animationName}"
+		
+		@_running = false
+		
 		@view.style["-webkit-animation-play-state"] = "paused"
 		
 		# Copy over the calculated properties at this point in the animation so
@@ -175,7 +190,7 @@ class Animation extends EventEmitter
 	_cleanup: =>
 		
 		# Remove this animation from the current ones for this view
-		@view._currentAnimations = _.without @view._currentAnimations, [@]
+		@view._currentAnimations = _.without @view._currentAnimations, @
 		@view.removeClass @animationName
 		@emit "end"
 		

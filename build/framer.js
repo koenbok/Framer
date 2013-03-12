@@ -3037,7 +3037,6 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       this.start = __bind(this.start, this);
 
       var p, _i, _len, _ref, _ref1, _ref2, _ref3;
-      console.log("Animation.constructor", args);
       _ref = this.AnimationProperties;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         p = _ref[_i];
@@ -3062,7 +3061,14 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         _this = this;
       this.count++;
       this.animationName = "framer-animation-" + this.animationId + "-" + this.count;
-      console.log("Animation.start " + this.animationName);
+      if (this.view._currentAnimations.length > 0) {
+        console.log("Warning: Animation.start " + this.animationName + " already animations running on view " + this.view.name);
+      }
+      this.view._currentAnimations.push(this);
+      if (this._running === true) {
+        throw Error("Animation.start " + this.animationName + " already running");
+      }
+      this._running = true;
       propertiesA = this.view.properties;
       propertiesB = this.properties;
       if (propertiesB.scale) {
@@ -3093,7 +3099,6 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         }
       }
       this.keyFrameAnimationCSS = this._css();
-      this.view._currentAnimations.push(this);
       css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.time / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;			}");
       this.view.addClass(this.animationName);
       finalize = function() {
@@ -3116,6 +3121,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     Animation.prototype.stop = function() {
       var calculatedStyles, computedStyles, k, v, _ref;
+      this._running = false;
       this.view.style["-webkit-animation-play-state"] = "paused";
       this.view._matrix = this.view._computedMatrix();
       calculatedStyles = {};
@@ -3147,7 +3153,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     };
 
     Animation.prototype._cleanup = function() {
-      this.view._currentAnimations = _.without(this.view._currentAnimations, [this]);
+      this.view._currentAnimations = _.without(this.view._currentAnimations, this);
       this.view.removeClass(this.animationName);
       return this.emit("end");
     };
