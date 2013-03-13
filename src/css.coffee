@@ -4,33 +4,10 @@ _STYLESHEET = null
 
 exports.addStyle = (css) ->
 	
-	# styleSheet = document.getElementById STYLESHEET_ID
-	# 
-	# if not styleSheet
-	# 		
-	# 	head = document.getElementsByTagName "head"
-	# 	head = head[0] if head
-	# 
-	# 	if not head
-	# 		head = document.body or document.documentElement
-	# 
-	# 	styleSheet = document.createElement "style"
-	# 	styleSheet.id = STYLESHEET_ID
-	# 	
-	# 	head.appendChild styleSheet
-	# 
-	# styleSheet.appendChild document.createTextNode css
+	styleSheet = document.createElement "style"
+	styleSheet.innerHTML = css
 	
-	# if _STYLESHEET is null
-	_STYLESHEET = document.createElement('style');
-	document.head.appendChild(_STYLESHEET);
-	
-	_STYLESHEET.innerHTML += css
-	
-	# style = document.createElement('style');
-	# style.innerHTML = css
-
-	
+	document.head.appendChild styleSheet
 
 
 exports.addStyle "
