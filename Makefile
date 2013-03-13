@@ -9,4 +9,7 @@ build:
 clean:
 	rm -rf dist
 
-.PHONY: build clean
+lint:
+	./node_modules/coffeelint/bin/coffeelint -f lint.config.json -r src
+
+.PHONY: build clean lint
