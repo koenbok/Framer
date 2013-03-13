@@ -68,7 +68,7 @@ BezierCurve = (a, b, c, d, time, fps) ->
 	values = []
 	steps = (time / 1000) * fps
 	
-	if steps > 1000
+	if steps > 3000
 		throw Error "Bezier: too many values"
 
 	for step in [0..steps]

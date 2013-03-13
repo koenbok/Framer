@@ -107,7 +107,7 @@ class Spring
 		@reset()
 		count = 0
 		while @moving
-			if count > 1000
+			if count > 3000
 				throw Error "Spring: too many values"
 			count++
 			@next()
