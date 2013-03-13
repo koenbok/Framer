@@ -399,9 +399,10 @@ require.define("/src/css.coffee",function(require,module,exports,__dirname,__fil
   _STYLESHEET = null;
 
   exports.addStyle = function(css) {
-    _STYLESHEET = document.createElement('style');
-    document.head.appendChild(_STYLESHEET);
-    return _STYLESHEET.innerHTML += css;
+    var styleSheet;
+    styleSheet = document.createElement("style");
+    styleSheet.innerHTML = css;
+    return document.head.appendChild(styleSheet);
   };
 
   exports.addStyle(".uilayer {	display: block;	visibility: visible;	position: absolute;	top:auto; right:auto; bottom:auto; left:auto;	width:auto; height:auto;	overflow: visible;	z-index:0;	opacity:1;	box-sizing: border-box;	-webkit-box-sizing: border-box;}.uilayer.textureBacked {	-webkit-transform: matrix3d(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);	-webkit-transform-origin: 50% 50% 0%;	-webkit-backface-visibility: hidden;	-webkit-transform-style: flat;}.uilayer.animated {	-webkit-transition-duration: 500ms;	-webkit-transition-timing-function: linear;	-webkit-transition-delay: 0;	-webkit-transition-property: none;}");
@@ -3061,14 +3062,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         _this = this;
       this.count++;
       this.animationName = "framer-animation-" + this.animationId + "-" + this.count;
-      if (this.view._currentAnimations.length > 0) {
-        console.log("Warning: Animation.start " + this.animationName + " already animations running on view " + this.view.name);
-      }
       this.view._currentAnimations.push(this);
-      if (this._running === true) {
-        throw Error("Animation.start " + this.animationName + " already running");
-      }
-      this._running = true;
       propertiesA = this.view.properties;
       propertiesB = this.properties;
       if (propertiesB.scale) {
@@ -3159,8 +3153,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     };
 
     Animation.prototype._css = function() {
-      var cssString, deltas, propertyName, stepDelta, stepIncrement, value, _ref,
-        _this = this;
+      var cssString, deltas, m, position, propertyName, springValue, stepDelta, stepIncrement, unit, value, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3;
       stepIncrement = 0;
       stepDelta = 100 / (this.curveValues.length - 1);
       cssString = [];
@@ -3171,27 +3164,31 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         value = _ref[propertyName];
         deltas[propertyName] = (this.propertiesB[propertyName] - this.propertiesA[propertyName]) / 100.0;
       }
-      this.curveValues.map(function(springValue) {
-        var m, position, unit, _i, _len, _ref1, _ref2;
+      m = new Matrix();
+      _ref1 = this.curveValues;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        springValue = _ref1[_i];
         position = stepIncrement * stepDelta;
         cssString.push("\t" + (position.toFixed(2)) + "%\t{ -webkit-transform: ");
-        m = new Matrix();
-        _ref1 = _this.AnimatableMatrixProperties;
-        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-          propertyName = _ref1[_i];
-          value = springValue * deltas[propertyName] + _this.propertiesA[propertyName];
+        _ref2 = this.AnimatableMatrixProperties;
+        for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+          propertyName = _ref2[_j];
+          value = springValue * deltas[propertyName] + this.propertiesA[propertyName];
           m[propertyName] = value;
         }
         cssString.push(m.matrix().cssValues() + "; ");
-        _ref2 = _this.AnimatableCSSProperties;
-        for (propertyName in _ref2) {
-          unit = _ref2[propertyName];
-          value = springValue * deltas[propertyName] + _this.propertiesA[propertyName];
+        _ref3 = this.AnimatableCSSProperties;
+        for (propertyName in _ref3) {
+          unit = _ref3[propertyName];
+          if (!this.propertiesA.hasOwnProperty(propertyName)) {
+            continue;
+          }
+          value = springValue * deltas[propertyName] + this.propertiesA[propertyName];
           cssString.push("" + propertyName + ":" + (value.toFixed(5)) + unit + "; ");
         }
         cssString.push("}\n");
-        return stepIncrement++;
-      });
+        stepIncrement++;
+      }
       cssString.push("}\n");
       return cssString.join("");
     };
@@ -3338,7 +3335,7 @@ require.define("/src/curves/spring.coffee",function(require,module,exports,__dir
       count = 0;
       _results = [];
       while (this.moving) {
-        if (count > 1000) {
+        if (count > 3000) {
           throw Error("Spring: too many values");
         }
         count++;
@@ -3453,7 +3450,7 @@ require.define("/src/curves/bezier.coffee",function(require,module,exports,__dir
     curve = new UnitBezier(a, b, c, d);
     values = [];
     steps = (time / 1000) * fps;
-    if (steps > 1000) {
+    if (steps > 3000) {
       throw Error("Bezier: too many values");
     }
     for (step = _i = 0; 0 <= steps ? _i <= steps : _i >= steps; step = 0 <= steps ? ++_i : --_i) {

@@ -50,11 +50,14 @@ class Animation extends EventEmitter
 		@time ?= 1000
 		@curve ?= "linear"
 		@precision ?= 30
+		
 		@curveValues = @_parseCurve @curve
 		@count = 0
 		@animationId = utils.uuid()[..8]
 
 	start: (callback) =>
+		
+		# console.profile "Animation.start"
 		
 		@count++
 		@animationName = "framer-animation-#{@animationId}-#{@count}"
@@ -62,8 +65,8 @@ class Animation extends EventEmitter
 		# console.log "Animation.start #{@animationName}"
 		
 		# See if we have other animations running on this view
-		if @view._currentAnimations.length > 0
-			console.log "Warning: Animation.start #{@animationName} already animations running on view #{@view.name}"
+		# if @view._currentAnimations.length > 0
+		# 	console.log "Warning: Animation.start #{@animationName} already animations running on view #{@view.name}"
 		
 		
 		# We stop all other animations on this view. Maybe we should revisit
@@ -74,10 +77,10 @@ class Animation extends EventEmitter
 		# @view.animateStop()
 		@view._currentAnimations.push @
 		
-		if @_running is true
-			throw Error "Animation.start #{@animationName} already running"
-		
-		@_running = true
+		# if @_running is true
+		# 	throw Error "Animation.start #{@animationName} already running"
+		# 
+		# @_running = true
 
 		# TODO: test if we are trying to animate something that cannot animate
 		
@@ -146,6 +149,8 @@ class Animation extends EventEmitter
 			
 			callback?()
 			@_cleanup()
+			
+			# console.profileEnd "Animation.start"
 		
 		@view.once "webkitAnimationEnd", finalize
 
@@ -194,6 +199,8 @@ class Animation extends EventEmitter
 		@view.removeClass @animationName
 		@emit "end"
 		
+		# console.log "_cleanup", @view._currentAnimations
+		
 	_css: ->
 		
 		# Build the css for the keyframe animation. I wish there was a nicer
@@ -207,19 +214,21 @@ class Animation extends EventEmitter
 		
 		deltas = {}
 		
+		# Pre-calculate the delta values
 		for propertyName, value of @propertiesA
 			deltas[propertyName] = (@propertiesB[propertyName] - @propertiesA[propertyName]) / 100.0
 		
-		@curveValues.map (springValue) =>
-			
+		# We define this object outside of the loop to re-use it. In theory this should help a 
+		# bit with perfomance, in practise I'm too lazy to prove it.
+		m = new Matrix()
+		
+		for springValue in @curveValues
+		
 			position = stepIncrement * stepDelta
 
 			cssString.push "\t#{position.toFixed(2)}%\t{ -webkit-transform: "
 			
 			# Add the matrix based values
-			
-			m = new Matrix()
-			
 			for propertyName in @AnimatableMatrixProperties
 				value = springValue * deltas[propertyName] + @propertiesA[propertyName]
 				m[propertyName] = value
@@ -227,6 +236,7 @@ class Animation extends EventEmitter
 			cssString.push m.matrix().cssValues() + "; "
 			
 			for propertyName, unit of @AnimatableCSSProperties
+				continue if not @propertiesA.hasOwnProperty propertyName
 				value = springValue * deltas[propertyName] + @propertiesA[propertyName]
 				cssString.push "#{propertyName}:#{value.toFixed 5}#{unit}; "
 				
@@ -235,9 +245,9 @@ class Animation extends EventEmitter
 			stepIncrement++
 			
 		cssString.push "}\n"
-		
-		return cssString.join ""
+		cssString.join ""
 
+		
 	_parseCurve: (curve) ->
 		
 		curve ?= ""
