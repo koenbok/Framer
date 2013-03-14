@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="vendor/mocha.css" />
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="vendor/mocha.js"></script>
+    <script src="vendor/chai.js"></script>
+    <script src="lib/framer.js"></script>
+
+    <script>
+      chai.should()
+      mocha.setup('bdd')
+      $(function() {
+        mocha.run()
+      })
+    </script>
+
+    <script src="init.js"></script>
+  </body>
+</html>
