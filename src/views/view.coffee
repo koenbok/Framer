@@ -65,7 +65,7 @@ class View extends Frame
 			
 			for key, value of View.Properties
 				if args[key] not in [null, undefined]
-					@[key] = args[key] 
+					@[key] = args[key]
 			
 			for key, value of Frame.CalculatedProperties
 				@[key] = args[key] if args[key] not in [null, undefined]
@@ -81,9 +81,9 @@ class View extends Frame
 	
 	@define "x"
 		get: ->
-			@_x or 0  
+			@_x or 0
 			# @_matrix.m41
-		set: (value) -> 
+		set: (value) ->
 			@_x = value
 			@_matrix = utils.extend @_matrix, {m41: value}
 			@emit "change:x"
@@ -91,9 +91,9 @@ class View extends Frame
 	
 	@define "y"
 		get: ->
-			@_y or 0 
+			@_y or 0
 			# @_matrix.m42
-		set: (value) -> 
+		set: (value) ->
 			@_y = value
 			@_matrix = utils.extend @_matrix, {m42: value}
 			@emit "change:y"
@@ -104,27 +104,27 @@ class View extends Frame
 	# 	set: (value) ->  @_matrix = utils.extend @_matrix, {m43: value}
 
 	@define "width"
-		get: -> 
+		get: ->
 			@_width or 0
 			# @_getPropertyCSSValue("width").getFloatValue CSSPrimitiveValue.CSS_NUMBER
-		set: (value) -> 
+		set: (value) ->
 			@_width = value
 			@_element.style.width = "#{value}px"
 			@emit "change:width"
 			@emit "change:frame"
 
 	@define "height"
-		get: -> 
+		get: ->
 			@_height or 0
 			# @_getPropertyCSSValue("height").getFloatValue CSSPrimitiveValue.CSS_NUMBER
-		set: (value) -> 
+		set: (value) ->
 			@_height = value
 			@_element.style.height = "#{value}px"
 			@emit "change:height"
 			@emit "change:frame"
 	
 	@define "_matrix"
-		get: -> 
+		get: ->
 			return @__matrix or @__matrix = new WebKitCSSMatrix @_element.style.webkitTransform
 			
 		set: (value) ->
@@ -162,18 +162,18 @@ class View extends Frame
 			@_opacity or 1
 			# @_getPropertyCSSValue("opacity")
 			# 	.getFloatValue CSSPrimitiveValue.CSS_NUMBER
-		set: (value) -> 
+		set: (value) ->
 			@_opacity = value
 			@style["opacity"] = value
 			@emit "change:opacity"
 	
 	@define "scale"
-		get: -> 
+		get: ->
 			@_scale
 			# @_matrix.m11
-		set: (value) ->  
+		set: (value) ->
 			@_scale = value
-			@_matrix = utils.extend @_matrix, 
+			@_matrix = utils.extend @_matrix,
 				{m11:value, m22:value, m33:value}
 			@emit "change:scale"
 	
@@ -189,7 +189,7 @@ class View extends Frame
 	@define "visible"
 		get: ->
 			@_visible
-		set: (value) -> 
+		set: (value) ->
 			@_visible = value
 			@style.display = "block" if value is true
 			@style.display = "none" if value is false
@@ -256,7 +256,25 @@ class View extends Frame
 	
 	@define "subViews"
 		get: -> @_subViews
+
+	@define "index"
+	  get: -> @_index or 0
+	  set: (value) ->
+	    @_index = value
+	    @style['z-index'] = value
+	    @emit "change:index"
 	
+	placeBefore: (view) ->
+	  @index = view.index + 1
+
+	placeBehind: (view) ->
+	  @index = view.index - 1
+
+	switchPlaces: (view) ->
+	  our_i      = @index
+	  their_i    = view.index
+	  view.index = our_i
+	  @index     = their_i
 
 	# Animation
 
@@ -277,10 +295,10 @@ class View extends Frame
 			# @_animationDuration
 
 	@define "_animationDuration"
-		get: -> 
+		get: ->
 			@__animationDuration
 			# @_getPropertyCSSValue "-webkit-transition-duration", CSSPrimitiveValue.CSS_MS
-		set: (value) -> 
+		set: (value) ->
 			@__animationDuration = value
 			@style["-webkit-transition-duration"] = "#{value}ms"
 
@@ -308,7 +326,7 @@ class View extends Frame
 
 	@define "html"
 		get: -> @_element.innerHTML
-		set: (value) -> 
+		set: (value) ->
 			@_element.innerHTML = value
 			@emit "change:html"
 
@@ -335,7 +353,7 @@ class View extends Frame
 	# Class helpers
 
 	@define "class"
-		get: -> 
+		get: ->
 			@_element.className
 		set: (value) ->
 			@_element.className = value
@@ -407,6 +425,7 @@ View.Properties = utils.extend Frame.Properties,
 	class: ""
 	superView: null
 	visible: true
+	index: 0
 
 View.Views = []
 
