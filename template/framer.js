@@ -3018,7 +3018,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     __extends(Animation, _super);
 
-    Animation.prototype.AnimationProperties = ["view", "properties", "curve", "time", "origin", "tolerance", "precision"];
+    Animation.prototype.AnimationProperties = ["view", "properties", "curve", "time", "origin", "tolerance", "precision", "graph"];
 
     Animation.prototype.AnimatableCSSProperties = {
       opacity: "",
@@ -3050,7 +3050,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         this.curve = "linear";
       }
       if ((_ref3 = this.precision) == null) {
-        this.precision = 30;
+        this.precision = 40;
       }
       this.curveValues = this._parseCurve(this.curve);
       this.count = 0;
@@ -3094,6 +3094,9 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       }
       this.keyFrameAnimationCSS = this._css();
       css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.time / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;			}");
+      if (this.graph) {
+        this._graphView = this.graphView(this, 10, 20, 20, this.time);
+      }
       this.view.addClass(this.animationName);
       finalize = function() {
         var calculatedStyles, _ref2;
@@ -3147,9 +3150,11 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     };
 
     Animation.prototype._cleanup = function() {
+      var _ref;
       this.view._currentAnimations = _.without(this.view._currentAnimations, this);
       this.view.removeClass(this.animationName);
-      return this.emit("end");
+      this.emit("end");
+      return (_ref = this._graphView) != null ? _ref.visible = false : void 0;
     };
 
     Animation.prototype._css = function() {
@@ -3221,6 +3226,57 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       }
     };
 
+    Animation.prototype.graphView = function(animation, x, y, h, time) {
+      var background, color, dot, graph, i, player, value, values, width, _i, _len;
+      color = "rgba(50,150,200,.35)";
+      values = animation.curveValues;
+      width = 300;
+      graph = new View({
+        y: y,
+        x: x,
+        width: 100,
+        height: h
+      });
+      graph.clip = false;
+      background = new View({
+        y: 0 - h,
+        height: h * 2 + 3,
+        superView: graph
+      });
+      background.style.backgroundColor = "rgba(255,255,255,.85)";
+      for (i = _i = 0, _len = values.length; _i < _len; i = ++_i) {
+        value = values[i];
+        dot = new View({
+          width: 3,
+          height: 3,
+          x: i * widthFactor,
+          y: (100 - value) * (h / 100),
+          superView: graph
+        });
+        dot.style.borderRadius = "5px";
+        dot.style.backgroundColor = color;
+      }
+      graph.width = dot.x;
+      background.width = dot.x;
+      if (time) {
+        player = new View({
+          x: 0,
+          y: -h,
+          width: 2,
+          height: h * 2,
+          superView: graph
+        });
+        player.style.backgroundColor = color;
+        player.animate({
+          properties: {
+            x: graph.width
+          },
+          time: time
+        });
+      }
+      return graph;
+    };
+
     return Animation;
 
   })(EventEmitter);
@@ -3240,7 +3296,7 @@ require.define("/src/curves/spring.coffee",function(require,module,exports,__dir
     friction: 8,
     velocity: 0,
     speed: 1 / 60.0,
-    tolerance: 0.01
+    tolerance: .1
   };
 
   springAccelerationForState = function(state) {

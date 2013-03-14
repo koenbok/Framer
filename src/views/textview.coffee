@@ -30,7 +30,9 @@ class exports.TextView extends View
 		view.frame = frame
 		view.insert()
 		
-		size = {width:view.layer.element_.clientWidth, height:view.layer.element_.clientHeight}
+		size =
+			width: view.layer.element_.clientWidth
+			height: view.layer.element_.clientHeight
 		
 		return size
 	

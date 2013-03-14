@@ -78,15 +78,15 @@ BezierCurve = (a, b, c, d, time, fps) ->
 
 defaults = {}
 
-defaults.Linear = (time, fps) -> 
+defaults.Linear = (time, fps) ->
 	BezierCurve 0, 0, 1, 1, time, fps
-defaults.Ease = (time, fps) -> 
+defaults.Ease = (time, fps) ->
 	BezierCurve .25, .1, .25, 1, time, fps
-defaults.EaseIn = (time, fps) -> 
+defaults.EaseIn = (time, fps) ->
 	BezierCurve .42, 0, 1, 1, time, fps
-defaults.EaseOut = (time, fps) -> 
+defaults.EaseOut = (time, fps) ->
 	BezierCurve 0, 0, .58, 1, time, fps
-defaults.EaseInOut = (time, fps) -> 
+defaults.EaseInOut = (time, fps) ->
 	BezierCurve .42, 0, .58, 1, time, fps
 
 exports.defaults = defaults

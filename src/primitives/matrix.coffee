@@ -8,9 +8,9 @@ WebKitCSSMatrix::cssValues = ->
 	
 	values = "
 		matrix3d(
-			#{r @m11}, #{r @m12}, #{r @m13}, #{r @m14}, 
-			#{r @m21}, #{r @m22}, #{r @m23}, #{r @m24}, 
-			#{r @m31}, #{r @m32}, #{r @m33}, #{r @m34}, 
+			#{r @m11}, #{r @m12}, #{r @m13}, #{r @m14},
+			#{r @m21}, #{r @m22}, #{r @m23}, #{r @m24},
+			#{r @m31}, #{r @m32}, #{r @m33}, #{r @m34},
 			#{r @m41}, #{r @m42}, #{r @m43}, #{r @m44})"
 
 class Matrix
@@ -46,7 +46,7 @@ class Matrix
 
 	@define "scale",
 		get: -> (@_scaleX + @_scaleY) / 2.0
-		set: (value) -> 
+		set: (value) ->
 			@_scaleX = value
 			@_scaleY = value
 
@@ -77,7 +77,7 @@ class Matrix
 			y: m.m42
 			z: m.m43
 		
-		result.scale = 
+		result.scale =
 			x: Math.sqrt(m.m11*m.m11 + m.m12*m.m12 + m.m13*m.m13)
 			y: Math.sqrt(m.m21*m.m21 + m.m22*m.m22 + m.m23*m.m23)
 			z: Math.sqrt(m.m31*m.m31 + m.m32*m.m32 + m.m33*m.m33)

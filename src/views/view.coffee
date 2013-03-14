@@ -64,7 +64,7 @@ class View extends Frame
 			
 			for key, value of View.Properties
 				if args[key] not in [null, undefined]
-					@[key] = args[key] 
+					@[key] = args[key]
 			
 			for key, value of Frame.CalculatedProperties
 				@[key] = args[key] if args[key] not in [null, undefined]
@@ -92,24 +92,24 @@ class View extends Frame
 	## Geometry
 
 	@define "width"
-		get: -> 
+		get: ->
 			parseFloat @style.width
-		set: (value) -> 
+		set: (value) ->
 			@style.width = "#{value}px"
 			@emit "change:width"
-			@emit "change:frame"	
+			@emit "change:frame"
 
 	@define "height"
-		get: -> 
+		get: ->
 			parseFloat @style.height
-		set: (value) -> 
+		set: (value) ->
 			@style.height = "#{value}px"
 			@emit "change:height"
 			@emit "change:frame"
 	
 	@define "x"
 		get: -> @_matrix.x
-		set: (value) -> 
+		set: (value) ->
 			@_matrix.x = value
 			@_matrix = @_matrix
 
@@ -118,7 +118,7 @@ class View extends Frame
 	
 	@define "y"
 		get: -> @_matrix.y
-		set: (value) -> 
+		set: (value) ->
 			@_matrix.y = value
 			@_matrix = @_matrix
 
@@ -127,7 +127,7 @@ class View extends Frame
 
 	@define "z"
 		get: -> @_matrix.z
-		set: (value) -> 
+		set: (value) ->
 			@_matrix.z = value
 			@_matrix = @_matrix
 
@@ -179,7 +179,7 @@ class View extends Frame
 
 	@define "rotate"
 		get: -> @_matrix.rotate
-		set: (value) -> 
+		set: (value) ->
 			@_matrix.rotate = value
 			@_matrix = @_matrix
 
@@ -187,7 +187,7 @@ class View extends Frame
 
 	@define "rotateX"
 		get: -> @_matrix.rotateX
-		set: (value) -> 
+		set: (value) ->
 			@_matrix.rotateX = value
 			@_matrix = @_matrix
 			
@@ -196,7 +196,7 @@ class View extends Frame
 	
 	@define "rotateY"
 		get: -> @_matrix.rotateY
-		set: (value) -> 
+		set: (value) ->
 			@_matrix.rotateY = value
 			@_matrix = @_matrix
 
@@ -205,7 +205,7 @@ class View extends Frame
 
 	@define "rotateZ"
 		get: -> @_matrix.rotateZ
-		set: (value) -> 
+		set: (value) ->
 			@_matrix.rotateZ = value
 			@_matrix = @_matrix
 
@@ -217,7 +217,7 @@ class View extends Frame
 	## Matrix
 	
 	@define "_matrix"
-		get: -> 
+		get: ->
 			if not @__matrix
 				@__matrix = new Matrix new WebKitCSSMatrix @_element.style.webkitTransform
 			return @__matrix
@@ -246,9 +246,9 @@ class View extends Frame
 	## Visual Properties
 	
 	@define "opacity"
-		get: -> 
+		get: ->
 			parseFloat @style.opacity or 1
-		set: (value) -> 
+		set: (value) ->
 			@style.opacity = value
 			@style["opacity"] = value
 			@emit "change:opacity"
@@ -265,7 +265,7 @@ class View extends Frame
 	@define "visible"
 		get: ->
 			@_visible
-		set: (value) -> 
+		set: (value) ->
 			@_visible = value
 			@style.display = "block" if value is true
 			@style.display = "none" if value is false
@@ -308,38 +308,6 @@ class View extends Frame
 
 	#############################################################################
 	## Animation
-
-	# @define "_animated"
-	# 	get: -> @__animated or false
-	# 	set: (value) ->
-	# 		
-	# 		return if value not in [true, false]
-	# 
-	# 		# @addClass "animated" if value is true
-	# 		# @removeClass "animated" if value is false
-	# 		
-	# 		@__animated = value
-	# 
-	# 		# Small hack to go to next event tick and make sure
-	# 		# that the css gets added so animations start working
-	# 		# after this call
-	# 		# @_animationDuration
-
-	# @define "_animationDuration"
-	# 	get: -> 
-	# 		@__animationDuration
-	# 		# @_getPropertyCSSValue "-webkit-transition-duration", CSSPrimitiveValue.CSS_MS
-	# 	set: (value) -> 
-	# 		@__animationDuration = value
-	# 		@style["-webkit-transition-duration"] = "#{value}ms"
-	# 
-	# @define "_animationTimingFunction"
-	# 	get: -> @computedStyle["-webkit-transition-timing-function"]
-	# 	set: (value) -> @style["-webkit-transition-timing-function"] = value
-
-	# @define "_animationTransformOrigin"
-	# 	get: -> @computedStyle["-webkit-transform-origin"]
-	# 	set: (value) -> @style["-webkit-transform-origin"] = value
 	
 	animate: (args, callback) =>
 		args.view = @
@@ -357,7 +325,7 @@ class View extends Frame
 
 	@define "html"
 		get: -> @_element.innerHTML
-		set: (value) -> 
+		set: (value) ->
 			@_element.innerHTML = value
 			@emit "change:html"
 
@@ -372,25 +340,10 @@ class View extends Frame
 		set: (value) ->
 			throw Error "computedStyle is readonly"
 
-	# _getPropertyCSSValue: (name) ->
-	# 	
-	# 	cs = @_element.style
-	# 	# cs = @computedStyle
-	# 	
-	# 	value = cs.getPropertyCSSValue name
-	# 	
-	# 	# console.log cs["width"]
-	# 	# console.log "_getPropertyCSSValue", name, value
-	# 	
-	# 	if value instanceof CSSValueList
-	# 		return value[value.length - 1]
-	# 
-	# 	return value
-
 	# Class helpers
 
 	@define "class"
-		get: -> 
+		get: ->
 			@_element.className
 		set: (value) ->
 			@_element.className = value

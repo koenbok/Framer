@@ -38,7 +38,7 @@ class Frame extends EventEmitter
 
 	@define "maxX"
 		get: -> @x + @width
-		set: (value) -> 
+		set: (value) ->
 			throw Error "Width is zero" if @width is 0
 			@x = value - @width
 
@@ -54,13 +54,13 @@ class Frame extends EventEmitter
 
 	@define "maxY"
 		get: -> @y + @height
-		set: (value) -> 
+		set: (value) ->
 			throw Error "Width is zero" if @height is 0
 			@y = value - @height
 
 	merge: (r2) ->
 		r1 = @
-		frame = 
+		frame =
 			x: Math.min(r1.x, r2.x)
 			y: Math.min(r1.y, r2.y)
 			width: Math.max(r1.width, r2.width)

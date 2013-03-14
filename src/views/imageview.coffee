@@ -17,7 +17,7 @@ class exports.ImageView extends View
 
 	@define "image"
 		
-		get: -> 
+		get: ->
 			return @_image
 		
 		set: (value) ->

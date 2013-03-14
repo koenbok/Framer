@@ -3,7 +3,7 @@ defaults =
 	friction: 8
 	velocity: 0
 	speed: 1/60.0
-	tolerance: 0.01
+	tolerance: .1
 	
 
 springAccelerationForState = (state) ->
@@ -103,7 +103,7 @@ class Spring
 		
 		return @currentValue
 	
-	all: -> 
+	all: ->
 		@reset()
 		count = 0
 		while @moving
@@ -117,7 +117,11 @@ class Spring
 
 SpringCurve = (tension, friction, velocity, fps) ->
 	# console.log "spring.SpringCurve", tension, friction, velocity, fps
-	spring = new Spring(tension:tension, friction:friction, velocity:velocity, speed:1/fps)
+	spring = new Spring
+		tension:tension
+		friction:friction
+		velocity:velocity
+		speed:1/fps
 	spring.all()
 
 exports.SpringCurve = SpringCurve

@@ -37,7 +37,7 @@ exports.filter = (a, f) ->
 exports.union = ->
 	Array.prototype.concat.apply Array.prototype, arguments
 
-exports.remove = (a, e) -> 
+exports.remove = (a, e) ->
 	a.splice(t,1)[0] if (t = a.indexOf(e)) > -1
 	a
 
@@ -173,8 +173,10 @@ exports.uuid = ->
 
 exports.isWebKit = ->
 	
-	isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)
-	isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor)
+	isChrome = /Chrome/.test(navigator.userAgent) and \
+		/Google Inc/.test(navigator.vendor)
+	isSafari = /Safari/.test(navigator.userAgent) and \
+		 /Apple Computer/.test(navigator.vendor)
 
 	return true in [isChrome, isSafari]
 	

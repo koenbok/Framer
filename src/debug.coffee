@@ -24,7 +24,11 @@ exports.debug = ->
 			
 			node = document.createElement "div"
 			node.innerHTML = "#{view.name or view.id}"
-			node.innerHTML += " <span style='opacity:.5'>in #{view.superView.name or view.superView.id}</span>" if view.superView
+			
+			if view.superView
+				node.innerHTML += " <span style='opacity:.5'>
+					in #{view.superView.name or view.superView.id}
+				</span>"
 				
 			node.style.position = "absolute"
 			node.style.padding = "3px"
@@ -57,7 +61,8 @@ window.document.onkeydown = (event) ->
 
 window.onerror = (e) ->
 	errorView = new View x:20, y:20, width:350, height:60
-	errorView.html = "<b>Javascript Error</b><br>Inspect the error console for more info."
+	errorView.html = "<b>Javascript Error</b>
+		<br>Inspect the error console for more info."
 	errorView.style =
 		font: "13px/1.3em Menlo, Monaco"
 		backgroundColor: "rgba(255,0,0,0.5)"

@@ -1,6 +1,7 @@
 all: build
 
 build:
+	make lint
 	make clean
 	mkdir -p build
 	./node_modules/browserify/bin/cmd.js src/init.coffee -o build/framer.js

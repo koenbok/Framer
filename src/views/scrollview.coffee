@@ -12,7 +12,7 @@ class exports.ScrollView extends View
 		
 		# # Hack to disable rubber banding on ios devices
 		# startY = startTopScroll = deltaY = undefined
-		# 
+		#
 		# @on "touchstart", =>
 		# 	el = @_element
 		# 	startY = event.touches[0].pageY
