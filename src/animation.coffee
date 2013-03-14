@@ -24,8 +24,8 @@ parseCurve = (a, prefix) ->
 class Animation extends EventEmitter
 	
 	AnimationProperties: [
-		"view", "properties", "curve", "time", 
-		"origin", "tolerance", "precision"
+		"view", "properties", "curve", "time",
+		"origin", "tolerance", "precision", "graph"
 	]
 	AnimatableCSSProperties: {
 		opacity: "",
@@ -33,10 +33,10 @@ class Animation extends EventEmitter
 		height: "px",
 	}
 	AnimatableMatrixProperties: [
-		"x", "y", "z", 
-		"scaleX", "scaleY", "scaleZ", # "scale",  
+		"x", "y", "z",
+		"scaleX", "scaleY", "scaleZ", # "scale",
 		"rotateX", "rotateY", "rotateZ", # "rotate"
-	] # width, height, opacity
+	]
 
 	constructor: (args) ->
 		
@@ -49,7 +49,7 @@ class Animation extends EventEmitter
 		# Set all the defaults
 		@time ?= 1000
 		@curve ?= "linear"
-		@precision ?= 30
+		@precision ?= 40
 		
 		@curveValues = @_parseCurve @curve
 		@count = 0
@@ -66,7 +66,8 @@ class Animation extends EventEmitter
 		
 		# See if we have other animations running on this view
 		# if @view._currentAnimations.length > 0
-		# 	console.log "Warning: Animation.start #{@animationName} already animations running on view #{@view.name}"
+		# 	console.log "Warning: Animation.start #{@animationName} already
+		# 	 animations running on view #{@view.name}"
 		
 		
 		# We stop all other animations on this view. Maybe we should revisit
@@ -79,7 +80,7 @@ class Animation extends EventEmitter
 		
 		# if @_running is true
 		# 	throw Error "Animation.start #{@animationName} already running"
-		# 
+		#
 		# @_running = true
 
 		# TODO: test if we are trying to animate something that cannot animate
@@ -100,7 +101,7 @@ class Animation extends EventEmitter
 		
 		# Build up the matrix animation properties
 		
-		for k in @AnimatableMatrixProperties 
+		for k in @AnimatableMatrixProperties
 			
 			@propertiesA[k] = propertiesA[k]
 			
@@ -132,7 +133,11 @@ class Animation extends EventEmitter
 				-webkit-animation-timing-function: linear;
 				-webkit-animation-fill-mode: both;
 			}"
-
+		
+		
+		if @graph
+			@_graphView = @graphView @, 10, 20, 20, @time
+		
 		@view.addClass @animationName
 			
 		finalize = =>
@@ -171,7 +176,7 @@ class Animation extends EventEmitter
 		calculatedStyles = {}
 		computedStyles = @view.computedStyles
 		for k, v of @AnimatableCSSProperties
-			calculatedStyles[k] = computedStyles 
+			calculatedStyles[k] = computedStyles
 		@view.style = calculatedStyles
 		
 		@_cleanup()
@@ -199,6 +204,8 @@ class Animation extends EventEmitter
 		@view.removeClass @animationName
 		@emit "end"
 		
+		@_graphView?.visible = false
+		
 		# console.log "_cleanup", @view._currentAnimations
 		
 	_css: ->
@@ -216,10 +223,13 @@ class Animation extends EventEmitter
 		
 		# Pre-calculate the delta values
 		for propertyName, value of @propertiesA
-			deltas[propertyName] = (@propertiesB[propertyName] - @propertiesA[propertyName]) / 100.0
+			deltas[propertyName] = (
+				@propertiesB[propertyName] - @propertiesA[propertyName]
+			) / 100.0
 		
-		# We define this object outside of the loop to re-use it. In theory this should help a 
-		# bit with perfomance, in practise I'm too lazy to prove it.
+		# We define this object outside of the loop to re-use it.
+		# In theory this should help a bit with perfomance, in practise
+		# I'm too lazy to prove it.
 		m = new Matrix()
 		
 		for springValue in @curveValues
@@ -274,6 +284,56 @@ class Animation extends EventEmitter
 			# The default curve is linear
 			console.log "Animation.parseCurve: could not parse curve '#{curve}'"
 			return bezier.defaults.Linear @precision, @time
+
+	graphView: (animation, x, y, h, time) ->
+	
+		color = "rgba(50,150,200,.35)"
+		values = animation.curveValues
+		
+		width = 300
+	
+		graph = new View
+			y: y
+			x: x
+			width:100
+			height:h
+	
+		# graph.style.backgroundColor = "rgba(0, 0, 0, 1)"
+		graph.clip = false
+		
+		background = new View
+			y: 0 - h
+			height:h * 2 + 3
+			superView: graph
+		
+		background.style.backgroundColor = "rgba(255,255,255,.85)"
+			
+		
+		for value, i in values
+			dot = new View
+				width:3, height:3
+				x: i * widthFactor, y: (100 - value) * (h / 100)
+				superView: graph
+			dot.style.borderRadius = "5px"
+			dot.style.backgroundColor = color
+
+		graph.width = dot.x
+		background.width = dot.x
+
+		if time
+			player = new View
+				x:0, y:-h
+				width: 2, height: h * 2
+				superView: graph
+	
+			player.style.backgroundColor = color
+		
+			player.animate
+				properties: {x:graph.width}
+				time: time
+
+		return graph
+
 
 
 exports.Animation = Animation
