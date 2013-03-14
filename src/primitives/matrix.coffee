@@ -1,7 +1,5 @@
 _ = require "underscore"
 
-
-
 WebKitCSSMatrix::cssValues = ->
 	
 	r = (v) -> v.toFixed 5
