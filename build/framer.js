@@ -331,47 +331,6 @@ exports.extname = function(path) {
   return splitPathRe.exec(path)[3] || '';
 };
 
-exports.relative = function(from, to) {
-  from = exports.resolve(from).substr(1);
-  to = exports.resolve(to).substr(1);
-
-  function trim(arr) {
-    var start = 0;
-    for (; start < arr.length; start++) {
-      if (arr[start] !== '') break;
-    }
-
-    var end = arr.length - 1;
-    for (; end >= 0; end--) {
-      if (arr[end] !== '') break;
-    }
-
-    if (start > end) return [];
-    return arr.slice(start, end - start + 1);
-  }
-
-  var fromParts = trim(from.split('/'));
-  var toParts = trim(to.split('/'));
-
-  var length = Math.min(fromParts.length, toParts.length);
-  var samePartsLength = length;
-  for (var i = 0; i < length; i++) {
-    if (fromParts[i] !== toParts[i]) {
-      samePartsLength = i;
-      break;
-    }
-  }
-
-  var outputParts = [];
-  for (var i = samePartsLength; i < fromParts.length; i++) {
-    outputParts.push('..');
-  }
-
-  outputParts = outputParts.concat(toParts.slice(samePartsLength));
-
-  return outputParts.join('/');
-};
-
 });
 
 require.define("__browserify_process",function(require,module,exports,__dirname,__filename,process,global){var process = module.exports = {};
@@ -384,7 +343,7 @@ process.nextTick = (function () {
     ;
 
     if (canSetImmediate) {
-        return function (f) { return window.setImmediate(f) };
+        return window.setImmediate;
     }
 
     if (canPost) {
@@ -1318,9 +1277,9 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
 require.define("/node_modules/underscore/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {"main":"underscore.js"}
 });
 
-require.define("/node_modules/underscore/underscore.js",function(require,module,exports,__dirname,__filename,process,global){//     Underscore.js 1.4.4
+require.define("/node_modules/underscore/underscore.js",function(require,module,exports,__dirname,__filename,process,global){//     Underscore.js 1.4.2
 //     http://underscorejs.org
-//     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud Inc.
+//     (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
 //     Underscore may be freely distributed under the MIT license.
 
 (function() {
@@ -1344,6 +1303,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   var push             = ArrayProto.push,
       slice            = ArrayProto.slice,
       concat           = ArrayProto.concat,
+      unshift          = ArrayProto.unshift,
       toString         = ObjProto.toString,
       hasOwnProperty   = ObjProto.hasOwnProperty;
 
@@ -1380,11 +1340,11 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
     }
     exports._ = _;
   } else {
-    root._ = _;
+    root['_'] = _;
   }
 
   // Current version.
-  _.VERSION = '1.4.4';
+  _.VERSION = '1.4.2';
 
   // Collection Functions
   // --------------------
@@ -1421,8 +1381,6 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
     return results;
   };
 
-  var reduceError = 'Reduce of empty array with no initial value';
-
   // **Reduce** builds up a single result from a list of values, aka `inject`,
   // or `foldl`. Delegates to **ECMAScript 5**'s native `reduce` if available.
   _.reduce = _.foldl = _.inject = function(obj, iterator, memo, context) {
@@ -1440,7 +1398,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
         memo = iterator.call(context, memo, value, index, list);
       }
     });
-    if (!initial) throw new TypeError(reduceError);
+    if (!initial) throw new TypeError('Reduce of empty array with no initial value');
     return memo;
   };
 
@@ -1451,7 +1409,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
     if (obj == null) obj = [];
     if (nativeReduceRight && obj.reduceRight === nativeReduceRight) {
       if (context) iterator = _.bind(iterator, context);
-      return initial ? obj.reduceRight(iterator, memo) : obj.reduceRight(iterator);
+      return arguments.length > 2 ? obj.reduceRight(iterator, memo) : obj.reduceRight(iterator);
     }
     var length = obj.length;
     if (length !== +length) {
@@ -1467,7 +1425,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
         memo = iterator.call(context, memo, obj[index], index, list);
       }
     });
-    if (!initial) throw new TypeError(reduceError);
+    if (!initial) throw new TypeError('Reduce of empty array with no initial value');
     return memo;
   };
 
@@ -1498,9 +1456,12 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
 
   // Return all the elements for which a truth test fails.
   _.reject = function(obj, iterator, context) {
-    return _.filter(obj, function(value, index, list) {
-      return !iterator.call(context, value, index, list);
-    }, context);
+    var results = [];
+    if (obj == null) return results;
+    each(obj, function(value, index, list) {
+      if (!iterator.call(context, value, index, list)) results[results.length] = value;
+    });
+    return results;
   };
 
   // Determine whether all of the elements match a truth test.
@@ -1534,19 +1495,20 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // Determine if the array or object contains a given value (using `===`).
   // Aliased as `include`.
   _.contains = _.include = function(obj, target) {
-    if (obj == null) return false;
+    var found = false;
+    if (obj == null) return found;
     if (nativeIndexOf && obj.indexOf === nativeIndexOf) return obj.indexOf(target) != -1;
-    return any(obj, function(value) {
+    found = any(obj, function(value) {
       return value === target;
     });
+    return found;
   };
 
   // Invoke a method (with arguments) on every item in a collection.
   _.invoke = function(obj, method) {
     var args = slice.call(arguments, 2);
-    var isFunc = _.isFunction(method);
     return _.map(obj, function(value) {
-      return (isFunc ? method : value[method]).apply(value, args);
+      return (_.isFunction(method) ? method : value[method]).apply(value, args);
     });
   };
 
@@ -1556,21 +1518,15 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   };
 
   // Convenience version of a common use case of `filter`: selecting only objects
-  // containing specific `key:value` pairs.
-  _.where = function(obj, attrs, first) {
-    if (_.isEmpty(attrs)) return first ? null : [];
-    return _[first ? 'find' : 'filter'](obj, function(value) {
+  // with specific `key:value` pairs.
+  _.where = function(obj, attrs) {
+    if (_.isEmpty(attrs)) return [];
+    return _.filter(obj, function(value) {
       for (var key in attrs) {
         if (attrs[key] !== value[key]) return false;
       }
       return true;
     });
-  };
-
-  // Convenience version of a common use case of `find`: getting the first object
-  // containing specific `key:value` pairs.
-  _.findWhere = function(obj, attrs) {
-    return _.where(obj, attrs, true);
   };
 
   // Return the maximum element or (element-based computation).
@@ -1581,7 +1537,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
       return Math.max.apply(Math, obj);
     }
     if (!iterator && _.isEmpty(obj)) return -Infinity;
-    var result = {computed : -Infinity, value: -Infinity};
+    var result = {computed : -Infinity};
     each(obj, function(value, index, list) {
       var computed = iterator ? iterator.call(context, value, index, list) : value;
       computed >= result.computed && (result = {value : value, computed : computed});
@@ -1595,7 +1551,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
       return Math.min.apply(Math, obj);
     }
     if (!iterator && _.isEmpty(obj)) return Infinity;
-    var result = {computed : Infinity, value: Infinity};
+    var result = {computed : Infinity};
     each(obj, function(value, index, list) {
       var computed = iterator ? iterator.call(context, value, index, list) : value;
       computed < result.computed && (result = {value : value, computed : computed});
@@ -1644,7 +1600,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // An internal function used for aggregate "group by" operations.
   var group = function(obj, value, context, behavior) {
     var result = {};
-    var iterator = lookupIterator(value || _.identity);
+    var iterator = lookupIterator(value);
     each(obj, function(value, index) {
       var key = iterator.call(context, value, index, obj);
       behavior(result, key, value);
@@ -1664,7 +1620,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // either a string attribute to count by, or a function that returns the
   // criterion.
   _.countBy = function(obj, value, context) {
-    return group(obj, value, context, function(result, key) {
+    return group(obj, value, context, function(result, key, value) {
       if (!_.has(result, key)) result[key] = 0;
       result[key]++;
     });
@@ -1686,14 +1642,12 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // Safely convert anything iterable into a real, live array.
   _.toArray = function(obj) {
     if (!obj) return [];
-    if (_.isArray(obj)) return slice.call(obj);
-    if (obj.length === +obj.length) return _.map(obj, _.identity);
+    if (obj.length === +obj.length) return slice.call(obj);
     return _.values(obj);
   };
 
   // Return the number of elements in an object.
   _.size = function(obj) {
-    if (obj == null) return 0;
     return (obj.length === +obj.length) ? obj.length : _.keys(obj).length;
   };
 
@@ -1704,7 +1658,6 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // values in the array. Aliased as `head` and `take`. The **guard** check
   // allows it to work with `_.map`.
   _.first = _.head = _.take = function(array, n, guard) {
-    if (array == null) return void 0;
     return (n != null) && !guard ? slice.call(array, 0, n) : array[0];
   };
 
@@ -1719,7 +1672,6 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // Get the last element of an array. Passing **n** will return the last N
   // values in the array. The **guard** check allows it to work with `_.map`.
   _.last = function(array, n, guard) {
-    if (array == null) return void 0;
     if ((n != null) && !guard) {
       return slice.call(array, Math.max(array.length - n, 0));
     } else {
@@ -1737,7 +1689,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
 
   // Trim out all falsy values from an array.
   _.compact = function(array) {
-    return _.filter(array, _.identity);
+    return _.filter(array, function(value){ return !!value; });
   };
 
   // Internal implementation of a recursive `flatten` function.
@@ -1766,11 +1718,6 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // been sorted, you have the option of using a faster algorithm.
   // Aliased as `unique`.
   _.uniq = _.unique = function(array, isSorted, iterator, context) {
-    if (_.isFunction(isSorted)) {
-      context = iterator;
-      iterator = isSorted;
-      isSorted = false;
-    }
     var initial = iterator ? _.map(array, iterator, context) : array;
     var results = [];
     var seen = [];
@@ -1823,7 +1770,6 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // pairs, or two parallel arrays of the same length -- one of keys, and one of
   // the corresponding values.
   _.object = function(list, values) {
-    if (list == null) return {};
     var result = {};
     for (var i = 0, l = list.length; i < l; i++) {
       if (values) {
@@ -1894,23 +1840,25 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // Function (ahem) Functions
   // ------------------
 
-  // Create a function bound to a given object (assigning `this`, and arguments,
-  // optionally). Delegates to **ECMAScript 5**'s native `Function.bind` if
-  // available.
-  _.bind = function(func, context) {
-    if (func.bind === nativeBind && nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
-    var args = slice.call(arguments, 2);
-    return function() {
-      return func.apply(context, args.concat(slice.call(arguments)));
-    };
-  };
+  // Reusable constructor function for prototype setting.
+  var ctor = function(){};
 
-  // Partially apply a function by creating a version that has had some of its
-  // arguments pre-filled, without changing its dynamic `this` context.
-  _.partial = function(func) {
-    var args = slice.call(arguments, 1);
-    return function() {
-      return func.apply(this, args.concat(slice.call(arguments)));
+  // Create a function bound to a given object (assigning `this`, and arguments,
+  // optionally). Binding with arguments is also known as `curry`.
+  // Delegates to **ECMAScript 5**'s native `Function.bind` if available.
+  // We check for `func.bind` first, to fail fast when `func` is undefined.
+  _.bind = function bind(func, context) {
+    var bound, args;
+    if (func.bind === nativeBind && nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
+    if (!_.isFunction(func)) throw new TypeError;
+    args = slice.call(arguments, 2);
+    return bound = function() {
+      if (!(this instanceof bound)) return func.apply(context, args.concat(slice.call(arguments)));
+      ctor.prototype = func.prototype;
+      var self = new ctor;
+      var result = func.apply(self, args.concat(slice.call(arguments)));
+      if (Object(result) === result) return result;
+      return self;
     };
   };
 
@@ -1918,7 +1866,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // all callbacks defined on an object belong to it.
   _.bindAll = function(obj) {
     var funcs = slice.call(arguments, 1);
-    if (funcs.length === 0) funcs = _.functions(obj);
+    if (funcs.length == 0) funcs = _.functions(obj);
     each(funcs, function(f) { obj[f] = _.bind(obj[f], obj); });
     return obj;
   };
@@ -1949,26 +1897,25 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // Returns a function, that, when invoked, will only be triggered at most once
   // during a given window of time.
   _.throttle = function(func, wait) {
-    var context, args, timeout, result;
-    var previous = 0;
-    var later = function() {
-      previous = new Date;
-      timeout = null;
-      result = func.apply(context, args);
-    };
+    var context, args, timeout, throttling, more, result;
+    var whenDone = _.debounce(function(){ more = throttling = false; }, wait);
     return function() {
-      var now = new Date;
-      var remaining = wait - (now - previous);
-      context = this;
-      args = arguments;
-      if (remaining <= 0) {
-        clearTimeout(timeout);
+      context = this; args = arguments;
+      var later = function() {
         timeout = null;
-        previous = now;
+        if (more) {
+          result = func.apply(context, args);
+        }
+        whenDone();
+      };
+      if (!timeout) timeout = setTimeout(later, wait);
+      if (throttling) {
+        more = true;
+      } else {
+        throttling = true;
         result = func.apply(context, args);
-      } else if (!timeout) {
-        timeout = setTimeout(later, remaining);
       }
+      whenDone();
       return result;
     };
   };
@@ -2086,10 +2033,8 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // Extend a given object with all the properties in passed-in object(s).
   _.extend = function(obj) {
     each(slice.call(arguments, 1), function(source) {
-      if (source) {
-        for (var prop in source) {
-          obj[prop] = source[prop];
-        }
+      for (var prop in source) {
+        obj[prop] = source[prop];
       }
     });
     return obj;
@@ -2118,10 +2063,8 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // Fill in a given object with default properties.
   _.defaults = function(obj) {
     each(slice.call(arguments, 1), function(source) {
-      if (source) {
-        for (var prop in source) {
-          if (obj[prop] == null) obj[prop] = source[prop];
-        }
+      for (var prop in source) {
+        if (obj[prop] == null) obj[prop] = source[prop];
       }
     });
     return obj;
@@ -2286,7 +2229,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
 
   // Is a given object a finite number?
   _.isFinite = function(obj) {
-    return isFinite(obj) && !isNaN(parseFloat(obj));
+    return _.isNumber(obj) && isFinite(obj);
   };
 
   // Is the given value `NaN`? (NaN is the only number which does not equal itself).
@@ -2332,9 +2275,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
 
   // Run a function **n** times.
   _.times = function(n, iterator, context) {
-    var accum = Array(n);
-    for (var i = 0; i < n; i++) accum[i] = iterator.call(context, i);
-    return accum;
+    for (var i = 0; i < n; i++) iterator.call(context, i);
   };
 
   // Return a random integer between min and max (inclusive).
@@ -2343,7 +2284,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
       max = min;
       min = 0;
     }
-    return min + Math.floor(Math.random() * (max - min + 1));
+    return min + (0 | Math.random() * (max - min + 1));
   };
 
   // List of HTML entities for escaping.
@@ -2399,7 +2340,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // Useful for temporary DOM ids.
   var idCounter = 0;
   _.uniqueId = function(prefix) {
-    var id = ++idCounter + '';
+    var id = idCounter++;
     return prefix ? prefix + id : id;
   };
 
@@ -2434,7 +2375,6 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
   // Underscore templating handles arbitrary delimiters, preserves whitespace,
   // and correctly escapes quotes within interpolated code.
   _.template = function(text, data, settings) {
-    var render;
     settings = _.defaults({}, settings, _.templateSettings);
 
     // Combine delimiters into one regular expression via alternation.
@@ -2450,18 +2390,11 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
     text.replace(matcher, function(match, escape, interpolate, evaluate, offset) {
       source += text.slice(index, offset)
         .replace(escaper, function(match) { return '\\' + escapes[match]; });
-
-      if (escape) {
-        source += "'+\n((__t=(" + escape + "))==null?'':_.escape(__t))+\n'";
-      }
-      if (interpolate) {
-        source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
-      }
-      if (evaluate) {
-        source += "';\n" + evaluate + "\n__p+='";
-      }
+      source +=
+        escape ? "'+\n((__t=(" + escape + "))==null?'':_.escape(__t))+\n'" :
+        interpolate ? "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'" :
+        evaluate ? "';\n" + evaluate + "\n__p+='" : '';
       index = offset + match.length;
-      return match;
     });
     source += "';\n";
 
@@ -2473,7 +2406,7 @@ require.define("/node_modules/underscore/underscore.js",function(require,module,
       source + "return __p;\n";
 
     try {
-      render = new Function(settings.variable || 'obj', '_', source);
+      var render = new Function(settings.variable || 'obj', '_', source);
     } catch (e) {
       e.source = source;
       throw e;
