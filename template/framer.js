@@ -1,3 +1,8 @@
+// Framer 0.5.0-28-g5f9b84f (c) 2013 Koen Bok
+
+window.FramerVersion = "0.5.0-28-g5f9b84f"
+
+
 (function(){var require = function (file, cwd) {
     var resolved = require.resolve(file, cwd || '/');
     var mod = require.modules[resolved];
@@ -1897,7 +1902,7 @@ require.define("/src/debug.coffee",function(require,module,exports,__dirname,__f
         node = document.createElement("div");
         node.innerHTML = "" + (view.name || view.id);
         if (view.superView) {
-          node.innerHTML += " <span style='opacity:.5'>in " + (view.superView.name || view.superView.id) + "</span>";
+          node.innerHTML += " <span style='opacity:.5'>					in " + (view.superView.name || view.superView.id) + "				</span>";
         }
         node.style.position = "absolute";
         node.style.padding = "3px";
@@ -1933,7 +1938,7 @@ require.define("/src/debug.coffee",function(require,module,exports,__dirname,__f
       width: 350,
       height: 60
     });
-    errorView.html = "<b>Javascript Error</b><br>Inspect the error console for more info.";
+    errorView.html = "<b>Javascript Error</b>		<br>Inspect the error console for more info.";
     errorView.style = {
       font: "13px/1.3em Menlo, Monaco",
       backgroundColor: "rgba(255,0,0,0.5)",
@@ -2739,7 +2744,7 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
     r = function(v) {
       return v.toFixed(5);
     };
-    return values = "		matrix3d(			" + (r(this.m11)) + ", " + (r(this.m12)) + ", " + (r(this.m13)) + ", " + (r(this.m14)) + ", 			" + (r(this.m21)) + ", " + (r(this.m22)) + ", " + (r(this.m23)) + ", " + (r(this.m24)) + ", 			" + (r(this.m31)) + ", " + (r(this.m32)) + ", " + (r(this.m33)) + ", " + (r(this.m34)) + ", 			" + (r(this.m41)) + ", " + (r(this.m42)) + ", " + (r(this.m43)) + ", " + (r(this.m44)) + ")";
+    return values = "		matrix3d(			" + (r(this.m11)) + ", " + (r(this.m12)) + ", " + (r(this.m13)) + ", " + (r(this.m14)) + ",			" + (r(this.m21)) + ", " + (r(this.m22)) + ", " + (r(this.m23)) + ", " + (r(this.m24)) + ",			" + (r(this.m31)) + ", " + (r(this.m32)) + ", " + (r(this.m33)) + ", " + (r(this.m34)) + ",			" + (r(this.m41)) + ", " + (r(this.m42)) + ", " + (r(this.m43)) + ", " + (r(this.m44)) + ")";
   };
 
   Matrix = (function() {
