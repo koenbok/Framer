@@ -8,6 +8,8 @@ css = require "../css"
 spring = require "../curves/spring"
 bezier = require "../curves/bezier"
 
+AnimationCounter = 0
+
 parseCurve = (a, prefix) ->
 
 	# "spring(1, 2, 3)" -> 1, 2, 3
@@ -49,12 +51,16 @@ class Animation extends EventEmitter
 		# Set all the defaults
 		@time ?= 1000
 		@curve ?= "linear"
-		@precision ?= 40
+		@precision ?= 30
 		
 		@curveValues = @_parseCurve @curve
 		@count = 0
-		@animationId = utils.uuid()[..8]
-
+		# @animationId = utils.uuid()[..8]
+		
+		AnimationCounter += 1
+		@animationId = AnimationCounter
+		
+		
 	start: (callback) =>
 		
 		# console.profile "Animation.start"

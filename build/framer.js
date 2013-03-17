@@ -1,6 +1,6 @@
-// Framer 0.5.0-28-g5f9b84f (c) 2013 Koen Bok
+// Framer 0.5.0-29-gf74c9eb (c) 2013 Koen Bok
 
-window.FramerVersion = "0.5.0-28-g5f9b84f"
+window.FramerVersion = "0.5.0-29-gf74c9eb";
 
 
 (function(){var require = function (file, cwd) {
@@ -397,11 +397,6 @@ process.binding = function (name) {
 });
 
 require.define("/src/css.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var STYLESHEET_ID, _STYLESHEET;
-
-  STYLESHEET_ID = "FramerCSS";
-
-  _STYLESHEET = null;
 
   exports.addStyle = function(css) {
     var styleSheet;
@@ -2742,7 +2737,7 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
   WebKitCSSMatrix.prototype.cssValues = function() {
     var r, values;
     r = function(v) {
-      return v.toFixed(5);
+      return v;
     };
     return values = "		matrix3d(			" + (r(this.m11)) + ", " + (r(this.m12)) + ", " + (r(this.m13)) + ", " + (r(this.m14)) + ",			" + (r(this.m21)) + ", " + (r(this.m22)) + ", " + (r(this.m23)) + ", " + (r(this.m24)) + ",			" + (r(this.m31)) + ", " + (r(this.m32)) + ", " + (r(this.m33)) + ", " + (r(this.m34)) + ",			" + (r(this.m41)) + ", " + (r(this.m42)) + ", " + (r(this.m43)) + ", " + (r(this.m44)) + ")";
   };
@@ -2989,7 +2984,7 @@ require.define("/src/primitives/events.coffee",function(require,module,exports,_
 });
 
 require.define("/src/animation.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Animation, EventEmitter, Matrix, bezier, css, parseCurve, spring, utils, _,
+  var Animation, AnimationCounter, EventEmitter, Matrix, bezier, css, parseCurve, spring, utils, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -3007,6 +3002,8 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
   spring = require("../curves/spring");
 
   bezier = require("../curves/bezier");
+
+  AnimationCounter = 0;
 
   parseCurve = function(a, prefix) {
     a = a.replace(prefix, "");
@@ -3055,11 +3052,12 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         this.curve = "linear";
       }
       if ((_ref3 = this.precision) == null) {
-        this.precision = 40;
+        this.precision = 30;
       }
       this.curveValues = this._parseCurve(this.curve);
       this.count = 0;
-      this.animationId = utils.uuid().slice(0, 9);
+      AnimationCounter += 1;
+      this.animationId = AnimationCounter;
     }
 
     Animation.prototype.start = function(callback) {

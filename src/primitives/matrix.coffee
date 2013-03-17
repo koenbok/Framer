@@ -2,7 +2,8 @@ _ = require "underscore"
 
 WebKitCSSMatrix::cssValues = ->
 	
-	r = (v) -> v.toFixed 5
+	# r = (v) -> v.toFixed 5
+	r = (v) -> v
 	
 	values = "
 		matrix3d(

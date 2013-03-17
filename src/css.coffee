@@ -1,7 +1,3 @@
-STYLESHEET_ID = "FramerCSS"
-
-_STYLESHEET = null
-
 exports.addStyle = (css) ->
 	
 	styleSheet = document.createElement "style"
