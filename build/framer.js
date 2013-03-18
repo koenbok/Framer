@@ -1,6 +1,6 @@
-// Framer 0.5.0-31-g98ca654 (c) 2013 Koen Bok
+// Framer 0.5.0-44-ge73e07a (c) 2013 Koen Bok
 
-window.FramerVersion = "0.5.0-31-g98ca654";
+window.FramerVersion = "0.5.0-44-ge73e07a";
 
 
 (function(){var require = function (file, cwd) {
@@ -511,12 +511,8 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
   };
 
   exports.delay = function(time, f) {
-    var timer, _ref;
+    var timer;
     timer = setTimeout(f, time);
-    if ((_ref = window._delayTimers) == null) {
-      window._delayTimers = [];
-    }
-    window._delayTimers.push(timer);
     return timer;
   };
 

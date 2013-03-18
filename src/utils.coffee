@@ -64,8 +64,8 @@ exports.randomColor = (alpha) ->
 
 exports.delay = (time, f) ->
 	timer = setTimeout f, time
-	window._delayTimers ?= []
-	window._delayTimers.push timer
+	# window._delayTimers ?= []
+	# window._delayTimers.push timer
 	return timer
 
 exports.interval = (time, f) ->
