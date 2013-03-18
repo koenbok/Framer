@@ -112,18 +112,19 @@ class View extends Frame
 		set: (value) ->
 			@_matrix.x = value
 			@_matrix = @_matrix
-
 			@emit "change:x"
 			@emit "change:frame"
 	
 	@define "y"
+
 		get: -> @_matrix.y
 		set: (value) ->
 			@_matrix.y = value
 			@_matrix = @_matrix
-
+			
 			@emit "change:y"
 			@emit "change:frame"
+
 
 	@define "z"
 		get: -> @_matrix.z
@@ -134,7 +135,6 @@ class View extends Frame
 			@emit "change:z"
 			@emit "change:frame"
 
-	
 	#############################################################################
 	## Scale
 	
@@ -304,7 +304,27 @@ class View extends Frame
 	
 	@define "subViews"
 		get: -> @_subViews
+
+	#############################################################################
+	## Indexes
+
+	@define "index"
+		get: -> @style['z-index'] or 0
+		set: (value) ->
+			@style['z-index'] = value
+			@emit "change:index"
 	
+	placeBefore: (view) ->
+		@index = view.index + 1
+
+	placeBehind: (view) ->
+		@index = view.index - 1
+
+	switchPlaces: (view) ->
+		indexA = @index
+		indexB = view.index
+		view.index = indexA
+		@index = indexB
 
 	#############################################################################
 	## Animation
@@ -414,6 +434,7 @@ View.Properties = utils.extend Frame.Properties,
 	class: ""
 	superView: null
 	visible: true
+	index: 0
 
 View.Views = []
 

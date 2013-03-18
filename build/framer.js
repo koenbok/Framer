@@ -1,6 +1,6 @@
-// Framer 0.5.0-30-g37cd9ec (c) 2013 Koen Bok
+// Framer 0.5.0-31-g98ca654 (c) 2013 Koen Bok
 
-window.FramerVersion = "0.5.0-30-g37cd9ec";
+window.FramerVersion = "0.5.0-31-g98ca654";
 
 
 (function(){var require = function (file, cwd) {
@@ -2339,6 +2339,32 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       }
     });
 
+    View.define("index", {
+      get: function() {
+        return this.style['z-index'] || 0;
+      },
+      set: function(value) {
+        this.style['z-index'] = value;
+        return this.emit("change:index");
+      }
+    });
+
+    View.prototype.placeBefore = function(view) {
+      return this.index = view.index + 1;
+    };
+
+    View.prototype.placeBehind = function(view) {
+      return this.index = view.index - 1;
+    };
+
+    View.prototype.switchPlaces = function(view) {
+      var indexA, indexB;
+      indexA = this.index;
+      indexB = view.index;
+      view.index = indexA;
+      return this.index = indexB;
+    };
+
     View.prototype.animate = function(args, callback) {
       var animation;
       args.view = this;
@@ -2466,7 +2492,8 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     html: null,
     "class": "",
     superView: null,
-    visible: true
+    visible: true,
+    index: 0
   });
 
   View.Views = [];

@@ -1,0 +1,1 @@
+{ViewTest} = require './src/view'
