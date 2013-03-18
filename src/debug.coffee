@@ -2,11 +2,14 @@ utils = require "./utils"
 
 exports.debug = ->
 	
+	
+	console.log "Framer.debug"
+	
 	# Safari bug: https://bugs.webkit.org/show_bug.cgi?id=78206
-	if document._togglingDebug is true
+	if window._togglingDebug is true
 		return
 	
-	document._togglingDebug = true
+	window._togglingDebug = true
 	
 	View.Views.map (view, i) ->
 			
@@ -49,7 +52,7 @@ exports.debug = ->
 				backgroundImage: null
 			# view.clip = false
 	
-	document._togglingDebug = false
+	window._togglingDebug = false
 
 	
 
@@ -59,17 +62,17 @@ window.document.onkeydown = (event) ->
 		
 
 
-window.onerror = (e) ->
-	errorView = new View x:20, y:20, width:350, height:60
-	errorView.html = "<b>Javascript Error</b>
-		<br>Inspect the error console for more info."
-	errorView.style =
-		font: "13px/1.3em Menlo, Monaco"
-		backgroundColor: "rgba(255,0,0,0.5)"
-		padding: "12px"
-		border: "1px solid rgba(255,0,0,0.5)"
-		borderRadius: "5px"
-	errorView.scale = 0.5
-	errorView.animate
-		properties: {scale:1.0}
-		curve: "spring(150,8,1500)"
+# window.onerror = (e) ->
+# 	errorView = new View x:20, y:20, width:350, height:60
+# 	errorView.html = "<b>Javascript Error</b>
+# 		<br>Inspect the error console for more info."
+# 	errorView.style =
+# 		font: "13px/1.3em Menlo, Monaco"
+# 		backgroundColor: "rgba(255,0,0,0.5)"
+# 		padding: "12px"
+# 		border: "1px solid rgba(255,0,0,0.5)"
+# 		borderRadius: "5px"
+# 	errorView.scale = 0.5
+# 	errorView.animate
+# 		properties: {scale:1.0}
+# 		curve: "spring(150,8,1500)"
