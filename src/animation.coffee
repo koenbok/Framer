@@ -51,7 +51,7 @@ class Animation extends EventEmitter
 		# Set all the defaults
 		@time ?= 1000
 		@curve ?= "linear"
-		@precision ?= 30
+		@precision ?= 40
 		
 		@curveValues = @_parseCurve @curve
 		@count = 0
@@ -130,11 +130,13 @@ class Animation extends EventEmitter
 		# 	if @propertiesA[k] isnt @propertiesB[k]
 		# 		console.log " .#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
 		
+		totalTime = @curveValues.length / @precision
+		
 		css.addStyle "
 			#{@keyFrameAnimationCSS}
 		
 			.#{@animationName} {
-				-webkit-animation-duration: #{@time/1000}s;
+				-webkit-animation-duration: #{totalTime}s;
 				-webkit-animation-name: #{@animationName};
 				-webkit-animation-timing-function: linear;
 				-webkit-animation-fill-mode: both;
@@ -242,7 +244,7 @@ class Animation extends EventEmitter
 		
 			position = stepIncrement * stepDelta
 
-			cssString.push "\t#{position.toFixed(2)}%\t{ -webkit-transform: "
+			cssString.push "\t#{position}%\t{ -webkit-transform: "
 			
 			# Add the matrix based values
 			for propertyName in @AnimatableMatrixProperties
@@ -254,7 +256,7 @@ class Animation extends EventEmitter
 			for propertyName, unit of @AnimatableCSSProperties
 				continue if not @propertiesA.hasOwnProperty propertyName
 				value = springValue * deltas[propertyName] + @propertiesA[propertyName]
-				cssString.push "#{propertyName}:#{value.toFixed 5}#{unit}; "
+				cssString.push "#{propertyName}:#{value}#{unit}; "
 				
 			cssString.push "}\n"
 			

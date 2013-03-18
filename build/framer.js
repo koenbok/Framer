@@ -1,6 +1,6 @@
-// Framer 0.5.0-29-gf74c9eb (c) 2013 Koen Bok
+// Framer 0.5.0-30-g37cd9ec (c) 2013 Koen Bok
 
-window.FramerVersion = "0.5.0-29-gf74c9eb";
+window.FramerVersion = "0.5.0-30-g37cd9ec";
 
 
 (function(){var require = function (file, cwd) {
@@ -3052,7 +3052,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         this.curve = "linear";
       }
       if ((_ref3 = this.precision) == null) {
-        this.precision = 30;
+        this.precision = 40;
       }
       this.curveValues = this._parseCurve(this.curve);
       this.count = 0;
@@ -3061,7 +3061,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     }
 
     Animation.prototype.start = function(callback) {
-      var finalize, k, propertiesA, propertiesB, v, _i, _len, _ref, _ref1,
+      var finalize, k, propertiesA, propertiesB, totalTime, v, _i, _len, _ref, _ref1,
         _this = this;
       this.count++;
       this.animationName = "framer-animation-" + this.animationId + "-" + this.count;
@@ -3096,7 +3096,8 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         }
       }
       this.keyFrameAnimationCSS = this._css();
-      css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.time / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;			}");
+      totalTime = this.curveValues.length / this.precision;
+      css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + totalTime + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;			}");
       if (this.graph) {
         this._graphView = this.graphView(this, 10, 20, 20, this.time);
       }
@@ -3177,7 +3178,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
         springValue = _ref1[_i];
         position = stepIncrement * stepDelta;
-        cssString.push("\t" + (position.toFixed(2)) + "%\t{ -webkit-transform: ");
+        cssString.push("\t" + position + "%\t{ -webkit-transform: ");
         _ref2 = this.AnimatableMatrixProperties;
         for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
           propertyName = _ref2[_j];
@@ -3192,7 +3193,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
             continue;
           }
           value = springValue * deltas[propertyName] + this.propertiesA[propertyName];
-          cssString.push("" + propertyName + ":" + (value.toFixed(5)) + unit + "; ");
+          cssString.push("" + propertyName + ":" + value + unit + "; ");
         }
         cssString.push("}\n");
         stepIncrement++;
