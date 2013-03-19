@@ -27,7 +27,7 @@ class Animation extends EventEmitter
 	
 	AnimationProperties: [
 		"view", "properties", "curve", "time",
-		"origin", "tolerance", "precision", "graph"
+		"origin", "tolerance", "precision", "graph", "debug"
 	]
 	AnimatableCSSProperties: {
 		opacity: "",
@@ -63,12 +63,10 @@ class Animation extends EventEmitter
 		
 	start: (callback) =>
 		
-		# console.profile "Animation.start"
-		
 		@count++
 		@animationName = "framer-animation-#{@animationId}-#{@count}"
 		
-		# console.log "Animation.start #{@animationName}"
+		console.log "Animation.start #{@animationName}" if @debug
 		
 		# See if we have other animations running on this view
 		# if @view._currentAnimations.length > 0
@@ -126,11 +124,22 @@ class Animation extends EventEmitter
 		
 		@keyFrameAnimationCSS = @_css()
 		
-		# for k of @propertiesA
-		# 	if @propertiesA[k] isnt @propertiesB[k]
-		# 		console.log " .#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
+		if @debug
+			for k of @propertiesA
+				if @propertiesA[k] isnt @propertiesB[k]
+					console.log " .#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
 		
 		totalTime = @curveValues.length / @precision
+		
+		console.log "Animation.time = #{totalTime}" if @debug
+		
+		# css.addStyle @keyFrameAnimationCSS
+		#
+		# @view.style =
+		# 	webkitAnimationName: @animationName
+		# 	webkitAnimationDuration: totalTime
+		# 	webkitAnimationTimingFunction: "linear"
+		# 	webkitAnimationFillMode: "both"
 		
 		css.addStyle "
 			#{@keyFrameAnimationCSS}
@@ -142,11 +151,10 @@ class Animation extends EventEmitter
 				-webkit-animation-fill-mode: both;
 			}"
 		
-		
-		if @graph
-			@_graphView = @graphView @, 10, 20, 20, @time
-		
 		@view.addClass @animationName
+
+		# if @graph
+		# 	@_graphView = @graphView @, 10, 20, 20, @time
 			
 		finalize = =>
 			
