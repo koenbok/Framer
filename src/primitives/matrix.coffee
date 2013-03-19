@@ -45,9 +45,7 @@ class Matrix
 
 	@define "scale",
 		get: -> (@_scaleX + @_scaleY) / 2.0
-		set: (value) ->
-			@_scaleX = value
-			@_scaleY = value
+		set: (value) -> @_scaleX = @_scaleY = value
 
 
 	@define "rotateX",
