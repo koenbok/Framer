@@ -57,7 +57,7 @@ class View extends Frame
 		get: ->
 			p = {}
 			for key, value of View.Properties
-				p[key] = @[key] or View.Properties[key]
+				p[key] = @[key]
 			return p
 			
 		set: (args) ->
@@ -116,22 +116,18 @@ class View extends Frame
 			@emit "change:frame"
 	
 	@define "y"
-
 		get: -> @_matrix.y
 		set: (value) ->
 			@_matrix.y = value
 			@_matrix = @_matrix
-			
 			@emit "change:y"
 			@emit "change:frame"
-
 
 	@define "z"
 		get: -> @_matrix.z
 		set: (value) ->
 			@_matrix.z = value
 			@_matrix = @_matrix
-
 			@emit "change:z"
 			@emit "change:frame"
 
@@ -250,7 +246,6 @@ class View extends Frame
 			parseFloat @style.opacity or 1
 		set: (value) ->
 			@style.opacity = value
-			@style["opacity"] = value
 			@emit "change:opacity"
 	
 	@define "clip"
