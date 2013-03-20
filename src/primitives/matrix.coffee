@@ -5,12 +5,11 @@ WebKitCSSMatrix::cssValues = ->
 	# r = (v) -> v.toFixed 5
 	r = (v) -> v
 	
-	values = "
-		matrix3d(
-			#{r @m11}, #{r @m12}, #{r @m13}, #{r @m14},
-			#{r @m21}, #{r @m22}, #{r @m23}, #{r @m24},
-			#{r @m31}, #{r @m32}, #{r @m33}, #{r @m34},
-			#{r @m41}, #{r @m42}, #{r @m43}, #{r @m44})"
+	values = "matrix3d(
+#{r @m11}, #{r @m12}, #{r @m13}, #{r @m14},
+#{r @m21}, #{r @m22}, #{r @m23}, #{r @m24},
+#{r @m31}, #{r @m32}, #{r @m33}, #{r @m34},
+#{r @m41}, #{r @m42}, #{r @m43}, #{r @m44})"
 
 class Matrix
 	
