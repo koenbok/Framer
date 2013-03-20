@@ -66,7 +66,7 @@ BezierCurve = (a, b, c, d, time, fps) ->
 	curve = new UnitBezier a, b, c, d
 	
 	values = []
-	steps = (time / 1000) * fps
+	steps = ((time / 1000) * fps) - 1
 	
 	if steps > 3000
 		throw Error "Bezier: too many values"
@@ -80,6 +80,7 @@ defaults = {}
 
 defaults.Linear = (time, fps) ->
 	BezierCurve 0, 0, 1, 1, time, fps
+	# return [0, 100]
 defaults.Ease = (time, fps) ->
 	BezierCurve .25, .1, .25, 1, time, fps
 defaults.EaseIn = (time, fps) ->
