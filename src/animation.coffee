@@ -51,9 +51,10 @@ class Animation extends EventEmitter
 		# Set all the defaults
 		@time ?= 1000
 		@curve ?= "linear"
-		@precision ?= 40
+		@precision ?= 30
 		
 		@curveValues = @_parseCurve @curve
+		@totalTime = @curveValues.length / @precision
 		@count = 0
 		# @animationId = utils.uuid()[..8]
 		
@@ -66,7 +67,7 @@ class Animation extends EventEmitter
 		@count++
 		@animationName = "framer-animation-#{@animationId}-#{@count}"
 		
-		console.log "Animation.start #{@animationName}" if @debug
+
 		
 		# See if we have other animations running on this view
 		# if @view._currentAnimations.length > 0
@@ -78,14 +79,13 @@ class Animation extends EventEmitter
 		# this or give an option to disable it, but for now it makes sens because 1)
 		# you almost always want this and 2) we don't support simultaneous animations.
 		
-		# TODO: This breaks stuff
-		# @view.animateStop()
-		@view._currentAnimations.push @
+		# TODO: This doesn't work
 		
-		# if @_running is true
-		# 	throw Error "Animation.start #{@animationName} already running"
-		#
-		# @_running = true
+		@view.animateStop()
+
+		console.log "Animation.start #{@animationName} time = #{@a}" if @debug
+
+		@view._currentAnimations.push @
 
 		# TODO: test if we are trying to animate something that cannot animate
 		
@@ -129,9 +129,6 @@ class Animation extends EventEmitter
 				if @propertiesA[k] isnt @propertiesB[k]
 					console.log " .#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
 		
-		totalTime = @curveValues.length / @precision
-		
-		console.log "Animation.time = #{totalTime}" if @debug
 		
 		# css.addStyle @keyFrameAnimationCSS
 		#
@@ -145,18 +142,18 @@ class Animation extends EventEmitter
 			#{@keyFrameAnimationCSS}
 		
 			.#{@animationName} {
-				-webkit-animation-duration: #{totalTime}s;
+				-webkit-animation-duration: #{@totalTime}s;
 				-webkit-animation-name: #{@animationName};
 				-webkit-animation-timing-function: linear;
 				-webkit-animation-fill-mode: both;
 			}"
 		
 		@view.addClass @animationName
-
-		# if @graph
-		# 	@_graphView = @graphView @, 10, 20, 20, @time
 			
 		finalize = =>
+			
+			if @_canceled is true
+				return
 			
 			# Copy over the end state properties for this animation so we can safely
 			# remove the animation.
@@ -171,6 +168,8 @@ class Animation extends EventEmitter
 			callback?()
 			@_cleanup()
 			
+			console.log "Animation.end #{@animationName}" if @debug
+			
 			# console.profileEnd "Animation.start"
 		
 		@view.once "webkitAnimationEnd", finalize
@@ -178,9 +177,10 @@ class Animation extends EventEmitter
 	
 	stop: =>
 		
-		# console.log "Animation.stop #{@animationName}"
+		console.log "Animation.stop #{@animationName}" if @debug
 		
 		@_running = false
+		@_canceled = true
 		
 		@view.style["-webkit-animation-play-state"] = "paused"
 		
@@ -196,6 +196,9 @@ class Animation extends EventEmitter
 		@view.style = calculatedStyles
 		
 		@_cleanup()
+		
+		
+		@view.style["-webkit-animation-play-state"] = "running"
 	
 	reverse: =>
 		
@@ -220,7 +223,7 @@ class Animation extends EventEmitter
 		@view.removeClass @animationName
 		@emit "end"
 		
-		@_graphView?.visible = false
+		# @_graphView?.visible = false
 		
 		# console.log "_cleanup", @view._currentAnimations
 		
