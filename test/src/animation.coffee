@@ -1,27 +1,77 @@
 describe "Animation", ->
+
+	AnimatableMatrixProperties = (new Animation view:null).AnimatableMatrixProperties
+	AnimationTime = 1500
 	
-	describe "Animations", ->
+	createView = ->
+		view = new View
 
-		it "should animate", (callback) ->
-			
-			view = new View()
-			
-			animation = view.animate
-				properties: {x:500}
-			
-			animation.on "end", ->
-				view.x.should.equal 500
-				callback()
+	describe "Spring", ->
 		
-		it "should cancel", (callback) ->
+		it "should have the good time", ->
+			view = createView()
+			
+			animation = new Animation
+				view: view
+				properties: {opacity:0}
+				curve: "spring(100,10,1000)"
+			
+			animation.curveValues.length.should.equal \
+				parseInt(animation.totalTime * animation.precision)
 
-			view = new View()
+
+	describe "Bezier", ->
+				
+		it "should have the good time", ->
+			view = createView()
 			
-			animation = view.animate
-				properties: {x:200}
-				time: 2000
+			animation = new Animation
+				view: view
+				properties: {opacity:0}
+				time: 100
+				curve: "linear"
 			
-			utils.delay 1000, ->
-				animation.stop()
-				view.x.should.be.within(90, 110)
-				callback()
+			animation.totalTime.should.equal animation.time / 1000
+			animation.curveValues.length.should.equal \
+				parseInt(animation.time / animation.precision)
+		
+		
+		AnimatableMatrixProperties.map (p) ->
+			
+			it "should animate #{p}", (callback) ->
+		
+					view = createView()
+				
+					properties = {}
+					properties[p] = 20
+		
+					animation = view.animate
+						properties: properties
+						time: AnimationTime
+		
+					animation.on "end", ->
+						view.visible = false
+						view[p].should.equal 20
+					
+						callback()
+		
+			it "should cancel #{p}", (callback) ->
+	
+				view = createView()
+	
+				properties = {}
+				properties[p] = 20
+	
+				animation = new Animation
+					view: view
+					properties: properties
+					time: AnimationTime
+					curve: "linear"
+	
+				utils.delay AnimationTime/2.0, ->
+					animation.stop()
+					view.visible = false
+					view[p].should.be.within(9, 11)
+					callback()
+				
+				animation.start()

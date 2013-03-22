@@ -1,7 +1,3 @@
-# View::_postCreate = ->
-# 	@style.backgroundColor = "red"
-
+{DebugTest} = require './src/debug'
 {ViewTest} = require './src/view'
 {AnimationTest} = require './src/animation'
-{DebugTest} = require './src/debug'
-

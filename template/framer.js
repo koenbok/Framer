@@ -1,6 +1,6 @@
-// Framer 0.5.0-44-ge73e07a (c) 2013 Koen Bok
+// Framer 0.5.0-49-g2f345ec (c) 2013 Koen Bok
 
-window.FramerVersion = "0.5.0-44-ge73e07a";
+window.FramerVersion = "0.5.0-49-g2f345ec";
 
 
 (function(){var require = function (file, cwd) {
@@ -1878,10 +1878,11 @@ require.define("/src/debug.coffee",function(require,module,exports,__dirname,__f
   utils = require("./utils");
 
   exports.debug = function() {
-    if (document._togglingDebug === true) {
+    console.log("Framer.debug");
+    if (window._togglingDebug === true) {
       return;
     }
-    document._togglingDebug = true;
+    window._togglingDebug = true;
     View.Views.map(function(view, i) {
       var color, node;
       if (view._debug) {
@@ -1912,38 +1913,13 @@ require.define("/src/debug.coffee",function(require,module,exports,__dirname,__f
         };
       }
     });
-    return document._togglingDebug = false;
+    return window._togglingDebug = false;
   };
 
   window.document.onkeydown = function(event) {
     if (event.keyCode === 27) {
       return exports.debug();
     }
-  };
-
-  window.onerror = function(e) {
-    var errorView;
-    errorView = new View({
-      x: 20,
-      y: 20,
-      width: 350,
-      height: 60
-    });
-    errorView.html = "<b>Javascript Error</b>		<br>Inspect the error console for more info.";
-    errorView.style = {
-      font: "13px/1.3em Menlo, Monaco",
-      backgroundColor: "rgba(255,0,0,0.5)",
-      padding: "12px",
-      border: "1px solid rgba(255,0,0,0.5)",
-      borderRadius: "5px"
-    };
-    errorView.scale = 0.5;
-    return errorView.animate({
-      properties: {
-        scale: 1.0
-      },
-      curve: "spring(150,8,1500)"
-    });
   };
 
 }).call(this);
@@ -2019,7 +1995,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         _ref = View.Properties;
         for (key in _ref) {
           value = _ref[key];
-          p[key] = this[key] || View.Properties[key];
+          p[key] = this[key];
         }
         return p;
       },
@@ -2264,7 +2240,6 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       },
       set: function(value) {
         this.style.opacity = value;
-        this.style["opacity"] = value;
         return this.emit("change:opacity");
       }
     });
@@ -2762,7 +2737,7 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
     r = function(v) {
       return v;
     };
-    return values = "		matrix3d(			" + (r(this.m11)) + ", " + (r(this.m12)) + ", " + (r(this.m13)) + ", " + (r(this.m14)) + ",			" + (r(this.m21)) + ", " + (r(this.m22)) + ", " + (r(this.m23)) + ", " + (r(this.m24)) + ",			" + (r(this.m31)) + ", " + (r(this.m32)) + ", " + (r(this.m33)) + ", " + (r(this.m34)) + ",			" + (r(this.m41)) + ", " + (r(this.m42)) + ", " + (r(this.m43)) + ", " + (r(this.m44)) + ")";
+    return values = "matrix3d(" + (r(this.m11)) + ", " + (r(this.m12)) + ", " + (r(this.m13)) + ", " + (r(this.m14)) + "," + (r(this.m21)) + ", " + (r(this.m22)) + ", " + (r(this.m23)) + ", " + (r(this.m24)) + "," + (r(this.m31)) + ", " + (r(this.m32)) + ", " + (r(this.m33)) + ", " + (r(this.m34)) + "," + (r(this.m41)) + ", " + (r(this.m42)) + ", " + (r(this.m43)) + ", " + (r(this.m44)) + ")";
   };
 
   Matrix = (function() {
@@ -2832,8 +2807,7 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
         return (this._scaleX + this._scaleY) / 2.0;
       },
       set: function(value) {
-        this._scaleX = value;
-        return this._scaleY = value;
+        return this._scaleX = this._scaleY = value;
       }
     });
 
@@ -3043,7 +3017,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     __extends(Animation, _super);
 
-    Animation.prototype.AnimationProperties = ["view", "properties", "curve", "time", "origin", "tolerance", "precision", "graph"];
+    Animation.prototype.AnimationProperties = ["view", "properties", "curve", "time", "origin", "tolerance", "precision", "graph", "debug"];
 
     Animation.prototype.AnimatableCSSProperties = {
       opacity: "",
@@ -3075,19 +3049,24 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         this.curve = "linear";
       }
       if ((_ref3 = this.precision) == null) {
-        this.precision = 40;
+        this.precision = 30;
       }
       this.curveValues = this._parseCurve(this.curve);
+      this.totalTime = this.curveValues.length / this.precision;
       this.count = 0;
       AnimationCounter += 1;
       this.animationId = AnimationCounter;
     }
 
     Animation.prototype.start = function(callback) {
-      var finalize, k, propertiesA, propertiesB, totalTime, v, _i, _len, _ref, _ref1,
+      var finalize, k, propertiesA, propertiesB, v, _i, _len, _ref, _ref1,
         _this = this;
       this.count++;
       this.animationName = "framer-animation-" + this.animationId + "-" + this.count;
+      this.view.animateStop();
+      if (this.debug) {
+        console.log("Animation.start " + this.animationName + " time = " + this.a);
+      }
       this.view._currentAnimations.push(this);
       propertiesA = this.view.properties;
       propertiesB = this.properties;
@@ -3119,14 +3098,20 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         }
       }
       this.keyFrameAnimationCSS = this._css();
-      totalTime = this.curveValues.length / this.precision;
-      css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + totalTime + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;			}");
-      if (this.graph) {
-        this._graphView = this.graphView(this, 10, 20, 20, this.time);
+      if (this.debug) {
+        for (k in this.propertiesA) {
+          if (this.propertiesA[k] !== this.propertiesB[k]) {
+            console.log(" ." + k + " " + this.propertiesA[k] + " -> " + this.propertiesB[k]);
+          }
+        }
       }
+      css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + this.totalTime + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;			}");
       this.view.addClass(this.animationName);
       finalize = function() {
         var calculatedStyles, _ref2;
+        if (_this._canceled === true) {
+          return;
+        }
         _this.view._matrix = utils.extend(new Matrix(), _this.propertiesB);
         calculatedStyles = {};
         _ref2 = _this.AnimatableCSSProperties;
@@ -3138,15 +3123,23 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         if (typeof callback === "function") {
           callback();
         }
-        return _this._cleanup();
+        _this._cleanup();
+        if (_this.debug) {
+          return console.log("Animation.end " + _this.animationName);
+        }
       };
       return this.view.once("webkitAnimationEnd", finalize);
     };
 
     Animation.prototype.stop = function() {
       var calculatedStyles, computedStyles, k, v, _ref;
+      if (this.debug) {
+        console.log("Animation.stop " + this.animationName);
+      }
       this._running = false;
+      this._canceled = true;
       this.view.style["-webkit-animation-play-state"] = "paused";
+      this.view._matrix = this.view._computedMatrix();
       this.view._matrix = this.view._computedMatrix();
       calculatedStyles = {};
       computedStyles = this.view.computedStyles;
@@ -3156,7 +3149,8 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         calculatedStyles[k] = computedStyles;
       }
       this.view.style = calculatedStyles;
-      return this._cleanup();
+      this._cleanup();
+      return this.view.style["-webkit-animation-play-state"] = "running";
     };
 
     Animation.prototype.reverse = function() {
@@ -3177,11 +3171,9 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     };
 
     Animation.prototype._cleanup = function() {
-      var _ref;
       this.view._currentAnimations = _.without(this.view._currentAnimations, this);
       this.view.removeClass(this.animationName);
-      this.emit("end");
-      return (_ref = this._graphView) != null ? _ref.visible = false : void 0;
+      return this.emit("end");
     };
 
     Animation.prototype._css = function() {
@@ -3532,7 +3524,7 @@ require.define("/src/curves/bezier.coffee",function(require,module,exports,__dir
     var curve, step, steps, values, _i;
     curve = new UnitBezier(a, b, c, d);
     values = [];
-    steps = (time / 1000) * fps;
+    steps = ((time / 1000) * fps) - 1;
     if (steps > 3000) {
       throw Error("Bezier: too many values");
     }
