@@ -1,12 +1,12 @@
 _ = require "underscore"
-utils = require "../utils"
-css = require "../css"
+utils = require "./utils"
+css = require "./css"
 
 {EventEmitter} = require "./eventemitter"
-{Matrix} = require "../primitives/matrix"
+{Matrix} = require "./primitives/matrix"
 
-spring = require "../curves/spring"
-bezier = require "../curves/bezier"
+spring = require "./curves/spring"
+bezier = require "./curves/bezier"
 
 AnimationCounter = 0
 
