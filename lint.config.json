@@ -3,7 +3,7 @@
 		"level": "ignore"
 	},
 	"no_trailing_whitespace": {
-		"level": "error"
+		"level": "ignore"
 	},
 	"max_line_length": {
 		"value": 80,
