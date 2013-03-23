@@ -1,6 +1,6 @@
-// Framer 0.5.0-49-g2f345ec (c) 2013 Koen Bok
+// Framer 0.5.0-56-g685804a (c) 2013 Koen Bok
 
-window.FramerVersion = "0.5.0-49-g2f345ec";
+window.FramerVersion = "0.5.0-56-g685804a";
 
 
 (function(){var require = function (file, cwd) {
@@ -1967,12 +1967,12 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       this._element.id = this.id;
       this.addClass("uilayer");
       this.clip = args.clip || View.Properties.clip;
+      this._subViews = [];
+      this._currentAnimations = [];
       this.properties = args;
       if (!args.superView) {
         this._insertElement();
       }
-      this._subViews = [];
-      this._currentAnimations = [];
       this._postCreate();
     }
 
@@ -2059,6 +2059,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return parseFloat(this.style.width);
       },
       set: function(value) {
+        this.animateStop();
         this.style.width = "" + value + "px";
         this.emit("change:width");
         return this.emit("change:frame");
@@ -2070,6 +2071,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return parseFloat(this.style.height);
       },
       set: function(value) {
+        this.animateStop();
         this.style.height = "" + value + "px";
         this.emit("change:height");
         return this.emit("change:frame");
@@ -2081,6 +2083,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return this._matrix.x;
       },
       set: function(value) {
+        this.animateStop();
         this._matrix.x = value;
         this._matrix = this._matrix;
         this.emit("change:x");
@@ -2093,6 +2096,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return this._matrix.y;
       },
       set: function(value) {
+        this.animateStop();
         this._matrix.y = value;
         this._matrix = this._matrix;
         this.emit("change:y");
@@ -2105,6 +2109,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return this._matrix.z;
       },
       set: function(value) {
+        this.animateStop();
         this._matrix.z = value;
         this._matrix = this._matrix;
         this.emit("change:z");
@@ -2117,6 +2122,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return this._matrix.scale;
       },
       set: function(value) {
+        this.animateStop();
         this._matrix.scale = value;
         this._matrix = this._matrix;
         return this.emit("change:scale");
@@ -2128,6 +2134,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return this._matrix.scaleX;
       },
       set: function(value) {
+        this.animateStop();
         this._matrix.scaleX = value;
         this._matrix = this._matrix;
         this.emit("change:scaleX");
@@ -2140,6 +2147,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return this._matrix.scaleY;
       },
       set: function(value) {
+        this.animateStop();
         this._matrix.scaleY = value;
         this._matrix = this._matrix;
         this.emit("change:scaleY");
@@ -2152,6 +2160,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return this._matrix.scaleZ;
       },
       set: function(value) {
+        this.animateStop();
         this._matrix.scaleZ = value;
         this._matrix = this._matrix;
         this.emit("change:scaleZ");
@@ -2164,6 +2173,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return this._matrix.rotate;
       },
       set: function(value) {
+        this.animateStop();
         this._matrix.rotate = value;
         this._matrix = this._matrix;
         return this.emit("change:rotate");
@@ -2175,6 +2185,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return this._matrix.rotateX;
       },
       set: function(value) {
+        this.animateStop();
         this._matrix.rotateX = value;
         this._matrix = this._matrix;
         this.emit("change:rotateX");
@@ -2187,6 +2198,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return this._matrix.rotateY;
       },
       set: function(value) {
+        this.animateStop();
         this._matrix.rotateY = value;
         this._matrix = this._matrix;
         this.emit("change:rotateX");
@@ -2199,6 +2211,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return this._matrix.rotateZ;
       },
       set: function(value) {
+        this.animateStop();
         this._matrix.rotateZ = value;
         this._matrix = this._matrix;
         this.emit("change:rotateZ");
@@ -2239,6 +2252,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return parseFloat(this.style.opacity || 1);
       },
       set: function(value) {
+        this.animateStop();
         this.style.opacity = value;
         return this.emit("change:opacity");
       }
@@ -2262,7 +2276,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
 
     View.define("visible", {
       get: function() {
-        return this._visible;
+        return this._visible || true;
       },
       set: function(value) {
         this._visible = value;
@@ -2728,14 +2742,16 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
 });
 
 require.define("/src/primitives/matrix.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Matrix, _;
+  var Matrix, RoundValue, _;
 
   _ = require("underscore");
+
+  RoundValue = 1000;
 
   WebKitCSSMatrix.prototype.cssValues = function() {
     var r, values;
     r = function(v) {
-      return v;
+      return Math.round(v * RoundValue) / RoundValue;
     };
     return values = "matrix3d(" + (r(this.m11)) + ", " + (r(this.m12)) + ", " + (r(this.m13)) + ", " + (r(this.m14)) + "," + (r(this.m21)) + ", " + (r(this.m22)) + ", " + (r(this.m23)) + ", " + (r(this.m24)) + "," + (r(this.m31)) + ", " + (r(this.m32)) + ", " + (r(this.m33)) + ", " + (r(this.m34)) + "," + (r(this.m41)) + ", " + (r(this.m42)) + ", " + (r(this.m43)) + ", " + (r(this.m44)) + ")";
   };
@@ -2981,26 +2997,28 @@ require.define("/src/primitives/events.coffee",function(require,module,exports,_
 });
 
 require.define("/src/animation.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Animation, AnimationCounter, EventEmitter, Matrix, bezier, css, parseCurve, spring, utils, _,
+  var Animation, AnimationCounter, AnimationList, EventEmitter, Matrix, bezier, css, parseCurve, spring, utils, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   _ = require("underscore");
 
-  utils = require("../utils");
+  utils = require("./utils");
 
-  css = require("../css");
+  css = require("./css");
 
   EventEmitter = require("./eventemitter").EventEmitter;
 
-  Matrix = require("../primitives/matrix").Matrix;
+  Matrix = require("./primitives/matrix").Matrix;
 
-  spring = require("../curves/spring");
+  spring = require("./curves/spring");
 
-  bezier = require("../curves/bezier");
+  bezier = require("./curves/bezier");
 
   AnimationCounter = 0;
+
+  AnimationList = [];
 
   parseCurve = function(a, prefix) {
     a = a.replace(prefix, "");
@@ -3017,7 +3035,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     __extends(Animation, _super);
 
-    Animation.prototype.AnimationProperties = ["view", "properties", "curve", "time", "origin", "tolerance", "precision", "graph", "debug"];
+    Animation.prototype.AnimationProperties = ["view", "properties", "curve", "time", "origin", "tolerance", "precision", "graph", "debug", "profile"];
 
     Animation.prototype.AnimatableCSSProperties = {
       opacity: "",
@@ -3030,9 +3048,11 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     function Animation(args) {
       this._cleanup = __bind(this._cleanup, this);
 
-      this.reverse = __bind(this.reverse, this);
+      this._finalize = __bind(this._finalize, this);
 
       this.stop = __bind(this.stop, this);
+
+      this.reverse = __bind(this.reverse, this);
 
       this.start = __bind(this.start, this);
 
@@ -3051,23 +3071,27 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       if ((_ref3 = this.precision) == null) {
         this.precision = 30;
       }
-      this.curveValues = this._parseCurve(this.curve);
-      this.totalTime = this.curveValues.length / this.precision;
       this.count = 0;
       AnimationCounter += 1;
       this.animationId = AnimationCounter;
     }
 
     Animation.prototype.start = function(callback) {
-      var finalize, k, propertiesA, propertiesB, v, _i, _len, _ref, _ref1,
-        _this = this;
+      var endTime, k, propertiesA, propertiesB, startTime, v, _i, _len, _ref, _ref1;
+      AnimationList.push(this);
+      startTime = new Date().getTime();
       this.count++;
       this.animationName = "framer-animation-" + this.animationId + "-" + this.count;
-      this.view.animateStop();
       if (this.debug) {
-        console.log("Animation.start " + this.animationName + " time = " + this.a);
+        console.log("Animation.start " + this.animationName);
       }
+      if (this.profile) {
+        console.profile(this.animationName);
+      }
+      this.view.animateStop();
       this.view._currentAnimations.push(this);
+      this.curveValues = this._parseCurve(this.curve);
+      this.totalTime = this.curveValues.length / this.precision;
       propertiesA = this.view.properties;
       propertiesB = this.properties;
       if (propertiesB.scale) {
@@ -3097,7 +3121,6 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
           this.propertiesB[k] = propertiesB[k];
         }
       }
-      this.keyFrameAnimationCSS = this._css();
       if (this.debug) {
         for (k in this.propertiesA) {
           if (this.propertiesA[k] !== this.propertiesB[k]) {
@@ -3105,52 +3128,17 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
           }
         }
       }
+      this.keyFrameAnimationCSS = this._css();
+      this.view.once("webkitAnimationEnd", this._finalize);
       css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + this.totalTime + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;			}");
       this.view.addClass(this.animationName);
-      finalize = function() {
-        var calculatedStyles, _ref2;
-        if (_this._canceled === true) {
-          return;
-        }
-        _this.view._matrix = utils.extend(new Matrix(), _this.propertiesB);
-        calculatedStyles = {};
-        _ref2 = _this.AnimatableCSSProperties;
-        for (k in _ref2) {
-          v = _ref2[k];
-          calculatedStyles[k] = _this.propertiesB[k] + v;
-        }
-        _this.view.style = calculatedStyles;
-        if (typeof callback === "function") {
-          callback();
-        }
-        _this._cleanup();
-        if (_this.debug) {
-          return console.log("Animation.end " + _this.animationName);
-        }
-      };
-      return this.view.once("webkitAnimationEnd", finalize);
-    };
-
-    Animation.prototype.stop = function() {
-      var calculatedStyles, computedStyles, k, v, _ref;
       if (this.debug) {
-        console.log("Animation.stop " + this.animationName);
+        endTime = new Date().getTime() - startTime;
+        console.log("Animation.setupTime = " + endTime + "ms");
       }
-      this._running = false;
-      this._canceled = true;
-      this.view.style["-webkit-animation-play-state"] = "paused";
-      this.view._matrix = this.view._computedMatrix();
-      this.view._matrix = this.view._computedMatrix();
-      calculatedStyles = {};
-      computedStyles = this.view.computedStyles;
-      _ref = this.AnimatableCSSProperties;
-      for (k in _ref) {
-        v = _ref[k];
-        calculatedStyles[k] = computedStyles;
+      if (this.profile) {
+        return console.profileEnd(this.animationName);
       }
-      this.view.style = calculatedStyles;
-      this._cleanup();
-      return this.view.style["-webkit-animation-play-state"] = "running";
     };
 
     Animation.prototype.reverse = function() {
@@ -3170,9 +3158,49 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       return new Animation(options);
     };
 
-    Animation.prototype._cleanup = function() {
+    Animation.prototype.stop = function() {
+      if (this.debug) {
+        console.log("Animation.stop " + this.animationName);
+      }
+      this._canceled = true;
+      return this._cleanup(false);
+    };
+
+    Animation.prototype._finalize = function() {
+      if (this._canceled === true) {
+        return;
+      }
+      if (this.debug) {
+        console.log("Animation.end " + this.animationName);
+      }
+      this._cleanup(true);
+      return typeof callback === "function" ? callback() : void 0;
+    };
+
+    Animation.prototype._cleanup = function(completed) {
+      var computedStyles, endMatrix, endStyles, k, v, _ref, _ref1;
       this.view._currentAnimations = _.without(this.view._currentAnimations, this);
+      if (completed) {
+        endMatrix = utils.extend(new Matrix(), this.propertiesB);
+        endStyles = {};
+        _ref = this.AnimatableCSSProperties;
+        for (k in _ref) {
+          v = _ref[k];
+          endStyles[k] = this.propertiesB[k] + v;
+        }
+      } else {
+        endMatrix = new Matrix(this.view._computedMatrix());
+        endStyles = {};
+        computedStyles = this.view.computedStyle;
+        _ref1 = this.AnimatableCSSProperties;
+        for (k in _ref1) {
+          v = _ref1[k];
+          endStyles[k] = computedStyles[k];
+        }
+      }
       this.view.removeClass(this.animationName);
+      this.view._matrix = endMatrix;
+      this.view.style = endStyles;
       return this.emit("end");
     };
 

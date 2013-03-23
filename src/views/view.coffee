@@ -29,14 +29,14 @@ class View extends Frame
 		# @addClass "animated"
 		
 		@clip = args.clip or View.Properties.clip
+
+		@_subViews = []
+		@_currentAnimations = []
 		
 		@properties = args
 		
 		if not args.superView
 			@_insertElement()
-		
-		@_subViews = []
-		@_currentAnimations = []
 		
 		# Override this prototype to change all behaviour
 		@_postCreate()
@@ -95,6 +95,7 @@ class View extends Frame
 		get: ->
 			parseFloat @style.width
 		set: (value) ->
+			@animateStop()
 			@style.width = "#{value}px"
 			@emit "change:width"
 			@emit "change:frame"
@@ -103,6 +104,7 @@ class View extends Frame
 		get: ->
 			parseFloat @style.height
 		set: (value) ->
+			@animateStop()
 			@style.height = "#{value}px"
 			@emit "change:height"
 			@emit "change:frame"
@@ -110,6 +112,7 @@ class View extends Frame
 	@define "x"
 		get: -> @_matrix.x
 		set: (value) ->
+			@animateStop()
 			@_matrix.x = value
 			@_matrix = @_matrix
 			@emit "change:x"
@@ -118,6 +121,7 @@ class View extends Frame
 	@define "y"
 		get: -> @_matrix.y
 		set: (value) ->
+			@animateStop()
 			@_matrix.y = value
 			@_matrix = @_matrix
 			@emit "change:y"
@@ -126,6 +130,7 @@ class View extends Frame
 	@define "z"
 		get: -> @_matrix.z
 		set: (value) ->
+			@animateStop()
 			@_matrix.z = value
 			@_matrix = @_matrix
 			@emit "change:z"
@@ -137,6 +142,7 @@ class View extends Frame
 	@define "scale"
 		get: -> @_matrix.scale
 		set: (value) ->
+			@animateStop()
 			@_matrix.scale = value
 			@_matrix = @_matrix
 
@@ -145,6 +151,7 @@ class View extends Frame
 	@define "scaleX"
 		get: -> @_matrix.scaleX
 		set: (value) ->
+			@animateStop()
 			@_matrix.scaleX = value
 			@_matrix = @_matrix
 
@@ -154,6 +161,7 @@ class View extends Frame
 	@define "scaleY"
 		get: -> @_matrix.scaleY
 		set: (value) ->
+			@animateStop()
 			@_matrix.scaleY = value
 			@_matrix = @_matrix
 
@@ -163,6 +171,7 @@ class View extends Frame
 	@define "scaleZ"
 		get: -> @_matrix.scaleZ
 		set: (value) ->
+			@animateStop()
 			@_matrix.scaleZ = value
 			@_matrix = @_matrix
 
@@ -176,6 +185,7 @@ class View extends Frame
 	@define "rotate"
 		get: -> @_matrix.rotate
 		set: (value) ->
+			@animateStop()
 			@_matrix.rotate = value
 			@_matrix = @_matrix
 
@@ -184,6 +194,7 @@ class View extends Frame
 	@define "rotateX"
 		get: -> @_matrix.rotateX
 		set: (value) ->
+			@animateStop()
 			@_matrix.rotateX = value
 			@_matrix = @_matrix
 			
@@ -193,6 +204,7 @@ class View extends Frame
 	@define "rotateY"
 		get: -> @_matrix.rotateY
 		set: (value) ->
+			@animateStop()
 			@_matrix.rotateY = value
 			@_matrix = @_matrix
 
@@ -202,6 +214,7 @@ class View extends Frame
 	@define "rotateZ"
 		get: -> @_matrix.rotateZ
 		set: (value) ->
+			@animateStop()
 			@_matrix.rotateZ = value
 			@_matrix = @_matrix
 
@@ -245,6 +258,7 @@ class View extends Frame
 		get: ->
 			parseFloat @style.opacity or 1
 		set: (value) ->
+			@animateStop()
 			@style.opacity = value
 			@emit "change:opacity"
 	
@@ -259,7 +273,7 @@ class View extends Frame
 	
 	@define "visible"
 		get: ->
-			@_visible
+			@_visible or true
 		set: (value) ->
 			@_visible = value
 			@style.display = "block" if value is true

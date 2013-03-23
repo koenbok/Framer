@@ -9,6 +9,7 @@ spring = require "./curves/spring"
 bezier = require "./curves/bezier"
 
 AnimationCounter = 0
+AnimationList = []
 
 parseCurve = (a, prefix) ->
 
@@ -27,7 +28,7 @@ class Animation extends EventEmitter
 	
 	AnimationProperties: [
 		"view", "properties", "curve", "time",
-		"origin", "tolerance", "precision", "graph", "debug"
+		"origin", "tolerance", "precision", "graph", "debug", "profile"
 	]
 	AnimatableCSSProperties: {
 		opacity: "",
@@ -52,11 +53,7 @@ class Animation extends EventEmitter
 		@time ?= 1000
 		@curve ?= "linear"
 		@precision ?= 30
-		
-		@curveValues = @_parseCurve @curve
-		@totalTime = @curveValues.length / @precision
 		@count = 0
-		# @animationId = utils.uuid()[..8]
 		
 		AnimationCounter += 1
 		@animationId = AnimationCounter
@@ -64,28 +61,36 @@ class Animation extends EventEmitter
 		
 	start: (callback) =>
 		
+		AnimationList.push @
+		
+		########################################################
+		# Set up some variables to start with
+		
+		startTime = new Date().getTime()
+		
 		@count++
 		@animationName = "framer-animation-#{@animationId}-#{@count}"
 		
-
-		
-		# See if we have other animations running on this view
-		# if @view._currentAnimations.length > 0
-		# 	console.log "Warning: Animation.start #{@animationName} already
-		# 	 animations running on view #{@view.name}"
+		console.log "Animation.start #{@animationName}" if @debug
+		console.profile @animationName if @profile
 		
 		
-		# We stop all other animations on this view. Maybe we should revisit
-		# this or give an option to disable it, but for now it makes sens because 1)
-		# you almost always want this and 2) we don't support simultaneous animations.
-		
-		# TODO: This doesn't work
+		########################################################
+		# Deal with other animations on this view
 		
 		@view.animateStop()
-
-		console.log "Animation.start #{@animationName} time = #{@a}" if @debug
-
 		@view._currentAnimations.push @
+		
+		
+		########################################################
+		# Calculate the curve values
+		
+		@curveValues = @_parseCurve @curve
+		@totalTime = @curveValues.length / @precision
+
+		
+		########################################################
+		# Build a property list that we want to animate
 
 		# TODO: test if we are trying to animate something that cannot animate
 		
@@ -121,22 +126,18 @@ class Animation extends EventEmitter
 			if propertiesB.hasOwnProperty k
 				@propertiesA[k] = propertiesA[k]
 				@propertiesB[k] = propertiesB[k]
-		
-		@keyFrameAnimationCSS = @_css()
-		
+
 		if @debug
 			for k of @propertiesA
 				if @propertiesA[k] isnt @propertiesB[k]
 					console.log " .#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
-		
-		
-		# css.addStyle @keyFrameAnimationCSS
-		#
-		# @view.style =
-		# 	webkitAnimationName: @animationName
-		# 	webkitAnimationDuration: totalTime
-		# 	webkitAnimationTimingFunction: "linear"
-		# 	webkitAnimationFillMode: "both"
+
+
+		########################################################
+		# Generate the keyframe css and insert
+
+		@keyFrameAnimationCSS = @_css()
+		@view.once "webkitAnimationEnd", @_finalize
 		
 		css.addStyle "
 			#{@keyFrameAnimationCSS}
@@ -149,57 +150,17 @@ class Animation extends EventEmitter
 			}"
 		
 		@view.addClass @animationName
-			
-		finalize = =>
-			
-			if @_canceled is true
-				return
-			
-			# Copy over the end state properties for this animation so we can safely
-			# remove the animation.
-			@view._matrix = utils.extend new Matrix(), @propertiesB
-			
-			# Copy over the end state css properties
-			calculatedStyles = {}
-			for k, v of @AnimatableCSSProperties
-				calculatedStyles[k] = @propertiesB[k] + v
-			@view.style = calculatedStyles
-			
-			callback?()
-			@_cleanup()
-			
-			console.log "Animation.end #{@animationName}" if @debug
-			
-			# console.profileEnd "Animation.start"
 		
-		@view.once "webkitAnimationEnd", finalize
+		
+		########################################################
+		# Finalize
 
-	
-	stop: =>
+		if @debug
+			endTime = new Date().getTime() - startTime
+			console.log "Animation.setupTime = #{endTime}ms"
 		
-		console.log "Animation.stop #{@animationName}" if @debug
-		
-		@_running = false
-		@_canceled = true
-		
-		@view.style["-webkit-animation-play-state"] = "paused"
-		
-		# Copy over the calculated properties at this point in the animation so
-		# we can safely remove it without the element jumping around.
-		@view._matrix = @view._computedMatrix()
-		
-		# Copy over the end state css properties
-		calculatedStyles = {}
-		computedStyles = @view.computedStyles
-		for k, v of @AnimatableCSSProperties
-			calculatedStyles[k] = computedStyles
-		@view.style = calculatedStyles
-		
-		@_cleanup()
-		
-		
-		@view.style["-webkit-animation-play-state"] = "running"
-	
+		console.profileEnd @animationName if @profile
+
 	reverse: =>
 		
 		# Return the inverse of this animation
@@ -215,17 +176,66 @@ class Animation extends EventEmitter
 			options.properties[k] = @view[k]
 			
 		return new Animation options
+
+
 	
-	_cleanup: =>
+	stop: =>
 		
+		console.log "Animation.stop #{@animationName}" if @debug
+		
+		@_canceled = true
+		
+		# @view.style["-webkit-animation-play-state"] = "paused"
+
+		@_cleanup false
+		
+		# @view.style["-webkit-animation-play-state"] = "running"
+	
+
+	_finalize: =>
+
+		if @_canceled is true
+			return
+		
+		console.log "Animation.end #{@animationName}" if @debug
+		
+		@_cleanup true
+		
+		callback?()
+
+
+	_cleanup: (completed) =>
+
 		# Remove this animation from the current ones for this view
 		@view._currentAnimations = _.without @view._currentAnimations, @
+		
+		if completed
+			
+			# A matrix with the defined end state
+			endMatrix = utils.extend new Matrix(), @propertiesB
+			endStyles = {}
+			
+			for k, v of @AnimatableCSSProperties
+				endStyles[k] = @propertiesB[k] + v
+
+		else
+			# A matrix from the current state
+			endMatrix = new Matrix(@view._computedMatrix())
+			endStyles = {}
+
+			computedStyles = @view.computedStyle
+
+			for k, v of @AnimatableCSSProperties
+				endStyles[k] = computedStyles[k]
+		
+		# Remove the animation class
 		@view.removeClass @animationName
+		
+		# Set the end states
+		@view._matrix = endMatrix
+		@view.style = endStyles
+		
 		@emit "end"
-		
-		# @_graphView?.visible = false
-		
-		# console.log "_cleanup", @view._currentAnimations
 		
 	_css: ->
 		
