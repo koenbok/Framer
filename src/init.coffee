@@ -2,6 +2,7 @@ require "./css"
 
 utils = require "./utils"
 debug = require "./debug"
+{tools} = require "./tools/init"
 
 {View} = require "./views/view"
 {ViewList} = require "./views/view"
@@ -17,14 +18,13 @@ debug = require "./debug"
 Global = {}
 Global.View = View
 Global.ScrollView = ScrollView
-# Global.CollectionView = CollectionView
 Global.ImageView = ImageView
-# Global.TextView = TextView
 Global.Animation = Animation
 Global.Frame = Frame
 Global.Spring = Spring
 
 Global.utils = utils
+Global.tools = tools
 Global.ViewList = ViewList
 Global.debug = debug.debug
 

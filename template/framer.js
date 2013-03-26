@@ -729,6 +729,107 @@ require.define("/src/debug.coffee",function(require,module,exports,__dirname,__f
 
 });
 
+require.define("/src/tools/init.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+
+  exports.tools = {};
+
+  exports.tools.facebook = (require("./facebook")).facebook;
+
+}).call(this);
+
+});
+
+require.define("/src/tools/facebook.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+  var FacebookAccessTokenKey, FacebookBaseURL, facebook;
+
+  facebook = {};
+
+  FacebookAccessTokenKey = "token";
+
+  FacebookBaseURL = "https://graph.facebook.com/me";
+
+  facebook.query = function(query, callback) {
+    var _ref;
+    facebook._token = localStorage.getItem(FacebookAccessTokenKey);
+    if ((_ref = facebook._token) === (void 0) || _ref === "") {
+      facebook._tokenDialog();
+      return;
+    }
+    return facebook._loadJQuery(function() {
+      var data;
+      data = {
+        fields: query,
+        method: "GET",
+        format: "json",
+        access_token: facebook._token
+      };
+      return $.ajax({
+        url: FacebookBaseURL,
+        data: data,
+        dataType: "json",
+        success: callback,
+        error: function(error) {
+          var _ref1;
+          console.log("error", error);
+          if ((_ref1 = error.status) === 0 || _ref1 === 400) {
+            return facebook._tokenDialog();
+          }
+        }
+      });
+    });
+  };
+
+  facebook.logout = function() {
+    localStorage.setItem(FacebookAccessTokenKey, "");
+    return document.location.reload();
+  };
+
+  facebook._loadJQuery = function(callback) {
+    var script;
+    if (typeof $ === "undefined") {
+      script = document.createElement("script");
+      script.src = 'http://cdnjs.cloudflare.com/ajax/libs/zepto/1.0/zepto.min.js';
+      script.type = 'text/javascript';
+      document.getElementsByTagName('head')[0].appendChild(script);
+      return script.onload = callback;
+    } else {
+      return callback();
+    }
+  };
+
+  facebook._tokenDialog = function() {
+    var view;
+    view = new View({
+      width: 500,
+      height: 120,
+      midX: window.innerWidth / 2,
+      midY: window.innerHeight / 2
+    });
+    view.style = {
+      padding: "20px",
+      backgroundColor: "#e9eaed"
+    };
+    view.html = "		<input type='text' id='tokenDialog'			placeholder='Paste Facebook Access Token' 			style='font:16px/1em Menlo;width:440px;padding:10px 10px 5px 5px' 			onpaste='tools.facebook._tokenDialogUpdate(this)'			onkeyup='tools.facebook._tokenDialogUpdate(this)'		>		<div style='text-align:center;font-size:18px;font-weight:bold;padding-top:20px'>			<a href='https://developers.facebook.com/tools/explorer' target='new'>Get it here</a>		</div	";
+    return utils.delay(0, function() {
+      var tokenInput;
+      tokenInput = window.document.getElementById("tokenDialog");
+      return tokenInput.focus();
+    });
+  };
+
+  facebook._tokenDialogUpdate = function(event) {
+    if (event.value.length > 50) {
+      localStorage.setItem(FacebookAccessTokenKey, event.value);
+      return document.location.reload();
+    }
+  };
+
+  exports.facebook = facebook;
+
+}).call(this);
+
+});
+
 require.define("/src/views/view.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
   var Animation, EventClass, EventEmitter, EventTypes, Frame, Spring, View, utils, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -3244,13 +3345,15 @@ require.define("/src/views/imageview.coffee",function(require,module,exports,__d
 });
 
 require.define("/src/init.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Animation, Frame, Global, ImageView, ScrollView, Spring, View, ViewList, debug, k, utils, v;
+  var Animation, Frame, Global, ImageView, ScrollView, Spring, View, ViewList, debug, k, tools, utils, v;
 
   require("./css");
 
   utils = require("./utils");
 
   debug = require("./debug");
+
+  tools = require("./tools/init").tools;
 
   View = require("./views/view").View;
 
@@ -3281,6 +3384,8 @@ require.define("/src/init.coffee",function(require,module,exports,__dirname,__fi
   Global.Spring = Spring;
 
   Global.utils = utils;
+
+  Global.tools = tools;
 
   Global.ViewList = ViewList;
 
