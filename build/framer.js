@@ -807,9 +807,12 @@ require.define("/src/tools/facebook.coffee",function(require,module,exports,__di
     });
     view.style = {
       padding: "20px",
-      backgroundColor: "#e9eaed"
+      backgroundColor: "#e5e5e5",
+      webkitBoxShadow: "0px 2px 10px 0px rgba(0,0,0,.2)",
+      border: "1px solid rgba(0,0,0,.1)",
+      borderRadius: "4px"
     };
-    view.html = "		<input type='text' id='tokenDialog'			placeholder='Paste Facebook Access Token' 			style='font:16px/1em Menlo;width:440px;padding:10px 10px 5px 5px' 			onpaste='tools.facebook._tokenDialogUpdate(this)'			onkeyup='tools.facebook._tokenDialogUpdate(this)'		>		<div style='text-align:center;font-size:18px;font-weight:bold;padding-top:20px'>			<a href='https://developers.facebook.com/tools/explorer' target='new'>Get it here</a>		</div	";
+    view.html = "		<input type='text' id='tokenDialog'			placeholder='Paste Facebook Access Token' 			style='font:16px/1em Menlo;width:440px;padding:10px 10px 5px 5px' 			onpaste='tools.facebook._tokenDialogUpdate(this)'			onkeyup='tools.facebook._tokenDialogUpdate(this)'		>		<div style='text-align:center;font-size:18px;font-weight:bold;padding-top:20px'>			<a href='https://developers.facebook.com/tools/explorer' target='new'>Find access token here</a>		</div	";
     return utils.delay(0, function() {
       var tokenInput;
       tokenInput = window.document.getElementById("tokenDialog");
