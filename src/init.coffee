@@ -34,6 +34,9 @@ if window
 	for k, v of Global
 		window[k] = v
 
+# Add underscore
+window._ = require "underscore"
+
 # Alert if not WebKit
 if not utils.isWebKit()
 	alert "Sorry, only WebKit browsers are currently supported. \

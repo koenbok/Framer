@@ -3399,6 +3399,8 @@ require.define("/src/init.coffee",function(require,module,exports,__dirname,__fi
     }
   }
 
+  window._ = require("underscore");
+
   if (!utils.isWebKit()) {
     alert("Sorry, only WebKit browsers are currently supported. \See https://github.com/koenbok/Framer/issues/2 for more info.");
   }
