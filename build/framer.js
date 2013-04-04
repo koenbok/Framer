@@ -1,6 +1,6 @@
-// Framer 0.5.0-56-g685804a (c) 2013 Koen Bok
+// Framer 0.5.0-57-g1c91f4a (c) 2013 Koen Bok
 
-window.FramerVersion = "0.5.0-56-g685804a";
+window.FramerVersion = "0.5.0-57-g1c91f4a";
 
 
 (function(){var require = function (file, cwd) {
@@ -639,6 +639,10 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
     }
   };
 
+  exports.pointInRect = function(point, rect) {
+    return alert("Not implemented, you lazy man");
+  };
+
   exports.uuid = function() {
     var chars, digit, output, r, random, _i;
     chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
@@ -656,10 +660,15 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
   };
 
   exports.isWebKit = function() {
-    var isChrome, isSafari;
-    isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-    isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
-    return true === isChrome || true === isSafari;
+    return window.WebKitCSSMatrix !== null;
+  };
+
+  exports.isTouch = function() {
+    return window.ontouchstart === null;
+  };
+
+  exports.isMobile = function() {
+    return /iphone|ipod|android|ie|blackberry|fennec/.test(navigator.userAgent.toLowerCase());
   };
 
 }).call(this);
@@ -1930,7 +1939,8 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
   var Animation, EventClass, EventEmitter, EventTypes, Frame, Matrix, View, utils, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   utils = require("../utils");
 
@@ -2052,6 +2062,17 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
 
     View.prototype.screenFrame = function() {
       return utils.convertPoint(this.frame, this, null);
+    };
+
+    View.prototype.contentFrame = function() {
+      var frame;
+      frame = {
+        x: utils.min(_.pluck(this.subViews, "minX")),
+        y: utils.min(_.pluck(this.subViews, "minY"))
+      };
+      frame.width = utils.max(_.pluck(this.subViews, "maxX")) - frame.x;
+      frame.height = utils.max(_.pluck(this.subViews, "maxY")) - frame.y;
+      return frame;
     };
 
     View.define("width", {
@@ -2290,10 +2311,6 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       }
     });
 
-    View.prototype.removeFromSuperview = function() {
-      return this.superView = null;
-    };
-
     View.define("superView", {
       get: function() {
         return this._superView || null;
@@ -2305,11 +2322,13 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         document.removeEventListener("DOMContentLoaded", this.__insertElement);
         if (this._superView) {
           this._superView._element.removeChild(this._element);
-          utils.remove(this._superView._subViews, this);
+          this._superView._subViews = _.without(this._superView._subViews, this);
+          this._superView.emit("change:subViews");
         }
         if (value) {
           value._element.appendChild(this._element);
           value._subViews.push(this);
+          value.emit("change:subViews");
         } else {
           this.__insertElement();
         }
@@ -2320,9 +2339,20 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
 
     View.define("subViews", {
       get: function() {
-        return this._subViews;
+        return _.compact(this._subViews);
       }
     });
+
+    View.prototype.addSubView = function(view) {
+      return view.superView = this;
+    };
+
+    View.prototype.removeSubView = function(view) {
+      if (__indexOf.call(this.subViews, view) < 0) {
+        return;
+      }
+      return view.superView = null;
+    };
 
     View.define("index", {
       get: function() {
@@ -3780,6 +3810,7 @@ require.define("/src/init.coffee",function(require,module,exports,__dirname,__fi
 
   if (window) {
     window.Framer = Global;
+    window._ = require("underscore");
     for (k in Global) {
       v = Global[k];
       window[k] = v;
