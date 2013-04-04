@@ -87,6 +87,16 @@ class View extends Frame
 		# Get this views absolute frame on the screen
 		utils.convertPoint @frame, @, null
 
+	contentFrame: ->
+		# Get the combined size of all subviews
+		frame =
+			x: utils.min _.pluck(@subViews, "minX")
+			y: utils.min _.pluck(@subViews, "minY")
+		
+		frame.width  = utils.max(_.pluck(@subViews, "maxX")) - frame.x
+		frame.height = utils.max(_.pluck(@subViews, "maxY")) - frame.y
+		
+		frame
 
 	#############################################################################
 	## Geometry
@@ -284,9 +294,6 @@ class View extends Frame
 	#############################################################################
 	## Hierarchy
 	
-	removeFromSuperview: ->
-		@superView = null
-	
 	@define "superView"
 		get: -> @_superView or null
 		set: (value) ->
@@ -299,12 +306,14 @@ class View extends Frame
 			# Remove from previous superview subviews
 			if @_superView
 				@_superView._element.removeChild @_element
-				utils.remove @_superView._subViews, @
+				@_superView._subViews = _.without @_superView._subViews, @
+				@_superView.emit "change:subViews"
 			
 			# Either insert the element to the new superview or into dom
 			if value
 				value._element.appendChild @_element
 				value._subViews.push @
+				value.emit "change:subViews"
 			else
 				@__insertElement()
 			
@@ -312,10 +321,20 @@ class View extends Frame
 			@emit "change:superView"
 	
 	@define "subViews"
-		get: -> @_subViews
+		get: -> _.compact @_subViews
+
+	addSubView: (view) ->
+		view.superView = @
+	
+	removeSubView: (view) ->
+		
+		if view not in @subViews
+			return
+		
+		view.superView = null
 
 	#############################################################################
-	## Indexes
+	## Ordering
 
 	@define "index"
 		get: -> @style['z-index'] or 0
