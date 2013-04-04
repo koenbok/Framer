@@ -155,6 +155,9 @@ exports.sum = (a) ->
 	else
 		0
 
+exports.pointInRect = (point, rect) ->
+	alert "Not implemented, you lazy man"
+
 exports.uuid = ->
 
 	chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('')
@@ -169,17 +172,12 @@ exports.uuid = ->
 
 	output.join('')
 
-
-
 exports.isWebKit = ->
-	
-	isChrome = /Chrome/.test(navigator.userAgent) and \
-		/Google Inc/.test(navigator.vendor)
-	isSafari = /Safari/.test(navigator.userAgent) and \
-		 /Apple Computer/.test(navigator.vendor)
+	window.WebKitCSSMatrix isnt null
 
-	return true in [isChrome, isSafari]
-	
-	
-	
-	
+exports.isTouch = ->
+	window.ontouchstart is null
+
+exports.isMobile = ->
+	(/iphone|ipod|android|ie|blackberry|fennec/).test \
+		navigator.userAgent.toLowerCase()
