@@ -28,8 +28,10 @@ Global.ViewList = ViewList
 Global.debug = debug.debug
 Global.css = css
 
+
 if window
 	window.Framer = Global
+	window._ = require "underscore"
 	
 	for k, v of Global
 		window[k] = v
