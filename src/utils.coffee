@@ -67,7 +67,7 @@ exports.filter = (source, iterator) ->
 			b[key] = value
 	return b
 
-# Public: Produce an array continting the elements from all
+# Public: Produce an array containing the elements from all
 # arguments.
 #
 # NOTE: This will include duplicate elements.
@@ -144,7 +144,7 @@ exports.interval = (time, f) ->
 #
 # Returns the passed Array
 #
-exports.remove = (a, e) -> 
+exports.remove = (a, e) ->
 	a.splice(t,1)[0] if (t = a.indexOf(e)) > -1
 	a
 	
