@@ -28,7 +28,8 @@ class Animation extends EventEmitter
 	
 	AnimationProperties: [
 		"view", "properties", "curve", "time",
-		"origin", "tolerance", "precision", "graph", "debug", "profile"
+		"origin", "tolerance", "precision", "modifiers" 
+		"debug", "profile"
 	]
 	AnimatableCSSProperties: {
 		opacity: "",
@@ -248,13 +249,7 @@ class Animation extends EventEmitter
 		cssString = []
 		cssString.push "@-webkit-keyframes #{@animationName} {\n"
 		
-		deltas = {}
-		
-		# Pre-calculate the delta values
-		for propertyName, value of @propertiesA
-			deltas[propertyName] = (
-				@propertiesB[propertyName] - @propertiesA[propertyName]
-			) / 100.0
+		deltas = @_deltas()
 		
 		# We define this object outside of the loop to re-use it.
 		# In theory this should help a bit with perfomance, in practise
@@ -269,7 +264,16 @@ class Animation extends EventEmitter
 			
 			# Add the matrix based values
 			for propertyName in @AnimatableMatrixProperties
+				
+				# Calculate the clean spring value for this point
 				value = springValue * deltas[propertyName] + @propertiesA[propertyName]
+				
+				# Modify the value if we have a modifier set up. This let's us do 
+				# special stuff like drop the friction once we run into the scroll 
+				# bounds for a scrollview.
+				if @modifiers?[propertyName]?
+					value = @modifiers[propertyName](value)
+				
 				m[propertyName] = value
 			
 			cssString.push m.matrix().cssValues() + "; "
@@ -285,7 +289,16 @@ class Animation extends EventEmitter
 			
 		cssString.push "}\n"
 		cssString.join ""
-
+	
+	_deltas: ->
+		
+		deltas = {}
+		
+		# Pre-calculate the delta values
+		for k of @propertiesA
+			deltas[k] = (@propertiesB[k] - @propertiesA[k]) / 100.0
+		
+		return deltas
 		
 	_parseCurve: (curve) ->
 		

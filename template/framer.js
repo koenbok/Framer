@@ -1,6 +1,6 @@
-// Framer 0.5.0-57-g1c91f4a (c) 2013 Koen Bok
+// Framer 0.5.0-61-g3fea5e0 (c) 2013 Koen Bok
 
-window.FramerVersion = "0.5.0-57-g1c91f4a";
+window.FramerVersion = "0.5.0-61-g3fea5e0";
 
 
 (function(){var require = function (file, cwd) {
@@ -3065,7 +3065,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     __extends(Animation, _super);
 
-    Animation.prototype.AnimationProperties = ["view", "properties", "curve", "time", "origin", "tolerance", "precision", "graph", "debug", "profile"];
+    Animation.prototype.AnimationProperties = ["view", "properties", "curve", "time", "origin", "tolerance", "precision", "modifiers", "debug", "profile"];
 
     Animation.prototype.AnimatableCSSProperties = {
       opacity: "",
@@ -3240,22 +3240,20 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       stepDelta = 100 / (this.curveValues.length - 1);
       cssString = [];
       cssString.push("@-webkit-keyframes " + this.animationName + " {\n");
-      deltas = {};
-      _ref = this.propertiesA;
-      for (propertyName in _ref) {
-        value = _ref[propertyName];
-        deltas[propertyName] = (this.propertiesB[propertyName] - this.propertiesA[propertyName]) / 100.0;
-      }
+      deltas = this._deltas();
       m = new Matrix();
-      _ref1 = this.curveValues;
-      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-        springValue = _ref1[_i];
+      _ref = this.curveValues;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        springValue = _ref[_i];
         position = stepIncrement * stepDelta;
         cssString.push("\t" + position + "%\t{ -webkit-transform: ");
-        _ref2 = this.AnimatableMatrixProperties;
-        for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
-          propertyName = _ref2[_j];
+        _ref1 = this.AnimatableMatrixProperties;
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          propertyName = _ref1[_j];
           value = springValue * deltas[propertyName] + this.propertiesA[propertyName];
+          if (((_ref2 = this.modifiers) != null ? _ref2[propertyName] : void 0) != null) {
+            value = this.modifiers[propertyName](value);
+          }
           m[propertyName] = value;
         }
         cssString.push(m.matrix().cssValues() + "; ");
@@ -3273,6 +3271,15 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       }
       cssString.push("}\n");
       return cssString.join("");
+    };
+
+    Animation.prototype._deltas = function() {
+      var deltas, k;
+      deltas = {};
+      for (k in this.propertiesA) {
+        deltas[k] = (this.propertiesB[k] - this.propertiesA[k]) / 100.0;
+      }
+      return deltas;
     };
 
     Animation.prototype._parseCurve = function(curve) {
