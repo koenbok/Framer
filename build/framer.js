@@ -1,6 +1,6 @@
-// Framer 0.5.0-61-g3fea5e0 (c) 2013 Koen Bok
+// Framer 0.5.0-62-g2aaea25 (c) 2013 Koen Bok
 
-window.FramerVersion = "0.5.0-61-g3fea5e0";
+window.FramerVersion = "0.5.0-62-g2aaea25";
 
 
 (function(){var require = function (file, cwd) {
@@ -447,25 +447,25 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
     return a;
   };
 
-  exports.update = function(a, b) {
+  exports.update = function(target, source) {
     var keys;
-    keys = exports.keys(a);
-    exports.extend(a, exports.filter(b, function(k) {
+    keys = exports.keys(target);
+    exports.extend(target, exports.filter(source, function(k) {
       return __indexOf.call(keys, k) >= 0;
     }));
     return a;
   };
 
-  exports.copy = function(a) {
-    return exports.extend({}, a);
+  exports.copy = function(source) {
+    return exports.extend({}, source);
   };
 
-  exports.filter = function(a, f) {
+  exports.filter = function(source, iterator) {
     var b, key, value;
     b = {};
-    for (key in a) {
-      value = a[key];
-      if (f(key, value)) {
+    for (key in source) {
+      value = source[key];
+      if (iterator(key, value)) {
         b[key] = value;
       }
     }
@@ -502,12 +502,14 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
   };
 
   exports.randomColor = function(alpha) {
-    var a, c;
-    a = alpha || 1.0;
+    var c;
+    if (alpha == null) {
+      alpha = 1.0;
+    }
     c = function() {
       return parseInt(Math.random() * 255);
     };
-    return "rgba(" + (c()) + ", " + (c()) + ", " + (c()) + ", " + a + ")";
+    return "rgba(" + (c()) + ", " + (c()) + ", " + (c()) + ", " + alpha + ")";
   };
 
   exports.delay = function(time, f) {
@@ -526,7 +528,7 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
     return timer;
   };
 
-  exports.debounce = function(func, threshold, execAsap) {
+  exports.debounce = function(fn, threshold, immediate) {
     var timeout;
     timeout = null;
     return function() {
@@ -534,15 +536,15 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       obj = this;
       delayed = function() {
-        if (!execAsap) {
-          func.apply(obj, args);
+        if (!immediate) {
+          fn.apply(obj, args);
         }
         return timeout = null;
       };
       if (timeout) {
         clearTimeout(timeout);
-      } else if (execAsap) {
-        func.apply(obj, args);
+      } else if (immediate) {
+        fn.apply(obj, args);
       }
       return timeout = setTimeout(delayed, threshold || 100);
     };
@@ -1930,6 +1932,110 @@ require.define("/src/debug.coffee",function(require,module,exports,__dirname,__f
       return exports.debug();
     }
   };
+
+}).call(this);
+
+});
+
+require.define("/src/tools/init.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+
+  exports.tools = {};
+
+  exports.tools.facebook = (require("./facebook")).facebook;
+
+}).call(this);
+
+});
+
+require.define("/src/tools/facebook.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+  var FacebookAccessTokenKey, FacebookBaseURL, facebook;
+
+  facebook = {};
+
+  FacebookAccessTokenKey = "token";
+
+  FacebookBaseURL = "https://graph.facebook.com/me";
+
+  facebook.query = function(query, callback) {
+    var _ref;
+    facebook._token = localStorage.getItem(FacebookAccessTokenKey);
+    if ((_ref = facebook._token) === (void 0) || _ref === "") {
+      facebook._tokenDialog();
+      return;
+    }
+    return facebook._loadJQuery(function() {
+      var data;
+      data = {
+        fields: query,
+        method: "GET",
+        format: "json",
+        access_token: facebook._token
+      };
+      return $.ajax({
+        url: FacebookBaseURL,
+        data: data,
+        dataType: "json",
+        success: callback,
+        error: function(error) {
+          var _ref1;
+          console.log("error", error);
+          if ((_ref1 = error.status) === 0 || _ref1 === 400) {
+            return facebook._tokenDialog();
+          }
+        }
+      });
+    });
+  };
+
+  facebook.logout = function() {
+    localStorage.setItem(FacebookAccessTokenKey, "");
+    return document.location.reload();
+  };
+
+  facebook._loadJQuery = function(callback) {
+    var script;
+    if (typeof $ === "undefined") {
+      script = document.createElement("script");
+      script.src = "http://cdnjs.cloudflare.com/ajax/libs/zepto/1.0/zepto.min.js";
+      script.type = "text/javascript";
+      document.getElementsByTagName("head")[0].appendChild(script);
+      return script.onload = callback;
+    } else {
+      return callback();
+    }
+  };
+
+  facebook._tokenDialog = function() {
+    var view;
+    view = new View({
+      width: 500,
+      height: 120,
+      midX: window.innerWidth / 2,
+      midY: window.innerHeight / 2
+    });
+    view.style = {
+      padding: "20px",
+      backgroundColor: "#e5e5e5",
+      webkitBoxShadow: "0px 2px 10px 0px rgba(0,0,0,.2)",
+      border: "1px solid rgba(0,0,0,.1)",
+      borderRadius: "4px"
+    };
+    view.html = "		<input type='text' id='tokenDialog'			placeholder='Paste Facebook Access Token' 			style='font:16px/1em Menlo;width:440px;padding:10px 10px 5px 5px' 			onpaste='tools.facebook._tokenDialogUpdate(this)'			onkeyup='tools.facebook._tokenDialogUpdate(this)'		>		<div style='			text-align:center;			font-size:18px;			font-weight:			bold;			padding-top:20px		'>			<a href='https://developers.facebook.com/tools/explorer' target='new'>				Find access token here			</a>		</div	";
+    return utils.delay(0, function() {
+      var tokenInput;
+      tokenInput = window.document.getElementById("tokenDialog");
+      return tokenInput.focus();
+    });
+  };
+
+  facebook._tokenDialogUpdate = function(event) {
+    if (event.value.length > 50) {
+      localStorage.setItem(FacebookAccessTokenKey, event.value);
+      return document.location.reload();
+    }
+  };
+
+  exports.facebook = facebook;
 
 }).call(this);
 
@@ -3771,13 +3877,15 @@ require.define("/src/views/imageview.coffee",function(require,module,exports,__d
 });
 
 require.define("/src/init.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Animation, Frame, Global, ImageView, Matrix, ScrollView, View, ViewList, css, debug, k, utils, v;
+  var Animation, Frame, Global, ImageView, Matrix, ScrollView, View, ViewList, css, debug, k, tools, utils, v;
 
   css = require("./css");
 
   utils = require("./utils");
 
   debug = require("./debug");
+
+  tools = require("./tools/init").tools;
 
   View = require("./views/view").View;
 
@@ -3809,6 +3917,8 @@ require.define("/src/init.coffee",function(require,module,exports,__dirname,__fi
 
   Global.utils = utils;
 
+  Global.tools = tools;
+
   Global.ViewList = ViewList;
 
   Global.debug = debug.debug;
@@ -3823,6 +3933,8 @@ require.define("/src/init.coffee",function(require,module,exports,__dirname,__fi
       window[k] = v;
     }
   }
+
+  window._ = require("underscore");
 
   if (!utils.isWebKit()) {
     alert("Sorry, only WebKit browsers are currently supported. \See https://github.com/koenbok/Framer/issues/2 for more info.");
