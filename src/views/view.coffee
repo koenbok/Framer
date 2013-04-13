@@ -45,7 +45,7 @@ class View extends Frame
 	
 	# Helpers
 
-	@define "name"
+	@define "name",
 		get: ->
 			@_name or @id
 			
@@ -53,7 +53,7 @@ class View extends Frame
 			@_name = value
 			@_element.setAttribute "name", @_name
 
-	@define "properties"
+	@define "properties",
 		get: ->
 			p = {}
 			for key, value of View.Properties
@@ -72,7 +72,7 @@ class View extends Frame
 	#############################################################################
 	## Geometry Utils
 
-	@define "frame"
+	@define "frame",
 		get: -> new Frame {x:@x, y:@y, width:@width, height:@height}
 		set: (value) ->
 			return if not value
@@ -101,7 +101,7 @@ class View extends Frame
 	#############################################################################
 	## Geometry
 
-	@define "width"
+	@define "width",
 		get: ->
 			parseFloat @style.width
 		set: (value) ->
@@ -110,7 +110,7 @@ class View extends Frame
 			@emit "change:width"
 			@emit "change:frame"
 
-	@define "height"
+	@define "height",
 		get: ->
 			parseFloat @style.height
 		set: (value) ->
@@ -119,7 +119,7 @@ class View extends Frame
 			@emit "change:height"
 			@emit "change:frame"
 	
-	@define "x"
+	@define "x",
 		get: -> @_matrix.x
 		set: (value) ->
 			@animateStop()
@@ -128,7 +128,7 @@ class View extends Frame
 			@emit "change:x"
 			@emit "change:frame"
 	
-	@define "y"
+	@define "y",
 		get: -> @_matrix.y
 		set: (value) ->
 			@animateStop()
@@ -137,7 +137,7 @@ class View extends Frame
 			@emit "change:y"
 			@emit "change:frame"
 
-	@define "z"
+	@define "z",
 		get: -> @_matrix.z
 		set: (value) ->
 			@animateStop()
@@ -149,7 +149,7 @@ class View extends Frame
 	#############################################################################
 	## Scale
 	
-	@define "scale"
+	@define "scale",
 		get: -> @_matrix.scale
 		set: (value) ->
 			@animateStop()
@@ -158,7 +158,7 @@ class View extends Frame
 
 			@emit "change:scale"
 
-	@define "scaleX"
+	@define "scaleX",
 		get: -> @_matrix.scaleX
 		set: (value) ->
 			@animateStop()
@@ -168,7 +168,7 @@ class View extends Frame
 			@emit "change:scaleX"
 			@emit "change:scale"
 	
-	@define "scaleY"
+	@define "scaleY",
 		get: -> @_matrix.scaleY
 		set: (value) ->
 			@animateStop()
@@ -178,7 +178,7 @@ class View extends Frame
 			@emit "change:scaleY"
 			@emit "change:scale"
 	
-	@define "scaleZ"
+	@define "scaleZ",
 		get: -> @_matrix.scaleZ
 		set: (value) ->
 			@animateStop()
@@ -192,7 +192,7 @@ class View extends Frame
 	#############################################################################
 	## Rotate
 
-	@define "rotate"
+	@define "rotate",
 		get: -> @_matrix.rotate
 		set: (value) ->
 			@animateStop()
@@ -201,7 +201,7 @@ class View extends Frame
 
 			@emit "change:rotate"
 
-	@define "rotateX"
+	@define "rotateX",
 		get: -> @_matrix.rotateX
 		set: (value) ->
 			@animateStop()
@@ -211,7 +211,7 @@ class View extends Frame
 			@emit "change:rotateX"
 			@emit "change:rotate"
 	
-	@define "rotateY"
+	@define "rotateY",
 		get: -> @_matrix.rotateY
 		set: (value) ->
 			@animateStop()
@@ -221,7 +221,7 @@ class View extends Frame
 			@emit "change:rotateX"
 			@emit "change:rotate"
 
-	@define "rotateZ"
+	@define "rotateZ",
 		get: -> @_matrix.rotateZ
 		set: (value) ->
 			@animateStop()
@@ -235,7 +235,7 @@ class View extends Frame
 	#############################################################################
 	## Matrix
 	
-	@define "_matrix"
+	@define "_matrix",
 		get: ->
 			if not @__matrix
 				@__matrix = new Matrix new WebKitCSSMatrix @_element.style.webkitTransform
@@ -264,7 +264,7 @@ class View extends Frame
 	#############################################################################
 	## Visual Properties
 	
-	@define "opacity"
+	@define "opacity",
 		get: ->
 			parseFloat @style.opacity or 1
 		set: (value) ->
@@ -272,7 +272,7 @@ class View extends Frame
 			@style.opacity = value
 			@emit "change:opacity"
 	
-	@define "clip"
+	@define "clip",
 		get: ->
 			@_clip
 		set: (value) ->
@@ -281,7 +281,7 @@ class View extends Frame
 			@style.overflow = "visible" if value is false
 			@emit "change:clip"
 	
-	@define "visible"
+	@define "visible",
 		get: ->
 			@_visible or true
 		set: (value) ->
@@ -294,7 +294,7 @@ class View extends Frame
 	#############################################################################
 	## Hierarchy
 	
-	@define "superView"
+	@define "superView",
 		get: -> @_superView or null
 		set: (value) ->
 			
@@ -320,7 +320,7 @@ class View extends Frame
 			@_superView = value
 			@emit "change:superView"
 	
-	@define "subViews"
+	@define "subViews",
 		get: -> _.compact @_subViews
 
 	addSubView: (view) ->
@@ -336,7 +336,7 @@ class View extends Frame
 	#############################################################################
 	## Ordering
 
-	@define "index"
+	@define "index",
 		get: -> @style['z-index'] or 0
 		set: (value) ->
 			@style['z-index'] = value
@@ -371,33 +371,33 @@ class View extends Frame
 	#############################################################################
 	## HTML Helpers
 
-	@define "html"
+	@define "html",
 		get: -> @_element.innerHTML
 		set: (value) ->
 			@_element.innerHTML = value
 			@emit "change:html"
 
-	@define "style"
+	@define "style",
 		get: -> @_element.style
 		set: (value) ->
 			utils.extend @_element.style, value
 			@emit "change:style"
 
-	@define "computedStyle"
+	@define "computedStyle",
 		get: -> document.defaultView.getComputedStyle @_element
 		set: (value) ->
 			throw Error "computedStyle is readonly"
 
 	# Class helpers
 
-	@define "class"
+	@define "class",
 		get: ->
 			@_element.className
 		set: (value) ->
 			@_element.className = value
 			@emit "change:class"
 
-	@define "classes"
+	@define "classes",
 		get: ->
 			classes = @class.split " "
 			classes = _(classes).filter (item) -> item not in ["", null]

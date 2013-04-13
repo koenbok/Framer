@@ -1,17 +1,13 @@
-
-
 utils = require "../utils"
-
 
 {EventEmitter} = require "../eventemitter"
 
-	
 class Frame extends EventEmitter
 
 	constructor: (args) ->
 		@properties = args
 
-	@define "properties"
+	@define "properties",
 		get: ->
 			p = {}
 			for key, value of Frame.Properties
@@ -26,33 +22,33 @@ class Frame extends EventEmitter
 			for key, value of Frame.CalculatedProperties
 				@[key] = args[key] if args[key] not in [null, undefined]
 
-	@define "minX"
+	@define "minX",
 		get: -> @x
 		set: (value) ->  @x = value
 
-	@define "midX"
+	@define "midX",
 		get: -> @x + (@width / 2.0)
 		set: (value) ->
 			throw Error "Width is zero" if @width is 0
 			@x = value - (@width / 2.0)
 
-	@define "maxX"
+	@define "maxX",
 		get: -> @x + @width
 		set: (value) ->
 			throw Error "Width is zero" if @width is 0
 			@x = value - @width
 
-	@define "minY"
+	@define "minY",
 		get: -> @y
 		set: (value) -> @y = value
 
-	@define "midY"
+	@define "midY",
 		get: -> @y + (@height / 2.0)
 		set: (value) ->
 			throw Error "Width is zero" if @height is 0
 			@y = value - (@height / 2.0)
 
-	@define "maxY"
+	@define "maxY",
 		get: -> @y + @height
 		set: (value) ->
 			throw Error "Width is zero" if @height is 0

@@ -1,6 +1,7 @@
-// Framer 0.5.0-62-g2aaea25 (c) 2013 Koen Bok
+// Framer 0.5.0-72-gd840b70 (c) 2013 Koen Bok
+// https://github.com/koenbok/Framer
 
-window.FramerVersion = "0.5.0-62-g2aaea25";
+window.FramerVersion = "0.5.0-72-gd840b70";
 
 
 (function(){var require = function (file, cwd) {
@@ -336,6 +337,47 @@ exports.extname = function(path) {
   return splitPathRe.exec(path)[3] || '';
 };
 
+exports.relative = function(from, to) {
+  from = exports.resolve(from).substr(1);
+  to = exports.resolve(to).substr(1);
+
+  function trim(arr) {
+    var start = 0;
+    for (; start < arr.length; start++) {
+      if (arr[start] !== '') break;
+    }
+
+    var end = arr.length - 1;
+    for (; end >= 0; end--) {
+      if (arr[end] !== '') break;
+    }
+
+    if (start > end) return [];
+    return arr.slice(start, end - start + 1);
+  }
+
+  var fromParts = trim(from.split('/'));
+  var toParts = trim(to.split('/'));
+
+  var length = Math.min(fromParts.length, toParts.length);
+  var samePartsLength = length;
+  for (var i = 0; i < length; i++) {
+    if (fromParts[i] !== toParts[i]) {
+      samePartsLength = i;
+      break;
+    }
+  }
+
+  var outputParts = [];
+  for (var i = samePartsLength; i < fromParts.length; i++) {
+    outputParts.push('..');
+  }
+
+  outputParts = outputParts.concat(toParts.slice(samePartsLength));
+
+  return outputParts.join('/');
+};
+
 });
 
 require.define("__browserify_process",function(require,module,exports,__dirname,__filename,process,global){var process = module.exports = {};
@@ -348,7 +390,7 @@ process.nextTick = (function () {
     ;
 
     if (canSetImmediate) {
-        return window.setImmediate;
+        return function (f) { return window.setImmediate(f) };
     }
 
     if (canPost) {
@@ -397,9 +439,9 @@ process.binding = function (name) {
 });
 
 require.define("/src/css.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-
   exports.addStyle = function(css) {
     var styleSheet;
+
     styleSheet = document.createElement("style");
     styleSheet.innerHTML = css;
     return document.head.appendChild(styleSheet);
@@ -425,6 +467,7 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.keys = function(a) {
     var key, _results;
+
     _results = [];
     for (key in a) {
       _results.push(key);
@@ -434,6 +477,7 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.extend = function() {
     var a, args, key, obj, value, _i, _len, _ref;
+
     args = Array.prototype.slice.call(arguments);
     a = args[0];
     _ref = args.slice(1);
@@ -449,6 +493,7 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.update = function(target, source) {
     var keys;
+
     keys = exports.keys(target);
     exports.extend(target, exports.filter(source, function(k) {
       return __indexOf.call(keys, k) >= 0;
@@ -462,6 +507,7 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.filter = function(source, iterator) {
     var b, key, value;
+
     b = {};
     for (key in source) {
       value = source[key];
@@ -478,6 +524,7 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.remove = function(a, e) {
     var t;
+
     if ((t = a.indexOf(e)) > -1) {
       a.splice(t, 1)[0];
     }
@@ -486,6 +533,7 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.toggle = function() {
     var args, curr;
+
     if (_.isArray(arguments[0])) {
       args = arguments[0];
     } else {
@@ -503,6 +551,7 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.randomColor = function(alpha) {
     var c;
+
     if (alpha == null) {
       alpha = 1.0;
     }
@@ -514,12 +563,14 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.delay = function(time, f) {
     var timer;
+
     timer = setTimeout(f, time);
     return timer;
   };
 
   exports.interval = function(time, f) {
     var timer, _ref;
+
     timer = setInterval(f, time);
     if ((_ref = window._delayIntervals) == null) {
       window._delayIntervals = [];
@@ -530,9 +581,11 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.debounce = function(fn, threshold, immediate) {
     var timeout;
+
     timeout = null;
     return function() {
       var args, delayed, obj;
+
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       obj = this;
       delayed = function() {
@@ -552,6 +605,7 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.throttle = function(fn, delay) {
     var timer;
+
     if (delay === 0) {
       return fn;
     }
@@ -572,9 +626,11 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.convertPoint = function(point, view1, view2) {
     var superViews1, superViews2, traverse, view, _i, _j, _len, _len1;
+
     point = exports.extend({}, point);
     traverse = function(view) {
       var currentView, superViews;
+
       currentView = view;
       superViews = [];
       while (currentView && currentView.superView) {
@@ -611,6 +667,7 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.max = function(obj) {
     var max, n, _i, _len;
+
     for (_i = 0, _len = obj.length; _i < _len; _i++) {
       n = obj[_i];
       if (!max || n > max) {
@@ -622,6 +679,7 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.min = function(obj) {
     var min, n, _i, _len;
+
     for (_i = 0, _len = obj.length; _i < _len; _i++) {
       n = obj[_i];
       if (!min || n < min) {
@@ -647,6 +705,7 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.uuid = function() {
     var chars, digit, output, r, random, _i;
+
     chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
     output = new Array(36);
     random = 0;
@@ -1896,6 +1955,7 @@ require.define("/src/debug.coffee",function(require,module,exports,__dirname,__f
     window._togglingDebug = true;
     View.Views.map(function(view, i) {
       var color, node;
+
       if (view._debug) {
         view._element.removeChild(view._debug.node);
         view.style = view._debug.style;
@@ -1938,7 +1998,6 @@ require.define("/src/debug.coffee",function(require,module,exports,__dirname,__f
 });
 
 require.define("/src/tools/init.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-
   exports.tools = {};
 
   exports.tools.facebook = (require("./facebook")).facebook;
@@ -1958,6 +2017,7 @@ require.define("/src/tools/facebook.coffee",function(require,module,exports,__di
 
   facebook.query = function(query, callback) {
     var _ref;
+
     facebook._token = localStorage.getItem(FacebookAccessTokenKey);
     if ((_ref = facebook._token) === (void 0) || _ref === "") {
       facebook._tokenDialog();
@@ -1965,6 +2025,7 @@ require.define("/src/tools/facebook.coffee",function(require,module,exports,__di
     }
     return facebook._loadJQuery(function() {
       var data;
+
       data = {
         fields: query,
         method: "GET",
@@ -1978,6 +2039,7 @@ require.define("/src/tools/facebook.coffee",function(require,module,exports,__di
         success: callback,
         error: function(error) {
           var _ref1;
+
           console.log("error", error);
           if ((_ref1 = error.status) === 0 || _ref1 === 400) {
             return facebook._tokenDialog();
@@ -1994,6 +2056,7 @@ require.define("/src/tools/facebook.coffee",function(require,module,exports,__di
 
   facebook._loadJQuery = function(callback) {
     var script;
+
     if (typeof $ === "undefined") {
       script = document.createElement("script");
       script.src = "http://cdnjs.cloudflare.com/ajax/libs/zepto/1.0/zepto.min.js";
@@ -2007,6 +2070,7 @@ require.define("/src/tools/facebook.coffee",function(require,module,exports,__di
 
   facebook._tokenDialog = function() {
     var view;
+
     view = new View({
       width: 500,
       height: 120,
@@ -2023,6 +2087,7 @@ require.define("/src/tools/facebook.coffee",function(require,module,exports,__di
     view.html = "		<input type='text' id='tokenDialog'			placeholder='Paste Facebook Access Token' 			style='font:16px/1em Menlo;width:440px;padding:10px 10px 5px 5px' 			onpaste='tools.facebook._tokenDialogUpdate(this)'			onkeyup='tools.facebook._tokenDialogUpdate(this)'		>		<div style='			text-align:center;			font-size:18px;			font-weight:			bold;			padding-top:20px		'>			<a href='https://developers.facebook.com/tools/explorer' target='new'>				Find access token here			</a>		</div	";
     return utils.delay(0, function() {
       var tokenInput;
+
       tokenInput = window.document.getElementById("tokenDialog");
       return tokenInput.focus();
     });
@@ -2067,14 +2132,11 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
   exports.ViewList = [];
 
   View = (function(_super) {
-
     __extends(View, _super);
 
     function View(args) {
       this.__insertElement = __bind(this.__insertElement, this);
-
-      this.animate = __bind(this.animate, this);
-      if (args == null) {
+      this.animate = __bind(this.animate, this);      if (args == null) {
         args = {};
       }
       View.Views.push(this);
@@ -2107,6 +2169,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     View.define("properties", {
       get: function() {
         var key, p, value, _ref;
+
         p = {};
         _ref = View.Properties;
         for (key in _ref) {
@@ -2117,6 +2180,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       },
       set: function(args) {
         var key, value, _ref, _ref1, _ref2, _ref3, _results;
+
         _ref = View.Properties;
         for (key in _ref) {
           value = _ref[key];
@@ -2149,6 +2213,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       },
       set: function(value) {
         var p, _i, _len, _ref, _results;
+
         if (!value) {
           return;
         }
@@ -2172,6 +2237,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
 
     View.prototype.contentFrame = function() {
       var frame;
+
       frame = {
         x: utils.min(_.pluck(this.subViews, "minX")),
         y: utils.min(_.pluck(this.subViews, "minY"))
@@ -2480,6 +2546,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
 
     View.prototype.switchPlaces = function(view) {
       var indexA, indexB;
+
       indexA = this.index;
       indexB = view.index;
       view.index = indexA;
@@ -2488,6 +2555,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
 
     View.prototype.animate = function(args, callback) {
       var animation;
+
       args.view = this;
       animation = new Animation(args);
       animation.start(callback);
@@ -2542,6 +2610,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     View.define("classes", {
       get: function() {
         var classes;
+
         classes = this["class"].split(" ");
         classes = _(classes).filter(function(item) {
           return item !== "" && item !== null;
@@ -2556,6 +2625,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
 
     View.prototype.addClass = function(className) {
       var classes;
+
       classes = this.classes;
       classes.push(className);
       return this.classes = classes;
@@ -2635,7 +2705,6 @@ require.define("/src/primitives/frame.coffee",function(require,module,exports,__
   EventEmitter = require("../eventemitter").EventEmitter;
 
   Frame = (function(_super) {
-
     __extends(Frame, _super);
 
     function Frame(args) {
@@ -2645,6 +2714,7 @@ require.define("/src/primitives/frame.coffee",function(require,module,exports,__
     Frame.define("properties", {
       get: function() {
         var key, p, value, _ref;
+
         p = {};
         _ref = Frame.Properties;
         for (key in _ref) {
@@ -2655,6 +2725,7 @@ require.define("/src/primitives/frame.coffee",function(require,module,exports,__
       },
       set: function(args) {
         var key, value, _ref, _ref1, _ref2, _ref3, _results;
+
         _ref = Frame.Properties;
         for (key in _ref) {
           value = _ref[key];
@@ -2744,6 +2815,7 @@ require.define("/src/primitives/frame.coffee",function(require,module,exports,__
 
     Frame.prototype.merge = function(r2) {
       var frame, r1;
+
       r1 = this;
       frame = {
         x: Math.min(r1.x, r2.x),
@@ -2785,13 +2857,13 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
   var __slice = [].slice;
 
   exports.EventEmitter = (function() {
-
     function EventEmitter() {
       this.events = {};
     }
 
     EventEmitter.prototype.emit = function() {
       var args, event, listener, _i, _len, _ref, _ref1, _results;
+
       event = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       if (!((_ref = this.events) != null ? _ref[event] : void 0)) {
         return;
@@ -2807,6 +2879,7 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
 
     EventEmitter.prototype.addListener = function(event, listener) {
       var _base, _ref, _ref1;
+
       if ((_ref = this.events) == null) {
         this.events = {};
       }
@@ -2818,6 +2891,7 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
 
     EventEmitter.prototype.removeListener = function(event, listener) {
       var l;
+
       if (!this.events) {
         return;
       }
@@ -2826,6 +2900,7 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
       }
       return this.events[event] = (function() {
         var _i, _len, _ref, _results;
+
         _ref = this.events[event];
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -2841,6 +2916,7 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
     EventEmitter.prototype.once = function(event, listener) {
       var fn,
         _this = this;
+
       fn = function() {
         _this.removeListener(event, fn);
         return listener.apply(null, arguments);
@@ -2850,6 +2926,7 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
 
     EventEmitter.prototype.removeAllListeners = function(event) {
       var listener, _i, _len, _ref, _results;
+
       if (!this.events) {
         return;
       }
@@ -2886,6 +2963,7 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
 
   WebKitCSSMatrix.prototype.cssValues = function() {
     var r, values;
+
     r = function(v) {
       return Math.round(v * RoundValue) / RoundValue;
     };
@@ -2893,7 +2971,6 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
   };
 
   Matrix = (function() {
-
     function Matrix(matrix) {
       if (matrix instanceof WebKitCSSMatrix) {
         this.from(matrix);
@@ -3001,6 +3078,7 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
 
     Matrix.prototype.decompose = function(m) {
       var result;
+
       result = {};
       result.translation = {
         x: m.m41,
@@ -3022,6 +3100,7 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
 
     Matrix.prototype.from = function(matrix) {
       var v;
+
       v = this.decompose(matrix);
       this.x = v.translation.x;
       this.y = v.translation.y;
@@ -3035,6 +3114,7 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
 
     Matrix.prototype.matrix = function() {
       var m;
+
       m = new WebKitCSSMatrix();
       m = m.translate(this._x, this._y, this._z);
       m = m.rotate(this._rotateX, 0, 0);
@@ -3168,7 +3248,6 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
   };
 
   Animation = (function(_super) {
-
     __extends(Animation, _super);
 
     Animation.prototype.AnimationProperties = ["view", "properties", "curve", "time", "origin", "tolerance", "precision", "modifiers", "debug", "profile"];
@@ -3183,16 +3262,12 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     function Animation(args) {
       this._cleanup = __bind(this._cleanup, this);
-
       this._finalize = __bind(this._finalize, this);
-
       this.stop = __bind(this.stop, this);
-
       this.reverse = __bind(this.reverse, this);
-
       this.start = __bind(this.start, this);
-
       var p, _i, _len, _ref, _ref1, _ref2, _ref3;
+
       _ref = this.AnimationProperties;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         p = _ref[_i];
@@ -3214,6 +3289,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     Animation.prototype.start = function(callback) {
       var endTime, k, propertiesA, propertiesB, startTime, v, _i, _len, _ref, _ref1;
+
       AnimationList.push(this);
       startTime = new Date().getTime();
       this.count++;
@@ -3279,6 +3355,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     Animation.prototype.reverse = function() {
       var k, options, p, v, _i, _len, _ref, _ref1;
+
       options = {};
       _ref = this.AnimationProperties;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -3315,6 +3392,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     Animation.prototype._cleanup = function(completed) {
       var computedStyles, endMatrix, endStyles, k, v, _ref, _ref1;
+
       this.view._currentAnimations = _.without(this.view._currentAnimations, this);
       if (completed) {
         endMatrix = utils.extend(new Matrix(), this.propertiesB);
@@ -3342,6 +3420,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     Animation.prototype._css = function() {
       var cssString, deltas, m, position, propertyName, springValue, stepDelta, stepIncrement, unit, value, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3;
+
       stepIncrement = 0;
       stepDelta = 100 / (this.curveValues.length - 1);
       cssString = [];
@@ -3381,6 +3460,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     Animation.prototype._deltas = function() {
       var deltas, k;
+
       deltas = {};
       for (k in this.propertiesA) {
         deltas[k] = (this.propertiesB[k] - this.propertiesA[k]) / 100.0;
@@ -3390,6 +3470,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     Animation.prototype._parseCurve = function(curve) {
       var v;
+
       if (curve == null) {
         curve = "";
       }
@@ -3418,6 +3499,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     Animation.prototype.graphView = function(animation, x, y, h, time) {
       var background, color, dot, graph, i, player, value, values, width, _i, _len;
+
       color = "rgba(50,150,200,.35)";
       values = animation.curveValues;
       width = 300;
@@ -3495,6 +3577,7 @@ require.define("/src/curves/spring.coffee",function(require,module,exports,__dir
 
   springEvaluateState = function(initialState) {
     var output;
+
     output = {};
     output.dx = initialState.v;
     output.dv = springAccelerationForState(initialState);
@@ -3503,6 +3586,7 @@ require.define("/src/curves/spring.coffee",function(require,module,exports,__dir
 
   springEvaluateStateWithDerivative = function(initialState, dt, derivative) {
     var output, state;
+
     state = {};
     state.x = initialState.x + derivative.dx * dt;
     state.v = initialState.v + derivative.dv * dt;
@@ -3516,6 +3600,7 @@ require.define("/src/curves/spring.coffee",function(require,module,exports,__dir
 
   springIntegrateState = function(state, speed) {
     var a, b, c, d, dvdt, dxdt;
+
     a = springEvaluateState(state);
     b = springEvaluateStateWithDerivative(state, speed * 0.5, a);
     c = springEvaluateStateWithDerivative(state, speed * 0.5, b);
@@ -3528,12 +3613,9 @@ require.define("/src/curves/spring.coffee",function(require,module,exports,__dir
   };
 
   Spring = (function() {
-
     function Spring(args) {
       this.next = __bind(this.next, this);
-
-      this.reset = __bind(this.reset, this);
-      args = args || {};
+      this.reset = __bind(this.reset, this);      args = args || {};
       this.velocity = args.velocity || defaults.velocity;
       this.tension = args.tension || defaults.tension;
       this.friction = args.friction || defaults.friction;
@@ -3551,6 +3633,7 @@ require.define("/src/curves/spring.coffee",function(require,module,exports,__dir
 
     Spring.prototype.next = function() {
       var finalVelocity, net1DVelocity, netFloat, netValueIsLow, netVelocityIsLow, stateAfter, stateBefore, stopSpring, targetValue;
+
       targetValue = this.currentValue;
       stateBefore = {};
       stateAfter = {};
@@ -3577,6 +3660,7 @@ require.define("/src/curves/spring.coffee",function(require,module,exports,__dir
 
     Spring.prototype.all = function() {
       var count, _results;
+
       this.reset();
       count = 0;
       _results = [];
@@ -3600,6 +3684,7 @@ require.define("/src/curves/spring.coffee",function(require,module,exports,__dir
 
   SpringCurve = function(tension, friction, velocity, fps) {
     var spring;
+
     spring = new Spring({
       tension: tension,
       friction: friction,
@@ -3619,7 +3704,6 @@ require.define("/src/curves/bezier.coffee",function(require,module,exports,__dir
   var BezierCurve, UnitBezier, defaults;
 
   UnitBezier = (function() {
-
     UnitBezier.prototype.epsilon = 1e-6;
 
     function UnitBezier(p1x, p1y, p2x, p2y) {
@@ -3645,6 +3729,7 @@ require.define("/src/curves/bezier.coffee",function(require,module,exports,__dir
 
     UnitBezier.prototype.solveCurveX = function(x) {
       var d2, i, t0, t1, t2, x2;
+
       t2 = x;
       i = 0;
       while (i < 8) {
@@ -3693,6 +3778,7 @@ require.define("/src/curves/bezier.coffee",function(require,module,exports,__dir
 
   BezierCurve = function(a, b, c, d, time, fps) {
     var curve, step, steps, values, _i;
+
     curve = new UnitBezier(a, b, c, d);
     values = [];
     steps = ((time / 1000) * fps) - 1;
@@ -3745,7 +3831,6 @@ require.define("/src/views/scrollview.coffee",function(require,module,exports,__
   View = require("./view").View;
 
   exports.ScrollView = (function(_super) {
-
     __extends(ScrollView, _super);
 
     function ScrollView() {
@@ -3780,6 +3865,7 @@ require.define("/src/views/scrollview.coffee",function(require,module,exports,__
 
     ScrollView.prototype.scrollToBottom = function() {
       var _this = this;
+
       return setTimeout(function() {
         return _this.scrollPoint = _this._element.scrollHeight - _this.frame.height;
       }, 0);
@@ -3825,7 +3911,6 @@ require.define("/src/views/imageview.coffee",function(require,module,exports,__d
   View = require("./view").View;
 
   exports.ImageView = (function(_super) {
-
     __extends(ImageView, _super);
 
     function ImageView(args) {
@@ -3835,15 +3920,6 @@ require.define("/src/views/imageview.coffee",function(require,module,exports,__d
       this.image = args.image;
     }
 
-    ImageView.define("html", {
-      get: function() {
-        return this._element.innerHTML;
-      },
-      set: function(value) {
-        return this._element.innerHTML = value;
-      }
-    });
-
     ImageView.define("image", {
       get: function() {
         return this._image;
@@ -3851,6 +3927,7 @@ require.define("/src/views/imageview.coffee",function(require,module,exports,__d
       set: function(value) {
         var loader,
           _this = this;
+
         if (this._image === value) {
           return this.emit("load", loader);
         }
@@ -3945,3 +4022,4 @@ require.define("/src/init.coffee",function(require,module,exports,__dirname,__fi
 });
 require("/src/init.coffee");
 })();
+

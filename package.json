@@ -10,7 +10,7 @@
   "dependencies": {
     "underscore": "1.x",
     "browserify": "1.x",
-    "coffee-script": "1.4.x",
+    "coffee-script": "1.6.x",
     "coffeelint": "0.5.x"
   },
   "license": "MIT"

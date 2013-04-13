@@ -23,13 +23,13 @@ class exports.ScrollView extends View
 		# 		el.scrollTop = el.scrollHeight - el.offsetHeight - 1
 		# , false
 
-	@define "scrollVertical"
+	@define "scrollVertical",
 		get: ->
 			@style["overflow-y"] != "hidden"
 		set: (value) ->
 			@style["overflow-y"] = if value then "scroll" else "hidden"
 
-	@define "scrollHorizontal"
+	@define "scrollHorizontal",
 		get: ->
 			@style["overflow-x"] != "hidden"
 		set: (value) ->
@@ -43,13 +43,13 @@ class exports.ScrollView extends View
 			@scrollPoint = @_element.scrollHeight - @frame.height
 		, 0
 	
-	@define "scrollPoint"
+	@define "scrollPoint",
 		get: ->
 			@_element.scrollTop
 		set: (value) ->
 			@_element.scrollTop = value
 
-	@define "scrollFrame"
+	@define "scrollFrame",
 		get: ->
 			return new Frame {
 				x: @_element.scrollLeft

@@ -11,11 +11,7 @@ class exports.ImageView extends View
 		
 		@image = args.image
 
-	@define "html"
-		get: -> @_element.innerHTML
-		set: (value) -> @_element.innerHTML = value
-
-	@define "image"
+	@define "image",
 		
 		get: ->
 			return @_image
