@@ -6,7 +6,7 @@ class exports.TextView extends View
 		super
 		@text = args?.text or ""
 		
-	@define "text"
+	@define "text",
 		get: -> @html
 		set: (value) ->
 			@html = value

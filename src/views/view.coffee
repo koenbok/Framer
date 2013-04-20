@@ -12,7 +12,15 @@ _ = require "underscore"
 
 exports.ViewList = []
 
+# Base class for all views.
+#
+# @example How to subclass an animal
+# 	class Lion extends Animal
+# 		move: (direction, speed): ->
+#
 class View extends Frame
+	
+	
 	
 	constructor: (args) ->
 		
@@ -41,10 +49,13 @@ class View extends Frame
 		# Override this prototype to change all behaviour
 		@_postCreate()
 	
+	# @private
 	_postCreate: ->
 	
 	# Helpers
-
+	
+	# @property [String] The views name
+	# 
 	@define "name",
 		get: ->
 			@_name or @id
@@ -78,7 +89,7 @@ class View extends Frame
 			return if not value
 			for p in ["x", "y", "width", "height"]
 				@[p] = value[p]
-
+	
 	convertPoint: (point) ->
 		# Convert a point on screen to this views coordinate system
 		utils.convertPoint point, null, @
@@ -86,9 +97,11 @@ class View extends Frame
 	screenFrame: ->
 		# Get this views absolute frame on the screen
 		utils.convertPoint @frame, @, null
-
+	
+	# Get the combined size of all subviews
+	# 
 	contentFrame: ->
-		# Get the combined size of all subviews
+		
 		frame =
 			x: utils.min _.pluck(@subViews, "minX")
 			y: utils.min _.pluck(@subViews, "minY")
@@ -101,6 +114,22 @@ class View extends Frame
 	#############################################################################
 	## Geometry
 
+	###
+	Shortcut to animate this view.
+
+	@example Move the view to the right in half a second
+	  myView.animate({
+	    properties:{x:500},
+	    time: 500
+	  })
+
+	@param [Object] options the moving options
+	@option options [Object] properties properties to animate
+	@option options [Number] time the time in miliseconds
+	@option options [String] curve the animation curve
+	@param [Function] callback function to run after the animation is done
+	@return [Animation] the created animation object
+	###
 	@define "width",
 		get: ->
 			parseFloat @style.width
@@ -257,6 +286,7 @@ class View extends Frame
 			@__matrix = matrix
 			@style.webkitTransform = @__matrix.matrix().cssValues()
 	
+	# @private
 	_computedMatrix: ->
 		new WebKitCSSMatrix @computedStyle.webkitTransform
 
@@ -357,12 +387,31 @@ class View extends Frame
 	#############################################################################
 	## Animation
 	
-	animate: (args, callback) =>
+	###
+	Shortcut to animate this view.
+
+	@example Move the view to the right in half a second
+	  myView.animate({
+	    properties:{x:500},
+	    time: 500
+	  })
+
+	@param [Object] options the moving options
+	@option options [Object] properties properties to animate
+	@option options [Number] time the time in miliseconds
+	@option options [String] curve the animation curve
+	@param [Function] callback function to run after the animation is done
+	@return [Animation] the created animation object
+	###
+	animate: (args, callback) ->
 		args.view = @
 		animation = new Animation args
 		animation.start callback
 		return animation
-	
+
+	###
+	Stop all current animations on this view
+	###
 	animateStop: ->
 		@_currentAnimations.map (animation) ->
 			animation.stop()
@@ -413,7 +462,8 @@ class View extends Frame
 
 	removeClass: (className) ->
 		@classes = _.filter @classes, (item) -> item isnt className
-
+	
+	# @private
 	_insertElement: ->
 		
 		# If we are loaded we insert the node immediately, if not we wait
@@ -421,7 +471,8 @@ class View extends Frame
 			@__insertElement()
 		else
 			document.addEventListener "DOMContentLoaded", @__insertElement
-
+	
+	# @private
 	__insertElement: =>
 		document.body.appendChild @_element
 
