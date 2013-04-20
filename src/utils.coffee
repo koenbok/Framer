@@ -56,7 +56,7 @@ exports.copy = (source) ->
 # Public: Looks through properties of a source object, returning an Object
 # of properties that path the iterator's truth test.
 #
-# NOTE: Although similarly named, utils.filter is not an ES5 compatible
+# NOTE: Although similarly named, exports.filter is not an ES5 compatible
 # filter implementation.
 #
 # source - an object that will be filtered
@@ -101,7 +101,7 @@ exports.remove = (a, e) ->
 #
 # Examples
 #
-#		opacityToggle = utils.toggle(0, 1)
+#		opacityToggle = exports.toggle(0, 1)
 #		dropdown.on 'click', -> dropdown.opacity = opacityToggle()
 #
 # Returns a Function
@@ -291,6 +291,10 @@ exports.uuid = ->
 
 	output.join('')
 
+exports.round = (value, decimals) ->
+	d = Math.pow 10, decimals
+	Math.round(value * d) / d
+
 
 # Public: Returns a Boolean indicating wether the current browser uses the
 # Webkit engine.
@@ -312,6 +316,5 @@ exports.isTouch = ->
 exports.isMobile = ->
 	(/iphone|ipod|android|ie|blackberry|fennec/).test \
 		navigator.userAgent.toLowerCase()
-
 
 

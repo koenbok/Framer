@@ -1,6 +1,5 @@
 _ = require "underscore"
-
-RoundValue = 1000
+utils = require "../utils"
 
 WebKitCSSMatrix::cssValues = ->
 	
@@ -10,7 +9,7 @@ WebKitCSSMatrix::cssValues = ->
 	# noted numbers with e and css really does not like that.
 	
 	# r = (v) -> v.toFixed 5
-	r = (v) -> Math.round(v * RoundValue) / RoundValue
+	r = (v) -> utils.round v, 5
 	
 	values = "matrix3d(
 #{r @m11}, #{r @m12}, #{r @m13}, #{r @m14},

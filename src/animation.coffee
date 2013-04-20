@@ -281,7 +281,7 @@ class Animation extends EventEmitter
 			for propertyName, unit of @AnimatableCSSProperties
 				continue if not @propertiesA.hasOwnProperty propertyName
 				value = springValue * deltas[propertyName] + @propertiesA[propertyName]
-				cssString.push "#{propertyName}:#{value}#{unit}; "
+				cssString.push "#{propertyName}:#{ utils.round value, 5}#{unit}; "
 				
 			cssString.push "}\n"
 			
