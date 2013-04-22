@@ -3,24 +3,20 @@ utils = require "../utils"
 
 WebKitCSSMatrix::cssValues = ->
 	
-	# Math.round is a lot faster then toFixed
-	
-	# Rounding is very important, because javascript sometimes
-	# noted numbers with e and css really does not like that.
-	
-	# r = (v) -> v.toFixed 5
-	r = (v) -> utils.round v, 5
-	
-	values = "matrix3d(
-#{r @m11}, #{r @m12}, #{r @m13}, #{r @m14},
-#{r @m21}, #{r @m22}, #{r @m23}, #{r @m24},
-#{r @m31}, #{r @m32}, #{r @m33}, #{r @m34},
-#{r @m41}, #{r @m42}, #{r @m43}, #{r @m44})"
+	@toString()
 
+	# r = (v) -> utils.round v, 5
+	# 
+	# values = "matrix3d(
+	# 	#{r @m11}, #{r @m12}, #{r @m13}, #{r @m14},
+	# 	#{r @m21}, #{r @m22}, #{r @m23}, #{r @m24},
+	# 	#{r @m31}, #{r @m32}, #{r @m33}, #{r @m34},
+	# 	#{r @m41}, #{r @m42}, #{r @m43}, #{r @m44})"
 
 class Matrix
 	
 	constructor: (matrix) ->
+		
 		if matrix instanceof WebKitCSSMatrix
 			@from matrix
 	
@@ -60,16 +56,18 @@ class Matrix
 	
 	@define "rotateY",
 		get: -> @_rotateY or 0
-		set: (value) -> @_rotateY = value
+		set: (value) ->
+			@_rotateY = value
 	
 	@define "rotateZ",
 		get: -> @_rotateZ or 0
-		set: (value) -> @_rotateZ = value
+		set: (value) -> 
+			@_rotateZ = value
 	
 	@define "rotate",
 		get: -> @rotateZ
-		set: (value) -> @rotateZ = value
-
+		set: (value) -> 
+			@rotateZ = value
 
 	decompose: (m) ->
 		
@@ -93,6 +91,21 @@ class Matrix
 			z: -Math.atan2(m.m21/result.scale.y, m.m11/result.scale.x)
 		
 		return result
+		
+		# Requires: https://raw.github.com/joelambert/morf/master/
+		#	js/src/WebkitCSSMatrix.ext.js
+		#
+		# d = m.decompose()
+		# 
+		# result = {}
+		# 
+		# result =
+		# 	translation: d.translate
+		# 	scale: d.scale
+		# 	rotation: d.rotate
+		# 
+		# return result
+		
 	
 	from: (matrix) ->
 		
@@ -113,6 +126,7 @@ class Matrix
 	matrix: ->
 		m = new WebKitCSSMatrix()
 		m = m.translate @_x, @_y, @_z
+		# m = m.rotate @_rotateX, @_rotateY, @_rotateZ
 		m = m.rotate @_rotateX, 0, 0
 		m = m.rotate 0, @_rotateY, 0
 		m = m.rotate 0, 0, @_rotateZ
