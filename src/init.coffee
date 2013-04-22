@@ -1,4 +1,5 @@
 css = require "./css"
+{config} = require "./config"
 utils = require "./utils"
 debug = require "./debug"
 {tools} = require "./tools/init"
@@ -25,6 +26,7 @@ Global.tools = tools
 Global.ViewList = ViewList
 Global.debug = debug.debug
 Global.css = css
+Global.config = config
 
 
 if window

@@ -1,15 +1,28 @@
 utils = require "./utils"
+{config} = require "./config"
 
-exports.debug = ->
-	
-	
-	console.log "Framer.debug"
+exports.errorWarning = (e) ->
+	errorView = new View x:20, y:20, width:350, height:60
+	errorView.html = "<b>Javascript Error</b>
+		<br>Inspect the error console for more info."
+	errorView.style =
+		font: "13px/1.3em Menlo, Monaco"
+		backgroundColor: "rgba(255,0,0,0.5)"
+		padding: "12px"
+		border: "1px solid rgba(255,0,0,0.5)"
+		borderRadius: "5px"
+	errorView.scale = 0.5
+	errorView.animate
+		properties: {scale:1.0}
+		curve: "spring(150,8,1500)"
+
+exports.debugView = ->
 	
 	# Safari bug: https://bugs.webkit.org/show_bug.cgi?id=78206
-	if window._togglingDebug is true
+	if window.Framer._togglingDebug is true
 		return
 	
-	window._togglingDebug = true
+	window.Framer._togglingDebug = true
 	
 	View.Views.map (view, i) ->
 			
@@ -52,27 +65,31 @@ exports.debug = ->
 				backgroundImage: null
 			# view.clip = false
 	
-	window._togglingDebug = false
+	window.Framer._togglingDebug = false
 
-	
+
+# Set up debug keyboard shortcuts
+
+EventKeys =
+	Shift: 16
+	Escape: 27
 
 window.document.onkeydown = (event) ->
-	if event.keyCode == 27 # Escape
-		exports.debug()
+	
+	if event.keyCode == EventKeys.Shift
+		config.timeSpeedFactor = 25
+
+
+window.document.onkeyup = (event) ->
+		
+	if event.keyCode == EventKeys.Shift
+		config.timeSpeedFactor = 1
+
+	if event.keyCode == EventKeys.Escape
+		exports.debugView()
 		
 
+# Throw a warning on a javascript error
 
-# window.onerror = (e) ->
-# 	errorView = new View x:20, y:20, width:350, height:60
-# 	errorView.html = "<b>Javascript Error</b>
-# 		<br>Inspect the error console for more info."
-# 	errorView.style =
-# 		font: "13px/1.3em Menlo, Monaco"
-# 		backgroundColor: "rgba(255,0,0,0.5)"
-# 		padding: "12px"
-# 		border: "1px solid rgba(255,0,0,0.5)"
-# 		borderRadius: "5px"
-# 	errorView.scale = 0.5
-# 	errorView.animate
-# 		properties: {scale:1.0}
-# 		curve: "spring(150,8,1500)"
+window.onerror = exports.errorWarning
+
