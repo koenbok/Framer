@@ -4,58 +4,47 @@ _ = require "underscore"
 {Frame} = require "../primitives/frame"
 {Matrix} = require "../primitives/matrix"
 
-{EventTypes} = require "../primitives/events"
-{EventClass} = require "../primitives/events"
-
 {EventEmitter} = require "../eventemitter"
 {Animation} = require "../animation"
 
 exports.ViewList = []
 
-# Base class for all views.
-#
-# @example How to subclass an animal
-# 	class Lion extends Animal
-# 		move: (direction, speed): ->
-#
+
 class View extends Frame
-	
-	
 	
 	constructor: (args) ->
 		
 		args ?= {}
 		
+		# Keep a generic list of all current views
 		View.Views.push @
 		@id = View.Views.length
 		
+		# Create the html element for this view
 		@_element = document.createElement "div"
 		@_element.id = @id
 		
-		@addClass "uilayer"
-		# @addClass "textureBacked"
-		# @addClass "animated"
+		# Add the default css
+		@addClass "framer"
 		
-		@clip = args.clip or View.Properties.clip
-
 		@_subViews = []
 		@_currentAnimations = []
 		
+		# Set the view properties
+		@clip = args.clip or View.Properties.clip
 		@properties = args
+		
+		# Overridable creation hook
+		@_postCreate?()
 		
 		if not args.superView
 			@_insertElement()
-		
-		# Override this prototype to change all behaviour
-		@_postCreate()
 	
-	# @private
+
 	_postCreate: ->
 	
 	# Helpers
 	
-	# @property [String] The views name
-	# 
 	@define "name",
 		get: ->
 			@_name or @id
@@ -98,10 +87,9 @@ class View extends Frame
 		# Get this views absolute frame on the screen
 		utils.convertPoint @frame, @, null
 	
-	# Get the combined size of all subviews
-	# 
+	
 	contentFrame: ->
-		
+		# Get the total size of all subviews
 		frame =
 			x: utils.min _.pluck(@subViews, "minX")
 			y: utils.min _.pluck(@subViews, "minY")
@@ -114,22 +102,6 @@ class View extends Frame
 	#############################################################################
 	## Geometry
 
-	###
-	Shortcut to animate this view.
-
-	@example Move the view to the right in half a second
-	  myView.animate({
-	    properties:{x:500},
-	    time: 500
-	  })
-
-	@param [Object] options the moving options
-	@option options [Object] properties properties to animate
-	@option options [Number] time the time in miliseconds
-	@option options [String] curve the animation curve
-	@param [Function] callback function to run after the animation is done
-	@return [Animation] the created animation object
-	###
 	@define "width",
 		get: ->
 			parseFloat @style.width
@@ -286,7 +258,6 @@ class View extends Frame
 			@__matrix = matrix
 			@style.webkitTransform = @__matrix.matrix().cssValues()
 	
-	# @private
 	_computedMatrix: ->
 		new WebKitCSSMatrix @computedStyle.webkitTransform
 
@@ -331,7 +302,7 @@ class View extends Frame
 			return if value is @_superView
 			
 			# Cancel previous pending insertions
-			document.removeEventListener "DOMContentLoaded", @__insertElement
+			# document.removeEventListener "DOMContentLoaded", @__insertElement
 			
 			# Remove from previous superview subviews
 			if @_superView
@@ -386,36 +357,18 @@ class View extends Frame
 
 	#############################################################################
 	## Animation
-	
-	###
-	Shortcut to animate this view.
 
-	@example Move the view to the right in half a second
-	  myView.animate({
-	    properties:{x:500},
-	    time: 500
-	  })
-
-	@param [Object] options the moving options
-	@option options [Object] properties properties to animate
-	@option options [Number] time the time in miliseconds
-	@option options [String] curve the animation curve
-	@param [Function] callback function to run after the animation is done
-	@return [Animation] the created animation object
-	###
 	animate: (args, callback) ->
+		# Shortcut to create and start animation on this view
 		args.view = @
 		animation = new Animation args
 		animation.start callback
 		return animation
 
-	###
-	Stop all current animations on this view
-	###
 	animateStop: ->
+		# Stop all animations on this view
 		@_currentAnimations.map (animation) ->
 			animation.stop()
-
 
 	#############################################################################
 	## HTML Helpers
@@ -463,18 +416,19 @@ class View extends Frame
 	removeClass: (className) ->
 		@classes = _.filter @classes, (item) -> item isnt className
 	
-	# @private
 	_insertElement: ->
 		
-		# If we are loaded we insert the node immediately, if not we wait
-		if document.readyState is "complete" or document.readySate is "loaded"
+		# Insert the element to the dom, wait for it if it's not loaded
+		# TODO: There might still be some bug here
+		
+		if document.readyState in ["complete"]
 			@__insertElement()
 		else
-			document.addEventListener "DOMContentLoaded", @__insertElement
-	
-	# @private
+			document.addEventListener "DOMContentLoaded", 
+				@__insertElement
+				
 	__insertElement: =>
-		document.body.appendChild @_element
+		@_rootElement.appendChild @_element
 
 
 	#############################################################################
