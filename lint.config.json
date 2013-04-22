@@ -7,7 +7,7 @@
 	},
 	"max_line_length": {
 		"value": 80,
-		"level": "error"
+		"level": "ignore"
 	},
 	"camel_case_classes": {
 		"level": "error"
