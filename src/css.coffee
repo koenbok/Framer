@@ -7,7 +7,7 @@ exports.addStyle = (css) ->
 
 
 exports.addStyle "
-.uilayer {
+.framer {
 	display: block;
 	visibility: visible;
 	position: absolute;
@@ -18,16 +18,7 @@ exports.addStyle "
 	opacity:1;
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
-}
-.uilayer.textureBacked {
-	-webkit-transform: matrix3d(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
 	-webkit-transform-origin: 50% 50% 0%;
 	-webkit-backface-visibility: hidden;
 	-webkit-transform-style: flat;
-}
-.uilayer.animated {
-	-webkit-transition-duration: 500ms;
-	-webkit-transition-timing-function: linear;
-	-webkit-transition-delay: 0;
-	-webkit-transition-property: none;
 }"
