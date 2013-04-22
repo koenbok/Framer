@@ -1,4 +1,5 @@
 _ = require "underscore"
+{config} = require "./config"
 utils = require "./utils"
 css = require "./css"
 
@@ -53,8 +54,11 @@ class Animation extends EventEmitter
 		# Set all the defaults
 		@time ?= 1000
 		@curve ?= "linear"
-		@precision ?= 30
 		@count = 0
+
+		@precision ?= config.animationPrecision
+		@debug ?= config.animationDebug
+		@profile ?= config.animationProfile
 		
 		AnimationCounter += 1
 		@animationId = AnimationCounter
@@ -72,7 +76,8 @@ class Animation extends EventEmitter
 		@count++
 		@animationName = "framer-animation-#{@animationId}-#{@count}"
 		
-		console.log "Animation.start #{@animationName}" if @debug
+		console.log "Animation[#{@animationId}].start" if @debug
+		console.log "Animation[#{@animationId}].view = #{@view.name}" if @debug
 		console.profile @animationName if @profile
 		
 		
@@ -158,7 +163,8 @@ class Animation extends EventEmitter
 
 		if @debug
 			endTime = new Date().getTime() - startTime
-			console.log "Animation.setupTime = #{endTime}ms"
+			console.log "Animation[#{@animationId}].setupTime = #{endTime}ms"
+			console.log "Animation[#{@animationId}].totalTime = #{utils.round @totalTime, 2}ms"
 		
 		console.profileEnd @animationName if @profile
 
@@ -182,7 +188,7 @@ class Animation extends EventEmitter
 	
 	stop: =>
 		
-		console.log "Animation.stop #{@animationName}" if @debug
+		console.log "Animation[#{@animationId}].stop #{@animationName}" if @debug
 		
 		@_canceled = true
 		
@@ -198,7 +204,7 @@ class Animation extends EventEmitter
 		if @_canceled is true
 			return
 		
-		console.log "Animation.end #{@animationName}" if @debug
+		console.log "Animation[#{@animationId}].end #{@animationName}" if @debug
 		
 		@_cleanup true
 		
@@ -260,7 +266,7 @@ class Animation extends EventEmitter
 		
 			position = stepIncrement * stepDelta
 
-			cssString.push "\t#{position}%\t{ -webkit-transform: "
+			cssString.push "\t#{utils.round position, config.roundingDecimals}%\t{ -webkit-transform: "
 			
 			# Add the matrix based values
 			for propertyName in @AnimatableMatrixProperties
@@ -281,7 +287,7 @@ class Animation extends EventEmitter
 			for propertyName, unit of @AnimatableCSSProperties
 				continue if not @propertiesA.hasOwnProperty propertyName
 				value = springValue * deltas[propertyName] + @propertiesA[propertyName]
-				cssString.push "#{propertyName}:#{ utils.round value, 5}#{unit}; "
+				cssString.push "#{propertyName}:#{ utils.round value, config.roundingDecimals}#{unit}; "
 				
 			cssString.push "}\n"
 			
@@ -305,77 +311,33 @@ class Animation extends EventEmitter
 		curve ?= ""
 		curve = curve.toLowerCase()
 		
+		# If the shift key is pressed, we would like to play the animation slowly.
+		factor = config.timeSpeedFactor
+		
+		precision = @precision * factor
+		time = @time * factor
+		
 		if curve in ["linear"]
-			return bezier.defaults.Linear @precision, @time
+			return bezier.defaults.Linear @precision, time
 		else if curve in ["ease"]
-			return bezier.defaults.Ease @precision, @time
+			return bezier.defaults.Ease @precision, time
 		else if curve in ["ease-in"]
-			return bezier.defaults.EaseIn @precision, @time
+			return bezier.defaults.EaseIn @precision, time
 		else if curve in ["ease-out"]
-			return bezier.defaults.EaseOut @precision, @time
+			return bezier.defaults.EaseOut @precision, time
 		else if curve in ["ease-in-out"]
-			return bezier.defaults.EaseInOut @precision, @time
+			return bezier.defaults.EaseInOut @precision, time
 		else if curve[.."cubic-bezier".length-1] is "cubic-bezier"
 			v = parseCurve curve, "cubic-bezier"
-			return bezier.BezierCurve v[0], v[1], v[2], v[3], @precision, @time
+			return bezier.BezierCurve v[0], v[1], v[2], v[3], precision, time
 		else if curve[.."spring".length-1] is "spring"
 			v = parseCurve curve, "spring"
-			return spring.SpringCurve v[0], v[1], v[2], @precision
+			return spring.SpringCurve v[0], v[1], v[2], precision
 		else
 
 			# The default curve is linear
 			console.log "Animation.parseCurve: could not parse curve '#{curve}'"
 			return bezier.defaults.Linear @precision, @time
-
-	graphView: (animation, x, y, h, time) ->
-	
-		color = "rgba(50,150,200,.35)"
-		values = animation.curveValues
-		
-		width = 300
-	
-		graph = new View
-			y: y
-			x: x
-			width:100
-			height:h
-	
-		# graph.style.backgroundColor = "rgba(0, 0, 0, 1)"
-		graph.clip = false
-		
-		background = new View
-			y: 0 - h
-			height:h * 2 + 3
-			superView: graph
-		
-		background.style.backgroundColor = "rgba(255,255,255,.85)"
-			
-		
-		for value, i in values
-			dot = new View
-				width:3, height:3
-				x: i * widthFactor, y: (100 - value) * (h / 100)
-				superView: graph
-			dot.style.borderRadius = "5px"
-			dot.style.backgroundColor = color
-
-		graph.width = dot.x
-		background.width = dot.x
-
-		if time
-			player = new View
-				x:0, y:-h
-				width: 2, height: h * 2
-				superView: graph
-	
-			player.style.backgroundColor = color
-		
-			player.animate
-				properties: {x:graph.width}
-				time: time
-
-		return graph
-
 
 
 exports.Animation = Animation
