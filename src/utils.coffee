@@ -1,4 +1,5 @@
 _ = require "underscore"
+{config} = require "./config"
 
 Function::define = (prop, desc) ->
 	Object.defineProperty @prototype, prop, desc
@@ -101,13 +102,13 @@ exports.remove = (a, e) ->
 #
 # Examples
 #
-#		opacityToggle = exports.toggle(0, 1)
+#		opacityToggle = exports.cycle(0, 1)
 #		dropdown.on 'click', -> dropdown.opacity = opacityToggle()
 #
 # Returns a Function
 #
 
-exports.toggle = ->
+exports.cycle = ->
 	
 	if _.isArray arguments[0]
 		args = arguments[0]
@@ -120,6 +121,8 @@ exports.toggle = ->
 		curr = 0 if curr >= args.length
 		return args[curr]
 
+# Backwards compatibility
+exports.toggle = exports.cycle
 
 # Public: Returns a String containing a color in rgba(...) format.
 #
@@ -143,7 +146,7 @@ exports.randomColor = (alpha = 1.0) ->
 # Returns a Timer
 #
 exports.delay = (time, f) ->
-	timer = setTimeout f, time
+	timer = setTimeout f, time * config.timeSpeedFactor
 	# window._delayTimers ?= []
 	# window._delayTimers.push timer
 	return timer
@@ -158,7 +161,7 @@ exports.delay = (time, f) ->
 # Returns a Timer
 #
 exports.interval = (time, f) ->
-	timer = setInterval f, time
+	timer = setInterval f, time * config.timeSpeedFactor
 	window._delayIntervals ?= []
 	window._delayIntervals.push timer
 	return timer
@@ -295,7 +298,6 @@ exports.round = (value, decimals) ->
 	d = Math.pow 10, decimals
 	Math.round(value * d) / d
 
-
 # Public: Returns a Boolean indicating wether the current browser uses the
 # Webkit engine.
 #
@@ -316,5 +318,37 @@ exports.isTouch = ->
 exports.isMobile = ->
 	(/iphone|ipod|android|ie|blackberry|fennec/).test \
 		navigator.userAgent.toLowerCase()
+
+
+
+
+
+# __domComplete = []
+# 
+# document.onreadystatechange = (event) =>
+# 	console.log "onreadystatechange", document.readyState
+# 	
+# 	utils.delay 100, ->
+# 	
+# 		if document.readyState is "complete"
+# 			while __domComplete.length
+# 				__domComplete.shift()()
+# 
+# 		# __domComplete.map (f) -> 
+# 		# 	console.log f
+# 		# 	f()
+# 		# __domComplete = []
+# 
+# exports.domComplete = (f) ->
+# 	if document.readyState is "complete"
+# 		f()
+# 	else
+# 		__domComplete.push f
+# 
+# exports.domCompleteCancel = (f) ->
+# 	__domComplete = _.whithout __domComplete, f
+
+
+
 
 
