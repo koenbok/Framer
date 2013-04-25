@@ -12,6 +12,7 @@ debug = require "./debug"
 
 {Frame} = require "./primitives/frame"
 {Matrix} = require "./primitives/matrix"
+{EventEmitter} = require "./eventemitter"
 
 Global = {}
 Global.View = View
@@ -20,6 +21,7 @@ Global.ImageView = ImageView
 Global.Animation = Animation
 Global.Frame = Frame
 Global.Matrix = Matrix
+Global.EventEmitter = EventEmitter
 
 Global.utils = utils
 Global.tools = tools
