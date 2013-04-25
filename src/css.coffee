@@ -19,6 +19,5 @@ exports.addStyle "
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	-webkit-transform-origin: 50% 50% 0%;
-	-webkit-backface-visibility: hidden;
 	-webkit-transform-style: flat;
 }"
