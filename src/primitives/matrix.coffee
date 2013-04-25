@@ -50,24 +50,24 @@ class Matrix
 		set: (value) -> @_scaleX = @_scaleY = value
 
 
-	@define "rotateX",
-		get: -> @_rotateX or 0
-		set: (value) -> @_rotateX = value
+	@define "rotationX",
+		get: -> @_rotationX or 0
+		set: (value) -> @_rotationX = value
 	
-	@define "rotateY",
-		get: -> @_rotateY or 0
+	@define "rotationY",
+		get: -> @_rotationY or 0
 		set: (value) ->
-			@_rotateY = value
+			@_rotationY = value
 	
-	@define "rotateZ",
-		get: -> @_rotateZ or 0
+	@define "rotationZ",
+		get: -> @_rotationZ or 0
 		set: (value) -> 
-			@_rotateZ = value
+			@_rotationZ = value
 	
-	@define "rotate",
-		get: -> @rotateZ
+	@define "rotation",
+		get: -> @rotationZ
 		set: (value) -> 
-			@rotateZ = value
+			@rotationZ = value
 
 	decompose: (m) ->
 		
@@ -84,7 +84,7 @@ class Matrix
 			z: Math.sqrt(m.m31*m.m31 + m.m32*m.m32 + m.m33*m.m33)
 		
 		# http://blog.bwhiting.co.uk/?p=26
-		# Todo: There is still a bug here, where it sometimes rotates in reverse
+		# Todo: There is still a bug here, where it sometimes rotations in reverse
 		result.rotation =
 			x: -Math.atan2(m.m32/result.scale.z, m.m33/result.scale.z)
 			y: Math.asin(m.m31/result.scale.z)
@@ -102,7 +102,7 @@ class Matrix
 		# result =
 		# 	translation: d.translate
 		# 	scale: d.scale
-		# 	rotation: d.rotate
+		# 	rotation: d.rotation
 		# 
 		# return result
 		
@@ -118,18 +118,18 @@ class Matrix
 		@scaleY = v.scale.y
 		@scaleZ = v.scale.z
 		
-		@rotateX = v.rotation.x / Math.PI * 180
-		@rotateY = v.rotation.y / Math.PI * 180
-		@rotateZ = v.rotation.z / Math.PI * 180
+		@rotationX = v.rotation.x / Math.PI * 180
+		@rotationY = v.rotation.y / Math.PI * 180
+		@rotationZ = v.rotation.z / Math.PI * 180
 		
 	
 	matrix: ->
 		m = new WebKitCSSMatrix()
 		m = m.translate @_x, @_y, @_z
-		# m = m.rotate @_rotateX, @_rotateY, @_rotateZ
-		m = m.rotate @_rotateX, 0, 0
-		m = m.rotate 0, @_rotateY, 0
-		m = m.rotate 0, 0, @_rotateZ
+		m = m.rotate @_rotationX, @_rotationY, @_rotationZ
+		# m = m.rotate @_rotationX, 0, 0
+		# m = m.rotate 0, @_rotationY, 0
+		# m = m.rotate 0, 0, @_rotationZ
 		m = m.scale @scaleX, @scaleY, @scaleZ
 		
 		return m
