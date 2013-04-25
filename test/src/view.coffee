@@ -1,12 +1,5 @@
 describe "View", ->
 	
-	# topView = new View width:300, height:300
-	# topView.style =
-	# 	position: "fixed"
-	# 	top: "10px"
-	# 	right: "10px"
-	# topView.clip = true
-	
 	createView = -> 
 		view = new View width:100, height:100
 		
@@ -74,19 +67,19 @@ describe "View", ->
 			
 	describe "Rotation", ->
 	
-		["rotateX", "rotateY", "rotateZ"].map (p) ->
+		["rotationX", "rotationY", "rotationZ"].map (p) ->
 			it "should set #{p}", ->
 				view = createView()
 				view[p] = 10
 				view[p].should.equal 10
 	
-		it "should set rotate", ->
+		it "should set rotation", ->
 			view = createView()
-			view.rotate = 200
-			view.rotate.should.equal 200
-			view.rotateX.should.equal 0
-			view.rotateY.should.equal 0
-			view.rotateZ.should.equal 200
+			view.rotation = 200
+			view.rotation.should.equal 200
+			view.rotationX.should.equal 0
+			view.rotationY.should.equal 0
+			view.rotationZ.should.equal 200
 	
 	describe "Hierarchy", ->
 		
@@ -94,7 +87,7 @@ describe "View", ->
 			view = createView()
 			(view.superView is null).should.equal true
 			(view._element.parentNode isnt null).should.equal true
-
+		
 		it "should add subview", ->
 			viewA = createView()
 			viewB = createView()
@@ -103,9 +96,64 @@ describe "View", ->
 			
 			viewB.superView.should.equal viewA
 			viewA.subViews.should.contain viewB
+
+		it "should remove subview", ->
+			viewA = createView()
+			viewB = createView()
+			
+			viewB.superView = viewA
+			
+			viewB.superView.should.equal viewA
+			viewA.subViews.should.contain viewB
+			
+			viewB.superView = null
+
+			# viewB.superView.should.equal null # Shoulda woulda coulda
+			viewA.subViews.should.eql []
+
+		it "should have sbiling views with a superview", ->
+			
+			viewA = new View width:100, height:100
+			viewB = new View width:100, height:100, superView:viewA
+			viewC = new View width:100, height:100, superView:viewA
+			viewD = new View width:100, height:100, superView:viewA
+			
+			viewB.siblingViews.should.eql [viewC, viewD]
 			
 
 	describe "Layering", ->
+
+		it "should change index", ->
+			view = createView()
+			view.index = 666
+			
+			view.index.should.equal 666
+
+		it "should have an index", ->
+			viewA = new View width:100, height:100
+			viewB = new View width:100, height:100, superView:viewA
+			viewC = new View width:100, height:100, superView:viewA
+			viewD = new View width:100, height:100, superView:viewA
+			
+			viewA.subViews.should.eql [viewB, viewC, viewD]
+			
+			viewB.index.should.equal = 0
+			viewC.index.should.equal = 1
+			viewD.index.should.equal = 2
+			
+			viewD.sendToBack()
+
+			viewB.index.should.equal = 0
+			viewC.index.should.equal = 1
+			viewD.index.should.equal = -1
+			
+			viewB.bringToFront()
+
+			viewB.index.should.equal = 2
+			viewC.index.should.equal = 1
+			viewD.index.should.equal = -1
+			
+			
 		
 	describe "Styling", ->
 	
@@ -113,7 +161,6 @@ describe "View", ->
 		
 		it "should allow classes to be added", ->
 			view = createView()
-			view = new View()
 			classA = view.class 
 			view.addClass("foo")
 			view.addClass("bar")
@@ -121,7 +168,6 @@ describe "View", ->
 	
 		it "should allow classes to be removed", ->
 			view = createView()
-			view = new View()
 			classA = view.class 
 			view.addClass('foo')
 			view.addClass('bar')

@@ -1809,9 +1809,14 @@ exports.list = function(failures){
 
     // explicitly show diff
     if (err.showDiff) {
-      escape = false;
-      err.actual = actual = JSON.stringify(actual, null, 2);
-      err.expected = expected = JSON.stringify(expected, null, 2);
+	
+	  escape = false;
+      err.actual = actual
+      err.expected = expected
+      
+	try { err.actual = JSON.stringify(actual, null, 2) } catch (err) {};
+	try { err.expected = JSON.stringify(expected, null, 2) } catch (err) {};
+ 
     }
 
     // actual / expected diff
