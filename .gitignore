@@ -1,5 +1,4 @@
 .DS_Store
-build
 node_modules
 test/init.js
 test/lib/framer.js
