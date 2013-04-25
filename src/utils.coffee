@@ -320,28 +320,16 @@ exports.isMobile = ->
 		navigator.userAgent.toLowerCase()
 
 
-
-
-
+# Public: Only executes a given function if the dom is loaded
+#
 __domComplete = []
 
 document.onreadystatechange = (event) =>
-	
-	console.log "document.onreadystatechange", document.readyState
-	
 	if document.readyState is "complete"
-		
-		console.log "__domComplete", __domComplete
-		
 		while __domComplete.length
-			f = __domComplete.shift()
-			
-			if typeof f is "function"
-				console.log "execute", f
-				f()
+			f = __domComplete.shift()()
 
 exports.domComplete = (f) ->
-	
 	if document.readyState is "complete"
 		f()
 	else
@@ -349,8 +337,3 @@ exports.domComplete = (f) ->
 
 exports.domCompleteCancel = (f) ->
 	__domComplete = _.without __domComplete, f
-
-
-
-
-
