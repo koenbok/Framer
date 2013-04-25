@@ -1,7 +1,7 @@
-// Framer 0.5.0-95-gab6a379 (c) 2013 Koen Bok
+// Framer v2.0.0b1 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "0.5.0-95-gab6a379";
+window.FramerVersion = "v2.0.0b1";
 
 
 (function(){var require = function (file, cwd) {
