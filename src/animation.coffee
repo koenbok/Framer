@@ -30,7 +30,7 @@ class Animation extends EventEmitter
 	AnimationProperties: [
 		"view", "properties", "curve", "time",
 		"origin", "tolerance", "precision", "modifiers" 
-		"debug", "profile"
+		"debug", "profile", "callback"
 	]
 	AnimatableCSSProperties: {
 		opacity: "",
@@ -40,7 +40,7 @@ class Animation extends EventEmitter
 	AnimatableMatrixProperties: [
 		"x", "y", "z",
 		"scaleX", "scaleY", "scaleZ", # "scale",
-		"rotateX", "rotateY", "rotateZ", # "rotate"
+		"rotationX", "rotationY", "rotationZ", # "rotation"
 	]
 
 	constructor: (args) ->
@@ -92,7 +92,7 @@ class Animation extends EventEmitter
 		# Calculate the curve values
 		
 		@curveValues = @_parseCurve @curve
-		@totalTime = @curveValues.length / @precision
+		@totalTime = (@curveValues.length / @precision) * 1000
 
 		
 		########################################################
@@ -108,8 +108,8 @@ class Animation extends EventEmitter
 			propertiesB.scaleX = propertiesB.scale
 			propertiesB.scaleY = propertiesB.scale
 		
-		if propertiesB.rotate
-			propertiesB.rotateZ = propertiesB.rotate
+		if propertiesB.rotation
+			propertiesB.rotationZ = propertiesB.rotation
 			
 		@propertiesA = {}
 		@propertiesB = {}
@@ -149,7 +149,7 @@ class Animation extends EventEmitter
 			#{@keyFrameAnimationCSS}
 		
 			.#{@animationName} {
-				-webkit-animation-duration: #{@totalTime}s;
+				-webkit-animation-duration: #{@totalTime / 1000}s;
 				-webkit-animation-name: #{@animationName};
 				-webkit-animation-timing-function: linear;
 				-webkit-animation-fill-mode: both;
@@ -164,7 +164,7 @@ class Animation extends EventEmitter
 		if @debug
 			endTime = new Date().getTime() - startTime
 			console.log "Animation[#{@animationId}].setupTime = #{endTime}ms"
-			console.log "Animation[#{@animationId}].totalTime = #{utils.round @totalTime, 2}ms"
+			console.log "Animation[#{@animationId}].totalTime = #{utils.round @totalTime, 0}ms"
 		
 		console.profileEnd @animationName if @profile
 
@@ -242,6 +242,7 @@ class Animation extends EventEmitter
 		@view._matrix = endMatrix
 		@view.style = endStyles
 		
+		@callback? @
 		@emit "end"
 		
 	_css: ->
