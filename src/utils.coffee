@@ -177,7 +177,7 @@ exports.interval = (time, f) ->
 #
 # Returns a Function
 #
-exports.debounce = (fn, threshold, immediate) ->
+exports.debounce = (threshold, fn, immediate) ->
 	timeout = null
 	(args...) ->
 		obj = this
@@ -199,7 +199,7 @@ exports.debounce = (fn, threshold, immediate) ->
 #
 # Returns a Function
 #
-exports.throttle = (fn, delay) ->
+exports.throttle = (delay, fn) ->
 	return fn if delay is 0
 	timer = false
 	return ->
@@ -323,30 +323,32 @@ exports.isMobile = ->
 
 
 
-# __domComplete = []
-# 
-# document.onreadystatechange = (event) =>
-# 	console.log "onreadystatechange", document.readyState
-# 	
-# 	utils.delay 100, ->
-# 	
-# 		if document.readyState is "complete"
-# 			while __domComplete.length
-# 				__domComplete.shift()()
-# 
-# 		# __domComplete.map (f) -> 
-# 		# 	console.log f
-# 		# 	f()
-# 		# __domComplete = []
-# 
-# exports.domComplete = (f) ->
-# 	if document.readyState is "complete"
-# 		f()
-# 	else
-# 		__domComplete.push f
-# 
-# exports.domCompleteCancel = (f) ->
-# 	__domComplete = _.whithout __domComplete, f
+__domComplete = []
+
+document.onreadystatechange = (event) =>
+	
+	console.log "document.onreadystatechange", document.readyState
+	
+	if document.readyState is "complete"
+		
+		console.log "__domComplete", __domComplete
+		
+		while __domComplete.length
+			f = __domComplete.shift()
+			
+			if typeof f is "function"
+				console.log "execute", f
+				f()
+
+exports.domComplete = (f) ->
+	
+	if document.readyState is "complete"
+		f()
+	else
+		__domComplete.push f
+
+exports.domCompleteCancel = (f) ->
+	__domComplete = _.without __domComplete, f
 
 
 
