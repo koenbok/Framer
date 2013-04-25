@@ -7,13 +7,17 @@ build:
 	./node_modules/coffee-script/bin/coffee src/banner.coffee > build/framer.js
 	./node_modules/browserify/bin/cmd.js src/init.coffee >> build/framer.js
 	cp build/framer.js template/framer.js
+buildw:
+	coffee scripts/watch.coffee . make build
 
 test:
 	make
 	mkdir -p test/lib
 	cp build/framer.js test/lib/framer.js
 	./node_modules/browserify/bin/cmd.js test/init.coffee -o test/init.js
-	open test/index.html
+	mocha-phantomjs test/index.html
+testw:
+	coffee scripts/watch.coffee . make test
 
 clean:
 	rm -rf dist
