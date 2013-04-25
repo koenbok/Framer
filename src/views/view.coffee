@@ -33,6 +33,7 @@ class View extends Frame
 		# Set the view properties
 		@clip = args.clip or View.Properties.clip
 		@properties = args
+		@index = 0
 		
 		# Overridable creation hook
 		@_postCreate?()
@@ -87,7 +88,6 @@ class View extends Frame
 		# Get this views absolute frame on the screen
 		utils.convertPoint @frame, @, null
 	
-	
 	contentFrame: ->
 		# Get the total size of all subviews
 		frame =
@@ -122,115 +122,54 @@ class View extends Frame
 	
 	@define "x",
 		get: -> @_matrix.x
-		set: (value) ->
-			@animateStop()
-			@_matrix.x = value
-			@_matrix = @_matrix
-			@emit "change:x"
-			@emit "change:frame"
+		set: (value) -> @_setMatrixValue "x", value
 	
 	@define "y",
 		get: -> @_matrix.y
-		set: (value) ->
-			@animateStop()
-			@_matrix.y = value
-			@_matrix = @_matrix
-			@emit "change:y"
-			@emit "change:frame"
+		set: (value) -> @_setMatrixValue "y", value
 
 	@define "z",
 		get: -> @_matrix.z
-		set: (value) ->
-			@animateStop()
-			@_matrix.z = value
-			@_matrix = @_matrix
-			@emit "change:z"
-			@emit "change:frame"
+		set: (value) -> @_setMatrixValue "z", value
 
 	#############################################################################
 	## Scale
 	
 	@define "scale",
 		get: -> @_matrix.scale
-		set: (value) ->
-			@animateStop()
-			@_matrix.scale = value
-			@_matrix = @_matrix
-
-			@emit "change:scale"
+		set: (value) -> @_setMatrixValue "scale", value
 
 	@define "scaleX",
 		get: -> @_matrix.scaleX
-		set: (value) ->
-			@animateStop()
-			@_matrix.scaleX = value
-			@_matrix = @_matrix
-
-			@emit "change:scaleX"
-			@emit "change:scale"
+		set: (value) -> @_setMatrixValue "scaleX", value
 	
 	@define "scaleY",
 		get: -> @_matrix.scaleY
-		set: (value) ->
-			@animateStop()
-			@_matrix.scaleY = value
-			@_matrix = @_matrix
-
-			@emit "change:scaleY"
-			@emit "change:scale"
+		set: (value) -> @_setMatrixValue "scaleY", value
 	
 	@define "scaleZ",
 		get: -> @_matrix.scaleZ
-		set: (value) ->
-			@animateStop()
-			@_matrix.scaleZ = value
-			@_matrix = @_matrix
-
-			@emit "change:scaleZ"
-			@emit "change:scale"
+		set: (value) -> @_setMatrixValue "scaleZ", value
 
 
 	#############################################################################
-	## Rotate
+	## Rotation
 
-	@define "rotate",
-		get: -> @_matrix.rotate
-		set: (value) ->
-			@animateStop()
-			@_matrix.rotate = value
-			@_matrix = @_matrix
+	@define "rotation",
+		get: -> @_matrix.rotation
+		set: (value) ->  @_setMatrixValue "rotation", value
 
-			@emit "change:rotate"
-
-	@define "rotateX",
-		get: -> @_matrix.rotateX
-		set: (value) ->
-			@animateStop()
-			@_matrix.rotateX = value
-			@_matrix = @_matrix
-			
-			@emit "change:rotateX"
-			@emit "change:rotate"
+	@define "rotationX",
+		get: -> @_matrix.rotationX
+		set: (value) -> @_setMatrixValue "rotationX", value
 	
-	@define "rotateY",
-		get: -> @_matrix.rotateY
-		set: (value) ->
-			@animateStop()
-			@_matrix.rotateY = value
-			@_matrix = @_matrix
+	@define "rotationY",
+		get: -> @_matrix.rotationY
+		set: (value) -> @_setMatrixValue "rotationY", value
 
-			@emit "change:rotateX"
-			@emit "change:rotate"
-
-	@define "rotateZ",
-		get: -> @_matrix.rotateZ
-		set: (value) ->
-			@animateStop()
-			@_matrix.rotateZ = value
-			@_matrix = @_matrix
-
-			@emit "change:rotateZ"
-			@emit "change:rotate"
+	@define "rotationZ",
+		get: -> @_matrix.rotationZ
+		set: (value) -> @_setMatrixValue "rotationZ", value
 
 
 	#############################################################################
@@ -257,6 +196,19 @@ class View extends Frame
 
 			@__matrix = matrix
 			@style.webkitTransform = @__matrix.matrix().cssValues()
+	
+	_setMatrixValue: (property, value) ->
+		
+		@animateStop()
+		
+		@_matrix[property] = value
+		@_matrix = @_matrix
+
+		@emit "change:#{property}"
+		
+		# Make sure we also emit group changes like scaleX -> scale
+		if property[-1..] in ["X", "Y", "Z"]
+			@emit "change:#{property[..(property.length - 1)]}"
 	
 	_computedMatrix: ->
 		new WebKitCSSMatrix @computedStyle.webkitTransform
@@ -302,7 +254,7 @@ class View extends Frame
 			return if value is @_superView
 			
 			# Cancel previous pending insertions
-			# document.removeEventListener "DOMContentLoaded", @__insertElement
+			utils.domCompleteCancel @__insertElement
 			
 			# Remove from previous superview subviews
 			if @_superView
@@ -316,13 +268,29 @@ class View extends Frame
 				value._subViews.push @
 				value.emit "change:subViews"
 			else
-				@__insertElement()
+				@_insertElement()
 			
+			# Set the superview
 			@_superView = value
+			
+			# Place this view on top of it's siblings
+			@bringToFront()
+			
 			@emit "change:superView"
 	
 	@define "subViews",
-		get: -> _.compact @_subViews
+		get: ->
+			# Make a shallow copy of the list
+			@_subViews.map (view) -> view
+	
+	@define "siblingViews",
+		get: ->
+			if @superView is null
+				_.filter View.ViewList, (view) =>
+					view isnt @ and view.superView
+			else
+				_.filter @superView.subViews, (view) =>
+					view isnt @
 
 	addSubView: (view) ->
 		view.superView = @
@@ -338,7 +306,7 @@ class View extends Frame
 	## Ordering
 
 	@define "index",
-		get: -> @style['z-index'] or 0
+		get: -> parseInt @style['z-index'] or 0
 		set: (value) ->
 			@style['z-index'] = value
 			@emit "change:index"
@@ -354,6 +322,14 @@ class View extends Frame
 		indexB = view.index
 		view.index = indexA
 		@index = indexB
+	
+	bringToFront: ->
+		siblingIndexes = _.pluck @siblingViews, "index"
+		@index = (utils.max(siblingIndexes) + 1) or 0
+	
+	sendToBack: ->
+		siblingIndexes = _.pluck @siblingViews, "index"
+		@index = (utils.min(siblingIndexes) - 1) or 0
 
 	#############################################################################
 	## Animation
@@ -417,18 +393,13 @@ class View extends Frame
 		@classes = _.filter @classes, (item) -> item isnt className
 	
 	_insertElement: ->
-		
-		# Insert the element to the dom, wait for it if it's not loaded
-		# TODO: There might still be some bug here
-		
-		if document.readyState in ["complete"]
-			@__insertElement()
-		else
-			document.addEventListener "DOMContentLoaded", 
-				@__insertElement
+		utils.domComplete @__insertElement
 				
 	__insertElement: =>
-		@_rootElement.appendChild @_element
+		document.body.appendChild @_element
+	
+	destroy: ->
+		@_element.parentNode.removeChild @_element
 
 
 	#############################################################################
@@ -454,10 +425,10 @@ View.Properties = utils.extend Frame.Properties,
 	frame: null
 	clip: true
 	opacity: 1.0
-	rotateX: 0
-	rotateY: 0
-	rotateZ: 0
-	rotate: 0
+	rotationX: 0
+	rotationY: 0
+	rotationZ: 0
+	rotation: 0
 	scale: 1.0
 	scaleX: 1.0
 	scaleY: 1.0
