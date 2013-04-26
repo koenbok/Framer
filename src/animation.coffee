@@ -54,6 +54,7 @@ class Animation extends EventEmitter
 		# Set all the defaults
 		@time ?= 1000
 		@curve ?= "linear"
+		@origin ?= "50% 50%"
 		@count = 0
 
 		@precision ?= config.animationPrecision
@@ -153,6 +154,7 @@ class Animation extends EventEmitter
 				-webkit-animation-name: #{@animationName};
 				-webkit-animation-timing-function: linear;
 				-webkit-animation-fill-mode: both;
+				-webkit-tranform-origin: #{@origin};
 			}"
 		
 		@view.addClass @animationName
@@ -328,8 +330,8 @@ class Animation extends EventEmitter
 			return bezier.defaults.EaseOut @precision, time
 		else if curve in ["ease-in-out"]
 			return bezier.defaults.EaseInOut @precision, time
-		else if curve[.."cubic-bezier".length-1] is "cubic-bezier"
-			v = parseCurve curve, "cubic-bezier"
+		else if curve[.."bezier-curve".length-1] is "bezier-curve"
+			v = parseCurve curve, "bezier-curve"
 			return bezier.BezierCurve v[0], v[1], v[2], v[3], precision, time
 		else if curve[.."spring".length-1] is "spring"
 			v = parseCurve curve, "spring"
