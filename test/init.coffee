@@ -1,3 +1,3 @@
-{DebugTest} = require './src/debug'
-{ViewTest} = require './src/view'
-{AnimationTest} = require './src/animation'
+{DebugTest} = require './tests/debug'
+{ViewTest} = require './tests/view'
+{AnimationTest} = require './tests/animation'

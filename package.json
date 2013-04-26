@@ -11,7 +11,10 @@
     "underscore": "1.x",
     "browserify": "1.x",
     "coffee-script": "1.6.x",
-    "coffeelint": "0.5.x"
+    "coffeelint": "0.5.x",
+    "phantomjs": "1.9.x",
+    "mocha-phantomjs": "2.x.x",
+    "watchr": "2.4.x"
   },
   "license": "MIT"
 }

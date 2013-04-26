@@ -4,7 +4,7 @@ build:
 	make lint
 	make clean
 	mkdir -p build
-	./node_modules/coffee-script/bin/coffee src/banner.coffee > build/framer.js
+	./node_modules/coffee-script/bin/coffee scripts/banner.coffee > build/framer.js
 	./node_modules/browserify/bin/cmd.js src/init.coffee >> build/framer.js
 	cp build/framer.js template/framer.js
 buildw:
@@ -15,7 +15,7 @@ test:
 	mkdir -p test/lib
 	cp build/framer.js test/lib/framer.js
 	./node_modules/browserify/bin/cmd.js test/init.coffee -o test/init.js
-	mocha-phantomjs test/index.html
+	./node_modules/mocha-phantomjs/bin/mocha-phantomjs test/index.html
 testw:
 	coffee scripts/watch.coffee . make test
 
