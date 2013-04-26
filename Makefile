@@ -8,7 +8,7 @@ build:
 	./node_modules/browserify/bin/cmd.js src/init.coffee >> build/framer.js
 	cp build/framer.js template/framer.js
 buildw:
-	coffee scripts/watch.coffee . make build
+	./node_modules/coffee-script/bin/coffee scripts/watch.coffee . make build
 
 test:
 	make
@@ -17,7 +17,7 @@ test:
 	./node_modules/browserify/bin/cmd.js test/init.coffee -o test/init.js
 	./node_modules/mocha-phantomjs/bin/mocha-phantomjs test/index.html
 testw:
-	coffee scripts/watch.coffee . make test
+	./node_modules/coffee-script/bin/coffee scripts/watch.coffee . make test
 
 clean:
 	rm -rf dist
