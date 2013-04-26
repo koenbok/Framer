@@ -38,8 +38,6 @@ describe "Animation", ->
 			
 			animation.start()
 			
-			console.log "animation.curveValues", animation.curveValues
-			
 			animation.totalTime.should.equal animation.time
 			animation.curveValues.length.should.equal \
 				(animation.time / 1000) * animation.precision
