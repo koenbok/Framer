@@ -1,7 +1,7 @@
-// Framer v2.0.0b1-1-g7469d1f (c) 2013 Koen Bok
+// Framer v2.0.0b1-5-g2bf250b (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "v2.0.0b1-1-g7469d1f";
+window.FramerVersion = "v2.0.0b1-5-g2bf250b";
 
 
 (function(){var require = function (file, cwd) {
@@ -3308,7 +3308,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       this.stop = __bind(this.stop, this);
       this.reverse = __bind(this.reverse, this);
       this.start = __bind(this.start, this);
-      var p, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
+      var p, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
 
       _ref = this.AnimationProperties;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -3321,14 +3321,17 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       if ((_ref2 = this.curve) == null) {
         this.curve = "linear";
       }
+      if ((_ref3 = this.origin) == null) {
+        this.origin = "50% 50%";
+      }
       this.count = 0;
-      if ((_ref3 = this.precision) == null) {
+      if ((_ref4 = this.precision) == null) {
         this.precision = config.animationPrecision;
       }
-      if ((_ref4 = this.debug) == null) {
+      if ((_ref5 = this.debug) == null) {
         this.debug = config.animationDebug;
       }
-      if ((_ref5 = this.profile) == null) {
+      if ((_ref6 = this.profile) == null) {
         this.profile = config.animationProfile;
       }
       AnimationCounter += 1;
@@ -3393,7 +3396,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       }
       this.keyFrameAnimationCSS = this._css();
       this.view.once("webkitAnimationEnd", this._finalize);
-      css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.totalTime / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;			}");
+      css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.totalTime / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;				-webkit-tranform-origin: " + this.origin + ";			}");
       this.view.addClass(this.animationName);
       if (this.debug) {
         endTime = new Date().getTime() - startTime;
@@ -3543,8 +3546,8 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         return bezier.defaults.EaseOut(this.precision, time);
       } else if (curve === "ease-in-out") {
         return bezier.defaults.EaseInOut(this.precision, time);
-      } else if (curve.slice(0, +("cubic-bezier".length - 1) + 1 || 9e9) === "cubic-bezier") {
-        v = parseCurve(curve, "cubic-bezier");
+      } else if (curve.slice(0, +("bezier-curve".length - 1) + 1 || 9e9) === "bezier-curve") {
+        v = parseCurve(curve, "bezier-curve");
         return bezier.BezierCurve(v[0], v[1], v[2], v[3], precision, time);
       } else if (curve.slice(0, +("spring".length - 1) + 1 || 9e9) === "spring") {
         v = parseCurve(curve, "spring");
