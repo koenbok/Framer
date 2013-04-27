@@ -1,7 +1,7 @@
-// Framer v2.0.0b1-6-g0acf5ea (c) 2013 Koen Bok
+// Framer v2.0.0b1-14-g9873269 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "v2.0.0b1-6-g0acf5ea";
+window.FramerVersion = "v2.0.0b1-14-g9873269";
 
 
 (function(){var require = function (file, cwd) {
@@ -3355,10 +3355,26 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       this.animationId = AnimationCounter;
     }
 
+    Animation.define("view", {
+      get: function() {
+        return this._view;
+      },
+      set: function(view) {
+        if (view === null || view === this._view) {
+          return;
+        }
+        this._originalProperties = view.properties;
+        return this._view = view;
+      }
+    });
+
     Animation.prototype.start = function(callback) {
-      var endTime, k, propertiesA, propertiesB, startTime, v, _i, _len, _ref, _ref1;
+      var animatedProperties, endTime, k, propertiesA, propertiesB, startTime, v, _i, _len, _ref, _ref1;
 
       AnimationList.push(this);
+      if (this.view === null) {
+        throw new Error("Animation does not have a view to animate");
+      }
       startTime = new Date().getTime();
       this.count++;
       this.animationName = "framer-animation-" + this.animationId + "-" + this.count;
@@ -3404,12 +3420,17 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
           this.propertiesB[k] = propertiesB[k];
         }
       }
-      if (this.debug) {
-        for (k in this.propertiesA) {
-          if (this.propertiesA[k] !== this.propertiesB[k]) {
+      animatedProperties = [];
+      for (k in this.propertiesA) {
+        if (this.propertiesA[k] !== this.propertiesB[k]) {
+          if (this.debug) {
             console.log(" ." + k + " " + this.propertiesA[k] + " -> " + this.propertiesB[k]);
           }
+          animatedProperties.push(k);
         }
+      }
+      if (animatedProperties.length === 0) {
+        console.error("Animation[" + this.animationId + "] Warning: nothing to animate");
       }
       this.keyFrameAnimationCSS = this._css();
       this.view.once("webkitAnimationEnd", this._finalize);
@@ -3435,10 +3456,10 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         options[p] = this[p];
       }
       options.properties = {};
-      _ref1 = this.properties;
+      _ref1 = this._originalProperties;
       for (k in _ref1) {
         v = _ref1[k];
-        options.properties[k] = this.view[k];
+        options.properties[k] = this._originalProperties[k];
       }
       return new Animation(options);
     };

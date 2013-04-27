@@ -64,10 +64,25 @@ class Animation extends EventEmitter
 		AnimationCounter += 1
 		@animationId = AnimationCounter
 		
+	@define "view",
+		get: -> 
+			@_view
+			
+		set: (view) ->
+			return if view in [null, @_view]
+			@_originalProperties = view.properties
+			@_view = view
 		
 	start: (callback) =>
 		
 		AnimationList.push @
+		
+		########################################################
+		# Check if we have a view to animate
+		
+		if @view is null
+			throw new Error "Animation does not have a view to animate"
+		
 		
 		########################################################
 		# Set up some variables to start with
@@ -80,7 +95,7 @@ class Animation extends EventEmitter
 		console.log "Animation[#{@animationId}].start" if @debug
 		console.log "Animation[#{@animationId}].view = #{@view.name}" if @debug
 		console.profile @animationName if @profile
-		
+
 		
 		########################################################
 		# Deal with other animations on this view
@@ -133,11 +148,20 @@ class Animation extends EventEmitter
 			if propertiesB.hasOwnProperty k
 				@propertiesA[k] = propertiesA[k]
 				@propertiesB[k] = propertiesB[k]
-
-		if @debug
-			for k of @propertiesA
-				if @propertiesA[k] isnt @propertiesB[k]
-					console.log " .#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}"
+		
+		
+		# Check which properties actually will animate
+		
+		animatedProperties = []
+		
+		for k of @propertiesA
+			if @propertiesA[k] isnt @propertiesB[k]
+				console.log " .#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}" if @debug
+				animatedProperties.push k
+		
+		# Throw a warning if we have nothing to animate
+		if animatedProperties.length is 0
+			console.error "Animation[#{@animationId}] Warning: nothing to animate"
 
 
 		########################################################
@@ -176,13 +200,15 @@ class Animation extends EventEmitter
 
 		options = {}
 		
+		# Copy the animation settings
 		for p in @AnimationProperties
 			options[p] = @[p]
 		
 		options.properties = {}
-
-		for k, v of @properties
-			options.properties[k] = @view[k]
+		
+		# Add the original view properties to animate to 
+		for k, v of @_originalProperties
+			options.properties[k] = @_originalProperties[k]
 			
 		return new Animation options
 

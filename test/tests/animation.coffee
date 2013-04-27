@@ -3,6 +3,9 @@ describe "Animation", ->
 	AnimatableMatrixProperties = (new Animation view:null).AnimatableMatrixProperties
 	AnimationTime = 200
 	
+	halfway = (a, b) ->
+		a + ((b - a) / 2)
+		
 	createView = ->
 		view = new View
 
@@ -87,3 +90,65 @@ describe "Animation", ->
 					callback()
 				
 				animation.start()
+	
+	
+	describe "Reverse", ->
+		
+		it "should reverse upfront", (callback) ->
+			
+			view = createView()
+			view.frame = {width:100, height:100, x:100, y:100}
+			
+			animationA = new Animation
+				view: view
+				properties: {x:200}
+				time: 500
+				curve: "linear"
+			
+			animationB = animationA.reverse()
+			
+			animationA.start()
+			
+			utils.delay animationA.totalTime / 2.0, ->
+				
+				view.animateStop()
+				view.x.should.be.within(140, 160)
+				
+				animationB.start()
+				animationB.on "end", ->
+					
+					view.x.should.equal 100
+					callback()
+
+		it "should reverse afterwards", (callback) ->
+			
+			view = createView()
+			view.frame = {width:100, height:100, x:100, y:100}
+			
+			animationA = new Animation
+				view: view
+				properties: {x:200}
+				time: 250
+				curve: "linear"
+			
+			animationA.start()
+			
+			utils.delay animationA.totalTime / 2.0, ->
+				
+				view.animateStop()
+				
+				halfwayX = halfway 100, 200
+				
+				view.x.should.be.within(halfwayX * 0.8, halfwayX * 1.2)
+				
+				animationB = animationA.reverse()
+				
+				animationB.start()
+				animationB.on "end", ->
+					
+					view.x.should.equal 100
+					callback()
+				
+
+		
+		
