@@ -5,6 +5,8 @@ class exports.ImageView extends View
 	constructor: (args) ->
 		super
 		
+		args ?= {}
+		
 		# Behave like NSImage. Stretch to view size
 		@style["background-repeat"] = "no-repeat"
 		@style["background-size"] = "cover"
