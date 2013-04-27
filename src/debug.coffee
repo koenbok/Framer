@@ -14,7 +14,7 @@ exports.errorWarning = (e) ->
 	errorView.scale = 0.5
 	errorView.animate
 		properties: {scale:1.0}
-		curve: "spring(150,8,1500)"
+		curve: "spring(2500,30,1500)"
 
 exports.debugView = ->
 	
