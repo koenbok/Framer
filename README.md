@@ -1,4 +1,4 @@
-## Framer Prototyping
+# Framer Prototyping
 
 For a complete overview, downloads and docs please visit [framerjs.com](http://www.framerjs.com).
 
