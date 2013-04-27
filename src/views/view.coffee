@@ -98,6 +98,10 @@ class View extends Frame
 		frame.height = utils.max(_.pluck(@subViews, "maxY")) - frame.y
 		
 		frame
+	
+	centerX: -> @midX = @superView.width  / 2.0 if @superView
+	centerY: -> @midY = @superView.height / 2.0 if @superView
+	center: -> @centerX(); @centerY()
 
 	#############################################################################
 	## Geometry
