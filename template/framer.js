@@ -1,7 +1,7 @@
-// Framer v2.0.0b1-5-g2bf250b (c) 2013 Koen Bok
+// Framer v2.0.0b1-6-g0acf5ea (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "v2.0.0b1-5-g2bf250b";
+window.FramerVersion = "v2.0.0b1-6-g0acf5ea";
 
 
 (function(){var require = function (file, cwd) {
@@ -2048,7 +2048,7 @@ require.define("/src/debug.coffee",function(require,module,exports,__dirname,__f
       properties: {
         scale: 1.0
       },
-      curve: "spring(150,8,1500)"
+      curve: "spring(2500,30,1500)"
     });
   };
 
@@ -2363,6 +2363,23 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       frame.width = utils.max(_.pluck(this.subViews, "maxX")) - frame.x;
       frame.height = utils.max(_.pluck(this.subViews, "maxY")) - frame.y;
       return frame;
+    };
+
+    View.prototype.centerX = function() {
+      if (this.superView) {
+        return this.midX = this.superView.width / 2.0;
+      }
+    };
+
+    View.prototype.centerY = function() {
+      if (this.superView) {
+        return this.midY = this.superView.height / 2.0;
+      }
+    };
+
+    View.prototype.center = function() {
+      this.centerX();
+      return this.centerY();
     };
 
     View.define("width", {
@@ -3924,6 +3941,9 @@ require.define("/src/views/imageview.coffee",function(require,module,exports,__d
 
     function ImageView(args) {
       ImageView.__super__.constructor.apply(this, arguments);
+      if (args == null) {
+        args = {};
+      }
       this.style["background-repeat"] = "no-repeat";
       this.style["background-size"] = "cover";
       this.image = args.image;
