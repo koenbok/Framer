@@ -1,7 +1,7 @@
-// Framer v2.0.0b1-14-g9873269 (c) 2013 Koen Bok
+// Framer v2.0.0b1-17-g09f407a (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "v2.0.0b1-14-g9873269";
+window.FramerVersion = "v2.0.0b1-17-g09f407a";
 
 
 (function(){var require = function (file, cwd) {
@@ -447,7 +447,7 @@ require.define("/src/css.coffee",function(require,module,exports,__dirname,__fil
     return document.head.appendChild(styleSheet);
   };
 
-  exports.addStyle(".framer {	display: block;	visibility: visible;	position: absolute;	top:auto; right:auto; bottom:auto; left:auto;	width:auto; height:auto;	overflow: visible;	z-index:0;	opacity:1;	box-sizing: border-box;	-webkit-box-sizing: border-box;	-webkit-transform-origin: 50% 50% 0%;	-webkit-transform-style: flat;}");
+  exports.addStyle(".framer {	display: block;	visibility: visible;	position: absolute;	top:auto; right:auto; bottom:auto; left:auto;	width:auto; height:auto;	overflow: visible;	z-index: 0;	opacity: 1;	box-sizing: border-box;	-webkit-box-sizing: border-box;	-webkit-transform-origin: 50% 50% 0%;	-webkit-transform-style: flat;	-webkit-backface-visibility: hidden;}");
 
 }).call(this);
 
@@ -683,28 +683,12 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
     return point;
   };
 
-  exports.max = function(obj) {
-    var max, n, _i, _len;
-
-    for (_i = 0, _len = obj.length; _i < _len; _i++) {
-      n = obj[_i];
-      if (!max || n > max) {
-        max = n;
-      }
-    }
-    return max;
+  exports.max = function(arr) {
+    return Math.max.apply(Math, arr);
   };
 
-  exports.min = function(obj) {
-    var min, n, _i, _len;
-
-    for (_i = 0, _len = obj.length; _i < _len; _i++) {
-      n = obj[_i];
-      if (!min || n < min) {
-        min = n;
-      }
-    }
-    return min;
+  exports.min = function(arr) {
+    return Math.min.apply(Math, arr);
   };
 
   exports.sum = function(a) {
@@ -781,6 +765,51 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.domCompleteCancel = function(f) {
     return __domComplete = _.without(__domComplete, f);
+  };
+
+  exports.pointDistance = function(pointA, pointB) {
+    var distance;
+
+    return distance = {
+      x: Math.abs(pointB.x - pointA.x),
+      y: Math.abs(pointB.y - pointA.y)
+    };
+  };
+
+  exports.pointInvert = function(point) {
+    return point = {
+      x: 0 - point.x,
+      y: 0 - point.y
+    };
+  };
+
+  exports.pointTotal = function(point) {
+    return point.x + point.y;
+  };
+
+  exports.frameSize = function(frame) {
+    var size;
+
+    return size = {
+      width: frame.width,
+      height: frame.height
+    };
+  };
+
+  exports.framePoint = function(frame) {
+    var point;
+
+    return point = {
+      x: frame.x,
+      y: frame.y
+    };
+  };
+
+  exports.pointAbs = function(point) {
+    return point = {
+      x: Math.abs(point.x),
+      y: Math.abs(point.y)
+    };
   };
 
 }).call(this);
@@ -2254,6 +2283,10 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       this.__insertElement = __bind(this.__insertElement, this);      if (args == null) {
         args = {};
       }
+      this._offset = {
+        x: 0,
+        y: 0
+      };
       View.Views.push(this);
       this.id = View.Views.length;
       this._element = document.createElement("div");
@@ -2354,15 +2387,18 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     };
 
     View.prototype.contentFrame = function() {
-      var frame;
+      var frame, maxX, maxY, minX, minY;
 
-      frame = {
-        x: utils.min(_.pluck(this.subViews, "minX")),
-        y: utils.min(_.pluck(this.subViews, "minY"))
+      minX = utils.min(_.pluck(this.subViews, "minX"));
+      maxX = utils.max(_.pluck(this.subViews, "maxX"));
+      minY = utils.min(_.pluck(this.subViews, "minY"));
+      maxY = utils.max(_.pluck(this.subViews, "maxY"));
+      return frame = {
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY
       };
-      frame.width = utils.max(_.pluck(this.subViews, "maxX")) - frame.x;
-      frame.height = utils.max(_.pluck(this.subViews, "maxY")) - frame.y;
-      return frame;
     };
 
     View.prototype.centerX = function() {
@@ -2408,19 +2444,21 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
 
     View.define("x", {
       get: function() {
-        return this._matrix.x;
+        return this._matrix.x - this._offset.x;
       },
       set: function(value) {
-        return this._setMatrixValue("x", value);
+        this._setMatrixValue("x", value + this._offset.x);
+        return this.emit("change:frame");
       }
     });
 
     View.define("y", {
       get: function() {
-        return this._matrix.y;
+        return this._matrix.y - this._offset.y;
       },
       set: function(value) {
-        return this._setMatrixValue("y", value);
+        this._setMatrixValue("y", value + this._offset.y);
+        return this.emit("change:frame");
       }
     });
 
@@ -2592,24 +2630,30 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       get: function() {
         return this._superView || null;
       },
-      set: function(value) {
-        if (value === this._superView) {
+      set: function(view) {
+        if (view === this._superView) {
           return;
         }
         utils.domCompleteCancel(this.__insertElement);
         if (this._superView) {
           this._superView._element.removeChild(this._element);
           this._superView._subViews = _.without(this._superView._subViews, this);
-          this._superView.emit("change:subViews");
+          this._superView.emit("change:subViews", {
+            added: [],
+            removed: [this]
+          });
         }
-        if (value) {
-          value._element.appendChild(this._element);
-          value._subViews.push(this);
-          value.emit("change:subViews");
+        if (view) {
+          view._element.appendChild(this._element);
+          view._subViews.push(this);
+          view.emit("change:subViews", {
+            added: [this],
+            removed: []
+          });
         } else {
           this._insertElement();
         }
-        this._superView = value;
+        this._superView = view;
         this.bringToFront();
         return this.emit("change:superView");
       }
@@ -2784,7 +2828,9 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     };
 
     View.prototype.destroy = function() {
-      return this._element.parentNode.removeChild(this._element);
+      if (this._element.parentNode) {
+        return this._element.parentNode.removeChild(this._element);
+      }
     };
 
     View.prototype.addListener = function(event, listener) {
@@ -3309,7 +3355,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
   Animation = (function(_super) {
     __extends(Animation, _super);
 
-    Animation.prototype.AnimationProperties = ["view", "properties", "curve", "time", "origin", "tolerance", "precision", "modifiers", "debug", "profile", "callback"];
+    Animation.prototype.AnimationProperties = ["view", "properties", "curve", "time", "origin", "tolerance", "precision", "modifiers", "limits", "debug", "profile", "callback"];
 
     Animation.prototype.AnimatableCSSProperties = {
       opacity: "",
@@ -3430,7 +3476,8 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         }
       }
       if (animatedProperties.length === 0) {
-        console.error("Animation[" + this.animationId + "] Warning: nothing to animate");
+        console.log("Animation[" + this.animationId + "] Warning: nothing to animate");
+        return;
       }
       this.keyFrameAnimationCSS = this._css();
       this.view.once("webkitAnimationEnd", this._finalize);
@@ -4003,8 +4050,297 @@ require.define("/src/views/imageview.coffee",function(require,module,exports,__d
 
 });
 
+require.define("/src/primitives/events.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+  var Events, utils, _;
+
+  _ = require("underscore");
+
+  utils = require("../utils");
+
+  Events = {};
+
+  if (utils.isTouch()) {
+    Events.TouchStart = "touchstart";
+    Events.TouchEnd = "touchend";
+    Events.TouchMove = "touchmove";
+  } else {
+    Events.TouchStart = "mousedown";
+    Events.TouchEnd = "mouseup";
+    Events.TouchMove = "mousemove";
+  }
+
+  Events.MouseOver = "mouseover";
+
+  Events.MouseOut = "mouseout";
+
+  Events.DragStart = "dragstart";
+
+  Events.DragMove = "dragmove";
+
+  Events.DragEnd = "dragend";
+
+  Events.sanitize = function(event) {
+    var touchEvent, _ref, _ref1;
+
+    touchEvent = (_ref = event.touches) != null ? _ref[0] : void 0;
+    if (touchEvent == null) {
+      touchEvent = (_ref1 = event.changedTouches) != null ? _ref1[0] : void 0;
+    }
+    if (touchEvent == null) {
+      touchEvent = event;
+    }
+    return touchEvent;
+  };
+
+  exports.Events = Events;
+
+}).call(this);
+
+});
+
+require.define("/src/ui/init.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+  exports.GridView = (require("./gridview")).GridView;
+
+  exports.Draggable = (require("./draggable")).Draggable;
+
+}).call(this);
+
+});
+
+require.define("/src/ui/gridview.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+  var View,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  View = require("../views/view").View;
+
+  exports.GridView = (function(_super) {
+    __extends(GridView, _super);
+
+    function GridView(args) {
+      GridView.__super__.constructor.apply(this, arguments);
+      this.rows = args.rows || 2;
+      this.cols = args.cols || 2;
+      this.views = {};
+      this.update();
+    }
+
+    GridView.prototype.update = function() {
+      var colIndex, frame, rowIndex, view, _i, _ref, _results;
+
+      _results = [];
+      for (rowIndex = _i = 1, _ref = this.rows; 1 <= _ref ? _i <= _ref : _i >= _ref; rowIndex = 1 <= _ref ? ++_i : --_i) {
+        _results.push((function() {
+          var _j, _ref1, _results1;
+
+          _results1 = [];
+          for (colIndex = _j = 1, _ref1 = this.cols; 1 <= _ref1 ? _j <= _ref1 : _j >= _ref1; colIndex = 1 <= _ref1 ? ++_j : --_j) {
+            view = this.createView();
+            view.superView = this;
+            frame = {
+              width: this.width / this.cols,
+              height: this.height / this.cols
+            };
+            frame.x = (colIndex - 1) * frame.width;
+            frame.y = (rowIndex - 1) * frame.height;
+            view.frame = frame;
+            _results1.push(this.views["" + rowIndex + "." + colIndex] = view);
+          }
+          return _results1;
+        }).call(this));
+      }
+      return _results;
+    };
+
+    GridView.prototype.createView = function() {
+      var view;
+
+      view = new View;
+      view.style.backgroundColor = utils.randomColor(.1);
+      view.clip = false;
+      return view;
+    };
+
+    return GridView;
+
+  })(View);
+
+}).call(this);
+
+});
+
+require.define("/src/ui/draggable.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+  var Events, _,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  _ = require("underscore");
+
+  Events = require("../primitives/events").Events;
+
+  exports.Draggable = (function() {
+    function Draggable(view) {
+      this.view = view;
+      this._calculateAverageVelocity = __bind(this._calculateAverageVelocity, this);
+      this._calculateVelocity = __bind(this._calculateVelocity, this);
+      this._touchEnd = __bind(this._touchEnd, this);
+      this._touchStart = __bind(this._touchStart, this);
+      this._updatePosition = __bind(this._updatePosition, this);
+      this.speed = {
+        x: 1.0,
+        y: 1.0
+      };
+      if (this.view.__draggable) {
+        console.error("Draggable: already registered draggable for " + this.view.name);
+      }
+      this.view.__draggable = this;
+      this._deltas = [];
+      this._isDragging = false;
+      this.attach();
+    }
+
+    Draggable.prototype.attach = function() {
+      return this.view.on(Events.TouchStart, this._touchStart);
+    };
+
+    Draggable.prototype.remove = function() {
+      return this.view.off(Events.TouchStart, this._touchStart);
+    };
+
+    Draggable.prototype._updatePosition = function(event) {
+      var correctedDelta, delta, touchEvent;
+
+      touchEvent = Events.sanitize(event);
+      delta = {
+        x: touchEvent.clientX - this._start.x,
+        y: touchEvent.clientY - this._start.y
+      };
+      correctedDelta = {
+        x: delta.x * this.speed.x,
+        y: delta.y * this.speed.y,
+        t: event.timeStamp
+      };
+      this.view.x = this._start.x + correctedDelta.x - this._offset.x;
+      this.view.y = this._start.y + correctedDelta.y - this._offset.y;
+      this._deltas.push(correctedDelta);
+      return this.view.emit(Events.DragMove, event);
+    };
+
+    Draggable.prototype._touchStart = function(event) {
+      var touchEvent;
+
+      this.view.animateStop();
+      this._isDragging = true;
+      touchEvent = Events.sanitize(event);
+      this._start = {
+        x: touchEvent.clientX,
+        y: touchEvent.clientY
+      };
+      this._offset = {
+        x: touchEvent.clientX - this.view.x,
+        y: touchEvent.clientY - this.view.y
+      };
+      document.addEventListener(Events.TouchMove, this._updatePosition);
+      document.addEventListener(Events.TouchEnd, this._touchEnd);
+      return this.view.emit(Events.DragStart, event);
+    };
+
+    Draggable.prototype._touchEnd = function(event) {
+      this._isDragging = false;
+      document.removeEventListener(Events.TouchMove, this._updatePosition);
+      document.removeEventListener(Events.TouchEnd, this._touchEnd);
+      this.view.emit(Events.DragEnd, event);
+      return this._deltas = [];
+    };
+
+    Draggable.prototype._calculateVelocity = function(time) {
+      var curr, prev, timeSinceLastMove, velocity;
+
+      if (time == null) {
+        time = 20;
+      }
+      if (this._deltas.length < 2) {
+        return {
+          x: 0,
+          y: 0
+        };
+      }
+      curr = this._deltas.slice(-1)[0];
+      prev = this._deltas.slice(-2, -1)[0];
+      time = curr.t - prev.t;
+      timeSinceLastMove = new Date().getTime() - prev.t;
+      if (timeSinceLastMove > 100) {
+        return {
+          x: 0,
+          y: 0
+        };
+      }
+      velocity = {
+        x: (curr.x - prev.x) / time,
+        y: (curr.y - prev.y) / time
+      };
+      if (velocity.x === Infinity) {
+        velocity.x = 0;
+      }
+      if (velocity.y === Infinity) {
+        velocity.y = 0;
+      }
+      return velocity;
+    };
+
+    Draggable.prototype._calculateAverageVelocity = function(time) {
+      var currDelta, currTime, deltas, i, lastTime, totalDelta, totalTime, velocity;
+
+      if (time == null) {
+        time = 100;
+      }
+      if (this._deltas.length < 2) {
+        return {
+          x: 0,
+          y: 0
+        };
+      }
+      currTime = lastTime = _.last(this._deltas).t;
+      deltas = (function() {
+        var _i, _ref, _results;
+
+        _results = [];
+        for (i = _i = _ref = this._deltas.length - 1; _i >= 0; i = _i += -1) {
+          currDelta = this._deltas[i];
+          currTime = currDelta.t;
+          if (currTime < (lastTime - time)) {
+            break;
+          }
+          _results.push(currDelta);
+        }
+        return _results;
+      }).call(this);
+      totalDelta = {
+        x: utils.sum(_.pluck(deltas, "x")),
+        y: utils.sum(_.pluck(deltas, "y"))
+      };
+      totalTime = _.first(deltas).t - _.last(deltas).t;
+      if (totalTime === 0) {
+        return {
+          x: 0,
+          y: 0
+        };
+      }
+      return velocity = {
+        x: totalDelta.x / totalTime,
+        y: totalDelta.y / totalTime
+      };
+    };
+
+    return Draggable;
+
+  })();
+
+}).call(this);
+
+});
+
 require.define("/src/init.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Animation, EventEmitter, Frame, Global, ImageView, Matrix, ScrollView, View, ViewList, config, css, debug, k, tools, utils, v;
+  var Animation, EventEmitter, Events, Frame, Global, ImageView, Matrix, ScrollView, View, ViewList, config, css, debug, tools, utils;
 
   css = require("./css");
 
@@ -4032,6 +4368,8 @@ require.define("/src/init.coffee",function(require,module,exports,__dirname,__fi
 
   EventEmitter = require("./eventemitter").EventEmitter;
 
+  Events = require("./primitives/events").Events;
+
   Global = {};
 
   Global.View = View;
@@ -4048,9 +4386,13 @@ require.define("/src/init.coffee",function(require,module,exports,__dirname,__fi
 
   Global.EventEmitter = EventEmitter;
 
+  Global.Events = Events;
+
   Global.utils = utils;
 
   Global.tools = tools;
+
+  Global.ui = require("./ui/init");
 
   Global.ViewList = ViewList;
 
@@ -4063,13 +4405,8 @@ require.define("/src/init.coffee",function(require,module,exports,__dirname,__fi
   if (window) {
     window.Framer = Global;
     window._ = require("underscore");
-    for (k in Global) {
-      v = Global[k];
-      window[k] = v;
-    }
+    _.extend(window, Global);
   }
-
-  window._ = require("underscore");
 
   if (!utils.isWebKit()) {
     alert("Sorry, only WebKit browsers are currently supported. \See https://github.com/koenbok/Framer/issues/2 for more info.");
