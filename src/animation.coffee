@@ -29,7 +29,7 @@ class Animation extends EventEmitter
 	
 	AnimationProperties: [
 		"view", "properties", "curve", "time",
-		"origin", "tolerance", "precision", "modifiers" 
+		"origin", "tolerance", "precision", "modifiers", "limits"
 		"debug", "profile", "callback"
 	]
 	AnimatableCSSProperties: {
@@ -161,8 +161,8 @@ class Animation extends EventEmitter
 		
 		# Throw a warning if we have nothing to animate
 		if animatedProperties.length is 0
-			console.error "Animation[#{@animationId}] Warning: nothing to animate"
-
+			console.log "Animation[#{@animationId}] Warning: nothing to animate"
+			return
 
 		########################################################
 		# Generate the keyframe css and insert
