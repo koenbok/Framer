@@ -48,6 +48,16 @@ describe "View", ->
 			view.y.should.equal frame.y
 			view.width.should.equal frame.width
 			view.height.should.equal frame.height
+
+		it "should set frame to 0", ->
+			view = createView()
+			frame = {x:200, y:200, width:0, height:0}
+			view.frame = frame
+			# view.frame.should.eql frame
+			view.x.should.equal frame.x
+			view.y.should.equal frame.y
+			view.width.should.equal frame.width
+			view.height.should.equal frame.height
 	
 	describe "Scale", ->
 		
