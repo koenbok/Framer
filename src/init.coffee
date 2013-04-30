@@ -13,18 +13,29 @@ debug = require "./debug"
 {Frame} = require "./primitives/frame"
 {Matrix} = require "./primitives/matrix"
 {EventEmitter} = require "./eventemitter"
+{Events} = require "./primitives/events"
+
 
 Global = {}
+
 Global.View = View
 Global.ScrollView = ScrollView
 Global.ImageView = ImageView
 Global.Animation = Animation
+
+
+
+
 Global.Frame = Frame
 Global.Matrix = Matrix
 Global.EventEmitter = EventEmitter
+Global.Events = Events
 
 Global.utils = utils
 Global.tools = tools
+
+Global.ui = require "./ui/init"
+
 Global.ViewList = ViewList
 Global.debug = debug.debug
 Global.css = css
@@ -35,11 +46,7 @@ if window
 	window.Framer = Global
 	window._ = require "underscore"
 	
-	for k, v of Global
-		window[k] = v
-
-# Add underscore
-window._ = require "underscore"
+	_.extend window, Global
 
 # Alert if not WebKit
 if not utils.isWebKit()
