@@ -257,17 +257,11 @@ exports.convertPoint = (point, view1, view2) ->
 
 # Returns the biggest value in an Array
 #
-exports.max = (obj) ->
-	for n in obj
-		if !max or n > max then max = n
-	max
+exports.max = (arr) -> Math.max arr...
 
 # Returns the lowest value in an Array
 #
-exports.min = (obj) ->
-	for n in obj
-		if !min or n < min then min = n
-	min
+exports.min = (arr) -> Math.min arr...
 
 # Returns the sum of the elements in an Array
 #
@@ -337,3 +331,35 @@ exports.domComplete = (f) ->
 
 exports.domCompleteCancel = (f) ->
 	__domComplete = _.without __domComplete, f
+
+
+exports.pointDistance = (pointA, pointB) ->
+	distance =
+		x: Math.abs(pointB.x - pointA.x)
+		y: Math.abs(pointB.y - pointA.y)
+
+exports.pointInvert = (point) ->
+	point =
+		x: 0 - point.x
+		y: 0 - point.y
+
+exports.pointTotal = (point) ->
+	point.x + point.y
+
+exports.frameSize = (frame) ->
+	size =
+		width: frame.width
+		height: frame.height
+
+exports.framePoint = (frame) ->
+	point =
+		x: frame.x
+		y: frame.y
+
+exports.pointAbs = (point) ->
+	point =
+		x: Math.abs point.x
+		y: Math.abs point.y
+
+
+
