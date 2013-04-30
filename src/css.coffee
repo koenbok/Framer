@@ -14,10 +14,11 @@ exports.addStyle "
 	top:auto; right:auto; bottom:auto; left:auto;
 	width:auto; height:auto;
 	overflow: visible;
-	z-index:0;
-	opacity:1;
+	z-index: 0;
+	opacity: 1;
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	-webkit-transform-origin: 50% 50% 0%;
 	-webkit-transform-style: flat;
+	-webkit-backface-visibility: hidden;
 }"
