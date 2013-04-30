@@ -15,6 +15,7 @@ class View extends Frame
 	constructor: (args) ->
 		
 		args ?= {}
+		@_offset = {x:0, y:0}
 		
 		# Keep a generic list of all current views
 		View.Views.push @
@@ -37,6 +38,8 @@ class View extends Frame
 		
 		# Overridable creation hook
 		@_postCreate?()
+		
+		
 		
 		if not args.superView
 			@_insertElement()
@@ -90,14 +93,18 @@ class View extends Frame
 	
 	contentFrame: ->
 		# Get the total size of all subviews
+		
+		minX = utils.min _.pluck @subViews, "minX"
+		maxX = utils.max _.pluck @subViews, "maxX"
+		minY = utils.min _.pluck @subViews, "minY"
+		maxY = utils.max _.pluck @subViews, "maxY"
+		
 		frame =
-			x: utils.min _.pluck(@subViews, "minX")
-			y: utils.min _.pluck(@subViews, "minY")
-		
-		frame.width  = utils.max(_.pluck(@subViews, "maxX")) - frame.x
-		frame.height = utils.max(_.pluck(@subViews, "maxY")) - frame.y
-		
-		frame
+			x: minX
+			y: minY
+			width: maxX - minX
+			height: maxY - minY
+
 	
 	centerX: -> @midX = @superView.width  / 2.0 if @superView
 	centerY: -> @midY = @superView.height / 2.0 if @superView
@@ -125,16 +132,23 @@ class View extends Frame
 			@emit "change:frame"
 	
 	@define "x",
-		get: -> @_matrix.x
-		set: (value) -> @_setMatrixValue "x", value
+		get: ->
+			@_matrix.x - @_offset.x
+		set: (value) ->
+			@_setMatrixValue "x", value + @_offset.x
+			@emit "change:frame"
 	
 	@define "y",
-		get: -> @_matrix.y
-		set: (value) -> @_setMatrixValue "y", value
+		get: ->
+			@_matrix.y - @_offset.y
+		set: (value) ->
+			@_setMatrixValue "y", value + @_offset.y
+			@emit "change:frame"
 
 	@define "z",
 		get: -> @_matrix.z
-		set: (value) -> @_setMatrixValue "z", value
+		set: (value) ->
+			@_setMatrixValue "z", value
 
 	#############################################################################
 	## Scale
@@ -253,9 +267,9 @@ class View extends Frame
 	
 	@define "superView",
 		get: -> @_superView or null
-		set: (value) ->
+		set: (view) ->
 			
-			return if value is @_superView
+			return if view is @_superView
 			
 			# Cancel previous pending insertions
 			utils.domCompleteCancel @__insertElement
@@ -264,18 +278,18 @@ class View extends Frame
 			if @_superView
 				@_superView._element.removeChild @_element
 				@_superView._subViews = _.without @_superView._subViews, @
-				@_superView.emit "change:subViews"
+				@_superView.emit "change:subViews", {added:[], removed:[@]}
 			
 			# Either insert the element to the new superview or into dom
-			if value
-				value._element.appendChild @_element
-				value._subViews.push @
-				value.emit "change:subViews"
+			if view
+				view._element.appendChild @_element
+				view._subViews.push @
+				view.emit "change:subViews", {added:[@], removed:[]}
 			else
 				@_insertElement()
 			
 			# Set the superview
-			@_superView = value
+			@_superView = view
 			
 			# Place this view on top of it's siblings
 			@bringToFront()
@@ -403,7 +417,8 @@ class View extends Frame
 		document.body.appendChild @_element
 	
 	destroy: ->
-		@_element.parentNode.removeChild @_element
+		if @_element.parentNode
+			@_element.parentNode.removeChild @_element
 
 
 	#############################################################################
