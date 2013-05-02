@@ -32,3 +32,9 @@ watchr.watch
 				
 				child.stdout.on "error", (data) ->
 					process.stderr.write Buffer(data).toString "utf8"
+
+				child.stderr.on "data", (data) ->
+					process.stdout.write Buffer(data).toString "utf8"
+				
+				child.stderr.on "error", (data) ->
+					process.stderr.write Buffer(data).toString "utf8"
