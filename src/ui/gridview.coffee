@@ -31,9 +31,3 @@ class exports.GridView extends View
 		view.style.backgroundColor = utils.randomColor(.1)
 		view.clip = false
 		view
-
-# gv = new GridView
-# 	width: 1000
-# 	height: 1000
-# 	rows: 5
-# 	cols: 5
