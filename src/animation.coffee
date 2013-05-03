@@ -29,8 +29,8 @@ class Animation extends EventEmitter
 	
 	AnimationProperties: [
 		"view", "properties", "curve", "time",
-		"origin", "tolerance", "precision", "modifiers", "limits"
-		"debug", "profile", "callback"
+		"origin", "tolerance", "precision", "modifiers", 
+		"limits", "debug", "profile", "callback"
 	]
 	AnimatableCSSProperties: {
 		opacity: "",
@@ -186,11 +186,12 @@ class Animation extends EventEmitter
 		
 		########################################################
 		# Finalize
-
-		if @debug
-			endTime = new Date().getTime() - startTime
-			console.log "Animation[#{@animationId}].setupTime = #{endTime}ms"
-			console.log "Animation[#{@animationId}].totalTime = #{utils.round @totalTime, 0}ms"
+		
+		@view.once "webkitAnimationStart", =>
+			if @debug
+				endTime = new Date().getTime() - startTime
+				console.log "Animation[#{@animationId}].setupTime = #{endTime}ms"
+				console.log "Animation[#{@animationId}].totalTime = #{utils.round @totalTime, 0}ms"
 		
 		console.profileEnd @animationName if @profile
 
@@ -273,58 +274,66 @@ class Animation extends EventEmitter
 		@callback? @
 		@emit "end"
 		
-	_css: ->
+	_keyFrames: ->
 		
-		# Build the css for the keyframe animation. I wish there was a nicer
-		# way to do this, but this will work for now.
+		# Build keyframes based on our values
 		
 		stepIncrement = 0
 		stepDelta = 100 / (@curveValues.length - 1)
 		
+		deltas = @_deltas()
+		keyFrames = {}
+		
+		for curveValue in @curveValues
+			
+			position = stepIncrement * stepDelta
+			position = utils.round position, config.roundingDecimals
+			
+			currentKeyFrame = {}
+			
+			for propertyName of @propertiesA
+				currentKeyFrame[propertyName] = curveValue * deltas[propertyName] + @propertiesA[propertyName]
+			
+			keyFrames[position] = currentKeyFrame
+			
+			stepIncrement++
+		
+		keyFrames
+
+	_css: ->
+		
+		# Create the css from a set of keyframes
+		
+		keyFrames = @_keyFrames()
+		
 		cssString = []
 		cssString.push "@-webkit-keyframes #{@animationName} {\n"
 		
-		deltas = @_deltas()
+		matrix = new Matrix()
 		
-		# We define this object outside of the loop to re-use it.
-		# In theory this should help a bit with perfomance, in practise
-		# I'm too lazy to prove it.
-		m = new Matrix()
-		
-		for springValue in @curveValues
-		
-			position = stepIncrement * stepDelta
-
-			cssString.push "\t#{utils.round position, config.roundingDecimals}%\t{ -webkit-transform: "
+		for position, values of keyFrames
+			
+			cssString.push "\t#{position}%\t{ -webkit-transform: "
 			
 			# Add the matrix based values
 			for propertyName in @AnimatableMatrixProperties
-				
-				# Calculate the clean spring value for this point
-				value = springValue * deltas[propertyName] + @propertiesA[propertyName]
-				
-				# Modify the value if we have a modifier set up. This let's us do 
-				# special stuff like drop the friction once we run into the scroll 
-				# bounds for a scrollview.
-				if @modifiers?[propertyName]?
-					value = @modifiers[propertyName](value)
-				
-				m[propertyName] = value
+				if values.hasOwnProperty propertyName
+					matrix[propertyName] = values[propertyName]
+				else
+					matrix[propertyName] = @view[propertyName]
+
+			cssString.push matrix.matrix().cssValues() + "; "
 			
-			cssString.push m.matrix().cssValues() + "; "
-			
+			# Add the css based values
 			for propertyName, unit of @AnimatableCSSProperties
-				continue if not @propertiesA.hasOwnProperty propertyName
-				value = springValue * deltas[propertyName] + @propertiesA[propertyName]
-				cssString.push "#{propertyName}:#{ utils.round value, config.roundingDecimals}#{unit}; "
+				continue if not values.hasOwnProperty propertyName
+				cssString.push "#{propertyName}:#{ utils.round values[propertyName], config.roundingDecimals}#{unit}; "
 				
 			cssString.push "}\n"
 			
-			stepIncrement++
-			
 		cssString.push "}\n"
 		cssString.join ""
-	
+
 	_deltas: ->
 		
 		deltas = {}
