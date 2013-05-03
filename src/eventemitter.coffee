@@ -1,9 +1,16 @@
+check = require "check-types"
+
+eventCheck = (event) ->
+	check.verifyUnemptyString event, "Missing event type"
+
 class exports.EventEmitter
 	
 	constructor: ->
 		@events = {}
 
 	emit: (event, args...) ->
+		
+		eventCheck event
 		
 		if not @events?[event]
 			return
@@ -15,6 +22,8 @@ class exports.EventEmitter
 		
 		# @emit "addListener", event, listener
 		
+		eventCheck event
+		
 		@events ?= {}
 		@events[event] ?= []
 		@events[event].push listener
@@ -23,12 +32,16 @@ class exports.EventEmitter
 		
 		# @emit "removeListener", event, listener
 		
+		check.verifyUnemptyString event
+		
 		return unless @events
 		return unless @events[event]
 		
 		@events[event] = (l for l in @events[event] when l isnt listener)
 
 	once: (event, listener) ->
+		
+		eventCheck event
 
 		fn = =>
 			@removeListener event, fn
@@ -36,8 +49,10 @@ class exports.EventEmitter
 
 		@on event, fn
 
-
 	removeAllListeners: (event) ->
+		
+		eventCheck event
+		
 		return unless @events
 		return unless @events[event]
 		
