@@ -14,7 +14,8 @@
     "coffeelint": "0.5.x",
     "phantomjs": "1.9.x",
     "mocha-phantomjs": "2.x.x",
-    "watchr": "2.4.x"
+    "watchr": "2.4.x",
+    "check-types": "0.6.x"
   },
   "license": "MIT"
 }
