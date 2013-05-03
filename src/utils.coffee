@@ -1,4 +1,5 @@
 _ = require "underscore"
+
 {config} = require "./config"
 
 Function::define = (prop, desc) ->
@@ -333,6 +334,10 @@ exports.domCompleteCancel = (f) ->
 	__domComplete = _.without __domComplete, f
 
 
+
+######################################################
+# POINT FUNCTIONS
+
 exports.pointDistance = (pointA, pointB) ->
 	distance =
 		x: Math.abs(pointB.x - pointA.x)
@@ -360,6 +365,5 @@ exports.pointAbs = (point) ->
 	point =
 		x: Math.abs point.x
 		y: Math.abs point.y
-
 
 
