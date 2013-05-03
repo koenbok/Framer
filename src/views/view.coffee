@@ -1,4 +1,5 @@
 utils = require "../utils"
+check = require "check-types"
 _ = require "underscore"
 
 {Frame} = require "../primitives/frame"
@@ -38,8 +39,6 @@ class View extends Frame
 		
 		# Overridable creation hook
 		@_postCreate?()
-		
-		
 		
 		if not args.superView
 			@_insertElement()
@@ -99,7 +98,7 @@ class View extends Frame
 		minY = utils.min _.pluck @subViews, "minY"
 		maxY = utils.max _.pluck @subViews, "maxY"
 		
-		frame =
+		new Frame
 			x: minX
 			y: minY
 			width: maxX - minX
