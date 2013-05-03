@@ -170,6 +170,12 @@ class Animation extends EventEmitter
 		@keyFrameAnimationCSS = @_css()
 		@view.once "webkitAnimationEnd", @_finalize
 		
+		# Only enable backside visibility if we are actually going to animate rotation
+		backsideVisibility = "hidden"
+		if "rotationX" in animatedProperties or "rotationY" in animatedProperties
+			backsideVisibility = "visible"
+		
+		
 		css.addStyle "
 			#{@keyFrameAnimationCSS}
 		
@@ -179,6 +185,7 @@ class Animation extends EventEmitter
 				-webkit-animation-timing-function: linear;
 				-webkit-animation-fill-mode: both;
 				-webkit-tranform-origin: #{@origin};
+				-webkit-backface-visibility: #{backsideVisibility};
 			}"
 		
 		@view.addClass @animationName
@@ -187,7 +194,8 @@ class Animation extends EventEmitter
 		########################################################
 		# Finalize
 		
-		@view.once "webkitAnimationStart", =>
+		@view.once "webkitAnimationStart", (event) =>
+			@emit "start", event
 			if @debug
 				endTime = new Date().getTime() - startTime
 				console.log "Animation[#{@animationId}].setupTime = #{endTime}ms"

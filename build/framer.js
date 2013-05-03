@@ -1,7 +1,7 @@
-// Framer v2.0.0b1-35-g5b23d4e (c) 2013 Koen Bok
+// Framer v2.0.0b1-36-g3ad0dc0 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "v2.0.0b1-35-g5b23d4e";
+window.FramerVersion = "v2.0.0b1-36-g3ad0dc0";
 
 
 (function(){var require = function (file, cwd) {
@@ -3822,7 +3822,8 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
   var Animation, AnimationCounter, AnimationList, EventEmitter, Matrix, bezier, config, css, parseCurve, spring, utils, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   _ = require("underscore");
 
@@ -3918,7 +3919,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     });
 
     Animation.prototype.start = function(callback) {
-      var animatedProperties, k, propertiesA, propertiesB, startTime, v, _i, _len, _ref, _ref1,
+      var animatedProperties, backsideVisibility, k, propertiesA, propertiesB, startTime, v, _i, _len, _ref, _ref1,
         _this = this;
 
       AnimationList.push(this);
@@ -3985,11 +3986,16 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       }
       this.keyFrameAnimationCSS = this._css();
       this.view.once("webkitAnimationEnd", this._finalize);
-      css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.totalTime / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;				-webkit-tranform-origin: " + this.origin + ";			}");
+      backsideVisibility = "hidden";
+      if (__indexOf.call(animatedProperties, "rotationX") >= 0 || __indexOf.call(animatedProperties, "rotationY") >= 0) {
+        backsideVisibility = "visible";
+      }
+      css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.totalTime / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;				-webkit-tranform-origin: " + this.origin + ";				-webkit-backface-visibility: " + backsideVisibility + ";			}");
       this.view.addClass(this.animationName);
-      this.view.once("webkitAnimationStart", function() {
+      this.view.once("webkitAnimationStart", function(event) {
         var endTime;
 
+        _this.emit("start", event);
         if (_this.debug) {
           endTime = new Date().getTime() - startTime;
           console.log("Animation[" + _this.animationId + "].setupTime = " + endTime + "ms");
