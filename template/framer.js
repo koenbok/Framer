@@ -1,7 +1,7 @@
-// Framer v2.0.0b1-17-g09f407a (c) 2013 Koen Bok
+// Framer v2.0.0b1-33-gc02eef3 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "v2.0.0b1-17-g09f407a";
+window.FramerVersion = "v2.0.0b1-33-gc02eef3";
 
 
 (function(){var require = function (file, cwd) {
@@ -2256,13 +2256,15 @@ require.define("/src/tools/facebook.coffee",function(require,module,exports,__di
 });
 
 require.define("/src/views/view.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Animation, EventEmitter, Frame, Matrix, View, utils, _,
+  var Animation, EventEmitter, Frame, Matrix, View, check, utils, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   utils = require("../utils");
+
+  check = require("check-types");
 
   _ = require("underscore");
 
@@ -2387,18 +2389,18 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     };
 
     View.prototype.contentFrame = function() {
-      var frame, maxX, maxY, minX, minY;
+      var maxX, maxY, minX, minY;
 
       minX = utils.min(_.pluck(this.subViews, "minX"));
       maxX = utils.max(_.pluck(this.subViews, "maxX"));
       minY = utils.min(_.pluck(this.subViews, "minY"));
       maxY = utils.max(_.pluck(this.subViews, "maxY"));
-      return frame = {
+      return new Frame({
         x: minX,
         y: minY,
         width: maxX - minX,
         height: maxY - minY
-      };
+      });
     };
 
     View.prototype.centerX = function() {
@@ -2879,6 +2881,499 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
 
 });
 
+require.define("/node_modules/check-types/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {"main":"./src/check-types.js"}
+});
+
+require.define("/node_modules/check-types/src/check-types.js",function(require,module,exports,__dirname,__filename,process,global){/**
+ * This module exports functions for checking types
+ * and throwing exceptions.
+ */
+
+/*globals define, module */
+
+(function (globals) {
+    'use strict';
+
+    var functions = {
+        verifyQuack: verifyQuack,
+        quacksLike: quacksLike,
+        verifyInstance: verifyInstance,
+        isInstance: isInstance,
+        verifyEmptyObject: verifyEmptyObject,
+        isEmptyObject: isEmptyObject,
+        verifyObject: verifyObject,
+        isObject: isObject,
+        verifyLength: verifyLength,
+        isLength: isLength,
+        verifyArray: verifyArray,
+        isArray: isArray,
+        verifyFunction: verifyFunction,
+        isFunction: isFunction,
+        verifyUnemptyString: verifyUnemptyString,
+        isUnemptyString:isUnemptyString,
+        verifyString: verifyString,
+        isString: isString,
+        verifyEvenNumber: verifyEvenNumber,
+        isEvenNumber: isEvenNumber,
+        verifyOddNumber: verifyOddNumber,
+        isOddNumber: isOddNumber,
+        verifyPositiveNumber: verifyPositiveNumber,
+        isPositiveNumber: isPositiveNumber,
+        verifyNegativeNumber: verifyNegativeNumber,
+        isNegativeNumber: isNegativeNumber,
+        verifyNumber: verifyNumber,
+        isNumber: isNumber
+    };
+
+    exportFunctions();
+
+    /**
+     * Public function `verifyQuack`.
+     *
+     * Throws an exception if an object does not share
+     * the properties of a second, archetypal object
+     * (i.e. doesn't 'quack like a duck').
+     *
+     * @param thing {object}     The object to test.
+     * @param duck {object}      The archetypal object,
+     *                           or 'duck', that the test
+     *                           is against.
+     * @param [message] {string} An optional error message
+     *                           to set on the thrown Error.
+     */
+    function verifyQuack (thing, duck, message) {
+        if (quacksLike(thing, duck) === false) {
+            throw new Error(message || 'Invalid type');
+        }
+    }
+
+    /**
+     * Public function `quacksLike`.
+     *
+     * Tests whether an object 'quacks like a duck'.
+     * Returns `true` if the first argument has all of
+     * the properties of the second, archetypal argument
+     * (the 'duck'). Returns `false` otherwise. If either
+     * argument is not an object, an exception is thrown.
+     *
+     * @param thing {object} The object to test.
+     * @param duck {object}  The archetypal object, or
+     *                       'duck', that the test is
+     *                       against.
+     */
+    function quacksLike (thing, duck) {
+        var property;
+
+        verifyObject(thing);
+        verifyObject(duck);
+
+        for (property in duck) {
+            if (duck.hasOwnProperty(property)) {
+                if (thing.hasOwnProperty(property) === false) {
+                    return false;
+                }
+
+                if (typeof thing[property] !== typeof duck[property]) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Public function `verifyInstance`.
+     *
+     * Throws an exception if an object is not an instance
+     * of a prototype.
+     *
+     * @param thing {object}       The object to test.
+     * @param prototype {function} The prototype that the
+     *                             test is against.
+     * @param [message] {string}   An optional error message
+     *                             to set on the thrown Error.
+     */
+    function verifyInstance (thing, prototype, message) {
+        if (isInstance(thing, prototype) === false) {
+            throw new Error(message || 'Invalid type');
+        }
+    }
+
+    /**
+     * Public function `isInstance`.
+     *
+     * Returns `true` if an object is an instance of a prototype,
+     * `false` otherwise.
+     *
+     * @param thing {object}       The object to test.
+     * @param prototype {function} The prototype that the
+     *                             test is against.
+     */
+    function isInstance (thing, prototype) {
+        if (typeof thing === 'undefined' || thing === null) {
+            return false;
+        }
+
+        if (isFunction(prototype) && thing instanceof prototype) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Public function `verifyEmptyObject`.
+     *
+     * Throws an exception unless something is an empty, non-null,
+     * non-array object.
+     *
+     * @param thing              The thing to test.
+     * @param [message] {string} An optional error message
+     *                           to set on the thrown Error.
+     */
+    function verifyEmptyObject (thing, message) {
+        if (isEmptyObject(thing) === false) {
+            throw new Error(message || 'Invalid empty object');
+        }
+    }
+
+    /**
+     * Public function `isEmptyObject`.
+     *
+     * Returns `true` if something is an empty, non-null, non-array object, `false` otherwise.
+     *
+     * @param thing          The thing to test.
+     */
+    function isEmptyObject (thing) {
+        var property;
+
+        if (isObject(thing)) {
+            for (property in thing) {
+                if (thing.hasOwnProperty(property)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Public function `verifyObject`.
+     *
+     * Throws an exception unless something is a non-null,
+     * non-array object.
+     *
+     * @param thing              The thing to test.
+     * @param [message] {string} An optional error message
+     *                           to set on the thrown Error.
+     */
+    function verifyObject (thing, message) {
+        if (isObject(thing) === false) {
+            throw new Error(message || 'Invalid object');
+        }
+    }
+
+    /**
+     * Public function `isObject`.
+     *
+     * Returns `true` if something is a non-null, non-array
+     * object, `false` otherwise.
+     *
+     * @param thing          The thing to test.
+     */
+    function isObject (thing) {
+        return typeof thing === 'object' && thing !== null && isArray(thing) === false;
+    }
+
+    /**
+     * Public function `verifyLength`.
+     *
+     * Throws an exception unless something is a non-null,
+     * non-array object.
+     *
+     * @param thing              The thing to test.
+     * @param [message] {string} An optional error message
+     *                           to set on the thrown Error.
+     */
+    function verifyLength (thing, length, message) {
+        if (isLength(thing, length) === false) {
+            throw new Error(message || 'Invalid length');
+        }
+    }
+
+    /**
+     * Public function `isLength`.
+     *
+     * Returns `true` if something is has a length property
+     * matching the specified value, `false` otherwise.
+     *
+     * @param thing  The thing to test.
+     * @param length The required length to test against.
+     */
+    function isLength (thing, length) {
+        return thing && thing.length === length;
+    }
+
+    /**
+     * Public function `verifyArray`.
+     *
+     * Throws an exception unless something is an array.
+     *
+     * @param thing              The thing to test.
+     * @param [message] {string} An optional error message
+     *                           to set on the thrown Error.
+     */
+    function verifyArray (thing, message) {
+        if (isArray(thing) === false) {
+            throw new Error(message || 'Invalid array');
+        }
+    }
+
+    /**
+     * Public function `isArray`.
+     *
+     * Returns `true` something is an array, `false` otherwise.
+     *
+     * @param thing          The thing to test.
+     */
+    function isArray (thing) {
+        return Object.prototype.toString.call(thing) === '[object Array]';
+    }
+
+    /**
+     * Public function `verifyFunction`.
+     *
+     * Throws an exception unless something is function.
+     *
+     * @param thing              The thing to test.
+     * @param [message] {string} An optional error message
+     *                           to set on the thrown Error.
+     */
+    function verifyFunction (thing, message) {
+        if (isFunction(thing) === false) {
+            throw new Error(message || 'Invalid function');
+        }
+    }
+
+    /**
+     * Public function `isFunction`.
+     *
+     * Returns `true` if something is function, `false` otherwise.
+     *
+     * @param thing          The thing to test.
+     */
+    function isFunction (thing) {
+        return typeof thing === 'function';
+    }
+
+    /**
+     * Public function `verifyUnemptyString`.
+     *
+     * Throws an exception unless something is a non-empty string.
+     *
+     * @param thing              The thing to test.
+     * @param [message] {string} An optional error message
+     *                           to set on the thrown Error.
+     */
+    function verifyUnemptyString (thing, message) {
+        if (isUnemptyString(thing) === false) {
+            throw new Error(message || 'Invalid string');
+        }
+    }
+
+    /**
+     * Public function `isUnemptyString`.
+     *
+     * Returns `true` if something is a non-empty string, `false`
+     * otherwise.
+     *
+     * @param thing          The thing to test.
+     */
+    function isUnemptyString (thing) {
+        return isString(thing) && thing !== '';
+    }
+
+    /**
+     * Public function `verifyString`.
+     *
+     * Throws an exception unless something is a string.
+     *
+     * @param thing              The thing to test.
+     * @param [message] {string} An optional error message
+     *                           to set on the thrown Error.
+     */
+    function verifyString (thing, message) {
+        if (isString(thing) === false) {
+            throw new Error(message || 'Invalid string');
+        }
+    }
+
+    /**
+     * Public function `isString`.
+     *
+     * Returns `true` if something is a string, `false` otherwise.
+     *
+     * @param thing          The thing to test.
+     */
+    function isString (thing) {
+        return typeof thing === 'string';
+    }
+
+    /**
+     * Public function `verifyOddNumber`.
+     *
+     * Throws an exception unless something is an odd number.
+     *
+     * @param thing              The thing to test.
+     * @param [message] {string} An optional error message
+     *                           to set on the thrown Error.
+     */
+    function verifyOddNumber (thing, message) {
+        if (isOddNumber(thing) === false) {
+            throw new Error(message || 'Invalid number');
+        }
+    }
+
+    /**
+     * Public function `isOddNumber`.
+     *
+     * Returns `true` if something is an odd number,
+     * `false` otherwise.
+     *
+     * @param thing          The thing to test.
+     */
+    function isOddNumber (thing) {
+        return isNumber(thing) && (thing % 2 === 1 || thing % 2 === -1);
+    }
+
+    /**
+     * Public function `verifyEvenNumber`.
+     *
+     * Throws an exception unless something is an even number.
+     *
+     * @param thing              The thing to test.
+     * @param [message] {string} An optional error message
+     *                           to set on the thrown Error.
+     */
+    function verifyEvenNumber (thing, message) {
+        if (isEvenNumber(thing) === false) {
+            throw new Error(message || 'Invalid number');
+        }
+    }
+
+    /**
+     * Public function `isEvenNumber`.
+     *
+     * Returns `true` if something is an even number,
+     * `false` otherwise.
+     *
+     * @param thing          The thing to test.
+     */
+    function isEvenNumber (thing) {
+        return isNumber(thing) && thing % 2 === 0;
+    }
+
+    /**
+     * Public function `verifyPositiveNumber`.
+     *
+     * Throws an exception unless something is a positive number.
+     *
+     * @param thing              The thing to test.
+     * @param [message] {string} An optional error message
+     *                           to set on the thrown Error.
+     */
+    function verifyPositiveNumber (thing, message) {
+        if (isPositiveNumber(thing) === false) {
+            throw new Error(message || 'Invalid number');
+        }
+    }
+
+    /**
+     * Public function `isPositiveNumber`.
+     *
+     * Returns `true` if something is a positive number,
+     * `false` otherwise.
+     *
+     * @param thing          The thing to test.
+     */
+    function isPositiveNumber (thing) {
+        return isNumber(thing) && thing > 0;
+    }
+
+    /**
+     * Public function `verifyNegativeNumber`.
+     *
+     * Throws an exception unless something is a positive number.
+     *
+     * @param thing              The thing to test.
+     * @param [message] {string} An optional error message
+     *                           to set on the thrown Error.
+     */
+    function verifyNegativeNumber (thing, message) {
+        if (isNegativeNumber(thing) === false) {
+            throw new Error(message || 'Invalid number');
+        }
+    }
+
+    /**
+     * Public function `isNegativeNumber`.
+     *
+     * Returns `true` if something is a positive number,
+     * `false` otherwise.
+     *
+     * @param thing          The thing to test.
+     */
+    function isNegativeNumber (thing) {
+        return isNumber(thing) && thing < 0;
+    }
+
+    /**
+     * Public function `verifyNumber`.
+     *
+     * Throws an exception unless something is a number, excluding NaN.
+     *
+     * @param thing              The thing to test.
+     * @param [message] {string} An optional error message
+     *                           to set on the thrown Error.
+     */
+    function verifyNumber (thing, message) {
+        if (isNumber(thing) === false) {
+            throw new Error(message || 'Invalid number');
+        }
+    }
+
+    /**
+     * Public function `isNumber`.
+     *
+     * Returns `true` if something is a number other than NaN,
+     * `false` otherwise.
+     *
+     * @param thing The thing to test.
+     */
+    function isNumber (thing) {
+        return typeof thing === 'number' && isNaN(thing) === false;
+    }
+
+    function exportFunctions () {
+        if (typeof define === 'function' && define.amd) {
+            define(function () {
+                return functions;
+            });
+        } else if (typeof module === 'object' || module !== null) {
+            module.exports = functions;
+        } else {
+            globals.check = functions;
+        }
+    }
+}(this));
+
+
+});
+
 require.define("/src/primitives/frame.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
   var EventEmitter, Frame, utils,
     __hasProp = {}.hasOwnProperty,
@@ -3038,7 +3533,14 @@ require.define("/src/primitives/frame.coffee",function(require,module,exports,__
 });
 
 require.define("/src/eventemitter.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var __slice = [].slice;
+  var check, eventCheck,
+    __slice = [].slice;
+
+  check = require("check-types");
+
+  eventCheck = function(event) {
+    return check.verifyUnemptyString(event, "Missing event type");
+  };
 
   exports.EventEmitter = (function() {
     function EventEmitter() {
@@ -3049,6 +3551,7 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
       var args, event, listener, _i, _len, _ref, _ref1, _results;
 
       event = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      eventCheck(event);
       if (!((_ref = this.events) != null ? _ref[event] : void 0)) {
         return;
       }
@@ -3064,6 +3567,7 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
     EventEmitter.prototype.addListener = function(event, listener) {
       var _base, _ref, _ref1;
 
+      eventCheck(event);
       if ((_ref = this.events) == null) {
         this.events = {};
       }
@@ -3076,6 +3580,7 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
     EventEmitter.prototype.removeListener = function(event, listener) {
       var l;
 
+      check.verifyUnemptyString(event);
       if (!this.events) {
         return;
       }
@@ -3101,6 +3606,7 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
       var fn,
         _this = this;
 
+      eventCheck(event);
       fn = function() {
         _this.removeListener(event, fn);
         return listener.apply(null, arguments);
@@ -3111,6 +3617,7 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
     EventEmitter.prototype.removeAllListeners = function(event) {
       var listener, _i, _len, _ref, _results;
 
+      eventCheck(event);
       if (!this.events) {
         return;
       }
@@ -3415,7 +3922,8 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     });
 
     Animation.prototype.start = function(callback) {
-      var animatedProperties, endTime, k, propertiesA, propertiesB, startTime, v, _i, _len, _ref, _ref1;
+      var animatedProperties, k, propertiesA, propertiesB, startTime, v, _i, _len, _ref, _ref1,
+        _this = this;
 
       AnimationList.push(this);
       if (this.view === null) {
@@ -3483,11 +3991,15 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       this.view.once("webkitAnimationEnd", this._finalize);
       css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.totalTime / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;				-webkit-tranform-origin: " + this.origin + ";			}");
       this.view.addClass(this.animationName);
-      if (this.debug) {
-        endTime = new Date().getTime() - startTime;
-        console.log("Animation[" + this.animationId + "].setupTime = " + endTime + "ms");
-        console.log("Animation[" + this.animationId + "].totalTime = " + (utils.round(this.totalTime, 0)) + "ms");
-      }
+      this.view.once("webkitAnimationStart", function() {
+        var endTime;
+
+        if (_this.debug) {
+          endTime = new Date().getTime() - startTime;
+          console.log("Animation[" + _this.animationId + "].setupTime = " + endTime + "ms");
+          return console.log("Animation[" + _this.animationId + "].totalTime = " + (utils.round(_this.totalTime, 0)) + "ms");
+        }
+      });
       if (this.profile) {
         return console.profileEnd(this.animationName);
       }
@@ -3561,41 +4073,57 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       return this.emit("end");
     };
 
-    Animation.prototype._css = function() {
-      var cssString, deltas, m, position, propertyName, springValue, stepDelta, stepIncrement, unit, value, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3;
+    Animation.prototype._keyFrames = function() {
+      var currentKeyFrame, curveValue, deltas, keyFrames, position, propertyName, stepDelta, stepIncrement, _i, _len, _ref;
 
       stepIncrement = 0;
       stepDelta = 100 / (this.curveValues.length - 1);
-      cssString = [];
-      cssString.push("@-webkit-keyframes " + this.animationName + " {\n");
       deltas = this._deltas();
-      m = new Matrix();
+      keyFrames = {};
       _ref = this.curveValues;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        springValue = _ref[_i];
+        curveValue = _ref[_i];
         position = stepIncrement * stepDelta;
-        cssString.push("\t" + (utils.round(position, config.roundingDecimals)) + "%\t{ -webkit-transform: ");
-        _ref1 = this.AnimatableMatrixProperties;
-        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-          propertyName = _ref1[_j];
-          value = springValue * deltas[propertyName] + this.propertiesA[propertyName];
-          if (((_ref2 = this.modifiers) != null ? _ref2[propertyName] : void 0) != null) {
-            value = this.modifiers[propertyName](value);
-          }
-          m[propertyName] = value;
+        position = utils.round(position, config.roundingDecimals);
+        currentKeyFrame = {};
+        for (propertyName in this.propertiesA) {
+          currentKeyFrame[propertyName] = curveValue * deltas[propertyName] + this.propertiesA[propertyName];
         }
-        cssString.push(m.matrix().cssValues() + "; ");
-        _ref3 = this.AnimatableCSSProperties;
-        for (propertyName in _ref3) {
-          unit = _ref3[propertyName];
-          if (!this.propertiesA.hasOwnProperty(propertyName)) {
+        keyFrames[position] = currentKeyFrame;
+        stepIncrement++;
+      }
+      return keyFrames;
+    };
+
+    Animation.prototype._css = function() {
+      var cssString, keyFrames, matrix, position, propertyName, unit, values, _i, _len, _ref, _ref1;
+
+      keyFrames = this._keyFrames();
+      cssString = [];
+      cssString.push("@-webkit-keyframes " + this.animationName + " {\n");
+      matrix = new Matrix();
+      for (position in keyFrames) {
+        values = keyFrames[position];
+        cssString.push("\t" + position + "%\t{ -webkit-transform: ");
+        _ref = this.AnimatableMatrixProperties;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          propertyName = _ref[_i];
+          if (values.hasOwnProperty(propertyName)) {
+            matrix[propertyName] = values[propertyName];
+          } else {
+            matrix[propertyName] = this.view[propertyName];
+          }
+        }
+        cssString.push(matrix.matrix().cssValues() + "; ");
+        _ref1 = this.AnimatableCSSProperties;
+        for (propertyName in _ref1) {
+          unit = _ref1[propertyName];
+          if (!values.hasOwnProperty(propertyName)) {
             continue;
           }
-          value = springValue * deltas[propertyName] + this.propertiesA[propertyName];
-          cssString.push("" + propertyName + ":" + (utils.round(value, config.roundingDecimals)) + unit + "; ");
+          cssString.push("" + propertyName + ":" + (utils.round(values[propertyName], config.roundingDecimals)) + unit + "; ");
         }
         cssString.push("}\n");
-        stepIncrement++;
       }
       cssString.push("}\n");
       return cssString.join("");
@@ -4073,13 +4601,7 @@ require.define("/src/primitives/events.coffee",function(require,module,exports,_
 
   Events.MouseOut = "mouseout";
 
-  Events.DragStart = "dragstart";
-
-  Events.DragMove = "dragmove";
-
-  Events.DragEnd = "dragend";
-
-  Events.sanitize = function(event) {
+  Events.touchEvent = function(event) {
     var touchEvent, _ref, _ref1;
 
     touchEvent = (_ref = event.touches) != null ? _ref[0] : void 0;
@@ -4102,6 +4624,10 @@ require.define("/src/ui/init.coffee",function(require,module,exports,__dirname,_
   exports.GridView = (require("./gridview")).GridView;
 
   exports.Draggable = (require("./draggable")).Draggable;
+
+  exports.ScrollView = (require("./scrollview")).ScrollView;
+
+  exports.PagingView = (require("./pagingview")).PagingView;
 
 }).call(this);
 
@@ -4170,18 +4696,30 @@ require.define("/src/ui/gridview.coffee",function(require,module,exports,__dirna
 });
 
 require.define("/src/ui/draggable.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Events, _,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var EventEmitter, Events, _,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   _ = require("underscore");
 
+  EventEmitter = require("../eventemitter").EventEmitter;
+
   Events = require("../primitives/events").Events;
 
-  exports.Draggable = (function() {
+  Events.DragStart = "dragstart";
+
+  Events.DragMove = "dragmove";
+
+  Events.DragEnd = "dragend";
+
+  exports.Draggable = (function(_super) {
+    __extends(Draggable, _super);
+
+    Draggable.VelocityTimeOut = 100;
+
     function Draggable(view) {
       this.view = view;
-      this._calculateAverageVelocity = __bind(this._calculateAverageVelocity, this);
-      this._calculateVelocity = __bind(this._calculateVelocity, this);
       this._touchEnd = __bind(this._touchEnd, this);
       this._touchStart = __bind(this._touchStart, this);
       this._updatePosition = __bind(this._updatePosition, this);
@@ -4189,10 +4727,6 @@ require.define("/src/ui/draggable.coffee",function(require,module,exports,__dirn
         x: 1.0,
         y: 1.0
       };
-      if (this.view.__draggable) {
-        console.error("Draggable: already registered draggable for " + this.view.name);
-      }
-      this.view.__draggable = this;
       this._deltas = [];
       this._isDragging = false;
       this.attach();
@@ -4206,10 +4740,42 @@ require.define("/src/ui/draggable.coffee",function(require,module,exports,__dirn
       return this.view.off(Events.TouchStart, this._touchStart);
     };
 
+    Draggable.prototype.calculateVelocity = function() {
+      var curr, prev, time, timeSinceLastMove, velocity;
+
+      if (this._deltas.length < 2) {
+        return {
+          x: 0,
+          y: 0
+        };
+      }
+      curr = this._deltas.slice(-1)[0];
+      prev = this._deltas.slice(-2, -1)[0];
+      time = curr.t - prev.t;
+      timeSinceLastMove = new Date().getTime() - prev.t;
+      if (timeSinceLastMove > this.VelocityTimeOut) {
+        return {
+          x: 0,
+          y: 0
+        };
+      }
+      velocity = {
+        x: (curr.x - prev.x) / time,
+        y: (curr.y - prev.y) / time
+      };
+      if (velocity.x === Infinity) {
+        velocity.x = 0;
+      }
+      if (velocity.y === Infinity) {
+        velocity.y = 0;
+      }
+      return velocity;
+    };
+
     Draggable.prototype._updatePosition = function(event) {
       var correctedDelta, delta, touchEvent;
 
-      touchEvent = Events.sanitize(event);
+      touchEvent = Events.touchEvent(event);
       delta = {
         x: touchEvent.clientX - this._start.x,
         y: touchEvent.clientY - this._start.y
@@ -4230,7 +4796,7 @@ require.define("/src/ui/draggable.coffee",function(require,module,exports,__dirn
 
       this.view.animateStop();
       this._isDragging = true;
-      touchEvent = Events.sanitize(event);
+      touchEvent = Events.touchEvent(event);
       this._start = {
         x: touchEvent.clientX,
         y: touchEvent.clientY
@@ -4241,99 +4807,251 @@ require.define("/src/ui/draggable.coffee",function(require,module,exports,__dirn
       };
       document.addEventListener(Events.TouchMove, this._updatePosition);
       document.addEventListener(Events.TouchEnd, this._touchEnd);
-      return this.view.emit(Events.DragStart, event);
+      return this.emit(Events.DragStart, event);
     };
 
     Draggable.prototype._touchEnd = function(event) {
       this._isDragging = false;
       document.removeEventListener(Events.TouchMove, this._updatePosition);
       document.removeEventListener(Events.TouchEnd, this._touchEnd);
-      this.view.emit(Events.DragEnd, event);
+      this.emit(Events.DragEnd, event);
       return this._deltas = [];
-    };
-
-    Draggable.prototype._calculateVelocity = function(time) {
-      var curr, prev, timeSinceLastMove, velocity;
-
-      if (time == null) {
-        time = 20;
-      }
-      if (this._deltas.length < 2) {
-        return {
-          x: 0,
-          y: 0
-        };
-      }
-      curr = this._deltas.slice(-1)[0];
-      prev = this._deltas.slice(-2, -1)[0];
-      time = curr.t - prev.t;
-      timeSinceLastMove = new Date().getTime() - prev.t;
-      if (timeSinceLastMove > 100) {
-        return {
-          x: 0,
-          y: 0
-        };
-      }
-      velocity = {
-        x: (curr.x - prev.x) / time,
-        y: (curr.y - prev.y) / time
-      };
-      if (velocity.x === Infinity) {
-        velocity.x = 0;
-      }
-      if (velocity.y === Infinity) {
-        velocity.y = 0;
-      }
-      return velocity;
-    };
-
-    Draggable.prototype._calculateAverageVelocity = function(time) {
-      var currDelta, currTime, deltas, i, lastTime, totalDelta, totalTime, velocity;
-
-      if (time == null) {
-        time = 100;
-      }
-      if (this._deltas.length < 2) {
-        return {
-          x: 0,
-          y: 0
-        };
-      }
-      currTime = lastTime = _.last(this._deltas).t;
-      deltas = (function() {
-        var _i, _ref, _results;
-
-        _results = [];
-        for (i = _i = _ref = this._deltas.length - 1; _i >= 0; i = _i += -1) {
-          currDelta = this._deltas[i];
-          currTime = currDelta.t;
-          if (currTime < (lastTime - time)) {
-            break;
-          }
-          _results.push(currDelta);
-        }
-        return _results;
-      }).call(this);
-      totalDelta = {
-        x: utils.sum(_.pluck(deltas, "x")),
-        y: utils.sum(_.pluck(deltas, "y"))
-      };
-      totalTime = _.first(deltas).t - _.last(deltas).t;
-      if (totalTime === 0) {
-        return {
-          x: 0,
-          y: 0
-        };
-      }
-      return velocity = {
-        x: totalDelta.x / totalTime,
-        y: totalDelta.y / totalTime
-      };
     };
 
     return Draggable;
 
-  })();
+  })(EventEmitter);
+
+}).call(this);
+
+});
+
+require.define("/src/ui/scrollview.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+  var Events, ScrollView, View, utils,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  utils = require("../utils");
+
+  View = require("../views/view").View;
+
+  Events = require("../primitives/events").Events;
+
+  Events.ScrollStart = "scrollstart";
+
+  Events.Scroll = "scroll";
+
+  Events.ScrollEnd = "scrollend";
+
+  ScrollView = (function(_super) {
+    __extends(ScrollView, _super);
+
+    function ScrollView() {
+      this._endBehaviourSnap = __bind(this._endBehaviourSnap, this);
+      this._endBehaviourMomentum = __bind(this._endBehaviourMomentum, this);
+      this._scrollEnd = __bind(this._scrollEnd, this);
+      this._scroll = __bind(this._scroll, this);
+      this._scrollStart = __bind(this._scrollStart, this);
+      this._updateSize = __bind(this._updateSize, this);
+      this._changeSubViews = __bind(this._changeSubViews, this);      ScrollView.__super__.constructor.apply(this, arguments);
+      this.clip = true;
+      this.contentView = new View({
+        superView: this
+      });
+      this.contentView.on("change:subViews", this._changeSubViews);
+      this._dragger = new ui.Draggable(this.contentView);
+      this._dragger.on(Events.DragStart, this._scrollStart);
+      this._dragger.on(Events.DragMove, this._scroll);
+      this._dragger.on(Events.DragEnd, this._scrollEnd);
+      this.endBehaviour = this._endBehaviourMomentum;
+    }
+
+    ScrollView.prototype.centerView = function(view, animate) {
+      if (animate == null) {
+        animate = false;
+      }
+      return this.scrollFrame = this._scrollFrameForView(view);
+    };
+
+    ScrollView.prototype.snapToView = function(view, curve) {
+      if (curve == null) {
+        curve = "spring(1000,20,1000)";
+      }
+      return this.contentView.animate({
+        properties: utils.pointInvert(this._scrollFrameForView(view)),
+        curve: curve
+      });
+    };
+
+    ScrollView.prototype.closestView = function(frame) {
+      var _this = this;
+
+      if (frame == null) {
+        frame = this.scrollFrame;
+      }
+      return _.first(_.sortBy(this.contentView.subViews, function(view) {
+        return utils.pointTotal(utils.pointDistance(view.frame, frame));
+      }));
+    };
+
+    ScrollView.prototype.calculateVelocity = function() {
+      return this._dragger.calculateVelocity();
+    };
+
+    ScrollView.define("scrollX", {
+      get: function() {
+        return this._dragger.speed.x === 1;
+      },
+      set: function(value) {
+        return this._dragger.speed.x = value === true ? 1 : 0;
+      }
+    });
+
+    ScrollView.define("scrollY", {
+      get: function() {
+        return this._dragger.speed.y === 1;
+      },
+      set: function(value) {
+        return this._dragger.speed.y = value === true ? 1 : 0;
+      }
+    });
+
+    ScrollView.define("scrollFrame", {
+      get: function() {
+        return new Framer.Frame(utils.pointInvert(this.contentView));
+      },
+      set: function(frame) {
+        return this.contentView.frame = utils.pointInvert(utils.framePoint(this.contentView.frame));
+      }
+    });
+
+    ScrollView.define("paging", {
+      get: function() {
+        return this._paging;
+      },
+      set: function(value) {
+        this._paging = value;
+        if (value === true) {
+          return this.endBehaviour = this._endBehaviourSnap;
+        } else {
+          return this.endBehaviour = this._endBehaviourMomentum;
+        }
+      }
+    });
+
+    ScrollView.prototype._scrollFrameForView = function(view) {
+      var frame;
+
+      return frame = {
+        x: view.x + (view.width - this.width) / 2.0,
+        y: view.y + (view.height - this.height) / 2.0
+      };
+    };
+
+    ScrollView.prototype._changeSubViews = function(event) {
+      var _ref, _ref1,
+        _this = this;
+
+      if (event != null) {
+        if ((_ref = event.added) != null) {
+          _ref.map(function(view) {
+            return view.on("change:frame", _this._updateSize);
+          });
+        }
+      }
+      if (event != null) {
+        if ((_ref1 = event.removed) != null) {
+          _ref1.map(function(view) {
+            return view.off("change:frame", _this._updateSize);
+          });
+        }
+      }
+      return this._updateSize();
+    };
+
+    ScrollView.prototype._updateSize = function() {
+      return this.contentView.frame = utils.frameSize(this.contentView.contentFrame());
+    };
+
+    ScrollView.prototype._scrollStart = function(event) {
+      event.preventDefault();
+      return this.emit(Events.ScrollStart, event);
+    };
+
+    ScrollView.prototype._scroll = function(event) {
+      event.preventDefault();
+      return this.emit(Events.Scroll, event);
+    };
+
+    ScrollView.prototype._scrollEnd = function(event) {
+      event.preventDefault();
+      if (typeof this.endBehaviour === "function") {
+        this.endBehaviour(event);
+      }
+      return this.emit(Events.ScrollEnd, event);
+    };
+
+    ScrollView.prototype._endBehaviourMomentum = function(event) {
+      var animation, constant1, constant2, totalVelocity, touchEvent, velocity;
+
+      touchEvent = Events.touchEvent(event);
+      constant1 = 1000;
+      constant2 = 0;
+      velocity = this.calculateVelocity();
+      totalVelocity = utils.pointAbs(utils.pointTotal(velocity));
+      return animation = this.contentView.animate({
+        properties: {
+          x: parseInt(this.contentView.x + (velocity.x * constant1)),
+          y: parseInt(this.contentView.y + (velocity.y * constant1))
+        },
+        curve: "spring(100,80," + (totalVelocity * constant2) + ")"
+      });
+    };
+
+    ScrollView.prototype._endBehaviourSnap = function(event) {
+      var animation, constant1, constant2, curve, friction, totalVelocity, touchEvent, velocity;
+
+      touchEvent = Events.touchEvent(event);
+      constant1 = 1;
+      constant2 = 1;
+      friction = 32;
+      velocity = this.calculateVelocity();
+      totalVelocity = utils.pointAbs(utils.pointTotal(velocity));
+      curve = "spring(300," + (friction * constant1) + "," + (totalVelocity * constant2) + ")";
+      return animation = this.snapToView(this.closestView(), curve);
+    };
+
+    return ScrollView;
+
+  })(View);
+
+  exports.ScrollView = ScrollView;
+
+}).call(this);
+
+});
+
+require.define("/src/ui/pagingview.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+  var PagingView, ScrollView,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  ScrollView = require("./scrollview").ScrollView;
+
+  PagingView = (function(_super) {
+    __extends(PagingView, _super);
+
+    function PagingView() {
+      PagingView.__super__.constructor.apply(this, arguments);
+      this.endBehaviour = this._endBehaviourSnap;
+    }
+
+    return PagingView;
+
+  })(ScrollView);
+
+  exports.PagingView = PagingView;
 
 }).call(this);
 
