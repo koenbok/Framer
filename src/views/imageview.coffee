@@ -25,13 +25,21 @@ class exports.ImageView extends View
 			
 			@_image = value
 			
-			loader = new Image()
-			loader.name = @image
-			loader.src = @image
+			# As an optimization, we will only use a loader
+			# if something is explicitly listening to the load event
 			
-			loader.onload = =>
+			if @events?.hasOwnProperty "load" or @events?.hasOwnProperty "error"
+			
+				loader = new Image()
+				loader.name = @image
+				loader.src = @image
+			
+				loader.onload = =>
+					@style["background-image"] = "url('#{@image}')"
+					@emit "load", loader
+			
+				loader.onerror = =>
+					@emit "error", loader
+			
+			else
 				@style["background-image"] = "url('#{@image}')"
-				@emit "load", loader
-			
-			loader.onerror = =>
-				@emit "error", loader

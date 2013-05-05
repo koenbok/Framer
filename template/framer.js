@@ -1,7 +1,7 @@
-// Framer v2.0.0b1-36-g3ad0dc0 (c) 2013 Koen Bok
+// Framer v2.0.0b1-38-ged0c03b (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "v2.0.0b1-36-g3ad0dc0";
+window.FramerVersion = "v2.0.0b1-38-ged0c03b";
 
 
 (function(){var require = function (file, cwd) {
@@ -4552,23 +4552,27 @@ require.define("/src/views/imageview.coffee",function(require,module,exports,__d
         return this._image;
       },
       set: function(value) {
-        var loader,
+        var loader, _ref, _ref1,
           _this = this;
 
         if (this._image === value) {
           return this.emit("load", loader);
         }
         this._image = value;
-        loader = new Image();
-        loader.name = this.image;
-        loader.src = this.image;
-        loader.onload = function() {
-          _this.style["background-image"] = "url('" + _this.image + "')";
-          return _this.emit("load", loader);
-        };
-        return loader.onerror = function() {
-          return _this.emit("error", loader);
-        };
+        if ((_ref = this.events) != null ? _ref.hasOwnProperty("load" || ((_ref1 = this.events) != null ? _ref1.hasOwnProperty("error") : void 0)) : void 0) {
+          loader = new Image();
+          loader.name = this.image;
+          loader.src = this.image;
+          loader.onload = function() {
+            _this.style["background-image"] = "url('" + _this.image + "')";
+            return _this.emit("load", loader);
+          };
+          return loader.onerror = function() {
+            return _this.emit("error", loader);
+          };
+        } else {
+          return this.style["background-image"] = "url('" + this.image + "')";
+        }
       }
     });
 
