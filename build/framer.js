@@ -1,7 +1,7 @@
-// Framer v2.0.0b1-38-ged0c03b (c) 2013 Koen Bok
+// Framer v2.0.0b1-39-g8b12dcb (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "v2.0.0b1-38-ged0c03b";
+window.FramerVersion = "v2.0.0b1-39-g8b12dcb";
 
 
 (function(){var require = function (file, cwd) {
@@ -455,6 +455,7 @@ require.define("/src/css.coffee",function(require,module,exports,__dirname,__fil
 
 require.define("/src/config.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
   exports.config = {
+    baseUrl: "",
     timeSpeedFactor: 1,
     roundingDecimals: 5,
     animationPrecision: 60,
@@ -580,9 +581,13 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
   };
 
   exports.delay = function(time, f) {
-    var timer;
+    var timer, _ref;
 
     timer = setTimeout(f, time * config.timeSpeedFactor);
+    if ((_ref = window._delayTimers) == null) {
+      window._delayTimers = [];
+    }
+    window._delayTimers.push(timer);
     return timer;
   };
 
@@ -4528,11 +4533,13 @@ require.define("/src/views/scrollview.coffee",function(require,module,exports,__
 });
 
 require.define("/src/views/imageview.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var View,
+  var View, config,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   View = require("./view").View;
+
+  config = require("../config").config;
 
   exports.ImageView = (function(_super) {
     __extends(ImageView, _super);
@@ -4558,7 +4565,7 @@ require.define("/src/views/imageview.coffee",function(require,module,exports,__d
         if (this._image === value) {
           return this.emit("load", loader);
         }
-        this._image = value;
+        this._image = config.baseUrl + value;
         if ((_ref = this.events) != null ? _ref.hasOwnProperty("load" || ((_ref1 = this.events) != null ? _ref1.hasOwnProperty("error") : void 0)) : void 0) {
           loader = new Image();
           loader.name = this.image;

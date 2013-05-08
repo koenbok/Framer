@@ -1,4 +1,5 @@
 exports.config =
+	baseUrl: ""
 	timeSpeedFactor: 1
 	roundingDecimals: 5
 	# Animations

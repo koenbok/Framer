@@ -1,4 +1,5 @@
 {View} = require "./view"
+{config} = require "../config"
 
 class exports.ImageView extends View
 	
@@ -23,7 +24,7 @@ class exports.ImageView extends View
 			if @_image is value
 				return @emit "load", loader
 			
-			@_image = value
+			@_image = config.baseUrl + value
 			
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
