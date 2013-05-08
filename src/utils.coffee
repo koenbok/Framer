@@ -148,8 +148,8 @@ exports.randomColor = (alpha = 1.0) ->
 #
 exports.delay = (time, f) ->
 	timer = setTimeout f, time * config.timeSpeedFactor
-	# window._delayTimers ?= []
-	# window._delayTimers.push timer
+	window._delayTimers ?= []
+	window._delayTimers.push timer
 	return timer
 
 
