@@ -25,5 +25,10 @@ clean:
 lint:
 	./node_modules/coffeelint/bin/coffeelint -f lint.config.json -r src
 
+dist:
+	make build
+	cp -R template build/template
+	cp build/framer.js build/template/framer.js
+
 .PHONY: build clean lint test
 
