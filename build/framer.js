@@ -1,7 +1,7 @@
-// Framer v2.0.0b1-39-g8b12dcb (c) 2013 Koen Bok
+// Framer 0.5.0-138-g318b135 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "v2.0.0b1-39-g8b12dcb";
+window.FramerVersion = "0.5.0-138-g318b135";
 
 
 (function(){var require = function (file, cwd) {
@@ -3364,7 +3364,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
             define(function () {
                 return functions;
             });
-        } else if (typeof module === 'object' || module !== null) {
+        } else if (typeof module === 'object' && module !== null) {
             module.exports = functions;
         } else {
             globals.check = functions;
