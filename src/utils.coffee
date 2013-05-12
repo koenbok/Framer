@@ -315,8 +315,10 @@ exports.isMobile = ->
 		navigator.userAgent.toLowerCase()
 
 
-# Public: Only executes a given function if the dom is loaded
-#
+
+######################################################
+# DOM FUNCTIONS
+
 __domComplete = []
 
 document.onreadystatechange = (event) =>
@@ -333,6 +335,19 @@ exports.domComplete = (f) ->
 exports.domCompleteCancel = (f) ->
 	__domComplete = _.without __domComplete, f
 
+
+exports.domLoadScript = (url, callback) ->
+	
+	script = document.createElement "script"
+	script.type = "text/javascript"
+	script.src = url
+	
+	script.onload = callback
+	
+	head = document.getElementsByTagName("head")[0]
+	head.appendChild script
+	
+	script
 
 
 ######################################################
