@@ -23,9 +23,6 @@ Global.ScrollView = ScrollView
 Global.ImageView = ImageView
 Global.Animation = Animation
 
-
-
-
 Global.Frame = Frame
 Global.Matrix = Matrix
 Global.EventEmitter = EventEmitter
