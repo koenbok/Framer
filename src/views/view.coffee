@@ -415,7 +415,15 @@ class View extends Frame
 		utils.domComplete @__insertElement
 				
 	__insertElement: =>
-		document.body.appendChild @_element
+		
+		if not Framer._rootElement
+			Framer._rootElement = document.createElement "div"
+			Framer._rootElement.id = "FramerRoot"
+			document.body.appendChild Framer._rootElement
+		
+		Framer._rootElement.appendChild @_element
+		
+		# document.body.appendChild @_element
 	
 	destroy: ->
 		if @_element.parentNode
