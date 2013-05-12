@@ -29,14 +29,18 @@ class Frame extends EventEmitter
 	@define "midX",
 		get: -> @x + (@width / 2.0)
 		set: (value) ->
-			throw Error "Width is zero" if @width is 0
-			@x = value - (@width / 2.0)
+			if @width is 0
+				@x = 0
+			else
+				@x = value - (@width / 2.0)
 
 	@define "maxX",
 		get: -> @x + @width
 		set: (value) ->
-			throw Error "Width is zero" if @width is 0
-			@x = value - @width
+			if @width is 0
+				@x = 0
+			else
+				@x = value - @width
 
 	@define "minY",
 		get: -> @y
@@ -45,14 +49,20 @@ class Frame extends EventEmitter
 	@define "midY",
 		get: -> @y + (@height / 2.0)
 		set: (value) ->
-			throw Error "Width is zero" if @height is 0
-			@y = value - (@height / 2.0)
+			if @height is 0
+				@y = 0
+			else
+				@y = value - (@height / 2.0)
+
+
 
 	@define "maxY",
 		get: -> @y + @height
 		set: (value) ->
-			throw Error "Width is zero" if @height is 0
-			@y = value - @height
+			if @height is 0
+				@y = 0
+			else
+				@y = value - @height
 
 	merge: (r2) ->
 		r1 = @
