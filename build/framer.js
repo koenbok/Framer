@@ -1,7 +1,7 @@
-// Framer 0.5.0-138-g318b135 (c) 2013 Koen Bok
+// Framer v2.0.0b1-48-g6ce75ff (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "0.5.0-138-g318b135";
+window.FramerVersion = "v2.0.0b1-48-g6ce75ff";
 
 
 (function(){var require = function (file, cwd) {
@@ -469,9 +469,9 @@ require.define("/src/config.coffee",function(require,module,exports,__dirname,__
 
 require.define("/src/utils.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
   var config, _, __domComplete,
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     __slice = [].slice,
-    _this = this;
+    _this = this,
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   _ = require("underscore");
 
@@ -480,104 +480,6 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
   Function.prototype.define = function(prop, desc) {
     Object.defineProperty(this.prototype, prop, desc);
     return Object.__;
-  };
-
-  exports.keys = function(a) {
-    var key, _results;
-
-    _results = [];
-    for (key in a) {
-      _results.push(key);
-    }
-    return _results;
-  };
-
-  exports.extend = function() {
-    var a, args, key, obj, value, _i, _len, _ref;
-
-    args = Array.prototype.slice.call(arguments);
-    a = args[0];
-    _ref = args.slice(1);
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      obj = _ref[_i];
-      for (key in obj) {
-        value = obj[key];
-        a[key] = value;
-      }
-    }
-    return a;
-  };
-
-  exports.update = function(target, source) {
-    var keys;
-
-    keys = exports.keys(target);
-    exports.extend(target, exports.filter(source, function(k) {
-      return __indexOf.call(keys, k) >= 0;
-    }));
-    return a;
-  };
-
-  exports.copy = function(source) {
-    return exports.extend({}, source);
-  };
-
-  exports.filter = function(source, iterator) {
-    var b, key, value;
-
-    b = {};
-    for (key in source) {
-      value = source[key];
-      if (iterator(key, value)) {
-        b[key] = value;
-      }
-    }
-    return b;
-  };
-
-  exports.union = function() {
-    return Array.prototype.concat.apply(Array.prototype, arguments);
-  };
-
-  exports.remove = function(a, e) {
-    var t;
-
-    if ((t = a.indexOf(e)) > -1) {
-      a.splice(t, 1)[0];
-    }
-    return a;
-  };
-
-  exports.cycle = function() {
-    var args, curr;
-
-    if (_.isArray(arguments[0])) {
-      args = arguments[0];
-    } else {
-      args = Array.prototype.slice.call(arguments);
-    }
-    curr = -1;
-    return function() {
-      curr++;
-      if (curr >= args.length) {
-        curr = 0;
-      }
-      return args[curr];
-    };
-  };
-
-  exports.toggle = exports.cycle;
-
-  exports.randomColor = function(alpha) {
-    var c;
-
-    if (alpha == null) {
-      alpha = 1.0;
-    }
-    c = function() {
-      return parseInt(Math.random() * 255);
-    };
-    return "rgba(" + (c()) + ", " + (c()) + ", " + (c()) + ", " + alpha + ")";
   };
 
   exports.delay = function(time, f) {
@@ -647,47 +549,6 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
     };
   };
 
-  exports.convertPoint = function(point, view1, view2) {
-    var superViews1, superViews2, traverse, view, _i, _j, _len, _len1;
-
-    point = exports.extend({}, point);
-    traverse = function(view) {
-      var currentView, superViews;
-
-      currentView = view;
-      superViews = [];
-      while (currentView && currentView.superView) {
-        superViews.push(currentView.superView);
-        currentView = currentView.superView;
-      }
-      return superViews;
-    };
-    superViews1 = traverse(view1);
-    superViews2 = traverse(view2);
-    if (view2) {
-      superViews2.push(view2);
-    }
-    for (_i = 0, _len = superViews1.length; _i < _len; _i++) {
-      view = superViews1[_i];
-      point.x += view.x;
-      point.y += view.y;
-      if (view.scrollFrame) {
-        point.x -= view.scrollFrame.x;
-        point.y -= view.scrollFrame.y;
-      }
-    }
-    for (_j = 0, _len1 = superViews2.length; _j < _len1; _j++) {
-      view = superViews2[_j];
-      point.x -= view.x;
-      point.y -= view.y;
-      if (view.scrollFrame) {
-        point.x += view.scrollFrame.x;
-        point.y += view.scrollFrame.y;
-      }
-    }
-    return point;
-  };
-
   exports.max = function(arr) {
     return Math.max.apply(Math, arr);
   };
@@ -706,8 +567,23 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
     }
   };
 
-  exports.pointInRect = function(point, rect) {
-    return alert("Not implemented, you lazy man");
+  exports.round = function(value, decimals) {
+    var d;
+
+    d = Math.pow(10, decimals);
+    return Math.round(value * d) / d;
+  };
+
+  exports.randomColor = function(alpha) {
+    var c;
+
+    if (alpha == null) {
+      alpha = 1.0;
+    }
+    c = function() {
+      return parseInt(Math.random() * 255);
+    };
+    return "rgba(" + (c()) + ", " + (c()) + ", " + (c()) + ", " + alpha + ")";
   };
 
   exports.uuid = function() {
@@ -727,12 +603,25 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
     return output.join('');
   };
 
-  exports.round = function(value, decimals) {
-    var d;
+  exports.cycle = function() {
+    var args, curr;
 
-    d = Math.pow(10, decimals);
-    return Math.round(value * d) / d;
+    if (_.isArray(arguments[0])) {
+      args = arguments[0];
+    } else {
+      args = Array.prototype.slice.call(arguments);
+    }
+    curr = -1;
+    return function() {
+      curr++;
+      if (curr >= args.length) {
+        curr = 0;
+      }
+      return args[curr];
+    };
   };
+
+  exports.toggle = exports.cycle;
 
   exports.isWebKit = function() {
     return window.WebKitCSSMatrix !== null;
@@ -744,6 +633,10 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.isMobile = function() {
     return /iphone|ipod|android|ie|blackberry|fennec/.test(navigator.userAgent.toLowerCase());
+  };
+
+  exports.devicePixelRatio = function() {
+    return window.devicePixelRatio;
   };
 
   __domComplete = [];
@@ -770,6 +663,18 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.domCompleteCancel = function(f) {
     return __domComplete = _.without(__domComplete, f);
+  };
+
+  exports.domLoadScript = function(url, callback) {
+    var head, script;
+
+    script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = url;
+    script.onload = callback;
+    head = document.getElementsByTagName("head")[0];
+    head.appendChild(script);
+    return script;
   };
 
   exports.pointDistance = function(pointA, pointB) {
@@ -815,6 +720,117 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
       x: Math.abs(point.x),
       y: Math.abs(point.y)
     };
+  };
+
+  exports.pointInRect = function(point, rect) {
+    return alert("Not implemented, you lazy man");
+  };
+
+  exports.convertPoint = function(point, view1, view2) {
+    var superViews1, superViews2, traverse, view, _i, _j, _len, _len1;
+
+    point = exports.extend({}, point);
+    traverse = function(view) {
+      var currentView, superViews;
+
+      currentView = view;
+      superViews = [];
+      while (currentView && currentView.superView) {
+        superViews.push(currentView.superView);
+        currentView = currentView.superView;
+      }
+      return superViews;
+    };
+    superViews1 = traverse(view1);
+    superViews2 = traverse(view2);
+    if (view2) {
+      superViews2.push(view2);
+    }
+    for (_i = 0, _len = superViews1.length; _i < _len; _i++) {
+      view = superViews1[_i];
+      point.x += view.x;
+      point.y += view.y;
+      if (view.scrollFrame) {
+        point.x -= view.scrollFrame.x;
+        point.y -= view.scrollFrame.y;
+      }
+    }
+    for (_j = 0, _len1 = superViews2.length; _j < _len1; _j++) {
+      view = superViews2[_j];
+      point.x -= view.x;
+      point.y -= view.y;
+      if (view.scrollFrame) {
+        point.x += view.scrollFrame.x;
+        point.y += view.scrollFrame.y;
+      }
+    }
+    return point;
+  };
+
+  exports.keys = function(a) {
+    var key, _results;
+
+    _results = [];
+    for (key in a) {
+      _results.push(key);
+    }
+    return _results;
+  };
+
+  exports.extend = function() {
+    var a, args, key, obj, value, _i, _len, _ref;
+
+    args = Array.prototype.slice.call(arguments);
+    a = args[0];
+    _ref = args.slice(1);
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      obj = _ref[_i];
+      for (key in obj) {
+        value = obj[key];
+        a[key] = value;
+      }
+    }
+    return a;
+  };
+
+  exports.update = function(target, source) {
+    var keys;
+
+    keys = exports.keys(target);
+    exports.extend(target, exports.filter(source, function(k) {
+      return __indexOf.call(keys, k) >= 0;
+    }));
+    return a;
+  };
+
+  exports.copy = function(source) {
+    return exports.extend({}, source);
+  };
+
+  exports.filter = function(source, iterator) {
+    var b, key, value;
+
+    b = {};
+    for (key in source) {
+      value = source[key];
+      if (iterator(key, value)) {
+        b[key] = value;
+      }
+    }
+    return b;
+  };
+
+  exports.union = function() {
+    return Array.prototype.concat.apply(Array.prototype, arguments);
+  };
+
+  exports.remove = function(a, e) {
+    var t;
+
+    if ((t = a.indexOf(e)) > -1) {
+      a.splice(t, 1)[0];
+    }
+    return a;
   };
 
 }).call(this);
@@ -2827,7 +2843,12 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     };
 
     View.prototype.__insertElement = function() {
-      return document.body.appendChild(this._element);
+      if (!Framer._rootElement) {
+        Framer._rootElement = document.createElement("div");
+        Framer._rootElement.id = "FramerRoot";
+        document.body.appendChild(Framer._rootElement);
+      }
+      return Framer._rootElement.appendChild(this._element);
     };
 
     View.prototype.destroy = function() {
@@ -3364,7 +3385,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
             define(function () {
                 return functions;
             });
-        } else if (typeof module === 'object' && module !== null) {
+        } else if (typeof module === 'object' || module !== null) {
             module.exports = functions;
         } else {
             globals.check = functions;
@@ -3442,9 +3463,10 @@ require.define("/src/primitives/frame.coffee",function(require,module,exports,__
       },
       set: function(value) {
         if (this.width === 0) {
-          throw Error("Width is zero");
+          return this.x = 0;
+        } else {
+          return this.x = value - (this.width / 2.0);
         }
-        return this.x = value - (this.width / 2.0);
       }
     });
 
@@ -3454,9 +3476,10 @@ require.define("/src/primitives/frame.coffee",function(require,module,exports,__
       },
       set: function(value) {
         if (this.width === 0) {
-          throw Error("Width is zero");
+          return this.x = 0;
+        } else {
+          return this.x = value - this.width;
         }
-        return this.x = value - this.width;
       }
     });
 
@@ -3475,9 +3498,10 @@ require.define("/src/primitives/frame.coffee",function(require,module,exports,__
       },
       set: function(value) {
         if (this.height === 0) {
-          throw Error("Width is zero");
+          return this.y = 0;
+        } else {
+          return this.y = value - (this.height / 2.0);
         }
-        return this.y = value - (this.height / 2.0);
       }
     });
 
@@ -3487,9 +3511,10 @@ require.define("/src/primitives/frame.coffee",function(require,module,exports,__
       },
       set: function(value) {
         if (this.height === 0) {
-          throw Error("Width is zero");
+          return this.y = 0;
+        } else {
+          return this.y = value - this.height;
         }
-        return this.y = value - this.height;
       }
     });
 
