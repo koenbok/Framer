@@ -186,8 +186,10 @@ exports.pointAbs = (point) ->
 		x: Math.abs point.x
 		y: Math.abs point.y
 
-exports.pointInRect = (point, rect) ->
-	alert "Not implemented, you lazy man"
+exports.pointInFrame = (point, frame) ->
+	return false  if point.x < frame.minX or point.x > frame.maxX
+	return false  if point.y < frame.minY or point.y > frame.maxY
+	true
 
 exports.convertPoint = (point, view1, view2) ->
 
