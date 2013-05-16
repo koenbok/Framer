@@ -168,7 +168,10 @@ class Animation extends EventEmitter
 		# Generate the keyframe css and insert
 
 		@keyFrameAnimationCSS = @_css()
-		@view.once "webkitAnimationEnd", @_finalize
+		@view.once "webkitAnimationEnd", (event) =>
+			# If we don't do this, all animations on parent views will be stopped
+			event.stopPropagation()
+			@_finalize()
 		
 		# Only enable backside visibility if we are actually going to animate rotation
 		backsideVisibility = "hidden"
@@ -237,7 +240,7 @@ class Animation extends EventEmitter
 	
 
 	_finalize: =>
-
+		
 		if @_canceled is true
 			return
 		

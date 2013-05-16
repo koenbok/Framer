@@ -1,7 +1,7 @@
-// Framer v2.0.0b1-48-g6ce75ff (c) 2013 Koen Bok
+// Framer 2.0 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "v2.0.0b1-48-g6ce75ff";
+window.FramerVersion = "2.0";
 
 
 (function(){var require = function (file, cwd) {
@@ -722,8 +722,14 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
     };
   };
 
-  exports.pointInRect = function(point, rect) {
-    return alert("Not implemented, you lazy man");
+  exports.pointInFrame = function(point, frame) {
+    if (point.x < frame.minX || point.x > frame.maxX) {
+      return false;
+    }
+    if (point.y < frame.minY || point.y > frame.maxY) {
+      return false;
+    }
+    return true;
   };
 
   exports.convertPoint = function(point, view1, view2) {
@@ -4015,7 +4021,10 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         return;
       }
       this.keyFrameAnimationCSS = this._css();
-      this.view.once("webkitAnimationEnd", this._finalize);
+      this.view.once("webkitAnimationEnd", function(event) {
+        event.stopPropagation();
+        return _this._finalize();
+      });
       backsideVisibility = "hidden";
       if (__indexOf.call(animatedProperties, "rotationX") >= 0 || __indexOf.call(animatedProperties, "rotationY") >= 0) {
         backsideVisibility = "visible";
