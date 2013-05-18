@@ -17,5 +17,8 @@
     "watchr": "2.4.x",
     "check-types": "0.6.x"
   },
+  "scripts": {
+    "test": "make test"
+  },
   "license": "MIT"
 }
