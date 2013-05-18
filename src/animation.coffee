@@ -187,7 +187,7 @@ class Animation extends EventEmitter
 				-webkit-animation-name: #{@animationName};
 				-webkit-animation-timing-function: linear;
 				-webkit-animation-fill-mode: both;
-				-webkit-tranform-origin: #{@origin};
+				-webkit-transform-origin: #{@origin};
 				-webkit-backface-visibility: #{backsideVisibility};
 			}"
 		
