@@ -1,0 +1,181 @@
+/**
+ * jstalk plugin for sketch.
+ *
+ * This plugin will generate a structure file, and all images files, into
+ * the directory where the current sketch-file is stored.
+ *
+ * This files can then be used with Framer to create interactive prototypes.
+ *
+ * @author Tobias Tom <t.tom@succont.de>
+ * @see http://www.framerjs.com
+ **/
+var name = [doc displayName];
+var directory = [[[doc fileURL] path] stringByDeletingLastPathComponent];
+var imageDirectory = [directory stringByAppendingPathComponent:'images'];
+
+// end of configuration
+// images will store a key value reference to the name of the image and the layer that represents the image
+var images = [];
+// layers will be the JSON tree that will be written to the file
+var layers = [];
+
+// some helper methods to make our live easier, but not adding additional dependencies.
+
+/**
+ * Loop though the given array and execute the given callback on each item
+ *
+ * The callback function will get two parameters:
+ * - the item which should be processed
+ * - the index at which the given object was found
+ *
+ * @param Array array The array that should be looped through
+ * @param Function callback The callback that should get executed
+ **/
+var each = function( array, callback ) {
+	var numberOfItems = [array length];
+	for( var index = 0; index < numberOfItems; index++ ) {
+		var item = array[ index ];
+		callback( item, index );
+	}
+}
+
+/**
+ * Convert a sketch layer into a dictionary
+ *
+ * @param MSLayer layer The layer that should get converted
+ * @return Object The JavaScript object that was generated from the given layer
+ **/
+var objectToDictionary = function( layer ) {
+	return {
+		// we need some magic to convert object-c strings to JavaScript strings
+		name: '' + [layer name],
+		layerFrame: rectToFrame( [layer frame] )
+	};
+};
+
+/**
+ * Convert an objective-c rect into a JavaScript object.
+ *
+ * @param MSRect The sketch rect that should get converted
+ * @return Object The JavaScript object that was generated from the given rect
+ **/
+var rectToFrame = function( frame ) {
+	return {
+		x: [frame x],
+		y: [frame y],
+		width: [frame width],
+		height: [frame height]
+	};
+};
+
+/**
+ * Convert an array of MSLayer into an JavaScript array.
+ *
+ * The array will contain JavaScript objects that specify the layer
+ * in a normal dictionary. One dictionary represents one layer.
+ *
+ * Of the layer is unknown, or should not be handled, it will just
+ * be ignored.
+ *
+ * @param NSArray layers The array that contains all layers
+ * @return Object An JavaScript array that contains all supported layers
+ **/
+var layersToArray = function( layers ) {
+	var result = [];
+	// loop though all layers in this hirarchy
+	each( layers, function( layer ) {
+		// get the class of the layer and check if we have a handler for
+		// that type of class. If we do not have one, skip it.
+		var layerClass = [layer class];
+		if ( !layerHandlers[ layerClass ] ) {
+			return;
+		}
+
+		// execute the stored handler and give the current layer as
+		// parameter.
+		var layerObject = layerHandlers[ layerClass ]( layer );
+		// if there was no result, we can also skip this one
+		if ( !layerObject ) {
+			return;
+		}
+
+		// pure magic, add the object to the result
+		result.push( layerObject );
+	} );
+
+	return result;
+}
+
+/**
+ * Variable that stores the handlers for each layer class.
+ *
+ * Every class that we support needs to have one handler. They are
+ * defined here in a central place. If we need to add more layer-types
+ * later, we can store them in this object.
+ **/
+var layerHandlers = {
+	MSLayerGroup: function( layer, parent ) {
+		// create the standard object from the layer
+		var result = objectToDictionary( layer );
+
+		// and, as we are a group, we create the references to the image
+		var name = result.name;
+		var imageFilename = name + '.png';
+		var imageFrame = [layer frame];
+		result.image = {
+			path: 'images/' + imageFilename,
+			frame: {
+				x: 0,
+				y: 0,
+				width: [imageFrame width],
+				height: [imageFrame height]
+			}
+		};
+		result.imageType = 'png';
+
+		// also, we need the references to the image later
+		images[ imageFilename ] = layer;
+
+		// check if this layer has items inside itself. If it has, we
+		// store the children inside the result for the current layer
+		var children = layersToArray( [layer layers] );
+		if ( children.length ) {
+			result.children = children;
+		}
+
+		return result;
+	},
+
+	MSArtboardGroup: function( artboard ) {
+		var result = objectToDictionary( artboard );
+		result.children = layersToArray( [artboard layers ] );
+
+		return result;
+	}
+};
+
+// create the tree structure from the artboards in the current file
+var layersAsString = JSON.stringify( layersToArray( [doc artboards] ), null, '\t' );
+// and add the header to the result
+var resultAsString = [
+	"window.FramerPS = window.FramerPS || {};",
+	"window.FramerPS['" + name + "'] = " + layersAsString
+].join( "\n" );
+
+// now we have everything: all the images as reference and the complete
+// tree as string
+
+// add the name of the resulting file to the configured path
+var path = [directory stringByAppendingPathComponent:'views.' + name + '.js'];
+// sometimes bridges are stupid. We now convert JavaScript strings to objective-c strings
+var resultAsCocoaString = [NSString stringWithString:resultAsString];
+// now we can write the objective-c based string to the file
+[[resultAsCocoaString dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:true]
+
+// loop through all the stored images and write them to the file
+for( var imageFilename in images ) {
+	var layer = images[ imageFilename ];
+	var imagePath = [imageDirectory stringByAppendingPathComponent:imageFilename];
+
+	[layer writeBitmapImageToFile:imagePath];
+}
