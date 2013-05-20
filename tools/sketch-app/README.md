@@ -10,3 +10,5 @@ To summarize just copy `Framer.jstalk` to
 - **AppStore release**: `~/Library/Containers/com.bohemiancoding.sketch/Data/Library/Application Support/sketch/Plugins`
 
 The AppStore version needs to be at least 2.3 (not released at this time while writing this).
+
+After copying the file to the correct folder, scripting has to be enabled inside the Sketch preferences.
