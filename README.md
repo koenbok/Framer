@@ -17,3 +17,7 @@ To run the tests run `make test` or `make testw` to keep watching and test on fi
 ### Contributing
 
 We love contributions. If you like to help out and need ideas what to work on send me a [message](mailto:koen+framer@madebysofa.com).
+
+wercker build status:
+
+[![Wercker status](https://app.wercker.com/status/8e5d02248bfd387acebdf177fba5f6b1)](https://app.wercker.com/project/bykey/8e5d02248bfd387acebdf177fba5f6b1)
