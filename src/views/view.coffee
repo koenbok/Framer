@@ -214,7 +214,8 @@ class View extends Frame
 				throw Error "View._matrix.set should be Matrix not #{typeof matrix}"
 
 			@__matrix = matrix
-			@style.webkitTransform = @__matrix.matrix().cssValues()
+			# @style.webkitTransform = @__matrix.matrix().cssValues()
+			@style.webkitTransform = @__matrix.css()
 	
 	_setMatrixValue: (property, value) ->
 		

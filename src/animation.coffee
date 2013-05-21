@@ -333,7 +333,8 @@ class Animation extends EventEmitter
 				else
 					matrix[propertyName] = @view[propertyName]
 
-			cssString.push matrix.matrix().cssValues() + "; "
+			# cssString.push matrix.matrix().cssValues() + "; "
+			cssString.push matrix.css() + "; "
 			
 			# Add the css based values
 			for propertyName, unit of @AnimatableCSSProperties

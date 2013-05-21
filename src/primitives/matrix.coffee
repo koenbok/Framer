@@ -1,17 +1,9 @@
 _ = require "underscore"
 utils = require "../utils"
 
-WebKitCSSMatrix::cssValues = ->
-	
-	@toString()
+# CSSMatrix = require "CSSMatrix"
 
-	# r = (v) -> utils.round v, 5
-	# 
-	# values = "matrix3d(
-	# 	#{r @m11}, #{r @m12}, #{r @m13}, #{r @m14},
-	# 	#{r @m21}, #{r @m22}, #{r @m23}, #{r @m24},
-	# 	#{r @m31}, #{r @m32}, #{r @m33}, #{r @m34},
-	# 	#{r @m41}, #{r @m42}, #{r @m43}, #{r @m44})"
+EmptyMatrix = new WebKitCSSMatrix()
 
 class Matrix
 	
@@ -123,19 +115,28 @@ class Matrix
 		@rotationZ = v.rotation.z / Math.PI * 180
 		
 	
-	matrix: ->
-		m = new WebKitCSSMatrix()
-		m = m.translate @_x, @_y, @_z
-		m = m.rotate @_rotationX, @_rotationY, @_rotationZ
-		# m = m.rotate @_rotationX, 0, 0
-		# m = m.rotate 0, @_rotationY, 0
-		# m = m.rotate 0, 0, @_rotationZ
-		m = m.scale @scaleX, @scaleY, @scaleZ
-		
-		return m
+	# matrix: ->
+	# 	m = new WebKitCSSMatrix()
+	# 	m = m.translate @_x, @_y, @_z
+	# 	m = m.rotate @_rotationX, @_rotationY, @_rotationZ
+	# 	# m = m.rotate @_rotationX, 0, 0
+	# 	# m = m.rotate 0, @_rotationY, 0
+	# 	# m = m.rotate 0, 0, @_rotationZ
+	# 	m = m.scale @scaleX, @scaleY, @scaleZ
+	# 	
+	# 	return m
 	
 	set: (view) ->
 		view._matrix = @
+	
+	css: ->
+		m = EmptyMatrix
+		
+		m = m.translate @_x, @_y, @_z
+		m = m.rotate @_rotationX, @_rotationY, @_rotationZ
+		m = m.scale @_scaleX, @_scaleY, @_scaleZ
+		
+		return m.toString()
 
 
 exports.Matrix = Matrix
