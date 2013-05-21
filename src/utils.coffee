@@ -191,16 +191,15 @@ exports.pointInFrame = (point, frame) ->
 	return false  if point.y < frame.minY or point.y > frame.maxY
 	true
 
+# Public: Convert a point between two view coordinate systems
+#
+# point - The point to be converted
+# view1 - The origin view of the point
+# view2 - The destination view of the point
+#
+# Returns an Object
+#
 exports.convertPoint = (point, view1, view2) ->
-
-	# Public: Convert a point between two view coordinate systems
-	#
-	# point - The point to be converted
-	# view1 - The origin view of the point
-	# view2 - The destination view of the point
-	# 
-	# Returns an Object
-	#
 
 	point = exports.extend {}, point
 	
@@ -237,6 +236,24 @@ exports.convertPoint = (point, view1, view2) ->
 			point.y += view.scrollFrame.y
 	
 	return point
+
+
+exports.titleize = (str) ->
+	return unless string
+  return String(str).replace /(?:^|\s)\S/g, ((c) -> c.toUpperCase())
+
+exports.classify = (str) ->
+	_s.titleize(String(str).replace(/_/g, ' ')).replace(/\s/g, '')
+
+exports.camelize = (str) ->
+	_s.trim(str).replace /[-_\s]+(.)?/g, ((match, c) -> c.toUpperCase())
+
+exports.startsWith = (str, starts) ->
+	return true if (starts is '')
+	return false if ((str is null) or (starts is null))
+	str = String(str)
+	starts = String(starts)
+	return str.length >= starts.length && str.slice(0, starts.length) == starts
 
 
 ######################################################
