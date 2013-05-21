@@ -12,57 +12,64 @@ bezier = require "./curves/bezier"
 AnimationCounter = 0
 AnimationList = []
 
+# Parses arguments from an easing function call provided
+# as a string, and its corresponding prefix.
+#
+# "spring(1,2,3)", "spring" # => [1, 2, 3]
+#
 parseCurve = (a, prefix) ->
 
-	# "spring(1, 2, 3)" -> 1, 2, 3
+	a = a.replace(prefix, "")
+		.replace(/\s+/g, "")
+		.replace("(", "")
+		.replace(")", "")
+		.split(",")
 
-	a = a.replace prefix, ""
-	a = a.replace /\s+/g, ""
-	a = a.replace "(", ""
-	a = a.replace ")", ""
-	a = a.split ","
+	parseFloat(float) for float in a
 
-	return a.map (i) -> parseFloat i
+# TODO: Standardize on Arrays or Objects for these lists
 
+AnimationProperties = [
+	"view", "properties", "curve", "time",
+	"origin", "tolerance", "precision", "modifiers",
+	"limits", "debug", "profile", "callback"
+]
+
+AnimatableCSSProperties = {
+	opacity: ""
+	width: "px"
+	height: "px"
+}
+
+AnimatableMatrixProperties = [
+	"x", "y", "z",
+	"scaleX", "scaleY", "scaleZ", # "scale",
+	"rotationX", "rotationY", "rotationZ", # "rotation"
+]
 
 class Animation extends EventEmitter
 	
-	AnimationProperties: [
-		"view", "properties", "curve", "time",
-		"origin", "tolerance", "precision", "modifiers", 
-		"limits", "debug", "profile", "callback"
-	]
-	AnimatableCSSProperties: {
-		opacity: "",
-		width: "px",
-		height: "px",
-	}
-	AnimatableMatrixProperties: [
-		"x", "y", "z",
-		"scaleX", "scaleY", "scaleZ", # "scale",
-		"rotationX", "rotationY", "rotationZ", # "rotation"
-	]
-
-	constructor: (args) ->
+	constructor: (options) ->
 		
-		# console.log "Animation.constructor", args
+		# console.log "Animation.constructor", options
 		
 		# Set all properties
-		for p in @AnimationProperties
-			@[p] = args[p]
-		
-		# Set all the defaults
-		@time ?= 1000
-		@curve ?= "linear"
-		@origin ?= "50% 50%"
-		@count = 0
+		for p in AnimationProperties
+			@[p] = options[p]
 
-		@precision ?= config.animationPrecision
-		@debug ?= config.animationDebug
-		@profile ?= config.animationProfile
-		
 		AnimationCounter += 1
-		@animationId = AnimationCounter
+
+		_.defaults @,
+			id: AnimationCounter
+			time: 1000
+			curve: "linear"
+			origin: "50% 50%"
+			count: 0
+
+			precision: config.animationPrecision
+			debug: config.animationDebug
+			profile: config.animationProfile
+
 		
 	@define "view",
 		get: -> 
@@ -77,16 +84,13 @@ class Animation extends EventEmitter
 		
 		AnimationList.push @
 		
-		########################################################
 		# Check if we have a view to animate
-		
 		if @view is null
 			throw new Error "Animation does not have a view to animate"
 		
 		
-		########################################################
 		# Set up some variables to start with
-		
+		#
 		startTime = new Date().getTime()
 		
 		@count++
@@ -97,25 +101,19 @@ class Animation extends EventEmitter
 		console.profile @animationName if @profile
 
 		
-		########################################################
 		# Deal with other animations on this view
-		
 		@view.animateStop()
 		@view._currentAnimations.push @
 		
 		
-		########################################################
 		# Calculate the curve values
-		
 		@curveValues = @_parseCurve @curve
 		@totalTime = (@curveValues.length / @precision) * 1000
 
 		
-		########################################################
 		# Build a property list that we want to animate
-
 		# TODO: test if we are trying to animate something that cannot animate
-		
+		#
 		propertiesA = @view.properties
 		propertiesB = @properties
 		
@@ -131,8 +129,8 @@ class Animation extends EventEmitter
 		@propertiesB = {}
 		
 		# Build up the matrix animation properties
-		
-		for k in @AnimatableMatrixProperties
+		#
+		for k in AnimatableMatrixProperties
 			
 			@propertiesA[k] = propertiesA[k]
 			
@@ -142,8 +140,8 @@ class Animation extends EventEmitter
 				@propertiesB[k] = propertiesA[k]
 			
 		# Build up the css animation properties
-		
-		for k, v of @AnimatableCSSProperties
+		#
+		for k, v of AnimatableCSSProperties
 			
 			if propertiesB.hasOwnProperty k
 				@propertiesA[k] = propertiesA[k]
@@ -151,7 +149,7 @@ class Animation extends EventEmitter
 		
 		
 		# Check which properties actually will animate
-		
+		#
 		animatedProperties = []
 		
 		for k of @propertiesA
@@ -164,9 +162,8 @@ class Animation extends EventEmitter
 			console.log "Animation[#{@animationId}] Warning: nothing to animate"
 			return
 
-		########################################################
 		# Generate the keyframe css and insert
-
+		#
 		@keyFrameAnimationCSS = @_css()
 		@view.once "webkitAnimationEnd", (event) =>
 			# If we don't do this, all animations on parent views will be stopped
@@ -179,7 +176,7 @@ class Animation extends EventEmitter
 			backsideVisibility = "visible"
 		
 		
-		css.addStyle "
+		css.addStyle """
 			#{@keyFrameAnimationCSS}
 		
 			.#{@animationName} {
@@ -189,14 +186,13 @@ class Animation extends EventEmitter
 				-webkit-animation-fill-mode: both;
 				-webkit-transform-origin: #{@origin};
 				-webkit-backface-visibility: #{backsideVisibility};
-			}"
+			}"""
 		
 		@view.addClass @animationName
 		
 		
-		########################################################
 		# Finalize
-		
+		#
 		@view.once "webkitAnimationStart", (event) =>
 			@emit "start", event
 			if @debug
@@ -206,14 +202,14 @@ class Animation extends EventEmitter
 		
 		console.profileEnd @animationName if @profile
 
+	# Return the inverse of this animation
+	#
 	reverse: =>
 		
-		# Return the inverse of this animation
-
 		options = {}
 		
 		# Copy the animation settings
-		for p in @AnimationProperties
+		for p in AnimationProperties
 			options[p] = @[p]
 		
 		options.properties = {}
@@ -241,20 +237,19 @@ class Animation extends EventEmitter
 
 	_finalize: =>
 		
-		if @_canceled is true
-			return
+		return if @_canceled
 		
 		console.log "Animation[#{@animationId}].end #{@animationName}" if @debug
 		
 		@_cleanup true
 		
-		callback?()
+		@callback?()
 
 
 	_cleanup: (completed) =>
 
 		# Remove this animation from the current ones for this view
-		@view._currentAnimations = _.without @view._currentAnimations, @
+		@view._currentAnimations = _.without(@view._currentAnimations, @)
 		
 		if completed
 			
@@ -262,7 +257,7 @@ class Animation extends EventEmitter
 			endMatrix = utils.extend new Matrix(), @propertiesB
 			endStyles = {}
 			
-			for k, v of @AnimatableCSSProperties
+			for k, v of AnimatableCSSProperties
 				endStyles[k] = @propertiesB[k] + v
 
 		else
@@ -272,7 +267,7 @@ class Animation extends EventEmitter
 
 			computedStyles = @view.computedStyle
 
-			for k, v of @AnimatableCSSProperties
+			for k, v of AnimatableCSSProperties
 				endStyles[k] = computedStyles[k]
 		
 		# Remove the animation class
@@ -327,7 +322,7 @@ class Animation extends EventEmitter
 			cssString.push "\t#{position}%\t{ -webkit-transform: "
 			
 			# Add the matrix based values
-			for propertyName in @AnimatableMatrixProperties
+			for propertyName in AnimatableMatrixProperties
 				if values.hasOwnProperty propertyName
 					matrix[propertyName] = values[propertyName]
 				else
@@ -336,7 +331,7 @@ class Animation extends EventEmitter
 			cssString.push matrix.matrix().cssValues() + "; "
 			
 			# Add the css based values
-			for propertyName, unit of @AnimatableCSSProperties
+			for propertyName, unit of AnimatableCSSProperties
 				continue if not values.hasOwnProperty propertyName
 				cssString.push "#{propertyName}:#{ utils.round values[propertyName], config.roundingDecimals}#{unit}; "
 				
@@ -365,28 +360,33 @@ class Animation extends EventEmitter
 		
 		precision = @precision * factor
 		time = @time * factor
+
+		args = [@precision, time]
 		
-		if curve in ["linear"]
-			return bezier.defaults.Linear @precision, time
-		else if curve in ["ease"]
-			return bezier.defaults.Ease @precision, time
-		else if curve in ["ease-in"]
-			return bezier.defaults.EaseIn @precision, time
-		else if curve in ["ease-out"]
-			return bezier.defaults.EaseOut @precision, time
-		else if curve in ["ease-in-out"]
-			return bezier.defaults.EaseInOut @precision, time
-		else if curve[.."bezier-curve".length-1] is "bezier-curve"
-			v = parseCurve curve, "bezier-curve"
-			return bezier.BezierCurve v[0], v[1], v[2], v[3], precision, time
-		else if curve[.."spring".length-1] is "spring"
-			v = parseCurve curve, "spring"
-			return spring.SpringCurve v[0], v[1], v[2], precision
-		else
+		# "ease-in-out" => "EaseInOut"
+		animationClass = utils.titleize(utils.camelize(curve))
 
-			# The default curve is linear
-			console.log "Animation.parseCurve: could not parse curve '#{curve}'"
-			return bezier.defaults.Linear @precision, @time
+		# Determine the correct easing function
+		switch
 
+			when utils.startsWith(curve, "bezier-curve")
+				v = parseCurve curve, "bezier-curve"
+				bezier.BezierCurve v[0...3].concat(args)...
+
+			when utils.startsWith(curve, "spring")
+				v = parseCurve curve, "spring"
+				spring.springCurve v[0...2].concat(args)...
+
+			# Easing functions which accept only the default
+			# arguments. ('ease', 'ease-in-out', 'easeIn', etc...)
+			#
+			when animationClass of bezier.defaults
+				bezier.defaults[animationClass] args...
+
+			# Fall back to linear easing
+			#
+			else
+				console.log "Animation.parseCurve: could not parse curve '#{curve}'"
+				bezier.defaults.Linear args...
 
 exports.Animation = Animation
