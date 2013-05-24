@@ -232,10 +232,7 @@ class Animation extends EventEmitter
 		
 		@_canceled = true
 		
-		# @view.style["-webkit-animation-play-state"] = "paused"
-
-		@_cleanup false
-		
+		# @view.style["-webkit-animation-play-state"] = "paused"		
 		# @view.style["-webkit-animation-play-state"] = "running"
 	
 
@@ -245,8 +242,6 @@ class Animation extends EventEmitter
 			return
 		
 		console.log "Animation[#{@animationId}].end #{@animationName}" if @debug
-		
-		@_cleanup true
 		
 		callback?()
 
