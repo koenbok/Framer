@@ -1,7 +1,7 @@
-// Framer 2.0-12-g2322236 (c) 2013 Koen Bok
+// Framer 2.0-13-g150f969 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-12-g2322236";
+window.FramerVersion = "2.0-13-g150f969";
 
 
 (function(){var require = function (file, cwd) {
@@ -4064,14 +4064,16 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     Animation.prototype.stop = function() {
       if (this.debug) {
-        return console.log("Animation[" + this.animationId + "].stop " + this.animationName);
+        console.log("Animation[" + this.animationId + "].stop " + this.animationName);
       }
+      return this._cleanup(false);
     };
 
     Animation.prototype._finalize = function() {
       if (this.debug) {
         console.log("Animation[" + this.animationId + "].end " + this.animationName);
       }
+      this._cleanup(true);
       return typeof callback === "function" ? callback() : void 0;
     };
 
