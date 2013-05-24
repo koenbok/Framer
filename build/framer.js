@@ -1,7 +1,7 @@
-// Framer 2.0 (c) 2013 Koen Bok
+// Framer 2.0-12-g2322236 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0";
+window.FramerVersion = "2.0-12-g2322236";
 
 
 (function(){var require = function (file, cwd) {
@@ -2588,7 +2588,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
           throw Error("View._matrix.set should be Matrix not " + (typeof matrix));
         }
         this.__matrix = matrix;
-        return this.style.webkitTransform = this.__matrix.matrix().cssValues();
+        return this.style.webkitTransform = this.__matrix.css();
       }
     });
 
@@ -3678,15 +3678,13 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
 });
 
 require.define("/src/primitives/matrix.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Matrix, utils, _;
+  var EmptyMatrix, Matrix, utils, _;
 
   _ = require("underscore");
 
   utils = require("../utils");
 
-  WebKitCSSMatrix.prototype.cssValues = function() {
-    return this.toString();
-  };
+  EmptyMatrix = new WebKitCSSMatrix();
 
   Matrix = (function() {
     function Matrix(matrix) {
@@ -3830,18 +3828,18 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
       return this.rotationZ = v.rotation.z / Math.PI * 180;
     };
 
-    Matrix.prototype.matrix = function() {
-      var m;
-
-      m = new WebKitCSSMatrix();
-      m = m.translate(this._x, this._y, this._z);
-      m = m.rotate(this._rotationX, this._rotationY, this._rotationZ);
-      m = m.scale(this.scaleX, this.scaleY, this.scaleZ);
-      return m;
-    };
-
     Matrix.prototype.set = function(view) {
       return view._matrix = this;
+    };
+
+    Matrix.prototype.css = function() {
+      var m;
+
+      m = EmptyMatrix;
+      m = m.translate(this._x, this._y, this._z);
+      m = m.rotate(this._rotationX, this._rotationY, this._rotationZ);
+      m = m.scale(this._scaleX, this._scaleY, this._scaleZ);
+      return m.toString();
     };
 
     return Matrix;
@@ -4009,10 +4007,10 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       }
       animatedProperties = [];
       for (k in this.propertiesA) {
+        if (this.debug) {
+          console.log(" ." + k + " " + this.propertiesA[k] + " -> " + this.propertiesB[k]);
+        }
         if (this.propertiesA[k] !== this.propertiesB[k]) {
-          if (this.debug) {
-            console.log(" ." + k + " " + this.propertiesA[k] + " -> " + this.propertiesB[k]);
-          }
           animatedProperties.push(k);
         }
       }
@@ -4029,7 +4027,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       if (__indexOf.call(animatedProperties, "rotationX") >= 0 || __indexOf.call(animatedProperties, "rotationY") >= 0) {
         backsideVisibility = "visible";
       }
-      css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.totalTime / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;				-webkit-tranform-origin: " + this.origin + ";				-webkit-backface-visibility: " + backsideVisibility + ";			}");
+      css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.totalTime / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;				-webkit-transform-origin: " + this.origin + ";				-webkit-backface-visibility: " + backsideVisibility + ";			}");
       this.view.addClass(this.animationName);
       this.view.once("webkitAnimationStart", function(event) {
         var endTime;
@@ -4066,20 +4064,14 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
 
     Animation.prototype.stop = function() {
       if (this.debug) {
-        console.log("Animation[" + this.animationId + "].stop " + this.animationName);
+        return console.log("Animation[" + this.animationId + "].stop " + this.animationName);
       }
-      this._canceled = true;
-      return this._cleanup(false);
     };
 
     Animation.prototype._finalize = function() {
-      if (this._canceled === true) {
-        return;
-      }
       if (this.debug) {
         console.log("Animation[" + this.animationId + "].end " + this.animationName);
       }
-      this._cleanup(true);
       return typeof callback === "function" ? callback() : void 0;
     };
 
@@ -4155,7 +4147,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
             matrix[propertyName] = this.view[propertyName];
           }
         }
-        cssString.push(matrix.matrix().cssValues() + "; ");
+        cssString.push(matrix.css() + "; ");
         _ref1 = this.AnimatableCSSProperties;
         for (propertyName in _ref1) {
           unit = _ref1[propertyName];

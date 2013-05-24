@@ -17,7 +17,10 @@
 
 		<script>
 			chai.should()
+			
 			mocha.setup('bdd')
+			mocha.setup({globals: ["_delayTmers"]});
+			
 			$(function() {
 				if (window.mochaPhantomJS) { 
 					mochaPhantomJS.run();

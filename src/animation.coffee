@@ -155,8 +155,8 @@ class Animation extends EventEmitter
 		animatedProperties = []
 		
 		for k of @propertiesA
+			console.log " .#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}" if @debug
 			if @propertiesA[k] isnt @propertiesB[k]
-				console.log " .#{k} #{@propertiesA[k]} -> #{@propertiesB[k]}" if @debug
 				animatedProperties.push k
 		
 		# Throw a warning if we have nothing to animate
@@ -229,8 +229,8 @@ class Animation extends EventEmitter
 	stop: =>
 		
 		console.log "Animation[#{@animationId}].stop #{@animationName}" if @debug
-		
-		@_canceled = true
+
+		@_cleanup false
 		
 		# @view.style["-webkit-animation-play-state"] = "paused"		
 		# @view.style["-webkit-animation-play-state"] = "running"
@@ -238,10 +238,12 @@ class Animation extends EventEmitter
 
 	_finalize: =>
 		
-		if @_canceled is true
-			return
+		# if @_canceled is true
+		# 	return
 		
 		console.log "Animation[#{@animationId}].end #{@animationName}" if @debug
+		
+		@_cleanup true
 		
 		callback?()
 
