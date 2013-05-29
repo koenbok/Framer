@@ -1,7 +1,7 @@
-// Framer 2.0-13-g150f969 (c) 2013 Koen Bok
+// Framer 2.0-14-gdcd4faa (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-13-g150f969";
+window.FramerVersion = "2.0-14-gdcd4faa";
 
 
 (function(){var require = function (file, cwd) {
@@ -633,6 +633,10 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.isMobile = function() {
     return /iphone|ipod|android|ie|blackberry|fennec/.test(navigator.userAgent.toLowerCase());
+  };
+
+  exports.isLocal = function() {
+    return window.location.href.slice(0, 7) === "file://";
   };
 
   exports.devicePixelRatio = function() {
@@ -4561,9 +4565,11 @@ require.define("/src/views/scrollview.coffee",function(require,module,exports,__
 });
 
 require.define("/src/views/imageview.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var View, config,
+  var View, config, uitis,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  uitis = require("../utils");
 
   View = require("./view").View;
 
@@ -4594,6 +4600,9 @@ require.define("/src/views/imageview.coffee",function(require,module,exports,__d
           return this.emit("load", loader);
         }
         this._image = config.baseUrl + value;
+        if (utils.isLocal()) {
+          this._image += "?nocache=" + (Date.now());
+        }
         if ((_ref = this.events) != null ? _ref.hasOwnProperty("load" || ((_ref1 = this.events) != null ? _ref1.hasOwnProperty("error") : void 0)) : void 0) {
           loader = new Image();
           loader.name = this.image;

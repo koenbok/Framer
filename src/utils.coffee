@@ -117,8 +117,12 @@ exports.isMobile = ->
 	(/iphone|ipod|android|ie|blackberry|fennec/).test \
 		navigator.userAgent.toLowerCase()
 
+exports.isLocal = ->
+	window.location.href[0..6] == "file://"
+
 exports.devicePixelRatio = ->
 	window.devicePixelRatio
+
 
 
 ######################################################

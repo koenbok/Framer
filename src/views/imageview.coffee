@@ -1,3 +1,5 @@
+uitis = require "../utils"
+
 {View} = require "./view"
 {config} = require "../config"
 
@@ -24,7 +26,12 @@ class exports.ImageView extends View
 			if @_image is value
 				return @emit "load", loader
 			
+			# Add the optional base url from the config
 			@_image = config.baseUrl + value
+			
+			# If the file is local, we want to avoid caching
+			if utils.isLocal()
+				@_image += "?nocache=#{Date.now()}"
 			
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
