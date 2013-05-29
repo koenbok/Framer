@@ -104,13 +104,28 @@ class View extends Frame
 			width: maxX - minX
 			height: maxY - minY
 
-	centeredFrame: ->
-		# Get the centered frame for it's superview
-		frame = @frame
-		frame.midX = @superView.width  / 2.0 if @superView
-		frame.midY = @superView.height / 2.0 if @superView
-		frame
+	centerFrame: ->
 
+		# Get the centered frame for it's superview
+		if @superView
+			frame = @frame
+			frame.midX = @superView.width / 2.0
+			frame.midY = @superView.height / 2.0
+			return frame
+		
+		else
+			frame = @frame
+			frame.midX = window.innerWidth / 2.0
+			frame.midY = window.innerHeight / 2.0
+			return frame
+	
+	centeredFrame: @centerFrame
+	
+	centerX: -> @x = @centerFrame().x
+	centerY: -> @y = @centerFrame().y
+	center: -> @frame = @centerFrame()
+
+		
 	#############################################################################
 	## Geometry
 

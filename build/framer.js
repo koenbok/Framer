@@ -1,7 +1,7 @@
-// Framer 2.0-14-gdcd4faa (c) 2013 Koen Bok
+// Framer 2.0-15-g2d59000 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-14-gdcd4faa";
+window.FramerVersion = "2.0-15-g2d59000";
 
 
 (function(){var require = function (file, cwd) {
@@ -2434,17 +2434,34 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       });
     };
 
-    View.prototype.centeredFrame = function() {
+    View.prototype.centerFrame = function() {
       var frame;
 
-      frame = this.frame;
       if (this.superView) {
+        frame = this.frame;
         frame.midX = this.superView.width / 2.0;
-      }
-      if (this.superView) {
         frame.midY = this.superView.height / 2.0;
+        return frame;
+      } else {
+        frame = this.frame;
+        frame.midX = window.innerWidth / 2.0;
+        frame.midY = window.innerHeight / 2.0;
+        return frame;
       }
-      return frame;
+    };
+
+    View.prototype.centeredFrame = View.centerFrame;
+
+    View.prototype.centerX = function() {
+      return this.x = this.centerFrame().x;
+    };
+
+    View.prototype.centerY = function() {
+      return this.y = this.centerFrame().y;
+    };
+
+    View.prototype.center = function() {
+      return this.frame = this.centerFrame();
     };
 
     View.define("width", {
