@@ -124,6 +124,10 @@ class View extends Frame
 	centerX: -> @x = @centerFrame().x
 	centerY: -> @y = @centerFrame().y
 	center: -> @frame = @centerFrame()
+	
+	pixelAlign: ->
+		# Put this view exactly on the pixel
+		@frame = {x:parseInt(@x), y:parseInt(@y)}
 
 		
 	#############################################################################

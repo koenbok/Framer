@@ -1,7 +1,7 @@
-// Framer 2.0-16-g538806f (c) 2013 Koen Bok
+// Framer 2.0-17-g4b8be87 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-16-g538806f";
+window.FramerVersion = "2.0-17-g4b8be87";
 
 
 (function(){var require = function (file, cwd) {
@@ -2462,6 +2462,13 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
 
     View.prototype.center = function() {
       return this.frame = this.centerFrame();
+    };
+
+    View.prototype.pixelAlign = function() {
+      return this.frame = {
+        x: parseInt(this.x),
+        y: parseInt(this.y)
+      };
     };
 
     View.define("width", {
