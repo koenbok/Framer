@@ -1,7 +1,7 @@
-// Framer 2.0-15-g2d59000 (c) 2013 Koen Bok
+// Framer 2.0-16-g538806f (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-15-g2d59000";
+window.FramerVersion = "2.0-16-g538806f";
 
 
 (function(){var require = function (file, cwd) {
@@ -3877,8 +3877,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
   var Animation, AnimationCounter, AnimationList, EventEmitter, Matrix, bezier, config, css, parseCurve, spring, utils, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   _ = require("underscore");
 
@@ -3930,7 +3929,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       this.stop = __bind(this.stop, this);
       this.reverse = __bind(this.reverse, this);
       this.start = __bind(this.start, this);
-      var p, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
+      var p, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
 
       _ref = this.AnimationProperties;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -3943,17 +3942,14 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       if ((_ref2 = this.curve) == null) {
         this.curve = "linear";
       }
-      if ((_ref3 = this.origin) == null) {
-        this.origin = "50% 50%";
-      }
       this.count = 0;
-      if ((_ref4 = this.precision) == null) {
+      if ((_ref3 = this.precision) == null) {
         this.precision = config.animationPrecision;
       }
-      if ((_ref5 = this.debug) == null) {
+      if ((_ref4 = this.debug) == null) {
         this.debug = config.animationDebug;
       }
-      if ((_ref6 = this.profile) == null) {
+      if ((_ref5 = this.profile) == null) {
         this.profile = config.animationProfile;
       }
       AnimationCounter += 1;
@@ -4044,11 +4040,11 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         event.stopPropagation();
         return _this._finalize();
       });
-      backsideVisibility = "hidden";
-      if (__indexOf.call(animatedProperties, "rotationX") >= 0 || __indexOf.call(animatedProperties, "rotationY") >= 0) {
-        backsideVisibility = "visible";
+      backsideVisibility = "visible";
+      if (this.origin) {
+        this.view.style["-webkit-transform-origin"] = this.origin;
       }
-      css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.totalTime / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;				-webkit-transform-origin: " + this.origin + ";				-webkit-backface-visibility: " + backsideVisibility + ";			}");
+      css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.totalTime / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;				-webkit-backface-visibility: " + backsideVisibility + ";			}");
       this.view.addClass(this.animationName);
       this.view.once("webkitAnimationStart", function(event) {
         var endTime;

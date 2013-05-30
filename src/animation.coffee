@@ -54,7 +54,6 @@ class Animation extends EventEmitter
 		# Set all the defaults
 		@time ?= 1000
 		@curve ?= "linear"
-		@origin ?= "50% 50%"
 		@count = 0
 
 		@precision ?= config.animationPrecision
@@ -174,9 +173,16 @@ class Animation extends EventEmitter
 			@_finalize()
 		
 		# Only enable backside visibility if we are actually going to animate rotation
-		backsideVisibility = "hidden"
-		if "rotationX" in animatedProperties or "rotationY" in animatedProperties
-			backsideVisibility = "visible"
+		# TODO: Switching this is quite buggy in safari
+		# backsideVisibility = "hidden"
+		# if "rotationX" in animatedProperties or "rotationY" in animatedProperties
+		# 	backsideVisibility = "visible"
+		
+		backsideVisibility = "visible"
+		
+		# Set the origin "sticky" to the view if there is one
+		if @origin
+			@view.style["-webkit-transform-origin"] = @origin
 		
 		
 		css.addStyle "
@@ -187,7 +193,6 @@ class Animation extends EventEmitter
 				-webkit-animation-name: #{@animationName};
 				-webkit-animation-timing-function: linear;
 				-webkit-animation-fill-mode: both;
-				-webkit-transform-origin: #{@origin};
 				-webkit-backface-visibility: #{backsideVisibility};
 			}"
 		
