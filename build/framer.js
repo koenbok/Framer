@@ -2663,6 +2663,22 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       }
     });
 
+    View.define("hover", {
+      get: function() {
+        return this._hover;
+      },
+      set: function(value) {
+        this._hover = value;
+        if (value === true) {
+          this.style.cursor = "pointer";
+        }
+        if (value === false) {
+          this.style.cursor = "auto";
+        }
+        return this.emit("change:hover");
+      }
+    });
+
     View.define("visible", {
       get: function() {
         return this._visible || true;
@@ -2926,7 +2942,8 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     "class": "",
     superView: null,
     visible: true,
-    index: 0
+    index: 0,
+    hover: false
   });
 
   View.Views = [];
