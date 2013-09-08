@@ -21,3 +21,7 @@ We love contributions. If you like to help out and need ideas what to work on se
 wercker build status:
 
 [![Wercker status](https://app.wercker.com/status/8e5d02248bfd387acebdf177fba5f6b1)](https://app.wercker.com/project/bykey/8e5d02248bfd387acebdf177fba5f6b1)
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/koenbok/framer/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
