@@ -20,7 +20,7 @@
 		"level": "ignore"
 	},
 	"no_trailing_semicolons": {
-		"level": "error"
+		"level": "ignore"
 	},
 	"no_plusplus": {
 		"level": "ignore"
