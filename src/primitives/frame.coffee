@@ -70,7 +70,7 @@ class Frame extends EventEmitter
 			x: Math.min(r1.x, r2.x)
 			y: Math.min(r1.y, r2.y)
 			width: Math.max(r1.width, (r2.x - r1.x) + r2.width),
-		        height: Math.max(r1.height, (r2.y - r1.y) + r2.height)
+			height: Math.max(r1.height, (r2.y - r1.y) + r2.height)
 
 		return new Frame frame
 
