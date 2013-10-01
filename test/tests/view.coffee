@@ -58,7 +58,28 @@ describe "View", ->
 			view.y.should.equal frame.y
 			view.width.should.equal frame.width
 			view.height.should.equal frame.height
-	
+
+		it "should merge view with frame", -> 
+			view = createView()
+			frameB = {x:200, y:200, width:200, height:200}
+			frameTest = view.merge(frameB)
+			frameTest.x.should.equal 0
+			frameTest.y.should.equal 0
+			frameTest.width.should.equal 400
+			frameTest.height.should.equal 400
+			viewB = new View width:500, height:500
+			frameTest = viewB.merge(frameB)
+			frameTest.x.should.equal 0
+			frameTest.y.should.equal 0
+			frameTest.width.should.equal 500
+			frameTest.height.should.equal 500
+			frameC = {x:-30, y:-40, width:200, height:200}
+			frameTest = viewB.merge(frameC)
+			frameTest.x.should.equal -30
+			frameTest.y.should.equal -40
+			frameTest.width.should.equal 530
+			frameTest.height.should.equal 540
+
 	describe "Visual", ->
 		
 		["scaleX", "scaleY", "scaleZ"].map (p) ->

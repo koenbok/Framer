@@ -3568,13 +3568,15 @@ require.define("/src/primitives/frame.coffee",function(require,module,exports,__
     });
 
     Frame.prototype.merge = function(r2) {
-      var frame, r1;
+      var frame, r1, xmin, ymin;
       r1 = this;
+      xmin = Math.min(r1.x, r2.x);
+      ymin = Math.min(r1.y, r2.y);
       frame = {
-        x: Math.min(r1.x, r2.x),
-        y: Math.min(r1.y, r2.y),
-        width: Math.max(r1.width, (r2.x - r1.x) + r2.width),
-        height: Math.max(r1.height, (r2.y - r1.y) + r2.height)
+        x: xmin,
+        y: ymin,
+        width: Math.max(r1.x + r1.width, r2.x + r2.width) - xmin,
+        height: Math.max(r1.y + r1.height, r2.y + r2.height) - ymin
       };
       return new Frame(frame);
     };
