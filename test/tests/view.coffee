@@ -59,7 +59,7 @@ describe "View", ->
 			view.width.should.equal frame.width
 			view.height.should.equal frame.height
 	
-	describe "Scale", ->
+	describe "Visual", ->
 		
 		["scaleX", "scaleY", "scaleZ"].map (p) ->
 			it "should set #{p}", ->
@@ -74,7 +74,12 @@ describe "View", ->
 			view.scaleX.should.equal 3
 			view.scaleY.should.equal 3
 			view.scaleZ.should.equal 1 # Should this also be 3?
-			
+
+		it "should set visible", ->
+			view = createView()
+			view.visible = false
+			view.visible.should.equal false
+
 	describe "Rotation", ->
 	
 		["rotationX", "rotationY", "rotationZ"].map (p) ->
