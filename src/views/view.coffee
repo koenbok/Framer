@@ -275,7 +275,7 @@ class View extends Frame
 	
 	@define "visible",
 		get: ->
-			@_visible or true
+			@_visible ? true
 		set: (value) ->
 			@_visible = value
 			@style.display = "block" if value is true
