@@ -1,7 +1,7 @@
-// Framer  (c) 2013 Koen Bok
+// Framer 2.0-29-gd21e7d0 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "";
+window.FramerVersion = "2.0-29-gd21e7d0";
 
 
 (function(){var require = function (file, cwd) {
@@ -2307,7 +2307,7 @@ require.define("/src/tools/facebook.coffee",function(require,module,exports,__di
 });
 
 require.define("/src/views/view.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Animation, EventEmitter, Frame, Matrix, View, check, utils, _,
+  var Animation, EventEmitter, Frame, Matrix, View, check, k, utils, v, _, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -2330,6 +2330,8 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
   exports.ViewList = [];
 
   View = (function(_super) {
+    var _this = this;
+
     __extends(View, _super);
 
     function View(args) {
@@ -2695,6 +2697,93 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       }
     });
 
+    View._FilterProperties = {
+      "blur": {
+        unit: "px",
+        "default": 0
+      },
+      "brightness": {
+        unit: "%",
+        "default": 0
+      },
+      "saturate": {
+        unit: "%",
+        "default": 0
+      },
+      "hue-rotate": {
+        unit: "deg",
+        "default": 0
+      },
+      "contrast": {
+        unit: "%",
+        "default": 0
+      },
+      "invert": {
+        unit: "%",
+        "default": 0
+      },
+      "grayscale": {
+        unit: "%",
+        "default": 0
+      },
+      "sepia": {
+        unit: "%",
+        "default": 0
+      }
+    };
+
+    View.prototype._getFilterValue = function(name) {
+      var values;
+      values = this._parseFilterCSS(this.style.webkitFilter);
+      return values[name] || View._FilterProperties[name]["default"];
+    };
+
+    View.prototype._setFilterValue = function(name, value, unit) {
+      if (this._filterValues == null) {
+        this._filterValues = {};
+      }
+      this._filterValues[name] = value;
+      return this.style.webkitFilter = this._filterCSS(this._filterValues);
+    };
+
+    View.prototype._filterCSS = function(filterValues) {
+      var css, k, v;
+      css = [];
+      for (k in filterValues) {
+        v = filterValues[k];
+        if (View._FilterProperties.hasOwnProperty(k)) {
+          css.push("" + k + "(" + v + View._FilterProperties[k].unit + ")");
+        }
+      }
+      return css.join(" ");
+    };
+
+    View.prototype._parseFilterCSS = function(css) {
+      var name, part, results, value, _i, _len, _ref;
+      results = {};
+      _ref = css.split(" ");
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        part = _ref[_i];
+        if (part) {
+          name = part.split("(")[0];
+          value = parseFloat(part.split("(")[1]);
+          results[name] = value;
+        }
+      }
+      return results;
+    };
+
+    _.map(View._FilterProperties, function(filterUnit, filterName) {
+      return View.define(filterName, {
+        get: function() {
+          return this._getFilterValue(filterName);
+        },
+        set: function(value) {
+          return this._setFilterValue(filterName, value);
+        }
+      });
+    });
+
     View.define("superView", {
       get: function() {
         return this._superView || null;
@@ -2916,7 +3005,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
 
     return View;
 
-  })(Frame);
+  }).call(this, Frame);
 
   View.Properties = utils.extend(Frame.Properties, {
     frame: null,
@@ -2937,6 +3026,12 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     visible: true,
     index: 0
   });
+
+  _ref = View._FilterProperties;
+  for (k in _ref) {
+    v = _ref[k];
+    View.Properties[k] = v["default"];
+  }
 
   View.Views = [];
 
@@ -2972,8 +3067,6 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
         isLength: isLength,
         verifyArray: verifyArray,
         isArray: isArray,
-        verifyDate: verifyDate,
-        isDate: isDate,
         verifyFunction: verifyFunction,
         isFunction: isFunction,
         verifyUnemptyString: verifyUnemptyString,
@@ -3009,12 +3102,8 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyQuack (thing, duck, message) {
-        verify(quacksLike, [ thing, duck ], message, 'Invalid type');
-    }
-
-    function verify (fn, args, message, defaultMessage) {
-        if (fn.apply(null, args) === false) {
-            throw new Error(message || defaultMessage);
+        if (quacksLike(thing, duck) === false) {
+            throw new Error(message || 'Invalid type');
         }
     }
 
@@ -3066,7 +3155,9 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                             to set on the thrown Error.
      */
     function verifyInstance (thing, prototype, message) {
-        verify(isInstance, [ thing, prototype ], message, 'Invalid type');
+        if (isInstance(thing, prototype) === false) {
+            throw new Error(message || 'Invalid type');
+        }
     }
 
     /**
@@ -3102,7 +3193,9 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyEmptyObject (thing, message) {
-        verify(isEmptyObject, [ thing ], message, 'Invalid object');
+        if (isEmptyObject(thing) === false) {
+            throw new Error(message || 'Invalid empty object');
+        }
     }
 
     /**
@@ -3132,26 +3225,28 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      * Public function `verifyObject`.
      *
      * Throws an exception unless something is a non-null,
-     * non-array, non-date object.
+     * non-array object.
      *
      * @param thing              The thing to test.
      * @param [message] {string} An optional error message
      *                           to set on the thrown Error.
      */
     function verifyObject (thing, message) {
-        verify(isObject, [ thing ], message, 'Invalid object');
+        if (isObject(thing) === false) {
+            throw new Error(message || 'Invalid object');
+        }
     }
 
     /**
      * Public function `isObject`.
      *
-     * Returns `true` if something is a non-null, non-array,
-     * non-date object, `false` otherwise.
+     * Returns `true` if something is a non-null, non-array
+     * object, `false` otherwise.
      *
      * @param thing          The thing to test.
      */
     function isObject (thing) {
-        return typeof thing === 'object' && thing !== null && isArray(thing) === false && isDate(thing) === false;
+        return typeof thing === 'object' && thing !== null && isArray(thing) === false;
     }
 
     /**
@@ -3165,7 +3260,9 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyLength (thing, length, message) {
-        verify(isLength, [ thing, length ], message, 'Invalid length');
+        if (isLength(thing, length) === false) {
+            throw new Error(message || 'Invalid length');
+        }
     }
 
     /**
@@ -3191,7 +3288,9 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyArray (thing, message) {
-        verify(isArray, [ thing ], message, 'Invalid array');
+        if (isArray(thing) === false) {
+            throw new Error(message || 'Invalid array');
+        }
     }
 
     /**
@@ -3202,35 +3301,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      * @param thing          The thing to test.
      */
     function isArray (thing) {
-        if (Array.isArray) {
-            return Array.isArray(thing);
-        }
-
         return Object.prototype.toString.call(thing) === '[object Array]';
-    }
-
-    /**
-     * Public function `verifyDate`.
-     *
-     * Throws an exception unless something is a date.
-     *
-     * @param thing              The thing to test.
-     * @param [message] {string} An optional error message
-     *                           to set on the thrown Error.
-     */
-    function verifyDate (thing, message) {
-        verify(isDate, [ thing ], message, 'Invalid date');
-    }
-
-    /**
-     * Public function `isDate`.
-     *
-     * Returns `true` something is a date, `false` otherwise.
-     *
-     * @param thing          The thing to test.
-     */
-    function isDate (thing) {
-        return Object.prototype.toString.call(thing) === '[object Date]';
     }
 
     /**
@@ -3243,7 +3314,9 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyFunction (thing, message) {
-        verify(isFunction, [ thing ], message, 'Invalid function');
+        if (isFunction(thing) === false) {
+            throw new Error(message || 'Invalid function');
+        }
     }
 
     /**
@@ -3267,7 +3340,9 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyUnemptyString (thing, message) {
-        verify(isUnemptyString, [ thing ], message, 'Invalid string');
+        if (isUnemptyString(thing) === false) {
+            throw new Error(message || 'Invalid string');
+        }
     }
 
     /**
@@ -3292,7 +3367,9 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyString (thing, message) {
-        verify(isString, [ thing ], message, 'Invalid string');
+        if (isString(thing) === false) {
+            throw new Error(message || 'Invalid string');
+        }
     }
 
     /**
@@ -3316,7 +3393,9 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyOddNumber (thing, message) {
-        verify(isOddNumber, [ thing ], message, 'Invalid number');
+        if (isOddNumber(thing) === false) {
+            throw new Error(message || 'Invalid number');
+        }
     }
 
     /**
@@ -3341,7 +3420,9 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyEvenNumber (thing, message) {
-        verify(isEvenNumber, [ thing ], message, 'Invalid number');
+        if (isEvenNumber(thing) === false) {
+            throw new Error(message || 'Invalid number');
+        }
     }
 
     /**
@@ -3366,7 +3447,9 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyPositiveNumber (thing, message) {
-        verify(isPositiveNumber, [ thing ], message, 'Invalid number');
+        if (isPositiveNumber(thing) === false) {
+            throw new Error(message || 'Invalid number');
+        }
     }
 
     /**
@@ -3391,7 +3474,9 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyNegativeNumber (thing, message) {
-        verify(isNegativeNumber, [ thing ], message, 'Invalid number');
+        if (isNegativeNumber(thing) === false) {
+            throw new Error(message || 'Invalid number');
+        }
     }
 
     /**
@@ -3416,7 +3501,9 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyNumber (thing, message) {
-        verify(isNumber, [ thing ], message, 'Invalid number');
+        if (isNumber(thing) === false) {
+            throw new Error(message || 'Invalid number');
+        }
     }
 
     /**
@@ -3933,6 +4020,17 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       height: "px"
     };
 
+    Animation.prototype.AnimatableFilterProperties = {
+      "blur": "px",
+      "brightness": "%",
+      "saturate": "%",
+      "hue-rotate": "%",
+      "contrast": "%",
+      "invert": "%",
+      "grayscale": "%",
+      "sepia": "%"
+    };
+
     Animation.prototype.AnimatableMatrixProperties = ["x", "y", "z", "scaleX", "scaleY", "scaleZ", "rotationX", "rotationY", "rotationZ"];
 
     function Animation(args) {
@@ -3981,7 +4079,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     });
 
     Animation.prototype.start = function(callback) {
-      var animatedProperties, backsideVisibility, k, propertiesA, propertiesB, startTime, v, _i, _len, _ref, _ref1,
+      var animatedProperties, backsideVisibility, k, propertiesA, propertiesB, startTime, v, _i, _len, _ref, _ref1, _ref2,
         _this = this;
       AnimationList.push(this);
       if (this.view === null) {
@@ -4027,6 +4125,14 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       _ref1 = this.AnimatableCSSProperties;
       for (k in _ref1) {
         v = _ref1[k];
+        if (propertiesB.hasOwnProperty(k)) {
+          this.propertiesA[k] = propertiesA[k];
+          this.propertiesB[k] = propertiesB[k];
+        }
+      }
+      _ref2 = this.AnimatableFilterProperties;
+      for (k in _ref2) {
+        v = _ref2[k];
         if (propertiesB.hasOwnProperty(k)) {
           this.propertiesA[k] = propertiesA[k];
           this.propertiesB[k] = propertiesB[k];
@@ -4113,6 +4219,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
           v = _ref[k];
           endStyles[k] = this.propertiesB[k] + v;
         }
+        endStyles["-webkit-filter"] = this.view._filterCSS(this.propertiesB);
       } else {
         endMatrix = new Matrix(this.view._computedMatrix());
         endStyles = {};
@@ -4122,6 +4229,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
           v = _ref1[k];
           endStyles[k] = computedStyles[k];
         }
+        endStyles["-webkit-filter"] = computedStyles["-webkit-filter"];
       }
       this.view.removeClass(this.animationName);
       this.view._matrix = endMatrix;
@@ -4154,17 +4262,28 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     };
 
     Animation.prototype._css = function() {
-      var cssString, keyFrames, matrix, position, propertyName, unit, values, _i, _len, _ref, _ref1;
+      var cssString, keyFrames, matrix, position, propertyName, unit, values, _i, _len, _ref, _ref1, _ref2;
       keyFrames = this._keyFrames();
       cssString = [];
       cssString.push("@-webkit-keyframes " + this.animationName + " {\n");
       matrix = new Matrix();
       for (position in keyFrames) {
         values = keyFrames[position];
-        cssString.push("\t" + position + "%\t{ -webkit-transform: ");
-        _ref = this.AnimatableMatrixProperties;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          propertyName = _ref[_i];
+        cssString.push("\t" + position + "%\t{");
+        cssString.push("-webkit-filter: ");
+        _ref = this.AnimatableFilterProperties;
+        for (propertyName in _ref) {
+          unit = _ref[propertyName];
+          if (!values.hasOwnProperty(propertyName)) {
+            continue;
+          }
+          cssString.push("" + propertyName + "(" + (utils.round(values[propertyName], config.roundingDecimals)) + unit + ") ");
+        }
+        cssString.push(";");
+        cssString.push("-webkit-transform: ");
+        _ref1 = this.AnimatableMatrixProperties;
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          propertyName = _ref1[_i];
           if (values.hasOwnProperty(propertyName)) {
             matrix[propertyName] = values[propertyName];
           } else {
@@ -4172,9 +4291,9 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
           }
         }
         cssString.push(matrix.css() + "; ");
-        _ref1 = this.AnimatableCSSProperties;
-        for (propertyName in _ref1) {
-          unit = _ref1[propertyName];
+        _ref2 = this.AnimatableCSSProperties;
+        for (propertyName in _ref2) {
+          unit = _ref2[propertyName];
           if (!values.hasOwnProperty(propertyName)) {
             continue;
           }

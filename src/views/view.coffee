@@ -10,7 +10,6 @@ _ = require "underscore"
 
 exports.ViewList = []
 
-
 class View extends Frame
 	
 	constructor: (args) ->
@@ -281,7 +280,55 @@ class View extends Frame
 			@style.display = "block" if value is true
 			@style.display = "none" if value is false
 			@emit "change:visible"
+
+	#############################################################################
+	## Visual Filters
 	
+	@_FilterProperties =
+		"blur": {unit:"px", default:0}
+		"brightness": {unit:"%", default:0}
+		"saturate": {unit:"%", default:0}
+		"hue-rotate": {unit:"deg", default:0}
+		"contrast": {unit:"%", default:0}
+		"invert": {unit:"%", default:0}
+		"grayscale": {unit:"%", default:0}
+		"sepia": {unit:"%", default:0}
+
+	_getFilterValue: (name) ->
+		values = @_parseFilterCSS @style.webkitFilter
+		values[name] or View._FilterProperties[name].default
+		
+	_setFilterValue: (name, value, unit) ->
+		
+		@_filterValues ?= {}
+		@_filterValues[name] = value
+
+		@style.webkitFilter = @_filterCSS @_filterValues
+	
+	_filterCSS: (filterValues) ->
+		css = [] 
+		
+		for k, v of filterValues
+			if View._FilterProperties.hasOwnProperty k
+				css.push "#{k}(#{v}#{View._FilterProperties[k].unit})"
+		
+		css.join " "
+	
+	_parseFilterCSS: (css) ->
+		results = {}	
+		for part in css.split " "
+			if part
+				name = part.split("(")[0]
+				value = parseFloat part.split("(")[1]
+				results[name] = value
+		results
+	
+	# Add methods for all the defined filters
+	_.map View._FilterProperties, (filterUnit, filterName) =>
+		@define filterName,
+			get: -> @_getFilterValue filterName
+			set: (value) -> @_setFilterValue filterName, value
+
 
 	#############################################################################
 	## Hierarchy
@@ -487,6 +534,10 @@ View.Properties = utils.extend Frame.Properties,
 	superView: null
 	visible: true
 	index: 0
+
+for k, v of View._FilterProperties
+	View.Properties[k] = v.default
+
 
 View.Views = []
 

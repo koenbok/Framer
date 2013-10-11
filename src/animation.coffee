@@ -37,6 +37,18 @@ class Animation extends EventEmitter
 		width: "px",
 		height: "px",
 	}
+	# TODO, we should get these from where they are
+	# defined in the view.
+	AnimatableFilterProperties: {
+		"blur": "px"
+		"brightness": "%"
+		"saturate": "%"
+		"hue-rotate": "%"
+		"contrast": "%"
+		"invert": "%"
+		"grayscale": "%"
+		"sepia": "%"
+	}
 	AnimatableMatrixProperties: [
 		"x", "y", "z",
 		"scaleX", "scaleY", "scaleZ", # "scale",
@@ -147,7 +159,12 @@ class Animation extends EventEmitter
 			if propertiesB.hasOwnProperty k
 				@propertiesA[k] = propertiesA[k]
 				@propertiesB[k] = propertiesB[k]
-		
+
+		for k, v of @AnimatableFilterProperties
+			
+			if propertiesB.hasOwnProperty k
+				@propertiesA[k] = propertiesA[k]
+				@propertiesB[k] = propertiesB[k]
 		
 		# Check which properties actually will animate
 		
@@ -266,6 +283,8 @@ class Animation extends EventEmitter
 			
 			for k, v of @AnimatableCSSProperties
 				endStyles[k] = @propertiesB[k] + v
+			
+			endStyles["-webkit-filter"] = @view._filterCSS @propertiesB
 
 		else
 			# A matrix from the current state
@@ -276,6 +295,8 @@ class Animation extends EventEmitter
 
 			for k, v of @AnimatableCSSProperties
 				endStyles[k] = computedStyles[k]
+				
+			endStyles["-webkit-filter"] = computedStyles["-webkit-filter"]
 		
 		# Remove the animation class
 		@view.removeClass @animationName
@@ -326,23 +347,39 @@ class Animation extends EventEmitter
 		
 		for position, values of keyFrames
 			
-			cssString.push "\t#{position}%\t{ -webkit-transform: "
+			# Start the keyframe with the location marker
+			cssString.push "\t#{position}%\t{"
 			
-			# Add the matrix based values
+			# Add the css filter properties
+			cssString.push "-webkit-filter: "
+			
+			# Add the filter based values
+			for propertyName, unit of @AnimatableFilterProperties
+				continue if not values.hasOwnProperty propertyName
+				cssString.push "#{propertyName}(#{ utils.round values[propertyName], config.roundingDecimals}#{unit}) "
+			
+			cssString.push ";"
+
+
+			# Add the css transform properties
+			cssString.push "-webkit-transform: "
+			
 			for propertyName in @AnimatableMatrixProperties
 				if values.hasOwnProperty propertyName
 					matrix[propertyName] = values[propertyName]
 				else
 					matrix[propertyName] = @view[propertyName]
-
-			# cssString.push matrix.matrix().cssValues() + "; "
+			
 			cssString.push matrix.css() + "; "
 			
+
 			# Add the css based values
 			for propertyName, unit of @AnimatableCSSProperties
 				continue if not values.hasOwnProperty propertyName
 				cssString.push "#{propertyName}:#{ utils.round values[propertyName], config.roundingDecimals}#{unit}; "
-				
+
+
+			# Close out this keyframe
 			cssString.push "}\n"
 			
 		cssString.push "}\n"
