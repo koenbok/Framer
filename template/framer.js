@@ -1,7 +1,7 @@
-// Framer 2.0-29-gd21e7d0 (c) 2013 Koen Bok
+// Framer 2.0-30-gaa847ac (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-29-gd21e7d0";
+window.FramerVersion = "2.0-30-gaa847ac";
 
 
 (function(){var require = function (file, cwd) {
@@ -4024,7 +4024,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       "blur": "px",
       "brightness": "%",
       "saturate": "%",
-      "hue-rotate": "%",
+      "hue-rotate": "deg",
       "contrast": "%",
       "invert": "%",
       "grayscale": "%",

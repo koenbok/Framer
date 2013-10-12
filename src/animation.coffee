@@ -43,7 +43,7 @@ class Animation extends EventEmitter
 		"blur": "px"
 		"brightness": "%"
 		"saturate": "%"
-		"hue-rotate": "%"
+		"hue-rotate": "deg"
 		"contrast": "%"
 		"invert": "%"
 		"grayscale": "%"
