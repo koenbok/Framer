@@ -1,7 +1,7 @@
-// Framer 2.0-32-g6eefeb0 (c) 2013 Koen Bok
+// Framer 2.0-33-g3e4051b (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-32-g6eefeb0";
+window.FramerVersion = "2.0-33-g3e4051b";
 
 
 (function(){var require = function (file, cwd) {
@@ -623,6 +623,10 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.isMobile = function() {
     return /iphone|ipod|android|ie|blackberry|fennec/.test(navigator.userAgent.toLowerCase());
+  };
+
+  exports.isChrome = function() {
+    return /chrome/.test(navigator.userAgent.toLowerCase());
   };
 
   exports.isLocal = function() {
@@ -4107,6 +4111,9 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       for (k in _ref2) {
         v = _ref2[k];
         if (propertiesB.hasOwnProperty(k)) {
+          if (utils.isChrome()) {
+            console.log("Warning: Filter animations are currently not working well in Chrome");
+          }
           this.propertiesA[k] = propertiesA[k];
           this.propertiesB[k] = propertiesB[k];
         }
@@ -4182,7 +4189,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     };
 
     Animation.prototype._cleanup = function(completed) {
-      var computedStyles, endMatrix, endStyles, _ref, _ref1;
+      var computedStyles, cssFilterProperties, endMatrix, endStyles, i, _i, _len, _ref, _ref1, _ref2, _ref3;
       this.view._currentAnimations = _.without(this.view._currentAnimations, this);
       if (completed) {
         endMatrix = utils.extend(new Matrix(), this.propertiesB);
@@ -4192,17 +4199,30 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
           v = _ref[k];
           endStyles[k] = this.propertiesB[k] + v;
         }
-        endStyles["-webkit-filter"] = this.view._filterCSS(this.propertiesB);
+        cssFilterProperties = {};
+        _ref1 = this.propertiesB;
+        for (k in _ref1) {
+          v = _ref1[k];
+          if (FilterProperties.hasOwnProperty(k)) {
+            cssFilterProperties[FilterProperties[k].css] = v;
+          }
+        }
+        endStyles["webkitFilter"] = this.view._filterCSS(cssFilterProperties);
       } else {
         endMatrix = new Matrix(this.view._computedMatrix());
         endStyles = {};
         computedStyles = this.view.computedStyle;
-        _ref1 = this.AnimatableCSSProperties;
-        for (k in _ref1) {
-          v = _ref1[k];
+        _ref2 = this.AnimatableCSSProperties;
+        for (k in _ref2) {
+          v = _ref2[k];
           endStyles[k] = computedStyles[k];
         }
-        endStyles["-webkit-filter"] = computedStyles["-webkit-filter"];
+        _ref3 = computedStyles.cssText.split(";");
+        for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
+          i = _ref3[_i];
+          console.log(i);
+        }
+        endStyles.webkitFilter = computedStyles.webkitFilter;
       }
       this.view.removeClass(this.animationName);
       this.view._matrix = endMatrix;
@@ -4342,7 +4362,7 @@ require.define("/src/filters.coffee",function(require,module,exports,__dirname,_
     },
     "saturate": {
       unit: "%",
-      "default": 0,
+      "default": 100,
       css: "saturate"
     },
     "hueRotate": {
@@ -4352,7 +4372,7 @@ require.define("/src/filters.coffee",function(require,module,exports,__dirname,_
     },
     "contrast": {
       unit: "%",
-      "default": 0,
+      "default": 100,
       css: "contrast"
     },
     "invert": {

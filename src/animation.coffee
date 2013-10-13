@@ -143,9 +143,7 @@ class Animation extends EventEmitter
 		# Build up the matrix animation properties
 		
 		for k in @AnimatableMatrixProperties
-			
 			@propertiesA[k] = propertiesA[k]
-			
 			if propertiesB.hasOwnProperty k
 				@propertiesB[k] = propertiesB[k]
 			else
@@ -160,6 +158,8 @@ class Animation extends EventEmitter
 		# Build up the css filter properties
 		for k, v of @AnimatableFilterProperties
 			if propertiesB.hasOwnProperty k
+				if utils.isChrome()
+					console.log "Warning: Filter animations are currently not working well in Chrome"
 				@propertiesA[k] = propertiesA[k]
 				@propertiesB[k] = propertiesB[k]
 		
@@ -268,7 +268,7 @@ class Animation extends EventEmitter
 
 
 	_cleanup: (completed) =>
-
+		
 		# Remove this animation from the current ones for this view
 		@view._currentAnimations = _.without @view._currentAnimations, @
 		
@@ -281,7 +281,12 @@ class Animation extends EventEmitter
 			for k, v of @AnimatableCSSProperties
 				endStyles[k] = @propertiesB[k] + v
 			
-			endStyles["-webkit-filter"] = @view._filterCSS @propertiesB
+			cssFilterProperties = {}
+			for k, v of @propertiesB
+				if FilterProperties.hasOwnProperty k
+					cssFilterProperties[FilterProperties[k].css] = v
+			
+			endStyles["webkitFilter"] = @view._filterCSS cssFilterProperties
 
 		else
 			# A matrix from the current state
@@ -292,9 +297,13 @@ class Animation extends EventEmitter
 
 			for k, v of @AnimatableCSSProperties
 				endStyles[k] = computedStyles[k]
-				
-			endStyles["-webkit-filter"] = computedStyles["-webkit-filter"]
-		
+			
+			for i in computedStyles.cssText.split ";"
+				console.log i
+			
+			# This does not seem to work well in Chrome :-/
+			endStyles.webkitFilter = computedStyles.webkitFilter
+			
 		# Remove the animation class
 		@view.removeClass @animationName
 		
@@ -346,6 +355,7 @@ class Animation extends EventEmitter
 			
 			# Start the keyframe with the location marker
 			cssString.push "\t#{position}%\t{"
+
 			
 			# Add the css filter properties
 			cssString.push "-webkit-filter: "

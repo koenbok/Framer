@@ -50,6 +50,9 @@ describe "Animation", ->
 		testProperties = []
 		testProperties = _.union testProperties, AnimatableMatrixProperties
 		# testProperties = _.union testProperties, _.keys AnimatableCSSProperties
+		
+		# These don't work well in chrome. There seems to be an issue with animating
+		# css filter properties for now.
 		# testProperties = _.union testProperties, _.keys AnimatableFilterProperties
 		
 		console.log "testProperties", testProperties 
