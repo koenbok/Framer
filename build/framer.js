@@ -1,7 +1,7 @@
-// Framer 2.0-31-gf367c76 (c) 2013 Koen Bok
+// Framer 2.0-32-g6eefeb0 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-31-gf367c76";
+window.FramerVersion = "2.0-32-g6eefeb0";
 
 
 (function(){var require = function (file, cwd) {
@@ -2727,6 +2727,9 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     View.prototype._parseFilterCSS = function(css) {
       var k, name, part, results, v, value, _i, _len, _ref;
       results = {};
+      if (!css) {
+        return results;
+      }
       _ref = css.split(" ");
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         part = _ref[_i];
@@ -4272,7 +4275,6 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         cssString.push("}\n");
       }
       cssString.push("}\n");
-      console.log(cssString.join(""));
       return cssString.join("");
     };
 

@@ -285,8 +285,6 @@ class View extends Frame
 	#############################################################################
 	## Visual Filters
 	
-
-
 	_getFilterValue: (name) ->
 		values = @_parseFilterCSS @style.webkitFilter
 		values[name] or FilterProperties[name].default
@@ -306,7 +304,10 @@ class View extends Frame
 		css.join " "
 	
 	_parseFilterCSS: (css) ->
-		results = {}	
+		results = {}
+		
+		return results if not css
+		
 		for part in css.split " "
 			if part
 				name = part.split("(")[0]

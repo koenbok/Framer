@@ -380,9 +380,6 @@ class Animation extends EventEmitter
 			cssString.push "}\n"
 			
 		cssString.push "}\n"
-		
-		console.log cssString.join ""
-		
 		cssString.join ""
 
 	_deltas: ->

@@ -1,6 +1,8 @@
 describe "Animation", ->
 
 	AnimatableMatrixProperties = (new Animation view:null).AnimatableMatrixProperties
+	AnimatableCSSProperties = (new Animation view:null).AnimatableCSSProperties 
+	AnimatableFilterProperties = (new Animation view:null).AnimatableFilterProperties
 	AnimationTime = 200
 	
 	halfway = (a, b) ->
@@ -45,8 +47,14 @@ describe "Animation", ->
 			animation.curveValues.length.should.equal \
 				(animation.time / 1000) * animation.precision
 		
+		testProperties = []
+		testProperties = _.union testProperties, AnimatableMatrixProperties
+		# testProperties = _.union testProperties, _.keys AnimatableCSSProperties
+		# testProperties = _.union testProperties, _.keys AnimatableFilterProperties
 		
-		AnimatableMatrixProperties.map (p) ->
+		console.log "testProperties", testProperties 
+		
+		testProperties.map (p) ->
 			
 			# Todo: Z is weird. I'll have to figure this out later
 			if p in ["z"]

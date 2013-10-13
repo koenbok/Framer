@@ -188,5 +188,13 @@ describe "View", ->
 			view.addClass('bar')
 			view.removeClass('bar')
 			view.class.should.equal "#{classA} foo"
+	
+	describe "Filters", ->
+		
+		for filterName in ["blur", "brightness", "saturate", "hueRotate", "contrast",
+			"invert", "grayscale", "sepia"]
+			view = createView()
+			view[filterName] = 10
+			view[filterName].should.equal 10
 
 
