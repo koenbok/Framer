@@ -1,7 +1,7 @@
-// Framer 2.0-30-gaa847ac (c) 2013 Koen Bok
+// Framer 2.0-31-gf367c76 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-30-gaa847ac";
+window.FramerVersion = "2.0-31-gf367c76";
 
 
 (function(){var require = function (file, cwd) {
@@ -2307,7 +2307,7 @@ require.define("/src/tools/facebook.coffee",function(require,module,exports,__di
 });
 
 require.define("/src/views/view.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Animation, EventEmitter, Frame, Matrix, View, check, k, utils, v, _, _ref,
+  var Animation, EventEmitter, FilterProperties, Frame, Matrix, View, check, k, utils, v, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -2326,6 +2326,8 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
   EventEmitter = require("../eventemitter").EventEmitter;
 
   Animation = require("../animation").Animation;
+
+  FilterProperties = require("../filters").FilterProperties;
 
   exports.ViewList = [];
 
@@ -2697,53 +2699,17 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       }
     });
 
-    View._FilterProperties = {
-      "blur": {
-        unit: "px",
-        "default": 0
-      },
-      "brightness": {
-        unit: "%",
-        "default": 0
-      },
-      "saturate": {
-        unit: "%",
-        "default": 0
-      },
-      "hue-rotate": {
-        unit: "deg",
-        "default": 0
-      },
-      "contrast": {
-        unit: "%",
-        "default": 0
-      },
-      "invert": {
-        unit: "%",
-        "default": 0
-      },
-      "grayscale": {
-        unit: "%",
-        "default": 0
-      },
-      "sepia": {
-        unit: "%",
-        "default": 0
-      }
-    };
-
     View.prototype._getFilterValue = function(name) {
       var values;
       values = this._parseFilterCSS(this.style.webkitFilter);
-      return values[name] || View._FilterProperties[name]["default"];
+      return values[name] || FilterProperties[name]["default"];
     };
 
     View.prototype._setFilterValue = function(name, value, unit) {
-      if (this._filterValues == null) {
-        this._filterValues = {};
-      }
-      this._filterValues[name] = value;
-      return this.style.webkitFilter = this._filterCSS(this._filterValues);
+      var values;
+      values = this._parseFilterCSS(this.style.webkitFilter);
+      values[name] = value;
+      return this.style.webkitFilter = this._filterCSS(values);
     };
 
     View.prototype._filterCSS = function(filterValues) {
@@ -2751,15 +2717,15 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       css = [];
       for (k in filterValues) {
         v = filterValues[k];
-        if (View._FilterProperties.hasOwnProperty(k)) {
-          css.push("" + k + "(" + v + View._FilterProperties[k].unit + ")");
+        if (FilterProperties.hasOwnProperty(k)) {
+          css.push("" + FilterProperties[k].css + "(" + v + FilterProperties[k].unit + ")");
         }
       }
       return css.join(" ");
     };
 
     View.prototype._parseFilterCSS = function(css) {
-      var name, part, results, value, _i, _len, _ref;
+      var k, name, part, results, v, value, _i, _len, _ref;
       results = {};
       _ref = css.split(" ");
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -2767,13 +2733,18 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         if (part) {
           name = part.split("(")[0];
           value = parseFloat(part.split("(")[1]);
-          results[name] = value;
+          for (k in FilterProperties) {
+            v = FilterProperties[k];
+            if (v.css === name) {
+              results[k] = value;
+            }
+          }
         }
       }
       return results;
     };
 
-    _.map(View._FilterProperties, function(filterUnit, filterName) {
+    _.map(FilterProperties, function(filterUnit, filterName) {
       return View.define(filterName, {
         get: function() {
           return this._getFilterValue(filterName);
@@ -3027,9 +2998,8 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
     index: 0
   });
 
-  _ref = View._FilterProperties;
-  for (k in _ref) {
-    v = _ref[k];
+  for (k in FilterProperties) {
+    v = FilterProperties[k];
     View.Properties[k] = v["default"];
   }
 
@@ -3973,7 +3943,7 @@ require.define("/src/primitives/matrix.coffee",function(require,module,exports,_
 });
 
 require.define("/src/animation.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Animation, AnimationCounter, AnimationList, EventEmitter, Matrix, bezier, config, css, parseCurve, spring, utils, _,
+  var AnimatableFilterProperties, Animation, AnimationCounter, AnimationList, EventEmitter, FilterProperties, Matrix, bezier, config, css, k, parseCurve, spring, utils, v, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -3989,6 +3959,8 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
   EventEmitter = require("./eventemitter").EventEmitter;
 
   Matrix = require("./primitives/matrix").Matrix;
+
+  FilterProperties = require("./filters").FilterProperties;
 
   spring = require("./curves/spring");
 
@@ -4009,6 +3981,13 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     });
   };
 
+  AnimatableFilterProperties = {};
+
+  for (k in FilterProperties) {
+    v = FilterProperties[k];
+    AnimatableFilterProperties[k] = v.unit;
+  }
+
   Animation = (function(_super) {
     __extends(Animation, _super);
 
@@ -4020,16 +3999,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       height: "px"
     };
 
-    Animation.prototype.AnimatableFilterProperties = {
-      "blur": "px",
-      "brightness": "%",
-      "saturate": "%",
-      "hue-rotate": "deg",
-      "contrast": "%",
-      "invert": "%",
-      "grayscale": "%",
-      "sepia": "%"
-    };
+    Animation.prototype.AnimatableFilterProperties = AnimatableFilterProperties;
 
     Animation.prototype.AnimatableMatrixProperties = ["x", "y", "z", "scaleX", "scaleY", "scaleZ", "rotationX", "rotationY", "rotationZ"];
 
@@ -4079,7 +4049,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     });
 
     Animation.prototype.start = function(callback) {
-      var animatedProperties, backsideVisibility, k, propertiesA, propertiesB, startTime, v, _i, _len, _ref, _ref1, _ref2,
+      var animatedProperties, backsideVisibility, propertiesA, propertiesB, startTime, _i, _len, _ref, _ref1, _ref2,
         _this = this;
       AnimationList.push(this);
       if (this.view === null) {
@@ -4177,7 +4147,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     };
 
     Animation.prototype.reverse = function() {
-      var k, options, p, v, _i, _len, _ref, _ref1;
+      var options, p, _i, _len, _ref, _ref1;
       options = {};
       _ref = this.AnimationProperties;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -4209,7 +4179,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     };
 
     Animation.prototype._cleanup = function(completed) {
-      var computedStyles, endMatrix, endStyles, k, v, _ref, _ref1;
+      var computedStyles, endMatrix, endStyles, _ref, _ref1;
       this.view._currentAnimations = _.without(this.view._currentAnimations, this);
       if (completed) {
         endMatrix = utils.extend(new Matrix(), this.propertiesB);
@@ -4277,7 +4247,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
           if (!values.hasOwnProperty(propertyName)) {
             continue;
           }
-          cssString.push("" + propertyName + "(" + (utils.round(values[propertyName], config.roundingDecimals)) + unit + ") ");
+          cssString.push("" + FilterProperties[propertyName].css + "(" + (utils.round(values[propertyName], config.roundingDecimals)) + unit + ") ");
         }
         cssString.push(";");
         cssString.push("-webkit-transform: ");
@@ -4302,11 +4272,12 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         cssString.push("}\n");
       }
       cssString.push("}\n");
+      console.log(cssString.join(""));
       return cssString.join("");
     };
 
     Animation.prototype._deltas = function() {
-      var deltas, k;
+      var deltas;
       deltas = {};
       for (k in this.propertiesA) {
         deltas[k] = (this.propertiesB[k] - this.propertiesA[k]) / 100.0;
@@ -4315,7 +4286,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     };
 
     Animation.prototype._parseCurve = function(curve) {
-      var factor, precision, time, v;
+      var factor, precision, time;
       if (curve == null) {
         curve = "";
       }
@@ -4350,6 +4321,54 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
   })(EventEmitter);
 
   exports.Animation = Animation;
+
+}).call(this);
+
+});
+
+require.define("/src/filters.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+  exports.FilterProperties = {
+    "blur": {
+      unit: "px",
+      "default": 0,
+      css: "blur"
+    },
+    "brightness": {
+      unit: "%",
+      "default": 100,
+      css: "brightness"
+    },
+    "saturate": {
+      unit: "%",
+      "default": 0,
+      css: "saturate"
+    },
+    "hueRotate": {
+      unit: "deg",
+      "default": 0,
+      css: "hue-rotate"
+    },
+    "contrast": {
+      unit: "%",
+      "default": 0,
+      css: "contrast"
+    },
+    "invert": {
+      unit: "%",
+      "default": 0,
+      css: "invert"
+    },
+    "grayscale": {
+      unit: "%",
+      "default": 0,
+      css: "grayscale"
+    },
+    "sepia": {
+      unit: "%",
+      "default": 0,
+      css: "sepia"
+    }
+  };
 
 }).call(this);
 

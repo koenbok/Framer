@@ -5,6 +5,7 @@ css = require "./css"
 
 {EventEmitter} = require "./eventemitter"
 {Matrix} = require "./primitives/matrix"
+{FilterProperties} = require "./filters"
 
 spring = require "./curves/spring"
 bezier = require "./curves/bezier"
@@ -25,6 +26,12 @@ parseCurve = (a, prefix) ->
 	return a.map (i) -> parseFloat i
 
 
+AnimatableFilterProperties = {}
+
+for k, v of FilterProperties
+	AnimatableFilterProperties[k] = v.unit
+
+
 class Animation extends EventEmitter
 	
 	AnimationProperties: [
@@ -39,16 +46,8 @@ class Animation extends EventEmitter
 	}
 	# TODO, we should get these from where they are
 	# defined in the view.
-	AnimatableFilterProperties: {
-		"blur": "px"
-		"brightness": "%"
-		"saturate": "%"
-		"hue-rotate": "deg"
-		"contrast": "%"
-		"invert": "%"
-		"grayscale": "%"
-		"sepia": "%"
-	}
+	AnimatableFilterProperties: AnimatableFilterProperties
+	
 	AnimatableMatrixProperties: [
 		"x", "y", "z",
 		"scaleX", "scaleY", "scaleZ", # "scale",
@@ -153,15 +152,13 @@ class Animation extends EventEmitter
 				@propertiesB[k] = propertiesA[k]
 			
 		# Build up the css animation properties
-		
 		for k, v of @AnimatableCSSProperties
-			
 			if propertiesB.hasOwnProperty k
 				@propertiesA[k] = propertiesA[k]
 				@propertiesB[k] = propertiesB[k]
-
+		
+		# Build up the css filter properties
 		for k, v of @AnimatableFilterProperties
-			
 			if propertiesB.hasOwnProperty k
 				@propertiesA[k] = propertiesA[k]
 				@propertiesB[k] = propertiesB[k]
@@ -356,7 +353,7 @@ class Animation extends EventEmitter
 			# Add the filter based values
 			for propertyName, unit of @AnimatableFilterProperties
 				continue if not values.hasOwnProperty propertyName
-				cssString.push "#{propertyName}(#{ utils.round values[propertyName], config.roundingDecimals}#{unit}) "
+				cssString.push "#{FilterProperties[propertyName].css}(#{ utils.round values[propertyName], config.roundingDecimals}#{unit}) "
 			
 			cssString.push ";"
 
@@ -376,13 +373,16 @@ class Animation extends EventEmitter
 			# Add the css based values
 			for propertyName, unit of @AnimatableCSSProperties
 				continue if not values.hasOwnProperty propertyName
-				cssString.push "#{propertyName}:#{ utils.round values[propertyName], config.roundingDecimals}#{unit}; "
+				cssString.push "#{propertyName}:#{utils.round(values[propertyName], config.roundingDecimals)}#{unit}; "
 
 
 			# Close out this keyframe
 			cssString.push "}\n"
 			
 		cssString.push "}\n"
+		
+		console.log cssString.join ""
+		
 		cssString.join ""
 
 	_deltas: ->

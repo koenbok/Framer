@@ -7,6 +7,7 @@ _ = require "underscore"
 
 {EventEmitter} = require "../eventemitter"
 {Animation} = require "../animation"
+{FilterProperties} = require "../filters"
 
 exports.ViewList = []
 
@@ -284,33 +285,23 @@ class View extends Frame
 	#############################################################################
 	## Visual Filters
 	
-	@_FilterProperties =
-		"blur": {unit:"px", default:0}
-		"brightness": {unit:"%", default:0}
-		"saturate": {unit:"%", default:0}
-		"hue-rotate": {unit:"deg", default:0}
-		"contrast": {unit:"%", default:0}
-		"invert": {unit:"%", default:0}
-		"grayscale": {unit:"%", default:0}
-		"sepia": {unit:"%", default:0}
+
 
 	_getFilterValue: (name) ->
 		values = @_parseFilterCSS @style.webkitFilter
-		values[name] or View._FilterProperties[name].default
+		values[name] or FilterProperties[name].default
 		
 	_setFilterValue: (name, value, unit) ->
-		
-		@_filterValues ?= {}
-		@_filterValues[name] = value
-
-		@style.webkitFilter = @_filterCSS @_filterValues
+		values = @_parseFilterCSS @style.webkitFilter
+		values[name] = value
+		@style.webkitFilter = @_filterCSS(values)
 	
 	_filterCSS: (filterValues) ->
 		css = [] 
 		
 		for k, v of filterValues
-			if View._FilterProperties.hasOwnProperty k
-				css.push "#{k}(#{v}#{View._FilterProperties[k].unit})"
+			if FilterProperties.hasOwnProperty k
+				css.push "#{FilterProperties[k].css}(#{v}#{FilterProperties[k].unit})"
 		
 		css.join " "
 	
@@ -320,13 +311,14 @@ class View extends Frame
 			if part
 				name = part.split("(")[0]
 				value = parseFloat part.split("(")[1]
-				results[name] = value
+				for k, v of FilterProperties
+					results[k] = value if v.css is name
 		results
 	
 	# Add methods for all the defined filters
-	_.map View._FilterProperties, (filterUnit, filterName) =>
+	_.map FilterProperties, (filterUnit, filterName) =>
 		@define filterName,
-			get: -> @_getFilterValue filterName
+			get: -> @_getFilterValue filterName 
 			set: (value) -> @_setFilterValue filterName, value
 
 
@@ -535,7 +527,7 @@ View.Properties = utils.extend Frame.Properties,
 	visible: true
 	index: 0
 
-for k, v of View._FilterProperties
+for k, v of FilterProperties
 	View.Properties[k] = v.default
 
 
