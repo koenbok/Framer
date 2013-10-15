@@ -1,7 +1,7 @@
-// Framer 2.0-38-g6c102c2 (c) 2013 Koen Bok
+// Framer 2.0-39-g4a289c5 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-38-g6c102c2";
+window.FramerVersion = "2.0-39-g4a289c5";
 
 
 (function(){var require = function (file, cwd) {
