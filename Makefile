@@ -6,7 +6,6 @@ build:
 	mkdir -p build
 	./node_modules/coffee-script/bin/coffee scripts/banner.coffee > build/framer.js
 	./node_modules/browserify/bin/cmd.js src/init.coffee >> build/framer.js
-	cp build/framer.js template/framer.js
 buildw:
 	./node_modules/coffee-script/bin/coffee scripts/watch.coffee . make build
 
@@ -20,15 +19,17 @@ testw:
 	./node_modules/coffee-script/bin/coffee scripts/watch.coffee . make test
 
 clean:
-	rm -rf dist
+	rm -rf build
 
 lint:
 	./node_modules/coffeelint/bin/coffeelint -f lint.config.json -r src
 
 dist:
+	make clean
 	make build
-	cp -R template build/template
-	cp build/framer.js build/template/framer.js
+	cp -R template build/Framer
+	cp build/framer.js build/Framer/framer.js
+	cd build; zip -r Framer.zip Framer
 
 .PHONY: build clean lint test
 
