@@ -298,9 +298,6 @@ class Animation extends EventEmitter
 			for k, v of @AnimatableCSSProperties
 				endStyles[k] = computedStyles[k]
 			
-			for i in computedStyles.cssText.split ";"
-				console.log i
-			
 			# This does not seem to work well in Chrome :-/
 			endStyles.webkitFilter = computedStyles.webkitFilter
 			
