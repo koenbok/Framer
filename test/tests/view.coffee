@@ -79,6 +79,15 @@ describe "View", ->
 			frameTest.y.should.equal -40
 			frameTest.width.should.equal 530
 			frameTest.height.should.equal 540
+		
+		it "should have default values", ->
+			
+			view = new View()
+			
+			view.x.should.equal 0
+			view.y.should.equal 0
+			view.width.should.equal 0
+			view.height.should.equal 0
 
 	describe "Visual", ->
 		

@@ -69,6 +69,12 @@ class View extends Frame
 				if args[key] not in [null, undefined]
 					@[key] = args[key]
 			
+			for key, value of Frame.Properties
+				if args[key] not in [null, undefined]
+					@[key] = args[key]
+				else
+					@[key] = Frame.Properties[key]
+			
 			for key, value of Frame.CalculatedProperties
 				@[key] = args[key] if args[key] not in [null, undefined]
 	
@@ -509,7 +515,7 @@ class View extends Frame
 	off: @::removeListener
 
 
-View.Properties = utils.extend Frame.Properties,
+View.Properties = utils.extend {}, Frame.Properties,
 	frame: null
 	clip: true
 	opacity: 1.0

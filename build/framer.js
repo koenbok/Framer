@@ -1,7 +1,7 @@
-// Framer 2.0-33-g3e4051b (c) 2013 Koen Bok
+// Framer 2.0-38-g6c102c2 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-33-g3e4051b";
+window.FramerVersion = "2.0-38-g6c102c2";
 
 
 (function(){var require = function (file, cwd) {
@@ -565,6 +565,18 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
     var d;
     d = Math.pow(10, decimals);
     return Math.round(value * d) / d;
+  };
+
+  exports.defaults = function(obj, defaults) {
+    var k, result, v, _ref;
+    result = _.extend(obj);
+    for (k in defaults) {
+      v = defaults[k];
+      if ((_ref = result[k]) === null || _ref === (void 0)) {
+        result[k] = defaults[k];
+      }
+    }
+    return result;
   };
 
   exports.randomColor = function(alpha) {
@@ -2391,7 +2403,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return p;
       },
       set: function(args) {
-        var key, value, _ref, _ref1, _ref2, _ref3, _results;
+        var key, value, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _results;
         _ref = View.Properties;
         for (key in _ref) {
           value = _ref[key];
@@ -2399,11 +2411,20 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
             this[key] = args[key];
           }
         }
-        _ref2 = Frame.CalculatedProperties;
-        _results = [];
+        _ref2 = Frame.Properties;
         for (key in _ref2) {
           value = _ref2[key];
           if ((_ref3 = args[key]) !== null && _ref3 !== (void 0)) {
+            this[key] = args[key];
+          } else {
+            this[key] = Frame.Properties[key];
+          }
+        }
+        _ref4 = Frame.CalculatedProperties;
+        _results = [];
+        for (key in _ref4) {
+          value = _ref4[key];
+          if ((_ref5 = args[key]) !== null && _ref5 !== (void 0)) {
             _results.push(this[key] = args[key]);
           } else {
             _results.push(void 0);
@@ -2985,7 +3006,7 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
 
   }).call(this, Frame);
 
-  View.Properties = utils.extend(Frame.Properties, {
+  View.Properties = utils.extend({}, Frame.Properties, {
     frame: null,
     clip: true,
     opacity: 1.0,
@@ -4191,7 +4212,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
     };
 
     Animation.prototype._cleanup = function(completed) {
-      var computedStyles, cssFilterProperties, endMatrix, endStyles, i, _i, _len, _ref, _ref1, _ref2, _ref3;
+      var computedStyles, cssFilterProperties, endMatrix, endStyles, _ref, _ref1, _ref2;
       this.view._currentAnimations = _.without(this.view._currentAnimations, this);
       if (completed) {
         endMatrix = utils.extend(new Matrix(), this.propertiesB);
@@ -4218,11 +4239,6 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         for (k in _ref2) {
           v = _ref2[k];
           endStyles[k] = computedStyles[k];
-        }
-        _ref3 = computedStyles.cssText.split(";");
-        for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
-          i = _ref3[_i];
-          console.log(i);
         }
         endStyles.webkitFilter = computedStyles.webkitFilter;
       }
