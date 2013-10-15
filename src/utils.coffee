@@ -67,6 +67,17 @@ exports.round = (value, decimals) ->
 ######################################################
 # HANDY FUNCTIONS
 
+exports.defaults = (obj, defaults) ->
+	
+	result = _.extend obj
+	
+	for k, v of defaults
+		if result[k] in [null, undefined]
+			result[k] = defaults[k]
+	
+	result
+
+
 exports.randomColor = (alpha = 1.0) ->
 	c = -> parseInt(Math.random() * 255)
 	"rgba(#{c()}, #{c()}, #{c()}, #{alpha})"
