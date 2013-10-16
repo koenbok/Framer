@@ -1,7 +1,7 @@
-// Framer 2.0-39-g4a289c5 (c) 2013 Koen Bok
+// Framer 2.0-41-g1d8cf24 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-39-g4a289c5";
+window.FramerVersion = "2.0-41-g1d8cf24";
 
 
 (function(){var require = function (file, cwd) {
@@ -4103,11 +4103,11 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       this.totalTime = (this.curveValues.length / this.precision) * 1000;
       propertiesA = this.view.properties;
       propertiesB = this.properties;
-      if (propertiesB.scale) {
+      if (propertiesB.hasOwnProperty("scale")) {
         propertiesB.scaleX = propertiesB.scale;
         propertiesB.scaleY = propertiesB.scale;
       }
-      if (propertiesB.rotation) {
+      if (propertiesB.hasOwnProperty("rotation")) {
         propertiesB.rotationZ = propertiesB.rotation;
       }
       this.propertiesA = {};

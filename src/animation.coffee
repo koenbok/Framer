@@ -130,13 +130,13 @@ class Animation extends EventEmitter
 		propertiesB = @properties
 		
 		# Set the derived properties scale and rotation
-		if propertiesB.scale
+		if propertiesB.hasOwnProperty "scale"
 			propertiesB.scaleX = propertiesB.scale
 			propertiesB.scaleY = propertiesB.scale
 		
-		if propertiesB.rotation
+		if propertiesB.hasOwnProperty "rotation"
 			propertiesB.rotationZ = propertiesB.rotation
-			
+		
 		@propertiesA = {}
 		@propertiesB = {}
 		
