@@ -1,7 +1,7 @@
-// Framer 2.0-41-g1d8cf24 (c) 2013 Koen Bok
+// Framer 2.0-42-g25a47eb (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-41-g1d8cf24";
+window.FramerVersion = "2.0-42-g25a47eb";
 
 
 (function(){var require = function (file, cwd) {
@@ -4971,6 +4971,11 @@ require.define("/src/ui/draggable.coffee",function(require,module,exports,__dirn
       return this.view.off(Events.TouchStart, this._touchStart);
     };
 
+    Draggable.prototype.emit = function(eventName, event) {
+      this.view.emit(eventName, event);
+      return Draggable.__super__.emit.call(this, eventName, event);
+    };
+
     Draggable.prototype.calculateVelocity = function() {
       var curr, prev, time, timeSinceLastMove, velocity;
       if (this._deltas.length < 2) {
@@ -5017,7 +5022,7 @@ require.define("/src/ui/draggable.coffee",function(require,module,exports,__dirn
       this.view.x = this._start.x + correctedDelta.x - this._offset.x;
       this.view.y = this._start.y + correctedDelta.y - this._offset.y;
       this._deltas.push(correctedDelta);
-      return this.view.emit(Events.DragMove, event);
+      return this.emit(Events.DragMove, event);
     };
 
     Draggable.prototype._touchStart = function(event) {

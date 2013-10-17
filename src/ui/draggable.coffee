@@ -26,6 +26,14 @@ class exports.Draggable extends EventEmitter
 	attach: -> @view.on  Events.TouchStart, @_touchStart
 	remove: -> @view.off Events.TouchStart, @_touchStart
 	
+	emit: (eventName, event) ->
+		# We override this to get all events both on the draggable
+		# and the encapsulated view.
+		@view.emit eventName, event
+		
+		super eventName, event
+		
+	
 	calculateVelocity: ->
 		
 		if @_deltas.length < 2
@@ -69,7 +77,7 @@ class exports.Draggable extends EventEmitter
 		
 		@_deltas.push correctedDelta
 		
-		@view.emit Events.DragMove, event
+		@emit Events.DragMove, event
 	
 	_touchStart: (event) => 
 		
