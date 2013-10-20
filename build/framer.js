@@ -1,7 +1,7 @@
-// Framer 2.0-42-g25a47eb (c) 2013 Koen Bok
+// Framer 2.0-43-g5d463ce (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-42-g25a47eb";
+window.FramerVersion = "2.0-43-g5d463ce";
 
 
 (function(){var require = function (file, cwd) {
@@ -2404,20 +2404,20 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
       },
       set: function(args) {
         var key, value, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _results;
-        _ref = View.Properties;
+        _ref = Frame.Properties;
         for (key in _ref) {
           value = _ref[key];
           if ((_ref1 = args[key]) !== null && _ref1 !== (void 0)) {
             this[key] = args[key];
+          } else {
+            this[key] = Frame.Properties[key];
           }
         }
-        _ref2 = Frame.Properties;
+        _ref2 = View.Properties;
         for (key in _ref2) {
           value = _ref2[key];
           if ((_ref3 = args[key]) !== null && _ref3 !== (void 0)) {
             this[key] = args[key];
-          } else {
-            this[key] = Frame.Properties[key];
           }
         }
         _ref4 = Frame.CalculatedProperties;
@@ -3065,6 +3065,8 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
         isLength: isLength,
         verifyArray: verifyArray,
         isArray: isArray,
+        verifyDate: verifyDate,
+        isDate: isDate,
         verifyFunction: verifyFunction,
         isFunction: isFunction,
         verifyUnemptyString: verifyUnemptyString,
@@ -3100,8 +3102,12 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyQuack (thing, duck, message) {
-        if (quacksLike(thing, duck) === false) {
-            throw new Error(message || 'Invalid type');
+        verify(quacksLike, [ thing, duck ], message, 'Invalid type');
+    }
+
+    function verify (fn, args, message, defaultMessage) {
+        if (fn.apply(null, args) === false) {
+            throw new Error(message || defaultMessage);
         }
     }
 
@@ -3153,9 +3159,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                             to set on the thrown Error.
      */
     function verifyInstance (thing, prototype, message) {
-        if (isInstance(thing, prototype) === false) {
-            throw new Error(message || 'Invalid type');
-        }
+        verify(isInstance, [ thing, prototype ], message, 'Invalid type');
     }
 
     /**
@@ -3191,9 +3195,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyEmptyObject (thing, message) {
-        if (isEmptyObject(thing) === false) {
-            throw new Error(message || 'Invalid empty object');
-        }
+        verify(isEmptyObject, [ thing ], message, 'Invalid object');
     }
 
     /**
@@ -3223,28 +3225,26 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      * Public function `verifyObject`.
      *
      * Throws an exception unless something is a non-null,
-     * non-array object.
+     * non-array, non-date object.
      *
      * @param thing              The thing to test.
      * @param [message] {string} An optional error message
      *                           to set on the thrown Error.
      */
     function verifyObject (thing, message) {
-        if (isObject(thing) === false) {
-            throw new Error(message || 'Invalid object');
-        }
+        verify(isObject, [ thing ], message, 'Invalid object');
     }
 
     /**
      * Public function `isObject`.
      *
-     * Returns `true` if something is a non-null, non-array
-     * object, `false` otherwise.
+     * Returns `true` if something is a non-null, non-array,
+     * non-date object, `false` otherwise.
      *
      * @param thing          The thing to test.
      */
     function isObject (thing) {
-        return typeof thing === 'object' && thing !== null && isArray(thing) === false;
+        return typeof thing === 'object' && thing !== null && isArray(thing) === false && isDate(thing) === false;
     }
 
     /**
@@ -3258,9 +3258,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyLength (thing, length, message) {
-        if (isLength(thing, length) === false) {
-            throw new Error(message || 'Invalid length');
-        }
+        verify(isLength, [ thing, length ], message, 'Invalid length');
     }
 
     /**
@@ -3286,9 +3284,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyArray (thing, message) {
-        if (isArray(thing) === false) {
-            throw new Error(message || 'Invalid array');
-        }
+        verify(isArray, [ thing ], message, 'Invalid array');
     }
 
     /**
@@ -3299,7 +3295,35 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      * @param thing          The thing to test.
      */
     function isArray (thing) {
+        if (Array.isArray) {
+            return Array.isArray(thing);
+        }
+
         return Object.prototype.toString.call(thing) === '[object Array]';
+    }
+
+    /**
+     * Public function `verifyDate`.
+     *
+     * Throws an exception unless something is a date.
+     *
+     * @param thing              The thing to test.
+     * @param [message] {string} An optional error message
+     *                           to set on the thrown Error.
+     */
+    function verifyDate (thing, message) {
+        verify(isDate, [ thing ], message, 'Invalid date');
+    }
+
+    /**
+     * Public function `isDate`.
+     *
+     * Returns `true` something is a date, `false` otherwise.
+     *
+     * @param thing          The thing to test.
+     */
+    function isDate (thing) {
+        return Object.prototype.toString.call(thing) === '[object Date]';
     }
 
     /**
@@ -3312,9 +3336,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyFunction (thing, message) {
-        if (isFunction(thing) === false) {
-            throw new Error(message || 'Invalid function');
-        }
+        verify(isFunction, [ thing ], message, 'Invalid function');
     }
 
     /**
@@ -3338,9 +3360,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyUnemptyString (thing, message) {
-        if (isUnemptyString(thing) === false) {
-            throw new Error(message || 'Invalid string');
-        }
+        verify(isUnemptyString, [ thing ], message, 'Invalid string');
     }
 
     /**
@@ -3365,9 +3385,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyString (thing, message) {
-        if (isString(thing) === false) {
-            throw new Error(message || 'Invalid string');
-        }
+        verify(isString, [ thing ], message, 'Invalid string');
     }
 
     /**
@@ -3391,9 +3409,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyOddNumber (thing, message) {
-        if (isOddNumber(thing) === false) {
-            throw new Error(message || 'Invalid number');
-        }
+        verify(isOddNumber, [ thing ], message, 'Invalid number');
     }
 
     /**
@@ -3418,9 +3434,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyEvenNumber (thing, message) {
-        if (isEvenNumber(thing) === false) {
-            throw new Error(message || 'Invalid number');
-        }
+        verify(isEvenNumber, [ thing ], message, 'Invalid number');
     }
 
     /**
@@ -3445,9 +3459,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyPositiveNumber (thing, message) {
-        if (isPositiveNumber(thing) === false) {
-            throw new Error(message || 'Invalid number');
-        }
+        verify(isPositiveNumber, [ thing ], message, 'Invalid number');
     }
 
     /**
@@ -3472,9 +3484,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyNegativeNumber (thing, message) {
-        if (isNegativeNumber(thing) === false) {
-            throw new Error(message || 'Invalid number');
-        }
+        verify(isNegativeNumber, [ thing ], message, 'Invalid number');
     }
 
     /**
@@ -3499,9 +3509,7 @@ require.define("/node_modules/check-types/src/check-types.js",function(require,m
      *                           to set on the thrown Error.
      */
     function verifyNumber (thing, message) {
-        if (isNumber(thing) === false) {
-            throw new Error(message || 'Invalid number');
-        }
+        verify(isNumber, [ thing ], message, 'Invalid number');
     }
 
     /**
