@@ -239,7 +239,11 @@ class Animation extends EventEmitter
 		
 		# Add the original view properties to animate to 
 		for k, v of @_originalProperties
-			options.properties[k] = @_originalProperties[k]
+
+			# Only revert back the properties that were originally
+			# set by this animation.
+			if @properties.hasOwnProperty k
+				options.properties[k] = @_originalProperties[k]
 			
 		return new Animation options
 
