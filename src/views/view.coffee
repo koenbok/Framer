@@ -1,5 +1,4 @@
 utils = require "../utils"
-check = require "check-types"
 _ = require "underscore"
 
 {Frame} = require "../primitives/frame"
