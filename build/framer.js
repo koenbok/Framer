@@ -1,7 +1,7 @@
-// Framer 2.0-44-g352e090 (c) 2013 Koen Bok
+// Framer 2.0-45-g7942d46 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-44-g352e090";
+window.FramerVersion = "2.0-45-g7942d46";
 
 
 (function(){var require = function (file, cwd) {
@@ -3702,14 +3702,10 @@ require.define("/src/primitives/frame.coffee",function(require,module,exports,__
 });
 
 require.define("/src/eventemitter.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var check, eventCheck,
+  var eventCheck,
     __slice = [].slice;
 
-  check = require("check-types");
-
-  eventCheck = function(event) {
-    return check.verifyUnemptyString(event, "Missing event type");
-  };
+  eventCheck = function() {};
 
   exports.EventEmitter = (function() {
     function EventEmitter() {
@@ -3746,7 +3742,6 @@ require.define("/src/eventemitter.coffee",function(require,module,exports,__dirn
 
     EventEmitter.prototype.removeListener = function(event, listener) {
       var l;
-      check.verifyUnemptyString(event);
       if (!this.events) {
         return;
       }

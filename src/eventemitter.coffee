@@ -1,7 +1,5 @@
-check = require "check-types"
 
-eventCheck = (event) ->
-	check.verifyUnemptyString event, "Missing event type"
+eventCheck = () ->
 
 class exports.EventEmitter
 	
@@ -31,8 +29,6 @@ class exports.EventEmitter
 	removeListener: (event, listener) ->
 		
 		# @emit "removeListener", event, listener
-		
-		check.verifyUnemptyString event
 		
 		return unless @events
 		return unless @events[event]
