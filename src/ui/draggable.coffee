@@ -57,14 +57,16 @@ class exports.Draggable extends EventEmitter
 		velocity.y = 0 if velocity.y is Infinity
 		
 		velocity
-
+  
 	_updatePosition: (event) =>
-		
+	
+		@emit Events.DragMove, event
+
 		touchEvent = Events.touchEvent event
-		
+
 		delta = 
-			x: touchEvent.clientX - @_start.x
-			y: touchEvent.clientY - @_start.y
+			x: touchEvent.webkitMovementX
+			y: touchEvent.webkitMovementY
 		
 		# Correct for current drag speed
 		correctedDelta = 
@@ -72,12 +74,10 @@ class exports.Draggable extends EventEmitter
 			y: delta.y * @speed.y
 			t: event.timeStamp
 		
-		@view.x = @_start.x + correctedDelta.x - @_offset.x
-		@view.y = @_start.y + correctedDelta.y - @_offset.y
+		@view.x += correctedDelta.x
+		@view.y += correctedDelta.y
 		
 		@_deltas.push correctedDelta
-		
-		@emit Events.DragMove, event
 	
 	_touchStart: (event) => 
 		
