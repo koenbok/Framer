@@ -1,7 +1,7 @@
-// Framer 2.0-46-g01172c3 (c) 2013 Koen Bok
+// Framer 2.0-47-ge4c5467 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-46-g01172c3";
+window.FramerVersion = "2.0-47-ge4c5467";
 
 
 (function(){var require = function (file, cwd) {
@@ -4511,20 +4511,20 @@ require.define("/src/ui/draggable.coffee",function(require,module,exports,__dirn
 
     Draggable.prototype._updatePosition = function(event) {
       var correctedDelta, delta, touchEvent;
+      this.emit(Events.DragMove, event);
       touchEvent = Events.touchEvent(event);
       delta = {
-        x: touchEvent.clientX - this._start.x,
-        y: touchEvent.clientY - this._start.y
+        x: touchEvent.webkitMovementX,
+        y: touchEvent.webkitMovementY
       };
       correctedDelta = {
         x: delta.x * this.speed.x,
         y: delta.y * this.speed.y,
         t: event.timeStamp
       };
-      this.view.x = this._start.x + correctedDelta.x - this._offset.x;
-      this.view.y = this._start.y + correctedDelta.y - this._offset.y;
-      this._deltas.push(correctedDelta);
-      return this.emit(Events.DragMove, event);
+      this.view.x += correctedDelta.x;
+      this.view.y += correctedDelta.y;
+      return this._deltas.push(correctedDelta);
     };
 
     Draggable.prototype._touchStart = function(event) {
