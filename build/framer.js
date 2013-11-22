@@ -1,7 +1,7 @@
-// Framer 2.0-47-ge4c5467 (c) 2013 Koen Bok
+// Framer 2.0-49-gae7c991 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-47-ge4c5467";
+window.FramerVersion = "2.0-49-gae7c991";
 
 
 (function(){var require = function (file, cwd) {
@@ -4315,6 +4315,74 @@ require.define("/src/views/imageview.coffee",function(require,module,exports,__d
 
 });
 
+require.define("/src/views/textview.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
+  var TextView, View,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  View = require("./view").View;
+
+  TextView = (function(_super) {
+    __extends(TextView, _super);
+
+    function TextView(args) {
+      TextView.__super__.constructor.apply(this, arguments);
+      this.text = (args != null ? args.text : void 0) || "";
+    }
+
+    TextView.define("text", {
+      get: function() {
+        return this.html;
+      },
+      set: function(value) {
+        return this.html = value;
+      }
+    });
+
+    TextView.prototype.calculateSize = function(options) {
+      var frame, size, styleOverride, view;
+      view = new TextView();
+      view.text = this.text;
+      styleOverride = {
+        position: "absolute",
+        height: "auto",
+        width: "auto",
+        backgroundColor: "rgba(0,255,0,.2)",
+        visbility: "hidden"
+      };
+      view.style = _.extend({}, this.style, styleOverride);
+      frame = {
+        x: -10000,
+        y: -10000
+      };
+      if (options == null) {
+        options = {};
+      }
+      if (options.width) {
+        frame.width = options.width;
+      }
+      if (options.height) {
+        frame.width = options.height;
+      }
+      view.frame = frame;
+      view.__insertElement();
+      size = {
+        width: view._element.clientWidth,
+        height: view._element.clientHeight
+      };
+      return size;
+    };
+
+    return TextView;
+
+  })(View);
+
+  exports.TextView = TextView;
+
+}).call(this);
+
+});
+
 require.define("/src/primitives/events.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
   var Events, utils, _;
 
@@ -4789,7 +4857,7 @@ require.define("/src/ui/pagingview.coffee",function(require,module,exports,__dir
 });
 
 require.define("/src/init.coffee",function(require,module,exports,__dirname,__filename,process,global){(function() {
-  var Animation, EventEmitter, Events, Frame, Global, ImageView, Matrix, ScrollView, View, ViewList, config, css, debug, tools, utils;
+  var Animation, EventEmitter, Events, Frame, Global, ImageView, Matrix, ScrollView, TextView, View, ViewList, config, css, debug, tools, utils;
 
   css = require("./css");
 
@@ -4809,6 +4877,8 @@ require.define("/src/init.coffee",function(require,module,exports,__dirname,__fi
 
   ImageView = require("./views/imageview").ImageView;
 
+  TextView = require("./views/textview").TextView;
+
   Animation = require("./animation").Animation;
 
   Frame = require("./primitives/frame").Frame;
@@ -4826,6 +4896,8 @@ require.define("/src/init.coffee",function(require,module,exports,__dirname,__fi
   Global.ScrollView = ScrollView;
 
   Global.ImageView = ImageView;
+
+  Global.TextView = TextView;
 
   Global.Animation = Animation;
 

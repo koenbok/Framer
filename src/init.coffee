@@ -8,6 +8,7 @@ debug = require "./debug"
 {ViewList} = require "./views/view"
 {ScrollView} = require "./views/scrollview"
 {ImageView} = require "./views/imageview"
+{TextView} = require "./views/textview"
 {Animation} = require "./animation"
 
 {Frame} = require "./primitives/frame"
@@ -21,6 +22,7 @@ Global = {}
 Global.View = View
 Global.ScrollView = ScrollView
 Global.ImageView = ImageView
+Global.TextView = TextView
 Global.Animation = Animation
 
 Global.Frame = Frame

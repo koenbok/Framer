@@ -1,6 +1,6 @@
 {View} = require "./view"
 
-class exports.TextView extends View
+class TextView extends View
 	
 	constructor: (args) ->
 		super
@@ -13,11 +13,18 @@ class exports.TextView extends View
 	
 	calculateSize: (options)->
 		
-		view = new exports.TextView()
+		view = new TextView()
 		view.text = @text
-		view.style = @style
-		view.style["position"] = "relative"
 		
+		styleOverride = 
+			position: "absolute"
+			height: "auto"
+			width: "auto"
+			backgroundColor: "rgba(0,255,0,.2)"
+			visbility: "hidden"
+
+		view.style = _.extend {}, @style, styleOverride
+
 		frame = {x:-10000, y:-10000}
 		
 		options ?= {}
@@ -28,21 +35,12 @@ class exports.TextView extends View
 			frame.width = options.height
 
 		view.frame = frame
-		view.insert()
+		view.__insertElement()
 		
 		size =
-			width: view.layer.element_.clientWidth
-			height: view.layer.element_.clientHeight
+			width: view._element.clientWidth
+			height: view._element.clientHeight
 		
 		return size
-	
-	autoWidth: (extra) ->
-		extra ?= 0
-		size = @calculateSize(height:@frame.height)
-		@frame.width = size.width + extra
 
-	autoHeight: (extra) ->
-		extra ?= 0
-		size = @calculateSize(width:@frame.width)
-		@frame.height = size.height + extra
-
+exports.TextView = TextView
