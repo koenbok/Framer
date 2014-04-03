@@ -79,6 +79,8 @@ class exports.Draggable extends EventEmitter
 
 		@_deltas.push correctedDelta
 
+		@emit Events.DragMove, event
+
 	_touchStart: (event) =>
 
 		@view.animateStop()
