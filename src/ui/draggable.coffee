@@ -66,7 +66,7 @@ class exports.Draggable extends EventEmitter
 
 		delta =
 			x: touchEvent.clientX - @_start.x
- -			y: touchEvent.clientY - @_start.y
+ 			y: touchEvent.clientY - @_start.y
 
 		# Correct for current drag speed
 		correctedDelta =
@@ -75,7 +75,7 @@ class exports.Draggable extends EventEmitter
 			t: event.timeStamp
 
 		@view.x = @_start.x + correctedDelta.x - @_offset.x
- -		@view.y = @_start.y + correctedDelta.y - @_offset.y
+ 		@view.y = @_start.y + correctedDelta.y - @_offset.y
 
 		@_deltas.push correctedDelta
 
