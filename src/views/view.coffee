@@ -502,6 +502,13 @@ class View extends Frame
 		if @_element.parentNode
 			@_element.parentNode.removeChild @_element
 
+	#############################################################################
+	## Draggable
+
+	@define "draggable",
+		get: ->
+			@_draggable ?= new ui.Draggable @
+			@_draggable
 
 	#############################################################################
 	## Events

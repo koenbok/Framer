@@ -21,6 +21,8 @@ class exports.Draggable extends EventEmitter
 		@_deltas = []
 		@_isDragging = false
 
+		@enabled = true
+
 		@attach()
 
 	attach: -> @view.on  Events.TouchStart, @_touchStart
@@ -60,13 +62,16 @@ class exports.Draggable extends EventEmitter
 
 	_updatePosition: (event) =>
 
+		if @enabled is false
+			return
+
 		@emit Events.DragMove, event
 
 		touchEvent = Events.touchEvent event
 
 		delta =
 			x: touchEvent.clientX - @_start.x
- 			y: touchEvent.clientY - @_start.y
+			y: touchEvent.clientY - @_start.y
 
 		# Correct for current drag speed
 		correctedDelta =
