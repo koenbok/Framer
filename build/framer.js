@@ -1,7 +1,7 @@
-// Framer 2.0-61-g958bf94 (c) 2013 Koen Bok
+// Framer 2.0-62-g449b155 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-61-g958bf94";
+window.FramerVersion = "2.0-62-g449b155";
 
 
 (function(){var require = function (file, cwd) {
@@ -3073,6 +3073,18 @@ require.define("/src/views/view.coffee",function(require,module,exports,__dirnam
         return this._draggable;
       }
     });
+
+    View.prototype.copy = function() {
+      var copiedSubView, subView, view, _i, _len, _ref;
+      view = new this.constructor(this.properties);
+      _ref = this.subViews;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        subView = _ref[_i];
+        copiedSubView = subView.copy();
+        copiedSubView.superView = view;
+      }
+      return view;
+    };
 
     View.prototype.addListener = function(event, listener) {
       View.__super__.addListener.apply(this, arguments);

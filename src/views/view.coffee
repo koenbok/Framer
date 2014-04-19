@@ -511,6 +511,19 @@ class View extends Frame
 			@_draggable
 
 	#############################################################################
+	## Copying
+
+	copy: ->
+
+		view  = new @constructor @properties
+
+		for subView in @subViews
+			copiedSubView = subView.copy()
+			copiedSubView.superView = view
+
+		view
+
+	#############################################################################
 	## Events
 	
 	# Listen to dom events on the element

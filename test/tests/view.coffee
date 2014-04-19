@@ -86,8 +86,8 @@ describe "View", ->
 			
 			view.x.should.equal 0
 			view.y.should.equal 0
-			view.width.should.equal 0
-			view.height.should.equal 0
+			view.width.should.equal Framer.config.defaultViewWidth
+			view.height.should.equal Framer.config.defaultViewHeight
 
 		it "should set frame", ->
 			frame = {x: 200, y: 200, width: 200, height: 200}
