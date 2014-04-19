@@ -1,7 +1,7 @@
-// Framer 2.0-58-g4b76906 (c) 2013 Koen Bok
+// Framer 2.0-59-gb78ddb1 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-58-g4b76906";
+window.FramerVersion = "2.0-59-gb78ddb1";
 
 
 (function(){var require = function (file, cwd) {
@@ -3533,7 +3533,7 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
   Animation = (function(_super) {
     __extends(Animation, _super);
 
-    Animation.prototype.AnimationProperties = ["view", "properties", "curve", "time", "origin", "tolerance", "precision", "modifiers", "limits", "debug", "profile", "callback"];
+    Animation.prototype.AnimationProperties = ["view", "properties", "curve", "time", "origin", "tolerance", "precision", "modifiers", "limits", "debug", "profile", "callback", "delay"];
 
     Animation.prototype.AnimatableCSSProperties = {
       opacity: "",
@@ -3562,6 +3562,9 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
       }
       if (this.curve == null) {
         this.curve = "linear";
+      }
+      if (this.delay == null) {
+        this.delay = 0;
       }
       this.count = 0;
       if (this.precision == null) {
@@ -3676,7 +3679,9 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         this.view.style["-webkit-transform-origin"] = this.origin;
       }
       css.addStyle("			" + this.keyFrameAnimationCSS + "					." + this.animationName + " {				-webkit-animation-duration: " + (this.totalTime / 1000) + "s;				-webkit-animation-name: " + this.animationName + ";				-webkit-animation-timing-function: linear;				-webkit-animation-fill-mode: both;				-webkit-backface-visibility: " + backsideVisibility + ";			}");
-      this.view.addClass(this.animationName);
+      utils.delay(this.delay, function() {
+        return _this.view.addClass(_this.animationName);
+      });
       this.view.once("webkitAnimationStart", function(event) {
         var endTime;
         _this.emit("start", event);

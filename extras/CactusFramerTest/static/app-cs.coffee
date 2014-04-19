@@ -1,3 +1,5 @@
 view = new View
 
-view.style.backgroundColor = null
+view.animate
+	properties: {x:100}
+	delay: 3000

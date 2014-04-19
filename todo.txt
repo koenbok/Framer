@@ -1,6 +1,7 @@
 - Add a delay option to animations
 + Fix the draggable
 - Fix the curve typo: https://www.facebook.com/groups/framerjs/permalink/469402916520118/
-- Add a default width, height and color
-- Fix frame error
++ Add a default width, height and color
++ Fix frame error
+- Add view copy
 - Make the invisible psd layers invisible in Framer too

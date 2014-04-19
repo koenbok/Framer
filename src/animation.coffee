@@ -37,7 +37,7 @@ class Animation extends EventEmitter
 	AnimationProperties: [
 		"view", "properties", "curve", "time",
 		"origin", "tolerance", "precision", "modifiers", 
-		"limits", "debug", "profile", "callback"
+		"limits", "debug", "profile", "callback", "delay"
 	]
 	AnimatableCSSProperties: {
 		opacity: "",
@@ -65,6 +65,7 @@ class Animation extends EventEmitter
 		# Set all the defaults
 		@time ?= 1000
 		@curve ?= "linear"
+		@delay ?= 0
 		@count = 0
 
 		@precision ?= config.animationPrecision
@@ -210,7 +211,8 @@ class Animation extends EventEmitter
 				-webkit-backface-visibility: #{backsideVisibility};
 			}"
 		
-		@view.addClass @animationName
+		utils.delay @delay, =>
+			@view.addClass @animationName
 		
 		
 		########################################################
