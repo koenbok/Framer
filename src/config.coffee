@@ -6,3 +6,6 @@ exports.config =
 	animationPrecision: 60
 	animationDebug: false
 	animationProfile: false
+	defaultViewWidth: 100
+	defaultViewHeight: 100
+	defaultViewBackgroundColor: "rgba(0,150,200,0.5)"

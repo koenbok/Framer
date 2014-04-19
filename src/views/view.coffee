@@ -1,6 +1,8 @@
 utils = require "../utils"
 _ = require "underscore"
 
+{config} = require "../config"
+
 {Frame} = require "../primitives/frame"
 {Matrix} = require "../primitives/matrix"
 
@@ -31,6 +33,12 @@ class View extends Frame
 		@_subViews = []
 		@_currentAnimations = []
 		
+		# We'll set a default width, height and background color
+		args.width ?=  config.defaultViewWidth
+		args.height ?= config.defaultViewHeight
+
+		@style.backgroundColor = config.defaultViewBackgroundColor
+
 		# Set the view properties
 		@clip = args.clip or View.Properties.clip
 		@properties = args

@@ -31,5 +31,8 @@ dist:
 	cp build/framer.js build/Framer/framer.js
 	cd build; zip -r Framer.zip Framer
 
+cactus:
+	cd extras/CactusFramerTest; cactus serve
+
 .PHONY: build clean lint test
 
