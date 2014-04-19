@@ -89,6 +89,14 @@ describe "View", ->
 			view.width.should.equal 0
 			view.height.should.equal 0
 
+		it "should set frame", ->
+			frame = {x: 200, y: 200, width: 200, height: 200}
+			view = new View {frame}
+			view.x.should.equal frame.x
+			view.y.should.equal frame.y
+			view.width.should.equal frame.width
+			view.height.should.equal frame.height
+
 	describe "Visual", ->
 		
 		["scaleX", "scaleY", "scaleZ"].map (p) ->

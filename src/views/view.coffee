@@ -64,15 +64,15 @@ class View extends Frame
 			
 		set: (args) ->
 			
-			for key, value of View.Properties
-				if args[key] not in [null, undefined]
-					@[key] = args[key]
-			
 			for key, value of Frame.Properties
 				if args[key] not in [null, undefined]
 					@[key] = args[key]
 				else
 					@[key] = Frame.Properties[key]
+			
+			for key, value of View.Properties
+				if args[key] not in [null, undefined]
+					@[key] = args[key]
 			
 			for key, value of Frame.CalculatedProperties
 				@[key] = args[key] if args[key] not in [null, undefined]
