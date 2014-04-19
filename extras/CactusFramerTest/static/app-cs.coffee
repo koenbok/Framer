@@ -2,4 +2,4 @@ view = new View
 
 view.animate
 	properties: {x:100}
-	delay: 3000
+	curve: "cubic-bezier(.2, .5, .4, .2)"

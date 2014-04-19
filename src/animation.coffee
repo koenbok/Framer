@@ -429,6 +429,9 @@ class Animation extends EventEmitter
 		else if curve[.."bezier-curve".length-1] is "bezier-curve"
 			v = parseCurve curve, "bezier-curve"
 			return bezier.BezierCurve v[0], v[1], v[2], v[3], precision, time
+		else if curve[.."cubic-bezier".length-1] is "cubic-bezier"
+			v = parseCurve curve, "cubic-bezier"
+			return bezier.BezierCurve v[0], v[1], v[2], v[3], precision, time
 		else if curve[.."spring".length-1] is "spring"
 			v = parseCurve curve, "spring"
 			return spring.SpringCurve v[0], v[1], v[2], precision

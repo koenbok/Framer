@@ -1,7 +1,7 @@
-// Framer 2.0-59-gb78ddb1 (c) 2013 Koen Bok
+// Framer 2.0-60-g2c1fd6d (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-59-gb78ddb1";
+window.FramerVersion = "2.0-60-g2c1fd6d";
 
 
 (function(){var require = function (file, cwd) {
@@ -3865,6 +3865,9 @@ require.define("/src/animation.coffee",function(require,module,exports,__dirname
         return bezier.defaults.EaseInOut(this.precision, time);
       } else if (curve.slice(0, +("bezier-curve".length - 1) + 1 || 9e9) === "bezier-curve") {
         v = parseCurve(curve, "bezier-curve");
+        return bezier.BezierCurve(v[0], v[1], v[2], v[3], precision, time);
+      } else if (curve.slice(0, +("cubic-bezier".length - 1) + 1 || 9e9) === "cubic-bezier") {
+        v = parseCurve(curve, "cubic-bezier");
         return bezier.BezierCurve(v[0], v[1], v[2], v[3], precision, time);
       } else if (curve.slice(0, +("spring".length - 1) + 1 || 9e9) === "spring") {
         v = parseCurve(curve, "spring");
