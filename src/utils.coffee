@@ -135,6 +135,9 @@ exports.isChrome = ->
 exports.isLocal = ->
 	window.location.href[0..6] == "file://"
 
+exports.isLocalFile = (url) ->
+	url[0..6] == "file://"
+
 exports.devicePixelRatio = ->
 	window.devicePixelRatio
 
