@@ -1,7 +1,7 @@
-// Framer 2.0-62-g449b155 (c) 2013 Koen Bok
+// Framer 2.0-64-gfad01d1 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-62-g449b155";
+window.FramerVersion = "2.0-64-gfad01d1";
 
 
 (function(){var require = function (file, cwd) {
@@ -646,6 +646,10 @@ require.define("/src/utils.coffee",function(require,module,exports,__dirname,__f
 
   exports.isLocal = function() {
     return window.location.href.slice(0, 7) === "file://";
+  };
+
+  exports.isLocalFile = function(url) {
+    return url.slice(0, 7) === "file://";
   };
 
   exports.devicePixelRatio = function() {
@@ -4291,12 +4295,13 @@ require.define("/src/views/scrollview.coffee",function(require,module,exports,__
   exports.ScrollView = (function(_super) {
     __extends(ScrollView, _super);
 
-    function ScrollView() {
+    function ScrollView(args) {
       ScrollView.__super__.constructor.apply(this, arguments);
       this.style["overflow"] = "scroll";
       this.style["-webkit-overflow-scrolling"] = "touch";
       this.style["overflow-x"] = "scroll";
       this.style["overflow-y"] = "scroll";
+      this.style.backgroundColor = null;
     }
 
     ScrollView.define("scrollVertical", {
@@ -4391,11 +4396,14 @@ require.define("/src/views/imageview.coffee",function(require,module,exports,__d
       set: function(value) {
         var loader, _ref, _ref1,
           _this = this;
+        if (value) {
+          this.style.backgroundColor = null;
+        }
         if (this._image === value) {
           return this.emit("load", loader);
         }
         this._image = config.baseUrl + value;
-        if (utils.isLocal()) {
+        if (utils.isLocalFile(this._image)) {
           this._image += "?nocache=" + (Date.now());
         }
         if ((_ref = this.events) != null ? _ref.hasOwnProperty("load" || ((_ref1 = this.events) != null ? _ref1.hasOwnProperty("error") : void 0)) : void 0) {

@@ -2,13 +2,16 @@
 {View} = require "./view"
 
 class exports.ScrollView extends View
-	constructor: ->
+	constructor: (args) ->
+		
 		super
+		
 		@style["overflow"] = "scroll"
 		@style["-webkit-overflow-scrolling"] = "touch"
 		@style["overflow-x"] = "scroll"
 		@style["overflow-y"] = "scroll"
 		
+		@style.backgroundColor = null
 		
 		# # Hack to disable rubber banding on ios devices
 		# startY = startTopScroll = deltaY = undefined

@@ -23,6 +23,10 @@ class exports.ImageView extends View
 		
 		set: (value) ->
 
+			if value
+				# Undo the setting of the default background color
+				@style.backgroundColor = null
+
 			if @_image is value
 				return @emit "load", loader
 			
@@ -30,7 +34,7 @@ class exports.ImageView extends View
 			@_image = config.baseUrl + value
 			
 			# If the file is local, we want to avoid caching
-			if utils.isLocal()
+			if utils.isLocalFile @_image
 				@_image += "?nocache=#{Date.now()}"
 			
 			# As an optimization, we will only use a loader
