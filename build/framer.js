@@ -1,7 +1,7 @@
-// Framer 2.0-64-gfad01d1 (c) 2013 Koen Bok
+// Framer 2.0-66-g68e7cd4 (c) 2013 Koen Bok
 // https://github.com/koenbok/Framer
 
-window.FramerVersion = "2.0-64-gfad01d1";
+window.FramerVersion = "2.0-66-g68e7cd4";
 
 
 (function(){var require = function (file, cwd) {
@@ -2218,7 +2218,8 @@ require.define("/src/debug.coffee",function(require,module,exports,__dirname,__f
       backgroundColor: "rgba(255,0,0,0.5)",
       padding: "12px",
       border: "1px solid rgba(255,0,0,0.5)",
-      borderRadius: "5px"
+      borderRadius: "5px",
+      zIndex: "99999"
     };
     errorView.scale = 0.5;
     return errorView.animate({
