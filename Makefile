@@ -1,38 +1,50 @@
+browserify = ./node_modules/.bin/browserify -t coffeeify -d --extension=".coffee"
+watch = ./node_modules/.bin/coffee scripts/watch.coffee
+
 all: build
 
 build:
-	make lint
-	# make clean
 	mkdir -p build
-	./node_modules/coffee-script/bin/coffee scripts/banner.coffee > build/framer.js
-	./node_modules/browserify/bin/cmd.js src/init.coffee >> build/framer.js
+	./node_modules/coffee-script/bin/coffee scripts/banner.coffee > build/framer.temp.js
+	$(browserify) Framer/Framer.coffee -o build/framer.temp.js
+	cp build/framer.temp.js build/framer.js
+	cp build/framer.js extras/CactusFramer/static/framer.js
 buildw:
-	./node_modules/coffee-script/bin/coffee scripts/watch.coffee . make build
+	$(watch) framer make build
 
 test:
 	make
 	mkdir -p test/lib
 	cp build/framer.js test/lib/framer.js
-	./node_modules/browserify/bin/cmd.js test/init.coffee -o test/init.js
-	./node_modules/mocha-phantomjs/bin/mocha-phantomjs test/index.html
+	$(browserify) test/init.coffee -o test/init.js
+	./node_modules/.bin/mocha-phantomjs test/index.html
 testw:
-	./node_modules/coffee-script/bin/coffee scripts/watch.coffee . make test
+	$(watch) . make test
 
-clean:
-	rm -rf build
-
-lint:
-	./node_modules/coffeelint/bin/coffeelint -f lint.config.json -r src
-
-dist:
-	make clean
-	make build
-	cp -R template build/Framer
-	cp build/framer.js build/Framer/framer.js
-	cd build; zip -r Framer.zip Framer
 
 cactus:
-	cd extras/CactusFramerTest; cactus serve
+	cd extras/CactusFramer; cactus serve
 
-.PHONY: build clean lint test
+# clean:
+# 	rm -rf build
+
+# lint:
+# 	./node_modules/coffeelint/bin/coffeelint -f lint.config.json -r src
+
+# dist:
+# 	make clean
+# 	make build
+# 	cp -R template build/Framer
+# 	cp build/framer.js build/Framer/framer.js
+# 	cd build; zip -r Framer.zip Framer
+
+# perf:
+# 	make
+# 	$(browserify) perf/init.coffee -o perf/init.js
+# 	./node_modules/.bin/phantomjs perf/init.js
+# perfw:
+# 	$(watch) make perf
+
+
+.PHONY: build clean lint test perf
 

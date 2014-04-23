@@ -6,8 +6,23 @@ cmd = process.argv[3]
 
 child = null
 
+runCommand = ->
+	
+	console.log "Running '#{cmd} #{process.argv[4..].join " "}'"
+
+	child?.kill()
+	child = spawn cmd, process.argv[4..]
+
+	child.stdout.on "data",  (data) -> process.stdout.write Buffer(data).toString()
+	child.stdout.on "error", (data) -> process.stderr.write Buffer(data).toString()
+
+	child.stderr.on "data",  (data) -> process.stdout.write Buffer(data).toString()
+	child.stderr.on "error", (data) -> process.stderr.write Buffer(data).toString()
+
 console.log "Path: #{path}"
 console.log "Command: #{cmd}"
+
+runCommand()
 
 watchr.watch
 	paths: [path]
@@ -17,24 +32,7 @@ watchr.watch
 
 		change: (changeType, filePath) ->
 			
-			# console.log "a change event occured:", changeType, filePath
-			# console.log filePath.indexOf ".coffee"
-			
 			if filePath.indexOf(".coffee") > -1
+				console.log "Change: #{filePath}"
+				runCommand()
 				
-				console.log "Running '#{cmd} #{process.argv[4..].join " "}'"
-				
-				child?.kill()
-				child = spawn cmd, process.argv[4..]
-				
-				child.stdout.on "data", (data) ->
-					process.stdout.write Buffer(data).toString "utf8"
-				
-				child.stdout.on "error", (data) ->
-					process.stderr.write Buffer(data).toString "utf8"
-
-				child.stderr.on "data", (data) ->
-					process.stdout.write Buffer(data).toString "utf8"
-				
-				child.stderr.on "error", (data) ->
-					process.stderr.write Buffer(data).toString "utf8"

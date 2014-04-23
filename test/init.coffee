@@ -1,4 +1,3 @@
-{EventTest} = require './tests/events'
-{DebugTest} = require './tests/debug'
-{ViewTest} = require './tests/view'
-{AnimationTest} = require './tests/animation'
+require "./tests/UtilsTest"
+require "./tests/BaseClassTest"
+require "./tests/LayerTest"

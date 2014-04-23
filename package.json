@@ -1,23 +1,40 @@
 {
-  "name": "Framer",
-  "version": "0.5.0",
-  "author": "Koen Bok <koen@madebysofa.com>",
-  "description": "Webkit based prototyping tool.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/koenbok/Framer.git"
-  },
-  "scripts": {
-    "test": "make test"
-  },
-  "dependencies": {
-    "underscore": "1.x",
-    "browserify": "1.x",
-    "coffee-script": "1.6.x",
-    "coffeelint": "0.5.x",
-    "phantomjs": "1.9.x",
-    "mocha-phantomjs": "2.x.x",
-    "watchr": "2.4.x"
-  },
-  "license": "MIT"
+	"name": "Framer",
+	"version": "3.0.0",
+	"description": "Modern Prototyping Framework",
+	"main": "build/framer.js",
+	"directories": {
+		"doc": "docs",
+		"test": "test"
+	},
+	"dependencies": {
+		"browserify": "~2.35.4",
+		"coffeeify": "~0.5.2",
+		"coffeelint": "~0.6.1",
+		"lodash": "~2.4.1",
+		"mocha-phantomjs": "~3.2.0",
+		"phantomjs": "~1.9.2-5",
+		"underscore": "~1.5.2",
+		"watch": "~0.8.0",
+		"watchr": "~2.4.4"
+	},
+	"devDependencies": {
+		"coffee-script": "~1.6.3"
+	},
+	"scripts": {
+		"test": "make test"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/koenbok/Framer.git"
+	},
+	"keywords": [
+		"prototyping"
+	],
+	"author": "Koen Bok",
+	"license": "BSD",
+	"bugs": {
+		"url": "https://github.com/koenbok/Framer/issues"
+	},
+	"homepage": "https://github.com/koenbok/Framer"
 }
