@@ -49,9 +49,15 @@ class exports.Animation extends EventEmitter
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
+		@options.properties = @_filterAnimatableProperties @options.properties
+
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
+
+	_filterAnimatableProperties: (properties) ->
+		delete properties.image
+		properties
 
 	_currentState: ->
 		_.pick @options.layer, _.keys(@options.properties)

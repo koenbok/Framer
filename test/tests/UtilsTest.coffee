@@ -59,3 +59,18 @@ describe "Utils", ->
 			result = Utils.parseFunction "spring(100 , 50 )"
 			result.name.should.equal "spring"
 			result.args.should.eql ["100", "50"]
+
+	describe "arrayNext", ->
+
+		it "should work", ->
+			Utils.arrayNext(["a", "b", "c"], "a").should.equal "b"
+			Utils.arrayNext(["a", "b", "c"], "b").should.equal "c"
+			Utils.arrayNext(["a", "b", "c"], "c").should.equal "a"
+
+	describe "arrayPrev", ->
+
+		it "should work", ->
+			Utils.arrayPrev(["a", "b", "c"], "a").should.equal "c"
+			Utils.arrayPrev(["a", "b", "c"], "b").should.equal "a"
+			Utils.arrayPrev(["a", "b", "c"], "c").should.equal "b"
+			

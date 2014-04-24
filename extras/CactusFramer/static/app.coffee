@@ -1,16 +1,58 @@
+
+
+
+layerB = new Layer y:50
+
+layerB.states.add "small", {scale:1, y:400}
+layerB.states.add "big", {scale:1, y:0}
+layerB.states.add "benjamin", {scale:1, y:48}
+
 layer = new Layer
 
-a1 = layer.animate
-	properties: 
-		x: 100
-	curve: "spring(500,15,1)"
+layer.states.add "small", {scale:2, blur:29}
+layer.states.add "big", {scale:5, blur:0}
+layer.states.add "benjamin", {scale:1, x:48}
+
+layer.states.defaultAnimationOptions =
+	curve: "linear"
+
+layer.on "click", ->
+	layer.states.next()
+	layerB.states.next()
 
 
-a2 = a1.inverse()
-
-# a1.on "end", a2.start
-# a2.on "end", a1.start
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+layer.states.states().map (stateName, i) ->
+	button = new Layer y:i*50, height:40, x:400
+	button._element.innerHTML = stateName
+	button.on "click", => layer.states.switch stateName

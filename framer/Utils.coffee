@@ -33,6 +33,12 @@ exports.arrayToObject = (arr) ->
 
 	obj
 
+exports.arrayNext = (arr, item) ->
+	arr[arr.indexOf(item) + 1] or _.first arr
+
+exports.arrayPrev = (arr, item) ->
+	arr[arr.indexOf(item) - 1] or _.last arr
+
 
 ######################################################
 # TIME FUNCTIONS

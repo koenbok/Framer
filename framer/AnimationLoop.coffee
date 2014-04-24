@@ -79,7 +79,7 @@ AnimationLoop =
 		requestAnimationFrame AnimationLoop._tick
 
 		for animator in removeAnimators
-			animator.emit "tick", 1 # This makes sure we and at a perfect value
+			# animator.emit "tick", 1 # This makes sure we and at a perfect value
 			AnimationLoop.remove animator
 			animator.emit "end"
 
