@@ -1,0 +1,5 @@
+.DS_Store
+.build
+.deploy
+static/app.js
+static/framer.js

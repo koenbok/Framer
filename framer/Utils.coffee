@@ -92,6 +92,10 @@ exports.randomColor = (alpha = 1.0) ->
 exports.randomChoice = (arr) ->
 	arr[Math.floor(Math.random() * arr.length)]
 
+exports.randomNumber = (a=0, b=1) ->
+	# Return a random number between a and b
+	exports.mapRange Math.random(), 0, 1, a, b
+
 exports.uuid = ->
 
 	chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('')
@@ -171,6 +175,20 @@ exports.round = (value, decimals) ->
 exports.mapRange = (value, fromLow, fromHigh, toLow, toHigh) ->
 	toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
 
+######################################################
+# STRING FUNCTIONS
+
+exports.parseFunction = (str) ->
+
+	result = {name: "", args: []}
+
+	if _.endsWith str, ")"
+		result.name = str.split("(")[0]
+		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.rtrim(a, ")"))
+	else
+		result.name = str
+
+	return result
 
 ######################################################
 # DOM FUNCTIONS

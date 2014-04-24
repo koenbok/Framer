@@ -95,17 +95,8 @@ class exports.Layer extends BaseClass
 		get: -> @_element.style
 		set: (value) -> _.extend @_element.style, value
 
-	# @define "computedStyle",
-	# 	# TODO: maybe make this into a function
-	# 	get: -> document.defaultView.getComputedStyle @_element
-	# 	# set: (value) -> throw Error "computedStyle is readonly"
-
 	computedStyle: ->
 		document.defaultView.getComputedStyle @_element
-
-	# TODO: Batching multiple style updates
-	# _styleTransactionStart: ->
-	# _styleTransactionCommit: ->
 
 	_setDefaultCSS: ->
 		@style = Config.layerBaseCSS
@@ -273,10 +264,14 @@ class exports.Layer extends BaseClass
 	## ANIMATION
 
 	animate: (options) ->
+
+		start = options.start
+		start ?= true
+		delete options.start
+
 		options.layer = @
-		options.start ?= true
 		animation = new Animation options
-		animation.start() if options.start
+		animation.start() if start
 		animation
 
 	animateStop: ->

@@ -13,9 +13,11 @@ Utils = require "./Utils"
 AnimatorClasses =
 	"linear": LinearAnimator
 	"bezier-curve": BezierCurveAnimator
-	"spring": SpringRK4Animator
 	"spring-rk4": SpringRK4Animator
 	"spring-dho": SpringDHOAnimator
+
+AnimatorClasses["spring"] = AnimatorClasses["spring-rk4"]
+AnimatorClasses["cubic-bezier"] = AnimatorClasses["bezier-curve"]
 
 _runningAnimations = []
 
@@ -36,13 +38,12 @@ class exports.Animation extends EventEmitter
 			curve: "linear"
 			curveOptions: {}
 			time: 1
-			# origin: "50% 50%"
 			repeat: 0
 			delay: 0
+			# origin: "50% 50%"
 			debug: true
 
-		@options.curveOptions = Utils.setDefaultProperties @options.curveOptions,
-			{time: @options.time}, false
+		@_parseAnimatorOptions()
 
 		if options.layer is null
 			console.error "Animation: missing layer"
@@ -52,22 +53,53 @@ class exports.Animation extends EventEmitter
 
 	_animatorClass: ->
 		
-		animatorClassName = @options.curve.toLowerCase()
+		parsedCurve = Utils.parseFunction @options.curve
+		animatorClassName = parsedCurve.name.toLowerCase()
 
 		if AnimatorClasses.hasOwnProperty animatorClassName
 			return AnimatorClasses[animatorClassName]
 
-		return BezierCurveAnimator
+		return LinearAnimator
 
-	_animatorOptions: ->
-		@options.curveOptions
+	_parseAnimatorOptions: ->
+
+		animatorClass = @_animatorClass()
+		parsedCurve = Utils.parseFunction @options.curve
+
+		# This is for compatibility with the direct Animation.time argument. This should
+		# ideally also be passed as a curveOption
+
+		if animatorClass in [LinearAnimator, BezierCurveAnimator]
+			@options.curveOptions.time = @options.time
+
+		# All this is to support curve: "spring(100,20,10)". In the future we'd like people
+		# to start using curveOptions: {tension:100, friction:10} etc 
+
+		if parsedCurve.args.length
+
+			console.warn "Animation.curve arguments are deprecated. Please use Animation.curveOptions"
+
+			if animatorClass is BezierCurveAnimator
+				@options.curveOptions.values = parsedCurve.args.map (v) -> parseFloat v
+			
+			if animatorClass is SpringRK4Animator
+				@options.curveOptions.tension = parseFloat parsedCurve.args[0]
+				@options.curveOptions.friction = parseFloat parsedCurve.args[1]
+				@options.curveOptions.velocity = parseFloat parsedCurve.args[2]
+			
+			if animatorClass is SpringDHOAnimator
+				@options.curveOptions.stiffness = parseFloat parsedCurve.args[0]
+				@options.curveOptions.damping = parseFloat parsedCurve.args[1]
+				@options.curveOptions.mass = parseFloat parsedCurve.args[2]
+				@options.curveOptions.tolerance = parseFloat parsedCurve.args[3]
 
 	start: ->
 
 		AnimatorClass = @_animatorClass()
-		animatorOptions = @_animatorOptions()
 
-		@_animator = new AnimatorClass @_animatorOptions()
+		console.debug "Animation.start #{AnimatorClass.name}", @options.curveOptions
+
+		@_animator = new AnimatorClass @options.curveOptions
 
 		target = @options.layer
 		stateB = @options.properties

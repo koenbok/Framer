@@ -49,9 +49,30 @@ describe "Layer", ->
 
 			layer.originX = 0.1
 			layer.originY = 0.2
-			layer.originZ = 0.3
 
-			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 50)"
-			layer.style.webkitTransformOrigin.should.equal "10% 20% 30%"
+			layer.style.webkitTransformOrigin.should.equal "10% 20%"
+
+			layer.originX = 0.5
+			layer.originY = 0.5
+
+			layer.style.webkitTransformOrigin.should.equal "50% 50%"
+
+		it "should set local image", ->
+	
+			imagePath = "static/test.png"			
+			layer = new Layer
+
+			layer.image = imagePath
+			layer.image.should.equal imagePath
+
+			layer.style["background-image"].should.contain imagePath
+			layer.style["background-image"].should.contain "file://"
+			layer.style["background-image"].should.contain "?nocache="
+
+			layer.style["background-size"].should.equal "cover"
+			layer.style["background-repeat"].should.equal "no-repeat"
+
+			layer.properties.image.should.equal imagePath
+
 
 

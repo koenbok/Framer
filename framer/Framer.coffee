@@ -15,7 +15,6 @@ _.extend window, Framer if window
 
 Framer.Config = (require "./Config").Config
 Framer.BaseClass = (require "./BaseClass").BaseClass
-Framer.Matrix = (require "./Matrix").Matrix
 Framer.LayerStyle = (require "./LayerStyle").LayerStyle
 Framer.AnimationLoop = (require "./AnimationLoop").AnimationLoop
 Framer.LinearAnimator = (require "./Animators/LinearAnimator").LinearAnimator

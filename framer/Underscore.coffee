@@ -1,6 +1,8 @@
 # This allows us to switch out the underscore utility library
 
-exports._ = require "lodash"
+_ = require "lodash"
 
-# exports._ = require "underscore"
-# exports._ = require "lodash/dist/lodash.underscore"
+_.str = require 'underscore.string'
+_.mixin _.str.exports()
+
+exports._ = _

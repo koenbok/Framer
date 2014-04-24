@@ -1,5 +1,5 @@
 browserify = ./node_modules/.bin/browserify -t coffeeify -d --extension=".coffee"
-watch = ./node_modules/.bin/coffee scripts/watch.coffee
+watch = ./node_modules/.bin/coffee scripts/watch.coffee framer,test/tests
 
 all: build
 
@@ -10,7 +10,7 @@ build:
 	cp build/framer.temp.js build/framer.js
 	cp build/framer.js extras/CactusFramer/static/framer.js
 buildw:
-	$(watch) framer make build
+	$(watch) make build
 
 test:
 	make
@@ -19,7 +19,7 @@ test:
 	$(browserify) test/init.coffee -o test/init.js
 	./node_modules/.bin/mocha-phantomjs test/index.html
 testw:
-	$(watch) . make test
+	$(watch) make test
 
 
 cactus:

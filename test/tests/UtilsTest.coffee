@@ -37,3 +37,25 @@ describe "Utils", ->
 
 		it "should work", ->
 			Utils.arrayToObject([["a", 1], ["b", 2]]).should.eql({"a": 1, "b": 2})
+
+	describe "parseFunction", ->
+
+		it "should work without arguments", ->
+			result = Utils.parseFunction "spring"
+			result.name.should.equal "spring"
+			result.args.should.eql []
+
+		it "should work with a single argument", ->
+			result = Utils.parseFunction "spring(100)"
+			result.name.should.equal "spring"
+			result.args.should.eql ["100"]
+
+		it "should work with multiple arguments", ->
+			result = Utils.parseFunction "spring(100,50)"
+			result.name.should.equal "spring"
+			result.args.should.eql ["100", "50"]
+
+		it "should cleanup arguments", ->
+			result = Utils.parseFunction "spring(100 , 50 )"
+			result.name.should.equal "spring"
+			result.args.should.eql ["100", "50"]
