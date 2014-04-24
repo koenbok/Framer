@@ -43,13 +43,18 @@ class exports.Animation extends EventEmitter
 			# origin: "50% 50%"
 			debug: true
 
-		@_parseAnimatorOptions()
-
 		if options.layer is null
 			console.error "Animation: missing layer"
 
-		@_creationState = _.pick @options.layer, _.keys(@options.properties)
+		if options.origin
+			console.warn "Animation.origin: please use layer.originX and layer.originY"
+
+		@_parseAnimatorOptions()
+		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
+
+	_currentState: ->
+		_.pick @options.layer, _.keys(@options.properties)
 
 	_animatorClass: ->
 		
@@ -77,7 +82,7 @@ class exports.Animation extends EventEmitter
 
 		if parsedCurve.args.length
 
-			console.warn "Animation.curve arguments are deprecated. Please use Animation.curveOptions"
+			# console.warn "Animation.curve arguments are deprecated. Please use Animation.curveOptions"
 
 			if animatorClass is BezierCurveAnimator
 				@options.curveOptions.values = parsedCurve.args.map (v) -> parseFloat v
@@ -93,7 +98,7 @@ class exports.Animation extends EventEmitter
 				@options.curveOptions.mass = parseFloat parsedCurve.args[2]
 				@options.curveOptions.tolerance = parseFloat parsedCurve.args[3]
 
-	start: ->
+	start: =>
 
 		AnimatorClass = @_animatorClass()
 
@@ -102,9 +107,8 @@ class exports.Animation extends EventEmitter
 		@_animator = new AnimatorClass @options.curveOptions
 
 		target = @options.layer
+		stateA = @_currentState()
 		stateB = @options.properties
-		# stateA = _.pick target, _.keys(stateB)
-		stateA = @_creationState
 
 		if _.isEqual stateA, stateB
 			console.warn "Nothing to animate"
@@ -133,6 +137,17 @@ class exports.Animation extends EventEmitter
 	stop: ->
 		@_animator.stop()
 		_runningAnimations = _.without _runningAnimations, @
+
+	reverse: ->
+		options = _.clone @options
+		options.properties = @_originalState
+		animation = new Animation options
+		animation
+
+	# A bunch of common aliases to minimize frustration
+	revert: -> 	@reverse()
+	inverse: -> @reverse()
+	invert: -> 	@reverse()
 
 	emit: (event) ->
 		super

@@ -20,6 +20,8 @@
 - Port the css keyframe animation backend and make it switchable between requestAndimationFrame and css keyframes. Maybe even auto switch it based on what you are trying to do if that isn't too magical.
 - Do something smarter with the curve property. It's weird that it's a string while all other objects are plain javascript objects. But it makes sense from a css perspective. Maybe just support both.
 - See if we can start animating other properties like colors, shadows, gradients etc. We'll have to explain why these are slower.
+- We should do something more smart for toggles or cycles, because that is such an important use case
+- Add delay and repeat keywords
 
 # Advanced Behaviour
 
@@ -27,5 +29,6 @@
 - Add a simple state machine like layer.states.define "test", {properties...} and layer.states.transform "new-state"
 - Capture more global state about layers and states so we can build a UI around all this.
 - Add box2d and let it do some simple things while figuring out an api for a physics engine that can be understood by designers without a math/physics background.
+
 
 
