@@ -517,6 +517,12 @@ class View extends Frame
 
 		view  = new @constructor @properties
 
+		# nuke the subViews from the framer object
+		@subViews = null
+
+		# nuke the subViews from the DOM
+		view.html = ""
+
 		for subView in @subViews
 			copiedSubView = subView.copy()
 			copiedSubView.superView = view
