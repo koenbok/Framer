@@ -517,9 +517,9 @@ class View extends Frame
 
 		view  = new @constructor @properties
 
-		for subView in @subViews
-			copiedSubView = subView.copy()
-			copiedSubView.superView = view
+		# for subView in @subViews
+		# 	copiedSubView = subView.copy()
+		# 	copiedSubView.superView = view
 
 		view
 
