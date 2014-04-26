@@ -2218,7 +2218,8 @@ require.define("/src/debug.coffee",function(require,module,exports,__dirname,__f
       backgroundColor: "rgba(255,0,0,0.5)",
       padding: "12px",
       border: "1px solid rgba(255,0,0,0.5)",
-      borderRadius: "5px"
+      borderRadius: "5px",
+      zIndex: "99999"
     };
     errorView.scale = 0.5;
     return errorView.animate({

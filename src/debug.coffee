@@ -11,6 +11,7 @@ exports.errorWarning = (e) ->
 		padding: "12px"
 		border: "1px solid rgba(255,0,0,0.5)"
 		borderRadius: "5px"
+		zIndex: "99999"
 	errorView.scale = 0.5
 	errorView.animate
 		properties: {scale:1.0}
