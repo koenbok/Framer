@@ -1,3 +1,14 @@
 language: node_js
 node_js:
-  - "0.10"
+- '0.10'
+deploy:
+  skip_cleanup: true
+  provider: s3
+  access_key_id: AKIAJPD7XYUEPAKP22SQ
+  secret_access_key:
+    secure: koojIA4npOlj5c8t6x8MZLTLKqx8nNXOwcfZUDVCg50TZT1CCZVnPY9itcGs2hRJN4jvWZXBrW6f6S2p/bUEIkBNUeEkFPY1bc6aJe1XoFqpTXzVDFKLMKcYKbricrF7J33jWD1U8DiOPuvbJORB3VnH4vAr8X1ifXez9P+8XsI=
+  bucket: builds.framerjs.com
+  local-dir: build
+  on:
+    repo: koenbok/Framer
+    branch: framer3
