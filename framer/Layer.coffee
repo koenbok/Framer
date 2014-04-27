@@ -31,8 +31,11 @@ class exports.Layer extends BaseClass
 		@_createElement()
 		@_setDefaultCSS()
 
+		# TODO: set the Defaults
+		# TODO: take all the options as properties
+
 		# Set some special defaults
-		@style.backgroundColor = Config.defaultBackgroundColor()
+		# @style.backgroundColor = Config.defaultBackgroundColor()
 
 		super options
 
@@ -167,6 +170,10 @@ class exports.Layer extends BaseClass
 
 			if currentValue == value
 				return @emit "load"
+
+
+			# Unset any background color
+			@style.backgroundColor = null
 
 			# Set the property value
 			@_setPropertyValue "image", value
