@@ -6,4 +6,4 @@ env:
     - secure: ep5scJ8LJ49LEwUBqJq3lklxDDGC5YVa9YxTNalDChAzy3DGT05EoUeLAGVDLfAM2K3vZ8n6xNJIrkN1c5ZPm2PZI2EteGB5NlvYxsGPjz7d4nQUXxhzmr202r3DmTqMLjk4Mr2jHg55VyAsjF5zkv0JuFF9SfmBfY3cIJq2jLY=
     - secure: Pas8QvTGuVTv0MOUMFjrVmWvIRl4kk9ziNYnR0wyTJ7Pekd6g4v1QumEpLxyfzy1C/NL2o38UyTjvNEakaZqZPld/PeqhPWv8ZtpqGaIOkwsEdNgRw0o/EbRK8gLMcJDNh16EK7Shs/4Lqv9BFu1+8MXbn5q+JJRDrjdzdyEPDA=
 after_success:
-  - node_modules/.bin/coffee scripts/deploy.coffee
+  - make deploy
