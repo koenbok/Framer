@@ -28,28 +28,6 @@ dist:
 deploy:
 	make dist
 	$(coffee) scripts/deploy.coffee
-	
 
-# clean:
-# 	rm -rf build
-
-# lint:
-# 	./node_modules/coffeelint/bin/coffeelint -f lint.config.json -r src
-
-# dist:
-# 	make clean
-# 	make build
-# 	cp -R template build/Framer
-# 	cp build/framer.js build/Framer/framer.js
-# 	cd build; zip -r Framer.zip Framer
-
-# perf:
-# 	make
-# 	$(browserify) perf/init.coffee -o perf/init.js
-# 	./node_modules/.bin/phantomjs perf/init.js
-# perfw:
-# 	$(watch) make perf
-
-
-.PHONY: build clean lint test perf
-
+clean:
+	rm -rf build
