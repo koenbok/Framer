@@ -1,13 +1,14 @@
-browserify = ./node_modules/.bin/browserify -t coffeeify -d --extension=".coffee"
-watch = ./node_modules/.bin/coffee scripts/watch.coffee framer,test/tests
+bin = ./node_modules/.bin
+coffee = $(bin)/coffee
+browserify = $(bin)/browserify -t coffeeify -d --extension=".coffee"
+watch = $(coffee) scripts/watch.coffee framer,test/tests
 
 all: build
 
 build:
 	mkdir -p build
-	./node_modules/coffee-script/bin/coffee scripts/banner.coffee > build/framer.temp.js
-	$(browserify) framer/Framer.coffee -o build/framer.temp.js
-	cp build/framer.temp.js build/framer.js
+	$(coffee) scripts/banner.coffee > build/framer.js
+	$(browserify) framer/Framer.coffee -o build/framer.js
 	cp build/framer.js extras/CactusFramer/static/framer.js
 buildw:
 	$(watch) make build
@@ -17,13 +18,16 @@ test:
 	mkdir -p test/lib
 	cp build/framer.js test/lib/framer.js
 	$(browserify) test/init.coffee -o test/init.js
-	./node_modules/.bin/mocha-phantomjs test/index.html
+	$(bin)/mocha-phantomjs test/index.html
 testw:
 	$(watch) make test
 
+dist:
+	make build
 
-cactus:
-	cd extras/CactusFramer; cactus serve
+deploy:
+	make dist
+	$(coffee) scripts/deploy.coffee
 	
 
 # clean:

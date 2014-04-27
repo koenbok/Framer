@@ -17,7 +17,8 @@
     "underscore": "~1.5.2",
     "watch": "~0.8.0",
     "watchr": "~2.4.4",
-    "underscore.string": "^2.3.3"
+    "underscore.string": "^2.3.3",
+    "aws-sdk": "^2.0.0-rc.14"
   },
   "devDependencies": {
     "coffee-script": "~1.6.3"
