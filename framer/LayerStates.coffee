@@ -9,7 +9,7 @@ class exports.LayerStates extends EventEmitter
 		@_states = {}
 		@_orderedStates = []
 		
-		@defaultAnimationOptions =
+		@animationOptions =
 			curve: "spring"
 		
 		# Always add the default state as the current
@@ -47,7 +47,7 @@ class exports.LayerStates extends EventEmitter
 		@_previousStates.push @_currentState
 		@_currentState = stateName
 
-		animationOptions ?= @defaultAnimationOptions
+		animationOptions ?= @animationOptions
 		animationOptions.properties = {}
 		
 		for k, v of @_states[stateName]

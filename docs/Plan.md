@@ -12,6 +12,7 @@
 
 - Throw warnings when you are trying to listen for non existing events, or events that don't make sense.
 - Optimize the hell out of the event emitter, as it is going to be used by the animation functions so it will get called a lot.
+- Bind the event scope (this) to the object that emitted it: http://goo.gl/r0q3SS
 
 # Animation
 
