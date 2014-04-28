@@ -42,8 +42,10 @@ class exports.Layer extends BaseClass
 
 		super options
 
-		if not options.superView
+		if not options.superLayer
 			@_insertElement()
+		else
+			@superLayer = options.superLayer
 
 		# Set needed private variables
 		@_subLayers = []
@@ -305,7 +307,7 @@ class exports.Layer extends BaseClass
 	## INDEX ORDERING
 
 	bringToFront: ->
-		throw "Layer.bringToFront not implemented"
+		# throw "Layer.bringToFront not implemented"
 
 	##############################################################
 	## STATES
