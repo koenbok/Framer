@@ -1,5 +1,6 @@
 layerA = new Layer
 
+layerA.states.add "test", {y: (-> Math.random() * 100)}
+
 layerA.on "click", ->
-	layerA.animate
-		properties: {y:parseInt(Math.random() * 300)}
+	layerA.states.next()

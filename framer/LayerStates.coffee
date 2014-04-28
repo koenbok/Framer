@@ -2,6 +2,8 @@
 
 {EventEmitter} = require "./EventEmitter"
 
+LayerStatesIgnoredKeys = ["ignoreEvents"]
+
 class exports.LayerStates extends EventEmitter
 	
 	constructor: (@layer) ->
@@ -50,9 +52,22 @@ class exports.LayerStates extends EventEmitter
 		animationOptions ?= @animationOptions
 		animationOptions.properties = {}
 		
+		animatingKeys = @animatingKeys()
+
+		console.log animatingKeys
+
 		for k, v of @_states[stateName]
+
+			# Don't animate ignored properties
+			if k in LayerStatesIgnoredKeys
+				continue
+
+			if k not in animatingKeys
+				continue
+
 			# Allow dynamic properties as functions
 			v = v() if _.isFunction(v)
+			
 			animationOptions.properties[k] = v
 			
 		animation = @layer.animate animationOptions
@@ -60,9 +75,28 @@ class exports.LayerStates extends EventEmitter
 		animation.on "stop", =>
 			@emit "didSwitch", _.last @_previousStates, stateName, @
 	
+	switchInstant: (stateName) ->
+		# Instantly switch to this new state
+		@switch stateName,
+			curve: "linear"
+			time: 0
+
 	states: ->
 		# Return a list of all the possible states
 		@_orderedStates
+
+	animatingKeys: ->
+
+		keys = []
+
+		for stateName, state of @_states
+			
+			if stateName is "default"
+				continue
+
+			keys = _.union keys, _.keys state
+
+		keys
 
 	previous: (states, animationOptions) ->
 		# Go to previous state in list

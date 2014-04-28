@@ -104,6 +104,17 @@ describe "Layer", ->
 
 			layer.properties.image.should.equal imagePath
 
+		it "should set image", ->
+	
+			imagePath = "static/test.png"	
+
+			layer = new Layer y:0, \
+				x:0, y:0,
+				width:100, height:100,
+				image:imagePath
+
+			layer.image.should.equal imagePath
+
 
 	describe "Events", ->
 
