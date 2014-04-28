@@ -3,4 +3,6 @@
 --recursive
 --log true
 --bail true
+--growl
+--check-leaks
 

@@ -7,8 +7,7 @@ Utils = require "./Utils"
 
 requestAnimationFrame =  window.requestAnimationFrame
 requestAnimationFrame ?= window.webkitRequestAnimationFrame
-
-# requestAnimationFrame = (f) -> Utils.delay 1/20, f
+requestAnimationFrame ?= (f) -> Utils.delay 1/60, f
 
 # Note: this is not an object because there should really only be one
 
@@ -72,6 +71,7 @@ AnimationLoop =
 			animator.emit "tick", animator.next(delta)
 
 			if animator.finished()
+				animator.emit "tick", 1 # This makes sure we and at a perfect value
 				removeAnimators.push animator
 
 		AnimationLoop._time = time
