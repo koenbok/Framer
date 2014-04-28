@@ -47,6 +47,11 @@ exports.LayerStyle =
 		"#{layer.originX * 100}% #{layer.originY * 100}%"
 		# "#{layer.originX * 100}% #{layer.originY * 100}% #{layer.originZ * 100}%"
 
+	pointerEvents: (layer) ->
+		if layer.ignoreEvents
+			return "none"
+		"auto"
+
 
 	# css: ->
 	# 	css = {}

@@ -105,4 +105,33 @@ describe "Layer", ->
 			layer.properties.image.should.equal imagePath
 
 
+	describe "Events", ->
+
+		it "should set pointer events", ->
+
+			layer = new Layer()
+
+			layer.ignoreEvents = false
+			layer.style["pointerEvents"].should.equal "auto"
+
+			layer.ignoreEvents = true
+			layer.style["pointerEvents"].should.equal "none"
+
+		it "should not listen to events by default", ->
+			
+			layer = new Layer()
+			layer.ignoreEvents.should.equal true
+			layer.style["pointerEvents"].should.equal "none"
+
+		it "should not listen to events until a listener is added", ->
+			
+			layer = new Layer()
+			layer.ignoreEvents.should.equal true
+
+			layer.on Events.Click, ->
+				console.log "hello"
+
+			layer.ignoreEvents.should.equal false
+
+
 

@@ -59,6 +59,9 @@ class exports.Layer extends BaseClass
 	@define "opacity", layerProperty "opacity", "opacity", 1
 	@define "clip", layerProperty "clip", "overflow", false
 
+	# Behaviour properties
+	@define "ignoreEvents", layerProperty "ignoreEvents", "pointerEvents", true
+
 	# Matrix properties
 	@define "x", layerProperty "x", "webkitTransform", 0
 	@define "y", layerProperty "y", "webkitTransform", 0
@@ -318,6 +321,9 @@ class exports.Layer extends BaseClass
 	addListener: (event, listener) ->
 		super
 		@_element.addEventListener event, listener
+
+		# We want to make sure we listen to these events
+		@ignoreEvents = false
 
 	removeListener: (event, listener) ->
 		super

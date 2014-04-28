@@ -1,6 +1,5 @@
 layerA = new Layer
-layerB = new Layer x:500, y:20
 
-layerB.on "click", ->
+layerA.on "click", ->
 	layerA.animate
-		properties: {y:100}
+		properties: {y:parseInt(Math.random() * 300)}
