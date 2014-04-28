@@ -6,5 +6,5 @@ exports.getVersion = (callback) ->
 		throw err if err
 		callback version.replace "\n", ""
 
-exports.getVersion (version) ->
-	console.log version
+# exports.getVersion (version) ->
+# 	console.log version

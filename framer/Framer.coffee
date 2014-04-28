@@ -4,7 +4,6 @@ Framer = {}
 
 # Root level modules
 Framer._ = _
-Framer.Defaults = (require "./Defaults")
 Framer.Utils = (require "./Utils")
 Framer.Layer = (require "./Layer").Layer
 Framer.Events = (require "./Events").Events
@@ -27,3 +26,8 @@ window.Framer = Framer if window
 
 # Compatibility for Framer 2
 require "./Compat"
+
+# Set the defaults
+Defaults = (require "./Defaults").Defaults
+Defaults.reset()
+Framer.resetDefaults = Defaults.reset

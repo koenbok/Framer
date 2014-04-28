@@ -3,6 +3,7 @@
 Utils = require "./Utils"
 
 {Config} = require "./Config"
+{Defaults} = require "./Defaults"
 {BaseClass} = require "./BaseClass"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
@@ -20,9 +21,15 @@ layerProperty = (name, cssProperty, fallback) ->
 		@_setPropertyValue name, value
 		@style[cssProperty] = LayerStyle[cssProperty](@)
 
+layerStyleProperty = (cssProperty) ->
+	exportable: true
+	# default: fallback
+	get: -> @style[cssProperty]
+	set: (value) -> @style[cssProperty] = value
+
 class exports.Layer extends BaseClass
 
-	constructor: (options) ->
+	constructor: (options={}) ->
 
 		_LayerList.push @
 
@@ -31,15 +38,9 @@ class exports.Layer extends BaseClass
 		@_createElement()
 		@_setDefaultCSS()
 
-		# TODO: set the Defaults
-		# TODO: take all the options as properties
-
-		# Set some special defaults
-		# @style.backgroundColor = Config.defaultBackgroundColor()
+		options = Defaults.getDefaults "Layer", options
 
 		super options
-
-		options ?= {}
 
 		if not options.superView
 			@_insertElement()
@@ -66,11 +67,11 @@ class exports.Layer extends BaseClass
 	@define "scaleX", layerProperty "scaleX", "webkitTransform", 1
 	@define "scaleY", layerProperty "scaleY", "webkitTransform", 1
 	@define "scaleZ", layerProperty "scaleZ", "webkitTransform", 1
-	# @define "scale", layerProperty "scale", "webkitTransform", 1
+	@define "scale", layerProperty "scale", "webkitTransform", 1
 
-	@define "scale",
-		get: -> (@scaleX + @scaleY + @scaleZ) / 3.0
-		set: (value) -> @scaleX = @scaleY = @scaleZ = value
+	# @define "scale",
+	# 	get: -> (@scaleX + @scaleY + @scaleZ) / 3.0
+	# 	set: (value) -> @scaleX = @scaleY = @scaleZ = value
 
 	@define "originX", layerProperty "originX", "webkitTransformOrigin", 0.5
 	@define "originY", layerProperty "originY", "webkitTransformOrigin", 0.5
@@ -90,6 +91,14 @@ class exports.Layer extends BaseClass
 	@define "invert", layerProperty "invert", "webkitFilter", 0
 	@define "grayscale", layerProperty "grayscale", "webkitFilter", 0
 	@define "sepia", layerProperty "sepia", "webkitFilter", 0
+
+	# Mapped style properties
+
+	@define "backgroundColor", layerStyleProperty "backgroundColor"
+	@define "borderRadius", layerStyleProperty "borderRadius"
+	@define "borderColor", layerStyleProperty "borderColor"
+	@define "borderWidth", layerStyleProperty "borderWidth"
+
 
 	##############################################################
 	# CSS
@@ -171,9 +180,11 @@ class exports.Layer extends BaseClass
 			if currentValue == value
 				return @emit "load"
 
-
-			# Unset any background color
-			@style.backgroundColor = null
+			# Unset any background color if it's the default color
+			# You can't really do this, because it ends up as a slightly different color
+			# if @backgroundColor is Framer.Defaults.Layer.backgroundColor
+			
+			@backgroundColor = null
 
 			# Set the property value
 			@_setPropertyValue "image", value
@@ -184,8 +195,8 @@ class exports.Layer extends BaseClass
 			# imageUrl = Config.baseUrl + imageUrl
 
 			# If the file is local, we want to avoid caching
-			if Utils.isLocal()
-				imageUrl += "?nocache=#{Date.now()}"
+			# if Utils.isLocal()
+			# 	imageUrl += "?nocache=#{Date.now()}"
 			
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
@@ -208,7 +219,6 @@ class exports.Layer extends BaseClass
 
 	##############################################################
 	## HIERARCHY
-
 
 	@define "superLayer",
 		exportable: false

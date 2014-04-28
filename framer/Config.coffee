@@ -4,8 +4,6 @@ exports.Config =
 	
 	# Animation
 	targetFPS: 60
-	# defaultBackgroundColor: -> Utils.randomColor 0.5
-	defaultBackgroundColor: -> "rgba(0,0,255,0.5)"
 
 	layerBaseCSS:
 		"display": "block"
@@ -20,7 +18,6 @@ exports.Config =
 		#"overflow": "visible"
 		#"z-index": 0
 		"-webkit-box-sizing": "border-box"
-		"-webkit-transform-origin": "50% 50% 0%"
 		#"-webkit-transform-style": "flat"
 		#"-webkit-backface-visibility": "hidden"
 		#"-webkit-backface-visibility": ""

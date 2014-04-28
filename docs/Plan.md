@@ -32,4 +32,7 @@
 - Add box2d and let it do some simple things while figuring out an api for a physics engine that can be understood by designers without a math/physics background.
 
 
+# TODO
 
+- Make sure animations stop exactly in their end state
+- Throw events for changing properties 

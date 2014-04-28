@@ -33,6 +33,13 @@ describe "BaseClass", ->
 			testClass.width.should.equal 0
 			testClass.height.should.equal 0
 
+		it "should set defaults on construction", ->
+			
+			testClass = new TestClass width:100, height:100
+
+			testClass.width.should.equal 100
+			testClass.height.should.equal 100
+
 		it "should set a property value", ->
 			
 			testClass = new TestClass()

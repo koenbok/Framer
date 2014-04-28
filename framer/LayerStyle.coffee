@@ -36,6 +36,7 @@ exports.LayerStyle =
 	webkitTransform: (layer) ->
 		"
 		translate3d(#{layer.x}px,#{layer.y}px,#{layer.z}px) 
+		scale(#{layer.scale})
 		scale3d(#{layer.scaleX},#{layer.scaleY},#{layer.scaleZ}) 
 		rotateX(#{layer.rotationX}deg) 
 		rotateY(#{layer.rotationY}deg) 

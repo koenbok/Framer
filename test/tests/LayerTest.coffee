@@ -1,5 +1,35 @@
 describe "Layer", ->
+
+	describe "Defaults", ->
+
+		it "should set defaults", ->
+			
+			Framer.Defaults =
+				Layer:
+					width: 200
+					height: 200
+					
+			layer = new Layer()
+			
+			layer.width.should.equal 200
+			layer.height.should.equal 200
+
+			Framer.resetDefaults()
+
+			layer = new Layer()
+			
+			layer.width.should.equal 100
+			layer.height.should.equal 100
 		
+
+		it "should set defaults with override", ->
+			
+			layer = new Layer x:50, y:50
+			layer.x.should.equal 50
+			layer.x.should.equal 50
+
+
+
 	describe "Properties", ->
 
 		it "should set defaults", ->
@@ -30,7 +60,7 @@ describe "Layer", ->
 			layer.y.should.equal 50
 			
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
-			layer.style.webkitTransform.should.equal "translate3d(100px, 50px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
+			layer.style.webkitTransform.should.equal "translate3d(100px, 50px, 0px) scale(1) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
 			
 		it "should set scale", ->
 			
@@ -41,7 +71,7 @@ describe "Layer", ->
 			layer.scaleZ = 100
 
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 50)"
-			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale3d(100, 100, 100) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(100, 100, 100) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
 
 		it "should set origin", ->
 			
@@ -66,8 +96,8 @@ describe "Layer", ->
 			layer.image.should.equal imagePath
 
 			layer.style["background-image"].should.contain imagePath
-			layer.style["background-image"].should.contain "file://"
-			layer.style["background-image"].should.contain "?nocache="
+			# layer.style["background-image"].should.contain "file://"
+			# layer.style["background-image"].should.contain "?nocache="
 
 			layer.style["background-size"].should.equal "cover"
 			layer.style["background-repeat"].should.equal "no-repeat"

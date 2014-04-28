@@ -8,7 +8,7 @@ all: build
 build:
 	mkdir -p build
 	$(coffee) scripts/banner.coffee > build/framer.js
-	$(browserify) framer/Framer.coffee -o build/framer.js
+	$(browserify) framer/Framer.coffee >> build/framer.js
 	cp build/framer.js extras/CactusFramer/static/framer.js
 buildw:
 	$(watch) make build
@@ -31,3 +31,5 @@ deploy:
 
 clean:
 	rm -rf build
+
+.PHONY: all build test clean
