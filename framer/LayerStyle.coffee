@@ -21,6 +21,9 @@ exports.LayerStyle =
 			return "hidden"
 		return "visible"
 
+	zIndex: (layer) ->
+		layer.index
+
 	webkitFilter: (layer) ->
 		"
 		blur(#{filterFormat layer.blur, "px"}) 

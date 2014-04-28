@@ -228,3 +228,11 @@ exports.domLoadScript = (url, callback) ->
 	head.appendChild script
 	
 	script
+
+######################################################
+# HELPER FUNCTIONS
+
+# exports.clearAll = ->
+# 	# Todo: clear all pending inserts
+# 	# Clear out whatever Framer rendered
+# 	document.getElementById("FramerRoot").innerHTML = ""

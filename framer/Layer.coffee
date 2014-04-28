@@ -43,12 +43,16 @@ class exports.Layer extends BaseClass
 		super options
 
 		if not options.superLayer
+			@bringToFront()
 			@_insertElement()
 		else
 			@superLayer = options.superLayer
 
 		# Set needed private variables
 		@_subLayers = []
+
+	toString: ->
+		"[Layer id:#{@id}]"
 
 	##############################################################
 	# Geometry
@@ -60,6 +64,7 @@ class exports.Layer extends BaseClass
 	@define "visible", layerProperty "visible", "visibility", true
 	@define "opacity", layerProperty "opacity", "opacity", 1
 	@define "clip", layerProperty "clip", "overflow", false
+	@define "index", layerProperty "index", "zIndex", 0
 
 	# Behaviour properties
 	@define "ignoreEvents", layerProperty "ignoreEvents", "pointerEvents", true
@@ -230,7 +235,7 @@ class exports.Layer extends BaseClass
 		get: -> 
 			@_superLayer or null
 		set: (layer) ->
-			
+
 			return if layer is @_superLayer
 			
 			# Cancel previous pending insertions
@@ -238,8 +243,8 @@ class exports.Layer extends BaseClass
 			
 			# Remove from previous superlayer sublayers
 			if @_superLayer
-				@_superLayer._element.removeChild @_element
 				@_superLayer._subLayers = _.without @_superLayer._subLayers, @
+				@_superLayer._element.removeChild @_element
 				@_superLayer.emit "change:subLayers", {added:[], removed:[@]}
 			
 			# Either insert the element to the new superlayer element or into dom
@@ -260,27 +265,27 @@ class exports.Layer extends BaseClass
 	
 	@define "subLayers",
 		exportable: false
-		get: -> @_subLayers.map (layer) -> layer
+		get: -> _.clone @_subLayers
 	
-	# @define "siblingLayers",
-	# 	exportable: false
-	# 	get: ->
-	# 		if @superView is null
-	# 			_.filter View.ViewList, (view) =>
-	# 				view isnt @ and view.superView
-	# 		else
-	# 			_.filter @superView.subViews, (view) =>
-	# 				view isnt @
+	@define "siblingLayers",
+		exportable: false
+		get: ->
+
+			if @superLayer is null
+				return _.filter _LayerList, (layer) =>
+					layer isnt @ and layer.superLayer is null
+
+			return _.without @superLayer.subLayers, @
 
 	addSubLayer: (layer) ->
 		layer.superLayer = @
 	
 	removeSubLayer: (layer) ->
 		
-		if layer not in @subLayer
+		if layer not in @subLayers
 			return
 		
-		view.superLayer = null
+		layer.superLayer = null
 
 	##############################################################
 	## ANIMATION
@@ -307,7 +312,29 @@ class exports.Layer extends BaseClass
 	## INDEX ORDERING
 
 	bringToFront: ->
-		# throw "Layer.bringToFront not implemented"
+		@index = _.max(_.union([0], @siblingLayers.map (layer) -> layer.index)) + 1
+
+	sendToBack: ->
+		@index = _.min(_.union([0], @siblingLayers.map (layer) -> layer.index)) - 1
+
+	placeBefore: (layer) ->
+		return if layer not in @siblingLayers
+
+		for l in @siblingLayers
+			if l.index <= layer.index
+				l.index -= 1
+
+		@index = layer.index + 1
+
+	placeBehind: (layer) ->
+		return if layer not in @siblingLayers
+
+		for l in @siblingLayers
+			if l.index >= layer.index
+				l.index += 1
+
+		@index = layer.index - 1
+
 
 	##############################################################
 	## STATES

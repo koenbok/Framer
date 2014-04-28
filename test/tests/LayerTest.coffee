@@ -1,6 +1,11 @@
+assert = require "assert"
+
 simulate = require "simulate"
 
 describe "Layer", ->
+
+	# afterEach ->
+	# 	Utils.clearAll()
 
 	describe "Defaults", ->
 
@@ -157,6 +162,131 @@ describe "Layer", ->
 
 			simulate.click myLayer._element
 
+	describe "Hierarchy", ->
+		
+		it "should insert in dom", ->
+			
+			layer = new Layer
+			
+			assert.equal layer._element.parentNode.id, "FramerRoot"
+			assert.equal layer.superLayer, null
 
+		it "should add sublayer", ->
+			
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA
+			
+			assert.equal layerB._element.parentNode, layerA._element
+			assert.equal layerB.superLayer, layerA
 
+		it "should remove sublayer", ->
 
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA
+
+			layerB.superLayer = null
+
+			assert.equal layerB._element.parentNode.id, "FramerRoot"
+			assert.equal layerB.superLayer, null
+
+		it "should list sublayers", ->
+
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA
+			layerC = new Layer superLayer:layerA
+
+			assert.deepEqual layerA.subLayers, [layerB, layerC]
+
+			layerB.superLayer = null
+			assert.equal layerA.subLayers.length, 1
+			assert.deepEqual layerA.subLayers, [layerC]
+
+			layerC.superLayer = null
+			assert.deepEqual layerA.subLayers, []
+
+		it "should list sibling root layers", ->
+
+			layerA = new Layer
+			layerB = new Layer
+			layerC = new Layer
+
+			assert layerB in layerA.siblingLayers, true
+			assert layerC in layerA.siblingLayers, true
+
+		it "should list sibling layers", ->
+
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA
+			layerC = new Layer superLayer:layerA
+
+			assert.deepEqual layerB.siblingLayers, [layerC]
+			assert.deepEqual layerC.siblingLayers, [layerB]
+			
+
+	describe "Layering", ->
+
+		it "should change index", ->
+
+			layer = new Layer
+			layer.index = 666
+			layer.index.should.equal 666
+
+		it "should be in front for root", ->
+
+			layerA = new Layer
+			layerB = new Layer
+
+			assert.equal layerB.index, layerA.index + 1
+
+		it "should be in front", ->
+
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA
+			layerC = new Layer superLayer:layerA
+
+			assert.equal layerB.index, 1
+			assert.equal layerC.index, 2
+
+		it "should send back and front", ->
+
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA
+			layerC = new Layer superLayer:layerA
+
+			layerC.sendToBack()
+
+			assert.equal layerB.index,  1
+			assert.equal layerC.index, -1
+
+			layerC.bringToFront()
+
+			assert.equal layerB.index,  1
+			assert.equal layerC.index,  2
+
+		it "should place in front", ->
+
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA # 1
+			layerC = new Layer superLayer:layerA # 2
+			layerD = new Layer superLayer:layerA # 3
+
+			layerB.placeBefore layerC
+
+			assert.equal layerB.index, 2
+			assert.equal layerC.index, 1
+			assert.equal layerD.index, 3
+
+		it "should place behind", ->
+
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA # 1
+			layerC = new Layer superLayer:layerA # 2
+			layerD = new Layer superLayer:layerA # 3
+
+			layerC.placeBehind layerB
+
+			# TODO: Still something fishy here, but it works
+
+			assert.equal layerB.index, 2
+			assert.equal layerC.index, 1
+			assert.equal layerD.index, 4
