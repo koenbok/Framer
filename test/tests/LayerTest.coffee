@@ -1,3 +1,5 @@
+simulate = require "simulate"
+
 describe "Layer", ->
 
 	describe "Defaults", ->
@@ -143,6 +145,18 @@ describe "Layer", ->
 				console.log "hello"
 
 			layer.ignoreEvents.should.equal false
+
+		it "should modify the event scope", (callback) ->
+
+			myLayer = new Layer()
+
+			myLayer.on "click", (event, layer) ->
+				@id.should.equal myLayer.id
+				layer.id.should.equal myLayer.id
+				callback()
+
+			simulate.click myLayer._element
+
 
 
 

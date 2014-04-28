@@ -318,10 +318,17 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## EVENTS
 	
-	# Listen to dom events on the element
+	
 
-	addListener: (event, listener) ->
-		super
+	addListener: (event, originalListener) =>
+
+		# Modify the scope to be the calling object, just like jquery
+		# also add the object as the last argument
+		listener = (args...) =>
+			originalListener.call @, args..., @
+
+		# Listen to dom events on the element
+		super event, listener
 		@_element.addEventListener event, listener
 
 		# We want to make sure we listen to these events

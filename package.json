@@ -18,7 +18,8 @@
     "watch": "~0.8.0",
     "watchr": "~2.4.4",
     "underscore.string": "^2.3.3",
-    "aws-sdk": "^2.0.0-rc.14"
+    "aws-sdk": "^2.0.0-rc.14",
+    "simulate": "0.0.3"
   },
   "devDependencies": {
     "coffee-script": "~1.6.3"
