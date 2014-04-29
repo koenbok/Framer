@@ -8,6 +8,7 @@ Utils = require "./Utils"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
 {Animation} = require "./Animation"
+{Frame} = require "./Frame"
 
 _RootElement = null
 _LayerList = []
@@ -20,12 +21,23 @@ layerProperty = (name, cssProperty, fallback) ->
 	set: (value) ->
 		@_setPropertyValue name, value
 		@style[cssProperty] = LayerStyle[cssProperty](@)
+		@emit "change:#{name}", value
 
 layerStyleProperty = (cssProperty) ->
 	exportable: true
 	# default: fallback
 	get: -> @style[cssProperty]
-	set: (value) -> @style[cssProperty] = value
+	set: (value) -> 
+		@style[cssProperty] = value
+		@emit "change:#{cssProperty}", value
+
+frameProperty = (name) ->
+	exportable: false
+	get: -> @frame[name]
+	set: (value) -> 
+		frame = @frame
+		frame[name] = value
+		@frame = frame
 
 class exports.Layer extends BaseClass
 
@@ -34,7 +46,6 @@ class exports.Layer extends BaseClass
 		_LayerList.push @
 
 		# We have to create the element before we set the defaults
-		@_setLayerId()
 		@_createElement()
 		@_setDefaultCSS()
 
@@ -42,6 +53,15 @@ class exports.Layer extends BaseClass
 
 		super options
 
+		# Extract the frame from the options, so we support minX, maxX etc.
+		if options.hasOwnProperty "frame"
+			frame = new Frame options.frame
+		else
+			frame = new Frame options
+
+		@frame = frame
+
+		# Insert the layer into the dom or the superLayer element
 		if not options.superLayer
 			@bringToFront()
 			@_insertElement()
@@ -51,8 +71,8 @@ class exports.Layer extends BaseClass
 		# Set needed private variables
 		@_subLayers = []
 
-	toString: ->
-		"[Layer id:#{@id}]"
+	# toString: ->
+	# 	"[Layer id:#{@id}]"
 
 	##############################################################
 	# Geometry
@@ -111,6 +131,24 @@ class exports.Layer extends BaseClass
 
 
 	##############################################################
+	# FRAME
+
+	@define "frame",
+		get: ->
+			new Frame @
+		set: (frame) ->
+			return if not frame
+			for k in ["x", "y", "width", "height"]
+				@[k] = frame[k]
+
+	@define "minX", frameProperty "minX"
+	@define "midX", frameProperty "midX"
+	@define "maxX", frameProperty "maxX"
+	@define "minY", frameProperty "minY"
+	@define "midY", frameProperty "midY"
+	@define "maxY", frameProperty "maxY"
+
+	##############################################################
 	# CSS
 
 	@define "style",
@@ -125,9 +163,6 @@ class exports.Layer extends BaseClass
 
 	##############################################################
 	# DOM ELEMENTS
-
-	_setLayerId: ->
-		@id = _LayerList.length
 		
 	_createElement: ->
 		return if @_element?
@@ -271,6 +306,7 @@ class exports.Layer extends BaseClass
 		exportable: false
 		get: ->
 
+			# If there is no superLayer we need to walk through the root
 			if @superLayer is null
 				return _.filter _LayerList, (layer) =>
 					layer isnt @ and layer.superLayer is null
@@ -301,12 +337,13 @@ class exports.Layer extends BaseClass
 		animation.start() if start
 		animation
 
-	animateStop: ->
-
-		layerAnimations = _.filter Animation.runningAnimations(), (a) =>
+	animations: ->
+		# Current running animations on this layer
+		_.filter Animation.runningAnimations(), (a) =>
 			a.options.layer == @
 
-		_.invoke layerAnimations, "stop"
+	animateStop: ->
+		_.invoke @animations(), "stop"
 
 	##############################################################
 	## INDEX ORDERING
@@ -335,7 +372,6 @@ class exports.Layer extends BaseClass
 
 		@index = layer.index - 1
 
-
 	##############################################################
 	## STATES
 
@@ -345,8 +381,6 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## EVENTS
 	
-	
-
 	addListener: (event, originalListener) =>
 
 		# Modify the scope to be the calling object, just like jquery

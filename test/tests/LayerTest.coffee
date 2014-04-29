@@ -290,3 +290,82 @@ describe "Layer", ->
 			assert.equal layerB.index, 2
 			assert.equal layerC.index, 1
 			assert.equal layerD.index, 4
+
+	describe "Frame", ->
+
+		it "should set on create", ->
+
+			layer = new Layer frame:{x:100, y:100, width:20, height:20}
+
+			assert.equal layer.x, 100
+			assert.equal layer.x, 100
+			assert.equal layer.width, 20
+			assert.equal layer.height, 20
+
+		it "should set after create", ->
+
+			layer = new Layer 
+			layer = {x:100, y:100, width:20, height:20}
+
+			assert.equal layer.x, 100
+			assert.equal layer.x, 100
+			assert.equal layer.width, 20
+			assert.equal layer.height, 20
+
+		it "should set minX on creation", ->
+			layer = new Layer minX:200, y:100, width:100, height:100
+			layer.x.should.equal 200
+
+		it "should set midX on creation", ->
+			layer = new Layer midX:200, y:100, width:100, height:100
+			layer.x.should.equal 150
+
+		it "should set maxX on creation", ->
+			layer = new Layer maxX:200, y:100, width:100, height:100
+			layer.x.should.equal 100
+
+		it "should set minY on creation", ->
+			layer = new Layer x:100, minY:200, width:100, height:100
+			layer.y.should.equal 200
+
+		it "should set midY on creation", ->
+			layer = new Layer x:100, midY:200, width:100, height:100
+			layer.y.should.equal 150
+
+		it "should set maxY on creation", ->
+			layer = new Layer x:100, maxY:200, width:100, height:100
+			layer.y.should.equal 100
+
+
+		it "should set minX", ->
+			layer = new Layer y:100, width:100, height:100
+			layer.minX = 200
+			layer.x.should.equal 200
+
+		it "should set midX", ->
+			layer = new Layer y:100, width:100, height:100
+			layer.midX = 200
+			layer.x.should.equal 150
+
+		it "should set maxX", ->
+			layer = new Layer y:100, width:100, height:100
+			layer.maxX = 200
+			layer.x.should.equal 100
+
+		it "should set minY", ->
+			layer = new Layer x:100, width:100, height:100
+			layer.minY = 200
+			layer.y.should.equal 200
+
+		it "should set midY", ->
+			layer = new Layer x:100, width:100, height:100
+			layer.midY = 200
+			layer.y.should.equal 150
+
+		it "should set maxY", ->
+			layer = new Layer x:100, width:100, height:100
+			layer.maxY = 200
+			layer.y.should.equal 100
+
+
+
