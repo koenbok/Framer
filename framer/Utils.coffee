@@ -62,30 +62,29 @@ exports.interval = (time, f) ->
 	# window._delayIntervals.push timer
 	return timer
 
-# exports.debounce = (threshold, fn, immediate) ->
-# 	timeout = null
-# 	(args...) ->
-# 		obj = this
-# 		delayed = ->
-# 			fn.apply(obj, args) unless immediate
-# 			timeout = null
-# 		if timeout
-# 			clearTimeout(timeout)
-# 		else if (immediate)
-# 			fn.apply(obj, args)
-# 		timeout = setTimeout delayed, threshold || 100
+exports.debounce = (threshold=0.1, fn, immediate) ->
+	timeout = null
+	threshold *= 1000
+	(args...) ->
+		obj = this
+		delayed = ->
+			fn.apply(obj, args) unless immediate
+			timeout = null
+		if timeout
+			clearTimeout(timeout)
+		else if (immediate)
+			fn.apply(obj, args)
+		timeout = setTimeout delayed, threshold
 
-# exports.throttle = (delay, fn) ->
-# 	return fn if delay is 0
-# 	timer = false
-# 	return ->
-# 		return if timer
-# 		timer = true
-# 		setTimeout (-> timer = false), delay unless delay is -1
-# 		fn arguments...
-
-
-# exports.getTime = -> performance.now() if performance?.now
+exports.throttle = (delay, fn) ->
+	return fn if delay is 0
+	delay *= 1000
+	timer = false
+	return ->
+		return if timer
+		timer = true
+		setTimeout (-> timer = false), delay unless delay is -1
+		fn arguments...
 
 
 ######################################################
@@ -160,18 +159,6 @@ exports.devicePixelRatio = ->
 
 ######################################################
 # MATH FUNCTIONS
-
-exports.max = (arr) ->
-	Math.max arr...
-
-exports.min = (arr) ->
-	Math.min arr...
-
-exports.sum = (a) ->
-	if a.length > 0
-		a.reduce (x, y) -> x + y
-	else
-		0
 		
 exports.round = (value, decimals) ->
 	d = Math.pow 10, decimals
@@ -230,9 +217,85 @@ exports.domLoadScript = (url, callback) ->
 	script
 
 ######################################################
-# HELPER FUNCTIONS
+# GEOMERTY FUNCTIONS
 
-# exports.clearAll = ->
-# 	# Todo: clear all pending inserts
-# 	# Clear out whatever Framer rendered
-# 	document.getElementById("FramerRoot").innerHTML = ""
+exports.pointDistance = (pointA, pointB) ->
+	distance =
+		x: Math.abs(pointB.x - pointA.x)
+		y: Math.abs(pointB.y - pointA.y)
+
+exports.pointInvert = (point) ->
+	point =
+		x: 0 - point.x
+		y: 0 - point.y
+
+exports.pointTotal = (point) ->
+	point.x + point.y
+
+exports.frameSize = (frame) ->
+	size =
+		width: frame.width
+		height: frame.height
+
+exports.framePoint = (frame) ->
+	point =
+		x: frame.x
+		y: frame.y
+
+exports.pointAbs = (point) ->
+	point =
+		x: Math.abs point.x
+		y: Math.abs point.y
+
+exports.pointInFrame = (point, frame) ->
+	return false  if point.x < frame.minX or point.x > frame.maxX
+	return false  if point.y < frame.minY or point.y > frame.maxY
+	true
+
+exports.convertPoint = (point, view1, view2) ->
+
+	# Public: Convert a point between two view coordinate systems
+	#
+	# point - The point to be converted
+	# view1 - The origin view of the point
+	# view2 - The destination view of the point
+	# 
+	# Returns an Object
+	#
+
+	point = exports.extend {}, point
+	
+	traverse = (view) ->
+	
+		currentView = view
+		superViews = []
+	
+		while currentView and currentView.superView
+			superViews.push currentView.superView
+			currentView = currentView.superView
+	
+		return superViews
+	
+	superViews1 = traverse view1
+	superViews2 = traverse view2
+	
+	superViews2.push view2 if view2
+	
+	for view in superViews1
+		point.x += view.x
+		point.y += view.y
+
+		if view.scrollFrame
+			point.x -= view.scrollFrame.x
+			point.y -= view.scrollFrame.y
+
+	for view in superViews2
+		point.x -= view.x
+		point.y -= view.y
+		
+		if view.scrollFrame
+			point.x += view.scrollFrame.x
+			point.y += view.scrollFrame.y
+	
+	return point
+
