@@ -4,8 +4,10 @@ Utils = require "./Utils"
 
 {EventEmitter} = require "./EventEmitter"
 
+CounterKey = "_ObjectCounter"
 DefinedPropertiesKey = "_DefinedPropertiesKey"
 DefinedPropertiesValuesKey = "_DefinedPropertiesValuesKey"
+
 
 class exports.BaseClass extends EventEmitter
 
@@ -23,6 +25,12 @@ class exports.BaseClass extends EventEmitter
 
 		Object.defineProperty @prototype, propertyName, descriptor
 		Object.__
+
+	@SimpleProperty = (name, fallback, exportable=true) ->
+		exportable: exportable
+		default: fallback
+		get: ->  @_getPropertyValue name
+		set: (value) -> @_setPropertyValue name, value
 
 	_setPropertyValue: (k, v) =>
 		@[DefinedPropertiesValuesKey][k] = v
@@ -53,18 +61,31 @@ class exports.BaseClass extends EventEmitter
 					if @constructor[DefinedPropertiesKey].exportable isnt false
 						@[k] = v
 
+	@define "id",
+		get: -> @_id
+
+	toString: =>
+		properties = _.map(@[DefinedPropertiesValuesKey], ((v, k) -> "#{k}:#{v}"), 4)
+		"[#{@constructor.name} id:#{@id} #{properties.join " "}]"
+
 
 	#################################################################
 	# Base constructor method
 
-	constructor: (options) ->
+	constructor: (options={}) ->
 
 		super
 
+		# Create a holde for the property values
 		@[DefinedPropertiesValuesKey] = {}
 
-		options ?= {}
+		# Count the creation for these objects and set the id
+		@constructor[CounterKey] ?= 0
+		@constructor[CounterKey] += 1
 
+		@_id = @constructor[CounterKey]
+
+		# Set the default values for this object
 		_.map @constructor[DefinedPropertiesKey], (descriptor, name) =>
 			@[name] = Utils.valueOrDefault options[name], @_getPropertyDefaultValue name
 
