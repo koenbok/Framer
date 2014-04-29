@@ -122,6 +122,17 @@ describe "Layer", ->
 
 			layer.image.should.equal imagePath
 
+		it "should set visible", ->
+			
+			layer = new Layer
+
+			layer.visible.should.equal true
+			layer.style["visibility"].should.equal "visible"
+
+			layer.visible = false
+			layer.visible.should.equal false
+			layer.style["visibility"].should.equal "hidden"
+
 
 	describe "Events", ->
 
