@@ -1,7 +1,5 @@
 {_} = require "./Underscore"
 
-
-
 class exports.EventEmitter
 	
 	constructor: ->
@@ -58,6 +56,8 @@ class exports.EventEmitter
 		
 		for listener in @events[event]
 			@removeListener event, listener
+
+		return
 	
 	on: @::addListener
 	off: @::removeListener
