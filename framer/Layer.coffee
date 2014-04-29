@@ -71,11 +71,8 @@ class exports.Layer extends BaseClass
 		# Set needed private variables
 		@_subLayers = []
 
-	# toString: ->
-	# 	"[Layer id:#{@id}]"
-
 	##############################################################
-	# Geometry
+	# Properties
 
 	# Css properties
 	@define "width",  layerProperty "width",  "width", 100
@@ -131,7 +128,7 @@ class exports.Layer extends BaseClass
 
 
 	##############################################################
-	# FRAME
+	# Geometry
 
 	@define "frame",
 		get: ->
@@ -148,18 +145,103 @@ class exports.Layer extends BaseClass
 	@define "midY", frameProperty "midY"
 	@define "maxY", frameProperty "maxY"
 
+	convertPoint: (point) ->
+		# Convert a point on screen to this views coordinate system
+		# TODO: needs tests
+		Utils.convertPoint point, null, @
+		
+	screenFrame: ->
+		# Get this views absolute frame on the screen
+		# TODO: needs tests
+		Utils.convertPoint @frame, @, null
+	
+	contentFrame: ->
+		# Get the total size of all subviews
+		# TODO: needs tests
+		
+		minX = utils.min _.pluck @subViews, "minX"
+		maxX = utils.max _.pluck @subViews, "maxX"
+		minY = utils.min _.pluck @subViews, "minY"
+		maxY = utils.max _.pluck @subViews, "maxY"
+		
+		new Frame
+			x: minX
+			y: minY
+			width: maxX - minX
+			height: maxY - minY
+
+	centerFrame: ->
+		# Get the centered frame for its superview
+		# TODO: needs tests
+		if @superView
+			frame = @frame
+			frame.midX = @superView.width / 2.0
+			frame.midY = @superView.height / 2.0
+			return frame
+		
+		else
+			frame = @frame
+			frame.midX = window.innerWidth / 2.0
+			frame.midY = window.innerHeight / 2.0
+			return frame
+	
+	center: -> @frame = @centerFrame() # Center  in superLayer
+	centerX: -> @x = @centerFrame().x # Center x in superLayer
+	centerY: -> @y = @centerFrame().y # Center y in superLayer
+	
+	pixelAlign: ->
+		# Put this view exactly on the pixel
+		# TODO: needs tests
+		@frame = {x:parseInt(@x), y:parseInt(@y)}
+
+
 	##############################################################
 	# CSS
 
 	@define "style",
 		get: -> @_element.style
-		set: (value) -> _.extend @_element.style, value
+		set: (value) -> 
+			_.extend @_element.style, value
+			@emit "change:style"
+
+	@define "html",
+		get: -> @_element.innerHTML
+		set: (value) ->
+			@_element.innerHTML = value
+			@emit "change:html"
 
 	computedStyle: ->
 		document.defaultView.getComputedStyle @_element
 
 	_setDefaultCSS: ->
 		@style = Config.layerBaseCSS
+
+	# Class helpers
+	# TODO: needs tests
+
+	@define "class",
+		get: ->
+			@_element.className
+		set: (value) ->
+			@_element.className = value
+			@emit "change:class"
+
+	@define "classes",
+		get: ->
+			classes = @class.split " "
+			classes = _(classes).filter (item) -> item not in ["", null]
+			classes = _(classes).unique()
+			classes
+		set: (value) ->
+			@class = value.join " "
+
+	addClass: (className) ->
+		classes = @classes
+		classes.push className
+		@classes = classes
+
+	removeClass: (className) ->
+		@classes = _.filter @classes, (item) -> item isnt className
 
 	##############################################################
 	# DOM ELEMENTS
