@@ -6,4 +6,5 @@ require "./tests/FrameTest"
 require "./tests/LayerTest"
 require "./tests/LayerAnimationTest"
 require "./tests/LayerStatesTest"
+require "./tests/CompatTest"
 

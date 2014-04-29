@@ -1,2 +1,17 @@
-layerA = new Layer x:10, y:50
-layerB = new Layer x:10, width:50, height:50, superLayer:layerA
+
+
+# class TestA
+# 	constructor: (options={}) ->
+# 		console.log "TestA.options", options
+
+# class TestB extends TestA
+# 	constructor: (options={}) ->
+# 		console.log "TestB.options", options
+# 		options.test2 = 2
+# 		super options
+
+# a = TestB test:1
+
+
+
+v = new View superView:1
