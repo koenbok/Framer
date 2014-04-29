@@ -65,7 +65,7 @@ class exports.BaseClass extends EventEmitter
 		get: -> @_id
 
 	toString: =>
-		properties = _.map(@[DefinedPropertiesValuesKey], ((v, k) -> "#{k}:#{v}"), 4)
+		properties = _.map(@properties, ((v, k) -> "#{k}:#{v}"), 4)
 		"[#{@constructor.name} id:#{@id} #{properties.join " "}]"
 
 
