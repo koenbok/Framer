@@ -172,17 +172,18 @@ class exports.Layer extends BaseClass
 
 	centerFrame: ->
 		# Get the centered frame for its superview
+		# We always make these pixel perfect
 		# TODO: needs tests
 		if @superView
 			frame = @frame
-			frame.midX = @superView.width / 2.0
-			frame.midY = @superView.height / 2.0
+			frame.midX = parseInt @superView.width / 2.0
+			frame.midY = parseInt @superView.height / 2.0
 			return frame
 		
 		else
 			frame = @frame
-			frame.midX = window.innerWidth / 2.0
-			frame.midY = window.innerHeight / 2.0
+			frame.midX = parseInt window.innerWidth / 2.0
+			frame.midY = parseInt window.innerHeight / 2.0
 			return frame
 	
 	center: -> @frame = @centerFrame() # Center  in superLayer
