@@ -23,7 +23,16 @@ class CompatView extends Layer
 	addSubView = (layer) -> @addSubLayer layer
 	removeSubView = (layer) -> @removeSubLayer layer
 
+class CompatImageView extends CompatView
+
+class CompatScrollView extends CompatView
+	constructor: ->
+		super
+		@scroll = true
+
 window.View = CompatView
+window.ImageView = CompatImageView
+window.ScrollView = CompatScrollView
 
 	
 
