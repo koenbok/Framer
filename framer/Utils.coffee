@@ -263,7 +263,7 @@ exports.convertPoint = (point, view1, view2) ->
 	# Returns an Object
 	#
 
-	point = exports.extend {}, point
+	point = _.clone point
 	
 	traverse = (view) ->
 	
