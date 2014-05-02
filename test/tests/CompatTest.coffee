@@ -27,3 +27,17 @@ describe "Compat", ->
 
 			viewB.superView.should.equal viewA
 			viewB.superLayer.should.equal viewA
+
+		it "should create scrollview", ->
+			
+			view = new ScrollView
+			view.scroll.should.equal true
+
+
+		it "should create imageview", ->
+			
+			imagePath = "static/test.png"
+
+			view = new ImageView image:imagePath
+			view.image.should.equal imagePath
+

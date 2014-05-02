@@ -80,8 +80,15 @@ class exports.Layer extends BaseClass
 
 	@define "visible", layerProperty "visible", "visibility", true
 	@define "opacity", layerProperty "opacity", "opacity", 1
-	@define "clip", layerProperty "clip", "overflow", false
 	@define "index", layerProperty "index", "zIndex", 0
+
+	@define "clip", layerProperty "clip", "overflow", true
+	@define "scrollX", layerProperty "scrollX", "overflowX", false
+	@define "scrollY", layerProperty "scrollY", "overflowY", false
+
+	@define "scroll",
+		get: -> @scrollX is true or @scrollY is true
+		set: (value) -> @scrollX = @scrollY = true
 
 	# Behaviour properties
 	@define "ignoreEvents", layerProperty "ignoreEvents", "pointerEvents", true
@@ -460,6 +467,39 @@ class exports.Layer extends BaseClass
 
 	@define "states",
 		get: -> @_states ?= new LayerStates @
+
+	##############################################################
+	## SCROLLING
+
+	# TODO: Tests
+
+	# scrollToTop: ->
+	# 	@_element.scrollTop = 0
+	
+	# scrollToBottom: ->
+	# 	setTimeout =>
+	# 		@scrollPoint = @_element.scrollHeight - @frame.height
+	# 	, 0
+	
+	# @define "scrollPoint",
+	# 	get: ->
+	# 		@_element.scrollTop
+	# 	set: (value) ->
+	# 		@_element.scrollTop = value
+
+	@define "scrollFrame",
+		get: ->
+			return new Frame {
+				x: @_element.scrollLeft
+				y: @_element.scrollTop
+				width: @width
+				height: @height
+			}
+		set: (frame) ->
+			@_element.scrollLeft = frame.x
+			@_element.scrollTop = frame.y
+			# @_element.innerWidth = frame.width
+			# @_element.innerHeight = frame.height
 
 	##############################################################
 	## EVENTS

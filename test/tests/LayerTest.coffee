@@ -133,6 +133,39 @@ describe "Layer", ->
 			layer.visible.should.equal false
 			layer.style["visibility"].should.equal "hidden"
 
+		it "should set clip", ->
+			
+			layer = new Layer
+
+			layer.clip.should.equal true
+			layer.style["overflow"].should.equal "hidden"
+
+			layer.clip = false
+			layer.scroll.should.equal false
+			layer.style["overflow"].should.equal "visible"
+
+		it "should set scroll", ->
+			
+			layer = new Layer
+
+			layer.scroll.should.equal false
+			layer.style["overflow"].should.equal "hidden"
+
+			layer.scroll = true
+			layer.scroll.should.equal true
+			layer.style["overflow"].should.equal "scroll"
+
+		it "should set scrollX", ->
+			
+			layer = new Layer
+
+			layer.scroll.should.equal false
+			layer.style["overflow"].should.equal "hidden"
+
+			layer.scroll = true
+			layer.scroll.should.equal true
+			layer.style["overflow"].should.equal "scroll"
+
 
 	describe "Events", ->
 
@@ -306,22 +339,22 @@ describe "Layer", ->
 
 		it "should set on create", ->
 
-			layer = new Layer frame:{x:100, y:100, width:20, height:20}
+			layer = new Layer frame:{x:111, y:222, width:333, height:444}
 
-			assert.equal layer.x, 100
-			assert.equal layer.x, 100
-			assert.equal layer.width, 20
-			assert.equal layer.height, 20
+			assert.equal layer.x, 111
+			assert.equal layer.y, 222
+			assert.equal layer.width, 333
+			assert.equal layer.height, 444
 
 		it "should set after create", ->
 
 			layer = new Layer 
-			layer = {x:100, y:100, width:20, height:20}
+			layer.frame = {x:111, y:222, width:333, height:444}
 
-			assert.equal layer.x, 100
-			assert.equal layer.x, 100
-			assert.equal layer.width, 20
-			assert.equal layer.height, 20
+			assert.equal layer.x, 111
+			assert.equal layer.y, 222
+			assert.equal layer.width, 333
+			assert.equal layer.height, 444
 
 		it "should set minX on creation", ->
 			layer = new Layer minX:200, y:100, width:100, height:100
