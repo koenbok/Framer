@@ -42,12 +42,10 @@ class exports.Frame extends BaseClass
 		xmin = Math.min(r1.x, r2.x)
 		ymin = Math.min(r1.y, r2.y)
 
-		new exports.Frame
+		return new exports.Frame
 			x: xmin
 			y: ymin
 			width: Math.max(r1.x + r1.width, r2.x + r2.width) - xmin
 			height: Math.max(r1.y + r1.height, r2.y + r2.height) - ymin
-
-		return new exports.Frame frame
 
 
