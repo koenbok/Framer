@@ -65,8 +65,6 @@ class exports.LayerStates extends EventEmitter
 		
 		animatingKeys = @animatingKeys()
 
-		console.log animatingKeys
-
 		for k, v of @_states[stateName]
 
 			# Don't animate ignored properties
