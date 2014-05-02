@@ -1,22 +1,32 @@
 bin = ./node_modules/.bin
 coffee = $(bin)/coffee
+
 browserify = $(bin)/browserify -t coffeeify -d --extension=".coffee"
+
+
+
+
 watch = $(coffee) scripts/watch.coffee framer,test/tests
 
 all: build
 
 build:
 	mkdir -p build
-	$(coffee) scripts/banner.coffee > build/framer.js
-	$(browserify) framer/Framer.coffee >> build/framer.js
-	cp build/framer.js extras/CactusFramer/static/framer.js
+	$(coffee) scripts/banner.coffee > build/framer.debug.js
+	$(browserify) framer/Framer.coffee >> build/framer.debug.js
+	cat build/framer.debug.js | $(bin)/exorcist build/framer.js.map > build/framer.js
+	$(bin)/uglifyjs \
+		--in-source-map build/framer.js.map \
+		--source-map build/framer.min.js.map build/framer.js \
+	> build/framer.min.js
+	# Copy the file over to the cactus project
+	cp -R build extras/CactusFramer/static/framer
 buildw:
 	$(watch) make build
 
 test:
-	make
+	make build
 	mkdir -p test/lib
-	cp build/framer.js test/lib/framer.js
 	$(browserify) test/init.coffee -o test/init.js
 	$(bin)/mocha-phantomjs test/index.html
 testw:

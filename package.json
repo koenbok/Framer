@@ -19,7 +19,9 @@
     "watchr": "~2.4.4",
     "underscore.string": "^2.3.3",
     "aws-sdk": "^2.0.0-rc.14",
-    "simulate": "0.0.3"
+    "simulate": "0.0.3",
+    "exorcist": "^0.1.6",
+    "uglify-js": "^2.4.13"
   },
   "devDependencies": {
     "coffee-script": "~1.6.3"

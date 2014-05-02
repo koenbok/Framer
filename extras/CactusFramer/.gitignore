@@ -2,4 +2,4 @@
 .build
 .deploy
 static/app.js
-static/framer.js
+static/framer
