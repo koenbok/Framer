@@ -7,3 +7,4 @@ layer.states.add
 
 layer.on "click", ->
 	layer.states.next()
+	
