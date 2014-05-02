@@ -411,5 +411,15 @@ describe "Layer", ->
 			layer.maxY = 200
 			layer.y.should.equal 100
 
+	describe "CSS", ->
+
+		it "classList should work", ->
+
+			layer = new Layer
+			layer.classList.add "test"
+
+			assert.equal layer.classList.contains("test"), true
+			assert.equal layer._element.classList.contains("test"), true
+
 
 

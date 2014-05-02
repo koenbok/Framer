@@ -224,32 +224,9 @@ class exports.Layer extends BaseClass
 	_setDefaultCSS: ->
 		@style = Config.layerBaseCSS
 
-	# Class helpers
-	# TODO: needs tests
+	@define "classList",
+		get: -> @_element.classList	
 
-	@define "class",
-		get: ->
-			@_element.className
-		set: (value) ->
-			@_element.className = value
-			@emit "change:class"
-
-	@define "classes",
-		get: ->
-			classes = @class.split " "
-			classes = _(classes).filter (item) -> item not in ["", null]
-			classes = _(classes).unique()
-			classes
-		set: (value) ->
-			@class = value.join " "
-
-	addClass: (className) ->
-		classes = @classes
-		classes.push className
-		@classes = classes
-
-	removeClass: (className) ->
-		@classes = _.filter @classes, (item) -> item isnt className
 
 	##############################################################
 	# DOM ELEMENTS
