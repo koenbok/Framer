@@ -21,6 +21,17 @@ class exports.LayerStates extends EventEmitter
 		@_previousStates = []
 	
 	add: (stateName, properties) ->
+
+		# We also allow an object with states to be passed in
+		if _.isObject stateName
+			for k, v of stateName
+				@add k, v
+			return
+
+		error = -> throw "Usage example: layer.states.add(\"someName\", {x:500})"
+		error() if not _.isString stateName
+		error() if not _.isObject properties
+
 		# Add a state with a name and properties
 		@_orderedStates.push stateName
 		@_states[stateName] = properties

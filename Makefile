@@ -20,7 +20,8 @@ build:
 		--source-map build/framer.min.js.map build/framer.js \
 	> build/framer.min.js
 	# Copy the file over to the cactus project
-	cp -R build extras/CactusFramer/static/framer
+	cp build/framer.js extras/CactusFramer/static/framer.js
+	cp build/framer.js.map extras/CactusFramer/static/framer.js.map
 buildw:
 	$(watch) make build
 

@@ -14,7 +14,7 @@ class CompatView extends Layer
 		if options.hasOwnProperty "superView"
 			options.superLayer = options.superView
 
-		super
+		super options
 
 	@define "superView", compatProperty "superLayer"
 	@define "subViews", compatProperty "subLayers"

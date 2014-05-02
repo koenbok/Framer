@@ -1,17 +1,10 @@
 
-
-# class TestA
-# 	constructor: (options={}) ->
-# 		console.log "TestA.options", options
-
-# class TestB extends TestA
-# 	constructor: (options={}) ->
-# 		console.log "TestB.options", options
-# 		options.test2 = 2
-# 		super options
-
-# a = TestB test:1
+layer = new Layer image:"https://fbexternal-a.akamaihd.net/safe_image.php?d=AQCzxOIN078nUkhK&w=470&h=246&url=http%3A%2F%2Fwww.newyorker.com%2Fonline%2Fblogs%2Fcomment%2F186296970-FB.jpg&cfs=1&upscale&sx=0&sy=1&sw=1200&sh=628"
 
 
+layer.states.add
+	test: {x:500, scale:1.5}
+	poop: {y:500}
 
-v = new View superView:1
+layer.on "click", ->
+	layer.states.next()

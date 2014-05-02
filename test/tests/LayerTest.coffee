@@ -215,6 +215,11 @@ describe "Layer", ->
 			assert.equal layer._element.parentNode.id, "FramerRoot"
 			assert.equal layer.superLayer, null
 
+		it "should check superLayer", ->
+
+			f = -> layer = new Layer superLayer:1
+			f.should.throw()
+
 		it "should add sublayer", ->
 			
 			layerA = new Layer

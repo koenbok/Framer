@@ -66,6 +66,10 @@ class exports.Layer extends BaseClass
 			@bringToFront()
 			@_insertElement()
 		else
+			
+			if not options.superLayer instanceof Layer
+				throw "Layer.superLayer needs to be a Layer object"
+			
 			@superLayer = options.superLayer
 
 		# Set needed private variables
