@@ -172,6 +172,9 @@ Utils.isLocalUrl = (url) ->
 Utils.devicePixelRatio = ->
 	window.devicePixelRatio
 
+Utils.pathJoin = ->
+	Utils.arrayFromArguments(arguments).join("/")
+
 ######################################################
 # MATH FUNCTIONS
 		
@@ -232,6 +235,20 @@ Utils.domLoadScript = (url, callback) ->
 	
 	script
 
+Utils.domLoadScriptSync = (path) ->
+
+	xhrObj = new XMLHttpRequest();
+	xhrObj.open('GET', path, false);
+	xhrObj.send('');
+
+	se = document.createElement('script')
+	se.type = "text/javascript"
+	se.text = "window.__import__ = " + xhrObj.responseText
+
+	document.getElementsByTagName('head')[0].appendChild(se)
+
+	return window.__import__
+
 ######################################################
 # GEOMERTY FUNCTIONS
 
@@ -248,6 +265,29 @@ Utils.pointMax = ->
 	point = 
 		x: _.max point.map (size) -> size.x
 		y: _.max point.map (size) -> size.y
+
+Utils.pointDistance = (pointA, pointB) ->
+	distance =
+		x: Math.abs(pointB.x - pointA.x)
+		y: Math.abs(pointB.y - pointA.y)
+
+Utils.pointInvert = (point) ->
+	point =
+		x: 0 - point.x
+		y: 0 - point.y
+
+Utils.pointTotal = (point) ->
+	point.x + point.y
+
+Utils.pointAbs = (point) ->
+	point =
+		x: Math.abs point.x
+		y: Math.abs point.y
+
+Utils.pointInFrame = (point, frame) ->
+	return false  if point.x < frame.minX or point.x > frame.maxX
+	return false  if point.y < frame.minY or point.y > frame.maxY
+	true
 
 # Size
 
@@ -319,83 +359,31 @@ Utils.frameMerge = ->
 
 	frame
 
+# Coordinate system
 
+Utils.convertPoint = (input, layerA, layerB) ->
 
+	# Convert a point between two layer coordinate systems
 
+	point = {}
 
-# Points
+	for k in ["x", "y", "width", "height"]
+		point[k] = input[k]
 
-# Utils.pointDistance = (pointA, pointB) ->
-# 	distance =
-# 		x: Math.abs(pointB.x - pointA.x)
-# 		y: Math.abs(pointB.y - pointA.y)
-
-# Utils.pointInvert = (point) ->
-# 	point =
-# 		x: 0 - point.x
-# 		y: 0 - point.y
-
-# Utils.pointTotal = (point) ->
-# 	point.x + point.y
-
-
-
-# Utils.pointAbs = (point) ->
-# 	point =
-# 		x: Math.abs point.x
-# 		y: Math.abs point.y
-
-# Utils.pointInFrame = (point, frame) ->
-# 	return false  if point.x < frame.minX or point.x > frame.maxX
-# 	return false  if point.y < frame.minY or point.y > frame.maxY
-# 	true
-
-# Utils.convertPoint = (point, view1, view2) ->
-
-# 	# Public: Convert a point between two view coordinate systems
-# 	#
-# 	# point - The point to be converted
-# 	# view1 - The origin view of the point
-# 	# view2 - The destination view of the point
-# 	# 
-# 	# Returns an Object
-# 	#
-
-# 	point = _.clone point
+	superLayersA = layerA?.superLayers() or []
+	superLayersB = layerB?.superLayers() or []
 	
-# 	traverse = (view) ->
+	superLayersB.push layerB if layerB
 	
-# 		currentView = view
-# 		superViews = []
-	
-# 		while currentView and currentView.superLayer
-# 			superViews.push currentView.superLayer
-# 			currentView = currentView.superLayer
-	
-# 		return superViews
-	
-# 	superViews1 = traverse view1
-# 	superViews2 = traverse view2
-	
-# 	superViews2.push view2 if view2
-	
-# 	for view in superViews1
-# 		point.x += view.x
-# 		point.y += view.y
+	for layer in superLayersA
+		point.x += layer.x - layer.scrollFrame.x
+		point.y += layer.y - layer.scrollFrame.y
 
-# 		if view.scrollFrame
-# 			point.x -= view.scrollFrame.x
-# 			point.y -= view.scrollFrame.y
-
-# 	for view in superViews2
-# 		point.x -= view.x
-# 		point.y -= view.y
-		
-# 		if view.scrollFrame
-# 			point.x += view.scrollFrame.x
-# 			point.y += view.scrollFrame.y
+	for layer in superLayersB
+		point.x -= layer.x + layer.scrollFrame.x
+		point.y -= layer.y + layer.scrollFrame.y
 	
-# 	return point
+	return point
 
 _.extend exports, Utils
 
