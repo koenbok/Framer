@@ -7,4 +7,5 @@ require "./tests/LayerTest"
 require "./tests/LayerAnimationTest"
 require "./tests/LayerStatesTest"
 require "./tests/CompatTest"
+require "./tests/ExternalDocumentTest"
 
