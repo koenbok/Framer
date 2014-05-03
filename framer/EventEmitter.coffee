@@ -1,9 +1,11 @@
 {_} = require "./Underscore"
 
+EventEmitterEventsKey = "_events"
+
 class exports.EventEmitter
 	
 	constructor: ->
-		@events = {}
+		@[EventEmitterEventsKey] = {}
 
 	_eventCheck: (event, method) ->
 		if not event
@@ -14,10 +16,10 @@ class exports.EventEmitter
 		# We skip it here because we need all the perf we can get
 		# @_eventCheck event, "emit"
 
-		if not @events?[event]
+		if not @[EventEmitterEventsKey]?[event]
 			return
 		
-		for listener in @events[event]
+		for listener in @[EventEmitterEventsKey][event]
 			listener args...
 		
 		return
@@ -26,18 +28,18 @@ class exports.EventEmitter
 		
 		@_eventCheck event, "addListener"
 		
-		@events ?= {}
-		@events[event] ?= []
-		@events[event].push listener
+		@[EventEmitterEventsKey] ?= {}
+		@[EventEmitterEventsKey][event] ?= []
+		@[EventEmitterEventsKey][event].push listener
 
 	removeListener: (event, listener) ->
 		
 		@_eventCheck event, "removeListener"
 		
-		return unless @events
-		return unless @events[event]
+		return unless @[EventEmitterEventsKey]
+		return unless @[EventEmitterEventsKey][event]
 		
-		@events[event] = _.without @events[event], listener
+		@[EventEmitterEventsKey][event] = _.without @[EventEmitterEventsKey][event], listener
 
 		return
 
@@ -51,10 +53,10 @@ class exports.EventEmitter
 
 	removeAllListeners: (event) ->
 		
-		return unless @events
-		return unless @events[event]
+		return unless @[EventEmitterEventsKey]
+		return unless @[EventEmitterEventsKey][event]
 		
-		for listener in @events[event]
+		for listener in @[EventEmitterEventsKey][event]
 			@removeListener event, listener
 
 		return
