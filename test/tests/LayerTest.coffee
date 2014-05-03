@@ -122,6 +122,35 @@ describe "Layer", ->
 
 			layer.image.should.equal imagePath
 
+		# it "should handle background color with image", ->
+			
+		# 	# We want the background color to be there until an images
+		# 	# is set UNLESS we set another backgroundColor explicitly
+
+		# 	imagePath = "static/test.png"	
+
+		# 	layer = new Layer image:imagePath
+		# 	layer.backgroundColor.should.equal ""
+
+		# 	layer = new Layer
+		# 	layer.image = imagePath
+		# 	layer.backgroundColor.should.equal ""
+
+		# 	layer = new Layer backgroundColor:"rgba(255,0,0,1)"
+		# 	layer.image = imagePath
+		# 	layer.backgroundColor = "rgba(255,0,0,1)"
+		# 	layer.backgroundColor.should.not.equal ""
+
+		# 	layer = new Layer backgroundColor:"red"
+		# 	layer.image = imagePath
+		# 	layer.backgroundColor.should.equal "red"
+
+		# 	layer = new Layer
+		# 	layer.backgroundColor = "red"
+		# 	layer.image = imagePath
+		# 	layer.backgroundColor.should.equal "red"
+
+
 		it "should set visible", ->
 			
 			layer = new Layer
@@ -165,6 +194,12 @@ describe "Layer", ->
 			layer.scroll = true
 			layer.scroll.should.equal true
 			layer.style["overflow"].should.equal "scroll"
+
+		it "should set style properties on create", ->
+
+			layer = new Layer backgroundColor: "red"
+			layer.backgroundColor.should.equal "red"
+			layer.style["backgroundColor"].should.equal "red"
 
 
 	describe "Events", ->
@@ -270,6 +305,16 @@ describe "Layer", ->
 
 			assert.deepEqual layerB.siblingLayers, [layerC]
 			assert.deepEqual layerC.siblingLayers, [layerB]
+
+		it "should list super layers", ->
+
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA
+			layerC = new Layer superLayer:layerB
+
+			assert.deepEqual layerC.superLayers(), [layerB, layerA]
+
+
 			
 
 	describe "Layering", ->

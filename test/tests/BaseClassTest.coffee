@@ -90,19 +90,20 @@ describe "BaseClass", ->
 				width: 500
 				height: 500
 
+		it "should have keys", ->
 
+			class TestClass3 extends Framer.BaseClass
+				@define "testA", @simpleProperty "testA", 100
+				@define "testB", @simpleProperty "testB", 100
 
+			testClass = new TestClass3()
+			testClass.keys().should.eql ["testA", "testB"]
 
-		# # # it "should display css", ->
-			
-		# # # 	testClass = new TestClass width:100
+		it "should have keys", ->
 
-		# # # 	console.log testClass.css()
+			class TestClass3 extends Framer.BaseClass
+				@define "testA", @simpleProperty "testA", 100
+				@define "testB", @simpleProperty "testB", 100
 
-		# # it "should set properties", ->
-			
-		# # 	class TestClass3 extends Framer.BaseClass
-		# # 		@define "width", new Framer.Property "width", "px", 100
-
-		# # 		testClass = new TestClass3()
-		# # 		testClass.width.should.equal 100
+			testClass = new TestClass3()
+			testClass.keys().should.eql ["testA", "testB"]

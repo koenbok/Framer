@@ -38,6 +38,21 @@ describe "Utils", ->
 		it "should work", ->
 			Utils.arrayToObject([["a", 1], ["b", 2]]).should.eql({"a": 1, "b": 2})
 
+	describe "arrayFromArguments", ->
+
+		it "should work", ->
+
+			f = -> return Utils.arrayFromArguments arguments
+
+			f("a").should.eql ["a"]
+			f("a", "b").should.eql ["a", "b"]
+			
+			f(["a"]).should.eql ["a"]
+			f(["a", "b"]).should.eql ["a", "b"]
+
+			f("monkey").should.eql ["monkey"]
+			f(["monkey"]).should.eql ["monkey"]
+
 	describe "parseFunction", ->
 
 		it "should work without arguments", ->
@@ -88,6 +103,12 @@ describe "Utils", ->
 				{width:100, height:100},
 			]).should.eql {width:1000, height:1000}
 
+	describe "pathJoin", ->
+
+		it "should work", ->
+			Utils.pathJoin("test", "monkey").should.equal "test/monkey"
+
+
 	describe "sizeMin", ->
 
 		it "should work", ->
@@ -133,18 +154,9 @@ describe "Utils", ->
 			],  {x:100, y:100, width:500, height:500}
 
 			# Bla bla. This works. Doing a visual comparison is so much easier
-			# Just add this code to some random thing
+			# Start the cactus project and go to /test.html
 
-			# frames = [0..3].map ->
-			# 	layer = new Layer
-			# 		x: Utils.mapRange Math.random(), 0, 1, 0, 500
-			# 		y: Utils.mapRange Math.random(), 0, 1, 0, 500
-			# 		width: Utils.mapRange Math.random(), 0, 1, 0, 500
-			# 		height: Utils.mapRange Math.random(), 0, 1, 0, 500
 
-			# overLayer = new Layer
-			# overLayer.backgroundColor = Utils.randomColor .5
-			# overLayer.frame = Utils.frameMerge frames
 
 
 			
