@@ -4,3 +4,4 @@
 static/app.js
 static/framer.js
 static/framer.js.map
+static/tests/*.js
