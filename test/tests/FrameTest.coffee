@@ -45,3 +45,5 @@ describe "Frame", ->
 		it "should set maxY", ->
 			frame = new Frame x:100, maxY:200, width:100, height:100
 			frame.y.should.equal 100
+
+

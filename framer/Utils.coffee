@@ -1,7 +1,11 @@
-# exports.log = ->
+# Utils.log = ->
 # 	console.log arguments.join " "
 
-exports.setDefaultProperties = (obj, defaults, warn=true) ->
+{_} = require "./Underscore"
+
+Utils = {}
+
+Utils.setDefaultProperties = (obj, defaults, warn=true) ->
 
 	result = {}
 
@@ -18,14 +22,14 @@ exports.setDefaultProperties = (obj, defaults, warn=true) ->
 
 	result
 
-exports.valueOrDefault = (value, defaultValue) ->
+Utils.valueOrDefault = (value, defaultValue) ->
 
 	if value in [undefined, null]
 		value = defaultValue
 
 	return value
 
-exports.arrayToObject = (arr) ->
+Utils.arrayToObject = (arr) ->
 	obj = {}
 
 	for item in arr
@@ -33,10 +37,10 @@ exports.arrayToObject = (arr) ->
 
 	obj
 
-exports.arrayNext = (arr, item) ->
+Utils.arrayNext = (arr, item) ->
 	arr[arr.indexOf(item) + 1] or _.first arr
 
-exports.arrayPrev = (arr, item) ->
+Utils.arrayPrev = (arr, item) ->
 	arr[arr.indexOf(item) - 1] or _.last arr
 
 
@@ -45,24 +49,26 @@ exports.arrayPrev = (arr, item) ->
 
 # Note: in Framer 3 we try to keep all times in seconds
 
-if window.performance
-	exports.getTime = -> performance.now() / 1000
-else
-	exports.getTime = ->  Date.now() / 1000
+# Used by animation engine, needs to be very performant
+Utils.getTime = -> Date.now() / 1000
 
-exports.delay = (time, f) ->
+# This works only in chrome, but we only use it for testing
+# if window.performance
+# 	Utils.getTime = -> performance.now() / 1000
+
+Utils.delay = (time, f) ->
 	timer = setTimeout f, time * 1000
 	# window._delayTimers ?= []
 	# window._delayTimers.push timer
 	return timer
 	
-exports.interval = (time, f) ->
+Utils.interval = (time, f) ->
 	timer = setInterval f, time * 1000
 	# window._delayIntervals ?= []
 	# window._delayIntervals.push timer
 	return timer
 
-exports.debounce = (threshold=0.1, fn, immediate) ->
+Utils.debounce = (threshold=0.1, fn, immediate) ->
 	timeout = null
 	threshold *= 1000
 	(args...) ->
@@ -76,7 +82,7 @@ exports.debounce = (threshold=0.1, fn, immediate) ->
 			fn.apply(obj, args)
 		timeout = setTimeout delayed, threshold
 
-exports.throttle = (delay, fn) ->
+Utils.throttle = (delay, fn) ->
 	return fn if delay is 0
 	delay *= 1000
 	timer = false
@@ -90,20 +96,20 @@ exports.throttle = (delay, fn) ->
 ######################################################
 # HANDY FUNCTIONS
 
-exports.randomColor = (alpha = 1.0) ->
+Utils.randomColor = (alpha = 1.0) ->
 	c = -> parseInt(Math.random() * 255)
 	"rgba(#{c()}, #{c()}, #{c()}, #{alpha})"
 
-exports.randomChoice = (arr) ->
+Utils.randomChoice = (arr) ->
 	arr[Math.floor(Math.random() * arr.length)]
 
-exports.randomNumber = (a=0, b=1) ->
+Utils.randomNumber = (a=0, b=1) ->
 	# Return a random number between a and b
-	exports.mapRange Math.random(), 0, 1, a, b
+	Utils.mapRange Math.random(), 0, 1, a, b
 
-exports.uuid = ->
+Utils.uuid = ->
 
-	chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('')
+	chars = "0123456789abcdefghijklmnopqrstuvwxyz".split("")
 	output = new Array(36)
 	random = 0
 
@@ -113,16 +119,22 @@ exports.uuid = ->
 		random = random >> 4
 		output[digit] = chars[if digit == 19 then (r & 0x3) | 0x8 else r]
 
-	output.join('')
+	output.join ""
 
-exports.cycle = ->
+Utils.arrayFromArguments = (args) ->
+
+	# Convert an arguments object to an array
+	
+	if _.isArray args[0]
+		return args[0]
+	
+	Array.prototype.slice.call args
+
+Utils.cycle = ->
 	
 	# Returns a function that cycles through a list of values with each call.
 	
-	if _.isArray arguments[0]
-		args = arguments[0]
-	else
-		args = Array.prototype.slice.call arguments
+	args = Utils.arrayFromArguments arguments
 	
 	curr = -1
 	return ->
@@ -131,47 +143,51 @@ exports.cycle = ->
 		return args[curr]
 
 # Backwards compatibility
-exports.toggle = exports.cycle
+Utils.toggle = Utils.cycle
 
 
 ######################################################
 # ENVIROMENT FUNCTIONS
 
-exports.isWebKit = ->
+Utils.isWebKit = ->
 	window.WebKitCSSMatrix isnt null
 	
-exports.isTouch = ->
+Utils.isTouch = ->
 	window.ontouchstart is null
 
-exports.isMobile = ->
+Utils.isMobile = ->
 	(/iphone|ipod|android|ie|blackberry|fennec/).test \
 		navigator.userAgent.toLowerCase()
 
-exports.isChrome = ->
+Utils.isChrome = ->
 	(/chrome/).test \
 		navigator.userAgent.toLowerCase()
 
-exports.isLocal = ->
-	window.location.href[0..6] == "file://"
+Utils.isLocal = ->
+	Utils.isLocalUrl window.location.href
 
-exports.devicePixelRatio = ->
+Utils.isLocalUrl = (url) ->
+	url[0..6] == "file://"
+
+Utils.devicePixelRatio = ->
 	window.devicePixelRatio
 
 ######################################################
 # MATH FUNCTIONS
 		
-exports.round = (value, decimals) ->
+Utils.round = (value, decimals) ->
 	d = Math.pow 10, decimals
 	Math.round(value * d) / d
 
 # Taken from http://jsfiddle.net/Xz464/7/
-exports.mapRange = (value, fromLow, fromHigh, toLow, toHigh) ->
+# Used by animation engine, needs to be very performant
+Utils.mapRange = (value, fromLow, fromHigh, toLow, toHigh) ->
 	toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
 
 ######################################################
 # STRING FUNCTIONS
 
-exports.parseFunction = (str) ->
+Utils.parseFunction = (str) ->
 
 	result = {name: "", args: []}
 
@@ -194,16 +210,16 @@ if document?
 			while __domComplete.length
 				f = __domComplete.shift()()
 
-exports.domComplete = (f) ->
+Utils.domComplete = (f) ->
 	if document.readyState is "complete"
 		f()
 	else
 		__domComplete.push f
 
-exports.domCompleteCancel = (f) ->
+Utils.domCompleteCancel = (f) ->
 	__domComplete = _.without __domComplete, f
 
-exports.domLoadScript = (url, callback) ->
+Utils.domLoadScript = (url, callback) ->
 	
 	script = document.createElement "script"
 	script.type = "text/javascript"
@@ -219,83 +235,167 @@ exports.domLoadScript = (url, callback) ->
 ######################################################
 # GEOMERTY FUNCTIONS
 
-exports.pointDistance = (pointA, pointB) ->
-	distance =
-		x: Math.abs(pointB.x - pointA.x)
-		y: Math.abs(pointB.y - pointA.y)
+# Point
 
-exports.pointInvert = (point) ->
-	point =
-		x: 0 - point.x
-		y: 0 - point.y
+Utils.pointMin = ->
+	points = Utils.arrayFromArguments arguments
+	point = 
+		x: _.min point.map (size) -> size.x
+		y: _.min point.map (size) -> size.y
 
-exports.pointTotal = (point) ->
-	point.x + point.y
+Utils.pointMax = ->
+	points = Utils.arrayFromArguments arguments
+	point = 
+		x: _.max point.map (size) -> size.x
+		y: _.max point.map (size) -> size.y
 
-exports.frameSize = (frame) ->
+# Size
+
+Utils.sizeMin = ->
+	sizes = Utils.arrayFromArguments arguments
+	size  =
+		width:  _.min sizes.map (size) -> size.width
+		height: _.min sizes.map (size) -> size.height
+
+Utils.sizeMax = ->
+	sizes = Utils.arrayFromArguments arguments
+	size  =
+		width:  _.max sizes.map (size) -> size.width
+		height: _.max sizes.map (size) -> size.height
+
+# Frames
+
+# min mid max * x, y
+
+Utils.frameGetMinX = (frame) -> frame.x
+Utils.frameSetMinX = (frame, value) -> frame.x = value
+
+Utils.frameGetMidX = (frame) -> 
+	if frame.width is 0 then 0 else frame.x + (frame.width / 2.0)
+Utils.frameSetMidX = (frame, value) ->
+	frame.x = if frame.width is 0 then 0 else value - (frame.width / 2.0)
+
+Utils.frameGetMaxX = (frame) -> 
+	if frame.width is 0 then 0 else frame.x + frame.width
+Utils.frameSetMaxX = (frame, value) ->
+	frame.x = if frame.width is 0 then 0 else value - frame.width
+
+Utils.frameGetMinY = (frame) -> frame.y
+Utils.frameSetMinY = (frame, value) -> frame.y = value
+
+Utils.frameGetMidY = (frame) -> 
+	if frame.height is 0 then 0 else frame.y + (frame.height / 2.0)
+Utils.frameSetMidY = (frame, value) ->
+	frame.y = if frame.height is 0 then 0 else value - (frame.height / 2.0)
+
+Utils.frameGetMaxY = (frame) -> 
+	if frame.height is 0 then 0 else frame.y + frame.height
+Utils.frameSetMaxY = (frame, value) ->
+	frame.y = if frame.height is 0 then 0 else value - frame.height
+
+
+Utils.frameSize = (frame) ->
 	size =
 		width: frame.width
 		height: frame.height
 
-exports.framePoint = (frame) ->
+Utils.framePoint = (frame) ->
 	point =
 		x: frame.x
 		y: frame.y
 
-exports.pointAbs = (point) ->
-	point =
-		x: Math.abs point.x
-		y: Math.abs point.y
+Utils.frameMerge = ->
 
-exports.pointInFrame = (point, frame) ->
-	return false  if point.x < frame.minX or point.x > frame.maxX
-	return false  if point.y < frame.minY or point.y > frame.maxY
-	true
+	# Return a frame that fits all the input frames
 
-exports.convertPoint = (point, view1, view2) ->
+	frames = Utils.arrayFromArguments arguments
 
-	# Public: Convert a point between two view coordinate systems
-	#
-	# point - The point to be converted
-	# view1 - The origin view of the point
-	# view2 - The destination view of the point
-	# 
-	# Returns an Object
-	#
+	frame =
+		x: _.min frames.map Utils.frameGetMinX
+		y: _.min frames.map Utils.frameGetMinY
 
-	point = _.clone point
-	
-	traverse = (view) ->
-	
-		currentView = view
-		superViews = []
-	
-		while currentView and currentView.superView
-			superViews.push currentView.superView
-			currentView = currentView.superView
-	
-		return superViews
-	
-	superViews1 = traverse view1
-	superViews2 = traverse view2
-	
-	superViews2.push view2 if view2
-	
-	for view in superViews1
-		point.x += view.x
-		point.y += view.y
+	frame.width  = _.max(frames.map Utils.frameGetMaxX) - frame.x
+	frame.height = _.max(frames.map Utils.frameGetMaxY) - frame.y
 
-		if view.scrollFrame
-			point.x -= view.scrollFrame.x
-			point.y -= view.scrollFrame.y
+	frame
 
-	for view in superViews2
-		point.x -= view.x
-		point.y -= view.y
+
+
+
+
+# Points
+
+# Utils.pointDistance = (pointA, pointB) ->
+# 	distance =
+# 		x: Math.abs(pointB.x - pointA.x)
+# 		y: Math.abs(pointB.y - pointA.y)
+
+# Utils.pointInvert = (point) ->
+# 	point =
+# 		x: 0 - point.x
+# 		y: 0 - point.y
+
+# Utils.pointTotal = (point) ->
+# 	point.x + point.y
+
+
+
+# Utils.pointAbs = (point) ->
+# 	point =
+# 		x: Math.abs point.x
+# 		y: Math.abs point.y
+
+# Utils.pointInFrame = (point, frame) ->
+# 	return false  if point.x < frame.minX or point.x > frame.maxX
+# 	return false  if point.y < frame.minY or point.y > frame.maxY
+# 	true
+
+# Utils.convertPoint = (point, view1, view2) ->
+
+# 	# Public: Convert a point between two view coordinate systems
+# 	#
+# 	# point - The point to be converted
+# 	# view1 - The origin view of the point
+# 	# view2 - The destination view of the point
+# 	# 
+# 	# Returns an Object
+# 	#
+
+# 	point = _.clone point
+	
+# 	traverse = (view) ->
+	
+# 		currentView = view
+# 		superViews = []
+	
+# 		while currentView and currentView.superLayer
+# 			superViews.push currentView.superLayer
+# 			currentView = currentView.superLayer
+	
+# 		return superViews
+	
+# 	superViews1 = traverse view1
+# 	superViews2 = traverse view2
+	
+# 	superViews2.push view2 if view2
+	
+# 	for view in superViews1
+# 		point.x += view.x
+# 		point.y += view.y
+
+# 		if view.scrollFrame
+# 			point.x -= view.scrollFrame.x
+# 			point.y -= view.scrollFrame.y
+
+# 	for view in superViews2
+# 		point.x -= view.x
+# 		point.y -= view.y
 		
-		if view.scrollFrame
-			point.x += view.scrollFrame.x
-			point.y += view.scrollFrame.y
+# 		if view.scrollFrame
+# 			point.x += view.scrollFrame.x
+# 			point.y += view.scrollFrame.y
 	
-	return point
+# 	return point
+
+_.extend exports, Utils
 

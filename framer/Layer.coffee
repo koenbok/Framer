@@ -170,16 +170,23 @@ class exports.Layer extends BaseClass
 		# Get the total size of all subviews
 		# TODO: needs tests
 		
-		minX = utils.min _.pluck @subViews, "minX"
-		maxX = utils.max _.pluck @subViews, "maxX"
-		minY = utils.min _.pluck @subViews, "minY"
-		maxY = utils.max _.pluck @subViews, "maxY"
+		# minX = _.min _.map @subLayers, (layer) -> layer.minX
+		# maxX = _.max _.map @subLayers, (layer) -> layer.maxX
+		# minY = _.min _.map @subLayers, (layer) -> layer.minY
+		# maxY = _.max _.map @subLayers, (layer) -> layer.maxY
 		
-		new Frame
-			x: minX
-			y: minY
-			width: maxX - minX
-			height: maxY - minY
+		# new Frame
+		# 	x: minX
+		# 	y: minY
+		# 	width: maxX - minX
+		# 	height: maxY - minY
+
+		frame = @frame
+
+		for subLayer in @subLayers
+			frame = frame.merge subLayer.frame
+
+		frame
 
 	centerFrame: ->
 		# Get the centered frame for its superview

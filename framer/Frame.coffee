@@ -19,20 +19,20 @@ class exports.Frame extends BaseClass
 				@[k] = options[k]
 
 	@define "midX",
-		get: -> @x + (@width / 2.0)
-		set: (value) -> @x = if @width is 0 then 0 else value - (@width / 2.0)
+		get: -> Utils.frameGetMidX @
+		set: (value) -> Utils.frameSetMidX @, value
 
 	@define "maxX",
-		get: -> @x + @width
-		set: (value) -> @x = if @width is 0 then 0 else value - @width
+		get: -> Utils.frameGetMaxX @
+		set: (value) -> Utils.frameSetMaxX @, value
 
 	@define "midY",
-		get: -> @y + (@height / 2.0)
-		set: (value) -> @y = if @height is 0 then 0 else value - (@height / 2.0)
+		get: -> Utils.frameGetMidY @
+		set: (value) -> Utils.frameSetMidY @, value
 
 	@define "maxY",
-		get: -> @y + @height
-		set: (value) -> @y = if @height is 0 then 0 else value - @height
+		get: -> Utils.frameGetMaxY @
+		set: (value) -> Utils.frameSetMaxY @, value
 
 	merge: (r2) ->
 
