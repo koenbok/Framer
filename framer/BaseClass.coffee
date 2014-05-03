@@ -26,7 +26,7 @@ class exports.BaseClass extends EventEmitter
 		Object.defineProperty @prototype, propertyName, descriptor
 		Object.__
 
-	@SimpleProperty = (name, fallback, exportable=true) ->
+	@simpleProperty = (name, fallback, exportable=true) ->
 		exportable: exportable
 		default: fallback
 		get: ->  @_getPropertyValue name
@@ -44,6 +44,9 @@ class exports.BaseClass extends EventEmitter
 
 	_propertyList: ->
 		@constructor[DefinedPropertiesKey]
+
+	keys: ->
+		_.keys @properties
 
 	@define "properties",
 		get: ->
