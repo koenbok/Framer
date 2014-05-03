@@ -14,12 +14,22 @@ exports.Defaults =
 
 	getDefaults: (className, options) ->
 
-		defaults = Utils.setDefaultProperties Framer.Defaults[className], Originals[className], false
+		# Always start with the originals
+		defaults = _.clone Originals[className]
 
-		for k, v of options
+		# Copy over the user defined options
+		for k, v of Framer.Defaults[className]
 			defaults[k] = if _.isFunction(v) then v() else v
 
-		defaults
+		# Then copy over the default keys to the options
+		for k, v of defaults
+			if not options.hasOwnProperty k
+				options[k] = v
+
+		# Include a secret property with the default keys
+		# options._defaultValues = defaults
+		
+		options
 
 	reset: ->
 		Framer.Defaults = _.clone Originals

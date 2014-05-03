@@ -49,9 +49,15 @@ class exports.Layer extends BaseClass
 		@_createElement()
 		@_setDefaultCSS()
 
+		super options
+
 		options = Defaults.getDefaults "Layer", options
 
-		super options
+		# Keep track of the default values
+		# @_defaultValues = options._defaultValues
+
+		# We need to explicitly set the element id again, becuase it was made by the super
+		@_element.id = "FramerLayer-#{@id}"
 
 		# Extract the frame from the options, so we support minX, maxX etc.
 		if options.hasOwnProperty "frame"
@@ -64,12 +70,8 @@ class exports.Layer extends BaseClass
 		# Insert the layer into the dom or the superLayer element
 		if not options.superLayer
 			@bringToFront()
-			@_insertElement()
+			@_insertElement() if not options.shadow
 		else
-			
-			if not options.superLayer instanceof Layer
-				throw "Layer.superLayer needs to be a Layer object"
-			
 			@superLayer = options.superLayer
 
 		# Set needed private variables
@@ -167,26 +169,7 @@ class exports.Layer extends BaseClass
 		Utils.convertPoint @frame, @, null
 	
 	contentFrame: ->
-		# Get the total size of all subviews
-		# TODO: needs tests
-		
-		# minX = _.min _.map @subLayers, (layer) -> layer.minX
-		# maxX = _.max _.map @subLayers, (layer) -> layer.maxX
-		# minY = _.min _.map @subLayers, (layer) -> layer.minY
-		# maxY = _.max _.map @subLayers, (layer) -> layer.maxY
-		
-		# new Frame
-		# 	x: minX
-		# 	y: minY
-		# 	width: maxX - minX
-		# 	height: maxY - minY
-
-		frame = @frame
-
-		for subLayer in @subLayers
-			frame = frame.merge subLayer.frame
-
-		frame
+		Utils.mergeFrame @subLayers.map (layer) -> layer.frame.properties
 
 	centerFrame: ->
 		# Get the centered frame for its superview
@@ -245,7 +228,6 @@ class exports.Layer extends BaseClass
 	_createElement: ->
 		return if @_element?
 		@_element = document.createElement "div"
-		@_element.id = "FramerLayer-#{@id}"
 
 	_insertElement: ->
 		Utils.domComplete @__insertElement
@@ -303,12 +285,17 @@ class exports.Layer extends BaseClass
 			if currentValue == value
 				return @emit "load"
 
-			# Unset any background color if it's the default color
-			# You can't really do this, because it ends up as a slightly different color
-			# if @backgroundColor is Framer.Defaults.Layer.backgroundColor
-			
-			@backgroundColor = null
+			# Todo: this is not very nice but I wanted to have it fixed
+			# defaults = Defaults.getDefaults "Layer", {}
 
+			# console.log defaults.backgroundColor
+			# console.log @_defaultValues?.backgroundColor
+
+			# if defaults.backgroundColor == @_defaultValues?.backgroundColor
+			# 	@backgroundColor = null
+
+			@backgroundColor = null
+			
 			# Set the property value
 			@_setPropertyValue "image", value
 
@@ -351,6 +338,10 @@ class exports.Layer extends BaseClass
 
 			return if layer is @_superLayer
 			
+			# Check the type
+			if not layer instanceof Layer
+				throw "Layer.superLayer needs to be a Layer object"
+
 			# Cancel previous pending insertions
 			Utils.domCompleteCancel @__insertElement
 			
@@ -375,7 +366,23 @@ class exports.Layer extends BaseClass
 			@bringToFront()
 			
 			@emit "change:superLayer"
+
+	superLayers: ->
+
+		superLayers = []
+
+		recurse = (layer) ->
+			return if not layer.superLayer
+			superLayers.push layer.superLayer
+			recurse layer.superLayer
+
+		recurse @
+
+		superLayers
 	
+	# Todo: should we have a recursive subLayers function?
+	# Let's make it when we need it.
+
 	@define "subLayers",
 		exportable: false
 		get: -> _.clone @_subLayers
