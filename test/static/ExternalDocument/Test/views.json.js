@@ -1,4 +1,4 @@
-[
+window.__imported__ = [
 	{
 		"id": 3,
 		"name": "Background",

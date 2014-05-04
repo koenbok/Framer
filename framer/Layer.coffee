@@ -169,7 +169,7 @@ class exports.Layer extends BaseClass
 		Utils.convertPoint @frame, @, null
 	
 	contentFrame: ->
-		Utils.mergeFrame @subLayers.map (layer) -> layer.frame.properties
+		Utils.frameMerge @subLayers.map (layer) -> layer.frame.properties
 
 	centerFrame: ->
 		# Get the centered frame for its superview

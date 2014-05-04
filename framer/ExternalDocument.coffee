@@ -23,7 +23,8 @@ class exports.ExternalDocument
 
 		# Pass two. Adjust position on screen for all layers
 		# based on the hierarchy.
-		_.map @_createdLayers, @_correctLayer
+		for layer in @_createdLayers
+			@_correctLayer layer
 
 		# Pass three, insert the layers into the dom
 		# (they were not inserted yet because of the shadow keyword)
@@ -75,15 +76,26 @@ class exports.ExternalDocument
 		if not layer.image and not info.children.length and not info.maskFrame
 			layer.frame = new Frame
 
-		info.children.map (info) => @_createLayer info, layer
+		info.children.reverse().map (info) => @_createLayer info, layer
 
-		# If a layer has no image or mask, make it the size of it's combined sublayers
-		if not layer.image and not layer.viewInfo.maskFrame
+		# TODODODODOD
+		if not layer.image and not info.maskFrame
 			layer.frame = layer.contentFrame()
+
+		layer._info = info
 
 		@_createdLayers.push layer
 		@_createdLayersByName[layer.name] = layer
 
 	_correctLayer: (layer) ->
-		if layer.superLayer
-			layer.frame = layer.superLayer.convertPoint layer.frame
+
+		traverse = (layer) ->
+
+			if layer.superLayer
+				layer.frame = Utils.convertPoint layer.frame, null, layer.superLayer
+
+			for subLayer in layer.subLayers
+				traverse subLayer
+
+		if not layer.superLayer
+			traverse layer

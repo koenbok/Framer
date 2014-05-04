@@ -1,0 +1,31 @@
+{
+	"Background": {
+		"frame": {
+			"x": 0,
+			"y": 0,
+			"width": 320,
+			"height": 568
+		},
+		"subLayerNames": []
+	},
+	"Text2": {
+		"frame": {
+			"x": 6,
+			"y": 128,
+			"width": 157,
+			"height": 26
+		},
+		"subLayerNames": []
+	},
+	"Text": {
+		"frame": {
+			"x": 75,
+			"y": 260,
+			"width": 168,
+			"height": 26
+		},
+		"subLayerNames": [
+			"Text2"
+		]
+	}
+}

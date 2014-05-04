@@ -1,49 +1,41 @@
+assert = require "assert"
+
 describe "ExternalDocument", ->
 
-	describe "Defaults", ->
+	compareDocument = (name) ->
 
-		it "should load", ->
+		path = "static/ExternalDocument"
 
-			doc = new Framer.ExternalDocument "static/ExternalDocument/Test"
-			
-			layers = doc.load()
+		layers = (new Framer.ExternalDocument Utils.pathJoin(path, name)).load()
+		
+		dataA = Framer.Utils.domLoadScriptSync Utils.pathJoin(path, "#{name}.out.json")
+		dataB = {}
 
-			dataA =  {
-				"Background": {
-					"frame": {
-						"x": 0,
-						"y": 0,
-						"width": 320,
-						"height": 568
-					}
-				},
-				"Text2": {
-					"frame": {
-						"x": 6,
-						"y": 129,
-						"width": 157,
-						"height": 26
-					},
-					"superLayerName": "Text"
-				},
-				"Text": {
-					"frame": {
-						"x": 75,
-						"y": 260,
-						"width": 168,
-						"height": 26
-					}
-				}
-			}
+		for layerName, layer of layers
+			dataB[layerName] =
+				frame: layer.frame.properties
+				superLayerName: layer.superLayer?.layerName
+				subLayerNames: layer.subLayers.map (l) -> l.name
 
-			dataB = {}
+		jsonA = JSON.stringify dataA, null, "\t"
+		jsonB = JSON.stringify dataB, null, "\t"
 
-			for name, layer of layers
-				dataB[name] =
-					frame: layer.frame.properties
-					superLayerName: layer.superLayer?.name
+		# Uncomment this to see current dump
+		# console.log ""
+		# console.log "Name: #{name}"
+		# console.log jsonB
 
-			jsonA = JSON.stringify dataA
-			jsonB = JSON.stringify dataB
+		assert.equal jsonA, jsonB
 
-			jsonA.should.equal jsonB
+	describe "External Files", ->
+
+		it "Android", ->
+			compareDocument "Android"
+
+		it "Square", ->
+			compareDocument "Square"
+
+		it "Test", ->
+			compareDocument "Test"
+
+
