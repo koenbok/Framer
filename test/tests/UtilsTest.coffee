@@ -156,6 +156,16 @@ describe "Utils", ->
 			# Bla bla. This works. Doing a visual comparison is so much easier
 			# Start the cactus project and go to /test.html
 
+	describe "domLoadDataSync", ->
+
+		it "should load data async", ->
+			data = Utils.domLoadDataSync "static/test.txt"
+			data.should.equal "TEST HELLO"
+
+		it "should load throw error on nonexisting", ->
+			data = Utils.domLoadDataSync "static/nonexisting.txt"
+
+
 
 
 

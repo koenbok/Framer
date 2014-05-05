@@ -1,7 +1,7 @@
 {_} = require "./Underscore"
 Utils = require "./Utils"
 
-class exports.ExternalDocument
+class exports.Importer
 
 	constructor: (@path, @extraLayerProperties={}) ->
 
@@ -35,7 +35,7 @@ class exports.ExternalDocument
 		@_createdLayersByName
 
 	_loadViewInfo: ->
-		Framer.Utils.domLoadScriptSync @paths.viewInfo
+		Framer.Utils.domLoadJSONSync @paths.viewInfo
 
 	_createLayer: (info, superLayer) ->
 		
@@ -99,3 +99,7 @@ class exports.ExternalDocument
 
 		if not layer.superLayer
 			traverse layer
+
+exports.Importer.load = (path) ->
+	importer = new exports.Importer path
+	importer.load()

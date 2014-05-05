@@ -6,9 +6,9 @@ describe "ExternalDocument", ->
 
 		path = "static/ExternalDocument"
 
-		layers = (new Framer.ExternalDocument Utils.pathJoin(path, name)).load()
+		layers = Framer.Importer.load Utils.pathJoin(path, name)
 		
-		dataA = Framer.Utils.domLoadScriptSync Utils.pathJoin(path, "#{name}.out.json")
+		dataA = Framer.Utils.domLoadJSONSync Utils.pathJoin(path, "#{name}.out.json")
 		dataB = {}
 
 		for layerName, layer of layers

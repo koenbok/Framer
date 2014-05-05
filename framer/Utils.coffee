@@ -235,19 +235,16 @@ Utils.domLoadScript = (url, callback) ->
 	
 	script
 
-Utils.domLoadScriptSync = (path) ->
+Utils.domLoadDataSync = (path) ->
 
-	xhrObj = new XMLHttpRequest();
-	xhrObj.open('GET', path, false);
-	xhrObj.send('');
+	request = new XMLHttpRequest()
+	request.open "GET", path, false
+	request.send null
+	
+	return request.responseText
 
-	se = document.createElement('script')
-	se.type = "text/javascript"
-	se.text = "window.__import__ = " + xhrObj.responseText
-
-	document.getElementsByTagName('head')[0].appendChild(se)
-
-	return window.__import__
+Utils.domLoadJSONSync = (path) ->
+	JSON.parse Utils.domLoadDataSync path
 
 ######################################################
 # GEOMERTY FUNCTIONS

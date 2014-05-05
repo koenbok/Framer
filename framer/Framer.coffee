@@ -22,7 +22,7 @@ Framer.LinearAnimator = (require "./Animators/LinearAnimator").LinearAnimator
 Framer.BezierCurveAnimator = (require "./Animators/BezierCurveAnimator").BezierCurveAnimator
 Framer.SpringDHOAnimator = (require "./Animators/SpringDHOAnimator").SpringDHOAnimator
 Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4Animator
-Framer.ExternalDocument = (require "./ExternalDocument").ExternalDocument
+Framer.Importer = (require "./Importer").Importer
 
 window.Framer = Framer if window
 
