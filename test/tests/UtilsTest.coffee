@@ -163,7 +163,9 @@ describe "Utils", ->
 			data.should.equal "TEST HELLO"
 
 		it "should load throw error on nonexisting", ->
-			data = Utils.domLoadDataSync "static/nonexisting.txt"
+
+			test = -> Utils.domLoadDataSync("static/nonexisting.txt")
+			test.should.throw()
 
 
 

@@ -239,8 +239,20 @@ Utils.domLoadDataSync = (path) ->
 
 	request = new XMLHttpRequest()
 	request.open "GET", path, false
-	request.send null
-	
+
+	# This does not work in Safari, see below
+	try
+		request.send null
+	catch e
+		console.debug "XMLHttpRequest.error", e
+
+	data = request.responseText
+
+	# Because I can't catch the actual 404 with Safari, I just assume something
+	# went wrong if there is no text data returned from the request.
+	if not data
+		throw "Utils.domLoadDataSync: no data was loaded (url not found?)"
+
 	return request.responseText
 
 Utils.domLoadJSONSync = (path) ->
