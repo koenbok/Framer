@@ -49,9 +49,9 @@ class exports.Layer extends BaseClass
 		@_createElement()
 		@_setDefaultCSS()
 
-		super options
-
 		options = Defaults.getDefaults "Layer", options
+
+		super options
 
 		# Keep track of the default values
 		# @_defaultValues = options._defaultValues

@@ -33,8 +33,3 @@ exports.Defaults =
 
 	reset: ->
 		Framer.Defaults = _.clone Originals
-
-
-
-
-

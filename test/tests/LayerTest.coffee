@@ -27,6 +27,20 @@ describe "Layer", ->
 			
 			layer.width.should.equal 100
 			layer.height.should.equal 100
+
+		it "should set default background color", ->
+			
+			Framer.Defaults =
+				Layer:
+					backgroundColor: "red"
+					
+			layer = new Layer()
+			
+			layer.style.backgroundColor.should.equal "red"
+			#layer.backgroundColor.should.equal "red"
+
+
+			Framer.resetDefaults()
 		
 
 		it "should set defaults with override", ->
