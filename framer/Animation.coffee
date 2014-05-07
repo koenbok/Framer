@@ -125,8 +125,6 @@ class exports.Animation extends EventEmitter
 		@_animator.on "stop",  => @emit "stop"
 		@_animator.on "end",   => @emit "end"
 
-		console.log @_repeatCounter
-
 		# See if we need to repeat this animation
 		# Todo: more repeat behaviours:
 		# 1) add (from end position) 2) reverse (loop between a and b)
