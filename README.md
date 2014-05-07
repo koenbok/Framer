@@ -19,7 +19,7 @@ For a complete overview, downloads and docs please visit [framerjs.com](http://w
 - Please use the issue tracker and tag them with Framer3
 - Try to include an example and clearly describe expected behaviour
 
-[![wercker status](https://app.wercker.com/status/8e5d02248bfd387acebdf177fba5f6b1/m/ "wercker status")](https://app.wercker.com/project/bykey/8e5d02248bfd387acebdf177fba5f6b1)
+[![wercker status](https://app.wercker.com/status/8e5d02248bfd387acebdf177fba5f6b1/m/framer3 "wercker status")](https://app.wercker.com/project/bykey/8e5d02248bfd387acebdf177fba5f6b1)
 
 ## Framer 3 Changes
 
@@ -102,3 +102,4 @@ Framer 3 is close to a rewrite. Or maybe more a huge refactor. The new code base
 - Add js error warning
 - Add esc-layer overview mode
 - Test scrolling
+
