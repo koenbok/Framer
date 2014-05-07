@@ -485,5 +485,15 @@ describe "Layer", ->
 			assert.equal layer.classList.contains("test"), true
 			assert.equal layer._element.classList.contains("test"), true
 
+	describe "DOM", ->
+
+		it "should destroy", ->
+
+			layer = new Layer
+			layer.destroy()
+
+			Layer.Layers().should.not.contain layer
+			assert.equal layer._element.parentNode, null
+
 
 

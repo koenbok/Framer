@@ -240,6 +240,17 @@ class exports.Layer extends BaseClass
 
 		_RootElement.appendChild @_element
 
+	destroy: ->
+		
+		if @superLayer
+			@superLayer._subLayers = _.without @superLayer._subLayers, @
+
+		@_element.parentNode.removeChild @_element
+		@removeAllListeners()
+
+		_LayerList = _.without _LayerList, @
+
+
 	##############################################################
 	## COPYING
 
@@ -510,12 +521,27 @@ class exports.Layer extends BaseClass
 		super event, listener
 		@_element.addEventListener event, listener
 
+		@_eventListeners ?= {}
+		@_eventListeners[event] ?= []
+		@_eventListeners[event].push listener
+
 		# We want to make sure we listen to these events
 		@ignoreEvents = false
 
 	removeListener: (event, listener) ->
 		super
 		@_element.removeEventListener event, listener
+		@_eventListeners[event] = _.without @_eventListeners[event], listener
+
+	removeAllListeners: ->
+
+		return if not @_eventListeners
+		
+		for eventName, listeners of @_eventListeners
+			for listener in listeners
+				@removeListener eventName, listener
 
 	on: @::addListener
 	off: @::removeListener
+
+exports.Layer.Layers = -> _.clone _LayerList

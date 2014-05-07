@@ -23,6 +23,7 @@ Framer.BezierCurveAnimator = (require "./Animators/BezierCurveAnimator").BezierC
 Framer.SpringDHOAnimator = (require "./Animators/SpringDHOAnimator").SpringDHOAnimator
 Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4Animator
 Framer.Importer = (require "./Importer").Importer
+Framer.Debug = (require "./Debug").Debug
 
 window.Framer = Framer if window
 
