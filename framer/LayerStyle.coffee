@@ -10,10 +10,10 @@ exports.LayerStyle =
 	height: (layer) ->
 		layer.height + "px"
 
-	visibility: (layer) ->
+	display: (layer) ->
 		if layer.visible is true
-			return "visible"
-		return "hidden"
+			return "block"
+		return "none"
 
 	opacity: (layer) ->
 		layer.opacity
