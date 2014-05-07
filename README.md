@@ -1,27 +1,99 @@
-# Framer Prototyping
+## Framer Prototyping
 
 For a complete overview, downloads and docs please visit [framerjs.com](http://www.framerjs.com).
 
-### About
+#### Building
 
-Framer is a modern prototyping tool. It can help you to quickly build and test complex interactions and rich animations for both desktop and mobile.
+- Download or clone the code
+- Run `npm install` to get the dependencies
+- Run `make build` to build the latest version
 
-### Developing
+#### Testing
 
-To start developing, clone the code and install the dependencies with `npm install`. To make a new build run `make build` or `make buildw` to keep watching and rebuild on file changes.
-
-### Tests
-
-To run the tests run `make test` or `make testw` to keep watching and test on file changes. The tests are run in PhantomJS, a headless version of WebKit. You can also run the tests in the browser directly by simply opening `test/index.html`.
-
-### Contributing
-
-We love contributions. If you like to help out and need ideas what to work on send me a [message](mailto:koen+framer@madebysofa.com).
-
-wercker build status:
+- Run `make test` to run the unit tests in phantomjs
+- Run `make safari` to run the tests in Safari
+- Download Cactus and open extras/CactusFramer, then go to /test.html for a list of visual tests.
 
 [![Wercker status](https://app.wercker.com/status/8e5d02248bfd387acebdf177fba5f6b1)](https://app.wercker.com/project/bykey/8e5d02248bfd387acebdf177fba5f6b1)
 
+## Framer 3 Changes
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/koenbok/framer/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+Framer 3 is close to a rewrite. Or maybe more a huge refactor. The new code base is simpler and very well tested, so I hope others can start contributing more easily.
 
+#### New Features
+
+- State machine
+  - A proper way to organize animations
+  - Define a set of states with myLayer.states.add "name", {properties...}
+  - Transform to a specific state with myLayer.states.switch "name" or myLayer.states.next()
+  - Optionally override layer.states.animationOptions, or pass them in 
+- Animation backend
+  - Based on requestAnimationFrame
+  - Allows for more precise animation handling and better control
+  - Allows to change animations in-flight, which is required for real physics
+  - Animations now take a new argument curveOptions that can contain named inputs (like spring, tension, velocity) rather than the old curve "spring(x,y,z)" argument.
+- Animators
+  - Added damping harmonic oscillator spring physics (curve: "spring-dho")
+  - Very simple infrastructure to add your own animators:
+    - Emit a number on a tick
+    - Check if the animation has reached it's end
+    - Support for future advanced animators like real physics and path animators
+
+#### Big Changes
+
+- Views are now called Layers (superLayer, subLayers, etc)
+- Layers get a default background color and width, height on default so you can see them
+- You can override the defaults yourself like Framer.Defaults.Layer.width = 100
+- Layer events (myLayer.on) have a modified scope where this is the layer it's being called on
+- There is no ScrollLayer, it's just a Layer. You can enable scrolling with scroll, scrollX, scrollY (and animate them).
+- There is no ImageLayer, it's just a Layer. Set the image with myLayer.image = "url"
+
+#### Smaller Changes
+
+- More sane error checking all around, throwing sensible errors if you do something wrong
+- Transform origin are now full properties: Layer.originX, Layer.originY
+- Most objects have a nice .toString() method for debugging
+- Added delay and repeat keywords to animation
+- Animation events now also get emitted on the layer (start, stop, end)
+- Replaces the Underscore library with Lodash and added Underscore.String
+- Some css properties are now directly exposed on the layer (without having to go through .style) like backgroundColor
+- Added Utils.mapRange to map from one number range to another. So 0.5 as input from 0-1 to 0-50 becomes 25.
+
+#### Big bugs fixed
+
+- A lot of stuff around animations
+  - Reliable event handling (start, stop, end)
+  - Multiple animations for one layer
+- Rotation issues beyond 360 degrees
+- Rewritten the Photoshop importer with tests
+
+#### Backwards Compatibility
+
+- View, ScrollView and ImageView should work, but they give a warning.
+- Animation spring initial velocity behaves a bit different
+
+#### Known Issues
+
+- Rotation issues with a low z-index cause drawing issues.
+- Animation perf in some versions of Chrome seems less good than Framer 2.
+
+#### Plans
+
+- Add back in the css keyframe animation backend and allow to switch between them on a per animation basis.
+- Add more animatable properties. You can set layer.style as an animation target and animate it's numeric css properties. - We'll have to put some converters in to tween between colors, gradients, shadows, etc.
+- Add back in the box2d physics engine and come up with a testable api
+- Research FF/IE support
+
+#### Framer 3 Release Todo
+
++ Animation.delay
++ Animation.repeat
+- Test copy layer hierarchy
+- Add myLayer.sublayerWithName
+- Add myLayer.name property
+- Set html/text content
+- Add layer.draggable
+- Add a Framer.Future namespace to try new stuff
+- Add js error warning
+- Add esc-layer overview mode
+- Test scrolling
