@@ -112,7 +112,10 @@ class exports.LayerStates extends EventEmitter
 	next:  ->
 		# TODO: maybe add animationOptions
 		states = Utils.arrayFromArguments arguments
-		states ?= @states()
+		
+		if not states.length
+			states = @states()
+		
 		@switch Utils.arrayNext(states, @_currentState)
 
 
