@@ -52,10 +52,16 @@ testw%safari:
 
 dist:
 	make build
+	mkdir -p build/Framer
+	cp -R templates/Project build/Framer/Project
+	cp build/framer.js build/Framer/Project/framer
+	cp build/framer.js.map build/Framer/Project/framer
+	cd build; zip -r Framer.zip Framer
 
-deploy:
-	make dist
-	$(coffee) scripts/deploy.coffee
+
+# deploy:
+# 	make dist
+# 	$(coffee) scripts/deploy.coffee
 
 clean:
 	rm -rf build
