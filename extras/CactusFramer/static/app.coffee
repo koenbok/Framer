@@ -6,4 +6,6 @@ layer.states.add
 	two: {x: 500}
 
 layer.on Events.Click, ->
-	@states.next "one", "two"
+	@animate
+		properties: x:500
+		repeat: 5

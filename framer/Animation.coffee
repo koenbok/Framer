@@ -40,7 +40,6 @@ class exports.Animation extends EventEmitter
 			time: 1
 			repeat: 0
 			delay: 0
-			# origin: "50% 50%"
 			debug: true
 
 		if options.layer is null
@@ -126,19 +125,34 @@ class exports.Animation extends EventEmitter
 		@_animator.on "stop",  => @emit "stop"
 		@_animator.on "end",   => @emit "end"
 
+		console.log @_repeatCounter
+
 		# See if we need to repeat this animation
+		# Todo: more repeat behaviours:
+		# 1) add (from end position) 2) reverse (loop between a and b)
 		if @_repeatCounter > 0
 			@_animator.on "end", =>
+				for k, v of stateA target[k] = v
 				@_repeatCounter--
 				@start()
 
+		# This is the function that sets the actual value to the layer in the 
+		# animation loop. It needs to be very fast.
 		@_animator.on "tick", (value) ->
 			for k, v of stateB
 				target[k] = Utils.mapRange value, 0, 1, stateA[k], stateB[k]
+			return # For performance
 
-		Utils.delay @options.delay, =>
+		start = => 
 			_runningAnimations.push @
 			@_animator.start()
+
+		# If we have a delay, we wait a bit for it to start
+		if @options.delay
+			Utils.delay @options.delay, start
+		else
+			start()
+
 
 	stop: ->
 		@_animator.stop()
