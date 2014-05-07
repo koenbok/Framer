@@ -145,6 +145,7 @@ class exports.Animation extends EventEmitter
 		_runningAnimations = _.without _runningAnimations, @
 
 	reverse: ->
+		# TODO: Add some tests
 		options = _.clone @options
 		options.properties = @_originalState
 		animation = new Animation options
