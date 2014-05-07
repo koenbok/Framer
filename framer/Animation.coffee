@@ -132,7 +132,8 @@ class exports.Animation extends EventEmitter
 		# 1) add (from end position) 2) reverse (loop between a and b)
 		if @_repeatCounter > 0
 			@_animator.on "end", =>
-				for k, v of stateA target[k] = v
+				for k, v of stateA
+					target[k] = v
 				@_repeatCounter--
 				@start()
 
