@@ -47,6 +47,7 @@ class exports.Importer
 			frame: info.layerFrame
 			clip: false
 			backgroundColor: null
+			visible: info.visible
 
 		_.extend viewInfo, @extraLayerProperties
 
