@@ -92,17 +92,14 @@ class exports.LayerStates extends EventEmitter
 
 	states: ->
 		# Return a list of all the possible states
-		@_orderedStates
+		_.clone @_orderedStates
 
 	animatingKeys: ->
 
 		keys = []
 
 		for stateName, state of @_states
-			
-			if stateName is "default"
-				continue
-
+			continue if stateName is "default"
 			keys = _.union keys, _.keys state
 
 		keys
@@ -112,10 +109,11 @@ class exports.LayerStates extends EventEmitter
 		states ?= @states()
 		@switch Utils.arrayPrev(states, @_currentState), animationOptions
 
-	next: (states, animationOptions) ->
-		# Go to next state in list
+	next:  ->
+		# TODO: maybe add animationOptions
+		states = Utils.arrayFromArguments arguments
 		states ?= @states()
-		@switch Utils.arrayNext(states, @_currentState), animationOptions
+		@switch Utils.arrayNext(states, @_currentState)
 
 
 	last: (animationOptions) ->
