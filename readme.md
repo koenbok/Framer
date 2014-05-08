@@ -92,8 +92,6 @@ Framer 3 is close to a rewrite. Or maybe more a huge refactor. The new code base
 
 #### Framer 3 Release Todo
 
-+ Animation.delay
-+ Animation.repeat
 - Test copy layer hierarchy
 - Add myLayer.sublayerWithName
 - Add myLayer.name property
@@ -101,6 +99,5 @@ Framer 3 is close to a rewrite. Or maybe more a huge refactor. The new code base
 - Add layer.draggable
 - Add a Framer.Future namespace to try new stuff
 - Add js error warning
-- Add esc-layer overview mode
 - Test scrolling
 
