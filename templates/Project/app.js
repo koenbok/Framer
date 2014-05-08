@@ -2,44 +2,22 @@
 
 // This is just demo code. Feel free to delete it all.
 
+imageLayer = new Layer({x:0, y:0, width:128, height:128, image:"images/icon.png"})
+imageLayer.center()
 
-// Create the logo view
-logoView = new ImageView({
-	width:251, height:302,
-	image: "images/framer-logo.png"
-});
+// Define a set of states with names (the original state is 'default')
+imageLayer.states.add({
+	second: {y:100, scale:0.6, rotationZ:100},
+	third:  {y:300, scale:1.3},
+	fourth:	{y:200, scale:0.9, rotationZ:200},
+})
 
-// Place it center screen
-logoView.midX = window.innerWidth / 2
-logoView.midY = window.innerHeight / 2 - 100
-
-originalX = logoView.x
-
-// Bounce on a click
-logoView.on("click", function() {
-	logoView.x = 500,
-	logoView.animate({
-		properties: {x:originalX},
-		curve: "spring",
-		curveOptions: {
-			tension: 1000,
-			friction: 10,
-		}
-	});
-});
-
-// Create the logo view
-instructionsView = new View({
-	x: logoView.x, y: logoView.maxY + 30,
-	width:logoView.width, height:100,
-});
-
-// Add some handy links
-instructionsView.backgroundColor = null
-instructionsView.html = "To start editing, open the app.js file in your text editor.<br><br>";
-instructionsView.html += "<a href='http://www.framerjs.com/documentation?origin=project' target='new'>Documentation</a> &nbsp;";
-instructionsView.html += "<a href='http://www.framerjs.com/examples?origin=project' target='new'>Examples</a>";
-instructionsView.style = {
-	font: "15px/1.4em Helvetica",
-	textAlign: "center"
+// Set the default animation options
+imageLayer.states.animationOptions = {
+	curve: "spring(500,12,0)"
 }
+
+// On a click, go to the next state
+imageLayer.on(Events.Click, function() {
+	imageLayer.states.next()
+})
