@@ -80,7 +80,8 @@ Framer 3 is close to a rewrite. Or maybe more a huge refactor. The new code base
 #### Known Issues
 
 - Rotation issues with a low z-index cause drawing issues.
-- Animation perf in some versions of Chrome seems less good than Framer 2.
+- Animation perf in some versions of Chrome seems less good than Framer 2 (maybe fixed)
+- The blur (and likely other filter properties) are kind of broken on Chrome
 
 #### Plans
 

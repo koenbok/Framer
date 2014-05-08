@@ -1,6 +1,6 @@
 layerA = new Layer
 
-layerA.blur = 5
+
 
 layerA.on Events.Click, ->
 	@scale = 0.5
