@@ -6,7 +6,8 @@ build:
         - npm-test
 deploy:
     steps:
-        name: builds.framerjs.com
-        code: make deploy
+        - script:
+            name: builds.framerjs.com
+            code: make deploy
 
 # $WERCKER_OUTPUT_DIR
