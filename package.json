@@ -18,10 +18,13 @@
     "watch": "~0.8.0",
     "watchr": "~2.4.4",
     "underscore.string": "^2.3.3",
-    "aws-sdk": "^2.0.0-rc.14",
+    "aws-sdk": "^2.0.0-rc.15",
     "simulate": "0.0.3",
     "exorcist": "^0.1.6",
-    "uglify-js": "^2.4.13"
+    "uglify-js": "^2.4.13",
+    "mustache": "^0.8.1",
+    "mime": "^1.2.11",
+    "knox": "^0.8.9"
   },
   "devDependencies": {
     "coffee-script": "~1.6.3"

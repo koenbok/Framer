@@ -1,0 +1,25 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Framer Builds</title>
+	<link rel="stylesheet" href="static/css/style.css">
+</head>
+
+<body>
+	<h1>Framer Builds</h1>
+
+	<table>
+		{{#commits}}
+		<tr>
+			<td><a href="https://github.com/koenbok/Framer/commit/{{hash}}">{{hash}}</a></td>
+			<td>{{date}}</td>
+			<td>{{author}}</td>
+			<td><a href="/{{hash}}/framer.js">framer.js</a></td>
+			<td><a href="/{{hash}}/Framer.zip">download</a></td>
+		</tr>
+		{{/commits}}
+	</table>
+</body>
+</html>

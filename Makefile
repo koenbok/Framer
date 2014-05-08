@@ -3,6 +3,7 @@ coffee = $(bin)/coffee
 
 browserify = $(bin)/browserify -t coffeeify -d --extension=".coffee"
 watch = $(coffee) scripts/watch.coffee framer,test/tests
+githash = `git rev-parse --short HEAD`
 
 all: build
 
@@ -22,6 +23,12 @@ build:
 buildw:
 	$(watch) make build
 
+clean:
+	rm -rf build
+
+
+# Testing
+
 test:
 	make build
 	mkdir -p test/lib
@@ -29,8 +36,6 @@ test:
 	$(bin)/mocha-phantomjs test/index.html
 testw:
 	$(watch) make test
-
-
 
 safari:
 	make build
@@ -41,14 +46,8 @@ safari:
 safariw:
 	$(watch) make safari
 
-test%safari:
-	make build
-	mkdir -p test/lib
-	$(browserify) test/init.coffee -o test/init.js
-	# open -a Safari test/index.html &
-testw%safari:
-	$(watch) make test
 
+# Building and uploading the site
 
 dist:
 	make build
@@ -58,12 +57,23 @@ dist:
 	cp build/framer.js.map build/Framer/Project/framer
 	cd build; zip -r Framer.zip Framer
 
+site%build:
+	make dist
+	mkdir -p build/builds.framerjs.com
+	$(coffee) scripts/site-deploy.coffee build
+	cp -R extras/builds.framerjs.com/static build/builds.framerjs.com/static
+	mkdir -p build/builds.framerjs.com/latest
+	cp build/*.js build/builds.framerjs.com/latest
+	cp build/*.map build/builds.framerjs.com/latest
+	cp build/*.zip build/builds.framerjs.com/latest
+	cp -R build/builds.framerjs.com/latest build/builds.framerjs.com/$(githash)
 
-# deploy:
-# 	make dist
-# 	$(coffee) scripts/deploy.coffee
+site%upload:
+	make site:build
+	$(coffee) scripts/site-deploy.coffee upload
 
-clean:
-	rm -rf build
+deploy:
+	make site:build
+	make site:upload
 
 .PHONY: all build test clean
