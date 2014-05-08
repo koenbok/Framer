@@ -216,6 +216,25 @@ describe "Layer", ->
 			layer.style["backgroundColor"].should.equal "red"
 
 
+	describe "Filter Properties", ->
+
+		it "should set nothing on defaults", ->
+			
+			layer = new Layer
+			layer.style.webkitFilter.should.equal ""
+
+		it "should set only the filter that is non default", ->
+			
+			layer = new Layer
+
+			layer.blur = 10
+			layer.blur.should.equal 10
+			layer.style.webkitFilter.should.equal "blur(10px)"
+
+			layer.contrast = 50
+			layer.contrast.should.equal 50
+			layer.style.webkitFilter.should.equal "blur(10px) contrast(50%)"
+
 	describe "Events", ->
 
 		it "should set pointer events", ->
