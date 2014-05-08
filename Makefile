@@ -53,8 +53,11 @@ dist:
 	make build
 	mkdir -p build/Framer
 	cp -R templates/Project build/Framer/Project
+	rm -Rf build/Framer/Project/framer
+	mkdir -p build/Framer/Project/framer
 	cp build/framer.js build/Framer/Project/framer/framer.js
 	cp build/framer.js.map build/Framer/Project/framer/framer.js.map
+	find build/Framer -name ".DS_Store" -depth -exec rm {} \;
 	cd build; zip -r Framer.zip Framer
 
 site%build:
