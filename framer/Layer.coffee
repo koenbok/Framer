@@ -84,7 +84,7 @@ class exports.Layer extends BaseClass
 	@define "width",  layerProperty "width",  "width", 100
 	@define "height", layerProperty "height", "height", 100
 
-	@define "visible", layerProperty "visible", "visibility", true
+	@define "visible", layerProperty "visible", "display", true
 	@define "opacity", layerProperty "opacity", "opacity", 1
 	@define "index", layerProperty "index", "zIndex", 0
 

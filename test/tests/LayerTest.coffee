@@ -170,11 +170,11 @@ describe "Layer", ->
 			layer = new Layer
 
 			layer.visible.should.equal true
-			layer.style["visibility"].should.equal "visible"
+			layer.style["display"].should.equal "block"
 
 			layer.visible = false
 			layer.visible.should.equal false
-			layer.style["visibility"].should.equal "hidden"
+			layer.style["display"].should.equal "none"
 
 		it "should set clip", ->
 			
