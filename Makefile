@@ -10,7 +10,7 @@ all: build
 build:
 	make clean
 	mkdir -p build
-	$(coffee) scripts/banner.coffee > build/framer.debug.js
+	# $(coffee) scripts/banner.coffee > build/framer.debug.js
 	$(browserify) framer/Framer.coffee >> build/framer.debug.js
 	cat build/framer.debug.js | $(bin)/exorcist build/framer.js.map > build/framer.js
 	$(bin)/uglifyjs \

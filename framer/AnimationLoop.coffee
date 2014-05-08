@@ -5,10 +5,6 @@ Utils = require "./Utils"
 {Config} = require "./Config"
 {EventEmitter} = require "./EventEmitter"
 
-requestAnimationFrame =  window.requestAnimationFrame
-requestAnimationFrame ?= window.webkitRequestAnimationFrame
-requestAnimationFrame ?= (f) -> Utils.delay 1/60, f
-
 # Note: this is not an object because there should really only be one
 
 AnimationLoopIndexKey = "_animationLoopIndex"
@@ -34,7 +30,7 @@ AnimationLoop =
 		AnimationLoop._time = Utils.getTime()
 		AnimationLoop._sessionTime = 0
 
-		requestAnimationFrame AnimationLoop._tick
+		window.requestAnimationFrame AnimationLoop._tick
 
 	_stop: ->
 		console.debug "AnimationLoop._stop"
@@ -76,7 +72,7 @@ AnimationLoop =
 
 		AnimationLoop._time = time
 
-		requestAnimationFrame AnimationLoop._tick
+		window.requestAnimationFrame AnimationLoop._tick
 
 		for animator in removeAnimators
 			AnimationLoop.remove animator

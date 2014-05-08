@@ -45,6 +45,14 @@ Utils.arrayPrev = (arr, item) ->
 
 
 ######################################################
+# ANIMATION
+
+# This is a little hacky, but I want to avoid wrapping the function
+# in another one as it gets called at 60 fps. So we make it a global.
+window.requestAnimationFrame ?= window.webkitRequestAnimationFrame
+window.requestAnimationFrame ?= (f) -> Utils.delay 1/60, f
+
+######################################################
 # TIME FUNCTIONS
 
 # Note: in Framer 3 we try to keep all times in seconds

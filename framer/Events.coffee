@@ -19,13 +19,11 @@ Events.Click = Events.TouchEnd
 Events.MouseOver = "mouseover"
 Events.MouseOut = "mouseout"
 
-
-
 # Extract touch events for any event
-# Events.touchEvent = (event) ->
-# 	touchEvent = event.touches?[0]
-# 	touchEvent ?= event.changedTouches?[0]
-# 	touchEvent ?= event
-# 	touchEvent
+Events.touchEvent = (event) ->
+	touchEvent = event.touches?[0]
+	touchEvent ?= event.changedTouches?[0]
+	touchEvent ?= event
+	touchEvent
 	
 exports.Events = Events

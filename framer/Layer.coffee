@@ -5,10 +5,11 @@ Utils = require "./Utils"
 {Config} = require "./Config"
 {Defaults} = require "./Defaults"
 {BaseClass} = require "./BaseClass"
-{LayerStyle} = require "./LayerStyle"
-{LayerStates} = require "./LayerStates"
 {Animation} = require "./Animation"
 {Frame} = require "./Frame"
+{LayerStyle} = require "./LayerStyle"
+{LayerStates} = require "./LayerStates"
+{LayerDraggable} = require "./LayerDraggable"
 
 _RootElement = null
 _LayerList = []
@@ -473,6 +474,14 @@ class exports.Layer extends BaseClass
 
 	@define "states",
 		get: -> @_states ?= new LayerStates @
+
+	#############################################################################
+	## Draggable
+
+	@define "draggable",
+		get: ->
+			@_draggable ?= new LayerDraggable @
+			@_draggable
 
 	##############################################################
 	## SCROLLING
