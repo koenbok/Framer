@@ -14,4 +14,4 @@ layerA.on Events.DragEnd, (event, layer) ->
 		properties:
 			x: parseInt(layer.x + (velocity.x * constant1))
 			y: parseInt(layer.y + (velocity.y * constant1))
-		curve: "spring(100,80,#{totalVelocity * constant2})"
+		curve: "spring(600,10,#{totalVelocity * constant2})"

@@ -1,12 +1,17 @@
 {_} = require "./Underscore"
 Utils = require "./Utils"
 
+ChromeAlert = """
+Importing layers is currently only supported on Safari. If you really want it to work with Chrome quit it, open a terminal and run:
+open -a Google\ Chrome -–allow-file-access-from-files
+"""
+
 class exports.Importer
 
 	constructor: (@path, @extraLayerProperties={}) ->
 
 		@paths =
-			viewInfo: Utils.pathJoin @path, "views.json"
+			layerInfo: Utils.pathJoin @path, "layers.json"
 			images: Utils.pathJoin @path, "images"
 
 		@_createdLayers = []
@@ -15,11 +20,11 @@ class exports.Importer
 	load: ->
 
 		layersByName = {}
-		viewInfo = @_loadViewInfo()
+		layerInfo = @_loadlayerInfo()
 		
 		# Pass one. Create all layers build the hierarchy
-		viewInfo.map (layerInfo) =>
-			@_createLayer layerInfo
+		layerInfo.map (layerItemInfo) =>
+			@_createLayer layerItemInfo
 
 		# Pass two. Adjust position on screen for all layers
 		# based on the hierarchy.
@@ -34,14 +39,24 @@ class exports.Importer
 
 		@_createdLayersByName
 
-	_loadViewInfo: ->
-		Framer.Utils.domLoadJSONSync @paths.viewInfo
+	_loadlayerInfo: ->
+
+		# For now this does not work in Chrome and we throw an error
+		try
+			return Framer.Utils.domLoadJSONSync @paths.layerInfo
+		catch e
+			if Utils.isChrome
+				alert ChromeAlert
+			else
+				throw e
+
+
 
 	_createLayer: (info, superLayer) ->
 		
 		LayerClass = Layer
 
-		viewInfo =
+		layerInfo =
 			shadow: true
 			name: info.name
 			frame: info.layerFrame
@@ -49,30 +64,30 @@ class exports.Importer
 			backgroundColor: null
 			visible: info.visible ? true
 
-		_.extend viewInfo, @extraLayerProperties
+		_.extend layerInfo, @extraLayerProperties
 
 		# Most layer will have an image, add that here
 		if info.image
-			viewInfo.frame = info.image.frame
-			viewInfo.image = Utils.pathJoin @path, info.image.path
+			layerInfo.frame = info.image.frame
+			layerInfo.image = Utils.pathJoin @path, info.image.path
 			
 		# If there is a mask on this layer group, take it's frame
 		if info.maskFrame
-			viewInfo.frame = info.maskFrame
-			viewInfo.clip = true
+			layerInfo.frame = info.maskFrame
+			layerInfo.clip = true
 
 		# Todo: smart stuff for paging and scroll views
 
 		# Figure out what the super layer should be. If this layer has a contentLayer
 		# (like a scroll view) we attach it to that instead.
 		if superLayer?.contentLayer
-			viewInfo.superLayer = superLayer.contentLayer
+			layerInfo.superLayer = superLayer.contentLayer
 		else if superLayer
-			viewInfo.superLayer = superLayer
+			layerInfo.superLayer = superLayer
 
 		# We can create the layer here
-		layer = new LayerClass viewInfo
-		layer.name = viewInfo.name
+		layer = new LayerClass layerInfo
+		layer.name = layerInfo.name
 
 		# A layer without an image, mask or sublayers should be zero
 		if not layer.image and not info.children.length and not info.maskFrame
