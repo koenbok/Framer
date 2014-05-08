@@ -4,6 +4,11 @@ build:
     steps:
         - npm-install
         - npm-test
+    after-steps:
+        - sherzberg/slack-notify:
+            subdomain: wercker
+            token: $SLACK_TOKEN
+            channel: podium
 deploy:
     steps:
         - install-packages:
