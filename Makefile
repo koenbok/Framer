@@ -10,7 +10,7 @@ all: build
 build:
 	make clean
 	mkdir -p build
-	# $(coffee) scripts/banner.coffee > build/framer.debug.js
+	$(coffee) scripts/banner.coffee > build/framer.debug.js
 	$(browserify) framer/Framer.coffee >> build/framer.debug.js
 	cat build/framer.debug.js | $(bin)/exorcist build/framer.js.map > build/framer.js
 	$(bin)/uglifyjs \
@@ -53,8 +53,8 @@ dist:
 	make build
 	mkdir -p build/Framer
 	cp -R templates/Project build/Framer/Project
-	cp build/framer.js build/Framer/Project/framer
-	cp build/framer.js.map build/Framer/Project/framer
+	cp build/framer.js build/Framer/Project/framer/framer.js
+	cp build/framer.js.map build/Framer/Project/framer/framer.js.map
 	cd build; zip -r Framer.zip Framer
 
 site%build:
