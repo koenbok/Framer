@@ -197,6 +197,7 @@ describe "Layer", ->
 			layer.scroll = true
 			layer.scroll.should.equal true
 			layer.style["overflow"].should.equal "scroll"
+			layer.ignoreEvents.should.equal false
 
 		it "should set scrollX", ->
 			
@@ -204,10 +205,12 @@ describe "Layer", ->
 
 			layer.scroll.should.equal false
 			layer.style["overflow"].should.equal "hidden"
+			layer.ignoreEvents.should.equal true
 
 			layer.scroll = true
 			layer.scroll.should.equal true
 			layer.style["overflow"].should.equal "scroll"
+			layer.ignoreEvents.should.equal false
 
 		it "should set style properties on create", ->
 

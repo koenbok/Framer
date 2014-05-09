@@ -14,15 +14,17 @@ Utils = require "./Utils"
 _RootElement = null
 _LayerList = []
 
-layerProperty = (name, cssProperty, fallback) ->
+layerProperty = (name, cssProperty, fallback, set) ->
 	exportable: true
 	default: fallback
 	get: ->
 		@_getPropertyValue name
+
 	set: (value) ->
 		@_setPropertyValue name, value
 		@style[cssProperty] = LayerStyle[cssProperty](@)
 		@emit "change:#{name}", value
+		set @, value if set
 
 layerStyleProperty = (cssProperty) ->
 	exportable: true
@@ -89,9 +91,12 @@ class exports.Layer extends BaseClass
 	@define "opacity", layerProperty "opacity", "opacity", 1
 	@define "index", layerProperty "index", "zIndex", 0
 
+
 	@define "clip", layerProperty "clip", "overflow", true
-	@define "scrollX", layerProperty "scrollX", "overflowX", false
-	@define "scrollY", layerProperty "scrollY", "overflowY", false
+	@define "scrollX", layerProperty "scrollX", "overflowX", false, (layer, value) -> 
+		layer.ignoreEvents = false if value is true
+	@define "scrollY", layerProperty "scrollY", "overflowY", false, (layer, value) -> 
+		layer.ignoreEvents = false if value is true
 
 	@define "scroll",
 		get: -> @scrollX is true or @scrollY is true
