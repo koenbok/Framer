@@ -93,11 +93,6 @@ Framer 3 is close to a rewrite. Or maybe more a huge refactor. The new code base
 #### Framer 3 Release Todo
 
 - Test copy layer hierarchy
-- Add myLayer.sublayerWithName
-- Add myLayer.name property
-- Set html/text content
-- Add layer.draggable
 - Add a Framer.Future namespace to try new stuff
 - Add js error warning
-- Test scrolling
 
