@@ -19,7 +19,6 @@ layerProperty = (name, cssProperty, fallback, set) ->
 	default: fallback
 	get: ->
 		@_getPropertyValue name
-
 	set: (value) ->
 		@_setPropertyValue name, value
 		@style[cssProperty] = LayerStyle[cssProperty](@)
@@ -82,6 +81,8 @@ class exports.Layer extends BaseClass
 
 	##############################################################
 	# Properties
+
+	@define "name", @simpleProperty "name", ""
 
 	# Css properties
 	@define "width",  layerProperty "width",  "width", 100

@@ -79,7 +79,7 @@ class exports.BaseClass extends EventEmitter
 
 		super
 
-		# Create a holde for the property values
+		# Create a holder for the property values
 		@[DefinedPropertiesValuesKey] = {}
 
 		# Count the creation for these objects and set the id
