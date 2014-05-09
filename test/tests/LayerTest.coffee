@@ -430,6 +430,16 @@ describe "Layer", ->
 			assert.equal layerC.index, 1
 			assert.equal layerD.index, 4
 
+		it "should get a sublayers by name", ->
+
+			layerA = new Layer
+			layerB = new Layer name:"B", superLayer:layerA
+			layerC = new Layer name:"C", superLayer:layerA
+			layerD = new Layer name:"C", superLayer:layerA
+
+			layerA.subLayersByName("B").should.eql [layerB]
+			layerA.subLayersByName("C").should.eql [layerC, layerD]
+
 	describe "Frame", ->
 
 		it "should set on create", ->

@@ -446,6 +446,9 @@ class exports.Layer extends BaseClass
 		
 		layer.superLayer = null
 
+	subLayersByName: (name) ->
+		_.filter @subLayers, (layer) -> layer.name == name
+
 	##############################################################
 	## ANIMATION
 
