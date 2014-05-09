@@ -92,7 +92,5 @@ Framer 3 is close to a rewrite. Or maybe more a huge refactor. The new code base
 
 #### Framer 3 Release Todo
 
-- Test copy layer hierarchy
 - Add a Framer.Future namespace to try new stuff
-- Add js error warning
 
