@@ -514,5 +514,25 @@ describe "Layer", ->
 			Layer.Layers().should.not.contain layer
 			assert.equal layer._element.parentNode, null
 
+		it "should set text", ->
+
+			layer = new Layer
+			layer.html = "Hello"
+
+			layer._element.childNodes[0].should.equal layer._elementHTML
+			layer._elementHTML.innerHTML.should.equal "Hello"
+			layer.ignoreEvents.should.equal true
+
+		it "should set other html", ->
+
+			layer = new Layer
+			layer.html = "<input type=\"button\">"
+
+			layer._element.childNodes[0].should.equal layer._elementHTML
+			layer._elementHTML.innerHTML.should.equal "<input type=\"button\">"
+			layer.ignoreEvents.should.equal false
+
+
+
 
 

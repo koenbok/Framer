@@ -208,9 +208,29 @@ class exports.Layer extends BaseClass
 			@emit "change:style"
 
 	@define "html",
-		get: -> @_element.innerHTML
+		get: -> 
+			@_elementHTML?.innerHTML
+
 		set: (value) ->
-			@_element.innerHTML = value
+
+			# Insert some html directly into this layer. We actually create
+			# a child node to insert it in, so it won't mess with Framers
+			# layer hierarchy.
+
+			if not @_elementHTML
+				@_elementHTML = document.createElement "div"
+				@_element.appendChild @_elementHTML
+			
+			@_elementHTML.innerHTML = value
+
+			# If the contents contains something else than plain text
+			# then we turn off ignoreEvents so buttons etc will work.
+
+			if not (
+				@_elementHTML.childNodes.length == 1 and 
+				@_elementHTML.childNodes[0].nodeName == "#text")
+				@ignoreEvents = false
+
 			@emit "change:html"
 
 	computedStyle: ->
