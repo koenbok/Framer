@@ -13,6 +13,7 @@ class exports.Importer
 		@paths =
 			layerInfo: Utils.pathJoin @path, "layers.json"
 			images: Utils.pathJoin @path, "images"
+			documentName: @path.split("/").pop()
 
 		@_createdLayers = []
 		@_createdLayersByName = {}
@@ -41,16 +42,25 @@ class exports.Importer
 
 	_loadlayerInfo: ->
 
-		# For now this does not work in Chrome and we throw an error
-		try
-			return Framer.Utils.domLoadJSONSync @paths.layerInfo
-		catch e
-			if Utils.isChrome
-				alert ChromeAlert
-			else
-				throw e
+		# Chrome is a pain in the ass and won't allow local file access
+		# therefore I add a .js file which adds the data to 
+		# window.__imported__["<path>"]
 
+		importedKey = "#{@paths.documentName}/layers.json.js"
 
+		if window.__imported__?.hasOwnProperty importedKey
+			return window.__imported__[importedKey]
+
+		# # For now this does not work in Chrome and we throw an error
+		# try
+		# 	return Framer.Utils.domLoadJSONSync @paths.layerInfo
+		# catch e
+		# 	if Utils.isChrome
+		# 		alert ChromeAlert
+		# 	else
+		# 		throw e
+
+		return Framer.Utils.domLoadJSONSync @paths.layerInfo
 
 	_createLayer: (info, superLayer) ->
 		
@@ -66,7 +76,7 @@ class exports.Importer
 
 		_.extend layerInfo, @extraLayerProperties
 
-		# Most layer will have an image, add that here
+		# Most layers will have an image, add that here
 		if info.image
 			layerInfo.frame = info.image.frame
 			layerInfo.image = Utils.pathJoin @path, info.image.path
