@@ -1,5 +1,8 @@
 Utils = require "./Utils"
 
+###############################################################
+# Debug overview
+
 _debugLayers = null
 
 createDebugLayer = (layer) ->
@@ -30,26 +33,48 @@ hideDebug = -> _debugLayers.map (layer) -> layer.destroy()
 
 toggleDebug = Utils.toggle showDebug, hideDebug
 
-
-
-
-
-
 EventKeys =
 	Shift: 16
 	Escape: 27
 
-# window.document.onkeydown = (event) ->
-	
-# 	if event.keyCode == EventKeys.Shift
-# 		config.timeSpeedFactor = 25
-
-
 window.document.onkeyup = (event) ->
 	if event.keyCode == EventKeys.Escape
 		toggleDebug()()
-		
 
-# # Throw a warning on a javascript error
+###############################################################
+# Error warning
 
-# window.onerror = exports.errorWarning
+_errorWarningLayer = null
+
+errorWarning = ->
+
+	return if _errorWarningLayer
+
+	layer = new Layer {x:20, y:-50, width:300, height:40}
+
+	layer.states.add
+		visible: {x:20, y:20, width:300, height:40}
+
+	layer.html = "Javascript Error, see the console"
+	layer.style =
+		font: "12px/1.35em Menlo"
+		color: "white"
+		textAlign: "center"
+		lineHeight: "#{layer.height}px"
+		borderRadius: "5px"
+		backgroundColor: "rgba(255,0,0,.8)"
+
+	layer.states.animationOptions =
+		curve: "spring"
+		curveOptions:
+			tension: 1000
+			friction: 30
+
+	layer.states.switch "visible"
+
+	layer.on Events.Click, ->
+		@states.switch "default"
+
+	_errorWarningLayer = layer
+
+window.onerror = errorWarning
