@@ -1,41 +1,49 @@
-AnimationFactor = 1
 
-layerA = new Layer width:80, height:80
-layerA.name = "layerA"
-layerA.animate
-	properties: {y:300}
-	time: 2 * AnimationFactor
 
-layerB = new Layer width:80, height:80, x:100, backgroundColor:"red"
-layerB.name = "layerB"
-layerB.animate
-	properties: {y:300}
-	time: 5 * AnimationFactor
+# linear, ease-in, ease-out
+# bezier-curve(a, b, c, d)
+# spring(tension, friction, velocity)
 
-layerC = new Layer width:80, height:80, x:200, backgroundColor:"orange"
-layerC.name = "layerC"
-layerC.animate
-	properties: {y:300}
-	time: 2 * AnimationFactor
-	curve: "cubic-bezier"
+# AnimatorClasses =
+# 	"linear": LinearAnimator
+# 	"bezier-curve": BezierCurveAnimator
+# 	"spring-rk4": SpringRK4Animator
+# 	"spring-dho": SpringDHOAnimator
 
-readyLayers = []
+# AnimatorClasses["spring"] = AnimatorClasses["spring-rk4"]
+# AnimatorClasses["cubic-bezier"] = AnimatorClasses["bezier-curve"]
 
-ready = (animation, layer)->
 
-	console.log layer.name, "end"
+tests = [
+	{curve: "linear"},
+	{curve: "linear", time:2},
+	{curve: "spring-rk4"},
+	{curve: "spring-dho(100,20)"},
+	{curve: "cubic-bezier"},
+	{curve: "cubic-bezier", curveOptions: "ease-in"},
+	{curve: "cubic-bezier", curveOptions: "ease-out"},
+	{curve: "cubic-bezier", curveOptions: "ease-in-out"},
+	{curve: "cubic-bezier(0.95, 0.05, 0.795, 0.035)"}
+	{curve: "cubic-bezier", curveOptions:[0.95, 0.05, 0.795, 0.035]}
+]
 
-	if layer in readyLayers
-		console.log "2x", layer.name
-		return 
+for options, index in tests
 
-	readyLayers.push layer
+	layer = new Layer
+		width:  parseInt window.innerWidth/tests.length
+		height: parseInt window.innerWidth/tests.length
+		backgroundColor: Utils.randomColor 0.8
 
-	if readyLayers.length is 3
-		layerA.y.should.equal 300
-		layerB.y.should.equal 300
-		layerC.y.should.equal 300
+	layer.x = index * layer.width
 
-layerA.on "end", ready
-layerB.on "end", ready
-layerC.on "end", ready
+	layer.html = "#{options.curve}<br>#{options.curveOptions or ""}"
+	layer.style =
+		font: "10px/1.35em Menlo"
+		textAlign: "center"
+		color: "white"
+		paddingTop: "12px"
+
+	options.properties =
+		y: parseInt ((window.innerHeight * 0.8) - layer.height)
+
+	layer.animate options

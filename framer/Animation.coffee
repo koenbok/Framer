@@ -90,19 +90,18 @@ class exports.Animation extends EventEmitter
 			# console.warn "Animation.curve arguments are deprecated. Please use Animation.curveOptions"
 
 			if animatorClass is BezierCurveAnimator
-				@options.curveOptions.values = parsedCurve.args.map (v) -> parseFloat v
+				@options.curveOptions.values = parsedCurve.args.map (v) -> parseFloat(v) or 0
 			
 			if animatorClass is SpringRK4Animator
-				@options.curveOptions.tension = parseFloat parsedCurve.args[0]
-				@options.curveOptions.friction = parseFloat parsedCurve.args[1]
-				@options.curveOptions.velocity = parseFloat parsedCurve.args[2]
+				for k, i in ["tension", "friction", "velocity"]
+					value = parseFloat parsedCurve.args[i]
+					@options.curveOptions[k] = value if value
 			
 			if animatorClass is SpringDHOAnimator
-				@options.curveOptions.stiffness = parseFloat parsedCurve.args[0]
-				@options.curveOptions.damping = parseFloat parsedCurve.args[1]
-				@options.curveOptions.mass = parseFloat parsedCurve.args[2]
-				@options.curveOptions.tolerance = parseFloat parsedCurve.args[3]
-
+				for k, i in ["stiffness", "damping", "mass", "tolerance"]
+					value = parseFloat parsedCurve.args[i]
+					@options.curveOptions[k] = value if value
+					
 	start: =>
 
 		AnimatorClass = @_animatorClass()

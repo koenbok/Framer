@@ -8,7 +8,7 @@ class exports.SpringRK4Animator extends Animator
 
 		@options = Utils.setDefaultProperties options,
 			tension: 500
-			friction: 25
+			friction: 10
 			velocity: 0
 			tolerance: 1/10000
 			time: null # Hack

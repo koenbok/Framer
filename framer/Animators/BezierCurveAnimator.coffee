@@ -14,13 +14,13 @@ class exports.BezierCurveAnimator extends Animator
 
 	setup: (options) ->
 
-		optionValues = options.values?.toLowerCase()
+		# Input is a single default
+		if _.isString(options) and BezierCurveDefaults.hasOwnProperty options.toLowerCase()
+			options = {values: BezierCurveDefaults[options.toLowerCase()]}
 
-		if _.isString optionValues
-			if BezierCurveDefaults.hasOwnProperty optionValues
-				options.values = BezierCurveDefaults[optionValues]
-			else
-				delete options.values
+		# Input is a single array of 4 values
+		if _.isArray(options) and options.length is 4
+			options = {values: options}
 
 		@options = Utils.setDefaultProperties options,
 			values: BezierCurveDefaults["ease-in-out"]
