@@ -72,11 +72,11 @@ AnimationLoop =
 
 		AnimationLoop._time = time
 
-		window.requestAnimationFrame AnimationLoop._tick
-
 		for animator in removeAnimators
 			AnimationLoop.remove animator
 			animator.emit "end"
+
+		window.requestAnimationFrame AnimationLoop._tick
 
 		return # Important for performance
 
@@ -90,7 +90,7 @@ AnimationLoop =
 		AnimationLoop._start()
 
 	remove: (animator) ->
-		AnimationLoop._animators.splice animator[AnimationLoop._animators], 1
+		AnimationLoop._animators = _.without AnimationLoop._animators, animator
 		animator.emit "stop"
 
 exports.AnimationLoop = AnimationLoop

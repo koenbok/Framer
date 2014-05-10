@@ -33,13 +33,13 @@ describe "LayerAnimation", ->
 				layer: layer
 				properties: {x:50}
 				curve: "linear"
-				time: AnimationTime * 2
+				time: 0.5
 
 			animation.start()
 
 			Utils.delay animation.options.time / 2.0, ->
 				animation.stop()
-				layer.x.should.be.within(15, 35)
+				layer.x.should.be.within(10, 40)
 				done()
 
 
@@ -126,6 +126,46 @@ describe "LayerAnimation", ->
 				Utils.delay AnimationTime, ->
 					layer.x.should.be.within(30, 50)
 					done()
+
+	describe "AnimationLoop", ->
+
+		it "should only stop when all animations are done", (done) ->
+
+			layerA = new Layer width:80, height:80
+			layerA.name = "layerA"
+			layerA.animate
+				properties: {y:300}
+				time: 2 * AnimationTime
+
+			layerB = new Layer width:80, height:80, x:100, backgroundColor:"red"
+			layerB.name = "layerB"
+			layerB.animate
+				properties: {y:300}
+				time: 5 * AnimationTime
+
+			layerC = new Layer width:80, height:80, x:200, backgroundColor:"orange"
+			layerC.name = "layerC"
+			layerC.animate
+				properties: {y:300}
+				time: 2 * AnimationTime
+				curve: "cubic-bezier"
+
+			readyLayers = []
+
+			ready = (animation, layer)->
+				(layer in readyLayers).should.equal false
+
+				readyLayers.push layer
+
+				if readyLayers.length is 3
+					layerA.y.should.equal 300
+					layerB.y.should.equal 300
+					layerC.y.should.equal 300
+					done()
+
+			layerA.on "end", ready
+			layerB.on "end", ready
+			layerC.on "end", ready
 
 
 
