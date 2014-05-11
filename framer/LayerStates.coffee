@@ -5,21 +5,21 @@
 LayerStatesIgnoredKeys = ["ignoreEvents"]
 
 class exports.LayerStates extends EventEmitter
-	
+
 	constructor: (@layer) ->
-		
+
 		@_states = {}
 		@_orderedStates = []
-		
+
 		@animationOptions =
 			curve: "spring"
-		
+
 		# Always add the default state as the current
 		@add "default", @layer.properties
 
 		@_currentState = "default"
 		@_previousStates = []
-	
+
 	add: (stateName, properties) ->
 
 		# We also allow an object with states to be passed in
@@ -37,24 +37,24 @@ class exports.LayerStates extends EventEmitter
 		@_states[stateName] = properties
 
 	remove: (stateName) ->
-		
+
 		if not @_states.hasOwnProperty stateName
 			return
-		
+
 		delete @_states[stateName]
 		@_orderedStates = _.without @_orderedStates, stateName
-	
+
 	switch: (stateName, animationOptions) ->
-		
+
 		# Switches to a specific state. If animationOptions are
 		# given use those, otherwise the default options.
-		
+
 		if stateName is @_currentState
 			return
 
 		if not @_states.hasOwnProperty stateName
 			throw Error "No such state: '#{stateName}'"
-		
+
 		@emit "willSwitch", @_currentState, stateName, @
 
 		@_previousStates.push @_currentState
@@ -62,7 +62,7 @@ class exports.LayerStates extends EventEmitter
 
 		animationOptions ?= @animationOptions
 		animationOptions.properties = {}
-		
+
 		animatingKeys = @animatingKeys()
 
 		for k, v of @_states[stateName]
@@ -76,14 +76,14 @@ class exports.LayerStates extends EventEmitter
 
 			# Allow dynamic properties as functions
 			v = v() if _.isFunction(v)
-			
+
 			animationOptions.properties[k] = v
-			
+
 		animation = @layer.animate animationOptions
 
 		animation.on "stop", =>
-			@emit "didSwitch", _.last @_previousStates, stateName, @
-	
+			@emit "didSwitch", _.last(@_previousStates), stateName, @
+
 	switchInstant: (stateName) ->
 		# Instantly switch to this new state
 		# TODO: this is not good because we need to be able to get 
@@ -114,14 +114,13 @@ class exports.LayerStates extends EventEmitter
 	next:  ->
 		# TODO: maybe add animationOptions
 		states = Utils.arrayFromArguments arguments
-		
+
 		if not states.length
 			states = @states()
-		
+
 		@switch Utils.arrayNext(states, @_currentState)
 
 
 	last: (animationOptions) ->
 		# Return to last state
 		@switch _.last(@_previousStates), animationOptions
-
