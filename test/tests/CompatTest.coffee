@@ -20,6 +20,15 @@ describe "Compat", ->
 			viewB.superView.should.equal viewA
 			viewB.superLayer.should.equal viewA
 
+		it "should set superview on layer", ->
+			
+			layerA = new Layer
+			layerB = new Layer
+
+			layerB.superView = layerA
+			layerB.superView.should.equal layerA
+			layerB.superLayer.should.equal layerA
+
 		it "should set superview on create", ->
 			
 			viewA = new View

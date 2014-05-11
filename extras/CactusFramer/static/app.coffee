@@ -1,7 +1,11 @@
-layer = new Layer
+layerA = new Layer
+	width: 250
+	height: 300
+	midX: 200
+	clip: true
 
-layer.on Events.MouseOver, (event, layer) ->
-	layer.backgroundColor = "red"
-
-layer.on Events.MouseOut, (event, layer) ->
-	layer.backgroundColor = "green"
+layerB = new Layer
+	y: layerA.maxY-20
+	height: 100
+	width: layerA.width
+	superLayer: layerA
