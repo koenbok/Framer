@@ -86,6 +86,8 @@ class exports.LayerStates extends EventEmitter
 	
 	switchInstant: (stateName) ->
 		# Instantly switch to this new state
+		# TODO: this is not good because we need to be able to get 
+		# the next state immediately after calling this
 		@switch stateName,
 			curve: "linear"
 			time: 0
