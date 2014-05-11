@@ -29,7 +29,7 @@ class exports.Animation extends EventEmitter
 		_runningAnimations
 
 	constructor: (options={}) ->
-		
+
 		super options
 
 		@options = Utils.setDefaultProperties options,
@@ -62,7 +62,7 @@ class exports.Animation extends EventEmitter
 		_.pick @options.layer, _.keys(@options.properties)
 
 	_animatorClass: ->
-		
+
 		parsedCurve = Utils.parseFunction @options.curve
 		animatorClassName = parsedCurve.name.toLowerCase()
 
@@ -80,10 +80,14 @@ class exports.Animation extends EventEmitter
 		# ideally also be passed as a curveOption
 
 		if animatorClass in [LinearAnimator, BezierCurveAnimator]
-			@options.curveOptions.time = @options.time
+			if _.isString(@options.curveOptions) or _.isArray(@options.curveOptions)
+				@options.curveOptions =
+					values: @options.curveOptions
+
+			@options.curveOptions.time ?= @options.time
 
 		# All this is to support curve: "spring(100,20,10)". In the future we'd like people
-		# to start using curveOptions: {tension:100, friction:10} etc 
+		# to start using curveOptions: {tension:100, friction:10} etc
 
 		if parsedCurve.args.length
 
@@ -91,17 +95,17 @@ class exports.Animation extends EventEmitter
 
 			if animatorClass is BezierCurveAnimator
 				@options.curveOptions.values = parsedCurve.args.map (v) -> parseFloat(v) or 0
-			
+
 			if animatorClass is SpringRK4Animator
 				for k, i in ["tension", "friction", "velocity"]
 					value = parseFloat parsedCurve.args[i]
 					@options.curveOptions[k] = value if value
-			
+
 			if animatorClass is SpringDHOAnimator
 				for k, i in ["stiffness", "damping", "mass", "tolerance"]
 					value = parseFloat parsedCurve.args[i]
 					@options.curveOptions[k] = value if value
-					
+
 	start: =>
 
 		AnimatorClass = @_animatorClass()
@@ -134,14 +138,14 @@ class exports.Animation extends EventEmitter
 				@_repeatCounter--
 				@start()
 
-		# This is the function that sets the actual value to the layer in the 
+		# This is the function that sets the actual value to the layer in the
 		# animation loop. It needs to be very fast.
 		@_animator.on "tick", (value) ->
 			for k, v of stateB
 				target[k] = Utils.mapRange value, 0, 1, stateA[k], stateB[k]
 			return # For performance
 
-		start = => 
+		start = =>
 			_runningAnimations.push @
 			@_animator.start()
 
