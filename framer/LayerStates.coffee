@@ -75,7 +75,7 @@ class exports.LayerStates extends EventEmitter
 				continue
 
 			# Allow dynamic properties as functions
-			v = v() if _.isFunction(v)
+			v = v.call(@layer, @layer, stateName) if _.isFunction(v)
 
 			animationOptions.properties[k] = v
 
