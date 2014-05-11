@@ -4,8 +4,4 @@ layerA = new Layer
 	midX: 200
 	clip: true
 
-layerB = new Layer
-	y: layerA.maxY-20
-	height: 100
-	width: layerA.width
-	superLayer: layerA
+Utils.labelLayer layerA, "Hello"

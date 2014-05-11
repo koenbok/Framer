@@ -115,6 +115,18 @@ Utils.randomNumber = (a=0, b=1) ->
 	# Return a random number between a and b
 	Utils.mapRange Math.random(), 0, 1, a, b
 
+Utils.labelLayer = (layer, text, style={}) ->
+	
+	style = _.extend
+		font: "10px/1em Menlo"
+		lineHeight: "#{layer.height}px"
+		textAlign: "center"
+		color: "#fff"
+	, style
+
+	layer.style = style
+	layer.html = text
+
 Utils.uuid = ->
 
 	chars = "0123456789abcdefghijklmnopqrstuvwxyz".split("")
