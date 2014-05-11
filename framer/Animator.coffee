@@ -16,13 +16,13 @@ class exports.Animator extends EventEmitter
 		@setup options
 
 	setup: (options) ->
-		throw "Not implemented"
+		throw Error "Not implemented"
 
 	next: (delta) ->
-		throw "Not implemented"
+		throw Error "Not implemented"
 
 	finished: ->
-		throw "Not implemented"
+		throw Error "Not implemented"
 
 	start: -> AnimationLoop.add @
 	stop: -> AnimationLoop.remove @

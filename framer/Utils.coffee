@@ -259,7 +259,7 @@ Utils.domLoadDataSync = (path) ->
 	# Because I can't catch the actual 404 with Safari, I just assume something
 	# went wrong if there is no text data returned from the request.
 	if not data
-		throw "Utils.domLoadDataSync: no data was loaded (url not found?)"
+		throw Error "Utils.domLoadDataSync: no data was loaded (url not found?)"
 
 	return request.responseText
 

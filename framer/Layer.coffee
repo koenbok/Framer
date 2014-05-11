@@ -378,7 +378,7 @@ class exports.Layer extends BaseClass
 			
 			# Check the type
 			if not layer instanceof Layer
-				throw "Layer.superLayer needs to be a Layer object"
+				throw Error "Layer.superLayer needs to be a Layer object"
 
 			# Cancel previous pending insertions
 			Utils.domCompleteCancel @__insertElement

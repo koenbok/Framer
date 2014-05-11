@@ -10,7 +10,7 @@
   "dependencies": {
     "browserify": "~2.35.4",
     "coffeeify": "~0.5.2",
-    "coffeelint": "~0.6.1",
+    "coffeelint": "^0.6.1",
     "lodash": "~2.4.1",
     "mocha-phantomjs": "~3.2.0",
     "phantomjs": "~1.9.2-5",

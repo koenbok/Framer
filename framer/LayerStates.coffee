@@ -28,7 +28,7 @@ class exports.LayerStates extends EventEmitter
 				@add k, v
 			return
 
-		error = -> throw "Usage example: layer.states.add(\"someName\", {x:500})"
+		error = -> throw Error "Usage example: layer.states.add(\"someName\", {x:500})"
 		error() if not _.isString stateName
 		error() if not _.isObject properties
 

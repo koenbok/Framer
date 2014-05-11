@@ -30,6 +30,7 @@ clean:
 # Testing
 
 test:
+	make lint
 	make build
 	mkdir -p test/lib
 	$(browserify) test/init.coffee -o test/init.js
@@ -78,5 +79,8 @@ site%upload:
 deploy:
 	make site:build
 	make site:upload
+
+lint:
+	./node_modules/.bin/coffeelint -f coffeelint.json -r framer
 
 .PHONY: all build test clean
