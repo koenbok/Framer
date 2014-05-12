@@ -32,5 +32,5 @@ require "./Compat"
 
 # Set the defaults
 Defaults = (require "./Defaults").Defaults
-Defaults.reset()
 Framer.resetDefaults = Defaults.reset
+Framer.resetDefaults()

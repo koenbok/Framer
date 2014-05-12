@@ -42,6 +42,20 @@ describe "LayerAnimation", ->
 				layer.x.should.be.within(10, 40)
 				done()
 
+		it "should use defaults", ->
+
+			Framer.Defaults.Animation =
+				curve: "spring(1,2,3)"
+
+			animation = new Animation
+				layer: new Layer()
+				properties: {x:50}
+
+			animation.options.curve.should.equal "spring(1,2,3)"
+
+			Framer.resetDefaults()
+
+
 
 	describe "Events", ->
 

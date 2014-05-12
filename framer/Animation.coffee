@@ -3,6 +3,7 @@
 Utils = require "./Utils"
 
 {Config} = require "./Config"
+{Defaults} = require "./Defaults"
 {EventEmitter} = require "./EventEmitter"
 {Frame} = require "./Frame"
 
@@ -30,6 +31,8 @@ class exports.Animation extends EventEmitter
 		_runningAnimations
 
 	constructor: (options={}) ->
+
+		options = Defaults.getDefaults "Animation", options
 
 		super options
 

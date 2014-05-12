@@ -32,4 +32,4 @@ exports.Defaults =
 		options
 
 	reset: ->
-		Framer.Defaults = _.clone Originals
+		window.Framer.Defaults = _.clone Originals
