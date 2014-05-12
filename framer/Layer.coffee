@@ -94,14 +94,14 @@ class exports.Layer extends BaseClass
 
 
 	@define "clip", layerProperty "clip", "overflow", true
-	@define "scrollX", layerProperty "scrollX", "overflowX", false, (layer, value) -> 
+	@define "scrollHorizontal", layerProperty "scrollHorizontal", "overflowX", false, (layer, value) -> 
 		layer.ignoreEvents = false if value is true
-	@define "scrollY", layerProperty "scrollY", "overflowY", false, (layer, value) -> 
+	@define "scrollVertical", layerProperty "scrollVertical", "overflowY", false, (layer, value) -> 
 		layer.ignoreEvents = false if value is true
 
 	@define "scroll",
-		get: -> @scrollX is true or @scrollY is true
-		set: (value) -> @scrollX = @scrollY = true
+		get: -> @scrollHorizontal is true or @scrollVertical is true
+		set: (value) -> @scrollHorizontal = @scrollVertical = true
 
 	# Behaviour properties
 	@define "ignoreEvents", layerProperty "ignoreEvents", "pointerEvents", true
@@ -199,9 +199,8 @@ class exports.Layer extends BaseClass
 	centerY: -> @y = @centerFrame().y # Center y in superLayer
 	
 	pixelAlign: ->
-		# Put this view exactly on the pixel
-		# TODO: needs tests
-		@frame = {x:parseInt(@x), y:parseInt(@y)}
+		@x = parseInt @x
+		@y = parseInt @y
 
 
 	##############################################################
@@ -517,33 +516,24 @@ class exports.Layer extends BaseClass
 
 	# TODO: Tests
 
-	# scrollToTop: ->
-	# 	@_element.scrollTop = 0
-	
-	# scrollToBottom: ->
-	# 	setTimeout =>
-	# 		@scrollPoint = @_element.scrollHeight - @frame.height
-	# 	, 0
-	
-	# @define "scrollPoint",
-	# 	get: ->
-	# 		@_element.scrollTop
-	# 	set: (value) ->
-	# 		@_element.scrollTop = value
-
 	@define "scrollFrame",
 		get: ->
-			return new Frame {
-				x: @_element.scrollLeft
-				y: @_element.scrollTop
+			return new Frame
+				x: @scrollX
+				y: @scrollY
 				width: @width
 				height: @height
-			}
 		set: (frame) ->
-			@_element.scrollLeft = frame.x
-			@_element.scrollTop = frame.y
-			# @_element.innerWidth = frame.width
-			# @_element.innerHeight = frame.height
+			@scrollX = frame.x
+			@scrollY = frame.y
+
+	@define "scrollX",
+		get: -> @_element.scrollLeft
+		set: (value) -> @_element.scrollLeft = value
+
+	@define "scrollY",
+		get: -> @_element.scrollTop
+		set: (value) -> @_element.scrollTop = value
 
 	##############################################################
 	## EVENTS

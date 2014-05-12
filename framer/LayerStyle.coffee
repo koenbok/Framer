@@ -31,21 +31,21 @@ exports.LayerStyle =
 		layer.opacity
 
 	overflow: (layer) ->
-		if layer.scrollX is true or layer.scrollY is true
+		if layer.scrollHorizontal is true or layer.scrollVertical is true
 			return "auto"
 		if layer.clip is true
 			return "hidden"
 		return "visible"
 
 	overflowX: (layer) ->
-		if layer.scrollX is true
+		if layer.scrollHorizontal is true
 			return "scroll"
 		if layer.clip is true
 			return "hidden"
 		return "visible"
 
 	overflowY: (layer) ->
-		if layer.scrollY is true
+		if layer.scrollVertical is true
 			return "scroll"
 		if layer.clip is true
 			return "hidden"

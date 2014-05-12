@@ -208,7 +208,7 @@ describe "Layer", ->
 			layer.style["overflow"].should.equal "scroll"
 			layer.ignoreEvents.should.equal false
 
-		it "should set scrollX", ->
+		it "should set scrollHorizontal", ->
 			
 			layer = new Layer
 
