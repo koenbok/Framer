@@ -27,7 +27,9 @@ class exports.LayerDraggable extends EventEmitter
 
 	constructor: (@layer) ->
 
-		@speed = {x:1.0, y:1.0}
+		# @speed = {x:1.0, y:1.0}
+		@speedX = 1.0
+		@speedY = 1.0
 
 		@_deltas = []
 		@_isDragging = false
@@ -86,8 +88,8 @@ class exports.LayerDraggable extends EventEmitter
 
 		# Correct for current drag speed
 		correctedDelta =
-			x: delta.x * @speed.x
-			y: delta.y * @speed.y
+			x: delta.x * @speedX
+			y: delta.y * @speedY
 			t: event.timeStamp
 
 		# We use the requestAnimationFrame to update the position
