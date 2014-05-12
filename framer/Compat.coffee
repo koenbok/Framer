@@ -3,13 +3,13 @@
 compatWarning = (msg) ->
 	console.warn msg
 
-compatProperty = (name) ->
+compatProperty = (name, originalName) ->
 	exportable: false
 	get: -> 
-		compatWarning "#{name} is a deprecated property"
+		compatWarning "#{originalName} is a deprecated property"
 		@[name]
 	set: (value) -> 
-		compatWarning "#{name} is a deprecated property"
+		compatWarning "#{originalName} is a deprecated property"
 		@[name] = value
 
 class CompatLayer extends Layer
@@ -21,9 +21,9 @@ class CompatLayer extends Layer
 
 		super options
 
-	@define "superView", compatProperty "superLayer"
-	@define "subViews", compatProperty "subLayers"
-	@define "siblingViews", compatProperty "siblingLayers"
+	@define "superView", compatProperty "superLayer", "superView"
+	@define "subViews", compatProperty "subLayers", "subViews"
+	@define "siblingViews", compatProperty "siblingLayers", "siblingViews"
 
 	addSubView = (layer) -> @addSubLayer layer
 	removeSubView = (layer) -> @removeSubLayer layer
