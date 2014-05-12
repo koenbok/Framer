@@ -19,6 +19,14 @@ Events.Click = Events.TouchEnd
 Events.MouseOver = "mouseover"
 Events.MouseOut = "mouseout"
 
+# Animation events
+Events.AnimationStart = "start"
+Events.AnimationStop = "stop"
+Events.AnimationEnd = "end"
+
+# Scroll events
+Events.Scroll = "scroll"
+
 # Extract touch events for any event
 Events.touchEvent = (event) ->
 	touchEvent = event.touches?[0]

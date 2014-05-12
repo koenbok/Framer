@@ -1,8 +1,13 @@
 {_} = require "./Underscore"
 
+{Events} = require "./Events"
 {EventEmitter} = require "./EventEmitter"
 
 LayerStatesIgnoredKeys = ["ignoreEvents"]
+
+# Animation events
+Events.StateWillSwitch = "willSwitch"
+Events.StateDidSwitch = "didSwitch"
 
 class exports.LayerStates extends EventEmitter
 
@@ -55,7 +60,7 @@ class exports.LayerStates extends EventEmitter
 		if not @_states.hasOwnProperty stateName
 			throw Error "No such state: '#{stateName}'"
 
-		@emit "willSwitch", @_currentState, stateName, @
+		@emit Events.StateWillSwitch, @_currentState, stateName, @
 
 		@_previousStates.push @_currentState
 		@_currentState = stateName
@@ -82,7 +87,7 @@ class exports.LayerStates extends EventEmitter
 		animation = @layer.animate animationOptions
 
 		animation.on "stop", =>
-			@emit "didSwitch", _.last(@_previousStates), stateName, @
+			@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
 
 	switchInstant: (stateName) ->
 		# Instantly switch to this new state
