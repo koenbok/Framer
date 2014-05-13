@@ -1,6 +1,6 @@
 ## Framer Prototyping
 
-For a complete overview, downloads and docs please visit [framerjs.com](http://www.framerjs.com). Find the latest builds here [builds.framerjs.com](http://builds.framerjs.com)
+For a complete overview, downloads and docs please visit [framerjs.com](http://www.framerjs.com). Find the latest builds at [builds.framerjs.com](http://builds.framerjs.com)
 
 #### Building
 
