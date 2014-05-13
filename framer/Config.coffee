@@ -21,8 +21,8 @@ exports.Config =
 		#"overflow": "visible"
 		#"z-index": 0
 		"-webkit-box-sizing": "border-box"
-		"-webkit-transform-style": "preserve-3d"
-		"-webkit-backface-visibility": "visible"
+		# "-webkit-transform-style": "preserve-3d"
+		# "-webkit-backface-visibility": "visible"
 		#"-webkit-backface-visibility": ""
 		#"-webkit-perspective": 500
 		# "pointer-events": "none"
