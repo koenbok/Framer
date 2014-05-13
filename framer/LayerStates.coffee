@@ -1,7 +1,7 @@
 {_} = require "./Underscore"
 
 {Events} = require "./Events"
-{EventEmitter} = require "./EventEmitter"
+{BaseClass} = require "./BaseClass"
 
 LayerStatesIgnoredKeys = ["ignoreEvents"]
 
@@ -9,7 +9,7 @@ LayerStatesIgnoredKeys = ["ignoreEvents"]
 Events.StateWillSwitch = "willSwitch"
 Events.StateDidSwitch = "didSwitch"
 
-class exports.LayerStates extends EventEmitter
+class exports.LayerStates extends BaseClass
 
 	constructor: (@layer) ->
 
@@ -24,6 +24,8 @@ class exports.LayerStates extends EventEmitter
 
 		@_currentState = "default"
 		@_previousStates = []
+
+		super
 
 	add: (stateName, properties) ->
 
@@ -96,6 +98,12 @@ class exports.LayerStates extends EventEmitter
 		@switch stateName,
 			curve: "linear"
 			time: 0
+
+	@define "state",
+		get: -> @_currentState
+
+	@define "current",
+		get: -> @_currentState
 
 	states: ->
 		# Return a list of all the possible states
