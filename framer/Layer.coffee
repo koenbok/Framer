@@ -262,6 +262,7 @@ class exports.Layer extends BaseClass
 		if not _RootElement
 			_RootElement = document.createElement "div"
 			_RootElement.id = "FramerRoot"
+			_.extend _RootElement.style, Config.rootBaseCSS
 			document.body.appendChild _RootElement
 
 		_RootElement.appendChild @_element
