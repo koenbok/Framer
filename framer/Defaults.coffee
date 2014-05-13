@@ -8,7 +8,8 @@ Originals =
 		width: 100
 		height: 100
 	Animation:
-		curve: "spring(500,30,0)"
+		curve: "linear"
+		time: 1
 
 exports.Defaults =
 
