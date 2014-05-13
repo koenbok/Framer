@@ -3,6 +3,32 @@ AnimationProperties = ["x", "y", "rotation"]
 
 describe "LayerAnimation", ->
 
+	describe "Defaults", ->
+
+		it "should use defaults", ->
+
+			Framer.Defaults.Animation =
+				curve: "spring(1,2,3)"
+
+			animation = new Animation
+				layer: new Layer()
+				properties: {x:50}
+
+			animation.options.curve.should.equal "spring(1,2,3)"
+
+			Framer.resetDefaults()
+
+		it "should use linear", ->
+
+			# We shouldn't change the linear default, people rely on it
+
+			animation = new Animation
+				layer: new Layer()
+				properties: {x:50}
+
+			animation.options.curve.should.equal "linear"
+			animation.options.time.should.equal 1
+
 	describe "Properties", ->
 
 		AnimationProperties.map (p) ->
@@ -42,18 +68,7 @@ describe "LayerAnimation", ->
 				layer.x.should.be.within(10, 40)
 				done()
 
-		it "should use defaults", ->
 
-			Framer.Defaults.Animation =
-				curve: "spring(1,2,3)"
-
-			animation = new Animation
-				layer: new Layer()
-				properties: {x:50}
-
-			animation.options.curve.should.equal "spring(1,2,3)"
-
-			Framer.resetDefaults()
 
 
 
