@@ -1,0 +1,15 @@
+box: wercker/nodejs
+
+build:
+    steps:
+        - npm-install
+        - npm-test
+deploy:
+    steps:
+        - install-packages:
+            packages: zip
+        - script:
+            name: builds.framerjs.com
+            code: make deploy
+
+# $WERCKER_OUTPUT_DIR

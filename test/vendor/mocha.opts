@@ -1,4 +1,5 @@
 --compilers coffee:coffee-script 
 --require should 
 --recursive
-
+--log true
+--bail true

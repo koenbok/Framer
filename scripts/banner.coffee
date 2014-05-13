@@ -1,10 +1,9 @@
 {exec} = require "child_process"
+{getVersion} = require "./version"
 
-exec "git describe --tags", (err, version) ->
+getVersion (version) ->
 	
-	version = version.replace "\n", ""
-	
-	console.log "// Framer #{version} (c) 2013 Koen Bok"
+	console.log "// Framer #{version} (c) 2014 Koen Bok"
 	console.log "// https://github.com/koenbok/Framer\n"
 	
 	console.log "window.FramerVersion = \"#{version}\";\n\n"

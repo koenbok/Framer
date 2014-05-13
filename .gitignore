@@ -4,3 +4,4 @@ test/init.js
 test/lib/framer.js
 *.swp
 build/template
+build

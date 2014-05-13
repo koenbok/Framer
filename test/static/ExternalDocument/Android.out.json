@@ -1,0 +1,100 @@
+{
+	"Device": {
+		"frame": {
+			"x": 49,
+			"y": 40,
+			"width": 576,
+			"height": 896
+		},
+		"subLayerNames": []
+	},
+	"Background": {
+		"frame": {
+			"x": 15,
+			"y": 0,
+			"width": 450,
+			"height": 555
+		},
+		"subLayerNames": []
+	},
+	"Image": {
+		"frame": {
+			"x": 0,
+			"y": 163,
+			"width": 480,
+			"height": 276
+		},
+		"subLayerNames": []
+	},
+	"Text": {
+		"frame": {
+			"x": 36,
+			"y": 95,
+			"width": 363,
+			"height": 46
+		},
+		"subLayerNames": []
+	},
+	"LikesComments": {
+		"frame": {
+			"x": 17,
+			"y": -43,
+			"width": 178,
+			"height": 14
+		},
+		"subLayerNames": []
+	},
+	"UFI": {
+		"frame": {
+			"x": 18,
+			"y": 503,
+			"width": 444,
+			"height": 48
+		},
+		"subLayerNames": [
+			"LikesComments"
+		]
+	},
+	"Header": {
+		"frame": {
+			"x": 36,
+			"y": 20,
+			"width": 409,
+			"height": 51
+		},
+		"subLayerNames": []
+	},
+	"Post": {
+		"frame": {
+			"x": 97,
+			"y": 299,
+			"width": 480,
+			"height": 555
+		},
+		"subLayerNames": [
+			"Background",
+			"Image",
+			"Text",
+			"UFI",
+			"Header"
+		]
+	},
+	"Top Bar": {
+		"frame": {
+			"x": 89,
+			"y": 199,
+			"width": 496,
+			"height": 84
+		},
+		"subLayerNames": []
+	},
+	"Nav Bar": {
+		"frame": {
+			"x": 97,
+			"y": 117,
+			"width": 480,
+			"height": 83
+		},
+		"subLayerNames": []
+	}
+}

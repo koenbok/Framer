@@ -1,0 +1,22 @@
+<script src="{% static 'framer.js' %}"></script>
+
+<script type="text/javascript">
+
+function changeScript(e) {
+
+	var framerRoot = document.getElementById("FramerRoot");
+	if (framerRoot) framerRoot.innerHTML = "";
+
+	var testScript = document.getElementById("testScript").value;
+	if (testScript) Utils.domLoadScript("/static/tests/" + testScript.replace(".coffee", ".js"))
+}
+
+</script>
+
+
+<select id="testScript" onchange="changeScript()">
+	<option value="">Select a script</option>
+	{% for testScript in testScripts %}
+	<option value="{{ testScript }}">{{ testScript }}</option>
+	{% endfor %}
+</select>

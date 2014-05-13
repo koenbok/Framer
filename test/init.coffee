@@ -1,4 +1,11 @@
-{EventTest} = require './tests/events'
-{DebugTest} = require './tests/debug'
-{ViewTest} = require './tests/view'
-{AnimationTest} = require './tests/animation'
+window.console.debug = (v) ->
+
+require "./tests/UtilsTest"
+require "./tests/BaseClassTest"
+require "./tests/FrameTest"
+require "./tests/LayerTest"
+require "./tests/LayerAnimationTest"
+require "./tests/LayerStatesTest"
+require "./tests/CompatTest"
+require "./tests/ImporterTest"
+

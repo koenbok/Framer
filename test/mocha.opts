@@ -1,0 +1,9 @@
+--compilers coffee:coffee-script 
+--require should 
+--recursive
+--log true
+--bail true
+--growl
+--check-leaks
+--globals __import__
+
