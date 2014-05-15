@@ -30,6 +30,7 @@ class exports.LayerStates extends BaseClass
 	add: (stateName, properties) ->
 
 		# We also allow an object with states to be passed in
+		# like: layer.states.add({stateA: {...}, stateB: {...}})
 		if _.isObject stateName
 			for k, v of stateName
 				@add k, v
@@ -51,7 +52,7 @@ class exports.LayerStates extends BaseClass
 		delete @_states[stateName]
 		@_orderedStates = _.without @_orderedStates, stateName
 
-	switch: (stateName, animationOptions) ->
+	switch: (stateName, animationOptions, instant=false) ->
 
 		# Switches to a specific state. If animationOptions are
 		# given use those, otherwise the default options.
@@ -67,9 +68,7 @@ class exports.LayerStates extends BaseClass
 		@_previousStates.push @_currentState
 		@_currentState = stateName
 
-		animationOptions ?= @animationOptions
-		animationOptions.properties = {}
-		
+		properties = {}
 		animatingKeys = @animatingKeys()
 
 		for propertyName, value of @_states[stateName]
@@ -84,26 +83,29 @@ class exports.LayerStates extends BaseClass
 			# Allow dynamic properties as functions
 			value = value.call(@layer, @layer, stateName) if _.isFunction(value)
 
-			animationOptions.properties[propertyName] = value
+			# Set the new value 
+			properties[propertyName] = value
 
-		@_animation = @layer.animate animationOptions
-
-		@_animation.on "stop", =>
+		if instant is true
+			# We want to switch immediately without animation
+			@layer.properties = properties
 			@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
 
+		else
+			# Start the animation and update the state when finished
+			animationOptions ?= @animationOptions
+			animationOptions.properties = properties
+
+			@_animation = @layer.animate animationOptions
+			@_animation.on "stop", => 
+				@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
+
+
 	switchInstant: (stateName) ->
-		# Instantly switch to this new state
-		# TODO: this is not good because we need to be able to get 
-		# the next state immediately after calling this
-		@switch stateName,
-			curve: "linear"
-			time: 0
+		@switch stateName, null, true
 
-	@define "state",
-		get: -> @_currentState
-
-	@define "current",
-		get: -> @_currentState
+	@define "state", get: -> @_currentState
+	@define "current", get: -> @_currentState
 
 	states: ->
 		# Return a list of all the possible states

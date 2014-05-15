@@ -29,6 +29,7 @@ describe "LayerStates", ->
 			@layer.states.on 'didSwitch', test
 			@layer.states.switchInstant 'a'
 
+
 	describe "Defaults", ->
 		
 		it "should set defaults", ->
@@ -52,6 +53,19 @@ describe "LayerStates", ->
 
 
 
-	# describe "Switch", ->
+	describe "Switch", ->
 
-	# 	it "should switch instant", (done) ->
+		it "should switch instant", ->
+
+			layer = new Layer
+			layer.states.add
+				stateA: {x:123}
+				stateB: {y:123}
+
+			layer.states.switchInstant "stateA"
+			layer.states.current.should.equal "stateA"
+			layer.x.should.equal 123
+
+			layer.states.switchInstant "stateB"
+			layer.states.current.should.equal "stateB"
+			layer.y.should.equal 123
