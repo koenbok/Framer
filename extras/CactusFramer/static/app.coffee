@@ -4,7 +4,14 @@ layerA = new Layer
 	midX: 200
 	clip: true
 
-Utils.labelLayer layerA, "Hello"
+layerA.states.add "hello", {x:500}
 
-layerA.draggable.enabled = true
-layerA.draggable.speedY = 0.1
+layerA.y = 300
+
+layerA.states.add "other", layerA.properties
+
+
+layerA.states.switchInstant "hello"
+layerA.states.switch "other"
+
+# console.log typeof layerA.properties.visible

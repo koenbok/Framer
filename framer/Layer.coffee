@@ -26,7 +26,7 @@ layerProperty = (name, cssProperty, fallback, validator, set) ->
 		# 	console.log "Missing validator for Layer.#{name}", validator
 
 		if validator(value) is false
-			throw Error "type #{typeof value} is not valid for a Layer.#{name} property"
+			throw Error "value '#{value}' of type #{typeof value} is not valid for a Layer.#{name} property"
 
 		@_setPropertyValue name, value
 		@style[cssProperty] = LayerStyle[cssProperty](@)

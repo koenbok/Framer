@@ -63,8 +63,14 @@ class exports.Animation extends EventEmitter
 		@_repeatCounter = @options.repeat
 
 	_filterAnimatableProperties: (properties) ->
-		delete properties.image
-		properties
+
+		animatableProperties = {}
+
+		# Only animate numeric properties for now
+		for k, v of properties
+			animatableProperties[k] = v if _.isNumber v
+
+		animatableProperties
 
 	_currentState: ->
 		_.pick @options.layer, _.keys(@options.properties)
@@ -124,13 +130,17 @@ class exports.Animation extends EventEmitter
 
 		target = @options.layer
 		stateA = @_currentState()
-		stateB = @options.properties
+		stateB = {}
+
+		# Filter out the properties that are equal
+		for k, v of @options.properties
+			stateB[k] = v if stateA[k] != v
 
 		if _.isEqual stateA, stateB
 			console.warn "Nothing to animate"
 
 		console.debug "Animation.start"
-		console.debug "\t#{k}: #{stateA[k]} -> #{stateB[k]}" for k, v of stateB
+		console.debug "\t#{k}: #{stateA[k]} -> #{stateB[k]}" for k, v of stateB 
 
 		@_animator.on "start", => @emit "start"
 		@_animator.on "stop",  => @emit "stop"
