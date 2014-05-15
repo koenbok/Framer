@@ -181,6 +181,20 @@ describe "Utils", ->
 			test = -> Utils.domLoadDataSync("static/nonexisting.txt")
 			test.should.throw()
 
+	describe "modulate", ->
+
+		it "should have the right results", ->
+			Utils.modulate(0.5, [0, 1], [0, 100]).should.equal 50
+			Utils.modulate(1, [0, 1], [0, 100]).should.equal 100
+			
+			Utils.modulate(2, [0, 1], [0, 100], true).should.equal 100
+			Utils.modulate(2, [0, 1], [0, 100], false).should.equal 200
+
+			Utils.modulate(0, [1, 2], [0, 100], true).should.equal 0
+			Utils.modulate(0, [1, 2], [0, 100], false).should.equal -100
+
+
+
 
 
 

@@ -207,6 +207,22 @@ Utils.round = (value, decimals) ->
 Utils.mapRange = (value, fromLow, fromHigh, toLow, toHigh) ->
 	toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
 
+# Kind of similar as above but with a better syntax and a limiting option
+Utils.modulate = (value, rangeA, rangeB, limit=false) ->
+	
+	[fromLow, fromHigh] = rangeA
+	[toLow, toHigh] = rangeB
+	
+	result = toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
+
+	if limit is true
+		return toLow if result < toLow
+		return toHigh if result > toHigh
+
+	result
+
+
+
 ######################################################
 # STRING FUNCTIONS
 
