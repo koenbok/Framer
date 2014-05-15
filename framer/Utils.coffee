@@ -278,6 +278,11 @@ Utils.domLoadDataSync = (path) ->
 Utils.domLoadJSONSync = (path) ->
 	JSON.parse Utils.domLoadDataSync path
 
+Utils.domLoadScriptSync = (path) ->
+	scriptData = Utils.domLoadDataSync path
+	eval scriptData
+	scriptData
+
 ######################################################
 # GEOMERTY FUNCTIONS
 
