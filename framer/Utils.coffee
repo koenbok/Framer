@@ -255,6 +255,28 @@ Utils.domLoadScript = (url, callback) ->
 	
 	script
 
+Utils.domLoadData = (path, callback) ->
+
+	request = new XMLHttpRequest()
+
+	# request.addEventListener "progress", updateProgress, false
+	# request.addEventListener "abort", transferCanceled, false
+	
+	request.addEventListener "load", ->
+		callback null, request.responseText
+	, false
+	
+	request.addEventListener "error", ->
+		callback true, null
+	, false
+
+	request.open "GET", path, true
+	request.send null
+
+Utils.domLoadJSON = (path, callback) ->
+	Utils.domLoadData path, (err, data) ->
+		callback err, JSON.parse data
+
 Utils.domLoadDataSync = (path) ->
 
 	request = new XMLHttpRequest()
