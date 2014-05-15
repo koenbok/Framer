@@ -1,5 +1,6 @@
 window.console.debug = (v) ->
 
+require "./tests/EventEmitterTest"
 require "./tests/UtilsTest"
 require "./tests/BaseClassTest"
 require "./tests/FrameTest"

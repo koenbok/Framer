@@ -15,6 +15,7 @@ _.extend window, Framer if window
 # Framer level modules
 
 Framer.Config = (require "./Config").Config
+Framer.EventEmitter = (require "./EventEmitter").EventEmitter
 Framer.BaseClass = (require "./BaseClass").BaseClass
 Framer.LayerStyle = (require "./LayerStyle").LayerStyle
 Framer.AnimationLoop = (require "./AnimationLoop").AnimationLoop

@@ -5,6 +5,7 @@ Utils = require "./Utils"
 {Config} = require "./Config"
 {Defaults} = require "./Defaults"
 {BaseClass} = require "./BaseClass"
+{EventEmitter} = require "./EventEmitter"
 {Animation} = require "./Animation"
 {Frame} = require "./Frame"
 {LayerStyle} = require "./LayerStyle"
@@ -560,10 +561,14 @@ class exports.Layer extends BaseClass
 
 	addListener: (event, originalListener) =>
 
-		# Modify the scope to be the calling object, just like jquery
-		# also add the object as the last argument
+		# # Modify the scope to be the calling object, just like jquery
+		# # also add the object as the last argument
 		listener = (args...) =>
 			originalListener.call @, args..., @
+
+		# Because we modify the listener we need to keep track of it
+		# so we can find it back when we want to unlisten again
+		originalListener.modifiedListener = listener
 
 		# Listen to dom events on the element
 		super event, listener
@@ -577,7 +582,14 @@ class exports.Layer extends BaseClass
 		@ignoreEvents = false
 
 	removeListener: (event, listener) ->
-		super
+
+		# If the original listener was modified, remove that
+		# one instead
+		if listener.modifiedListener
+			listener = listener.modifiedListener
+
+		super event, listener
+		
 		@_element.removeEventListener event, listener
 		@_eventListeners[event] = _.without @_eventListeners[event], listener
 

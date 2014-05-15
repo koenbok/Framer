@@ -288,6 +288,27 @@ describe "Layer", ->
 
 			simulate.click myLayer._element
 
+		it "should remove events", ->
+
+			layer = new Layer
+			
+			clickCount = 0
+
+			handler = ->
+				clickCount++
+
+			layer.on "test", handler
+
+			layer.emit "test"
+			clickCount.should.equal 1
+
+			layer.off "test", handler
+
+			layer.emit "test"
+			clickCount.should.equal 1
+
+
+
 	describe "Hierarchy", ->
 		
 		it "should insert in dom", ->
