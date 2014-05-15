@@ -1,6 +1,7 @@
 describe "LayerStates", ->
 	
 	describe "Events", ->
+
 		beforeEach ->
 			@layer = new Layer()
 			@layer.states.add 'a', x: 100, y: 100
@@ -27,3 +28,30 @@ describe "LayerStates", ->
 
 			@layer.states.on 'didSwitch', test
 			@layer.states.switchInstant 'a'
+
+	describe "Defaults", ->
+		
+		it "should set defaults", ->
+
+			layer = new Layer
+			layer.states.add "test", {x:123}
+			layer.states.switch "test"
+
+			layer.states._animation.options.curve.should.equal Framer.Defaults.Animation.curve
+
+			Framer.Defaults.Animation =
+				curve: "spring(1, 2, 3)"
+
+			layer = new Layer
+			layer.states.add "test", {x:456}
+			layer.states.switch "test"
+
+			layer.states._animation.options.curve.should.equal "spring(1, 2, 3)"
+
+			Framer.resetDefaults()
+
+
+
+	# describe "Switch", ->
+
+	# 	it "should switch instant", (done) ->

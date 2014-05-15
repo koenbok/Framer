@@ -2,6 +2,7 @@
 
 {Events} = require "./Events"
 {BaseClass} = require "./BaseClass"
+{Defaults} = require "./Defaults"
 
 LayerStatesIgnoredKeys = ["ignoreEvents"]
 
@@ -16,8 +17,7 @@ class exports.LayerStates extends BaseClass
 		@_states = {}
 		@_orderedStates = []
 
-		@animationOptions =
-			curve: "spring"
+		@animationOptions = {}
 
 		# Always add the default state as the current
 		@add "default", @layer.properties
@@ -69,26 +69,25 @@ class exports.LayerStates extends BaseClass
 
 		animationOptions ?= @animationOptions
 		animationOptions.properties = {}
-
 		animatingKeys = @animatingKeys()
 
-		for k, v of @_states[stateName]
+		for propertyName, value of @_states[stateName]
 
 			# Don't animate ignored properties
-			if k in LayerStatesIgnoredKeys
+			if propertyName in LayerStatesIgnoredKeys
 				continue
 
-			if k not in animatingKeys
+			if propertyName not in animatingKeys
 				continue
 
 			# Allow dynamic properties as functions
-			v = v.call(@layer, @layer, stateName) if _.isFunction(v)
+			value = value.call(@layer, @layer, stateName) if _.isFunction(value)
 
-			animationOptions.properties[k] = v
+			animationOptions.properties[propertyName] = value
 
-		animation = @layer.animate animationOptions
+		@_animation = @layer.animate animationOptions
 
-		animation.on "stop", =>
+		@_animation.on "stop", =>
 			@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
 
 	switchInstant: (stateName) ->
