@@ -5,4 +5,6 @@ _ = require "lodash"
 _.str = require 'underscore.string'
 _.mixin _.str.exports()
 
+_.isBool = (v) -> typeof v == 'boolean'
+
 exports._ = _

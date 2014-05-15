@@ -14,12 +14,19 @@ Utils = require "./Utils"
 _RootElement = null
 _LayerList = []
 
-layerProperty = (name, cssProperty, fallback, set) ->
+layerProperty = (name, cssProperty, fallback, validator, set) ->
 	exportable: true
 	default: fallback
 	get: ->
 		@_getPropertyValue name
 	set: (value) ->
+
+		# if not validator
+		# 	console.log "Missing validator for Layer.#{name}", validator
+
+		if validator(value) is false
+			throw Error "type #{typeof value} is not valid for a Layer.#{name} property"
+
 		@_setPropertyValue name, value
 		@style[cssProperty] = LayerStyle[cssProperty](@)
 		@emit "change:#{name}", value
@@ -83,18 +90,18 @@ class exports.Layer extends BaseClass
 	# Properties
 
 	# Css properties
-	@define "width",  layerProperty "width",  "width", 100
-	@define "height", layerProperty "height", "height", 100
+	@define "width",  layerProperty "width",  "width", 100, _.isNumber
+	@define "height", layerProperty "height", "height", 100, _.isNumber
 
-	@define "visible", layerProperty "visible", "display", true
-	@define "opacity", layerProperty "opacity", "opacity", 1
-	@define "index", layerProperty "index", "zIndex", 0
-
-
-	@define "clip", layerProperty "clip", "overflow", true
-	@define "scrollHorizontal", layerProperty "scrollHorizontal", "overflowX", false, (layer, value) ->
+	@define "visible", layerProperty "visible", "display", true, _.isBool
+	@define "opacity", layerProperty "opacity", "opacity", 1, _.isNumber
+	@define "index", layerProperty "index", "zIndex", 0, _.isNumber
+	@define "clip", layerProperty "clip", "overflow", true, _.isBool
+	
+	@define "scrollHorizontal", layerProperty "scrollHorizontal", "overflowX", false, _.isBool, (layer, value) ->
 		layer.ignoreEvents = false if value is true
-	@define "scrollVertical", layerProperty "scrollVertical", "overflowY", false, (layer, value) ->
+	
+	@define "scrollVertical", layerProperty "scrollVertical", "overflowY", false, _.isBool, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 
 	@define "scroll",
@@ -102,40 +109,40 @@ class exports.Layer extends BaseClass
 		set: (value) -> @scrollHorizontal = @scrollVertical = true
 
 	# Behaviour properties
-	@define "ignoreEvents", layerProperty "ignoreEvents", "pointerEvents", true
+	@define "ignoreEvents", layerProperty "ignoreEvents", "pointerEvents", true, _.isBool
 
 	# Matrix properties
-	@define "x", layerProperty "x", "webkitTransform", 0
-	@define "y", layerProperty "y", "webkitTransform", 0
-	@define "z", layerProperty "z", "webkitTransform", 0
+	@define "x", layerProperty "x", "webkitTransform", 0, _.isNumber
+	@define "y", layerProperty "y", "webkitTransform", 0, _.isNumber
+	@define "z", layerProperty "z", "webkitTransform", 0, _.isNumber
 
-	@define "scaleX", layerProperty "scaleX", "webkitTransform", 1
-	@define "scaleY", layerProperty "scaleY", "webkitTransform", 1
-	@define "scaleZ", layerProperty "scaleZ", "webkitTransform", 1
-	@define "scale", layerProperty "scale", "webkitTransform", 1
+	@define "scaleX", layerProperty "scaleX", "webkitTransform", 1, _.isNumber
+	@define "scaleY", layerProperty "scaleY", "webkitTransform", 1, _.isNumber
+	@define "scaleZ", layerProperty "scaleZ", "webkitTransform", 1, _.isNumber
+	@define "scale", layerProperty "scale", "webkitTransform", 1, _.isNumber
 
 	# @define "scale",
 	# 	get: -> (@scaleX + @scaleY + @scaleZ) / 3.0
 	# 	set: (value) -> @scaleX = @scaleY = @scaleZ = value
 
-	@define "originX", layerProperty "originX", "webkitTransformOrigin", 0.5
-	@define "originY", layerProperty "originY", "webkitTransformOrigin", 0.5
+	@define "originX", layerProperty "originX", "webkitTransformOrigin", 0.5, _.isNumber
+	@define "originY", layerProperty "originY", "webkitTransformOrigin", 0.5, _.isNumber
 	# @define "originZ", layerProperty "originZ", "webkitTransformOrigin", 0.5
 
-	@define "rotationX", layerProperty "rotationX", "webkitTransform", 0
-	@define "rotationY", layerProperty "rotationY", "webkitTransform", 0
-	@define "rotationZ", layerProperty "rotationZ", "webkitTransform", 0
-	@define "rotation",  layerProperty "rotationZ", "webkitTransform", 0
+	@define "rotationX", layerProperty "rotationX", "webkitTransform", 0, _.isNumber
+	@define "rotationY", layerProperty "rotationY", "webkitTransform", 0, _.isNumber
+	@define "rotationZ", layerProperty "rotationZ", "webkitTransform", 0, _.isNumber
+	@define "rotation",  layerProperty "rotationZ", "webkitTransform", 0, _.isNumber
 
 	# Filter properties
-	@define "blur", layerProperty "blur", "webkitFilter", 0
-	@define "brightness", layerProperty "brightness", "webkitFilter", 100
-	@define "saturate", layerProperty "saturate", "webkitFilter", 100
-	@define "hueRotate", layerProperty "hueRotate", "webkitFilter", 0
-	@define "contrast", layerProperty "contrast", "webkitFilter", 100
-	@define "invert", layerProperty "invert", "webkitFilter", 0
-	@define "grayscale", layerProperty "grayscale", "webkitFilter", 0
-	@define "sepia", layerProperty "sepia", "webkitFilter", 0
+	@define "blur", layerProperty "blur", "webkitFilter", 0, _.isNumber
+	@define "brightness", layerProperty "brightness", "webkitFilter", 100, _.isNumber
+	@define "saturate", layerProperty "saturate", "webkitFilter", 100, _.isNumber
+	@define "hueRotate", layerProperty "hueRotate", "webkitFilter", 0, _.isNumber
+	@define "contrast", layerProperty "contrast", "webkitFilter", 100, _.isNumber
+	@define "invert", layerProperty "invert", "webkitFilter", 0, _.isNumber
+	@define "grayscale", layerProperty "grayscale", "webkitFilter", 0, _.isNumber
+	@define "sepia", layerProperty "sepia", "webkitFilter", 0, _.isNumber
 
 	# Mapped style properties
 
