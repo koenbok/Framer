@@ -69,6 +69,7 @@ class exports.LayerStates extends BaseClass
 
 		animationOptions ?= @animationOptions
 		animationOptions.properties = {}
+		
 		animatingKeys = @animatingKeys()
 
 		for propertyName, value of @_states[stateName]
