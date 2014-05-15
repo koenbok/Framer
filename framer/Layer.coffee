@@ -82,8 +82,6 @@ class exports.Layer extends BaseClass
 	##############################################################
 	# Properties
 
-	@define "name", @simpleProperty "name", ""
-
 	# Css properties
 	@define "width",  layerProperty "width",  "width", 100
 	@define "height", layerProperty "height", "height", 100
@@ -146,6 +144,20 @@ class exports.Layer extends BaseClass
 	@define "borderColor", layerStyleProperty "borderColor"
 	@define "borderWidth", layerStyleProperty "borderWidth"
 
+
+	##############################################################
+	# Identity
+
+	@define "name",
+		exportable: true
+		default: ""
+		get: -> 
+			@_getPropertyValue "name"
+		set: (value) ->
+			@_setPropertyValue "name", value
+			# Set the name attribute of the dom element too
+			# See: https://github.com/koenbok/Framer/issues/63
+			@_element.setAttribute "name", value
 
 	##############################################################
 	# Geometry

@@ -139,11 +139,13 @@ describe "Layer", ->
 		it "should set name on create", ->
 			layer = new Layer name:"Test"
 			layer.name.should.equal "Test"
+			layer._element.getAttribute("name").should.equal "Test"
 
 		it "should set name after create", ->
 			layer = new Layer
 			layer.name = "Test"
 			layer.name.should.equal "Test"
+			layer._element.getAttribute("name").should.equal "Test"
 
 		# it "should handle background color with image", ->
 			
