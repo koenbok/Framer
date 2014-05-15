@@ -57,8 +57,11 @@ class exports.LayerStates extends BaseClass
 		# Switches to a specific state. If animationOptions are
 		# given use those, otherwise the default options.
 
-		if stateName is @_currentState
-			return
+		# We actually do want to allow this. A state can be set to something
+		# that does not equal the property values for that state.
+
+		# if stateName is @_currentState
+		# 	return
 
 		if not @_states.hasOwnProperty stateName
 			throw Error "No such state: '#{stateName}'"
