@@ -48,5 +48,8 @@ window.View = CompatView
 window.ImageView = CompatImageView
 window.ScrollView = CompatScrollView
 
+# Utils were utils in Framer 2
+window.utils = window.Utils
+
 	
 
