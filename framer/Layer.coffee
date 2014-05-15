@@ -29,14 +29,14 @@ layerStyleProperty = (cssProperty) ->
 	exportable: true
 	# default: fallback
 	get: -> @style[cssProperty]
-	set: (value) -> 
+	set: (value) ->
 		@style[cssProperty] = value
 		@emit "change:#{cssProperty}", value
 
 frameProperty = (name) ->
 	exportable: false
 	get: -> @frame[name]
-	set: (value) -> 
+	set: (value) ->
 		frame = @frame
 		frame[name] = value
 		@frame = frame
@@ -94,9 +94,9 @@ class exports.Layer extends BaseClass
 
 
 	@define "clip", layerProperty "clip", "overflow", true
-	@define "scrollHorizontal", layerProperty "scrollHorizontal", "overflowX", false, (layer, value) -> 
+	@define "scrollHorizontal", layerProperty "scrollHorizontal", "overflowX", false, (layer, value) ->
 		layer.ignoreEvents = false if value is true
-	@define "scrollVertical", layerProperty "scrollVertical", "overflowY", false, (layer, value) -> 
+	@define "scrollVertical", layerProperty "scrollVertical", "overflowY", false, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 
 	@define "scroll",
@@ -169,35 +169,35 @@ class exports.Layer extends BaseClass
 		# Convert a point on screen to this views coordinate system
 		# TODO: needs tests
 		Utils.convertPoint point, null, @
-		
+
 	screenFrame: ->
 		# Get this views absolute frame on the screen
 		# TODO: needs tests
 		Utils.convertPoint @frame, @, null
-	
+
 	contentFrame: ->
 		Utils.frameMerge @subLayers.map (layer) -> layer.frame.properties
 
 	centerFrame: ->
-		# Get the centered frame for its superview
+		# Get the centered frame for its superLayer
 		# We always make these pixel perfect
 		# TODO: needs tests
-		if @superView
+		if @superLayer
 			frame = @frame
-			frame.midX = parseInt @superView.width / 2.0
-			frame.midY = parseInt @superView.height / 2.0
+			frame.midX = parseInt @superLayer.width / 2.0
+			frame.midY = parseInt @superLayer.height / 2.0
 			return frame
-		
+
 		else
 			frame = @frame
 			frame.midX = parseInt window.innerWidth / 2.0
 			frame.midY = parseInt window.innerHeight / 2.0
 			return frame
-	
+
 	center: -> @frame = @centerFrame() # Center  in superLayer
 	centerX: -> @x = @centerFrame().x # Center x in superLayer
 	centerY: -> @y = @centerFrame().y # Center y in superLayer
-	
+
 	pixelAlign: ->
 		@x = parseInt @x
 		@y = parseInt @y
@@ -208,12 +208,12 @@ class exports.Layer extends BaseClass
 
 	@define "style",
 		get: -> @_element.style
-		set: (value) -> 
+		set: (value) ->
 			_.extend @_element.style, value
 			@emit "change:style"
 
 	@define "html",
-		get: -> 
+		get: ->
 			@_elementHTML?.innerHTML
 
 		set: (value) ->
@@ -225,14 +225,14 @@ class exports.Layer extends BaseClass
 			if not @_elementHTML
 				@_elementHTML = document.createElement "div"
 				@_element.appendChild @_elementHTML
-			
+
 			@_elementHTML.innerHTML = value
 
 			# If the contents contains something else than plain text
 			# then we turn off ignoreEvents so buttons etc will work.
 
 			if not (
-				@_elementHTML.childNodes.length == 1 and 
+				@_elementHTML.childNodes.length == 1 and
 				@_elementHTML.childNodes[0].nodeName == "#text")
 				@ignoreEvents = false
 
@@ -245,12 +245,12 @@ class exports.Layer extends BaseClass
 		@style = Config.layerBaseCSS
 
 	@define "classList",
-		get: -> @_element.classList	
+		get: -> @_element.classList
 
 
 	##############################################################
 	# DOM ELEMENTS
-		
+
 	_createElement: ->
 		return if @_element?
 		@_element = document.createElement "div"
@@ -268,7 +268,7 @@ class exports.Layer extends BaseClass
 		_RootElement.appendChild @_element
 
 	destroy: ->
-		
+
 		if @superLayer
 			@superLayer._subLayers = _.without @superLayer._subLayers, @
 
@@ -299,7 +299,7 @@ class exports.Layer extends BaseClass
 	## ANIMATION
 
 	animate: (options) ->
-		
+
 		options.layer = @
 		options.curveOptions = options
 
@@ -333,35 +333,35 @@ class exports.Layer extends BaseClass
 			# 	@backgroundColor = null
 
 			@backgroundColor = null
-			
+
 			# Set the property value
 			@_setPropertyValue "image", value
 
 			imageUrl = value
 
-			# Optional base image value 
+			# Optional base image value
 			# imageUrl = Config.baseUrl + imageUrl
 
 			# If the file is local, we want to avoid caching
 			# if Utils.isLocal()
 			# 	imageUrl += "?nocache=#{Date.now()}"
-			
+
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
-			
+
 			if @events?.hasOwnProperty "load" or @events?.hasOwnProperty "error"
-			
+
 				loader = new Image()
 				loader.name = imageUrl
 				loader.src = imageUrl
-			
+
 				loader.onload = =>
 					@style["background-image"] = "url('#{imageUrl}')"
 					@emit "load", loader
-			
+
 				loader.onerror = =>
 					@emit "error", loader
-			
+
 			else
 				@style["background-image"] = "url('#{imageUrl}')"
 
@@ -370,25 +370,25 @@ class exports.Layer extends BaseClass
 
 	@define "superLayer",
 		exportable: false
-		get: -> 
+		get: ->
 			@_superLayer or null
 		set: (layer) ->
 
 			return if layer is @_superLayer
-			
+
 			# Check the type
 			if not layer instanceof Layer
 				throw Error "Layer.superLayer needs to be a Layer object"
 
 			# Cancel previous pending insertions
 			Utils.domCompleteCancel @__insertElement
-			
+
 			# Remove from previous superlayer sublayers
 			if @_superLayer
 				@_superLayer._subLayers = _.without @_superLayer._subLayers, @
 				@_superLayer._element.removeChild @_element
 				@_superLayer.emit "change:subLayers", {added:[], removed:[@]}
-			
+
 			# Either insert the element to the new superlayer element or into dom
 			if layer
 				layer._element.appendChild @_element
@@ -396,13 +396,13 @@ class exports.Layer extends BaseClass
 				layer.emit "change:subLayers", {added:[@], removed:[]}
 			else
 				@_insertElement()
-			
+
 			# Set the superlayer
 			@_superLayer = layer
-			
+
 			# Place this layer on top of it's siblings
 			@bringToFront()
-			
+
 			@emit "change:superLayer"
 
 	superLayers: ->
@@ -417,14 +417,14 @@ class exports.Layer extends BaseClass
 		recurse @
 
 		superLayers
-	
+
 	# Todo: should we have a recursive subLayers function?
 	# Let's make it when we need it.
 
 	@define "subLayers",
 		exportable: false
 		get: -> _.clone @_subLayers
-	
+
 	@define "siblingLayers",
 		exportable: false
 		get: ->
@@ -438,12 +438,12 @@ class exports.Layer extends BaseClass
 
 	addSubLayer: (layer) ->
 		layer.superLayer = @
-	
+
 	removeSubLayer: (layer) ->
-		
+
 		if layer not in @subLayers
 			return
-		
+
 		layer.superLayer = null
 
 	subLayersByName: (name) ->
@@ -538,7 +538,7 @@ class exports.Layer extends BaseClass
 
 	##############################################################
 	## EVENTS
-	
+
 	addListener: (event, originalListener) =>
 
 		# Modify the scope to be the calling object, just like jquery
@@ -565,7 +565,7 @@ class exports.Layer extends BaseClass
 	removeAllListeners: ->
 
 		return if not @_eventListeners
-		
+
 		for eventName, listeners of @_eventListeners
 			for listener in listeners
 				@removeListener eventName, listener
