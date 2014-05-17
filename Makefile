@@ -80,6 +80,10 @@ deploy:
 	make site:build
 	make site:upload
 
+publish:
+	# Todo: update version
+	npm publish
+
 lint:
 	./node_modules/.bin/coffeelint -f coffeelint.json -r framer
 

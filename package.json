@@ -1,5 +1,5 @@
 {
-  "name": "Framer",
+  "name": "framerjs",
   "version": "3.0.0",
   "description": "Modern Prototyping Framework",
   "main": "build/framer.js",
@@ -40,9 +40,9 @@
     "prototyping"
   ],
   "author": "Koen Bok",
-  "license": "BSD",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/koenbok/Framer/issues"
   },
-  "homepage": "https://github.com/koenbok/Framer"
+  "homepage": "http://framerjs.com"
 }
