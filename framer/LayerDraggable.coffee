@@ -1,4 +1,4 @@
-_ = require "./Underscore"
+{_} = require "./Underscore"
 
 Utils = require "./Utils"
 {EventEmitter} = require "./EventEmitter"
@@ -27,14 +27,18 @@ class exports.LayerDraggable extends EventEmitter
 
 	constructor: (@layer) ->
 
-		# @speed = {x:1.0, y:1.0}
-		@speedX = 1.0
-		@speedY = 1.0
-
 		@_deltas = []
 		@_isDragging = false
 
 		@enabled = true
+		@speedX = 1.0
+		@speedY = 1.0
+		
+		@maxDragFrame = null
+
+		# @resistancePointX = null
+		# @resistancePointY = null
+		# @resistanceDistance = null
 
 		@attach()
 
@@ -92,10 +96,29 @@ class exports.LayerDraggable extends EventEmitter
 			y: delta.y * @speedY
 			t: event.timeStamp
 
+		newX = @_start.x + correctedDelta.x - @_offset.x
+		newY = @_start.y + correctedDelta.y - @_offset.y
+
+		if @maxDragFrame
+
+			maxDragFrame = @maxDragFrame
+			maxDragFrame = maxDragFrame() if _.isFunction maxDragFrame
+
+			minX = Utils.frameGetMinX(@maxDragFrame)
+			maxX = Utils.frameGetMaxX(@maxDragFrame) - @layer.width
+			minY = Utils.frameGetMinY(@maxDragFrame)
+			maxY = Utils.frameGetMaxY(@maxDragFrame) - @layer.height
+
+			newX = minX if newX < minX
+			newX = maxX if newX > maxX
+			newY = minY if newY < minY
+			newY = maxY if newY > maxY
+
+
 		# We use the requestAnimationFrame to update the position
 		window.requestAnimationFrame =>
-			@layer.x = @_start.x + correctedDelta.x - @_offset.x
-			@layer.y = @_start.y + correctedDelta.y - @_offset.y
+			@layer.x = newX
+			@layer.y = newY
 
 		@_deltas.push correctedDelta
 

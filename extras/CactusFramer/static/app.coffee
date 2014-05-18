@@ -1,17 +1,17 @@
+
+
+
+
+
 layerA = new Layer
-	width: 250
-	height: 300
-	midX: 200
-	clip: true
+	width: 100
+	height: 100
 
-layerA.states.add "hello", {x:500}
+layerB = new Layer
+	width: 20
+	height: 20
+	superLayer: layerA
 
-layerA.y = 300
+layerB.draggable.enabled = true
+layerB.draggable.maxDragFrame = layerA.frame
 
-layerA.states.add "other", layerA.properties
-
-
-layerA.states.switchInstant "hello"
-layerA.states.switch "other"
-
-# console.log typeof layerA.properties.visible
