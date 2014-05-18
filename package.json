@@ -2,7 +2,7 @@
   "name": "framerjs",
   "version": "3.0.0",
   "description": "Modern Prototyping Framework",
-  "main": "build/framer.js",
+  "main": "lib/Framer.js",
   "directories": {
     "doc": "docs",
     "test": "test"

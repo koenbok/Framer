@@ -82,6 +82,7 @@ deploy:
 
 publish:
 	# Todo: update version
+	coffee -o lib/ -c framer/
 	npm publish
 
 lint:

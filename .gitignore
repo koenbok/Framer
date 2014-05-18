@@ -5,3 +5,4 @@ test/lib/framer.js
 *.swp
 build/template
 build
+lib
