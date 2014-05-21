@@ -4,6 +4,7 @@ Utils = require "./Utils"
 
 {Config} = require "./Config"
 {Defaults} = require "./Defaults"
+{Session} = require "./Session"
 {BaseClass} = require "./BaseClass"
 {EventEmitter} = require "./EventEmitter"
 {Animation} = require "./Animation"
@@ -12,8 +13,8 @@ Utils = require "./Utils"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
 
-_RootElement = null
-_LayerList = []
+Session._RootElement = null
+Session._LayerList = []
 
 layerProperty = (name, cssProperty, fallback, validator, set) ->
 	exportable: true
@@ -53,7 +54,7 @@ class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
 
-		_LayerList.push @
+		Session._LayerList.push @
 
 		# We have to create the element before we set the defaults
 		@_createElement()
@@ -279,23 +280,23 @@ class exports.Layer extends BaseClass
 		Utils.domComplete @__insertElement
 
 	__insertElement: =>
-		if not _RootElement
-			_RootElement = document.createElement "div"
-			_RootElement.id = "FramerRoot"
-			_.extend _RootElement.style, Config.rootBaseCSS
-			document.body.appendChild _RootElement
+		if not Session._RootElement
+			Session._RootElement = document.createElement "div"
+			Session._RootElement.id = "FramerRoot"
+			_.extend Session._RootElement.style, Config.rootBaseCSS
+			document.body.appendChild Session._RootElement
 
-		_RootElement.appendChild @_element
+		Session._RootElement.appendChild @_element
 
 	destroy: ->
 
 		if @superLayer
 			@superLayer._subLayers = _.without @superLayer._subLayers, @
 
-		@_element.parentNode.removeChild @_element
+		@_element.parentNode?.removeChild @_element
 		@removeAllListeners()
 
-		_LayerList = _.without _LayerList, @
+		Session._LayerList = _.without Session._LayerList, @
 
 
 	##############################################################
@@ -451,7 +452,7 @@ class exports.Layer extends BaseClass
 
 			# If there is no superLayer we need to walk through the root
 			if @superLayer is null
-				return _.filter _LayerList, (layer) =>
+				return _.filter Session._LayerList, (layer) =>
 					layer isnt @ and layer.superLayer is null
 
 			return _.without @superLayer.subLayers, @
@@ -604,4 +605,4 @@ class exports.Layer extends BaseClass
 	on: @::addListener
 	off: @::removeListener
 
-exports.Layer.Layers = -> _.clone _LayerList
+exports.Layer.Layers = -> _.clone Session._LayerList

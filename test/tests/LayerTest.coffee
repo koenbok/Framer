@@ -7,6 +7,9 @@ describe "Layer", ->
 	# afterEach ->
 	# 	Utils.clearAll()
 
+	# beforeEach ->
+	# 	Framer.Utils.reset()
+
 	describe "Defaults", ->
 
 		it "should set defaults", ->
