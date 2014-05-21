@@ -4,23 +4,27 @@
 Utils = {}
 
 Utils.reset = ->
-	Utils.domComplete ->
 
-		for layer in Session._LayerList
-			layer.removeAllListeners()
+	# There is no use calling this even before the dom is ready
+	if __domReady is false
+		return
 
-		Session._LayerList = []
-		Session._RootElement?.innerHTML = ""
+	# Remove all the listeners so we don't leak memory
+	for layer in Session._LayerList
+		layer.removeAllListeners()
 
-		if Session._delayTimers
-			for delayTimer in Session._delayTimers
-				clearTimeout delayTimer
-			Session._delayTimers = []
+	Session._LayerList = []
+	Session._RootElement?.innerHTML = ""
 
-		if Session._delayIntervals
-			for delayInterval in Session._delayIntervals
-				clearInterval delayInterval
-			Session._delayIntervals = []
+	if Session._delayTimers
+		for delayTimer in Session._delayTimers
+			clearTimeout delayTimer
+		Session._delayTimers = []
+
+	if Session._delayIntervals
+		for delayInterval in Session._delayIntervals
+			clearInterval delayInterval
+		Session._delayIntervals = []
 
 Utils.getValue = (value) ->
 	return value() if _.isFunction value
@@ -263,10 +267,12 @@ Utils.parseFunction = (str) ->
 # DOM FUNCTIONS
 
 __domComplete = []
+__domReady = false
 
 if document?
 	document.onreadystatechange = (event) =>
 		if document.readyState is "complete"
+			__domReady = true
 			while __domComplete.length
 				f = __domComplete.shift()()
 
