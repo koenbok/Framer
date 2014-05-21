@@ -9,6 +9,9 @@ Utils.reset = ->
 	if __domReady is false
 		return
 
+	# Reset all pending operations to the dom
+	__domComplete = []
+
 	# Remove all the listeners so we don't leak memory
 	for layer in Session._LayerList
 		layer.removeAllListeners()
