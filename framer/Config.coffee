@@ -22,7 +22,7 @@ exports.Config =
 		#"z-index": 0
 		"-webkit-box-sizing": "border-box"
 		"-webkit-user-select": "none"
-		"cursor": "default"
+		# "cursor": "default"
 		# "-webkit-transform-style": "preserve-3d"
 		# "-webkit-backface-visibility": "visible"
 		#"-webkit-backface-visibility": ""
