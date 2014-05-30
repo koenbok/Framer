@@ -44,10 +44,7 @@ class exports.Animation extends EventEmitter
 			time: 1
 			repeat: 0
 			delay: 0
-			debug: true
-
-		if options.layer is null
-			console.error "Animation: missing layer"
+			debug: false
 
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
@@ -122,9 +119,13 @@ class exports.Animation extends EventEmitter
 
 	start: =>
 
+		if @options.layer is null
+			console.error "Animation: missing layer"
+
 		AnimatorClass = @_animatorClass()
 
-		console.debug "Animation.start #{AnimatorClass.name}", @options.curveOptions
+		if @options.debug
+			console.log "Animation.start #{AnimatorClass.name}", @options.curveOptions
 
 		@_animator = new AnimatorClass @options.curveOptions
 
@@ -139,8 +140,9 @@ class exports.Animation extends EventEmitter
 		if _.isEqual stateA, stateB
 			console.warn "Nothing to animate"
 
-		console.debug "Animation.start"
-		console.debug "\t#{k}: #{stateA[k]} -> #{stateB[k]}" for k, v of stateB 
+		if @options.debug
+			console.log "Animation.start"
+			console.log "\t#{k}: #{stateA[k]} -> #{stateB[k]}" for k, v of stateB 
 
 		@_animator.on "start", => @emit "start"
 		@_animator.on "stop",  => @emit "stop"

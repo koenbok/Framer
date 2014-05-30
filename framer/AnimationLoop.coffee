@@ -33,7 +33,7 @@ AnimationLoop =
 		window.requestAnimationFrame AnimationLoop._tick
 
 	_stop: ->
-		console.debug "AnimationLoop._stop"
+		# console.log "AnimationLoop._stop"
 		AnimationLoop._running = false
 
 
@@ -42,8 +42,8 @@ AnimationLoop =
 		if not AnimationLoop._animators.length
 			return AnimationLoop._stop()
 
-		if AnimationLoop._sessionTime == 0
-			console.debug "AnimationLoop._start"
+		# if AnimationLoop._sessionTime == 0
+		# 	console.log "AnimationLoop._start"
 
 
 		AnimationLoop._frameCounter++
