@@ -592,7 +592,9 @@ class exports.Layer extends BaseClass
 		super event, listener
 		
 		@_element.removeEventListener event, listener
-		@_eventListeners[event] = _.without @_eventListeners[event], listener
+
+		if @_eventListeners
+			@_eventListeners[event] = _.without @_eventListeners[event], listener
 
 	removeAllListeners: ->
 
