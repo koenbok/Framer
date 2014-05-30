@@ -177,7 +177,7 @@ class exports.Animation extends EventEmitter
 
 
 	stop: ->
-		@_animator.stop()
+		@_animator?.stop()
 		_runningAnimations = _.without _runningAnimations, @
 
 	reverse: ->
