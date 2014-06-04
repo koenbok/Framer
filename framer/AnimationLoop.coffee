@@ -45,7 +45,6 @@ AnimationLoop =
 		# if AnimationLoop._sessionTime == 0
 		# 	console.log "AnimationLoop._start"
 
-
 		AnimationLoop._frameCounter++
 		
 		time  = Utils.getTime()
