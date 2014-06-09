@@ -421,7 +421,7 @@ class exports.Layer extends BaseClass
 			# Set the superlayer
 			@_superLayer = layer
 
-			# Place this layer on top of it's siblings
+			# Place this layer on top of its siblings
 			@bringToFront()
 
 			@emit "change:superLayer"
