@@ -81,7 +81,7 @@ class exports.Importer
 			layerInfo.frame = info.image.frame
 			layerInfo.image = Utils.pathJoin @path, info.image.path
 			
-		# If there is a mask on this layer group, take it's frame
+		# If there is a mask on this layer group, take its frame
 		if info.maskFrame
 			layerInfo.frame = info.maskFrame
 			layerInfo.clip = true

@@ -41,7 +41,7 @@ Framer 3 is close to a rewrite. Or maybe more a huge refactor. The new code base
   - Added damping harmonic oscillator spring physics (curve: "spring-dho")
   - Very simple infrastructure to add your own animators:
     - Emit a number on a tick
-    - Check if the animation has reached it's end
+    - Check if the animation has reached its end
     - Support for future advanced animators like real physics and path animators
 
 #### Big Changes
@@ -86,7 +86,7 @@ Framer 3 is close to a rewrite. Or maybe more a huge refactor. The new code base
 #### Plans
 
 - Add back in the css keyframe animation backend and allow to switch between them on a per animation basis.
-- Add more animatable properties. You can set layer.style as an animation target and animate it's numeric css properties. - We'll have to put some converters in to tween between colors, gradients, shadows, etc.
+- Add more animatable properties. You can set layer.style as an animation target and animate its numeric css properties. - We'll have to put some converters in to tween between colors, gradients, shadows, etc.
 - Add back in the box2d physics engine and come up with a testable api
 - Research FF/IE support
 
