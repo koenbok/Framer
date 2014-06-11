@@ -6,6 +6,7 @@
   "keywords": [
     "prototyping"
   ],
+  "main": "build/framer.js",
   "scripts": [
     "build/framer.js"
   ],
