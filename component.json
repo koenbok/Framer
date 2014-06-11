@@ -1,0 +1,16 @@
+{
+  "name": "framerjs",
+  "repository": "https://github.com/koenbok/Framer.git",
+  "description": "Modern Prototyping Framework",
+  "version": "3.0.0",
+  "keywords": [
+    "prototyping"
+  ],
+  "scripts": [
+    "build/framer.js"
+  ],
+  "license": "MIT",
+  "json": [
+    "component.json"
+  ]
+}
