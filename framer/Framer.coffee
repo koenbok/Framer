@@ -9,6 +9,8 @@ Framer.Frame = (require "./Frame").Frame
 Framer.Layer = (require "./Layer").Layer
 Framer.Events = (require "./Events").Events
 Framer.Animation = (require "./Animation").Animation
+Framer.Screen = (require "./Screen").Screen
+Framer.print = (require "./Print").print
 
 _.extend window, Framer if window
 

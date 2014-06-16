@@ -1,5 +1,6 @@
 {_} = require "./Underscore"
 {Session} = require "./Session"
+{Screen} = require "./Screen"
 
 Utils = {}
 
@@ -12,9 +13,13 @@ Utils.reset = ->
 	# Reset all pending operations to the dom
 	__domComplete = []
 
+	# Reset the print console layer
+	Session.printLayer = null
+
 	# Remove all the listeners so we don't leak memory
-	for layer in Session._LayerList
-		layer.removeAllListeners()
+	if Session._LayerList
+		for layer in Session._LayerList
+			layer.removeAllListeners()
 
 	Session._LayerList = []
 	Session._RootElement?.innerHTML = ""
@@ -28,6 +33,8 @@ Utils.reset = ->
 		for delayInterval in Session._delayIntervals
 			clearInterval delayInterval
 		Session._delayIntervals = []
+
+
 
 Utils.getValue = (value) ->
 	return value() if _.isFunction value
@@ -154,6 +161,15 @@ Utils.labelLayer = (layer, text, style={}) ->
 
 	layer.style = style
 	layer.html = text
+
+Utils.stringify = (obj) ->
+	try
+		return JSON.stringify obj if _.isObject obj
+	catch
+		""
+	return "undefined" if obj is undefined
+	return obj.toString() if obj.toString
+	return obj
 
 Utils.uuid = ->
 
