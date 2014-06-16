@@ -5,7 +5,7 @@
 - Add a way to copy and deepcopy layer hierarchies.
 - Add a way to set text or html content without removing the other layers by accident.
 - Maybe ditcht the PSD global for layers and use something more 
-- Add a way to get a sublayer by it's (PSD) name. layer.subLayerWithName(LayerName)
+- Add a way to get a sublayer by its (PSD) name. layer.subLayerWithName(LayerName)
 
 
 # Events
