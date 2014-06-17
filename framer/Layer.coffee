@@ -364,7 +364,8 @@ class exports.Layer extends BaseClass
 			# imageUrl = Config.baseUrl + imageUrl
 
 			# If the file is local, we want to avoid caching
-			if Utils.isLocal() and not (_.startsWith(imageUrl, "http://") or _.startsWith(imageUrl, "https://"))
+			# if Utils.isLocal() and not (_.startsWith(imageUrl, "http://") or _.startsWith(imageUrl, "https://"))
+			if Utils.isLocal() and not imageUrl.match(/^https?:\/\//)
 				imageUrl += "?nocache=#{Date.now()}"
 
 			# As an optimization, we will only use a loader
