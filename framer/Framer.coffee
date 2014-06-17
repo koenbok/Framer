@@ -7,6 +7,7 @@ Framer._ = _
 Framer.Utils = (require "./Utils")
 Framer.Frame = (require "./Frame").Frame
 Framer.Layer = (require "./Layer").Layer
+Framer.BackgroundLayer = (require "./BackgroundLayer").BackgroundLayer
 Framer.Events = (require "./Events").Events
 Framer.Animation = (require "./Animation").Animation
 Framer.Screen = (require "./Screen").Screen
