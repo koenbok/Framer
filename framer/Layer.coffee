@@ -123,6 +123,8 @@ class exports.Layer extends BaseClass
 	@define "scaleZ", layerProperty "scaleZ", "webkitTransform", 1, _.isNumber
 	@define "scale", layerProperty "scale", "webkitTransform", 1, _.isNumber
 
+	@define "skewX", layerProperty "skewX", "webkitTransform", 0, _.isNumber
+	@define "skewY", layerProperty "skewY", "webkitTransform", 0, _.isNumber
 	@define "skew", layerProperty "skew", "webkitTransform", 0, _.isNumber
 
 	# @define "scale",
