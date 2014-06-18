@@ -21,6 +21,20 @@ AnimatorClasses =
 AnimatorClasses["spring"] = AnimatorClasses["spring-rk4"]
 AnimatorClasses["cubic-bezier"] = AnimatorClasses["bezier-curve"]
 
+numberRE = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/
+relativePropertyRE = new RegExp('^(?:([+-])=|)(' + numberRE.source + ')([a-z%]*)$', 'i')
+
+isRelativeProperty = (v) ->
+	_.isString(v) and relativePropertyRE.test(v)
+
+evaluateRelativeProperty = (target, k, v) ->
+	[match, sign, number, unit, rest...] = relativePropertyRE.exec(v)
+
+	if sign
+		return target[k] + (sign + 1) * number
+	else
+		return +number
+
 _runningAnimations = []
 
 # Todo: this would normally be BaseClass but the properties keyword
@@ -65,7 +79,7 @@ class exports.Animation extends EventEmitter
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			animatableProperties[k] = v if _.isNumber v
+			animatableProperties[k] = v if _.isNumber(v) or isRelativeProperty(v)
 
 		animatableProperties
 
@@ -133,8 +147,11 @@ class exports.Animation extends EventEmitter
 		stateA = @_currentState()
 		stateB = {}
 
-		# Filter out the properties that are equal
 		for k, v of @options.properties
+			# Evaluate relative properties
+			v = evaluateRelativeProperty(target, k, v) if isRelativeProperty(v)
+
+			# Filter out the properties that are equal
 			stateB[k] = v if stateA[k] != v
 
 		if _.isEqual stateA, stateB
@@ -142,7 +159,7 @@ class exports.Animation extends EventEmitter
 
 		if @options.debug
 			console.log "Animation.start"
-			console.log "\t#{k}: #{stateA[k]} -> #{stateB[k]}" for k, v of stateB 
+			console.log "\t#{k}: #{stateA[k]} -> #{stateB[k]}" for k, v of stateB
 
 		@_animator.on "start", => @emit "start"
 		@_animator.on "stop",  => @emit "stop"
