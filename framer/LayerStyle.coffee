@@ -88,7 +88,10 @@ exports.LayerStyle =
 		"
 		translate3d(#{layer.x}px,#{layer.y}px,#{layer.z}px) 
 		scale(#{layer.scale})
-		scale3d(#{layer.scaleX},#{layer.scaleY},#{layer.scaleZ}) 
+		scale3d(#{layer.scaleX},#{layer.scaleY},#{layer.scaleZ})
+		skew(#{layer.skew}deg,#{layer.skew}deg) 
+		skewX(#{layer.skewX}deg)  
+		skewY(#{layer.skewY}deg) 
 		rotateX(#{layer.rotationX}deg) 
 		rotateY(#{layer.rotationY}deg) 
 		rotateZ(#{layer.rotationZ}deg) 
