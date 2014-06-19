@@ -279,13 +279,15 @@ class exports.Layer extends BaseClass
 	_insertElement: ->
 		Utils.domComplete @__insertElement
 
-	__insertElement: =>
-		if not Session._RootElement
-			Session._RootElement = document.createElement "div"
-			Session._RootElement.id = "FramerRoot"
-			_.extend Session._RootElement.style, Config.rootBaseCSS
-			document.body.appendChild Session._RootElement
+	__createRootElement: =>
+		element = document.createElement "div"
+		element.id = "FramerRoot"
+		_.extend element.style, Config.rootBaseCSS
+		document.body.appendChild element
+		element
 
+	__insertElement: =>
+		Session._RootElement ?= @__createRootElement()
 		Session._RootElement.appendChild @_element
 
 	destroy: ->

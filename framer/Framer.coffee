@@ -16,7 +16,6 @@ Framer.print = (require "./Print").print
 _.extend window, Framer if window
 
 # Framer level modules
-
 Framer.Config = (require "./Config").Config
 Framer.EventEmitter = (require "./EventEmitter").EventEmitter
 Framer.BaseClass = (require "./BaseClass").BaseClass
@@ -29,11 +28,15 @@ Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4An
 Framer.Importer = (require "./Importer").Importer
 Framer.Debug = (require "./Debug").Debug
 Framer.Session = (require "./Session").Session
+Framer.Extras = require "./Extras/Extras"
 
 window.Framer = Framer if window
 
 # Compatibility for Framer 2
 require "./Compat"
+
+# Fix for mobile scrolling
+Framer.Extras.MobileScrollFix.enable() if Utils.isMobile
 
 # Set the defaults
 Defaults = (require "./Defaults").Defaults
