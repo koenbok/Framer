@@ -24,6 +24,7 @@ exports.enable = ->
 			super options
 
 			@on "change:scrollVertical", @_updateScrollListeners
+			@_updateScrollListeners()
 
 		_updateScrollListeners: =>
 			if @scrollVertical is true
@@ -35,11 +36,12 @@ exports.enable = ->
 
 		__createRootElement: =>
 			
-			element = super
-			element.addEventListener "touchmove", (event) ->
+			rootElement = super
+
+			rootElement.addEventListener "touchmove", (event) ->
 				event.preventDefault()
 
-			return element
+			return rootElement
 
 	# Override the standard window Layer with this patched one
 	window.Layer = window.Framer.Layer = MobileScrollFixLayer

@@ -563,7 +563,7 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## EVENTS
 
-	addListener: (event, originalListener) =>
+	addListener: (eventName, originalListener) =>
 
 		# # Modify the scope to be the calling object, just like jquery
 		# # also add the object as the last argument
@@ -575,29 +575,31 @@ class exports.Layer extends BaseClass
 		originalListener.modifiedListener = listener
 
 		# Listen to dom events on the element
-		super event, listener
-		@_element.addEventListener event, listener
+		super eventName, listener
+		@_element.addEventListener eventName, listener
 
 		@_eventListeners ?= {}
-		@_eventListeners[event] ?= []
-		@_eventListeners[event].push listener
+		@_eventListeners[eventName] ?= []
+		@_eventListeners[eventName].push listener
 
-		# We want to make sure we listen to these events
-		@ignoreEvents = false
+		# We want to make sure we listen to these events, but we can safely
+		# ignore it for change events
+		if not _.startsWith eventName, "change:"
+			@ignoreEvents = false
 
-	removeListener: (event, listener) ->
+	removeListener: (eventName, listener) ->
 
 		# If the original listener was modified, remove that
 		# one instead
 		if listener.modifiedListener
 			listener = listener.modifiedListener
 
-		super event, listener
+		super eventName, listener
 		
-		@_element.removeEventListener event, listener
+		@_element.removeEventListener eventName, listener
 
 		if @_eventListeners
-			@_eventListeners[event] = _.without @_eventListeners[event], listener
+			@_eventListeners[eventName] = _.without @_eventListeners[eventName], listener
 
 	removeAllListeners: ->
 
