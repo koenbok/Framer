@@ -49,6 +49,41 @@ describe "LayerAnimation", ->
 					layer[p].should.equal 100
 					done()
 
+			it "should animate property #{p} with positive offset from current value", (done) ->
+
+				layer = new Layer()
+				layer[p] = 50
+
+				properties = {}
+				properties[p] = '+=50'
+
+				layer.animate
+					properties: properties
+					curve: "linear"
+					time: AnimationTime
+
+				layer.on "end", ->
+					layer[p].should.equal 100
+					done()
+
+			it "should animate property #{p} with negative offset from current value", (done) ->
+
+				layer = new Layer()
+				layer[p] = 50
+
+				properties = {}
+				properties[p] = '+=50'
+
+				layer.animate
+					properties: properties
+					curve: "linear"
+					time: AnimationTime
+
+				layer.on "end", ->
+					layer[p].should.equal 100
+					done()
+
+
 	describe "Basic", ->
 
 		it "should stop", (done) ->
