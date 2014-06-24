@@ -12,34 +12,39 @@ Todo:
 
 exports.print = (args...) ->
 	
-	printLayer = Session.printLayer
+	printLayer = Framer.Session.printLayer
 
 	if not printLayer
 
 		printLayer = new Layer
 		printLayer.scrollVertical = true
+		printLayer.ignoreEvents = false
 		printLayer.html = ""
 		printLayer.style =
 			"font": "12px/1.35em Menlo"
 			"color": "rgba(0,0,0,.7)"
 			"padding": "8px"
 			"padding-bottom": "30px"
-			"zIndex": 9999
-			"border-top": "1px solid #ccc"
-			"backgroundColor": "#fff"
+			"border-top": "1px solid #d9d9d9"
 		
-		update = ->
-			printLayer.width = window.innerWidth
-			printLayer.height = 160
-			printLayer.maxY = window.innerHeight
-		
-		update()
-		
-		Screen.on "resize", update
+		printLayer.opacity = 0.9
+		printLayer.style.zIndex = 999 # Always stay on top
+		printLayer.visible = true
+		printLayer.backgroundColor = "white"
+		# printLayer.bringToFront()
+
+		printLayer.width = window.innerWidth
+		printLayer.height = 160
+		printLayer.maxY = window.innerHeight
 	
-	printLayer.visible = true
+	printNode = document.createElement("div")
+	printNode.innerHTML = "&raquo; " + args.map(Utils.stringify).join(", ") + "<br>"
+	printNode.style["-webkit-user-select"] = "text"
+	printNode.style["cursor"] = "auto"
+	
+	printLayer._element.appendChild(printNode)
 
-	printLayer.html += "&raquo; #{args.map(Utils.stringify).join ', '}<br>"
-	printLayer._element.scrollTop = printLayer._element.scrollHeight
-
-	Session.printLayer = printLayer
+	Framer.Session.printLayer = printLayer
+	
+	Utils.delay 0, ->
+		printLayer._element.scrollTop = printLayer._element.scrollHeight
