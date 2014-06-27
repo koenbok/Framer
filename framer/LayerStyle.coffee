@@ -106,8 +106,15 @@ exports.LayerStyle =
 	pointerEvents: (layer) ->
 		if layer.ignoreEvents
 			return "none"
-		"auto"
+		else
+			return "auto"
 
+	boxShadow: (layer) ->
+
+		if not layer.shadowColor
+			return ""
+		
+		return "#{layer.shadowX}px #{layer.shadowY}px #{layer.shadowBlur}px #{layer.shadowSpread}px #{layer.shadowColor}"
 
 	# css: ->
 	# 	css = {}

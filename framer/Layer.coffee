@@ -26,7 +26,7 @@ layerProperty = (name, cssProperty, fallback, validator, set) ->
 		# if not validator
 		# 	console.log "Missing validator for Layer.#{name}", validator
 
-		if validator(value) is false
+		if validator?(value) is false
 			throw Error "value '#{value}' of type #{typeof value} is not valid for a Layer.#{name} property"
 
 		@_setPropertyValue name, value
@@ -150,9 +150,19 @@ class exports.Layer extends BaseClass
 	@define "grayscale", layerProperty "grayscale", "webkitFilter", 0, _.isNumber
 	@define "sepia", layerProperty "sepia", "webkitFilter", 0, _.isNumber
 
+	# Shadow properties
+	@define "shadowX", layerProperty "shadowX", "boxShadow", 0, _.isNumber
+	@define "shadowY", layerProperty "shadowY", "boxShadow", 0, _.isNumber
+	@define "shadowBlur", layerProperty "shadowBlur", "boxShadow", 0, _.isNumber
+	@define "shadowSpread", layerProperty "shadowSpread", "boxShadow", 0, _.isNumber
+	@define "shadowColor", layerProperty "shadowColor", "boxShadow", ""
+
 	# Mapped style properties
 
 	@define "backgroundColor", layerStyleProperty "backgroundColor"
+	@define "color", layerStyleProperty "color"
+
+	# Border properties
 	@define "borderRadius", layerStyleProperty "borderRadius"
 	@define "borderColor", layerStyleProperty "borderColor"
 	@define "borderWidth", layerStyleProperty "borderWidth"

@@ -252,6 +252,39 @@ describe "Layer", ->
 			layer.contrast.should.equal 50
 			layer.style.webkitFilter.should.equal "blur(10px) contrast(50%)"
 
+	describe "Shadow Properties", ->
+
+		it "should set nothing on defaults", ->
+			
+			layer = new Layer
+			layer.style.boxShadow.should.equal ""
+
+		it "should set the shadow", ->
+			
+			layer = new Layer
+
+			layer.shadowX = 10
+			layer.shadowY = 10
+			layer.shadowBlur = 10
+			layer.shadowSpread = 10
+
+			layer.shadowX.should.equal 10
+			layer.shadowY.should.equal 10
+			layer.shadowBlur.should.equal 10
+			layer.shadowSpread.should.equal 10
+
+			layer.style.boxShadow.should.equal ""
+
+			# Only after we set a color a shadow should be drawn
+			layer.shadowColor = "red"
+			layer.shadowColor.should.equal "red"
+			
+			layer.style.boxShadow.should.equal "red 10px 10px 10px 10px"
+
+			# Only after we set a color a shadow should be drawn
+			layer.shadowColor = null
+			layer.style.boxShadow.should.equal ""
+
 	describe "Events", ->
 
 		it "should set pointer events", ->
