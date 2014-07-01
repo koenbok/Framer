@@ -56,6 +56,10 @@ class exports.Layer extends BaseClass
 
 		Session._LayerList.push @
 
+		# Special power setting for 2d rendering path. Only enable this
+		# if you know what you are doing. See LayerStyle for more info.
+		@_prefer2d = false
+
 		# We have to create the element before we set the defaults
 		@_createElement()
 		@_setDefaultCSS()

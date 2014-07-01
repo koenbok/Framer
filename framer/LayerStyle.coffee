@@ -71,6 +71,33 @@ exports.LayerStyle =
 
 	webkitTransform: (layer) ->
 
+
+		# We have a special rendering path for layers that prefer 2d rendering.
+		# This definitely decreases performance, but is handy in complex drawing
+		# scenarios with rounded corners and shadows where gpu drawing gets weird
+		# results.
+
+		if layer._prefer2d
+			return exports.LayerStyle.webkitTransformPrefer2d(layer)
+
+		"
+		translate3d(#{layer.x}px,#{layer.y}px,#{layer.z}px) 
+		scale(#{layer.scale})
+		scale3d(#{layer.scaleX},#{layer.scaleY},#{layer.scaleZ})
+		skew(#{layer.skew}deg,#{layer.skew}deg) 
+		skewX(#{layer.skewX}deg)  
+		skewY(#{layer.skewY}deg) 
+		rotateX(#{layer.rotationX}deg) 
+		rotateY(#{layer.rotationY}deg) 
+		rotateZ(#{layer.rotationZ}deg) 
+		"
+
+
+	webkitTransformPrefer2d: (layer) ->
+
+		# This detects if we use 3d properties, if we don't it only uses
+		# 2d properties to disable gpu rendering.
+
 		css = []
 
 		if layer.z != 0
