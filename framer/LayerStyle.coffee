@@ -68,34 +68,54 @@ exports.LayerStyle =
 
 		return css.join(" ")
 
-		# This is how I used to do it before, and it works well in Safari
-		
-		# "
-		# blur(#{filterFormat layer.blur, "px"}) 
-		# brightness(#{filterFormat layer.brightness, "%"}) 
-		# saturate(#{filterFormat layer.saturate, "%"}) 
-		# hue-rotate(#{filterFormat layer.hueRotate, "deg"}) 
-		# contrast(#{filterFormat layer.contrast, "%"}) 
-		# invert(#{filterFormat layer.invert, "%"}) 
-		# grayscale(#{filterFormat layer.grayscale, "%"}) 
-		# sepia(#{filterFormat layer.sepia, "%"})
-		# "
 
 	webkitTransform: (layer) ->
-		# TODO: On Chrome it seems that adding any other transform property
-		# together with a blur, it breaks the blur and performance. I'll just
-		# wait for the Chrome guys to fix this I guess.
-		"
-		translate3d(#{layer.x}px,#{layer.y}px,#{layer.z}px) 
-		scale(#{layer.scale})
-		scale3d(#{layer.scaleX},#{layer.scaleY},#{layer.scaleZ})
-		skew(#{layer.skew}deg,#{layer.skew}deg) 
-		skewX(#{layer.skewX}deg)  
-		skewY(#{layer.skewY}deg) 
-		rotateX(#{layer.rotationX}deg) 
-		rotateY(#{layer.rotationY}deg) 
-		rotateZ(#{layer.rotationZ}deg) 
-		"
+
+		css = []
+
+		if layer.z != 0
+			css.push "translate3d(#{layer.x}px,#{layer.y}px,#{layer.z}px)"
+		else
+			css.push "translate(#{layer.x}px,#{layer.y}px)"
+
+		if layer.scale != 1
+			css.push "scale(#{layer.scale})"
+
+		if layer.scaleX != 1 or layer.scaleY != 1 or layer.scaleZ != 1
+			css.push "scale3d(#{layer.scaleX},#{layer.scaleY},#{layer.scaleZ})"
+
+		if layer.skew
+			css.push "skew(#{layer.skew}deg,#{layer.skew}deg)"
+
+		if layer.skewX
+			css.push "skewX(#{layer.skewX}deg)"
+
+		if layer.skewY
+			css.push "skewY(#{layer.skewY}deg)"
+
+		if layer.rotationX
+			css.push "rotateX(#{layer.rotationX}deg)"
+
+		if layer.rotationY
+			css.push "rotateY(#{layer.rotationY}deg)"
+
+		if layer.rotationZ
+			css.push "rotateZ(#{layer.rotationZ}deg)"
+
+
+		return css.join(" ")
+
+		# "
+		# translate3d(#{layer.x}px,#{layer.y}px,#{layer.z}px) 
+		# scale(#{layer.scale})
+		# scale3d(#{layer.scaleX},#{layer.scaleY},#{layer.scaleZ})
+		# skew(#{layer.skew}deg,#{layer.skew}deg) 
+		# skewX(#{layer.skewX}deg)  
+		# skewY(#{layer.skewY}deg) 
+		# rotateX(#{layer.rotationX}deg) 
+		# rotateY(#{layer.rotationY}deg) 
+		# rotateZ(#{layer.rotationZ}deg) 
+		# "
 
 	webkitTransformOrigin: (layer) ->
 		"#{layer.originX * 100}% #{layer.originY * 100}%"
