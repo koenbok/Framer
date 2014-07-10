@@ -220,7 +220,7 @@ Utils.isTouch = ->
 	window.ontouchstart is null
 
 Utils.isMobile = ->
-	(/iphone|ipod|android|ie|blackberry|fennec/).test \
+	(/iphone|ipod|ipad|android|ie|blackberry|fennec/).test \
 		navigator.userAgent.toLowerCase()
 
 Utils.isChrome = ->
