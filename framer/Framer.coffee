@@ -8,6 +8,7 @@ Framer.Utils = (require "./Utils")
 Framer.Frame = (require "./Frame").Frame
 Framer.Layer = (require "./Layer").Layer
 Framer.BackgroundLayer = (require "./BackgroundLayer").BackgroundLayer
+Framer.VideoLayer = (require "./VideoLayer").VideoLayer
 Framer.Events = (require "./Events").Events
 Framer.Animation = (require "./Animation").Animation
 Framer.Screen = (require "./Screen").Screen
