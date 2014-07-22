@@ -20,6 +20,7 @@ require "./tests/FrameTest"
 require "./tests/LayerTest"
 require "./tests/LayerAnimationTest"
 require "./tests/LayerStatesTest"
+require "./tests/VideoLayerTest"
 require "./tests/CompatTest"
 require "./tests/ImporterTest"
 
