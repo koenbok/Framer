@@ -233,9 +233,17 @@ class exports.Layer extends BaseClass
 			frame.midY = parseInt window.innerHeight / 2.0
 			return frame
 
-	center: -> @frame = @centerFrame() # Center  in superLayer
-	centerX: -> @x = @centerFrame().x # Center x in superLayer
-	centerY: -> @y = @centerFrame().y # Center y in superLayer
+	center: ->
+		@frame = @centerFrame() # Center  in superLayer
+		@
+	
+	centerX: (offset=0) ->
+		@x = @centerFrame().x + offset # Center x in superLayer
+		@
+	
+	centerY: (offset=0) ->
+		@y = @centerFrame().y + offset # Center y in superLayer
+		@
 
 	pixelAlign: ->
 		@x = parseInt @x

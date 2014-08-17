@@ -575,6 +575,40 @@ describe "Layer", ->
 			layer.maxY = 200
 			layer.y.should.equal 100
 
+	describe "Center", ->
+
+		it "should center", ->
+			layerA = new Layer width:200, height:200
+			layerB = new Layer width:100, height:100, superLayer:layerA
+			layerB.center()
+
+			assert.equal layerB.x, 50
+			assert.equal layerB.y, 50
+
+		it "should center with offset", ->
+			layerA = new Layer width:200, height:200
+			layerB = new Layer width:100, height:100, superLayer:layerA
+			layerB.centerX(50)
+			layerB.centerY(50)
+
+			assert.equal layerB.x, 100
+			assert.equal layerB.y, 100
+
+		it "should center return layer", ->
+			layerA = new Layer width:200, height:200
+			layerA.center().should.equal layerA
+			layerA.centerX().should.equal layerA
+			layerA.centerY().should.equal layerA
+
+		it "should center pixel align", ->
+			layerA = new Layer width:200, height:200
+			layerB = new Layer width:111, height:111, superLayer:layerA
+			layerB.center().pixelAlign()
+
+			assert.equal layerB.x, 44
+			assert.equal layerB.y, 44
+
+
 	describe "CSS", ->
 
 		it "classList should work", ->
