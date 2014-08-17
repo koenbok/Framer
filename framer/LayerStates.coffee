@@ -142,3 +142,8 @@ class exports.LayerStates extends BaseClass
 	last: (animationOptions) ->
 		# Return to last state
 		@switch _.last(@_previousStates), animationOptions
+
+	emit: (args...) ->
+		super
+		# Also emit this to the layer with self as argument
+		@layer.emit args...
