@@ -483,10 +483,7 @@ Utils.convertPoint = (input, layerA, layerB) ->
 
 	# Convert a point between two layer coordinate systems
 
-	point = {}
-
-	for k in ["x", "y", "width", "height"]
-		point[k] = input[k]
+	point = _.defaults(input, {x:0, y:0})
 
 	superLayersA = layerA?.superLayers() or []
 	superLayersB = layerB?.superLayers() or []
