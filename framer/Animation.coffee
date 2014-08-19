@@ -40,7 +40,7 @@ _runningAnimations = []
 # Todo: this would normally be BaseClass but the properties keyword
 # is not compatible and causes problems.
 class exports.Animation extends EventEmitter
-
+	@globalTimeScale: 1
 	@runningAnimations = ->
 		_runningAnimations
 
@@ -59,6 +59,8 @@ class exports.Animation extends EventEmitter
 			repeat: 0
 			delay: 0
 			debug: false
+
+		@options.time = @options.time * Animation.globalTimeScale
 
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
