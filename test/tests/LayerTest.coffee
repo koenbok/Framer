@@ -575,6 +575,25 @@ describe "Layer", ->
 			layer.maxY = 200
 			layer.y.should.equal 100
 
+		it "should get and set screenFrame", ->
+			layerA = new Layer x:100, y:100, width:100, height:100
+			layerB = new Layer x:300, y:300, width:100, height:100, superLayer:layerA
+
+			assert.equal layerB.screenFrame.x, 400
+			assert.equal layerB.screenFrame.y, 400
+
+			layerB.screenFrame = {x:1000, y:1000}
+
+			assert.equal layerB.screenFrame.x, 1000
+			assert.equal layerB.screenFrame.y, 1000
+
+			assert.equal layerB.x, 900
+			assert.equal layerB.y, 900
+
+			layerB.superLayer = null
+			assert.equal layerB.screenFrame.x, 900
+			assert.equal layerB.screenFrame.y, 900
+
 	describe "Center", ->
 
 		it "should center", ->

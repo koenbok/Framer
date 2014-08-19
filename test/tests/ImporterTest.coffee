@@ -13,17 +13,18 @@ describe "ExternalDocument", ->
 
 		for layerName, layer of layers
 			dataB[layerName] =
-				frame: layer.frame.properties
+				frame: layer.frame
 				superLayerName: layer.superLayer?.layerName
 				subLayerNames: layer.subLayers.map (l) -> l.name
 
 		jsonA = JSON.stringify dataA, null, "\t"
 		jsonB = JSON.stringify dataB, null, "\t"
 
-		# Uncomment this to see current dump
-		# console.log ""
-		# console.log "Name: #{name}"
-		# console.log jsonB
+		if jsonA != jsonB
+			# Uncomment this to see current dump
+			console.log ""
+			console.log "Name: #{name}"
+			console.log jsonB
 
 		assert.equal jsonA, jsonB
 

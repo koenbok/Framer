@@ -42,14 +42,6 @@ layerStyleProperty = (cssProperty) ->
 		@style[cssProperty] = value
 		@emit "change:#{cssProperty}", value
 
-frameProperty = (name) ->
-	exportable: false
-	get: -> @frame[name]
-	set: (value) ->
-		frame = @frame
-		frame[name] = value
-		@frame = frame
-
 class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
@@ -64,6 +56,9 @@ class exports.Layer extends BaseClass
 		@_createElement()
 		@_setDefaultCSS()
 
+		if options.hasOwnProperty "frame"
+			options = _.extend(options, options.frame)
+
 		options = Defaults.getDefaults "Layer", options
 
 		super options
@@ -74,13 +69,9 @@ class exports.Layer extends BaseClass
 		# We need to explicitly set the element id again, becuase it was made by the super
 		@_element.id = "FramerLayer-#{@id}"
 
-		# Extract the frame from the options, so we support minX, maxX etc.
-		if options.hasOwnProperty "frame"
-			frame = new Frame options.frame
-		else
-			frame = new Frame options
-
-		@frame = frame
+		for k in ["minX", "midX", "maxX", "minY", "midY", "maxY"]
+			if options.hasOwnProperty k
+				@[k] = options[k]
 
 		# Insert the layer into the dom or the superLayer element
 		if not options.superLayer
@@ -190,47 +181,65 @@ class exports.Layer extends BaseClass
 	# Geometry
 
 	@define "frame",
-		get: ->
-			new Frame @
+		get: -> _.pick(@, ["x", "y", "width", "height"])
 		set: (frame) ->
 			return if not frame
 			for k in ["x", "y", "width", "height"]
-				@[k] = frame[k]
+				if frame.hasOwnProperty(k)
+					@[k] = frame[k]
 
-	@define "minX", frameProperty "minX"
-	@define "midX", frameProperty "midX"
-	@define "maxX", frameProperty "maxX"
-	@define "minY", frameProperty "minY"
-	@define "midY", frameProperty "midY"
-	@define "maxY", frameProperty "maxY"
+	@define "minX",
+		get: -> @x
+		set: (value) -> @x = value
+
+	@define "midX",
+		get: -> Utils.frameGetMidX @
+		set: (value) -> Utils.frameSetMidX @, value
+
+	@define "maxX",
+		get: -> Utils.frameGetMaxX @
+		set: (value) -> Utils.frameSetMaxX @, value
+
+	@define "minY",
+		get: -> @y
+		set: (value) -> @y = value
+
+	@define "midY",
+		get: -> Utils.frameGetMidY @
+		set: (value) -> Utils.frameSetMidY @, value
+
+	@define "maxY",
+		get: -> Utils.frameGetMaxY @
+		set: (value) -> Utils.frameSetMaxY @, value
 
 	convertPoint: (point) ->
 		# Convert a point on screen to this views coordinate system
 		# TODO: needs tests
 		Utils.convertPoint point, null, @
 
-	screenFrame: ->
-		# Get this views absolute frame on the screen
-		# TODO: needs tests
-		Utils.convertPoint @frame, @, null
+	@define "screenFrame",
+		get: ->
+			Utils.convertPoint(@frame, @, null)
+		set: (frame) ->
+			if not @superLayer
+				@frame = frame
+			else
+				@frame = Utils.convertPoint(frame, null, @superLayer)
 
 	contentFrame: ->
-		Utils.frameMerge @subLayers.map (layer) -> layer.frame.properties
+		Utils.frameMerge(_.pluck(@subLayers, "frame"))
 
 	centerFrame: ->
 		# Get the centered frame for its superLayer
-		# We always make these pixel perfect
-		# TODO: needs tests
 		if @superLayer
 			frame = @frame
-			frame.midX = parseInt @superLayer.width / 2.0
-			frame.midY = parseInt @superLayer.height / 2.0
+			Utils.frameSetMidX(frame, parseInt(@superLayer.width  / 2.0))
+			Utils.frameSetMidY(frame, parseInt(@superLayer.height / 2.0))
 			return frame
-
 		else
 			frame = @frame
-			frame.midX = parseInt window.innerWidth / 2.0
-			frame.midY = parseInt window.innerHeight / 2.0
+			Utils.frameSetMidX(frame, parseInt(window.innerWidth  / 2.0))
+			Utils.frameSetMidY(frame, parseInt(window.innerHeight / 2.0))
 			return frame
 
 	center: ->
