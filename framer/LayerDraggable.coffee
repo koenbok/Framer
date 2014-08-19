@@ -116,8 +116,8 @@ class exports.LayerDraggable extends EventEmitter
 
 
 		# We use the requestAnimationFrame to update the position
-		@nextX = newX
-		@nextY = newY
+		@_nextX = newX
+		@_nextY = newY
 		window.requestAnimationFrame @_setLayerPositions
 
 		@_deltas.push correctedDelta
@@ -125,8 +125,8 @@ class exports.LayerDraggable extends EventEmitter
 		@emit Events.DragMove, event
 
 	_setLayerPositions: () =>
-		@layer.x = @nextX
-		@layer.y = @nextY
+		@layer.x = @_nextX
+		@layer.y = @_nextY
 
 	_touchStart: (event) =>
 
