@@ -8,7 +8,7 @@ _debugLayers = null
 createDebugLayer = (layer) ->
 
 	overLayer = new Layer
-		frame: layer.screenFrame()
+		frame: layer.screenFrame
 		backgroundColor: "rgba(50,150,200,.35)"
 
 	overLayer.style =

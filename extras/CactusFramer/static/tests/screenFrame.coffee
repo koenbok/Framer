@@ -23,7 +23,7 @@ highlightLayer = (event, layer) ->
 
 	event.stopPropagation()
 
-	screenFrame = layer.screenFrame()
+	screenFrame = layer.screenFrame
 	screenLayer = new Layer
 
 	screenLayer.animate
