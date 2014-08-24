@@ -1,12 +1,7 @@
 exports.enable = (module=window) ->
 
-	ClassWrapper = (Klass)->
-		CreateWrapper = (args...) ->
-			if @ is window
-				return new Klass args...
-			else
-				@prototype = new Klass args...
-		return CreateWrapper
+	ClassWrapper = (Klass) -> (args...) ->
+		@prototype = new Klass(args...)
 
 	module.Frame = ClassWrapper(Framer.Frame)
 	module.Layer = ClassWrapper(Framer.Layer)
