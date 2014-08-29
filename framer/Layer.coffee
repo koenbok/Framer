@@ -46,8 +46,6 @@ class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
 
-		Session._LayerList.push @
-
 		# Special power setting for 2d rendering path. Only enable this
 		# if you know what you are doing. See LayerStyle for more info.
 		@_prefer2d = false
@@ -62,6 +60,9 @@ class exports.Layer extends BaseClass
 		options = Defaults.getDefaults "Layer", options
 
 		super options
+
+		# Add this layer to the current context
+		@_context._layerList.push @
 
 		# Keep track of the default values
 		# @_defaultValues = options._defaultValues
@@ -312,18 +313,7 @@ class exports.Layer extends BaseClass
 		@_element = document.createElement "div"
 
 	_insertElement: ->
-		Utils.domComplete @__insertElement
-
-	__createRootElement: =>
-		element = document.createElement "div"
-		element.id = "FramerRoot"
-		_.extend element.style, Config.rootBaseCSS
-		document.body.appendChild element
-		element
-
-	__insertElement: =>
-		Session._RootElement ?= @__createRootElement()
-		Session._RootElement.appendChild @_element
+		@_context.getRootElement().appendChild @_element
 
 	destroy: ->
 
@@ -333,7 +323,9 @@ class exports.Layer extends BaseClass
 		@_element.parentNode?.removeChild @_element
 		@removeAllListeners()
 
-		Session._LayerList = _.without Session._LayerList, @
+		# Session._LayerList = _.without Session._LayerList, @
+
+		@_context._layerList = _.without @_context._layerList, @
 
 
 	##############################################################
@@ -490,7 +482,7 @@ class exports.Layer extends BaseClass
 
 			# If there is no superLayer we need to walk through the root
 			if @superLayer is null
-				return _.filter Session._LayerList, (layer) =>
+				return _.filter @_context._layerList, (layer) =>
 					layer isnt @ and layer.superLayer is null
 
 			return _.without @superLayer.subLayers, @
@@ -611,7 +603,7 @@ class exports.Layer extends BaseClass
 
 		# Listen to dom events on the element
 		super eventName, listener
-		@_element.addEventListener eventName, listener
+		@_context.eventManager.wrap(@_element).addEventListener(eventName, listener)
 
 		@_eventListeners ?= {}
 		@_eventListeners[eventName] ?= []
@@ -631,7 +623,7 @@ class exports.Layer extends BaseClass
 
 		super eventName, listener
 		
-		@_element.removeEventListener eventName, listener
+		@_context.eventManager.wrap(@_element).removeEventListener(eventName, listener)
 
 		if @_eventListeners
 			@_eventListeners[eventName] = _.without @_eventListeners[eventName], listener
@@ -647,4 +639,4 @@ class exports.Layer extends BaseClass
 	on: @::addListener
 	off: @::removeListener
 
-exports.Layer.Layers = -> _.clone Session._LayerList
+#exports.Layer.Layers = -> _.clone Session._LayerList

@@ -29,7 +29,11 @@ Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4An
 Framer.Importer = (require "./Importer").Importer
 Framer.Debug = (require "./Debug").Debug
 Framer.Session = (require "./Session").Session
+Framer.Context = (require "./Context").Context
 Framer.Extras = require "./Extras/Extras"
+
+Framer.CurrentContext = new Framer.Context
+
 
 window.Framer = Framer if window
 

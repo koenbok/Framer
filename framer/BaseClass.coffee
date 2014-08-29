@@ -79,6 +79,8 @@ class exports.BaseClass extends EventEmitter
 
 		super
 
+		@_context = Framer?.CurrentContext
+
 		# Create a holder for the property values
 		@[DefinedPropertiesValuesKey] = {}
 
