@@ -17,6 +17,7 @@ Framer.print = (require "./Print").print
 _.extend window, Framer if window
 
 # Framer level modules
+Framer.Context = (require "./Context").Context
 Framer.Config = (require "./Config").Config
 Framer.EventEmitter = (require "./EventEmitter").EventEmitter
 Framer.BaseClass = (require "./BaseClass").BaseClass
@@ -28,12 +29,10 @@ Framer.SpringDHOAnimator = (require "./Animators/SpringDHOAnimator").SpringDHOAn
 Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4Animator
 Framer.Importer = (require "./Importer").Importer
 Framer.Debug = (require "./Debug").Debug
-Framer.Session = (require "./Session").Session
-Framer.Context = (require "./Context").Context
 Framer.Extras = require "./Extras/Extras"
 
-Framer.CurrentContext = new Framer.Context
-
+Framer.DefaultContext = new Framer.Context
+Framer.CurrentContext = Framer.DefaultContext
 
 window.Framer = Framer if window
 

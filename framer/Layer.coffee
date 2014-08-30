@@ -4,7 +4,6 @@ Utils = require "./Utils"
 
 {Config} = require "./Config"
 {Defaults} = require "./Defaults"
-{Session} = require "./Session"
 {BaseClass} = require "./BaseClass"
 {EventEmitter} = require "./EventEmitter"
 {Animation} = require "./Animation"
@@ -12,9 +11,6 @@ Utils = require "./Utils"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
-
-Session._RootElement = null
-Session._LayerList = []
 
 layerProperty = (name, cssProperty, fallback, validator, set) ->
 	exportable: true
@@ -322,9 +318,7 @@ class exports.Layer extends BaseClass
 
 		@_element.parentNode?.removeChild @_element
 		@removeAllListeners()
-
-		# Session._LayerList = _.without Session._LayerList, @
-
+		
 		@_context._layerList = _.without @_context._layerList, @
 
 
@@ -639,4 +633,3 @@ class exports.Layer extends BaseClass
 	on: @::addListener
 	off: @::removeListener
 
-#exports.Layer.Layers = -> _.clone Session._LayerList

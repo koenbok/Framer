@@ -33,5 +33,8 @@ Events.touchEvent = (event) ->
 	touchEvent ?= event.changedTouches?[0]
 	touchEvent ?= event
 	touchEvent
+
+Events.wrap = (element) ->
+	Framer.CurrentContext.eventManager.wrap(element)
 	
 exports.Events = Events

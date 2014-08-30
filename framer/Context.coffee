@@ -8,17 +8,32 @@ Counter = 1
 
 class exports.Context
 	
-	constructor: (rootElement) ->
+	constructor: (options={}) ->
 
 		Counter++
 
-		@_rootElement = rootElement or @_createRootElement()
+		options = Utils.setDefaultProperties options,
+			contextName: null
+			rootElement: null
+
+		@_rootElement = options.rootElement or @_createRootElement()
 		@_layerList = []
+		@_delayTimers = []
+		@_delayIntervals = []
 
 		@eventManager = new EventManager
 
 	reset: ->
 		@eventManager.reset()
+
+		@_rootElement.innerHTML = ""
+
+		@_delayTimers.map (timer) -> window.clearTimer(timer)
+		@_delayIntervals.map (timer) -> window.clearInterval(timer)
+
+
+		# for layer in @_layerList
+		# 	layer.destroy()
 
 	getRootElement: ->
 		@_rootElement
@@ -34,3 +49,9 @@ class exports.Context
 		Utils.domComplete -> document.body.appendChild(element)
 		
 		element
+
+	run: (f) ->
+
+		Framer.CurrentContext = @
+		f()
+		Framer.CurrentContext = Framer.DefaultContext

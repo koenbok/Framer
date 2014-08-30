@@ -52,8 +52,6 @@ class exports.EventManager
 		
 		if not @_elements[element._eventManagerId]
 			@_elements[element._eventManagerId] = new EventManagerElement(element)
-		
-		console.log @_elements
 
 		@_elements[element._eventManagerId]
 	

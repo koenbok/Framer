@@ -1,40 +1,7 @@
 {_} = require "./Underscore"
-{Session} = require "./Session"
 {Screen} = require "./Screen"
 
 Utils = {}
-
-Utils.reset = ->
-
-	# There is no use calling this even before the dom is ready
-	if __domReady is false
-		return
-
-	# Reset all pending operations to the dom
-	__domComplete = []
-
-	# Reset the print console layer
-	Session.printLayer = null
-
-	# Remove all the listeners so we don't leak memory
-	if Session._LayerList
-		for layer in Session._LayerList
-			layer.removeAllListeners()
-
-	Session._LayerList = []
-	Session._RootElement?.innerHTML = ""
-
-	if Session._delayTimers
-		for delayTimer in Session._delayTimers
-			clearTimeout delayTimer
-		Session._delayTimers = []
-
-	if Session._delayIntervals
-		for delayInterval in Session._delayIntervals
-			clearInterval delayInterval
-		Session._delayIntervals = []
-
-
 
 Utils.getValue = (value) ->
 	return value() if _.isFunction value
@@ -101,14 +68,12 @@ Utils.getTime = -> Date.now() / 1000
 
 Utils.delay = (time, f) ->
 	timer = setTimeout f, time * 1000
-	Session._delayTimers ?= []
-	Session._delayTimers.push timer
+	Framer.CurrentContext._delayTimers.push timer
 	return timer
 	
 Utils.interval = (time, f) ->
 	timer = setInterval f, time * 1000
-	Session._delayIntervals ?= []
-	Session._delayIntervals.push timer
+	Framer.CurrentContext._delayIntervals.push timer
 	return timer
 
 Utils.debounce = (threshold=0.1, fn, immediate) ->
