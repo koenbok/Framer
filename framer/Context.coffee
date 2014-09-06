@@ -30,7 +30,7 @@ class exports.Context
 
 		@_rootElement.innerHTML = ""
 
-		@_delayTimers.map (timer) -> window.clearTimer(timer)
+		@_delayTimers.map (timer) -> window.clearTimeout(timer)
 		@_delayIntervals.map (timer) -> window.clearInterval(timer)
 
 
@@ -52,7 +52,8 @@ class exports.Context
 
 		parentElement = @_parentElement
 
-		Utils.domComplete -> Utils.delay 0, ->
+		# Utils.domComplete -> Utils.delay 0, ->
+		Utils.domComplete ->
 			parentElement ?= document.body
 			parentElement.appendChild(element)
 		

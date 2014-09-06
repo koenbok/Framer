@@ -28,6 +28,7 @@ Framer.BezierCurveAnimator = (require "./Animators/BezierCurveAnimator").BezierC
 Framer.SpringDHOAnimator = (require "./Animators/SpringDHOAnimator").SpringDHOAnimator
 Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4Animator
 Framer.Importer = (require "./Importer").Importer
+Framer.Device = (require "./Device").Device
 Framer.Debug = (require "./Debug").Debug
 Framer.Extras = require "./Extras/Extras"
 
@@ -46,3 +47,7 @@ Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
 Defaults = (require "./Defaults").Defaults
 Framer.resetDefaults = Defaults.reset
 Framer.resetDefaults()
+
+Framer.CurrentDevice = new Framer.Device()
+Framer.CurrentContext = Framer.CurrentDevice._context
+device = Framer.CurrentDevice

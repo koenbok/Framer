@@ -80,6 +80,9 @@ deploy:
 	make site:build
 	make site:upload
 
+resources:
+	cd extras/resources.framerjs.com; cactus deploy
+
 publish:
 	# Todo: update version
 	coffee -o lib/ -c framer/

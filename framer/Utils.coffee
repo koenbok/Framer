@@ -198,6 +198,9 @@ Utils.isLocal = ->
 Utils.isLocalUrl = (url) ->
 	url[0..6] == "file://"
 
+Utils.isFramerStudio = ->
+	navigator.userAgent.indexOf("FramerStudio") != -1
+
 Utils.devicePixelRatio = ->
 	window.devicePixelRatio
 

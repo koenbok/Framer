@@ -91,4 +91,4 @@ errorWarning = (event) ->
 
 	_errorWarningLayer = layer
 
-_errorContext.eventManager.wrap(window).addEventListener("error", errorWarning)
+# _errorContext.eventManager.wrap(window).addEventListener("error", errorWarning)
