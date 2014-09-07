@@ -99,6 +99,7 @@ class exports.LayerStates extends BaseClass
 			animationOptions ?= @animationOptions
 			animationOptions.properties = properties
 
+			@_animation?.stop()
 			@_animation = @layer.animate animationOptions
 			@_animation.on "stop", => 
 				@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
