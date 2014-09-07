@@ -34,7 +34,7 @@ AnimationLoop =
 		window.requestAnimationFrame AnimationLoop._tick
 
 	_stop: ->
-		console.log "AnimationLoop._stop"
+		# console.log "AnimationLoop._stop"
 		AnimationLoop._running = false
 
 	_tick: (timestamp) ->
@@ -84,9 +84,7 @@ AnimationLoop =
 			if animator.finished()
 				animator.emit "tick", 1 # This makes sure we and at a perfect value
 				animator.emit "end"
-				animator.emit "stop"
-
-				AnimationLoop._animators[index] = null
+				AnimationLoop.remove(animator)
 
 		# This means there were no animators anymore so we can safely exit
 		# and reset the animators array.

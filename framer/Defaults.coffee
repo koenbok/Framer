@@ -2,6 +2,8 @@
 
 Utils = require "./Utils"
 
+# You can set Framer Defaults before loading Framer (sort of enviroment variables) in window.FramerDefaults
+
 Originals = 
 	Layer:
 		backgroundColor: "rgba(0,124,255,.5)"
@@ -10,6 +12,16 @@ Originals =
 	Animation:
 		curve: "linear"
 		time: 1
+	Device:
+		padding: 50
+		deviceType: "iphone-5s-spacegray"
+		deviceZoom: "fit"
+		contentZoom: 1
+		orientation: "portrait"
+		keyboard: false
+		resourceUrl: "http://resources.framerjs.com/static/DeviceResources"
+		animationOptions:
+			curve: "spring(400,40,0)"
 
 exports.Defaults =
 
@@ -31,6 +43,16 @@ exports.Defaults =
 		# options._defaultValues = defaults
 		
 		options
+
+	setup: ->
+		# This should only be called once when Framer loads. It looks if there
+		# are already options defined and updates them with the originals.
+		if window.FramerDefaults
+			for className, classValues of window.FramerDefaults
+				for k, v of classValues
+					Originals[className][k] = v
+
+		exports.Defaults.reset()
 
 	reset: ->
 		window.Framer.Defaults = _.clone Originals

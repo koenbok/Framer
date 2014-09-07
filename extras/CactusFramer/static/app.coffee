@@ -1,33 +1,20 @@
-layer = new Layer width:500, height:500
-
-layer.x = 100
-layer.clip = false
 
 
-ctx = new Framer.Context parentElement:layer._element
+for i in [1..100]
+	layer = new Layer
+		x: Math.random() * Framer.CurrentDevice.content.width
+		y: Math.random() * Framer.CurrentDevice.content.height
 
-codeFunction = ->
+	# console.timeline("boo")
 
-	lastLayer = null
+	layer.animate
+		properties:
+			x: Math.random() * Framer.CurrentDevice.content.width
+			y: Math.random() * Framer.CurrentDevice.content.height
+		curve: "spring(40,10,0)"
+		delay: 1
 
-	for i in [1..100]
-		layer = new Layer x:i*10, y:i*10
-		layer.clip = false
-		layer.superLayer = lastLayer if lastLayer
-
-		lastLayer = layer
-
-
-	# console.timelineEnd("yo")
-		# console.log layer
-
-
-
-	# layer = new Layer backgroundColor:"red"
-
-	# layer.on Events.Click, ->
-	# 	ctx.reset()
+	# layer.on Events.AnimationEnd, ->
+	# 	console.timelineEnd("boo")
 
 
-
-ctx.run codeFunction

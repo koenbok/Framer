@@ -15,8 +15,14 @@ class exports.Context
 		options = Utils.setDefaultProperties options,
 			contextName: null
 			parentElement: null
+			name: null
+
+		if not options.name
+			throw Error("Contexts need a name")
 
 		@_parentElement = options.parentElement
+		@_name = options.name
+
 		@_rootElement = @_createRootElement()
 		
 		@_layerList = []
@@ -46,7 +52,7 @@ class exports.Context
 	_createRootElement: ->
 
 		element = document.createElement("div")
-		element.id = "FramerContextRoot-#{Counter}"
+		element.id = "FramerContextRoot-#{@_name}"
 		
 		_.extend element.style, Config.rootBaseCSS
 

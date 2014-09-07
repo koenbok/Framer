@@ -12,35 +12,45 @@ Utils = require "./Utils"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
 
-layerProperty = (name, cssProperty, fallback, validator, set) ->
-	exportable: true
-	default: fallback
-	get: ->
-		@_getPropertyValue name
-	set: (value) ->
+layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
 
-		# if not validator
-		# 	console.log "Missing validator for Layer.#{name}", validator
+	console.log "set_#{name}"
 
-		if validator?(value) is false
-			throw Error "value '#{value}' of type #{typeof value} is not valid for a Layer.#{name} property"
-
-		@_setPropertyValue name, value
+	obj::["set_#{name}"] = (value) ->
+		@_properties[name] = value
 		@style[cssProperty] = LayerStyle[cssProperty](@)
-		@emit "change:#{name}", value
-		set @, value if set
 
-layerStyleProperty = (cssProperty) ->
-	exportable: true
-	# default: fallback
-	get: -> @style[cssProperty]
-	set: (value) ->
+	result = 
+		exportable: true
+		default: fallback
+		get: -> @_properties[name]
+		set: (value) ->
+			
+			if validator?(value) is false
+				throw Error "value '#{value}' of type #{typeof value} is not valid for a Layer.#{name} property"
+
+			@["set_#{name}"](value)
+			@emit "change:#{name}", value
+			set?(@, value)
+
+layerStyleProperty = (obj, cssProperty) ->
+
+	obj::["set_#{cssProperty}"] = (value) ->
 		@style[cssProperty] = value
-		@emit "change:#{cssProperty}", value
+
+	result =
+		exportable: true
+		# default: fallback
+		get: -> @style[cssProperty]
+		set: (value) ->
+			@["set_#{cssProperty}"](value)
+			@emit "change:#{cssProperty}", value
 
 class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
+
+		@_properties = {}
 
 		# Special power setting for 2d rendering path. Only enable this
 		# if you know what you are doing. See LayerStyle for more info.
@@ -84,18 +94,18 @@ class exports.Layer extends BaseClass
 	# Properties
 
 	# Css properties
-	@define "width",  layerProperty "width",  "width", 100, _.isNumber
-	@define "height", layerProperty "height", "height", 100, _.isNumber
+	@define "width",  layerProperty @, "width",  "width", 100, _.isNumber
+	@define "height", layerProperty @, "height", "height", 100, _.isNumber
 
-	@define "visible", layerProperty "visible", "display", true, _.isBool
-	@define "opacity", layerProperty "opacity", "opacity", 1, _.isNumber
-	@define "index", layerProperty "index", "zIndex", 0, _.isNumber
-	@define "clip", layerProperty "clip", "overflow", true, _.isBool
+	@define "visible", layerProperty @, "visible", "display", true, _.isBool
+	@define "opacity", layerProperty @, "opacity", "opacity", 1, _.isNumber
+	@define "index", layerProperty @, "index", "zIndex", 0, _.isNumber
+	@define "clip", layerProperty @, "clip", "overflow", true, _.isBool
 	
-	@define "scrollHorizontal", layerProperty "scrollHorizontal", "overflowX", false, _.isBool, (layer, value) ->
+	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBool, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 	
-	@define "scrollVertical", layerProperty "scrollVertical", "overflowY", false, _.isBool, (layer, value) ->
+	@define "scrollVertical", layerProperty @, "scrollVertical", "overflowY", false, _.isBool, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 
 	@define "scroll",
@@ -103,61 +113,61 @@ class exports.Layer extends BaseClass
 		set: (value) -> @scrollHorizontal = @scrollVertical = true
 
 	# Behaviour properties
-	@define "ignoreEvents", layerProperty "ignoreEvents", "pointerEvents", true, _.isBool
+	@define "ignoreEvents", layerProperty @, "ignoreEvents", "pointerEvents", true, _.isBool
 
 	# Matrix properties
-	@define "x", layerProperty "x", "webkitTransform", 0, _.isNumber
-	@define "y", layerProperty "y", "webkitTransform", 0, _.isNumber
-	@define "z", layerProperty "z", "webkitTransform", 0, _.isNumber
+	@define "x", layerProperty @, "x", "webkitTransform", 0, _.isNumber
+	@define "y", layerProperty @, "y", "webkitTransform", 0, _.isNumber
+	@define "z", layerProperty @, "z", "webkitTransform", 0, _.isNumber
 
-	@define "scaleX", layerProperty "scaleX", "webkitTransform", 1, _.isNumber
-	@define "scaleY", layerProperty "scaleY", "webkitTransform", 1, _.isNumber
-	@define "scaleZ", layerProperty "scaleZ", "webkitTransform", 1, _.isNumber
-	@define "scale", layerProperty "scale", "webkitTransform", 1, _.isNumber
+	@define "scaleX", layerProperty @, "scaleX", "webkitTransform", 1, _.isNumber
+	@define "scaleY", layerProperty @, "scaleY", "webkitTransform", 1, _.isNumber
+	@define "scaleZ", layerProperty @, "scaleZ", "webkitTransform", 1, _.isNumber
+	@define "scale", layerProperty @, "scale", "webkitTransform", 1, _.isNumber
 
-	@define "skewX", layerProperty "skewX", "webkitTransform", 0, _.isNumber
-	@define "skewY", layerProperty "skewY", "webkitTransform", 0, _.isNumber
-	@define "skew", layerProperty "skew", "webkitTransform", 0, _.isNumber
+	@define "skewX", layerProperty @, "skewX", "webkitTransform", 0, _.isNumber
+	@define "skewY", layerProperty @, "skewY", "webkitTransform", 0, _.isNumber
+	@define "skew", layerProperty @, "skew", "webkitTransform", 0, _.isNumber
 
 	# @define "scale",
 	# 	get: -> (@scaleX + @scaleY + @scaleZ) / 3.0
 	# 	set: (value) -> @scaleX = @scaleY = @scaleZ = value
 
-	@define "originX", layerProperty "originX", "webkitTransformOrigin", 0.5, _.isNumber
-	@define "originY", layerProperty "originY", "webkitTransformOrigin", 0.5, _.isNumber
-	# @define "originZ", layerProperty "originZ", "webkitTransformOrigin", 0.5
+	@define "originX", layerProperty @, "originX", "webkitTransformOrigin", 0.5, _.isNumber
+	@define "originY", layerProperty @, "originY", "webkitTransformOrigin", 0.5, _.isNumber
+	# @define "originZ", layerProperty @, "originZ", "webkitTransformOrigin", 0.5
 
-	@define "rotationX", layerProperty "rotationX", "webkitTransform", 0, _.isNumber
-	@define "rotationY", layerProperty "rotationY", "webkitTransform", 0, _.isNumber
-	@define "rotationZ", layerProperty "rotationZ", "webkitTransform", 0, _.isNumber
-	@define "rotation",  layerProperty "rotationZ", "webkitTransform", 0, _.isNumber
+	@define "rotationX", layerProperty @, "rotationX", "webkitTransform", 0, _.isNumber
+	@define "rotationY", layerProperty @, "rotationY", "webkitTransform", 0, _.isNumber
+	@define "rotationZ", layerProperty @, "rotationZ", "webkitTransform", 0, _.isNumber
+	@define "rotation", layerProperty @, "rotation", "webkitTransform", 0, _.isNumber
 
 	# Filter properties
-	@define "blur", layerProperty "blur", "webkitFilter", 0, _.isNumber
-	@define "brightness", layerProperty "brightness", "webkitFilter", 100, _.isNumber
-	@define "saturate", layerProperty "saturate", "webkitFilter", 100, _.isNumber
-	@define "hueRotate", layerProperty "hueRotate", "webkitFilter", 0, _.isNumber
-	@define "contrast", layerProperty "contrast", "webkitFilter", 100, _.isNumber
-	@define "invert", layerProperty "invert", "webkitFilter", 0, _.isNumber
-	@define "grayscale", layerProperty "grayscale", "webkitFilter", 0, _.isNumber
-	@define "sepia", layerProperty "sepia", "webkitFilter", 0, _.isNumber
+	@define "blur", layerProperty @, "blur", "webkitFilter", 0, _.isNumber
+	@define "brightness", layerProperty @, "brightness", "webkitFilter", 100, _.isNumber
+	@define "saturate", layerProperty @, "saturate", "webkitFilter", 100, _.isNumber
+	@define "hueRotate", layerProperty @, "hueRotate", "webkitFilter", 0, _.isNumber
+	@define "contrast", layerProperty @, "contrast", "webkitFilter", 100, _.isNumber
+	@define "invert", layerProperty @, "invert", "webkitFilter", 0, _.isNumber
+	@define "grayscale", layerProperty @, "grayscale", "webkitFilter", 0, _.isNumber
+	@define "sepia", layerProperty @, "sepia", "webkitFilter", 0, _.isNumber
 
 	# Shadow properties
-	@define "shadowX", layerProperty "shadowX", "boxShadow", 0, _.isNumber
-	@define "shadowY", layerProperty "shadowY", "boxShadow", 0, _.isNumber
-	@define "shadowBlur", layerProperty "shadowBlur", "boxShadow", 0, _.isNumber
-	@define "shadowSpread", layerProperty "shadowSpread", "boxShadow", 0, _.isNumber
-	@define "shadowColor", layerProperty "shadowColor", "boxShadow", ""
+	@define "shadowX", layerProperty @, "shadowX", "boxShadow", 0, _.isNumber
+	@define "shadowY", layerProperty @, "shadowY", "boxShadow", 0, _.isNumber
+	@define "shadowBlur", layerProperty @, "shadowBlur", "boxShadow", 0, _.isNumber
+	@define "shadowSpread", layerProperty @, "shadowSpread", "boxShadow", 0, _.isNumber
+	@define "shadowColor", layerProperty @, "shadowColor", "boxShadow", ""
 
 	# Mapped style properties
 
-	@define "backgroundColor", layerStyleProperty "backgroundColor"
-	@define "color", layerStyleProperty "color"
+	@define "backgroundColor", layerStyleProperty @, "backgroundColor"
+	@define "color", layerStyleProperty @, "color"
 
 	# Border properties
-	@define "borderRadius", layerStyleProperty "borderRadius"
-	@define "borderColor", layerStyleProperty "borderColor"
-	@define "borderWidth", layerStyleProperty "borderWidth"
+	@define "borderRadius", layerStyleProperty @, "borderRadius"
+	@define "borderColor", layerStyleProperty @, "borderColor"
+	@define "borderWidth", layerStyleProperty @, "borderWidth"
 
 
 	##############################################################

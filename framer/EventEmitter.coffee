@@ -11,14 +11,25 @@ class exports.EventEmitter
 		if not event
 			console.warn "#{@constructor.name}.#{method} missing event (like 'click')"
 
-	emit: (event, arg1, arg2, arg3, arg4) ->
+	# emit: (event, arg1, arg2, arg3, arg4) ->
+		
+	# 	# We skip it here because we need all the perf we can get
+	# 	# @_eventCheck event, "emit"
+
+	# 	if @[EventEmitterEventsKey] and @[EventEmitterEventsKey].hasOwnProperty(event)
+	# 		for listener in @[EventEmitterEventsKey][event]
+	# 			listener(arg1, arg2, arg3, arg4)
+
+	# 	return 0
+
+	emit: (event, args...) ->
 		
 		# We skip it here because we need all the perf we can get
 		# @_eventCheck event, "emit"
 
 		if @[EventEmitterEventsKey] and @[EventEmitterEventsKey].hasOwnProperty(event)
 			for listener in @[EventEmitterEventsKey][event]
-				listener(arg1, arg2, arg3, arg4)
+				listener(args...)
 
 		return 0
 

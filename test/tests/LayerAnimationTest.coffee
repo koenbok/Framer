@@ -216,7 +216,8 @@ describe "LayerAnimation", ->
 
 			readyLayers = []
 
-			ready = (animation, layer)->
+			ready = (animation, layer) ->
+				
 				(layer in readyLayers).should.equal false
 
 				readyLayers.push layer

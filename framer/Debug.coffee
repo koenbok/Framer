@@ -5,9 +5,12 @@ Utils = require "./Utils"
 ###############################################################
 # Debug overview
 
-_debugContext = new Context
+_debugContext = null
 
 createDebugLayer = (layer) ->
+
+	if not _debugContext
+		_debugContext = new Context(name:"Debug")
 
 	overLayer = new Layer
 		frame: layer.screenFrame
@@ -51,10 +54,13 @@ window.document.onkeyup = (event) ->
 ###############################################################
 # Error warning
 
-_errorContext = new Context
+_errorContext = null
 _errorShown = false
 
 errorWarning = (event) ->
+
+	if not _errorContext
+		_errorContext = new Context(name:"Error")
 
 	print event.message
 

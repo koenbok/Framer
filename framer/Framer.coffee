@@ -32,7 +32,7 @@ Framer.Device = (require "./Device").Device
 Framer.Debug = (require "./Debug").Debug
 Framer.Extras = require "./Extras/Extras"
 
-Framer.DefaultContext = new Framer.Context
+Framer.DefaultContext = new Framer.Context(name:"Default")
 Framer.CurrentContext = Framer.DefaultContext
 
 window.Framer = Framer if window
@@ -45,9 +45,8 @@ Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
 
 # Set the defaults
 Defaults = (require "./Defaults").Defaults
+Defaults.setup()
 Framer.resetDefaults = Defaults.reset
-Framer.resetDefaults()
 
 Framer.CurrentDevice = new Framer.Device()
-Framer.CurrentContext = Framer.CurrentDevice._context
-device = Framer.CurrentDevice
+Framer.CurrentDevice._setupContext()

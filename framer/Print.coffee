@@ -10,10 +10,13 @@ Todo:
 
 """
 
-printContext = new Context
+printContext = null
 printLayer = null
 
 exports.print = (args...) ->
+
+	if not printContext
+		printContext = new Context(name:"Print")
 
 	printContext.run ->
 
