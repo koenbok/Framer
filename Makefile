@@ -13,13 +13,16 @@ build:
 	# $(coffee) scripts/banner.coffee > build/framer.debug.js
 	$(browserify) framer/Framer.coffee >> build/framer.debug.js
 	cat build/framer.debug.js | $(bin)/exorcist build/framer.js.map > build/framer.js
-	$(bin)/uglifyjs \
-		--in-source-map build/framer.js.map \
-		--source-map build/framer.min.js.map build/framer.js \
-	> build/framer.min.js
+	# Build the minimized version
+	cd build; ../$(bin)/uglifyjs \
+		--source-map-include-sources \
+		--in-source-map framer.js.map \
+		--source-map framer.min.js.map \
+		framer.js > framer.min.js
+	$(coffee) scripts/fix-sourcemap.coffee
 	# Copy the file over to the cactus project
-	cp build/framer.js extras/CactusFramer/static/framer.js
-	cp build/framer.js.map extras/CactusFramer/static/framer.js.map
+	cp build/framer.min.js extras/CactusFramer/static/framer.min.js
+	cp build/framer.min.js.map extras/CactusFramer/static/framer.min.js.map
 buildw:
 	$(watch) make build
 
