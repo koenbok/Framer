@@ -117,12 +117,12 @@ Utils.randomNumber = (a=0, b=1) ->
 
 Utils.labelLayer = (layer, text, style={}) ->
 	
-	style = _.extend
+	style = _.extend({
 		font: "10px/1em Menlo"
 		lineHeight: "#{layer.height}px"
 		textAlign: "center"
 		color: "#fff"
-	, style
+	}, style)
 
 	layer.style = style
 	layer.html = text
@@ -185,12 +185,11 @@ Utils.isTouch = ->
 	window.ontouchstart is null
 
 Utils.isMobile = ->
-	(/iphone|ipod|ipad|android|ie|blackberry|fennec/).test \
-		navigator.userAgent.toLowerCase()
+	(/iphone|ipod|ipad|android|ie|blackberry|fennec/).test(
+		navigator.userAgent.toLowerCase())
 
 Utils.isChrome = ->
-	(/chrome/).test \
-		navigator.userAgent.toLowerCase()
+	(/chrome/).test(navigator.userAgent.toLowerCase())
 
 Utils.isLocal = ->
 	Utils.isLocalUrl window.location.href
