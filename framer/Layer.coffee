@@ -14,7 +14,7 @@ Utils = require "./Utils"
 
 layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
 
-	console.log "set_#{name}"
+	# console.log "set_#{name}"
 
 	obj::["set_#{name}"] = (value) ->
 		@_properties[name] = value
@@ -595,6 +595,8 @@ class exports.Layer extends BaseClass
 	## EVENTS
 
 	addListener: (eventName, originalListener) =>
+
+		console.log "addListener", eventName
 
 		# # Modify the scope to be the calling object, just like jquery
 		# # also add the object as the last argument

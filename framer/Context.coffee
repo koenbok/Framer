@@ -23,25 +23,22 @@ class exports.Context
 		@_parentElement = options.parentElement
 		@_name = options.name
 
-		@_rootElement = @_createRootElement()
-		
-		@_layerList = []
-		@_delayTimers = []
-		@_delayIntervals = []
-
-		@eventManager = new EventManager
+		@reset()
 
 	reset: ->
-		@eventManager.reset()
 
-		@_rootElement.innerHTML = ""
+		@eventManager?.reset()
+		@eventManager = new EventManager
 
-		@_delayTimers.map (timer) -> window.clearTimeout(timer)
-		@_delayIntervals.map (timer) -> window.clearInterval(timer)
+		@_rootElement?.parentNode.removeChild(@_rootElement)
+		@_rootElement = @_createRootElement()
 
+		@_delayTimers?.map (timer) -> window.clearTimeout(timer)
+		@_delayIntervals?.map (timer) -> window.clearInterval(timer)
 
-		# for layer in @_layerList
-		# 	layer.destroy()
+		@_layerList = []
+		@_delayTimers = []
+		@_delayIntervals = []	
 
 	getRootElement: ->
 		@_rootElement

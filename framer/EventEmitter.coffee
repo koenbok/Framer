@@ -35,8 +35,6 @@ class exports.EventEmitter
 
 	addListener: (event, listener) ->
 		
-		@_eventCheck event, "addListener"
-		
 		@[EventEmitterEventsKey] ?= {}
 		@[EventEmitterEventsKey][event] ?= []
 		@[EventEmitterEventsKey][event].push listener
