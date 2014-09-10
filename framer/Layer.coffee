@@ -391,6 +391,10 @@ class exports.Layer extends BaseClass
 			# Set the property value
 			@_setPropertyValue "image", value
 
+			if value in [null, ""]
+				@style["background-image"] = null
+				return
+
 			imageUrl = value
 
 			# Optional base image value
@@ -595,8 +599,6 @@ class exports.Layer extends BaseClass
 	## EVENTS
 
 	addListener: (eventName, originalListener) =>
-
-		console.log "addListener", eventName
 
 		# # Modify the scope to be the calling object, just like jquery
 		# # also add the object as the last argument
