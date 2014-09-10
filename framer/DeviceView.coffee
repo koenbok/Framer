@@ -72,7 +72,8 @@ class exports.DeviceView extends BaseClass
 		
 		@background = new Layer
 		@background.clip = true
-		@background.backgroundColor = "white"
+		@background.backgroundColor = "transparent"
+		@background.classList.add("DeviceBackground")		
 
 		@phone = new Layer superLayer:@background
 		#@phone = new Layer
@@ -80,7 +81,8 @@ class exports.DeviceView extends BaseClass
 		@viewport = new Layer superLayer:@screen
 		@content  = new Layer superLayer:@viewport
 
-		@screen.backgroundColor = "white"
+		@screen.classList.add("DeviceScreen")
+		@screen.backgroundColor = "transparent"
 		@viewport.backgroundColor = "white"
 		@content.backgroundColor = "white"
 
@@ -92,25 +94,47 @@ class exports.DeviceView extends BaseClass
 		
 		Screen.on "resize", @_update
 		
-		
 	_update: =>
 		
 		# Todo: pixel align at zoom level 1, 0.5
 
-		@background.width  = Screen.width
-		@background.height = Screen.height
+		if @_shouldRenderFullScreen()
+			for layer in [@background, @phone, @viewport, @content, @screen]
+				layer.x = layer.y = 0
+				layer.scale = 1
+				layer.width = window.innerWidth
+				layer.height = window.innerHeight
 
-		@phone.scale = @_calculatePhoneScale()
-		@phone.center()
+		else
 
-		[width, height] = @_getOrientationDimensions(@_device.screenWidth, @_device.screenHeight)
+			@background.width  = Screen.width
+			@background.height = Screen.height
 
-		@screen.width  = @_device.screenWidth
-		@screen.height = @_device.screenHeight
+			@phone.scale = @_calculatePhoneScale()
+			@phone.center()
 
-		@viewport.width  = @content.width  = width
-		@viewport.height = @content.height = height
-		@screen.center()
+			[width, height] = @_getOrientationDimensions(@_device.screenWidth, @_device.screenHeight)
+
+			@screen.width  = @_device.screenWidth
+			@screen.height = @_device.screenHeight
+
+			@viewport.width  = @content.width  = width
+			@viewport.height = @content.height = height
+			@screen.center()
+
+	_shouldRenderFullScreen: ->
+		
+		if not @_device
+			return true
+		
+		if @fullScreen
+			return true
+		
+		if @deviceType is "fullscreen"
+			return true
+
+		return false
+
 
 	_setupContext: ->
 		# Sets this device up as the default context
@@ -119,6 +143,38 @@ class exports.DeviceView extends BaseClass
 		
 	_deviceImageUrl: (name) ->
 		return "#{@resourceUrl}/#{name}" 
+
+	###########################################################################
+	# FULLSCREEN
+
+	@define "fullScreen",
+		get: ->
+			@_fullScreen
+		set: (fullScreen) ->
+			@_setFullScreen(fullScreen)
+
+	_setFullScreen: (fullScreen) ->
+
+		if @_deviceType is "fullscreen"
+			fullScreen = true
+
+		if not _.isBool(fullScreen)
+			return
+
+		if fullScreen is @_fullScreen
+			return
+
+		@_fullScreen = fullScreen
+
+		if fullScreen is true
+			@phone.image = ""
+		else
+			@_updateDeviceImage()
+
+		@_update()
+		@emit("change:fullScreen")
+
+
 
 	###########################################################################
 	# DEVICE TYPE
@@ -144,22 +200,17 @@ class exports.DeviceView extends BaseClass
 
 			@_device = device
 			@_deviceType = deviceType
-			
-			imageUrl = @_deviceImageUrl(device.deviceImage)
-
-			updateDevice = =>
-				@phone.image = imageUrl
-				@phone.width  = @_device.deviceImageWidth
-				@phone.height = @_device.deviceImageHeight
-
-			# This avoids a flickr with switching between devices
-			# Utils.loadImage(imageUrl, updateDevice, Framer.DefaultContext)
-
-			updateDevice()
-	
+			@_updateDeviceImage()	
 			@_update()
 			@_renderKeyboard()
 			@emit("change:deviceType")
+
+	_updateDeviceImage: =>
+		return unless @_device
+		return if @deviceType is "fullscreen"
+		@phone.image  = @_deviceImageUrl(@_device.deviceImage)
+		@phone.width  = @_device.deviceImageWidth
+		@phone.height = @_device.deviceImageHeight
 
 
 	###########################################################################
@@ -433,8 +484,8 @@ iPadAirBaseDevice =
 	# keyboardHeight: 0
 
 AppleWatchDevice =
-	deviceImageWidth: 831 * 0.88
-	deviceImageHeight: 986 * 0.88
+	deviceImageWidth: 500
+	deviceImageHeight: 820
 	screenWidth: 320
 	screenHeight: 320
 	# keyboardImage: "ios-keyboard.png"
@@ -443,6 +494,9 @@ AppleWatchDevice =
 
 
 Devices =
+
+	"fullscreen":
+		name: "Fullscreen"
 
 	# iPhone 5S
 	"iphone-5s-spacegray": _.extend {}, iPhone5BaseDevice,
@@ -481,9 +535,16 @@ Devices =
 		deviceImage: "ipad-mini-spacegray.png"
 
 	# Apple Watch
-	"apple-watch": _.extend {}, AppleWatchDevice,
+	"apple-watch-primary": _.extend {}, AppleWatchDevice,
 		name: "Apple Watch"
-		deviceImage: "apple-watch.png"
+		deviceImage: "apple-watch-primary.png"
+	"apple-watch-sport": _.extend {}, AppleWatchDevice,
+		name: "Apple Watch Sport"
+		deviceImage: "apple-watch-sport.png"
+	"apple-watch-edition": _.extend {}, AppleWatchDevice,
+		name: "Apple Watch Edition"
+		deviceImage: "apple-watch-edition.png"
+
 
 
 

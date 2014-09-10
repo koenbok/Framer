@@ -13,6 +13,7 @@ Originals =
 		curve: "linear"
 		time: 1
 	DeviceView:
+		fullScreen: false
 		padding: 50
 		deviceType: "iphone-5s-spacegray"
 		deviceZoom: "fit"
