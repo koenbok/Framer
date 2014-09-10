@@ -24,8 +24,8 @@ Device.orientationName landscape|portrait|unknown
 Device.rotateLeft()
 Device.rotateRight()
 
-Device.setDeviceZoom(zoom:float, animate:bool)
-Device.setContentZoom(zoom:float, animate:bool)
+Device.setDeviceScale(zoom:float, animate:bool)
+Device.setContentScale(zoom:float, animate:bool)
 
 Device.keyboard bool
 Device.setKeyboard(visible:bool, animate:bool)
@@ -45,8 +45,8 @@ Events.DeviceKeyboardDidShow
 
 # _.extend Events,
 # 	DeviceTypeDidChange: "change:deviceType"
-# 	DeviceZoomDidChange: "change:deviceZoom"
-# 	DeviceContentZoomDidChange: "change:contentZoom"
+# 	DeviceScaleDidChange: "change:deviceScale"
+# 	DeviceContentScaleDidChange: "change:contentScale"
 # 	DeviceFullScreenDidChange: ""
 
 class exports.DeviceView extends BaseClass
@@ -165,26 +165,26 @@ class exports.DeviceView extends BaseClass
 	###########################################################################
 	# DEVICE ZOOM
 	
-	@define "deviceZoom",
-		get: -> @_deviceZoom
-		set: (deviceZoom) -> @setDeviceZoom(deviceZoom, false)
+	@define "deviceScale",
+		get: -> @_deviceScale
+		set: (deviceScale) -> @setDeviceScale(deviceScale, false)
 	
-	setDeviceZoom: (deviceZoom, animate=false) ->
+	setDeviceScale: (deviceScale, animate=false) ->
 		
-		if deviceZoom == "fit" or deviceZoom < 0
-			deviceZoom = "fit"
+		if deviceScale == "fit" or deviceScale < 0
+			deviceScale = "fit"
 		else
-			deviceZoom = parseFloat(deviceZoom)
+			deviceScale = parseFloat(deviceScale)
 			
-		if deviceZoom == @_deviceZoom
+		if deviceScale == @_deviceScale
 			return
 
-		@_deviceZoom = deviceZoom
+		@_deviceScale = deviceScale
 		
-		if deviceZoom == "fit"
+		if deviceScale == "fit"
 			phoneScale = @_calculatePhoneScale()
 		else
-			phoneScale = deviceZoom
+			phoneScale = deviceScale
 			
 		@phone.animateStop()
 
@@ -195,15 +195,15 @@ class exports.DeviceView extends BaseClass
 			@phone.scale = phoneScale
 			@phone.center()
 
-		@emit("change:deviceZoom")
+		@emit("change:deviceScale")
 			
 
 	_calculatePhoneScale: ->
 		
 		# Calculates a phone scale that fits the screen unless a fixed value is set
 		
-		if @_deviceZoom and @_deviceZoom isnt "fit"
-			return @_deviceZoom
+		if @_deviceScale and @_deviceScale isnt "fit"
+			return @_deviceScale
 
 		[width, height] = @_getOrientationDimensions(@phone.width, @phone.height)
 
@@ -217,26 +217,26 @@ class exports.DeviceView extends BaseClass
 	###########################################################################
 	# CONTENT ZOOM
 
-	@define "contentZoom",
-		get: -> @_contentZoom
-		set: (contentZoom) -> @setContentZoom(contentZoom, false)
+	@define "contentScale",
+		get: -> @_contentScale
+		set: (contentScale) -> @setContentScale(contentScale, false)
 	
-	setContentZoom: (contentZoom, animate=false) ->
+	setContentScale: (contentScale, animate=false) ->
 		
-		contentZoom = parseFloat(contentZoom)
+		contentScale = parseFloat(contentScale)
 	
-		if contentZoom is @_contentZoom
+		if contentScale is @_contentScale
 			return
 		
-		@_contentZoom = contentZoom
+		@_contentScale = contentScale
 		
 		if animate
 			@content.animate _.extend @animationOptions,
-				properties: {scale: @_contentZoom}
+				properties: {scale: @_contentScale}
 		else
-			@content.scale = @_contentZoom
+			@content.scale = @_contentScale
 
-		@emit("change:contentZoom")
+		@emit("change:contentScale")
 
 
 	###########################################################################
@@ -378,6 +378,9 @@ class exports.DeviceView extends BaseClass
 		@setKeyboard(!@keyboard, animate)
 
 	_renderKeyboard: ->
+
+		return unless @_device.keyboards
+
 		@keyboardLayer.image  = @_deviceImageUrl @_device.keyboards[@orientationName].image
 		@keyboardLayer.width  = @_device.keyboards[@orientationName].width
 		@keyboardLayer.height = @_device.keyboards[@orientationName].height
@@ -430,10 +433,10 @@ iPadAirBaseDevice =
 	# keyboardHeight: 0
 
 AppleWatchDevice =
-	deviceImageWidth: 831
-	deviceImageHeight: 986
-	screenWidth: 360
-	screenHeight: 426
+	deviceImageWidth: 831 * 0.88
+	deviceImageHeight: 986 * 0.88
+	screenWidth: 320
+	screenHeight: 320
 	# keyboardImage: "ios-keyboard.png"
 	# keyboardWidth: 0
 	# keyboardHeight: 0
