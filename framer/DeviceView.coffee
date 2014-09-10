@@ -7,6 +7,7 @@ DeviceViewDefaultDevice = "iphone-5s-spacegray"
 {BaseClass} = require "./BaseClass"
 {Layer} = require "./Layer"
 {Defaults} = require "./Defaults"
+{Events} = require "./Events"
 
 ###
 
@@ -42,12 +43,17 @@ Events.DeviceKeyboardDidShow
 
 ###
 
+# _.extend Events,
+# 	DeviceTypeDidChange: "change:deviceType"
+# 	DeviceZoomDidChange: "change:deviceZoom"
+# 	DeviceContentZoomDidChange: "change:contentZoom"
+# 	DeviceFullScreenDidChange: ""
 
-class exports.Device extends BaseClass
+class exports.DeviceView extends BaseClass
 
 	constructor: (options={}) ->
 
-		defaults = Defaults.getDefaults("Device", options)
+		defaults = Defaults.getDefaults("DeviceView", options)
 		
 		@_setup()
 		
@@ -125,20 +131,35 @@ class exports.Device extends BaseClass
 			if deviceType is @_deviceType
 				return
 			
+			device = null
+
 			if _.isString(deviceType)
 				device = Devices[deviceType.toLowerCase()]
 			
 			if not device
 				throw Error "No device named #{deviceType}. Options are: #{_.keys Devices}"
 			
+			if @_device is device
+				return
+
 			@_device = device
-	
-			@phone.image  = @_deviceImageUrl(device.deviceImage)
-			@phone.width  = @_device.deviceImageWidth
-			@phone.height = @_device.deviceImageHeight
+			@_deviceType = deviceType
+			
+			imageUrl = @_deviceImageUrl(device.deviceImage)
+
+			updateDevice = =>
+				@phone.image = imageUrl
+				@phone.width  = @_device.deviceImageWidth
+				@phone.height = @_device.deviceImageHeight
+
+			# This avoids a flickr with switching between devices
+			# Utils.loadImage(imageUrl, updateDevice, Framer.DefaultContext)
+
+			updateDevice()
 	
 			@_update()
 			@_renderKeyboard()
+			@emit("change:deviceType")
 
 
 	###########################################################################
@@ -173,6 +194,8 @@ class exports.Device extends BaseClass
 		else
 			@phone.scale = phoneScale
 			@phone.center()
+
+		@emit("change:deviceZoom")
 			
 
 	_calculatePhoneScale: ->
@@ -212,6 +235,8 @@ class exports.Device extends BaseClass
 				properties: {scale: @_contentZoom}
 		else
 			@content.scale = @_contentZoom
+
+		@emit("change:contentZoom")
 
 
 	###########################################################################
@@ -279,6 +304,8 @@ class exports.Device extends BaseClass
 				@showKeyboard(true)
 			
 		@_renderKeyboard()
+
+		@emit("change:orientation")
 	
 	isPortrait: -> Math.abs(@_orientation) != 90
 	isLandscape: -> !@isPortrait()
@@ -310,6 +337,10 @@ class exports.Device extends BaseClass
 
 	setKeyboard: (keyboard, animate=false) ->
 		
+		# Check if this device has a keyboard at all
+		if not @_device.hasOwnProperty("keyboards")
+			return
+
 		if _.isString(keyboard)
 			if keyboard.toLowerCase() in ["1", "true"]
 				keyboard = true
@@ -321,18 +352,21 @@ class exports.Device extends BaseClass
 		if not _.isBool(keyboard)
 			return
 		
-		# print keyboard is @_keyboard, keyboard, @_keyboard
-		
 		if keyboard is @_keyboard
 			return
 		
 		@_keyboard = keyboard
-		
-		if keyboard is true
-			@_animateKeyboard(@viewport.height - @keyboardLayer.height, animate)
-		else
-			@_animateKeyboard(@viewport.height, animate)
 
+		@emit("change:keyboard")
+
+		if keyboard is true
+			@emit("keyboard:show:start")
+			@_animateKeyboard @viewport.height - @keyboardLayer.height, animate, =>
+				@emit("keyboard:show:end")
+		else
+			@emit("keyboard:hide:start")
+			@_animateKeyboard @viewport.height, animate, =>
+				@emit("keyboard:hide:end")
 		
 	showKeyboard: (animate=true) ->
 		@setKeyboard(true, animate)
@@ -348,13 +382,15 @@ class exports.Device extends BaseClass
 		@keyboardLayer.width  = @_device.keyboards[@orientationName].width
 		@keyboardLayer.height = @_device.keyboards[@orientationName].height
 
-	_animateKeyboard: (y, animate) =>
+	_animateKeyboard: (y, animate, callback) =>
 		@keyboardLayer.bringToFront()
 		if animate is false
 			@keyboardLayer.y = y
+			callback()
 		else
-			@keyboardLayer.animate _.extend @animationOptions, 
+			animation = @keyboardLayer.animate _.extend @animationOptions, 
 				properties: {y:y}
+			animation.on Events.AnimationEnd, callback
 
 
 ###########################################################################
@@ -380,18 +416,27 @@ iPadMiniBaseDevice =
 	deviceImageHeight: 1328
 	screenWidth: 768
 	screenHeight: 1024
-	keyboardImage: "ios-keyboard.png"
-	keyboardWidth: 768
-	keyboardHeight: 432
+	# keyboardImage: "ios-keyboard.png"
+	# keyboardWidth: 768
+	# keyboardHeight: 432
 
 iPadAirBaseDevice =
 	deviceImageWidth: 1856
 	deviceImageHeight: 2584
 	screenWidth: 1536
 	screenHeight: 2048
-	keyboardImage: "ios-keyboard.png"
-	keyboardWidth: 0
-	keyboardHeight: 0
+	# keyboardImage: "ios-keyboard.png"
+	# keyboardWidth: 0
+	# keyboardHeight: 0
+
+AppleWatchDevice =
+	deviceImageWidth: 831
+	deviceImageHeight: 986
+	screenWidth: 360
+	screenHeight: 426
+	# keyboardImage: "ios-keyboard.png"
+	# keyboardWidth: 0
+	# keyboardHeight: 0
 
 
 Devices =
@@ -400,27 +445,27 @@ Devices =
 	"iphone-5s-spacegray": _.extend {}, iPhone5BaseDevice,
 		name: "iPhone 5S Space Gray"
 		deviceImage: "iphone-5S-spacegray.png"
-	"iphone-5s–silver": _.extend {}, iPhone5BaseDevice,
+	"iphone-5s-silver": _.extend {}, iPhone5BaseDevice,
 		name: "iPhone 5S Silver"
-		deviceImage: "iphone-5S–silver.png"
-	"iphone-5s–gold": _.extend {}, iPhone5BaseDevice,
+		deviceImage: "iphone-5S-silver.png"
+	"iphone-5s-gold": _.extend {}, iPhone5BaseDevice,
 		name: "iPhone 5S Gold"
-		deviceImage: "iphone-5S–gold.png"
+		deviceImage: "iphone-5S-gold.png"
 
 	# iPhone 5C
-	"iphone-5c–green": _.extend {}, iPhone5BaseDevice,
+	"iphone-5c-green": _.extend {}, iPhone5BaseDevice,
 		name: "iPhone 5S Green"
-		deviceImage: "iphone-5C–green.png"
-	"iphone-5c–blue": _.extend {}, iPhone5BaseDevice,
+		deviceImage: "iphone-5C-green.png"
+	"iphone-5c-blue": _.extend {}, iPhone5BaseDevice,
 		name: "iPhone 5S Blue"
-		deviceImage: "iphone-5C–blue.png"
-	"iphone-5c–yellow": _.extend {}, iPhone5BaseDevice,
+		deviceImage: "iphone-5C-blue.png"
+	"iphone-5c-yellow": _.extend {}, iPhone5BaseDevice,
 		name: "iPhone 5S Yellow"
-		deviceImage: "iphone-5C–yellow.png"
-	"iphone-5c–pink": _.extend {}, iPhone5BaseDevice,
+		deviceImage: "iphone-5C-yellow.png"
+	"iphone-5c-pink": _.extend {}, iPhone5BaseDevice,
 		name: "iPhone 5C Pink"
 		deviceImage: "iphone-5C-pink.png"
-	"iphone-5c–white": _.extend {}, iPhone5BaseDevice,
+	"iphone-5c-white": _.extend {}, iPhone5BaseDevice,
 		name: "iPhone 5C White"
 		deviceImage: "iphone-5C-white.png"
 
@@ -431,6 +476,11 @@ Devices =
 	"ipad-mini-spacegray": _.extend {}, iPadMiniBaseDevice,
 		name: "iPad Mini Space Gray"
 		deviceImage: "ipad-mini-spacegray.png"
+
+	# Apple Watch
+	"apple-watch": _.extend {}, AppleWatchDevice,
+		name: "Apple Watch"
+		deviceImage: "apple-watch.png"
 
 
 

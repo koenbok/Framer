@@ -12,7 +12,7 @@ Originals =
 	Animation:
 		curve: "linear"
 		time: 1
-	Device:
+	DeviceView:
 		padding: 50
 		deviceType: "iphone-5s-spacegray"
 		deviceZoom: "fit"

@@ -28,7 +28,7 @@ Framer.BezierCurveAnimator = (require "./Animators/BezierCurveAnimator").BezierC
 Framer.SpringDHOAnimator = (require "./Animators/SpringDHOAnimator").SpringDHOAnimator
 Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4Animator
 Framer.Importer = (require "./Importer").Importer
-Framer.Device = (require "./Device").Device
+Framer.DeviceView = (require "./DeviceView").DeviceView
 Framer.Debug = (require "./Debug").Debug
 Framer.Extras = require "./Extras/Extras"
 
@@ -48,5 +48,5 @@ Defaults = (require "./Defaults").Defaults
 Defaults.setup()
 Framer.resetDefaults = Defaults.reset
 
-Framer.CurrentDevice = new Framer.Device()
-Framer.CurrentDevice._setupContext()
+Framer.Device = new Framer.DeviceView()
+Framer.Device._setupContext()

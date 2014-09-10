@@ -30,7 +30,7 @@ class exports.Context
 		@eventManager?.reset()
 		@eventManager = new EventManager
 
-		@_rootElement?.parentNode.removeChild(@_rootElement)
+		@_rootElement?.parentNode?.removeChild?(@_rootElement)
 		@_rootElement = @_createRootElement()
 
 		@_delayTimers?.map (timer) -> window.clearTimeout(timer)

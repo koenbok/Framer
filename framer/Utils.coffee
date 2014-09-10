@@ -68,12 +68,12 @@ Utils.getTime = -> Date.now() / 1000
 
 Utils.delay = (time, f) ->
 	timer = setTimeout f, time * 1000
-	Framer.CurrentContext._delayTimers.push timer
+	Framer.CurrentContext._delayTimers.push(timer)
 	return timer
 	
 Utils.interval = (time, f) ->
 	timer = setInterval f, time * 1000
-	Framer.CurrentContext._delayIntervals.push timer
+	Framer.CurrentContext._delayIntervals.push(timer)
 	return timer
 
 Utils.debounce = (threshold=0.1, fn, immediate) ->
@@ -132,6 +132,7 @@ Utils.stringify = (obj) ->
 		return JSON.stringify obj if _.isObject obj
 	catch
 		""
+	return "null" if obj is null
 	return "undefined" if obj is undefined
 	return obj.toString() if obj.toString
 	return obj
@@ -333,6 +334,22 @@ Utils.domLoadScriptSync = (path) ->
 	scriptData = Utils.domLoadDataSync path
 	eval scriptData
 	scriptData
+
+Utils.loadImage = (url, callback, context) ->
+	
+	# Loads a single image and calls callback. 
+	# The callback will be called with true if there is an error.
+
+	element = new Image
+	context ?= Framer.CurrentContext
+	
+	context.eventManager.wrap(element).addEventListener "load", (event) ->
+		callback()
+	
+	context.eventManager.wrap(element).addEventListener "error", (event) ->
+		callback(true)
+	
+	element.src = url
 
 ######################################################
 # GEOMERTY FUNCTIONS
