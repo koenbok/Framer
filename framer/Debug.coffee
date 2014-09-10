@@ -9,9 +9,6 @@ _debugContext = null
 
 createDebugLayer = (layer) ->
 
-	if not _debugContext
-		_debugContext = new Context(name:"Debug")
-
 	overLayer = new Layer
 		frame: layer.screenFrame
 		backgroundColor: "rgba(50,150,200,.35)"
@@ -34,6 +31,9 @@ createDebugLayer = (layer) ->
 	overLayer
 
 showDebug = -> 
+	
+	_debugContext ?= new Context(name:"Debug")
+
 	layerList = window.Framer.DefaultContext.getLayers()
 	_debugContext.run ->
 		layerList.map createDebugLayer
