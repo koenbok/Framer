@@ -103,6 +103,8 @@ class exports.LayerStates extends BaseClass
 			@_animation.on "stop", => 
 				@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
 
+			@_animation
+
 
 	switchInstant: (stateName) ->
 		@switch stateName, null, true
