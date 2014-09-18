@@ -31,7 +31,7 @@ AnimationLoop =
 		AnimationLoop._timestamp = 0
 		AnimationLoop._sessionTime = 0
 
-		window.requestAnimationFrame AnimationLoop._tick
+		window.requestAnimationFrame(AnimationLoop._tick)
 
 	_stop: ->
 		# console.log "AnimationLoop._stop"
@@ -47,14 +47,23 @@ AnimationLoop =
 
 		AnimationLoop._frameCounter++
 
-		# delta = (timestamp - AnimationLoop._timestamp) / 1000
+		# delta = (timestamp - (AnimationLoop._timestamp or 0)) / 1000
 		# fps = 1 / delta
+
+		# AnimationLoop._timestamp = timestamp
+
+		# console.log delta
+
 
 		# It seems that a fixed fps works better.
 		
 
 		fps = 60
 		delta = 1/fps
+
+		# console.log delta, fps, timestamp
+
+		# console.log timestamp
 		
 
 		AnimationLoop._sessionTime += delta
@@ -82,7 +91,7 @@ AnimationLoop =
 			animator.emit("tick", animator.next(delta, fps))
 
 			if animator.finished()
-				animator.emit "tick", 1 # This makes sure we and at a perfect value
+				animator.emit "tick", 1 # This makes sure we end at a perfect value
 				animator.emit "end"
 				AnimationLoop.remove(animator)
 
@@ -91,7 +100,7 @@ AnimationLoop =
 		if AnimationLoop._counter is 0
 			AnimationLoop._animators.length = 0
 
-		window.requestAnimationFrame AnimationLoop._tick
+		window.requestAnimationFrame(AnimationLoop._tick)
 
 		return # Important for performance
 

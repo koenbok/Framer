@@ -2,20 +2,18 @@
 
 class ScreenClass extends BaseClass
 	
-	constructor: (options) ->
-		super options
-		@_setupResizeListener()
-	
 	@define "width",  get: -> window.innerWidth
 	@define "height", get: -> window.innerHeight
-	
-	_setupResizeListener: ->
+
+	addListener: (eventName, listener) =>
 		
-		oldResizeFunction = window.onresize
+		if eventName is "resize"
+			Framer.CurrentContext.eventManager.wrap(window).addEventListener "resize", =>
+				@emit("resize")
 		
-		window.onresize = =>
-			@emit "resize", @
-			oldResizeFunction?()
+		super(eventName, listener)
+
+	on: @::addListener
 	
 # We use this as a singleton
 exports.Screen = new ScreenClass

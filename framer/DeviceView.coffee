@@ -1,8 +1,7 @@
 Utils = require "./Utils"
 {_}   = require "./Underscore"
 
-DeviceViewHostedImagesUrl = ""
-DeviceViewDefaultDevice = "iphone-5s-spacegray"
+DeviceViewDefaultDevice = "iphone-6-spacegray"
 
 {BaseClass} = require "./BaseClass"
 {Layer} = require "./Layer"
@@ -58,7 +57,7 @@ class exports.DeviceView extends BaseClass
 		@_setup()
 		
 		@animationOptions = defaults.animationOptions
-		@resourceUrl = defaults.resourceUrl
+		@deviceType = defaults.deviceType
 
 		_.extend @, Utils.setDefaultProperties(options, defaults)
 
@@ -75,40 +74,54 @@ class exports.DeviceView extends BaseClass
 		@background.backgroundColor = "transparent"
 		@background.classList.add("DeviceBackground")		
 
-		@phone = new Layer superLayer:@background
-		#@phone = new Layer
+		# @phone = new Layer superLayer:@background
+		@phone = new Layer
 		@screen   = new Layer superLayer:@phone
 		@viewport = new Layer superLayer:@screen
 		@content  = new Layer superLayer:@viewport
 
-		@screen.classList.add("DeviceScreen")
+		@phone.backgroundColor = "transparent"
+		@phone.classList.add("DevicePhone")
+		
 		@screen.backgroundColor = "transparent"
-		@viewport.backgroundColor = "white"
-		@content.backgroundColor = "white"
+		@screen.classList.add("DeviceScreen")
+
+		@viewport.backgroundColor = "transparent"
+		@viewport.classList.add("DeviceViewPort")
+
+		@content.backgroundColor = "transparent"
+		@content.classList.add("DeviceContent")
 
 		@content.originX = 0
 		@content.originY = 0
 
 		@keyboardLayer = new Layer superLayer:@viewport
 		@keyboardLayer.on "click", => @toggleKeyboard()
+		@keyboardLayer.classList.add("DeviceKeyboard")
+		@keyboardLayer.backgroundColor = "transparent"
 		
 		Screen.on "resize", @_update
 		
 	_update: =>
 		
-		# Todo: pixel align at zoom level 1, 0.5
+		# # Todo: pixel align at zoom level 1, 0.5
 
 		if @_shouldRenderFullScreen()
 			for layer in [@background, @phone, @viewport, @content, @screen]
 				layer.x = layer.y = 0
-				layer.scale = 1
 				layer.width = window.innerWidth
 				layer.height = window.innerHeight
+				layer.scale = 1
+			
+			@_positionKeyboard()
 
 		else
+			backgroundOverlap = 100
 
-			@background.width  = Screen.width
-			@background.height = Screen.height
+			@background.x = 0 - backgroundOverlap
+			@background.y = 0 - backgroundOverlap
+			@background.width  = Screen.width  + (2 * backgroundOverlap)
+			@background.height = Screen.height + (2 * backgroundOverlap)
 
 			@phone.scale = @_calculatePhoneScale()
 			@phone.center()
@@ -127,22 +140,34 @@ class exports.DeviceView extends BaseClass
 		if not @_device
 			return true
 		
-		if @fullScreen
+		if @fullScreen is true
 			return true
 		
 		if @deviceType is "fullscreen"
 			return true
 
 		return false
-
-
-	_setupContext: ->
-		# Sets this device up as the default context
-		@_context = new Framer.Context(parentElement:@content._element, name:"Device")
-		Framer.CurrentContext = @_context
 		
 	_deviceImageUrl: (name) ->
-		return "#{@resourceUrl}/#{name}" 
+		return null unless name
+
+		if Utils.isFramerStudio() && window.FramerStudioInfo
+			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
+		else
+			resourceUrl = "http://resources.framerjs.com/static/DeviceResources"
+
+		# return "#{resourceUrl}/#{name}" 
+
+		if (Utils.isJP2Supported())
+			return "#{resourceUrl}/#{name.replace(".png", ".jp2")}" 
+		else
+			return "#{resourceUrl}/#{name}" 
+
+	setupContext: ->
+		# Sets this device up as the default context so everything renders
+		# into the device screen
+		@_context = new Framer.Context(parentLayer:@content, name:"Device")
+		Framer.CurrentContext = @_context
 
 	###########################################################################
 	# FULLSCREEN
@@ -156,7 +181,7 @@ class exports.DeviceView extends BaseClass
 	_setFullScreen: (fullScreen) ->
 
 		if @_deviceType is "fullscreen"
-			fullScreen = true
+			return
 
 		if not _.isBool(fullScreen)
 			return
@@ -172,6 +197,8 @@ class exports.DeviceView extends BaseClass
 			@_updateDeviceImage()
 
 		@_update()
+		@keyboard = false
+		@_positionKeyboard()
 		@emit("change:fullScreen")
 
 
@@ -200,28 +227,32 @@ class exports.DeviceView extends BaseClass
 
 			@_device = device
 			@_deviceType = deviceType
+			@fullscreen = false
 			@_updateDeviceImage()	
 			@_update()
-			@_renderKeyboard()
+			@keyboard = false
+			@_positionKeyboard()
 			@emit("change:deviceType")
 
 	_updateDeviceImage: =>
-		return unless @_device
-		return if @deviceType is "fullscreen"
-		@phone.image  = @_deviceImageUrl(@_device.deviceImage)
-		@phone.width  = @_device.deviceImageWidth
-		@phone.height = @_device.deviceImageHeight
+		if @_shouldRenderFullScreen()
+			@phone.image  = ""
+		else
+			@phone._cacheImage = true
+			@phone.image  = @_deviceImageUrl(@_device.deviceImage)
+			@phone.width  = @_device.deviceImageWidth
+			@phone.height = @_device.deviceImageHeight
 
 
 	###########################################################################
 	# DEVICE ZOOM
 	
 	@define "deviceScale",
-		get: -> @_deviceScale
+		get: -> @_deviceScale or 1
 		set: (deviceScale) -> @setDeviceScale(deviceScale, false)
 	
 	setDeviceScale: (deviceScale, animate=false) ->
-		
+
 		if deviceScale == "fit" or deviceScale < 0
 			deviceScale = "fit"
 		else
@@ -231,6 +262,9 @@ class exports.DeviceView extends BaseClass
 			return
 
 		@_deviceScale = deviceScale
+
+		if @_shouldRenderFullScreen()
+			return
 		
 		if deviceScale == "fit"
 			phoneScale = @_calculatePhoneScale()
@@ -258,9 +292,11 @@ class exports.DeviceView extends BaseClass
 
 		[width, height] = @_getOrientationDimensions(@phone.width, @phone.height)
 
+		paddingOffset = @_device?.paddingOffset or 0
+
 		phoneScale = _.min([
-			(Screen.width -  (@padding * 2)) / width,
-			(Screen.height - (@padding * 2)) / height
+			(Screen.width -  ((@padding + paddingOffset) * 2)) / width,
+			(Screen.height - ((@padding + paddingOffset) * 2)) / height
 		])
 		
 		return phoneScale
@@ -269,7 +305,7 @@ class exports.DeviceView extends BaseClass
 	# CONTENT ZOOM
 
 	@define "contentScale",
-		get: -> @_contentScale
+		get: -> @_contentScale or 1
 		set: (contentScale) -> @setContentScale(contentScale, false)
 	
 	setContentScale: (contentScale, animate=false) ->
@@ -294,7 +330,7 @@ class exports.DeviceView extends BaseClass
 	# PHONE ORIENTATION
 
 	@define "orientation",
-		get: -> @_orientation
+		get: -> @_orientation or 0
 		set: (orientation) -> @setOrientation(orientation, false)
 
 	setOrientation: (orientation, animate=false) ->
@@ -304,6 +340,9 @@ class exports.DeviceView extends BaseClass
 					
 		if orientation == "landscape"
 			orientation = 90
+
+		if @_shouldRenderFullScreen()
+			return
 		
 		orientation = parseInt(orientation)
 		
@@ -412,11 +451,11 @@ class exports.DeviceView extends BaseClass
 
 		if keyboard is true
 			@emit("keyboard:show:start")
-			@_animateKeyboard @viewport.height - @keyboardLayer.height, animate, =>
+			@_animateKeyboard @_keyboardShowY(), animate, =>
 				@emit("keyboard:show:end")
 		else
 			@emit("keyboard:hide:start")
-			@_animateKeyboard @viewport.height, animate, =>
+			@_animateKeyboard @_keyboardHideY(), animate, =>
 				@emit("keyboard:hide:end")
 		
 	showKeyboard: (animate=true) ->
@@ -429,26 +468,47 @@ class exports.DeviceView extends BaseClass
 		@setKeyboard(!@keyboard, animate)
 
 	_renderKeyboard: ->
-
 		return unless @_device.keyboards
-
 		@keyboardLayer.image  = @_deviceImageUrl @_device.keyboards[@orientationName].image
 		@keyboardLayer.width  = @_device.keyboards[@orientationName].width
 		@keyboardLayer.height = @_device.keyboards[@orientationName].height
 
+	_positionKeyboard: ->
+		@keyboardLayer.centerX()
+		if @keyboard
+			@_animateKeyboard(@_keyboardShowY(), false)
+		else
+			@_animateKeyboard(@_keyboardHideY(), false)
+
 	_animateKeyboard: (y, animate, callback) =>
 		@keyboardLayer.bringToFront()
+		@keyboardLayer.animateStop()
 		if animate is false
 			@keyboardLayer.y = y
-			callback()
+			callback?()
 		else
 			animation = @keyboardLayer.animate _.extend @animationOptions, 
 				properties: {y:y}
 			animation.on Events.AnimationEnd, callback
 
+	_keyboardShowY: -> @viewport.height - @keyboardLayer.height
+	_keyboardHideY: -> @viewport.height
+
 
 ###########################################################################
 # DEVICE CONFIGURATIONS
+
+iPhone6BaseDevice =
+	deviceImageWidth: 870
+	deviceImageHeight: 1738
+	screenWidth: 750
+	screenHeight: 1334
+
+iPhone6BaseDeviceHand = _.extend {}, iPhone6BaseDevice,
+	deviceImageWidth: 2290
+	deviceImageHeight: 2760
+	paddingOffset: -120
+
 
 iPhone5BaseDevice =
 	deviceImageWidth: 792
@@ -465,32 +525,40 @@ iPhone5BaseDevice =
 			width: 1136
 			height: 322
 
+iPhone5BaseDeviceHand = _.extend {}, iPhone5BaseDevice,
+	deviceImageWidth: 1884
+	deviceImageHeight: 2234
+	paddingOffset: -120
+
+
 iPadMiniBaseDevice =
-	deviceImageWidth: 920
-	deviceImageHeight: 1328
+	deviceImageWidth: 872
+	deviceImageHeight: 1292
 	screenWidth: 768
 	screenHeight: 1024
-	# keyboardImage: "ios-keyboard.png"
-	# keyboardWidth: 768
-	# keyboardHeight: 432
 
-iPadAirBaseDevice =
-	deviceImageWidth: 1856
-	deviceImageHeight: 2584
-	screenWidth: 1536
-	screenHeight: 2048
-	# keyboardImage: "ios-keyboard.png"
-	# keyboardWidth: 0
-	# keyboardHeight: 0
+iPadMiniBaseDeviceHand = _.extend {}, iPadMiniBaseDevice,
+	deviceImageWidth: 1380
+	deviceImageHeight: 2072
+	paddingOffset: -120
 
-AppleWatchDevice =
-	deviceImageWidth: 500
-	deviceImageHeight: 820
-	screenWidth: 320
-	screenHeight: 320
-	# keyboardImage: "ios-keyboard.png"
-	# keyboardWidth: 0
-	# keyboardHeight: 0
+
+Nexus5BaseDevice =
+	deviceImageWidth: 1208
+	deviceImageHeight: 1440
+	screenWidth: 1080
+	screenHeight: 1920
+
+Nexus5BaseDeviceHand = _.extend {}, Nexus5BaseDevice, # 2692 × 2996
+	deviceImageWidth: 2692
+	deviceImageHeight: 2996
+	paddingOffset: -120
+
+# AppleWatchDevice =
+# 	deviceImageWidth: 500
+# 	deviceImageHeight: 820
+# 	screenWidth: 320
+# 	screenHeight: 320
 
 
 Devices =
@@ -498,54 +566,93 @@ Devices =
 	"fullscreen":
 		name: "Fullscreen"
 
+	# iPhone 6
+	"iphone-6-spacegray": _.extend {}, iPhone6BaseDevice,
+		deviceImage: "iphone-6-spacegray.png"
+	"iphone-6-spacegray-hand": _.extend {}, iPhone6BaseDeviceHand,
+		deviceImage: "iphone-6-spacegray-hand.png"
+
+	"iphone-6-silver": _.extend {}, iPhone6BaseDevice,
+		deviceImage: "iphone-6-silver.png"
+	"iphone-6-silver-hand": _.extend {}, iPhone6BaseDeviceHand,
+		deviceImage: "iphone-6-silver-hand.png"
+
+	"iphone-6-gold": _.extend {}, iPhone6BaseDevice,
+		deviceImage: "iphone-6-gold.png"
+	"iphone-6-gold-hand": _.extend {}, iPhone6BaseDeviceHand,
+		deviceImage: "iphone-6-gold-hand.png"
+
+
 	# iPhone 5S
 	"iphone-5s-spacegray": _.extend {}, iPhone5BaseDevice,
-		name: "iPhone 5S Space Gray"
-		deviceImage: "iphone-5S-spacegray.png"
+		deviceImage: "iphone-5s-spacegray.png"
+	"iphone-5s-spacegray-hand": _.extend {}, iPhone5BaseDeviceHand,
+		deviceImage: "iphone-5s-spacegray-hand.png"
+	
 	"iphone-5s-silver": _.extend {}, iPhone5BaseDevice,
-		name: "iPhone 5S Silver"
-		deviceImage: "iphone-5S-silver.png"
+		deviceImage: "iphone-5s-silver.png"
+	"iphone-5s-silver-hand": _.extend {}, iPhone5BaseDeviceHand,
+		deviceImage: "iphone-5s-silver-hand.png"
+	
 	"iphone-5s-gold": _.extend {}, iPhone5BaseDevice,
-		name: "iPhone 5S Gold"
-		deviceImage: "iphone-5S-gold.png"
+		deviceImage: "iphone-5s-gold.png"
+	"iphone-5s-gold-hand": _.extend {}, iPhone5BaseDeviceHand,
+		deviceImage: "iphone-5s-gold-hand.png"
+
 
 	# iPhone 5C
 	"iphone-5c-green": _.extend {}, iPhone5BaseDevice,
-		name: "iPhone 5S Green"
-		deviceImage: "iphone-5C-green.png"
+		deviceImage: "iphone-5c-green.png"
+	"iphone-5c-green-hand": _.extend {}, iPhone5BaseDeviceHand,
+		deviceImage: "iphone-5C-green-hand.png"
+
 	"iphone-5c-blue": _.extend {}, iPhone5BaseDevice,
-		name: "iPhone 5S Blue"
-		deviceImage: "iphone-5C-blue.png"
-	"iphone-5c-yellow": _.extend {}, iPhone5BaseDevice,
-		name: "iPhone 5S Yellow"
-		deviceImage: "iphone-5C-yellow.png"
-	"iphone-5c-pink": _.extend {}, iPhone5BaseDevice,
-		name: "iPhone 5C Pink"
-		deviceImage: "iphone-5C-pink.png"
+		deviceImage: "iphone-5c-blue.png"
+	"iphone-5c-blue-hand": _.extend {}, iPhone5BaseDeviceHand,
+		deviceImage: "iphone-5C-blue-hand.png"
+
+	"iphone-5c-red": _.extend {}, iPhone5BaseDevice,
+		deviceImage: "iphone-5c-red.png"
+	"iphone-5c-red-hand": _.extend {}, iPhone5BaseDeviceHand,
+		deviceImage: "iphone-5C-red-hand.png"
+
 	"iphone-5c-white": _.extend {}, iPhone5BaseDevice,
-		name: "iPhone 5C White"
-		deviceImage: "iphone-5C-white.png"
+		deviceImage: "iphone-5c-white.png"
+	"iphone-5c-white-hand": _.extend {}, iPhone5BaseDeviceHand,
+		deviceImage: "iphone-5C-white-hand.png"
+
+	"iphone-5c-yellow": _.extend {}, iPhone5BaseDevice,
+		deviceImage: "iphone-5c-yellow.png"
+	"iphone-5c-yellow-hand": _.extend {}, iPhone5BaseDeviceHand,
+		deviceImage: "iphone-5C-yellow-hand.png"
+
 
 	# iPad Mini
+	"ipad-mini-spacegrey": _.extend {}, iPadMiniBaseDevice,
+		deviceImage: "ipad-mini-spacegrey.png"
+	"ipad-mini-spacegrey-hand": _.extend {}, iPadMiniBaseDeviceHand,
+		deviceImage: "ipad-mini-spacegrey-hand.png"
+
 	"ipad-mini-silver": _.extend {}, iPadMiniBaseDevice,
-		name: "iPad Mini Silver"
 		deviceImage: "ipad-mini-silver.png"
-	"ipad-mini-spacegray": _.extend {}, iPadMiniBaseDevice,
-		name: "iPad Mini Space Gray"
-		deviceImage: "ipad-mini-spacegray.png"
+	"ipad-mini-silver-hand": _.extend {}, iPadMiniBaseDeviceHand,
+		deviceImage: "ipad-mini-silver-hand.png"
 
-	# Apple Watch
-	"apple-watch-primary": _.extend {}, AppleWatchDevice,
-		name: "Apple Watch"
-		deviceImage: "apple-watch-primary.png"
-	"apple-watch-sport": _.extend {}, AppleWatchDevice,
-		name: "Apple Watch Sport"
-		deviceImage: "apple-watch-sport.png"
-	"apple-watch-edition": _.extend {}, AppleWatchDevice,
-		name: "Apple Watch Edition"
-		deviceImage: "apple-watch-edition.png"
+	# Nexus 5
+
+	"nexus-5-black": _.extend {}, Nexus5BaseDevice,
+		deviceImage: "nexus-5-black.png"
+	"nexus-5-black-hand": _.extend {}, Nexus5BaseDeviceHand,
+		deviceImage: "nexus-5-black-hand.png"
+
+	# # Apple Watch
+	# "apple-watch-primary": _.extend {}, AppleWatchDevice,
+	# 	deviceImage: "apple-watch-primary.png"
+	# "apple-watch-sport": _.extend {}, AppleWatchDevice,
+	# 	deviceImage: "apple-watch-sport.png"
+	# "apple-watch-edition": _.extend {}, AppleWatchDevice,
+	# 	deviceImage: "apple-watch-edition.png"
 
 
 
-
-
+exports.DeviceView.Devices = Devices

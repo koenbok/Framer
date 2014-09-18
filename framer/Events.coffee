@@ -18,6 +18,7 @@ Events.Click = Events.TouchEnd
 # Standard dom events
 Events.MouseOver = "mouseover"
 Events.MouseOut = "mouseout"
+Events.MouseMove = "mousemove"
 
 # Animation events
 Events.AnimationStart = "start"

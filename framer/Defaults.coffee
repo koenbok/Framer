@@ -20,7 +20,6 @@ Originals =
 		contentZoom: 1
 		orientation: "portrait"
 		keyboard: false
-		resourceUrl: "http://resources.framerjs.com/static/DeviceResources"
 		animationOptions:
 			curve: "spring(400,40,0)"
 

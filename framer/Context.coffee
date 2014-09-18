@@ -14,13 +14,13 @@ class exports.Context
 
 		options = Utils.setDefaultProperties options,
 			contextName: null
-			parentElement: null
+			parentLayer: null
 			name: null
 
 		if not options.name
 			throw Error("Contexts need a name")
 
-		@_parentElement = options.parentElement
+		@_parentLayer = options.parentLayer
 		@_name = options.name
 
 		@reset()
@@ -53,7 +53,7 @@ class exports.Context
 		
 		_.extend element.style, Config.rootBaseCSS
 
-		parentElement = @_parentElement
+		parentElement = @_parentLayer?._element
 
 		# Utils.domComplete -> Utils.delay 0, ->
 		Utils.domComplete ->
@@ -64,6 +64,8 @@ class exports.Context
 
 	run: (f) ->
 
+		previousContext = Framer.CurrentContext
+
 		Framer.CurrentContext = @
 		f()
-		Framer.CurrentContext = Framer.DefaultContext
+		Framer.CurrentContext = previousContext

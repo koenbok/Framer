@@ -47,6 +47,3 @@ Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
 Defaults = (require "./Defaults").Defaults
 Defaults.setup()
 Framer.resetDefaults = Defaults.reset
-
-Framer.Device = new Framer.DeviceView()
-Framer.Device._setupContext()

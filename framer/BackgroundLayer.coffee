@@ -15,9 +15,13 @@ class exports.BackgroundLayer extends Layer
 		
 		@sendToBack()
 		@layout()
-		
-		Screen.on "resize", @layout
+		@_context.eventManager.wrap(window).addEventListener("resize", @layout)
 	
 	layout: =>
-		@width =  Screen.width
-		@height = Screen.height
+	
+		if @superLayer
+			@frame = {x:0, y:0, width:@superLayer.width, height:@superLayer.height}
+		else if @_context._parentLayer
+			@frame = {x:0, y:0, width:@_context._parentLayer.width, height:@_context._parentLayer.height}
+		else
+			@frame = {x:0, y:0, width:window.innerWidth, height:window.innerHeight}

@@ -13,6 +13,7 @@ exports.Config =
 		"right": 0
 		"bottom": 0
 		"pointer-events": "none"
+		"overflow": "hidden"
 		
 	layerBaseCSS:
 		"display": "block"

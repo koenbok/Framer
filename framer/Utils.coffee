@@ -3,6 +3,9 @@
 
 Utils = {}
 
+Utils.reset = ->
+	Framer.CurrentContext.reset()
+
 Utils.getValue = (value) ->
 	return value() if _.isFunction value
 	return value
@@ -204,6 +207,9 @@ Utils.isFramerStudio = ->
 Utils.devicePixelRatio = ->
 	window.devicePixelRatio
 
+Utils.isJP2Supported = ->
+	Utils.isWebKit() and not Utils.isChrome()
+
 Utils.pathJoin = ->
 	Utils.arrayFromArguments(arguments).join("/")
 
@@ -334,6 +340,15 @@ Utils.domLoadScriptSync = (path) ->
 	scriptData = Utils.domLoadDataSync path
 	eval scriptData
 	scriptData
+
+Utils.insertCSS = (css) ->
+
+	styleElement = document.createElement("style")
+	styleElement.type = "text/css"
+	styleElement.innerHTML = css
+	
+	Utils.domComplete ->
+		document.body.appendChild(styleElement)
 
 Utils.loadImage = (url, callback, context) ->
 	

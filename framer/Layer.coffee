@@ -55,6 +55,7 @@ class exports.Layer extends BaseClass
 		# Special power setting for 2d rendering path. Only enable this
 		# if you know what you are doing. See LayerStyle for more info.
 		@_prefer2d = false
+		@_cacheImage = false
 
 		# We have to create the element before we set the defaults
 		@_createElement()
@@ -243,6 +244,11 @@ class exports.Layer extends BaseClass
 			Utils.frameSetMidX(frame, parseInt(@superLayer.width  / 2.0))
 			Utils.frameSetMidY(frame, parseInt(@superLayer.height / 2.0))
 			return frame
+		else if @_context._parentLayer
+			frame = @frame
+			Utils.frameSetMidX(frame, parseInt(@_context._parentLayer.width  / 2.0))
+			Utils.frameSetMidY(frame, parseInt(@_context._parentLayer.height / 2.0))
+			return frame
 		else
 			frame = @frame
 			Utils.frameSetMidX(frame, parseInt(window.innerWidth  / 2.0))
@@ -389,7 +395,7 @@ class exports.Layer extends BaseClass
 			@backgroundColor = null
 
 			# Set the property value
-			@_setPropertyValue "image", value
+			@_setPropertyValue("image", value)
 
 			if value in [null, ""]
 				@style["background-image"] = null
@@ -402,7 +408,7 @@ class exports.Layer extends BaseClass
 
 			# If the file is local, we want to avoid caching
 			# if Utils.isLocal() and not (_.startsWith(imageUrl, "http://") or _.startsWith(imageUrl, "https://"))
-			if Utils.isLocal() and not imageUrl.match(/^https?:\/\//)
+			if Utils.isLocal() and not imageUrl.match(/^https?:\/\//) and @_cacheImage is false
 				imageUrl += "?nocache=#{Date.now()}"
 
 			# As an optimization, we will only use a loader
