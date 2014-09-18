@@ -26,15 +26,15 @@ imageLayer.states.add({
 	third:  {y:300, scale:1.3},
 	fourth:	{y:200, scale:0.9, rotationZ:200},
 })
-```javascript
-###### Set default animation options
 ```
+###### Set default animation options
+```javascript
 imageLayer.states.animationOptions = {
 	curve: "spring(500,12,0)"
 }
-```javascript
-###### Toggle states on click
 ```
+###### Toggle states on click
+```javascript
 imageLayer.on(Events.Click, function() {
 	imageLayer.states.next()
 })
