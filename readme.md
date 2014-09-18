@@ -15,24 +15,24 @@ Framer.js allows you to define animations and interactions, complete with filter
 
 ## Example
 ###### Define a layer and center it
-```
+```javascript
 imageLayer = new Layer({width:128, height:128, image:"images/icon.png"})
 imageLayer.center()
 ```
 ###### Add states
-```	  
+```javascript  
 imageLayer.states.add({
 	second: {y:100, scale:0.6, rotationZ:100},
 	third:  {y:300, scale:1.3},
 	fourth:	{y:200, scale:0.9, rotationZ:200},
 })
-```
+```javascript
 ###### Set default animation options
 ```
 imageLayer.states.animationOptions = {
 	curve: "spring(500,12,0)"
 }
-```
+```javascript
 ###### Toggle states on click
 ```
 imageLayer.on(Events.Click, function() {
