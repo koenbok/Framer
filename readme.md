@@ -41,10 +41,10 @@ imageLayer.on(Events.Click, function() {
 ```
 #### Features
 - Spring Physics, Easing Functions and Bezier Curves
-- Hardware Accelerated (3D) Animations with 60FPS
+- Hardware Accelerated (3D) Animations with 60fps
 - Events: Click, Touch, Drag, Scroll and more
 - State Machine to define and animate between sets of properties
-- Import from Sketch & Photoshop with Generator.app
+- Import from Sketch & Photoshop with Framer Generator
 - Based on WebKit: works on desktop, mobile and tablets
 - Debugging with Web Inspector and JavaScript console
 
@@ -57,7 +57,7 @@ You can safely move things around in Sketch or Photoshop and re-import. Generato
 - Access any layer by its group name
 - Groups within groups will become subLayers
 - Groups with vector masks will become clipped layers
-- Group names should be unique (Otherwise, they'll be renamed)
+- Group names should be unique (otherwise, they'll be renamed)
 
 
 ## Contribute
