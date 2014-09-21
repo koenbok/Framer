@@ -91,7 +91,7 @@ class exports.DeviceView extends BaseClass
 		@screen.backgroundColor = "transparent"
 		@screen.classList.add("DeviceScreen")
 
-		@viewport.backgroundColor = "black"
+		@viewport.backgroundColor = "transparent"
 		@viewport.classList.add("DeviceViewPort")
 
 		@content.backgroundColor = "transparent"
