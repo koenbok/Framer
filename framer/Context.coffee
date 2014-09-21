@@ -50,11 +50,6 @@ class exports.Context
 
 		element = document.createElement("div")
 		element.id = "FramerContextRoot-#{@_name}"
-
-		# Disable bouncy scrolling on mobile
-		if Utils.isMobile()
-			@eventManager.wrap(element).addEventListener "touchmove", (event) ->
-				event.preventDefault()
 		
 		_.extend element.style, Config.rootBaseCSS
 

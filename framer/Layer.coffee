@@ -91,11 +91,6 @@ class exports.Layer extends BaseClass
 		# Set needed private variables
 		@_subLayers = []
 
-		# If we are on mobile we need this to avoid scrolling the entire page
-		if Utils.isMobile()
-			@on "change:scrollVertical", @_updateScrollListeners
-			@_updateScrollListeners()
-
 	##############################################################
 	# Properties
 
@@ -657,29 +652,4 @@ class exports.Layer extends BaseClass
 
 	on: @::addListener
 	off: @::removeListener
-
-	# Special fixes for scrolling on mobile
-
-	_updateScrollListeners: =>
-		if @scrollVertical is true
-			@on "touchmove", @handleScrollingLayerTouchMove
-			@on "touchstart", @handleScrollingLayerTouchStart
-		else
-			@off "touchmove", @handleScrollingLayerTouchMove
-			@off "touchstart", @handleScrollingLayerTouchStart
-
-	handleScrollingLayerTouchMove: (event) =>
-		event.stopPropagation()
-
-	handleScrollingLayerTouchStart: (event) =>
-		
-		element = @_element
-		
-		startTopScroll = element.scrollTop
-
-		if startTopScroll <= 0
-			element.scrollTop = 1
-		
-		if startTopScroll + element.offsetHeight >= element.scrollHeight
-			element.scrollTop = element.scrollHeight - element.offsetHeight - 1
 
