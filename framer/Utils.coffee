@@ -184,16 +184,24 @@ Utils.toggle = Utils.cycle
 
 Utils.isWebKit = ->
 	window.WebKitCSSMatrix isnt null
-	
-Utils.isTouch = ->
-	window.ontouchstart is null
-
-Utils.isMobile = ->
-	(/iphone|ipod|ipad|android|ie|blackberry|fennec/).test(
-		navigator.userAgent.toLowerCase())
 
 Utils.isChrome = ->
 	(/chrome/).test(navigator.userAgent.toLowerCase())
+
+Utils.isTouch = ->
+	window.ontouchstart is null
+
+Utils.isDesktop = ->
+	Utils.deviceType() is "desktop"
+
+Utils.isPhone = ->
+	Utils.deviceType() is "phone"
+
+Utils.isTablet = ->
+	Utils.deviceType() is "tablet"
+
+Utils.isMobile = ->
+	Utils.isPhone() or Utils.isTablet()
 
 Utils.isLocal = ->
 	Utils.isLocalUrl window.location.href
@@ -209,6 +217,41 @@ Utils.devicePixelRatio = ->
 
 Utils.isJP2Supported = ->
 	Utils.isWebKit() and not Utils.isChrome()
+
+Utils.deviceType = ->
+
+	# Taken from
+	# https://github.com/jeffmcmahan/device-detective/blob/master/bin/device-detect.js
+
+	userAgentHeader = navigator.userAgent
+	userAgentInfo =
+		phone: false # mobile-first defaults
+		tablet: false
+		mobile: false
+		desktop: false
+		lynx: false
+		crawler: false
+
+	crawler = /(googlebot)|(mediapartners)|(adsbot)|(msnbot)|(bingbot)|(Yo(u)?daoBot)|(Ya)(andex|DirectBot)|(baiduspider)|(duckduckbot)|(slurp)|(blekkobot)|(scribdbot)|(asterias)|(DoCoMo)|(Sogou)|(ichiro)|(moget)|(NaverBot)|(MJ12bot)/i.test(userAgentHeader)
+	phone = /(mobi)/i.test(userAgentHeader)
+	tablet = /(tablet)|(iPad)/i.test(userAgentHeader)
+	textBrowser = /(Lynx)|(ELinks)|(Links[ s]\()|(Net-Tamer)|(w3m)/i.test(userAgentHeader)
+	
+	unless not crawler
+		userAgentInfo.crawler = true
+		return userAgentInfo
+	unless not textBrowser
+		userAgentInfo.lynx = true
+		return userAgentInfo
+	unless not phone
+		userAgentInfo.phone = true
+	else
+		userAgentInfo.desktop = true
+	
+	userAgentInfo.tablet = true unless not tablet
+	
+	return userAgentInfo
+
 
 Utils.pathJoin = ->
 	Utils.arrayFromArguments(arguments).join("/")

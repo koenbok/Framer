@@ -146,6 +146,9 @@ class exports.DeviceView extends BaseClass
 		if @deviceType is "fullscreen"
 			return true
 
+		if Utils.deviceType() is @_device.deviceType
+			return true
+
 		return false
 		
 	_deviceImageUrl: (name) ->
@@ -503,6 +506,7 @@ iPhone6BaseDevice =
 	deviceImageHeight: 1738
 	screenWidth: 750
 	screenHeight: 1334
+	deviceType: "mobile"
 
 iPhone6BaseDeviceHand = _.extend {}, iPhone6BaseDevice,
 	deviceImageWidth: 1988
@@ -515,6 +519,7 @@ iPhone5BaseDevice =
 	deviceImageHeight: 1608
 	screenWidth: 640
 	screenHeight: 1136
+	deviceType: "mobile"
 	keyboards:
 		portrait:
 			image:  "ios-keyboard.png"
@@ -536,6 +541,7 @@ iPadMiniBaseDevice =
 	deviceImageHeight: 1292
 	screenWidth: 768
 	screenHeight: 1024
+	deviceType: "tablet"
 
 iPadMiniBaseDeviceHand = _.extend {}, iPadMiniBaseDevice,
 	deviceImageWidth: 1380
@@ -548,6 +554,7 @@ Nexus5BaseDevice =
 	deviceImageHeight: 2440
 	screenWidth: 1080
 	screenHeight: 1920
+	deviceType: "mobile"
 
 Nexus5BaseDeviceHand = _.extend {}, Nexus5BaseDevice, # 2692 × 2996
 	deviceImageWidth: 2692
