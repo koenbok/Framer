@@ -59,7 +59,7 @@ class exports.Context
 		Utils.domComplete ->
 			parentElement ?= document.body
 			parentElement.appendChild(element)
-		
+
 		element
 
 	run: (f) ->

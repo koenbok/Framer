@@ -26,6 +26,7 @@ exports.enable = ->
 			@on "change:scrollVertical", @_updateScrollListeners
 			@_updateScrollListeners()
 
+
 		_updateScrollListeners: =>
 			if @scrollVertical is true
 				@on "touchmove", handleScrollingLayerTouchMove

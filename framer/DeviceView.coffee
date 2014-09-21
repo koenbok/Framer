@@ -62,6 +62,11 @@ class exports.DeviceView extends BaseClass
 		_.extend @, Utils.setDefaultProperties(options, defaults)
 
 
+
+
+
+
+
 	_setup: ->
 		
 		if @_setupDone
@@ -86,7 +91,7 @@ class exports.DeviceView extends BaseClass
 		@screen.backgroundColor = "transparent"
 		@screen.classList.add("DeviceScreen")
 
-		@viewport.backgroundColor = "transparent"
+		@viewport.backgroundColor = "black"
 		@viewport.classList.add("DeviceViewPort")
 
 		@content.backgroundColor = "transparent"
@@ -102,9 +107,15 @@ class exports.DeviceView extends BaseClass
 		
 		Framer.CurrentContext.eventManager.wrap(window).addEventListener("resize", @_update)
 		
+		# This avoids rubber banding on mobile
+		for layer in [@background, @phone, @viewport, @content, @screen]
+			layer.on "touchmove", (event) -> event.preventDefault()
+
 	_update: =>
 		
 		# # Todo: pixel align at zoom level 1, 0.5
+
+		console.log "_update", @_shouldRenderFullScreen()
 
 		if @_shouldRenderFullScreen()
 			for layer in [@background, @phone, @viewport, @content, @screen]
