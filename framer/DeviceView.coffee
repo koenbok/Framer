@@ -100,7 +100,7 @@ class exports.DeviceView extends BaseClass
 		@keyboardLayer.classList.add("DeviceKeyboard")
 		@keyboardLayer.backgroundColor = "transparent"
 		
-		Screen.on "resize", @_update
+		Framer.CurrentContext.eventManager.wrap(window).addEventListener("resize", @_update)
 		
 	_update: =>
 		
@@ -120,8 +120,8 @@ class exports.DeviceView extends BaseClass
 
 			@background.x = 0 - backgroundOverlap
 			@background.y = 0 - backgroundOverlap
-			@background.width  = Screen.width  + (2 * backgroundOverlap)
-			@background.height = Screen.height + (2 * backgroundOverlap)
+			@background.width  = window.innerWidth  + (2 * backgroundOverlap)
+			@background.height = window.innerHeight + (2 * backgroundOverlap)
 
 			@phone.scale = @_calculatePhoneScale()
 			@phone.center()
@@ -295,8 +295,8 @@ class exports.DeviceView extends BaseClass
 		paddingOffset = @_device?.paddingOffset or 0
 
 		phoneScale = _.min([
-			(Screen.width -  ((@padding + paddingOffset) * 2)) / width,
-			(Screen.height - ((@padding + paddingOffset) * 2)) / height
+			(window.innerWidth  - ((@padding + paddingOffset) * 2)) / width,
+			(window.innerHeight - ((@padding + paddingOffset) * 2)) / height
 		])
 		
 		return phoneScale
@@ -505,14 +505,14 @@ iPhone6BaseDevice =
 	screenHeight: 1334
 
 iPhone6BaseDeviceHand = _.extend {}, iPhone6BaseDevice,
-	deviceImageWidth: 2290
-	deviceImageHeight: 2760
-	paddingOffset: -120
+	deviceImageWidth: 1988
+	deviceImageHeight: 2368
+	paddingOffset: -150
 
 
 iPhone5BaseDevice =
-	deviceImageWidth: 792
-	deviceImageHeight: 1632
+	deviceImageWidth: 772
+	deviceImageHeight: 1608
 	screenWidth: 640
 	screenHeight: 1136
 	keyboards:
@@ -528,7 +528,7 @@ iPhone5BaseDevice =
 iPhone5BaseDeviceHand = _.extend {}, iPhone5BaseDevice,
 	deviceImageWidth: 1884
 	deviceImageHeight: 2234
-	paddingOffset: -120
+	paddingOffset: -200
 
 
 iPadMiniBaseDevice =
@@ -545,7 +545,7 @@ iPadMiniBaseDeviceHand = _.extend {}, iPadMiniBaseDevice,
 
 Nexus5BaseDevice =
 	deviceImageWidth: 1208
-	deviceImageHeight: 1440
+	deviceImageHeight: 2440
 	screenWidth: 1080
 	screenHeight: 1920
 
