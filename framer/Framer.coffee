@@ -40,9 +40,6 @@ window.Framer = Framer if window
 # Compatibility for Framer 2
 require "./Compat"
 
-# Fix for mobile scrolling
-Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
-
 # Set the defaults
 Defaults = (require "./Defaults").Defaults
 Defaults.setup()
