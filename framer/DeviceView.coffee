@@ -506,7 +506,7 @@ iPhone6BaseDevice =
 	deviceImageHeight: 1738
 	screenWidth: 750
 	screenHeight: 1334
-	deviceType: "mobile"
+	deviceType: "phone"
 
 iPhone6BaseDeviceHand = _.extend {}, iPhone6BaseDevice,
 	deviceImageWidth: 1988
@@ -519,7 +519,7 @@ iPhone5BaseDevice =
 	deviceImageHeight: 1608
 	screenWidth: 640
 	screenHeight: 1136
-	deviceType: "mobile"
+	deviceType: "phone"
 	keyboards:
 		portrait:
 			image:  "ios-keyboard.png"
@@ -554,7 +554,7 @@ Nexus5BaseDevice =
 	deviceImageHeight: 2440
 	screenWidth: 1080
 	screenHeight: 1920
-	deviceType: "mobile"
+	deviceType: "phone"
 
 Nexus5BaseDeviceHand = _.extend {}, Nexus5BaseDevice, # 2692 × 2996
 	deviceImageWidth: 2692
@@ -572,6 +572,7 @@ Devices =
 
 	"fullscreen":
 		name: "Fullscreen"
+		deviceType: "desktop"
 
 	# iPhone 6
 	"iphone-6-spacegray": _.extend {}, iPhone6BaseDevice,

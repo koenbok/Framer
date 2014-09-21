@@ -223,35 +223,13 @@ Utils.deviceType = ->
 	# Taken from
 	# https://github.com/jeffmcmahan/device-detective/blob/master/bin/device-detect.js
 
-	userAgentHeader = navigator.userAgent
-	userAgentInfo =
-		phone: false # mobile-first defaults
-		tablet: false
-		mobile: false
-		desktop: false
-		lynx: false
-		crawler: false
+	if /(mobi)/i.test(navigator.userAgent)
+		return "phone"
 
-	crawler = /(googlebot)|(mediapartners)|(adsbot)|(msnbot)|(bingbot)|(Yo(u)?daoBot)|(Ya)(andex|DirectBot)|(baiduspider)|(duckduckbot)|(slurp)|(blekkobot)|(scribdbot)|(asterias)|(DoCoMo)|(Sogou)|(ichiro)|(moget)|(NaverBot)|(MJ12bot)/i.test(userAgentHeader)
-	phone = /(mobi)/i.test(userAgentHeader)
-	tablet = /(tablet)|(iPad)/i.test(userAgentHeader)
-	textBrowser = /(Lynx)|(ELinks)|(Links[ s]\()|(Net-Tamer)|(w3m)/i.test(userAgentHeader)
-	
-	unless not crawler
-		userAgentInfo.crawler = true
-		return userAgentInfo
-	unless not textBrowser
-		userAgentInfo.lynx = true
-		return userAgentInfo
-	unless not phone
-		userAgentInfo.phone = true
-	else
-		userAgentInfo.desktop = true
-	
-	userAgentInfo.tablet = true unless not tablet
-	
-	return userAgentInfo
+	if /(tablet)|(iPad)/i.test(navigator.userAgent)
+		return "tablet"
 
+	return "desktop"
 
 Utils.pathJoin = ->
 	Utils.arrayFromArguments(arguments).join("/")
