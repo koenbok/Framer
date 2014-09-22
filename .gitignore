@@ -6,3 +6,6 @@ test/lib/framer.js
 build/template
 build
 lib
+.build
+.deploy
+*.pyc

@@ -1,40 +1,10 @@
 {_} = require "./Underscore"
-{Session} = require "./Session"
 {Screen} = require "./Screen"
 
 Utils = {}
 
 Utils.reset = ->
-
-	# There is no use calling this even before the dom is ready
-	if __domReady is false
-		return
-
-	# Reset all pending operations to the dom
-	__domComplete = []
-
-	# Reset the print console layer
-	Session.printLayer = null
-
-	# Remove all the listeners so we don't leak memory
-	if Session._LayerList
-		for layer in Session._LayerList
-			layer.removeAllListeners()
-
-	Session._LayerList = []
-	Session._RootElement?.innerHTML = ""
-
-	if Session._delayTimers
-		for delayTimer in Session._delayTimers
-			clearTimeout delayTimer
-		Session._delayTimers = []
-
-	if Session._delayIntervals
-		for delayInterval in Session._delayIntervals
-			clearInterval delayInterval
-		Session._delayIntervals = []
-
-
+	Framer.CurrentContext.reset()
 
 Utils.getValue = (value) ->
 	return value() if _.isFunction value
@@ -101,14 +71,12 @@ Utils.getTime = -> Date.now() / 1000
 
 Utils.delay = (time, f) ->
 	timer = setTimeout f, time * 1000
-	Session._delayTimers ?= []
-	Session._delayTimers.push timer
+	Framer.CurrentContext._delayTimers.push(timer)
 	return timer
 	
 Utils.interval = (time, f) ->
 	timer = setInterval f, time * 1000
-	Session._delayIntervals ?= []
-	Session._delayIntervals.push timer
+	Framer.CurrentContext._delayIntervals.push(timer)
 	return timer
 
 Utils.debounce = (threshold=0.1, fn, immediate) ->
@@ -152,12 +120,12 @@ Utils.randomNumber = (a=0, b=1) ->
 
 Utils.labelLayer = (layer, text, style={}) ->
 	
-	style = _.extend
+	style = _.extend({
 		font: "10px/1em Menlo"
 		lineHeight: "#{layer.height}px"
 		textAlign: "center"
 		color: "#fff"
-	, style
+	}, style)
 
 	layer.style = style
 	layer.html = text
@@ -167,6 +135,7 @@ Utils.stringify = (obj) ->
 		return JSON.stringify obj if _.isObject obj
 	catch
 		""
+	return "null" if obj is null
 	return "undefined" if obj is undefined
 	return obj.toString() if obj.toString
 	return obj
@@ -215,17 +184,24 @@ Utils.toggle = Utils.cycle
 
 Utils.isWebKit = ->
 	window.WebKitCSSMatrix isnt null
-	
+
+Utils.isChrome = ->
+	(/chrome/).test(navigator.userAgent.toLowerCase())
+
 Utils.isTouch = ->
 	window.ontouchstart is null
 
-Utils.isMobile = ->
-	(/iphone|ipod|ipad|android|ie|blackberry|fennec/).test \
-		navigator.userAgent.toLowerCase()
+Utils.isDesktop = ->
+	Utils.deviceType() is "desktop"
 
-Utils.isChrome = ->
-	(/chrome/).test \
-		navigator.userAgent.toLowerCase()
+Utils.isPhone = ->
+	Utils.deviceType() is "phone"
+
+Utils.isTablet = ->
+	Utils.deviceType() is "tablet"
+
+Utils.isMobile = ->
+	Utils.isPhone() or Utils.isTablet()
 
 Utils.isLocal = ->
 	Utils.isLocalUrl window.location.href
@@ -233,8 +209,27 @@ Utils.isLocal = ->
 Utils.isLocalUrl = (url) ->
 	url[0..6] == "file://"
 
+Utils.isFramerStudio = ->
+	navigator.userAgent.indexOf("FramerStudio") != -1
+
 Utils.devicePixelRatio = ->
 	window.devicePixelRatio
+
+Utils.isJP2Supported = ->
+	Utils.isWebKit() and not Utils.isChrome()
+
+Utils.deviceType = ->
+
+	# Taken from
+	# https://github.com/jeffmcmahan/device-detective/blob/master/bin/device-detect.js
+
+	if /(mobi)/i.test(navigator.userAgent)
+		return "phone"
+
+	if /(tablet)|(iPad)/i.test(navigator.userAgent)
+		return "tablet"
+
+	return "desktop"
 
 Utils.pathJoin = ->
 	Utils.arrayFromArguments(arguments).join("/")
@@ -366,6 +361,31 @@ Utils.domLoadScriptSync = (path) ->
 	scriptData = Utils.domLoadDataSync path
 	eval scriptData
 	scriptData
+
+Utils.insertCSS = (css) ->
+
+	styleElement = document.createElement("style")
+	styleElement.type = "text/css"
+	styleElement.innerHTML = css
+	
+	Utils.domComplete ->
+		document.body.appendChild(styleElement)
+
+Utils.loadImage = (url, callback, context) ->
+	
+	# Loads a single image and calls callback. 
+	# The callback will be called with true if there is an error.
+
+	element = new Image
+	context ?= Framer.CurrentContext
+	
+	context.eventManager.wrap(element).addEventListener "load", (event) ->
+		callback()
+	
+	context.eventManager.wrap(element).addEventListener "error", (event) ->
+		callback(true)
+	
+	element.src = url
 
 ######################################################
 # GEOMERTY FUNCTIONS

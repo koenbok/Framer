@@ -17,42 +17,42 @@ _WebkitProperties = [
 exports.LayerStyle =
 
 	width: (layer) ->
-		layer.width + "px"
+		layer._properties.width + "px"
 	
 	height: (layer) ->
-		layer.height + "px"
+		layer._properties.height + "px"
 
 	display: (layer) ->
-		if layer.visible is true
+		if layer._properties.visible is true
 			return "block"
 		return "none"
 
 	opacity: (layer) ->
-		layer.opacity
+		layer._properties.opacity
 
 	overflow: (layer) ->
-		if layer.scrollHorizontal is true or layer.scrollVertical is true
+		if layer._properties.scrollHorizontal is true or layer._properties.scrollVertical is true
 			return "auto"
-		if layer.clip is true
+		if layer._properties.clip is true
 			return "hidden"
 		return "visible"
 
 	overflowX: (layer) ->
-		if layer.scrollHorizontal is true
+		if layer._properties.scrollHorizontal is true
 			return "scroll"
-		if layer.clip is true
+		if layer._properties.clip is true
 			return "hidden"
 		return "visible"
 
 	overflowY: (layer) ->
-		if layer.scrollVertical is true
+		if layer._properties.scrollVertical is true
 			return "scroll"
-		if layer.clip is true
+		if layer._properties.clip is true
 			return "hidden"
 		return "visible"
 
 	zIndex: (layer) ->
-		layer.index
+		layer._properties.index
 
 	webkitFilter: (layer) ->
 
@@ -77,19 +77,19 @@ exports.LayerStyle =
 		# scenarios with rounded corners and shadows where gpu drawing gets weird
 		# results.
 
-		if layer._prefer2d
+		if layer._properties._prefer2d
 			return exports.LayerStyle.webkitTransformPrefer2d(layer)
 
 		"
-		translate3d(#{layer.x}px,#{layer.y}px,#{layer.z}px) 
-		scale(#{layer.scale})
-		scale3d(#{layer.scaleX},#{layer.scaleY},#{layer.scaleZ})
-		skew(#{layer.skew}deg,#{layer.skew}deg) 
-		skewX(#{layer.skewX}deg)  
-		skewY(#{layer.skewY}deg) 
-		rotateX(#{layer.rotationX}deg) 
-		rotateY(#{layer.rotationY}deg) 
-		rotateZ(#{layer.rotationZ}deg) 
+		translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px) 
+		scale(#{layer._properties.scale})
+		scale3d(#{layer._properties.scaleX},#{layer._properties.scaleY},#{layer._properties.scaleZ})
+		skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg) 
+		skewX(#{layer._properties.skewX}deg)  
+		skewY(#{layer._properties.skewY}deg) 
+		rotateX(#{layer._properties.rotationX}deg) 
+		rotateY(#{layer._properties.rotationY}deg) 
+		rotateZ(#{layer._properties.rotationZ}deg) 
 		"
 
 
@@ -100,68 +100,68 @@ exports.LayerStyle =
 
 		css = []
 
-		if layer.z != 0
-			css.push "translate3d(#{layer.x}px,#{layer.y}px,#{layer.z}px)"
+		if layer._properties.z != 0
+			css.push "translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px)"
 		else
-			css.push "translate(#{layer.x}px,#{layer.y}px)"
+			css.push "translate(#{layer._properties.x}px,#{layer._properties.y}px)"
 
-		if layer.scale != 1
-			css.push "scale(#{layer.scale})"
+		if layer._properties.scale != 1
+			css.push "scale(#{layer._properties.scale})"
 
-		if layer.scaleX != 1 or layer.scaleY != 1 or layer.scaleZ != 1
-			css.push "scale3d(#{layer.scaleX},#{layer.scaleY},#{layer.scaleZ})"
+		if layer._properties.scaleX != 1 or layer._properties.scaleY != 1 or layer._properties.scaleZ != 1
+			css.push "scale3d(#{layer._properties.scaleX},#{layer._properties.scaleY},#{layer._properties.scaleZ})"
 
-		if layer.skew
-			css.push "skew(#{layer.skew}deg,#{layer.skew}deg)"
+		if layer._properties.skew
+			css.push "skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg)"
 
-		if layer.skewX
-			css.push "skewX(#{layer.skewX}deg)"
+		if layer._properties.skewX
+			css.push "skewX(#{layer._properties.skewX}deg)"
 
-		if layer.skewY
-			css.push "skewY(#{layer.skewY}deg)"
+		if layer._properties.skewY
+			css.push "skewY(#{layer._properties.skewY}deg)"
 
-		if layer.rotationX
-			css.push "rotateX(#{layer.rotationX}deg)"
+		if layer._properties.rotationX
+			css.push "rotateX(#{layer._properties.rotationX}deg)"
 
-		if layer.rotationY
-			css.push "rotateY(#{layer.rotationY}deg)"
+		if layer._properties.rotationY
+			css.push "rotateY(#{layer._properties.rotationY}deg)"
 
-		if layer.rotationZ
-			css.push "rotateZ(#{layer.rotationZ}deg)"
+		if layer._properties.rotationZ
+			css.push "rotateZ(#{layer._properties.rotationZ}deg)"
 
 
 		return css.join(" ")
 
 		# "
-		# translate3d(#{layer.x}px,#{layer.y}px,#{layer.z}px) 
-		# scale(#{layer.scale})
-		# scale3d(#{layer.scaleX},#{layer.scaleY},#{layer.scaleZ})
-		# skew(#{layer.skew}deg,#{layer.skew}deg) 
-		# skewX(#{layer.skewX}deg)  
-		# skewY(#{layer.skewY}deg) 
-		# rotateX(#{layer.rotationX}deg) 
-		# rotateY(#{layer.rotationY}deg) 
-		# rotateZ(#{layer.rotationZ}deg) 
+		# translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px) 
+		# scale(#{layer._properties.scale})
+		# scale3d(#{layer._properties.scaleX},#{layer._properties.scaleY},#{layer._properties.scaleZ})
+		# skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg) 
+		# skewX(#{layer._properties.skewX}deg)  
+		# skewY(#{layer._properties.skewY}deg) 
+		# rotateX(#{layer._properties.rotationX}deg) 
+		# rotateY(#{layer._properties.rotationY}deg) 
+		# rotateZ(#{layer._properties.rotationZ}deg) 
 		# "
 
 	webkitTransformOrigin: (layer) ->
-		"#{layer.originX * 100}% #{layer.originY * 100}%"
+		"#{layer._properties.originX * 100}% #{layer._properties.originY * 100}%"
 
 		# Todo: Origin z is in pixels. I need to read up on this.
-		# "#{layer.originX * 100}% #{layer.originY * 100}% #{layer.originZ * 100}%"
+		# "#{layer._properties.originX * 100}% #{layer._properties.originY * 100}% #{layer._properties.originZ * 100}%"
 
 	pointerEvents: (layer) ->
-		if layer.ignoreEvents
+		if layer._properties.ignoreEvents
 			return "none"
 		else
 			return "auto"
 
 	boxShadow: (layer) ->
 
-		if not layer.shadowColor
+		if not layer._properties.shadowColor
 			return ""
 		
-		return "#{layer.shadowX}px #{layer.shadowY}px #{layer.shadowBlur}px #{layer.shadowSpread}px #{layer.shadowColor}"
+		return "#{layer._properties.shadowX}px #{layer._properties.shadowY}px #{layer._properties.shadowBlur}px #{layer._properties.shadowSpread}px #{layer._properties.shadowColor}"
 
 	# css: ->
 	# 	css = {}

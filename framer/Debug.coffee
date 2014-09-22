@@ -1,9 +1,11 @@
 Utils = require "./Utils"
 
+{Context} = require "./Context"
+
 ###############################################################
 # Debug overview
 
-_debugLayers = null
+_debugContext = null
 
 createDebugLayer = (layer) ->
 
@@ -28,8 +30,16 @@ createDebugLayer = (layer) ->
 
 	overLayer
 
-showDebug = -> _debugLayers = Layer.Layers().map createDebugLayer
-hideDebug = -> _debugLayers.map (layer) -> layer.destroy()
+showDebug = -> 
+	
+	_debugContext ?= new Context(name:"Debug")
+
+	layerList = window.Framer.DefaultContext.getLayers()
+	_debugContext.run ->
+		layerList.map createDebugLayer
+
+hideDebug = ->
+	_debugContext.reset()
 
 toggleDebug = Utils.toggle showDebug, hideDebug
 
@@ -44,11 +54,21 @@ window.document.onkeyup = (event) ->
 ###############################################################
 # Error warning
 
-_errorWarningLayer = null
+_errorContext = null
+_errorShown = false
 
-errorWarning = ->
+errorWarning = (event) ->
 
-	return if _errorWarningLayer
+	if not _errorContext
+		_errorContext = new Context(name:"Error")
+
+	print event.message
+
+	console.log event
+
+	return if _errorShown
+
+	_errorShown = true
 
 	layer = new Layer {x:20, y:-50, width:300, height:40}
 
@@ -77,4 +97,4 @@ errorWarning = ->
 
 	_errorWarningLayer = layer
 
-window.onerror = errorWarning
+# _errorContext.eventManager.wrap(window).addEventListener("error", errorWarning)

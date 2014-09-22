@@ -90,24 +90,25 @@ class exports.LayerDraggable extends EventEmitter
 			x: touchEvent.clientX - @_start.x
 			y: touchEvent.clientY - @_start.y
 
-		# Correct for current drag speed
+		# Correct for current drag speed and scale
 		correctedDelta =
-			x: delta.x * @speedX
-			y: delta.y * @speedY
+			x: delta.x * @speedX * (1 / @_screenScale.x)
+			y: delta.y * @speedY * (1 / @_screenScale.y)
 			t: event.timeStamp
 
-		newX = @_start.x + correctedDelta.x - @_offset.x
-		newY = @_start.y + correctedDelta.y - @_offset.y
+		# Pixel align all moves
+		newX = parseInt(@_start.x + correctedDelta.x - @_offset.x)
+		newY = parseInt(@_start.y + correctedDelta.y - @_offset.y)
 
 		if @maxDragFrame
 
 			maxDragFrame = @maxDragFrame
-			maxDragFrame = maxDragFrame() if _.isFunction maxDragFrame
+			maxDragFrame = maxDragFrame() if _.isFunction(maxDragFrame)
 
-			minX = Utils.frameGetMinX(@maxDragFrame)
-			maxX = Utils.frameGetMaxX(@maxDragFrame) - @layer.width
-			minY = Utils.frameGetMinY(@maxDragFrame)
-			maxY = Utils.frameGetMaxY(@maxDragFrame) - @layer.height
+			minX = Utils.frameGetMinX(maxDragFrame)
+			maxX = Utils.frameGetMaxX(maxDragFrame) - @layer.width
+			minY = Utils.frameGetMinY(maxDragFrame)
+			maxY = Utils.frameGetMaxY(maxDragFrame) - @layer.height
 
 			newX = minX if newX < minX
 			newX = maxX if newX > maxX
@@ -115,10 +116,8 @@ class exports.LayerDraggable extends EventEmitter
 			newY = maxY if newY > maxY
 
 
-		# We use the requestAnimationFrame to update the position
-		window.requestAnimationFrame =>
-			@layer.x = newX
-			@layer.y = newY
+		@layer.x = newX
+		@layer.y = newY
 
 		@_deltas.push correctedDelta
 
@@ -139,6 +138,10 @@ class exports.LayerDraggable extends EventEmitter
 		@_offset =
 			x: touchEvent.clientX - @layer.x
 			y: touchEvent.clientY - @layer.y
+
+		@_screenScale =
+			x: @layer.screenScaleX()
+			y: @layer.screenScaleY()
 
 		document.addEventListener Events.TouchMove, @_updatePosition
 		document.addEventListener Events.TouchEnd, @_touchEnd

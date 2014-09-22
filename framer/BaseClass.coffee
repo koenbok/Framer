@@ -75,9 +75,11 @@ class exports.BaseClass extends EventEmitter
 	#################################################################
 	# Base constructor method
 
-	constructor: (options={}) ->
+	constructor: (options) ->
 
 		super
+
+		@_context = Framer?.CurrentContext
 
 		# Create a holder for the property values
 		@[DefinedPropertiesValuesKey] = {}
@@ -89,6 +91,6 @@ class exports.BaseClass extends EventEmitter
 		@_id = @constructor[CounterKey]
 
 		# Set the default values for this object
-		_.map @constructor[DefinedPropertiesKey], (descriptor, name) =>
-			@[name] = Utils.valueOrDefault options[name], @_getPropertyDefaultValue name
+		for name, descriptor of @constructor[DefinedPropertiesKey]
+			@[name] = Utils.valueOrDefault(options?[name], @_getPropertyDefaultValue(name))
 

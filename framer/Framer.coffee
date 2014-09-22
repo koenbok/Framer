@@ -17,6 +17,7 @@ Framer.print = (require "./Print").print
 _.extend window, Framer if window
 
 # Framer level modules
+Framer.Context = (require "./Context").Context
 Framer.Config = (require "./Config").Config
 Framer.EventEmitter = (require "./EventEmitter").EventEmitter
 Framer.BaseClass = (require "./BaseClass").BaseClass
@@ -27,9 +28,12 @@ Framer.BezierCurveAnimator = (require "./Animators/BezierCurveAnimator").BezierC
 Framer.SpringDHOAnimator = (require "./Animators/SpringDHOAnimator").SpringDHOAnimator
 Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4Animator
 Framer.Importer = (require "./Importer").Importer
+Framer.DeviceView = (require "./DeviceView").DeviceView
 Framer.Debug = (require "./Debug").Debug
-Framer.Session = (require "./Session").Session
 Framer.Extras = require "./Extras/Extras"
+
+Framer.DefaultContext = new Framer.Context(name:"Default")
+Framer.CurrentContext = Framer.DefaultContext
 
 window.Framer = Framer if window
 
@@ -37,9 +41,9 @@ window.Framer = Framer if window
 require "./Compat"
 
 # Fix for mobile scrolling
-Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
+# Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
 
 # Set the defaults
 Defaults = (require "./Defaults").Defaults
+Defaults.setup()
 Framer.resetDefaults = Defaults.reset
-Framer.resetDefaults()

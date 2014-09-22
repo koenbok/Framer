@@ -351,7 +351,7 @@ describe "Layer", ->
 			
 			layer = new Layer
 			
-			assert.equal layer._element.parentNode.id, "FramerRoot"
+			assert.equal layer._element.parentNode.id, "FramerContextRoot-Default"
 			assert.equal layer.superLayer, null
 
 		it "should check superLayer", ->
@@ -374,7 +374,7 @@ describe "Layer", ->
 
 			layerB.superLayer = null
 
-			assert.equal layerB._element.parentNode.id, "FramerRoot"
+			assert.equal layerB._element.parentNode.id, "FramerContextRoot-Default"
 			assert.equal layerB.superLayer, null
 
 		it "should list sublayers", ->
@@ -645,7 +645,7 @@ describe "Layer", ->
 			layer = new Layer
 			layer.destroy()
 
-			Layer.Layers().should.not.contain layer
+			Framer.CurrentContext.getLayers().should.not.contain layer
 			assert.equal layer._element.parentNode, null
 
 		it "should set text", ->

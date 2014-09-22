@@ -27,17 +27,17 @@ AnimationLoop =
 			return
 
 		AnimationLoop._running = true
-		AnimationLoop._time = Utils.getTime()
+		# AnimationLoop._time = Utils.getTime()
+		AnimationLoop._timestamp = 0
 		AnimationLoop._sessionTime = 0
 
-		window.requestAnimationFrame AnimationLoop._tick
+		window.requestAnimationFrame(AnimationLoop._tick)
 
 	_stop: ->
 		# console.log "AnimationLoop._stop"
 		AnimationLoop._running = false
 
-
-	_tick: ->
+	_tick: (timestamp) ->
 
 		if not AnimationLoop._animators.length
 			return AnimationLoop._stop()
@@ -46,9 +46,25 @@ AnimationLoop =
 		# 	console.log "AnimationLoop._start"
 
 		AnimationLoop._frameCounter++
+
+		# delta = (timestamp - (AnimationLoop._timestamp or 0)) / 1000
+		# fps = 1 / delta
+
+		# AnimationLoop._timestamp = timestamp
+
+		# console.log delta
+
+
+		# It seems that a fixed fps works better.
 		
-		time  = Utils.getTime()
-		delta = time - AnimationLoop._time
+
+		fps = 60
+		delta = 1/fps
+
+		# console.log delta, fps, timestamp
+
+		# console.log timestamp
+		
 
 		AnimationLoop._sessionTime += delta
 
@@ -59,23 +75,32 @@ AnimationLoop =
 		# 	"animators:#{AnimationLoop._animators.length}"
 		# ].join " "
 
-		removeAnimators = []
+		AnimationLoop._counter = 0
+
+		index = 0
 
 		for animator in AnimationLoop._animators
 
-			animator.emit "tick", animator.next(delta)
+			index++
+
+			if not animator
+				continue
+
+			AnimationLoop._counter++
+
+			animator.emit("tick", animator.next(delta, fps))
 
 			if animator.finished()
-				animator.emit "tick", 1 # This makes sure we and at a perfect value
-				removeAnimators.push animator
+				animator.emit "tick", 1 # This makes sure we end at a perfect value
+				animator.emit "end"
+				AnimationLoop.remove(animator)
 
-		AnimationLoop._time = time
+		# This means there were no animators anymore so we can safely exit
+		# and reset the animators array.
+		if AnimationLoop._counter is 0
+			AnimationLoop._animators.length = 0
 
-		for animator in removeAnimators
-			AnimationLoop.remove animator
-			animator.emit "end"
-
-		window.requestAnimationFrame AnimationLoop._tick
+		window.requestAnimationFrame(AnimationLoop._tick)
 
 		return # Important for performance
 
@@ -86,10 +111,13 @@ AnimationLoop =
 
 		animator[AnimationLoopIndexKey] = AnimationLoop._animators.push animator
 		animator.emit "start"
-		AnimationLoop._start()
+
+		Utils.domComplete ->
+			AnimationLoop._start()
 
 	remove: (animator) ->
-		AnimationLoop._animators = _.without AnimationLoop._animators, animator
+		index = AnimationLoop._animators.indexOf(animator)
+		AnimationLoop._animators[index] = null
 		animator.emit "stop"
 
 exports.AnimationLoop = AnimationLoop

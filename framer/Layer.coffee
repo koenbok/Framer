@@ -4,7 +4,6 @@ Utils = require "./Utils"
 
 {Config} = require "./Config"
 {Defaults} = require "./Defaults"
-{Session} = require "./Session"
 {BaseClass} = require "./BaseClass"
 {EventEmitter} = require "./EventEmitter"
 {Animation} = require "./Animation"
@@ -13,44 +12,50 @@ Utils = require "./Utils"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
 
-Session._RootElement = null
-Session._LayerList = []
+layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
 
-layerProperty = (name, cssProperty, fallback, validator, set) ->
-	exportable: true
-	default: fallback
-	get: ->
-		@_getPropertyValue name
-	set: (value) ->
+	# console.log "set_#{name}"
 
-		# if not validator
-		# 	console.log "Missing validator for Layer.#{name}", validator
-
-		if validator?(value) is false
-			throw Error "value '#{value}' of type #{typeof value} is not valid for a Layer.#{name} property"
-
-		@_setPropertyValue name, value
+	obj::["set_#{name}"] = (value) ->
+		@_properties[name] = value
 		@style[cssProperty] = LayerStyle[cssProperty](@)
-		@emit "change:#{name}", value
-		set @, value if set
 
-layerStyleProperty = (cssProperty) ->
-	exportable: true
-	# default: fallback
-	get: -> @style[cssProperty]
-	set: (value) ->
+	result = 
+		exportable: true
+		default: fallback
+		get: -> @_properties[name]
+		set: (value) ->
+			
+			if validator?(value) is false
+				throw Error "value '#{value}' of type #{typeof value} is not valid for a Layer.#{name} property"
+
+			@["set_#{name}"](value)
+			@emit "change:#{name}", value
+			set?(@, value)
+
+layerStyleProperty = (obj, cssProperty) ->
+
+	obj::["set_#{cssProperty}"] = (value) ->
 		@style[cssProperty] = value
-		@emit "change:#{cssProperty}", value
+
+	result =
+		exportable: true
+		# default: fallback
+		get: -> @style[cssProperty]
+		set: (value) ->
+			@["set_#{cssProperty}"](value)
+			@emit "change:#{cssProperty}", value
 
 class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
 
-		Session._LayerList.push @
+		@_properties = {}
 
 		# Special power setting for 2d rendering path. Only enable this
 		# if you know what you are doing. See LayerStyle for more info.
 		@_prefer2d = false
+		@_cacheImage = false
 
 		# We have to create the element before we set the defaults
 		@_createElement()
@@ -62,6 +67,9 @@ class exports.Layer extends BaseClass
 		options = Defaults.getDefaults "Layer", options
 
 		super options
+
+		# Add this layer to the current context
+		@_context._layerList.push @
 
 		# Keep track of the default values
 		# @_defaultValues = options._defaultValues
@@ -87,18 +95,18 @@ class exports.Layer extends BaseClass
 	# Properties
 
 	# Css properties
-	@define "width",  layerProperty "width",  "width", 100, _.isNumber
-	@define "height", layerProperty "height", "height", 100, _.isNumber
+	@define "width",  layerProperty @, "width",  "width", 100, _.isNumber
+	@define "height", layerProperty @, "height", "height", 100, _.isNumber
 
-	@define "visible", layerProperty "visible", "display", true, _.isBool
-	@define "opacity", layerProperty "opacity", "opacity", 1, _.isNumber
-	@define "index", layerProperty "index", "zIndex", 0, _.isNumber
-	@define "clip", layerProperty "clip", "overflow", true, _.isBool
+	@define "visible", layerProperty @, "visible", "display", true, _.isBool
+	@define "opacity", layerProperty @, "opacity", "opacity", 1, _.isNumber
+	@define "index", layerProperty @, "index", "zIndex", 0, _.isNumber
+	@define "clip", layerProperty @, "clip", "overflow", true, _.isBool
 	
-	@define "scrollHorizontal", layerProperty "scrollHorizontal", "overflowX", false, _.isBool, (layer, value) ->
+	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBool, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 	
-	@define "scrollVertical", layerProperty "scrollVertical", "overflowY", false, _.isBool, (layer, value) ->
+	@define "scrollVertical", layerProperty @, "scrollVertical", "overflowY", false, _.isBool, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 
 	@define "scroll",
@@ -106,61 +114,62 @@ class exports.Layer extends BaseClass
 		set: (value) -> @scrollHorizontal = @scrollVertical = true
 
 	# Behaviour properties
-	@define "ignoreEvents", layerProperty "ignoreEvents", "pointerEvents", true, _.isBool
+	@define "ignoreEvents", layerProperty @, "ignoreEvents", "pointerEvents", true, _.isBool
 
 	# Matrix properties
-	@define "x", layerProperty "x", "webkitTransform", 0, _.isNumber
-	@define "y", layerProperty "y", "webkitTransform", 0, _.isNumber
-	@define "z", layerProperty "z", "webkitTransform", 0, _.isNumber
+	@define "x", layerProperty @, "x", "webkitTransform", 0, _.isNumber
+	@define "y", layerProperty @, "y", "webkitTransform", 0, _.isNumber
+	@define "z", layerProperty @, "z", "webkitTransform", 0, _.isNumber
 
-	@define "scaleX", layerProperty "scaleX", "webkitTransform", 1, _.isNumber
-	@define "scaleY", layerProperty "scaleY", "webkitTransform", 1, _.isNumber
-	@define "scaleZ", layerProperty "scaleZ", "webkitTransform", 1, _.isNumber
-	@define "scale", layerProperty "scale", "webkitTransform", 1, _.isNumber
+	@define "scaleX", layerProperty @, "scaleX", "webkitTransform", 1, _.isNumber
+	@define "scaleY", layerProperty @, "scaleY", "webkitTransform", 1, _.isNumber
+	@define "scaleZ", layerProperty @, "scaleZ", "webkitTransform", 1, _.isNumber
+	@define "scale", layerProperty @, "scale", "webkitTransform", 1, _.isNumber
 
-	@define "skewX", layerProperty "skewX", "webkitTransform", 0, _.isNumber
-	@define "skewY", layerProperty "skewY", "webkitTransform", 0, _.isNumber
-	@define "skew", layerProperty "skew", "webkitTransform", 0, _.isNumber
+	@define "skewX", layerProperty @, "skewX", "webkitTransform", 0, _.isNumber
+	@define "skewY", layerProperty @, "skewY", "webkitTransform", 0, _.isNumber
+	@define "skew", layerProperty @, "skew", "webkitTransform", 0, _.isNumber
 
 	# @define "scale",
 	# 	get: -> (@scaleX + @scaleY + @scaleZ) / 3.0
 	# 	set: (value) -> @scaleX = @scaleY = @scaleZ = value
 
-	@define "originX", layerProperty "originX", "webkitTransformOrigin", 0.5, _.isNumber
-	@define "originY", layerProperty "originY", "webkitTransformOrigin", 0.5, _.isNumber
-	# @define "originZ", layerProperty "originZ", "webkitTransformOrigin", 0.5
+	@define "originX", layerProperty @, "originX", "webkitTransformOrigin", 0.5, _.isNumber
+	@define "originY", layerProperty @, "originY", "webkitTransformOrigin", 0.5, _.isNumber
+	# @define "originZ", layerProperty @, "originZ", "webkitTransformOrigin", 0.5
 
-	@define "rotationX", layerProperty "rotationX", "webkitTransform", 0, _.isNumber
-	@define "rotationY", layerProperty "rotationY", "webkitTransform", 0, _.isNumber
-	@define "rotationZ", layerProperty "rotationZ", "webkitTransform", 0, _.isNumber
-	@define "rotation",  layerProperty "rotationZ", "webkitTransform", 0, _.isNumber
+	@define "rotationX", layerProperty @, "rotationX", "webkitTransform", 0, _.isNumber
+	@define "rotationY", layerProperty @, "rotationY", "webkitTransform", 0, _.isNumber
+	@define "rotationZ", layerProperty @, "rotationZ", "webkitTransform", 0, _.isNumber
+	@define "rotation", layerProperty @, "rotationZ", "webkitTransform", 0, _.isNumber
+	set_rotation: (value) -> @set_rotationZ(value)
 
 	# Filter properties
-	@define "blur", layerProperty "blur", "webkitFilter", 0, _.isNumber
-	@define "brightness", layerProperty "brightness", "webkitFilter", 100, _.isNumber
-	@define "saturate", layerProperty "saturate", "webkitFilter", 100, _.isNumber
-	@define "hueRotate", layerProperty "hueRotate", "webkitFilter", 0, _.isNumber
-	@define "contrast", layerProperty "contrast", "webkitFilter", 100, _.isNumber
-	@define "invert", layerProperty "invert", "webkitFilter", 0, _.isNumber
-	@define "grayscale", layerProperty "grayscale", "webkitFilter", 0, _.isNumber
-	@define "sepia", layerProperty "sepia", "webkitFilter", 0, _.isNumber
+	@define "blur", layerProperty @, "blur", "webkitFilter", 0, _.isNumber
+	@define "brightness", layerProperty @, "brightness", "webkitFilter", 100, _.isNumber
+	@define "saturate", layerProperty @, "saturate", "webkitFilter", 100, _.isNumber
+	@define "hueRotate", layerProperty @, "hueRotate", "webkitFilter", 0, _.isNumber
+	@define "contrast", layerProperty @, "contrast", "webkitFilter", 100, _.isNumber
+	@define "invert", layerProperty @, "invert", "webkitFilter", 0, _.isNumber
+	@define "grayscale", layerProperty @, "grayscale", "webkitFilter", 0, _.isNumber
+	@define "sepia", layerProperty @, "sepia", "webkitFilter", 0, _.isNumber
 
 	# Shadow properties
-	@define "shadowX", layerProperty "shadowX", "boxShadow", 0, _.isNumber
-	@define "shadowY", layerProperty "shadowY", "boxShadow", 0, _.isNumber
-	@define "shadowBlur", layerProperty "shadowBlur", "boxShadow", 0, _.isNumber
-	@define "shadowSpread", layerProperty "shadowSpread", "boxShadow", 0, _.isNumber
-	@define "shadowColor", layerProperty "shadowColor", "boxShadow", ""
+	@define "shadowX", layerProperty @, "shadowX", "boxShadow", 0, _.isNumber
+	@define "shadowY", layerProperty @, "shadowY", "boxShadow", 0, _.isNumber
+	@define "shadowBlur", layerProperty @, "shadowBlur", "boxShadow", 0, _.isNumber
+	@define "shadowSpread", layerProperty @, "shadowSpread", "boxShadow", 0, _.isNumber
+	@define "shadowColor", layerProperty @, "shadowColor", "boxShadow", ""
 
 	# Mapped style properties
 
-	@define "backgroundColor", layerStyleProperty "backgroundColor"
-	@define "color", layerStyleProperty "color"
+	@define "backgroundColor", layerStyleProperty @, "backgroundColor"
+	@define "color", layerStyleProperty @, "color"
 
 	# Border properties
-	@define "borderRadius", layerStyleProperty "borderRadius"
-	@define "borderColor", layerStyleProperty "borderColor"
-	@define "borderWidth", layerStyleProperty "borderWidth"
+	@define "borderRadius", layerStyleProperty @, "borderRadius"
+	@define "borderColor", layerStyleProperty @, "borderColor"
+	@define "borderWidth", layerStyleProperty @, "borderWidth"
 
 
 	##############################################################
@@ -226,6 +235,20 @@ class exports.Layer extends BaseClass
 			else
 				@frame = Utils.convertPoint(frame, null, @superLayer)
 
+	screenScaleX: ->
+		if @superLayer
+			return @superLayer.screenScaleX()
+		else if @_context._parentLayer
+			return @_context._parentLayer.screenScaleX()
+		return @scale * @scaleX
+
+	screenScaleY: ->
+		if @superLayer
+			return @superLayer.screenScaleY()
+		else if @_context._parentLayer
+			return @_context._parentLayer.screenScaleY()
+		return @scale * @scaleY
+
 	contentFrame: ->
 		Utils.frameMerge(_.pluck(@subLayers, "frame"))
 
@@ -235,6 +258,11 @@ class exports.Layer extends BaseClass
 			frame = @frame
 			Utils.frameSetMidX(frame, parseInt(@superLayer.width  / 2.0))
 			Utils.frameSetMidY(frame, parseInt(@superLayer.height / 2.0))
+			return frame
+		else if @_context._parentLayer
+			frame = @frame
+			Utils.frameSetMidX(frame, parseInt(@_context._parentLayer.width  / 2.0))
+			Utils.frameSetMidY(frame, parseInt(@_context._parentLayer.height / 2.0))
 			return frame
 		else
 			frame = @frame
@@ -312,18 +340,7 @@ class exports.Layer extends BaseClass
 		@_element = document.createElement "div"
 
 	_insertElement: ->
-		Utils.domComplete @__insertElement
-
-	__createRootElement: =>
-		element = document.createElement "div"
-		element.id = "FramerRoot"
-		_.extend element.style, Config.rootBaseCSS
-		document.body.appendChild element
-		element
-
-	__insertElement: =>
-		Session._RootElement ?= @__createRootElement()
-		Session._RootElement.appendChild @_element
+		@_context.getRootElement().appendChild @_element
 
 	destroy: ->
 
@@ -332,8 +349,8 @@ class exports.Layer extends BaseClass
 
 		@_element.parentNode?.removeChild @_element
 		@removeAllListeners()
-
-		Session._LayerList = _.without Session._LayerList, @
+		
+		@_context._layerList = _.without @_context._layerList, @
 
 
 	##############################################################
@@ -393,7 +410,11 @@ class exports.Layer extends BaseClass
 			@backgroundColor = null
 
 			# Set the property value
-			@_setPropertyValue "image", value
+			@_setPropertyValue("image", value)
+
+			if value in [null, ""]
+				@style["background-image"] = null
+				return
 
 			imageUrl = value
 
@@ -402,7 +423,7 @@ class exports.Layer extends BaseClass
 
 			# If the file is local, we want to avoid caching
 			# if Utils.isLocal() and not (_.startsWith(imageUrl, "http://") or _.startsWith(imageUrl, "https://"))
-			if Utils.isLocal() and not imageUrl.match(/^https?:\/\//)
+			if Utils.isLocal() and not imageUrl.match(/^https?:\/\//) and @_cacheImage is false
 				imageUrl += "?nocache=#{Date.now()}"
 
 			# As an optimization, we will only use a loader
@@ -490,7 +511,7 @@ class exports.Layer extends BaseClass
 
 			# If there is no superLayer we need to walk through the root
 			if @superLayer is null
-				return _.filter Session._LayerList, (layer) =>
+				return _.filter @_context._layerList, (layer) =>
 					layer isnt @ and layer.superLayer is null
 
 			return _.without @superLayer.subLayers, @
@@ -611,7 +632,7 @@ class exports.Layer extends BaseClass
 
 		# Listen to dom events on the element
 		super eventName, listener
-		@_element.addEventListener eventName, listener
+		@_context.eventManager.wrap(@_element).addEventListener(eventName, listener)
 
 		@_eventListeners ?= {}
 		@_eventListeners[eventName] ?= []
@@ -631,7 +652,7 @@ class exports.Layer extends BaseClass
 
 		super eventName, listener
 		
-		@_element.removeEventListener eventName, listener
+		@_context.eventManager.wrap(@_element).removeEventListener(eventName, listener)
 
 		if @_eventListeners
 			@_eventListeners[eventName] = _.without @_eventListeners[eventName], listener
@@ -647,4 +668,3 @@ class exports.Layer extends BaseClass
 	on: @::addListener
 	off: @::removeListener
 
-exports.Layer.Layers = -> _.clone Session._LayerList

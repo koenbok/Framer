@@ -179,7 +179,7 @@ class exports.Animation extends EventEmitter
 		# animation loop. It needs to be very fast.
 		@_animator.on "tick", (value) ->
 			for k, v of stateB
-				target[k] = Utils.mapRange value, 0, 1, stateA[k], stateB[k]
+				target["set_#{k}"](Utils.mapRange value, 0, 1, stateA[k], stateB[k])
 			return # For performance
 
 		start = =>
