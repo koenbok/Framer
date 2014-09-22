@@ -52,7 +52,7 @@ build = ->
 	# Build up a context
 	context = commits:[]
 
-	exec "git log --pretty=format:\"%h\t%an\t%ad\t%s\"", (err, output) ->
+	exec "git log --pretty=format:\"%h\t%an\t%ad\t%s\" --first-parent master", (err, output) ->
 		throw err if err
 		
 		start = false
