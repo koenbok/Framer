@@ -141,7 +141,8 @@ class exports.Layer extends BaseClass
 	@define "rotationX", layerProperty @, "rotationX", "webkitTransform", 0, _.isNumber
 	@define "rotationY", layerProperty @, "rotationY", "webkitTransform", 0, _.isNumber
 	@define "rotationZ", layerProperty @, "rotationZ", "webkitTransform", 0, _.isNumber
-	@define "rotation", layerProperty @, "rotation", "webkitTransform", 0, _.isNumber
+	@define "rotation", layerProperty @, "rotationZ", "webkitTransform", 0, _.isNumber
+	set_rotation: (value) -> @set_rotationZ(value)
 
 	# Filter properties
 	@define "blur", layerProperty @, "blur", "webkitFilter", 0, _.isNumber
@@ -233,6 +234,20 @@ class exports.Layer extends BaseClass
 				@frame = frame
 			else
 				@frame = Utils.convertPoint(frame, null, @superLayer)
+
+	screenScaleX: ->
+		if @superLayer
+			return @superLayer.screenScaleX()
+		else if @_context._parentLayer
+			return @_context._parentLayer.screenScaleX()
+		return @scale * @scaleX
+
+	screenScaleY: ->
+		if @superLayer
+			return @superLayer.screenScaleY()
+		else if @_context._parentLayer
+			return @_context._parentLayer.screenScaleY()
+		return @scale * @scaleY
 
 	contentFrame: ->
 		Utils.frameMerge(_.pluck(@subLayers, "frame"))
