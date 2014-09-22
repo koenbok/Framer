@@ -114,8 +114,8 @@ class exports.DeviceView extends BaseClass
 		if @_shouldRenderFullScreen()
 			for layer in [@background, @phone, @viewport, @content, @screen]
 				layer.x = layer.y = 0
-				layer.width = window.innerWidth
-				layer.height = window.innerHeight
+				layer.width = window.innerWidth / @contentScale
+				layer.height = window.innerHeight / @contentScale
 				layer.scale = 1
 			
 			@_positionKeyboard()
@@ -131,7 +131,7 @@ class exports.DeviceView extends BaseClass
 			@phone.scale = @_calculatePhoneScale()
 			@phone.center()
 
-			[width, height] = @_getOrientationDimensions(@_device.screenWidth, @_device.screenHeight)
+			[width, height] = @_getOrientationDimensions(@_device.screenWidth / @contentScale, @_device.screenHeight/ @contentScale)
 
 			@screen.width  = @_device.screenWidth
 			@screen.height = @_device.screenHeight
@@ -256,7 +256,10 @@ class exports.DeviceView extends BaseClass
 	# DEVICE ZOOM
 	
 	@define "deviceScale",
-		get: -> @_deviceScale or 1
+		get: ->
+			if @_shouldRenderFullScreen()
+				return 1 
+			return @_deviceScale or 1
 		set: (deviceScale) -> @setDeviceScale(deviceScale, false)
 	
 	setDeviceScale: (deviceScale, animate=false) ->
@@ -330,6 +333,8 @@ class exports.DeviceView extends BaseClass
 				properties: {scale: @_contentScale}
 		else
 			@content.scale = @_contentScale
+
+		@_update()
 
 		@emit("change:contentScale")
 
