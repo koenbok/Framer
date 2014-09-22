@@ -1,7 +1,7 @@
 Utils = require "./Utils"
 {_}   = require "./Underscore"
 
-DeviceViewDefaultDevice = "iphone-6-spacegray"
+DeviceViewDefaultDevice = "iphone-6-silver"
 
 {BaseClass} = require "./BaseClass"
 {Layer} = require "./Layer"
@@ -109,15 +109,17 @@ class exports.DeviceView extends BaseClass
 		
 		# # Todo: pixel align at zoom level 1, 0.5
 
-		console.log "_update", @_shouldRenderFullScreen()
+		contentScaleFactor = @contentScale
+		contentScaleFactor = 1 if contentScaleFactor > 1
 
 		if @_shouldRenderFullScreen()
 			for layer in [@background, @phone, @viewport, @content, @screen]
 				layer.x = layer.y = 0
-				layer.width = window.innerWidth / @contentScale
-				layer.height = window.innerHeight / @contentScale
+				layer.width = window.innerWidth / contentScaleFactor
+				layer.height = window.innerHeight / contentScaleFactor
 				layer.scale = 1
 			
+			@content.scale = contentScaleFactor
 			@_positionKeyboard()
 
 		else
@@ -131,7 +133,9 @@ class exports.DeviceView extends BaseClass
 			@phone.scale = @_calculatePhoneScale()
 			@phone.center()
 
-			[width, height] = @_getOrientationDimensions(@_device.screenWidth / @contentScale, @_device.screenHeight/ @contentScale)
+			[width, height] = @_getOrientationDimensions(
+				@_device.screenWidth / contentScaleFactor, 
+				@_device.screenHeight / contentScaleFactor)
 
 			@screen.width  = @_device.screenWidth
 			@screen.height = @_device.screenHeight
@@ -313,7 +317,7 @@ class exports.DeviceView extends BaseClass
 		return phoneScale
 
 	###########################################################################
-	# CONTENT ZOOM
+	# CONTENT SCALE
 
 	@define "contentScale",
 		get: -> @_contentScale or 1
@@ -322,7 +326,10 @@ class exports.DeviceView extends BaseClass
 	setContentScale: (contentScale, animate=false) ->
 		
 		contentScale = parseFloat(contentScale)
-	
+
+		if contentScale <= 0
+			return
+
 		if contentScale is @_contentScale
 			return
 		
@@ -525,24 +532,46 @@ iPhone6BaseDeviceHand = _.extend {}, iPhone6BaseDevice,
 
 
 iPhone5BaseDevice =
-	deviceImageWidth: 772
+	deviceImageWidth: 780
 	deviceImageHeight: 1608
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
-	keyboards:
-		portrait:
-			image:  "ios-keyboard.png"
-			width: 640
-			height: 432
-		landscape:
-			image: "ios-keyboard-landscape-light.png"
-			width: 1136
-			height: 322
+	# keyboards:
+	# 	portrait:
+	# 		image:  "ios-keyboard.png"
+	# 		width: 640
+	# 		height: 432
+	# 	landscape:
+	# 		image: "ios-keyboard-landscape-light.png"
+	# 		width: 1136
+	# 		height: 322
 
 iPhone5BaseDeviceHand = _.extend {}, iPhone5BaseDevice,
 	deviceImageWidth: 1884
 	deviceImageHeight: 2234
+	paddingOffset: -200
+
+
+iPhone5CBaseDevice =
+	deviceImageWidth: 776
+	deviceImageHeight: 1612
+	screenWidth: 640
+	screenHeight: 1136
+	deviceType: "phone"
+	# keyboards:
+	# 	portrait:
+	# 		image:  "ios-keyboard.png"
+	# 		width: 640
+	# 		height: 432
+	# 	landscape:
+	# 		image: "ios-keyboard-landscape-light.png"
+	# 		width: 1136
+	# 		height: 322
+
+iPhone5CBaseDeviceHand = _.extend {}, iPhone5CBaseDevice,
+	deviceImageWidth: 1894
+	deviceImageHeight: 2244
 	paddingOffset: -200
 
 
@@ -559,6 +588,19 @@ iPadMiniBaseDeviceHand = _.extend {}, iPadMiniBaseDevice,
 	paddingOffset: -120
 
 
+iPadAirBaseDevice =
+	deviceImageWidth: 1769
+	deviceImageHeight: 2509
+	screenWidth: 1536
+	screenHeight: 2048
+	deviceType: "tablet"
+
+iPadAirBaseDeviceHand = _.extend {}, iPadAirBaseDevice,
+	deviceImageWidth: 4744
+	deviceImageHeight: 4101
+	paddingOffset: -120
+
+
 Nexus5BaseDevice =
 	deviceImageWidth: 1208
 	deviceImageHeight: 2440
@@ -571,11 +613,11 @@ Nexus5BaseDeviceHand = _.extend {}, Nexus5BaseDevice, # 2692 × 2996
 	deviceImageHeight: 2996
 	paddingOffset: -120
 
-# AppleWatchDevice =
-# 	deviceImageWidth: 500
-# 	deviceImageHeight: 820
-# 	screenWidth: 320
-# 	screenHeight: 320
+AppleWatchDevice =
+	deviceImageWidth: 472
+	deviceImageHeight: 806
+	screenWidth: 320
+	screenHeight: 400
 
 
 Devices =
@@ -619,57 +661,66 @@ Devices =
 
 
 	# iPhone 5C
-	"iphone-5c-green": _.extend {}, iPhone5BaseDevice,
+	"iphone-5c-green": _.extend {}, iPhone5CBaseDevice,
 		deviceImage: "iphone-5c-green.png"
-	"iphone-5c-green-hand": _.extend {}, iPhone5BaseDeviceHand,
+	"iphone-5c-green-hand": _.extend {}, iPhone5CBaseDeviceHand,
 		deviceImage: "iphone-5C-green-hand.png"
 
-	"iphone-5c-blue": _.extend {}, iPhone5BaseDevice,
+	"iphone-5c-blue": _.extend {}, iPhone5CBaseDevice,
 		deviceImage: "iphone-5c-blue.png"
-	"iphone-5c-blue-hand": _.extend {}, iPhone5BaseDeviceHand,
+	"iphone-5c-blue-hand": _.extend {}, iPhone5CBaseDeviceHand,
 		deviceImage: "iphone-5C-blue-hand.png"
 
-	"iphone-5c-red": _.extend {}, iPhone5BaseDevice,
-		deviceImage: "iphone-5c-red.png"
-	"iphone-5c-red-hand": _.extend {}, iPhone5BaseDeviceHand,
-		deviceImage: "iphone-5C-red-hand.png"
+	"iphone-5c-pink": _.extend {}, iPhone5CBaseDevice,
+		deviceImage: "iphone-5c-pink.png"
+	"iphone-5c-pink-hand": _.extend {}, iPhone5CBaseDeviceHand,
+		deviceImage: "iphone-5C-pink-hand.png"
 
-	"iphone-5c-white": _.extend {}, iPhone5BaseDevice,
+	"iphone-5c-white": _.extend {}, iPhone5CBaseDevice,
 		deviceImage: "iphone-5c-white.png"
-	"iphone-5c-white-hand": _.extend {}, iPhone5BaseDeviceHand,
+	"iphone-5c-white-hand": _.extend {}, iPhone5CBaseDeviceHand,
 		deviceImage: "iphone-5C-white-hand.png"
 
-	"iphone-5c-yellow": _.extend {}, iPhone5BaseDevice,
+	"iphone-5c-yellow": _.extend {}, iPhone5CBaseDevice,
 		deviceImage: "iphone-5c-yellow.png"
-	"iphone-5c-yellow-hand": _.extend {}, iPhone5BaseDeviceHand,
+	"iphone-5c-yellow-hand": _.extend {}, iPhone5CBaseDeviceHand,
 		deviceImage: "iphone-5C-yellow-hand.png"
 
-
 	# iPad Mini
-	"ipad-mini-spacegrey": _.extend {}, iPadMiniBaseDevice,
-		deviceImage: "ipad-mini-spacegrey.png"
-	"ipad-mini-spacegrey-hand": _.extend {}, iPadMiniBaseDeviceHand,
-		deviceImage: "ipad-mini-spacegrey-hand.png"
+	"ipad-mini-spacegray": _.extend {}, iPadMiniBaseDevice,
+		deviceImage: "ipad-mini-spacegray.png"
+	"ipad-mini-spacegray-hand": _.extend {}, iPadMiniBaseDeviceHand,
+		deviceImage: "ipad-mini-spacegray-hand.png"
 
 	"ipad-mini-silver": _.extend {}, iPadMiniBaseDevice,
 		deviceImage: "ipad-mini-silver.png"
 	"ipad-mini-silver-hand": _.extend {}, iPadMiniBaseDeviceHand,
 		deviceImage: "ipad-mini-silver-hand.png"
 
-	# Nexus 5
+	# iPad Air
+	"ipad-air-spacegray": _.extend {}, iPadMiniBaseDevice,
+		deviceImage: "ipad-air-spacegray.png"
+	"ipad-air-spacegray-hand": _.extend {}, iPadMiniBaseDeviceHand,
+		deviceImage: "ipad-air-spacegray-hand.png"
 
+	"ipad-air-silver": _.extend {}, iPadMiniBaseDevice,
+		deviceImage: "ipad-mini-silver.png"
+	"ipad-air-silver-hand": _.extend {}, iPadMiniBaseDeviceHand,
+		deviceImage: "ipad-mini-silver-hand.png"
+
+	# Nexus 5
 	"nexus-5-black": _.extend {}, Nexus5BaseDevice,
 		deviceImage: "nexus-5-black.png"
 	"nexus-5-black-hand": _.extend {}, Nexus5BaseDeviceHand,
 		deviceImage: "nexus-5-black-hand.png"
 
-	# # Apple Watch
-	# "apple-watch-primary": _.extend {}, AppleWatchDevice,
-	# 	deviceImage: "apple-watch-primary.png"
-	# "apple-watch-sport": _.extend {}, AppleWatchDevice,
-	# 	deviceImage: "apple-watch-sport.png"
-	# "apple-watch-edition": _.extend {}, AppleWatchDevice,
-	# 	deviceImage: "apple-watch-edition.png"
+	# Apple Watch
+	"apple-watch": _.extend {}, AppleWatchDevice,
+		deviceImage: "apple-watch.png"
+	"apple-watch-sport": _.extend {}, AppleWatchDevice,
+		deviceImage: "apple-watch-sport.png"
+	"apple-watch-edition": _.extend {}, AppleWatchDevice,
+		deviceImage: "apple-watch-edition.png"
 
 
 
