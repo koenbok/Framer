@@ -61,12 +61,6 @@ class exports.DeviceView extends BaseClass
 
 		_.extend @, Utils.setDefaultProperties(options, defaults)
 
-
-
-
-
-
-
 	_setup: ->
 		
 		if @_setupDone
