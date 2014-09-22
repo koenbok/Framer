@@ -83,7 +83,10 @@ deploy:
 	make site:build
 	make site:upload
 
-resources:
+resources%optimize:
+	python scripts/optimize.py
+	
+resources%upload:
 	cd extras/resources.framerjs.com; cactus deploy
 
 publish:

@@ -2,9 +2,12 @@
 import os
 import sys
 
+path = os.path.join("extras", "DeviceResources")
 quality = 25
 
-for fileName in os.listdir(os.path.dirname(__file__)):
+os.chdir(path)
+
+for fileName in os.listdir("."):
 	if fileName.endswith(".png"):
 		os.system("sips -s format jp2 %s -s formatOptions %s --out %s" % (fileName, quality, fileName.replace(".png", ".jp2")))
 
