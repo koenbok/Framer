@@ -69,7 +69,7 @@ class exports.Layer extends BaseClass
 		super options
 
 		# Add this layer to the current context
-		@_context._layerList.push @
+		@_context._layerList.push(@)
 
 		# Keep track of the default values
 		# @_defaultValues = options._defaultValues
@@ -83,7 +83,6 @@ class exports.Layer extends BaseClass
 
 		# Insert the layer into the dom or the superLayer element
 		if not options.superLayer
-			@bringToFront()
 			@_insertElement() if not options.shadow
 		else
 			@superLayer = options.superLayer
@@ -340,6 +339,7 @@ class exports.Layer extends BaseClass
 		@_element = document.createElement "div"
 
 	_insertElement: ->
+		@bringToFront()
 		@_context.getRootElement().appendChild @_element
 
 	destroy: ->

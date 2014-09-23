@@ -48,17 +48,8 @@ class exports.Importer
 
 		importedKey = "#{@paths.documentName}/layers.json.js"
 
-		if window.__imported__?.hasOwnProperty importedKey
+		if window.__imported__?.hasOwnProperty(importedKey)
 			return window.__imported__[importedKey]
-
-		# # For now this does not work in Chrome and we throw an error
-		# try
-		# 	return Framer.Utils.domLoadJSONSync @paths.layerInfo
-		# catch e
-		# 	if Utils.isChrome
-		# 		alert ChromeAlert
-		# 	else
-		# 		throw e
 
 		return Framer.Utils.domLoadJSONSync @paths.layerInfo
 
@@ -103,7 +94,7 @@ class exports.Importer
 		if not layer.image and not info.children.length and not info.maskFrame
 			layer.frame = new Frame
 
-		info.children.reverse().map (info) => @_createLayer info, layer
+		_.clone(info.children).reverse().map (info) => @_createLayer info, layer
 
 		# TODODODODOD
 		if not layer.image and not info.maskFrame
