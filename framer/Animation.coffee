@@ -73,6 +73,109 @@ class exports.Animation extends EventEmitter
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
 
+	start: =>
+
+		if @options.layer is null
+			console.error "Animation: missing layer"
+
+		if @options.layer._animation
+			@options.layer._animation.stop()
+
+		@options.layer._animation = @
+
+		AnimatorClass = @_animatorClass()
+
+		if @options.debug
+			console.log "Animation.start #{AnimatorClass.name}", @options.curveOptions
+
+		@_animator = new AnimatorClass @options.curveOptions
+
+		@_target = @options.layer
+		@_stateA = @_currentState()
+		@_stateB = {}
+
+		for k, v of @options.properties
+
+			# Evaluate relative properties
+			v = evaluateRelativeProperty(@_target, k, v) if isRelativeProperty(v)
+
+			# Filter out the properties that are equal
+			@_stateB[k] = v if @_stateA[k] != v
+
+		if _.isEqual @_stateA, @_stateB
+			console.warn "Nothing to animate"
+
+		if @options.debug
+			console.log "Animation.start"
+			console.log "\t#{k}: #{@_stateA[k]} -> #{@_stateB[k]}" for k, v of @_stateB
+
+		# TODO
+
+		@_animator.on "start", => @emit "start"
+		@_animator.on "stop",  => @emit "stop"
+		@_animator.on "end",   => @emit "end"
+
+		# See if we need to repeat this animation
+		# Todo: more repeat behaviours:
+		# 1) add (from end position) 2) reverse (loop between a and b)
+		if @_repeatCounter > 0
+			@_animator.on "end", =>
+				for k, v of @_stateA
+					@_target[k] = v
+				@_repeatCounter--
+				@start()
+
+		# If we have a delay, we wait a bit for it to start
+		if @options.delay
+			Utils.delay(@options.delay, @_start)
+		else
+			@_start()
+
+
+
+
+
+
+	stop: ->
+		@_animator.emit("stop")
+		Framer.Loop.off("update", @_update)
+		# _runningAnimations = _.without _runningAnimations, @
+
+	reverse: ->
+		# TODO: Add some tests
+		options = _.clone @options
+		options.properties = @_originalState
+		animation = new Animation options
+		animation
+
+	# A bunch of common aliases to minimize frustration
+	revert: -> 	@reverse()
+	inverse: -> @reverse()
+	invert: -> 	@reverse()
+
+	emit: (event) ->
+		super
+		# Also emit this to the layer with self as argument
+		@options.layer.emit(event, @)
+
+	_start: =>
+		Framer.Loop.on("update", @_update)
+
+	_update: (delta) =>
+		if @_animator.finished()
+			@_updateValue(1)
+			@_animator.emit("end")
+			@stop()
+		else
+			@_updateValue(@_animator.next(delta))
+
+	_updateValue: (value) =>
+
+		for k, v of @_stateB
+			@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
+
+		return
+
 	_filterAnimatableProperties: (properties) ->
 
 		animatableProperties = {}
@@ -130,86 +233,3 @@ class exports.Animation extends EventEmitter
 				for k, i in ["stiffness", "damping", "mass", "tolerance"]
 					value = parseFloat parsedCurve.args[i]
 					@options.curveOptions[k] = value if value
-
-	start: =>
-
-		if @options.layer is null
-			console.error "Animation: missing layer"
-
-		AnimatorClass = @_animatorClass()
-
-		if @options.debug
-			console.log "Animation.start #{AnimatorClass.name}", @options.curveOptions
-
-		@_animator = new AnimatorClass @options.curveOptions
-
-		target = @options.layer
-		stateA = @_currentState()
-		stateB = {}
-
-		for k, v of @options.properties
-			# Evaluate relative properties
-			v = evaluateRelativeProperty(target, k, v) if isRelativeProperty(v)
-
-			# Filter out the properties that are equal
-			stateB[k] = v if stateA[k] != v
-
-		if _.isEqual stateA, stateB
-			console.warn "Nothing to animate"
-
-		if @options.debug
-			console.log "Animation.start"
-			console.log "\t#{k}: #{stateA[k]} -> #{stateB[k]}" for k, v of stateB
-
-		@_animator.on "start", => @emit "start"
-		@_animator.on "stop",  => @emit "stop"
-		@_animator.on "end",   => @emit "end"
-
-		# See if we need to repeat this animation
-		# Todo: more repeat behaviours:
-		# 1) add (from end position) 2) reverse (loop between a and b)
-		if @_repeatCounter > 0
-			@_animator.on "end", =>
-				for k, v of stateA
-					target[k] = v
-				@_repeatCounter--
-				@start()
-
-		# This is the function that sets the actual value to the layer in the
-		# animation loop. It needs to be very fast.
-		@_animator.on "tick", (value) ->
-			for k, v of stateB
-				target["set_#{k}"](Utils.mapRange value, 0, 1, stateA[k], stateB[k])
-			return # For performance
-
-		start = =>
-			_runningAnimations.push @
-			@_animator.start()
-
-		# If we have a delay, we wait a bit for it to start
-		if @options.delay
-			Utils.delay @options.delay, start
-		else
-			start()
-
-
-	stop: ->
-		@_animator?.stop()
-		_runningAnimations = _.without _runningAnimations, @
-
-	reverse: ->
-		# TODO: Add some tests
-		options = _.clone @options
-		options.properties = @_originalState
-		animation = new Animation options
-		animation
-
-	# A bunch of common aliases to minimize frustration
-	revert: -> 	@reverse()
-	inverse: -> @reverse()
-	invert: -> 	@reverse()
-
-	emit: (event) ->
-		super
-		# Also emit this to the layer with self as argument
-		@options.layer.emit event, @

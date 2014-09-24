@@ -35,6 +35,9 @@ Framer.Extras = require "./Extras/Extras"
 Framer.DefaultContext = new Framer.Context(name:"Default")
 Framer.CurrentContext = Framer.DefaultContext
 
+Framer.Loop = new Framer.AnimationLoop()
+Framer.Loop.tick()
+
 window.Framer = Framer if window
 
 # Compatibility for Framer 2

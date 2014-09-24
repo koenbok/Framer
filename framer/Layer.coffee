@@ -13,44 +13,33 @@ Utils = require "./Utils"
 {LayerDraggable} = require "./LayerDraggable"
 
 layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
-
-	# console.log "set_#{name}"
-
-	obj::["set_#{name}"] = (value) ->
-		@_properties[name] = value
-		@style[cssProperty] = LayerStyle[cssProperty](@)
-
 	result = 
 		exportable: true
 		default: fallback
-		get: -> @_properties[name]
+		get: -> 
+			@_properties[name]
 		set: (value) ->
-			
-			if validator?(value) is false
-				throw Error "value '#{value}' of type #{typeof value} is not valid for a Layer.#{name} property"
+			@_properties[name] = value
 
-			@["set_#{name}"](value)
-			@emit "change:#{name}", value
-			set?(@, value)
+			if value in ["", null, undefined]
+				delete @style[cssProperty]
+			else
+				@style[cssProperty] = LayerStyle[cssProperty](@)
 
-layerStyleProperty = (obj, cssProperty) ->
+			set?(value)
+			@emit("change:#{name}", value)
 
-	obj::["set_#{cssProperty}"] = (value) ->
-		@style[cssProperty] = value
+			@_context._needsRender = true
+			@_needsRender = true
 
-	result =
-		exportable: true
-		# default: fallback
-		get: -> @style[cssProperty]
-		set: (value) ->
-			@["set_#{cssProperty}"](value)
-			@emit "change:#{cssProperty}", value
 
 class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
 
 		@_properties = {}
+		@_style = {}
+		@_classList = []
 
 		# Special power setting for 2d rendering path. Only enable this
 		# if you know what you are doing. See LayerStyle for more info.
@@ -58,8 +47,8 @@ class exports.Layer extends BaseClass
 		@_cacheImage = false
 
 		# We have to create the element before we set the defaults
-		@_createElement()
-		@_setDefaultCSS()
+		# @_createElement()
+		# @_setDefaultCSS()
 
 		if options.hasOwnProperty "frame"
 			options = _.extend(options, options.frame)
@@ -75,17 +64,15 @@ class exports.Layer extends BaseClass
 		# @_defaultValues = options._defaultValues
 
 		# We need to explicitly set the element id again, becuase it was made by the super
-		@_element.id = "FramerLayer-#{@id}"
+		# @_element.id = "FramerLayer-#{@id}"
 
 		for k in ["minX", "midX", "maxX", "minY", "midY", "maxY"]
 			if options.hasOwnProperty k
 				@[k] = options[k]
 
 		# Insert the layer into the dom or the superLayer element
-		if not options.superLayer
-			@_insertElement() if not options.shadow
-		else
-			@superLayer = options.superLayer
+		#if not options.shadow
+		@superLayer = options.superLayer
 
 		# Set needed private variables
 		@_subLayers = []
@@ -116,42 +103,42 @@ class exports.Layer extends BaseClass
 	@define "ignoreEvents", layerProperty @, "ignoreEvents", "pointerEvents", true, _.isBool
 
 	# Matrix properties
-	@define "x", layerProperty @, "x", "webkitTransform", 0, _.isNumber
-	@define "y", layerProperty @, "y", "webkitTransform", 0, _.isNumber
-	@define "z", layerProperty @, "z", "webkitTransform", 0, _.isNumber
+	@define "x", layerProperty @, "x", "WebkitTransform", 0, _.isNumber
+	@define "y", layerProperty @, "y", "WebkitTransform", 0, _.isNumber
+	@define "z", layerProperty @, "z", "WebkitTransform", 0, _.isNumber
 
-	@define "scaleX", layerProperty @, "scaleX", "webkitTransform", 1, _.isNumber
-	@define "scaleY", layerProperty @, "scaleY", "webkitTransform", 1, _.isNumber
-	@define "scaleZ", layerProperty @, "scaleZ", "webkitTransform", 1, _.isNumber
-	@define "scale", layerProperty @, "scale", "webkitTransform", 1, _.isNumber
+	@define "scaleX", layerProperty @, "scaleX", "WebkitTransform", 1, _.isNumber
+	@define "scaleY", layerProperty @, "scaleY", "WebkitTransform", 1, _.isNumber
+	@define "scaleZ", layerProperty @, "scaleZ", "WebkitTransform", 1, _.isNumber
+	@define "scale", layerProperty @, "scale", "WebkitTransform", 1, _.isNumber
 
-	@define "skewX", layerProperty @, "skewX", "webkitTransform", 0, _.isNumber
-	@define "skewY", layerProperty @, "skewY", "webkitTransform", 0, _.isNumber
-	@define "skew", layerProperty @, "skew", "webkitTransform", 0, _.isNumber
+	@define "skewX", layerProperty @, "skewX", "WebkitTransform", 0, _.isNumber
+	@define "skewY", layerProperty @, "skewY", "WebkitTransform", 0, _.isNumber
+	@define "skew", layerProperty @, "skew", "WebkitTransform", 0, _.isNumber
 
 	# @define "scale",
 	# 	get: -> (@scaleX + @scaleY + @scaleZ) / 3.0
 	# 	set: (value) -> @scaleX = @scaleY = @scaleZ = value
 
-	@define "originX", layerProperty @, "originX", "webkitTransformOrigin", 0.5, _.isNumber
-	@define "originY", layerProperty @, "originY", "webkitTransformOrigin", 0.5, _.isNumber
-	# @define "originZ", layerProperty @, "originZ", "webkitTransformOrigin", 0.5
+	@define "originX", layerProperty @, "originX", "WebkitTransformOrigin", 0.5, _.isNumber
+	@define "originY", layerProperty @, "originY", "WebkitTransformOrigin", 0.5, _.isNumber
+	# @define "originZ", layerProperty @, "originZ", "WebkitTransformOrigin", 0.5
 
-	@define "rotationX", layerProperty @, "rotationX", "webkitTransform", 0, _.isNumber
-	@define "rotationY", layerProperty @, "rotationY", "webkitTransform", 0, _.isNumber
-	@define "rotationZ", layerProperty @, "rotationZ", "webkitTransform", 0, _.isNumber
-	@define "rotation", layerProperty @, "rotationZ", "webkitTransform", 0, _.isNumber
+	@define "rotationX", layerProperty @, "rotationX", "WebkitTransform", 0, _.isNumber
+	@define "rotationY", layerProperty @, "rotationY", "WebkitTransform", 0, _.isNumber
+	@define "rotationZ", layerProperty @, "rotationZ", "WebkitTransform", 0, _.isNumber
+	@define "rotation", layerProperty @, "rotationZ", "WebkitTransform", 0, _.isNumber
 	set_rotation: (value) -> @set_rotationZ(value)
 
 	# Filter properties
-	@define "blur", layerProperty @, "blur", "webkitFilter", 0, _.isNumber
-	@define "brightness", layerProperty @, "brightness", "webkitFilter", 100, _.isNumber
-	@define "saturate", layerProperty @, "saturate", "webkitFilter", 100, _.isNumber
-	@define "hueRotate", layerProperty @, "hueRotate", "webkitFilter", 0, _.isNumber
-	@define "contrast", layerProperty @, "contrast", "webkitFilter", 100, _.isNumber
-	@define "invert", layerProperty @, "invert", "webkitFilter", 0, _.isNumber
-	@define "grayscale", layerProperty @, "grayscale", "webkitFilter", 0, _.isNumber
-	@define "sepia", layerProperty @, "sepia", "webkitFilter", 0, _.isNumber
+	@define "blur", layerProperty @, "blur", "WebkitFilter", 0, _.isNumber
+	@define "brightness", layerProperty @, "brightness", "WebkitFilter", 100, _.isNumber
+	@define "saturate", layerProperty @, "saturate", "WebkitFilter", 100, _.isNumber
+	@define "hueRotate", layerProperty @, "hueRotate", "WebkitFilter", 0, _.isNumber
+	@define "contrast", layerProperty @, "contrast", "WebkitFilter", 100, _.isNumber
+	@define "invert", layerProperty @, "invert", "WebkitFilter", 0, _.isNumber
+	@define "grayscale", layerProperty @, "grayscale", "WebkitFilter", 0, _.isNumber
+	@define "sepia", layerProperty @, "sepia", "WebkitFilter", 0, _.isNumber
 
 	# Shadow properties
 	@define "shadowX", layerProperty @, "shadowX", "boxShadow", 0, _.isNumber
@@ -162,13 +149,13 @@ class exports.Layer extends BaseClass
 
 	# Mapped style properties
 
-	@define "backgroundColor", layerStyleProperty @, "backgroundColor"
-	@define "color", layerStyleProperty @, "color"
+	@define "backgroundColor", layerProperty @, "backgroundColor", "backgroundColor", null, _.isString
+	@define "color", layerProperty @, "color", "color", null, _.isString
 
 	# Border properties
-	@define "borderRadius", layerStyleProperty @, "borderRadius"
-	@define "borderColor", layerStyleProperty @, "borderColor"
-	@define "borderWidth", layerStyleProperty @, "borderWidth"
+	@define "borderRadius", layerProperty @, "borderRadius", "borderRadius", 0, _.isNumber
+	@define "borderColor", layerProperty @, "borderColor", "border", null, _.isString
+	@define "borderWidth", layerProperty @, "borderWidth", "border", 0, _.isNumber
 
 
 	##############################################################
@@ -183,7 +170,7 @@ class exports.Layer extends BaseClass
 			@_setPropertyValue "name", value
 			# Set the name attribute of the dom element too
 			# See: https://github.com/koenbok/Framer/issues/63
-			@_element.setAttribute "name", value
+			# @_element.setAttribute "name", value
 
 	##############################################################
 	# Geometry
@@ -290,34 +277,34 @@ class exports.Layer extends BaseClass
 	# CSS
 
 	@define "style",
-		get: -> @_element.style
+		get: -> @_style
 		set: (value) ->
-			_.extend @_element.style, value
+			_.extend @_style, value
 			@emit "change:style"
 
 	@define "html",
 		get: ->
-			@_elementHTML?.innerHTML
+			# @_elementHTML?.innerHTML
 
 		set: (value) ->
 
-			# Insert some html directly into this layer. We actually create
-			# a child node to insert it in, so it won't mess with Framers
-			# layer hierarchy.
+			# # Insert some html directly into this layer. We actually create
+			# # a child node to insert it in, so it won't mess with Framers
+			# # layer hierarchy.
 
-			if not @_elementHTML
-				@_elementHTML = document.createElement "div"
-				@_element.appendChild @_elementHTML
+			# if not @_elementHTML
+			# 	@_elementHTML = document.createElement "div"
+			# 	@_element.appendChild @_elementHTML
 
-			@_elementHTML.innerHTML = value
+			# @_elementHTML.innerHTML = value
 
-			# If the contents contains something else than plain text
-			# then we turn off ignoreEvents so buttons etc will work.
+			# # If the contents contains something else than plain text
+			# # then we turn off ignoreEvents so buttons etc will work.
 
-			if not (
-				@_elementHTML.childNodes.length == 1 and
-				@_elementHTML.childNodes[0].nodeName == "#text")
-				@ignoreEvents = false
+			# if not (
+			# 	@_elementHTML.childNodes.length == 1 and
+			# 	@_elementHTML.childNodes[0].nodeName == "#text")
+			# 	@ignoreEvents = false
 
 			@emit "change:html"
 
@@ -325,30 +312,32 @@ class exports.Layer extends BaseClass
 		document.defaultView.getComputedStyle @_element
 
 	_setDefaultCSS: ->
-		@style = Config.layerBaseCSS
+		# @style = Config.layerBaseCSS
 
 	@define "classList",
-		get: -> @_element.classList
+		get: -> 
+			result =
+				add: (value) => @_classList.push(value)
 
 
 	##############################################################
 	# DOM ELEMENTS
 
-	_createElement: ->
-		return if @_element?
-		@_element = document.createElement "div"
+	# _createElement: ->
+	# 	return if @_element?
+	# 	@_element = document.createElement "div"
 
-	_insertElement: ->
-		@bringToFront()
-		@_context.getRootElement().appendChild @_element
+	# _insertElement: ->
+	# 	@bringToFront()
+	# 	@_context.getRootElement().appendChild @_element
 
 	destroy: ->
 
 		if @superLayer
 			@superLayer._subLayers = _.without @superLayer._subLayers, @
 
-		@_element.parentNode?.removeChild @_element
-		@removeAllListeners()
+		# @_element.parentNode?.removeChild @_element
+		# @removeAllListeners()
 		
 		@_context._layerList = _.without @_context._layerList, @
 
@@ -466,16 +455,16 @@ class exports.Layer extends BaseClass
 			# Remove from previous superlayer sublayers
 			if @_superLayer
 				@_superLayer._subLayers = _.without @_superLayer._subLayers, @
-				@_superLayer._element.removeChild @_element
+				#@_superLayer._element.removeChild @_element
 				@_superLayer.emit "change:subLayers", {added:[], removed:[@]}
 
 			# Either insert the element to the new superlayer element or into dom
 			if layer
-				layer._element.appendChild @_element
+				#layer._element.appendChild @_element
 				layer._subLayers.push @
 				layer.emit "change:subLayers", {added:[@], removed:[]}
-			else
-				@_insertElement()
+			# else
+			# 	@_insertElement()
 
 			# Set the superlayer
 			@_superLayer = layer
@@ -609,12 +598,12 @@ class exports.Layer extends BaseClass
 			@scrollY = frame.y
 
 	@define "scrollX",
-		get: -> @_element.scrollLeft
-		set: (value) -> @_element.scrollLeft = value
+		get: -> #@_element.scrollLeft
+		set: (value) -> #@_element.scrollLeft = value
 
 	@define "scrollY",
-		get: -> @_element.scrollTop
-		set: (value) -> @_element.scrollTop = value
+		get: -> #@_element.scrollTop
+		set: (value) -> #@_element.scrollTop = value
 
 	##############################################################
 	## EVENTS
@@ -632,7 +621,7 @@ class exports.Layer extends BaseClass
 
 		# Listen to dom events on the element
 		super eventName, listener
-		@_context.eventManager.wrap(@_element).addEventListener(eventName, listener)
+		# @_context.eventManager.wrap(@_element).addEventListener(eventName, listener)
 
 		@_eventListeners ?= {}
 		@_eventListeners[eventName] ?= []
@@ -652,7 +641,7 @@ class exports.Layer extends BaseClass
 
 		super eventName, listener
 		
-		@_context.eventManager.wrap(@_element).removeEventListener(eventName, listener)
+		#@_context.eventManager.wrap(@_element).removeEventListener(eventName, listener)
 
 		if @_eventListeners
 			@_eventListeners[eventName] = _.without @_eventListeners[eventName], listener

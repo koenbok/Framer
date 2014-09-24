@@ -54,9 +54,9 @@ exports.LayerStyle =
 	zIndex: (layer) ->
 		layer._properties.index
 
-	webkitFilter: (layer) ->
+	WebkitFilter: (layer) ->
 
-		# This is mostly an optimization for Chrome. If you pass in the webkit filters
+		# This is mostly an optimization for Chrome. If you pass in the Webkit filters
 		# with the defaults, it still takes a shitty rendering path. So I compare them
 		# first and only add the ones that have a non default value.
 
@@ -69,7 +69,7 @@ exports.LayerStyle =
 		return css.join(" ")
 
 
-	webkitTransform: (layer) ->
+	WebkitTransform: (layer) ->
 
 
 		# We have a special rendering path for layers that prefer 2d rendering.
@@ -78,7 +78,7 @@ exports.LayerStyle =
 		# results.
 
 		if layer._properties._prefer2d
-			return exports.LayerStyle.webkitTransformPrefer2d(layer)
+			return exports.LayerStyle.WebkitTransformPrefer2d(layer)
 
 		"
 		translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px) 
@@ -93,7 +93,7 @@ exports.LayerStyle =
 		"
 
 
-	webkitTransformPrefer2d: (layer) ->
+	WebkitTransformPrefer2d: (layer) ->
 
 		# This detects if we use 3d properties, if we don't it only uses
 		# 2d properties to disable gpu rendering.
@@ -144,7 +144,7 @@ exports.LayerStyle =
 		# rotateZ(#{layer._properties.rotationZ}deg) 
 		# "
 
-	webkitTransformOrigin: (layer) ->
+	WebkitTransformOrigin: (layer) ->
 		"#{layer._properties.originX * 100}% #{layer._properties.originY * 100}%"
 
 		# Todo: Origin z is in pixels. I need to read up on this.
@@ -163,13 +163,17 @@ exports.LayerStyle =
 		
 		return "#{layer._properties.shadowX}px #{layer._properties.shadowY}px #{layer._properties.shadowBlur}px #{layer._properties.shadowSpread}px #{layer._properties.shadowColor}"
 
-	# css: ->
-	# 	css = {}
-	# 	for k, v of exports.LayerStyle layer
-	# 		if k isnt "css"
-	# 			css[k] = v()
-	# 	css
 
+	backgroundColor: (layer) ->
+		return layer._properties.backgroundColor
 
+	color: (layer) ->
+		return layer._properties.color
 
+	borderRadius: (layer) ->
+		return layer._properties.borderRadius + "px"
+
+	border: (layer) ->
+		return "#{layer._properties.borderWidth}px solid #{layer._properties.borderWidth}"
+		
 

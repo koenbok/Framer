@@ -1,40 +1,32 @@
 Utils = require "./Utils"
 
-exports.Config =
-	
-	# Animation
-	targetFPS: 60
+FramerCSS = """
+body {
+	overflow: hidden;
+	pointer-events: none
+}
 
-	rootBaseCSS:
-		"-webkit-perspective": 1000
-		"position": "absolute"
-		"left": 0
-		"top": 0
-		"right": 0
-		"bottom": 0
-		"pointer-events": "none"
-		"overflow": "hidden"
-		
-	layerBaseCSS:
-		"display": "block"
-		#"visibility": "visible"
-		"position": "absolute"
-		# "top": "auto"
-		# "right": "auto"
-		# "bottom": "auto"
-		# "left": "auto"
-		# "width": "auto"
-		# "height": "auto"
-		#"overflow": "visible"
-		#"z-index": 0
-		"-webkit-box-sizing": "border-box"
-		"-webkit-user-select": "none"
-		# "cursor": "default"
-		# "-webkit-transform-style": "preserve-3d"
-		# "-webkit-backface-visibility": "visible"
-		#"-webkit-backface-visibility": ""
-		#"-webkit-perspective": 500
-		# "pointer-events": "none"
-		"background-repeat": "no-repeat"
-		"background-size": "cover"
-		"-webkit-overflow-scrolling": "touch"
+.framerContext {	
+	position: absolute
+	left: 0
+	top: 0
+	right: 0
+	bottom: 0
+	pointer-events: none
+	overflow: hidden
+	-webkit-perspective: 1000
+}
+
+.framerLayer {
+	display: block;
+	position: absolute;
+	background-repeat: no-repeat;
+	background-size: cover;
+	-webkit-overflow-scrolling: touch;
+	-webkit-box-sizing: border-box;
+	-webkit-user-select: none;
+}
+
+"""
+
+Utils.domComplete -> Utils.insertCSS(FramerCSS)

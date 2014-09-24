@@ -24,5 +24,6 @@ class exports.Animator extends EventEmitter
 	finished: ->
 		throw Error "Not implemented"
 
-	start: -> AnimationLoop.add @
-	stop: -> AnimationLoop.remove @
+	
+	# start: -> Framer.Loop.on("update", )
+	# stop: -> AnimationLoop.remove @
