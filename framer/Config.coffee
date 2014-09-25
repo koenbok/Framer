@@ -1,11 +1,6 @@
 Utils = require "./Utils"
 
 FramerCSS = """
-body {
-	overflow: hidden;
-	pointer-events: none
-}
-
 .framerContext {	
 	position: absolute
 	left: 0
