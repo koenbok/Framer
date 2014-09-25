@@ -12,6 +12,9 @@ Utils = require "./Utils"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
 
+layerValueTypeError = (name, value) ->
+	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
+
 layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
 	result = 
 		exportable: true
@@ -22,7 +25,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
 		set: (value) ->
 
 			if value and validator and not validator(value)
-				throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
+				layerValueTypeError(name, value)
 
 			@_properties[name] = value
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
@@ -622,11 +625,15 @@ class exports.Layer extends BaseClass
 
 	@define "scrollX",
 		get: -> @_element.scrollLeft
-		set: (value) -> @_element.scrollLeft = value
+		set: (value) ->
+			layerValueTypeError("scrollX", value) if not _.isNumber(value)
+			@_element.scrollLeft = value
 
 	@define "scrollY",
 		get: -> @_element.scrollTop
-		set: (value) -> @_element.scrollTop = value
+		set: (value) -> 
+			layerValueTypeError("scrollY", value) if not _.isNumber(value)
+			@_element.scrollTop = value
 
 	##############################################################
 	## EVENTS
