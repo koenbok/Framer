@@ -71,6 +71,7 @@ You can safely move things around in Sketch or Photoshop and re-import. Generato
 
 - Run `make test` to run the unit tests in phantomjs
 - Run `make safari` to run the tests in Safari
+- Run `make perf` to run a performance test
 - Download Cactus and open extras/CactusFramer, then go to /test.html for a list of visual tests.
 
 ##### Reporting Issues
