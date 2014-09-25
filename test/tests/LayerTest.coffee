@@ -123,8 +123,8 @@ describe "Layer", ->
 			# layer.style["background-image"].should.contain "file://"
 			# layer.style["background-image"].should.contain "?nocache="
 
-			layer.style["background-size"].should.equal "cover"
-			layer.style["background-repeat"].should.equal "no-repeat"
+			layer.computedStyle()["background-size"].should.equal "cover"
+			layer.computedStyle()["background-repeat"].should.equal "no-repeat"
 
 			layer.properties.image.should.equal imagePath
 
@@ -211,6 +211,7 @@ describe "Layer", ->
 			layer.scroll = true
 			layer.scroll.should.equal true
 			layer.style["overflow"].should.equal "scroll"
+			
 			layer.ignoreEvents.should.equal false
 
 		it "should set scrollHorizontal", ->
@@ -665,6 +666,18 @@ describe "Layer", ->
 			layer._element.childNodes[0].should.equal layer._elementHTML
 			layer._elementHTML.innerHTML.should.equal "<input type=\"button\">"
 			layer.ignoreEvents.should.equal false
+
+		it "should work with querySelectorAll", ->
+
+			layer = new Layer
+			layer.html = "<input type='button' id='hello'>"
+
+			inputElements = layer.querySelectorAll("input")
+			inputElements.length.should.equal 1
+
+			inputElement = _.first(inputElements)
+			inputElement.getAttribute("id").should.equal "hello"
+
 
 
 

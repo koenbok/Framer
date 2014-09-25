@@ -18,14 +18,16 @@ layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
 		default: fallback
 		get: -> 
 			@_properties[name]
+
 		set: (value) ->
+
 			@_properties[name] = value
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
 			# @_dirtyStyle[cssProperty] = LayerStyle[cssProperty](@)
 			# @_setNeedsRender()
 
-			set?(value)
+			set?(@, value)
 			@emit("change:#{name}", value)
 
 
@@ -295,6 +297,29 @@ class exports.Layer extends BaseClass
 			_.extend @_element.style, value
 			@emit "change:style"
 
+	computedStyle: ->
+		# This is an expensive operation
+
+		getComputedStyle  = document.defaultView.getComputedStyle
+		getComputedStyle ?= window.getComputedStyle
+		
+		return getComputedStyle(@_element)
+
+	@define "classList",
+		get: -> @_element.classList
+
+	##############################################################
+	# DOM ELEMENTS
+
+	_createElement: ->
+		return if @_element?
+		@_element = document.createElement "div"
+		@_element.classList.add("framerLayer")
+
+	_insertElement: ->
+		@bringToFront()
+		@_context.getRootElement().appendChild(@_element)
+
 	@define "html",
 		get: ->
 			@_elementHTML?.innerHTML
@@ -321,29 +346,12 @@ class exports.Layer extends BaseClass
 
 			@emit "change:html"
 
-	computedStyle: ->
-		document.defaultView.getComputedStyle @_element
-
-	_setDefaultCSS: ->
-		@style = Config.layerBaseCSS
-
-	@define "classList",
-		get: -> @_element.classList
-
-
-	##############################################################
-	# DOM ELEMENTS
-
-	_createElement: ->
-		return if @_element?
-		@_element = document.createElement "div"
-		@_element.classList.add("framerLayer")
-
-	_insertElement: ->
-		@bringToFront()
-		@_context.getRootElement().appendChild @_element
+	querySelector: (query) -> @_element.querySelector(query)
+	querySelectorAll: (query) -> @_element.querySelectorAll(query)
 
 	destroy: ->
+		
+		# Todo: check this
 
 		if @superLayer
 			@superLayer._subLayers = _.without @superLayer._subLayers, @
