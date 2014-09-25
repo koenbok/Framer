@@ -1,10 +1,8 @@
 Utils = require "./Utils"
 
 {Config} = require "./Config"
-{EventEmitter} = require "./EventEmitter"
-{AnimationLoop} = require "./AnimationLoop"
 
-class exports.Animator extends EventEmitter
+class exports.Animator
 
 	"""
 	The animator class is a very simple class that

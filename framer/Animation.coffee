@@ -109,17 +109,11 @@ class exports.Animation extends EventEmitter
 			console.log "Animation.start"
 			console.log "\t#{k}: #{@_stateA[k]} -> #{@_stateB[k]}" for k, v of @_stateB
 
-		# TODO
-
-		@_animator.on "start", => @emit "start"
-		@_animator.on "stop",  => @emit "stop"
-		@_animator.on "end",   => @emit "end"
-
 		# See if we need to repeat this animation
 		# Todo: more repeat behaviours:
 		# 1) add (from end position) 2) reverse (loop between a and b)
 		if @_repeatCounter > 0
-			@_animator.on "end", =>
+			@on "end", =>
 				for k, v of @_stateA
 					@_target[k] = v
 				@_repeatCounter--
@@ -131,13 +125,8 @@ class exports.Animation extends EventEmitter
 		else
 			@_start()
 
-
-
-
-
-
 	stop: ->
-		@_animator.emit("stop")
+		@emit("stop")
 		Framer.Loop.off("update", @_update)
 		# _runningAnimations = _.without _runningAnimations, @
 
@@ -159,12 +148,13 @@ class exports.Animation extends EventEmitter
 		@options.layer.emit(event, @)
 
 	_start: =>
+		@emit("start")
 		Framer.Loop.on("update", @_update)
 
 	_update: (delta) =>
 		if @_animator.finished()
 			@_updateValue(1)
-			@_animator.emit("end")
+			@emit("end")
 			@stop()
 		else
 			@_updateValue(@_animator.next(delta))
