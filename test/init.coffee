@@ -1,4 +1,5 @@
 window.console.debug = (v) ->
+# window.console.log = print
 
 hideFramerRoot = ->
 	
