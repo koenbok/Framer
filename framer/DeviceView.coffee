@@ -664,27 +664,27 @@ Devices =
 	"iphone-5c-green": _.extend {}, iPhone5CBaseDevice,
 		deviceImage: "iphone-5c-green.png"
 	"iphone-5c-green-hand": _.extend {}, iPhone5CBaseDeviceHand,
-		deviceImage: "iphone-5C-green-hand.png"
+		deviceImage: "iphone-5c-green-hand.png"
 
 	"iphone-5c-blue": _.extend {}, iPhone5CBaseDevice,
 		deviceImage: "iphone-5c-blue.png"
 	"iphone-5c-blue-hand": _.extend {}, iPhone5CBaseDeviceHand,
-		deviceImage: "iphone-5C-blue-hand.png"
+		deviceImage: "iphone-5c-blue-hand.png"
 
 	"iphone-5c-pink": _.extend {}, iPhone5CBaseDevice,
 		deviceImage: "iphone-5c-pink.png"
 	"iphone-5c-pink-hand": _.extend {}, iPhone5CBaseDeviceHand,
-		deviceImage: "iphone-5C-pink-hand.png"
+		deviceImage: "iphone-5c-pink-hand.png"
 
 	"iphone-5c-white": _.extend {}, iPhone5CBaseDevice,
 		deviceImage: "iphone-5c-white.png"
 	"iphone-5c-white-hand": _.extend {}, iPhone5CBaseDeviceHand,
-		deviceImage: "iphone-5C-white-hand.png"
+		deviceImage: "iphone-5c-white-hand.png"
 
 	"iphone-5c-yellow": _.extend {}, iPhone5CBaseDevice,
 		deviceImage: "iphone-5c-yellow.png"
 	"iphone-5c-yellow-hand": _.extend {}, iPhone5CBaseDeviceHand,
-		deviceImage: "iphone-5C-yellow-hand.png"
+		deviceImage: "iphone-5c-yellow-hand.png"
 
 	# iPad Mini
 	"ipad-mini-spacegray": _.extend {}, iPadMiniBaseDevice,
