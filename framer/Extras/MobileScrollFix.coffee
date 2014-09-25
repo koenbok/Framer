@@ -2,6 +2,15 @@ Utils = require "../Utils"
 
 exports.enable = ->
 
+	# If we touch the document directly we want to ignore scroll events
+	document.ontouchmove = (event) ->
+		if event.target is document.body
+			event.preventDefault()
+
+
+	# The second part is that when we scroll a div that is already at it's top 
+	# scroll position the scroll event will propagate up and enable elastic scrolling.
+
 	handleScrollingLayerTouchMove = (event) ->
 		event.stopPropagation()
 
@@ -26,23 +35,14 @@ exports.enable = ->
 			@on "change:scrollVertical", @_updateScrollListeners
 			@_updateScrollListeners()
 
-
 		_updateScrollListeners: =>
+			
 			if @scrollVertical is true
 				@on "touchmove", handleScrollingLayerTouchMove
 				@on "touchstart", handleScrollingLayerTouchStart
 			else
 				@off "touchmove", handleScrollingLayerTouchMove
 				@off "touchstart", handleScrollingLayerTouchStart
-
-		__createRootElement: =>
-			
-			rootElement = super
-
-			rootElement.addEventListener "touchmove", (event) ->
-				event.preventDefault()
-
-			return rootElement
 
 	# Override the standard window Layer with this patched one
 	window.Layer = window.Framer.Layer = MobileScrollFixLayer

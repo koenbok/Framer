@@ -1,15 +1,19 @@
 Utils = require "./Utils"
 
 FramerCSS = """
+body {
+	margin: 0;
+}
+
 .framerContext {	
-	position: absolute
-	left: 0
-	top: 0
-	right: 0
-	bottom: 0
-	pointer-events: none
-	overflow: hidden
-	-webkit-perspective: 1000
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	overflow: hidden;
+	-webkit-perspective: 1000;
 }
 
 .framerLayer {
@@ -28,6 +32,7 @@ FramerCSS = """
 .framerLayer option
 {
 	pointer-events: auto;
+	-webkit-user-select: auto;
 }
 
 """
