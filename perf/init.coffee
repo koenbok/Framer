@@ -1,6 +1,6 @@
 getTime = Date.now
 
-if performance.now
+if performance?.now
 	getTime = -> performance.now()
 
 # class Timer
@@ -34,9 +34,13 @@ class FPSTimer
 	_tick: =>
 		@_frameCount++
 
+_contextLayer = new Layer width:800, height:800, backgroundColor:"white"
+_contextLayer.center()
+_contextLayer.style.border = "1px solid grey"
+
 run = (options, callback) ->
 	
-	context = new Framer.Context(name:"TestRun")
+	context = new Framer.Context(name:"TestRun", parentLayer:_contextLayer)
 	context.run -> _run options, (results) ->
 		context.reset()
 		callback(results)
@@ -49,8 +53,8 @@ _run = (options, callback) ->
 	LAYERS = for i in [1..options.n]
 
 		layerC = new Layer 
-			x: Math.random() * window.innerWidth, 
-			y: Math.random() * window.innerHeight
+			x: Math.random() * 800, 
+			y: Math.random() * 800
 	
 	results.layers = Framer.CurrentContext._layerList.length
 	results.buildTotal = getTime() - startTime
@@ -62,9 +66,10 @@ _run = (options, callback) ->
 		
 		layer.animate
 			properties:
-				x: Math.random() * window.innerWidth, 
-				y: Math.random() * window.innerHeight
-			curve: "spring(1000, 10, 0)"
+				midX: Math.random() * window.innerWidth, 
+				midY: Math.random() * window.innerHeight
+			curve: "linear"
+			time: 0.1
 
 	layer.on Events.AnimationEnd, ->
 		results.fps = t1.stop()
@@ -74,16 +79,28 @@ Utils.domComplete ->
 
 	c = 0
 
+	minFPS = 50
+	tooSlow = 0
+	tooSlowMax = 2
+
 	callback = (results) ->
 
 		if results
-			print "#{c} - #{results.layers}
-				Build: #{Utils.round(results.buildTotal, 0)}ms/#{Utils.round(results.buildLayer, 2)}ms
-				FPS: #{Utils.round(results.fps.fps, 1)}"
 
-		if c < 100
+			output =  "#{c} - #{results.layers}"
+			output += "\tBuild: #{Utils.round(results.buildTotal, 0)}ms /#{Utils.round(results.buildLayer, 2)}ms"
+			output += "\tFPS: #{Utils.round(results.fps.fps, 1)}"
+
+			console.log output
+
+			if results.fps.fps < minFPS
+				tooSlow++
+
+		if c < 100 and tooSlow < tooSlowMax
 			c++
 			run {n: c * 20}, callback
+		else
+			window.phantomComplete = true
 
 	callback()
 

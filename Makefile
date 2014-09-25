@@ -1,3 +1,4 @@
+
 bin = ./node_modules/.bin
 coffee = $(bin)/coffee
 
@@ -6,6 +7,10 @@ watch = $(coffee) scripts/watch.coffee framer,test/tests
 githash = `git rev-parse --short HEAD`
 
 all: build
+
+watch:
+	$(watch) make $(cmd)
+	# make watch cmd=perf
 
 build:
 	make clean
@@ -50,6 +55,15 @@ safari:
 	open -g -a Safari test/index.html
 safariw:
 	$(watch) make safari
+
+
+perf:
+	$(browserify) perf/init.coffee -o perf/init.js
+	$(bin)/phantomjs perf/runner.js perf/index.html
+perf%watch:
+
+perf%watch:
+	$(watch) make perf
 
 
 # Building and uploading the site
@@ -98,4 +112,4 @@ publish:
 lint:
 	./node_modules/.bin/coffeelint -f coffeelint.json -r framer
 
-.PHONY: all build test clean
+.PHONY: all build test clean perf watch
