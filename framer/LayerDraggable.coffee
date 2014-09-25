@@ -115,7 +115,6 @@ class exports.LayerDraggable extends EventEmitter
 			newY = minY if newY < minY
 			newY = maxY if newY > maxY
 
-
 		@layer.x = newX
 		@layer.y = newY
 

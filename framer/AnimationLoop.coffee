@@ -7,23 +7,27 @@ Utils = require "./Utils"
 
 class exports.AnimationLoop extends EventEmitter
 
-	start: ->
-		window.requestAnimationFrame(@tick)
+	start: =>
+		
+		animationLoop = @
 
-	tick: (timestamp) =>
+		_timestamp = null
 
-		@start()
 
-		# if @_timestamp
-		# 	delta = (timestamp - @_timestamp) / 1000
-		# else
-		# 	delta = 1/60
+		tick = (timestamp) ->
 
-		delta = 1/60
+			window.requestAnimationFrame(tick)
 
-		# console.log "tick", @_events?.update?.length
+			# if _timestamp
+			# 	delta = (timestamp - _timestamp) / 1000
+			# else
+			# 	delta = 1/60
 
-		@emit("update", delta)
-		@emit("render", delta)
+			delta = 1/60
 
-		@_timestamp = timestamp
+			animationLoop.emit("update", delta)
+			animationLoop.emit("render", delta)
+
+			_timestamp = timestamp
+
+		window.requestAnimationFrame(tick)

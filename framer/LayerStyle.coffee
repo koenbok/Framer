@@ -54,7 +54,7 @@ exports.LayerStyle =
 	zIndex: (layer) ->
 		layer._properties.index
 
-	WebkitFilter: (layer) ->
+	webkitFilter: (layer) ->
 
 		# This is mostly an optimization for Chrome. If you pass in the Webkit filters
 		# with the defaults, it still takes a shitty rendering path. So I compare them
@@ -69,7 +69,7 @@ exports.LayerStyle =
 		return css.join(" ")
 
 
-	WebkitTransform: (layer) ->
+	webkitTransform: (layer) ->
 
 
 		# We have a special rendering path for layers that prefer 2d rendering.
@@ -93,7 +93,7 @@ exports.LayerStyle =
 		"
 
 
-	WebkitTransformPrefer2d: (layer) ->
+	webkitTransformPrefer2d: (layer) ->
 
 		# This detects if we use 3d properties, if we don't it only uses
 		# 2d properties to disable gpu rendering.
@@ -144,7 +144,7 @@ exports.LayerStyle =
 		# rotateZ(#{layer._properties.rotationZ}deg) 
 		# "
 
-	WebkitTransformOrigin: (layer) ->
+	webkitTransformOrigin: (layer) ->
 		"#{layer._properties.originX * 100}% #{layer._properties.originY * 100}%"
 
 		# Todo: Origin z is in pixels. I need to read up on this.

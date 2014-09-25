@@ -32,13 +32,13 @@ Framer.DeviceView = (require "./DeviceView").DeviceView
 Framer.Debug = (require "./Debug").Debug
 Framer.Extras = require "./Extras/Extras"
 
-Framer.DefaultContext = new Framer.Context(name:"Default")
-Framer.CurrentContext = Framer.DefaultContext
-
 Framer.Loop = new Framer.AnimationLoop()
-Framer.Loop.tick()
+Utils.domComplete Framer.Loop.start
 
 window.Framer = Framer if window
+
+Framer.DefaultContext = new Framer.Context(name:"Default")
+Framer.CurrentContext = Framer.DefaultContext
 
 # Compatibility for Framer 2
 require "./Compat"
