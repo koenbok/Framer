@@ -76,9 +76,7 @@ class exports.Importer
 		if info.maskFrame
 			layerInfo.frame = info.maskFrame
 			layerInfo.clip = true
-
-		# Todo: smart stuff for paging and scroll views
-
+			
 		# Figure out what the super layer should be. If this layer has a contentLayer
 		# (like a scroll view) we attach it to that instead.
 		if superLayer?.contentLayer
@@ -89,6 +87,14 @@ class exports.Importer
 		# We can create the layer here
 		layer = new LayerClass layerInfo
 		layer.name = layerInfo.name
+
+		# Set scroll to true if scroll is in the layer name
+		if layerInfo.name.toLowerCase().indexOf("scroll") != -1
+			layer.scroll = true
+
+		# Set draggable enabled if draggable is in the name
+		if layerInfo.name.toLowerCase().indexOf("draggable") != -1
+			layer.draggable.enabled = true
 
 		# A layer without an image, mask or sublayers should be zero
 		if not layer.image and not info.children.length and not info.maskFrame
