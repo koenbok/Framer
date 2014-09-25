@@ -233,6 +233,13 @@ describe "Layer", ->
 			layer.backgroundColor.should.equal "red"
 			layer.style["backgroundColor"].should.equal "red"
 
+		it "should check value type", ->
+
+			f = ->
+				layer = new Layer
+				layer.x = "hello"
+			f.should.throw()
+
 
 	describe "Filter Properties", ->
 

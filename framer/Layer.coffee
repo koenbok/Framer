@@ -21,6 +21,9 @@ layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
 
 		set: (value) ->
 
+			if value and validator and not validator(value)
+				throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
+
 			@_properties[name] = value
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
