@@ -1,5 +1,5 @@
 AnimationTime = 0.05
-AnimationProperties = ["x", "y", "rotation"]
+AnimationProperties = ["x", "y", "midY", "rotation"]
 
 describe "LayerAnimation", ->
 
