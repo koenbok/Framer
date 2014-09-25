@@ -22,6 +22,14 @@ FramerCSS = """
 	-webkit-user-select: none;
 }
 
+.framerLayer input,
+.framerLayer textarea,
+.framerLayer select,
+.framerLayer option
+{
+	pointer-events: auto;
+}
+
 """
 
 Utils.domComplete -> Utils.insertCSS(FramerCSS)

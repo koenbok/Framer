@@ -342,10 +342,10 @@ class exports.Layer extends BaseClass
 			# If the contents contains something else than plain text
 			# then we turn off ignoreEvents so buttons etc will work.
 
-			if not (
-				@_elementHTML.childNodes.length == 1 and
-				@_elementHTML.childNodes[0].nodeName == "#text")
-				@ignoreEvents = false
+			# if not (
+			# 	@_elementHTML.childNodes.length == 1 and
+			# 	@_elementHTML.childNodes[0].nodeName == "#text")
+			# 	@ignoreEvents = false
 
 			@emit "change:html"
 

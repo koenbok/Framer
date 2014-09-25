@@ -665,14 +665,25 @@ describe "Layer", ->
 			layer._elementHTML.innerHTML.should.equal "Hello"
 			layer.ignoreEvents.should.equal true
 
-		it "should set other html", ->
+
+		it "should set interactive html and allow pointer events", ->
+
+			tags = ["input", "select", "textarea", "option"]
+
+			html = ""
+
+			for tag in tags
+				html += "<#{tag}></#{tag}>"
 
 			layer = new Layer
-			layer.html = "<input type=\"button\">"
+			layer.html = html
 
-			layer._element.childNodes[0].should.equal layer._elementHTML
-			layer._elementHTML.innerHTML.should.equal "<input type=\"button\">"
-			layer.ignoreEvents.should.equal false
+			for tag in tags
+				element = layer.querySelectorAll(tag)[0]
+				style = window.getComputedStyle(element)
+				style["pointer-events"].should.equal "auto"
+				# style["-webkit-user-select"].should.equal "auto"
+
 
 		it "should work with querySelectorAll", ->
 
