@@ -98,11 +98,16 @@ class exports.Animation extends EventEmitter
 			@_stateB[k] = v if @_stateA[k] != v
 
 		if _.isEqual(@_stateA, @_stateB)
-			console.warn "Nothing to animate"
-			return
+			console.warn "Animation: nothing to animate, all properties are equal to what it is now"
+			return false
 
 		# See if another animation targeting the same layer is animating the same properties
-
+		for runningAnimation in @_target.animations()
+			for key in _.keys(runningAnimation._stateA)
+				if @_stateA.hasOwnProperty(key)
+					console.warn "Animation: property #{key} is already being animated for this 
+						layer by another animation, so we bail"
+					return false
 
 		if @options.debug
 			console.log "Animation.start"
@@ -123,6 +128,8 @@ class exports.Animation extends EventEmitter
 			Utils.delay(@options.delay, @_start)
 		else
 			@_start()
+
+		return true
 
 	stop: (emit=true)->
 		@options.layer._context._animationList = _.without(

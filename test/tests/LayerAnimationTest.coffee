@@ -103,6 +103,25 @@ describe "LayerAnimation", ->
 				layer.x.should.be.within(10, 40)
 				done()
 
+		it "should not start animating the same property", ->
+
+			layer = new Layer()
+
+			animationA = new Animation
+				layer: layer
+				properties: {x:50}
+				curve: "linear"
+				time: 0.5
+
+			animationB = new Animation
+				layer: layer
+				properties: {x:50}
+				curve: "linear"
+				time: 0.5
+
+			animationA.start().should.equal true
+			animationB.start().should.equal false
+
 	describe "Context", ->
 
 		it "should list running animations", ->
