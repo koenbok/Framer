@@ -120,6 +120,18 @@ Utils.throttle = (delay, fn) ->
 		setTimeout (-> timer = false), delay unless delay is -1
 		fn arguments...
 
+# Taken from http://addyosmani.com/blog/faster-javascript-memoization/
+Utils.memoize = (fn) -> ->
+	args = Array::slice.call(arguments)
+	hash = ""
+	i = args.length
+	currentArg = null
+	while i--
+		currentArg = args[i]
+		hash += (if (currentArg is Object(currentArg)) then JSON.stringify(currentArg) else currentArg)
+		fn.memoize or (fn.memoize = {})
+	(if (hash of fn.memoize) then fn.memoize[hash] else fn.memoize[hash] = fn.apply(this, args))
+
 
 ######################################################
 # HANDY FUNCTIONS
