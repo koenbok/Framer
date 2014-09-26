@@ -60,10 +60,14 @@ safariw:
 perf:
 	$(browserify) perf/init.coffee -o perf/init.js
 	$(bin)/phantomjs perf/runner.js perf/index.html
-perf%watch:
-
-perf%watch:
+perfw:
 	$(watch) make perf
+
+perf-safari:
+	$(browserify) perf/init.coffee -o perf/init.js
+	open -g -a Safari perf/index.html
+perf-safariw:
+	$(watch) make perf-safari
 
 
 # Building and uploading the site

@@ -50,6 +50,23 @@ Utils.arrayPrev = (arr, item) ->
 
 
 ######################################################
+# MATH
+
+Utils.sum = (arr) -> _.reduce arr, (a, b) -> a + b 
+Utils.average = (arr) -> Utils.sum(arr) / arr.length
+Utils.mean = Utils.average
+Utils.median = (x) ->
+	return null if x.length is 0
+	
+	sorted = x.slice().sort (a, b) ->
+		a - b
+	
+	if sorted.length % 2 is 1
+		sorted[(sorted.length - 1) / 2]
+	else
+		(sorted[(sorted.length / 2) - 1] + sorted[sorted.length / 2]) / 2
+
+######################################################
 # ANIMATION
 
 # This is a little hacky, but I want to avoid wrapping the function

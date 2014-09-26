@@ -79,6 +79,8 @@ Utils.domComplete ->
 
 	c = 0
 
+	allResults = []
+
 	minFPS = 50
 	tooSlow = 0
 	tooSlowMax = 2
@@ -86,6 +88,8 @@ Utils.domComplete ->
 	callback = (results) ->
 
 		if results
+
+			allResults.push(results)
 
 			output =  "#{c} - #{results.layers}"
 			output += "\tBuild: #{Utils.round(results.buildTotal, 0)}ms /#{Utils.round(results.buildLayer, 2)}ms"
@@ -96,10 +100,21 @@ Utils.domComplete ->
 			if results.fps.fps < minFPS
 				tooSlow++
 
-		if c < 100 and tooSlow < tooSlowMax
+		# if c < 100 and tooSlow < tooSlowMax
+		if c < 30 and tooSlow < tooSlowMax
 			c++
 			run {n: c * 20}, callback
 		else
+
+			buildTotal = Utils.round(Utils.average(_.map(allResults, (i) -> i.buildLayer)), 3) * 1000
+			layerTotal = Utils.round(Utils.average(_.map(allResults, (i) -> i.fps.fps / i.layers)), 3) * 1000
+
+			print "#{buildTotal} (build)"
+			print "#{layerTotal} (layer)"
+
+			print "BUILD LOOKS SLOW > 440" if buildTotal > 440 
+			print "LAYER LOOKS SLOW > 760" if layerTotal > 760 
+
 			window.phantomComplete = true
 
 	callback()
