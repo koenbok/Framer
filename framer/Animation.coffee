@@ -35,14 +35,14 @@ evaluateRelativeProperty = (target, k, v) ->
 	else
 		return +number
 
-_runningAnimations = []
+# _runningAnimations = []
 
 # Todo: this would normally be BaseClass but the properties keyword
 # is not compatible and causes problems.
 class exports.Animation extends EventEmitter
 
-	@runningAnimations = ->
-		_runningAnimations
+	# @runningAnimations = ->
+	# 	_runningAnimations
 
 	constructor: (options={}) ->
 
@@ -78,11 +78,6 @@ class exports.Animation extends EventEmitter
 		if @options.layer is null
 			console.error "Animation: missing layer"
 
-		if @options.layer._animation
-			@options.layer._animation.stop()
-
-		@options.layer._animation = @
-
 		AnimatorClass = @_animatorClass()
 
 		if @options.debug
@@ -102,8 +97,12 @@ class exports.Animation extends EventEmitter
 			# Filter out the properties that are equal
 			@_stateB[k] = v if @_stateA[k] != v
 
-		if _.isEqual @_stateA, @_stateB
+		if _.isEqual(@_stateA, @_stateB)
 			console.warn "Nothing to animate"
+			return
+
+		# See if another animation targeting the same layer is animating the same properties
+
 
 		if @options.debug
 			console.log "Animation.start"
@@ -125,8 +124,13 @@ class exports.Animation extends EventEmitter
 		else
 			@_start()
 
-	stop: ->
-		@emit("stop")
+	stop: (emit=true)->
+		@options.layer._context._animationList = _.without(
+			@options.layer._context._animationList, @)
+
+		if emit
+			@emit("stop")
+		
 		Framer.Loop.off("update", @_update)
 		# _runningAnimations = _.without _runningAnimations, @
 
@@ -148,6 +152,7 @@ class exports.Animation extends EventEmitter
 		@options.layer.emit(event, @)
 
 	_start: =>
+		@options.layer._context._animationList.push(@)
 		@emit("start")
 		Framer.Loop.on("update", @_update)
 

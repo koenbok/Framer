@@ -36,7 +36,12 @@ class exports.Context
 		@_delayTimers?.map (timer) -> window.clearTimeout(timer)
 		@_delayIntervals?.map (timer) -> window.clearInterval(timer)
 
+		if @_animationList
+			for animation in @_animationList
+				animation.stop(false)
+
 		@_layerList = []
+		@_animationList = []
 		@_delayTimers = []
 		@_delayIntervals = []	
 
@@ -51,8 +56,6 @@ class exports.Context
 		element = document.createElement("div")
 		element.id = "FramerContextRoot-#{@_name}"
 		element.classList.add("framerContext")
-		
-		# _.extend element.style, Config.rootBaseCSS
 
 		parentElement = @_parentLayer?._element
 

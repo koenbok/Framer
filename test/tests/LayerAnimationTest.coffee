@@ -103,9 +103,18 @@ describe "LayerAnimation", ->
 				layer.x.should.be.within(10, 40)
 				done()
 
+	describe "Context", ->
 
+		it "should list running animations", ->
 
+			layer = new Layer()
+			animation = layer.animate
+				properties: {x: 100}
+				time: 0.5
 
+			layer.animations().should.contain(animation)
+			layer.animateStop()
+			layer.animations().should.not.contain(animation)
 
 	describe "Events", ->
 

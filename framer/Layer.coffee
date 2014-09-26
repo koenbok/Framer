@@ -560,11 +560,11 @@ class exports.Layer extends BaseClass
 
 	animations: ->
 		# Current running animations on this layer
-		_.filter Animation.runningAnimations(), (a) =>
-			a.options.layer == @
+		_.filter @_context._animationList, (animation) =>
+			animation.options.layer == @
 
 	animateStop: ->
-		_.invoke @animations(), "stop"
+		_.invoke(@animations(), "stop")
 
 	##############################################################
 	## INDEX ORDERING
