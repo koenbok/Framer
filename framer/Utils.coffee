@@ -188,6 +188,9 @@ Utils.isWebKit = ->
 Utils.isChrome = ->
 	(/chrome/).test(navigator.userAgent.toLowerCase())
 
+Utils.isSafari = ->
+	(/safari/).test(navigator.userAgent.toLowerCase())
+
 Utils.isTouch = ->
 	window.ontouchstart is null
 
