@@ -35,6 +35,12 @@ body {
 	-webkit-user-select: auto;
 }
 
+.framerDebug {
+	padding: 6px;
+	color: #fff;
+	font: 10px/1em Monaco;
+}
+
 """
 
 Utils.domComplete -> Utils.insertCSS(FramerCSS)
