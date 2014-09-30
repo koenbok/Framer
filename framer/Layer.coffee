@@ -173,7 +173,8 @@ class exports.Layer extends BaseClass
 	@define "color", layerProperty @, "color", "color", null, _.isString
 
 	# Border properties
-	@define "borderRadius", layerProperty @, "borderRadius", "borderRadius", 0, _.isNumber
+	# Todo: make this default, for compat we still allow strings but throw a warning
+	# @define "borderRadius", layerProperty @, "borderRadius", "borderRadius", 0, _.isNumber
 	@define "borderColor", layerProperty @, "borderColor", "border", null, _.isString
 	@define "borderWidth", layerProperty @, "borderWidth", "border", 0, _.isNumber
 
@@ -192,6 +193,25 @@ class exports.Layer extends BaseClass
 			# Set the name attribute of the dom element too
 			# See: https://github.com/koenbok/Framer/issues/63
 			@_element.setAttribute "name", value
+
+	##############################################################
+	# Border radius compatibility
+
+	@define "borderRadius",
+		exportable: true
+		default: 0
+		get: -> 
+			@_properties["borderRadius"]
+
+		set: (value) ->
+
+			if value and not _.isNumber(value)
+				console.warn "Layer.borderRadius should be a numeric property, not type #{typeof(value)}"
+
+			@_properties["borderRadius"] = value
+			@_element.style["borderRadius"] = LayerStyle["borderRadius"](@)
+
+			@emit("change:borderRadius", value)
 
 	##############################################################
 	# Geometry

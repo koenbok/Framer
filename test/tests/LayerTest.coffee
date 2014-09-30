@@ -240,6 +240,28 @@ describe "Layer", ->
 				layer.x = "hello"
 			f.should.throw()
 
+		it "should set borderRadius", ->
+
+			testBorderRadius = (layer, value) ->
+
+				layer.style["border-top-left-radius"].should.equal "#{value} #{value}"
+				layer.style["border-top-right-radius"].should.equal "#{value} #{value}"
+				layer.style["border-bottom-left-radius"].should.equal "#{value} #{value}"
+				layer.style["border-bottom-right-radius"].should.equal "#{value} #{value}"
+
+			layer = new Layer
+
+			layer.borderRadius = 10
+			layer.borderRadius.should.equal 10
+
+			testBorderRadius(layer, "10px")
+
+			layer.borderRadius = "50%"
+			layer.borderRadius.should.equal "50%"
+
+			testBorderRadius(layer, "50%")
+
+
 
 	describe "Filter Properties", ->
 

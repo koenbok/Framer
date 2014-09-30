@@ -147,6 +147,11 @@ exports.LayerStyle =
 		return layer._properties.color
 
 	borderRadius: (layer) ->
+
+		# Compatibility fix, remove later
+		if not _.isNumber(layer._properties.borderRadius)
+			return layer._properties.borderRadius
+		
 		return layer._properties.borderRadius + "px"
 
 	border: (layer) ->
