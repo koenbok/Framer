@@ -1,13 +1,8 @@
-layer = new Layer
+layerA = new Layer
+layerB = new Layer superLayer:layerA
 
+layerA.borderRadius = layerA.height / 4
+layerA.center()
 
-
-a = new Animation
-	layer: layer
-	properties:
-		x: -> layer.x + 100
-	time: 2.5
-	repeat: 5
-
-
-a.start()
+# layerA._prefer2d = true
+layerB.force2d = true

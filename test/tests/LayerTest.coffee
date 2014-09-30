@@ -696,6 +696,17 @@ describe "Layer", ->
 			inputElement = _.first(inputElements)
 			inputElement.getAttribute("id").should.equal "hello"
 
+	describe "Force 2D", ->
+
+		it "should switch to 2d rendering", ->
+
+			layer = new Layer
+
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
+
+			layer.force2d = true
+
+			layer.style.webkitTransform.should.equal "translate(0px, 0px) scale(1) skew(0deg, 0deg) rotate(0deg)"
 
 
 

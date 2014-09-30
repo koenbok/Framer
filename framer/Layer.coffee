@@ -168,8 +168,7 @@ class exports.Layer extends BaseClass
 	@define "shadowSpread", layerProperty @, "shadowSpread", "boxShadow", 0, _.isNumber
 	@define "shadowColor", layerProperty @, "shadowColor", "boxShadow", ""
 
-	# Mapped style properties
-
+	# Color properties
 	@define "backgroundColor", layerProperty @, "backgroundColor", "backgroundColor", null, _.isString
 	@define "color", layerProperty @, "color", "color", null, _.isString
 
@@ -178,6 +177,7 @@ class exports.Layer extends BaseClass
 	@define "borderColor", layerProperty @, "borderColor", "border", null, _.isString
 	@define "borderWidth", layerProperty @, "borderWidth", "border", 0, _.isNumber
 
+	@define "force2d", layerProperty @, "force2d", "webkitTransform", false, _.isBool
 
 	##############################################################
 	# Identity

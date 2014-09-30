@@ -14,6 +14,16 @@ _WebkitProperties = [
 	["sepia", "sepia", 0, "%"],
 ]
 
+_Force2DProperties =
+	"z": 0
+	"scaleX": 1
+	"scaleY": 1
+	"scaleZ": 1
+	"skewX": 0
+	"skewY": 0
+	"rotationX": 0
+	"rotationY": 0
+
 exports.LayerStyle =
 
 	width: (layer) ->
@@ -77,8 +87,8 @@ exports.LayerStyle =
 		# scenarios with rounded corners and shadows where gpu drawing gets weird
 		# results.
 
-		if layer._properties._prefer2d
-			return exports.LayerStyle.WebkitTransformPrefer2d(layer)
+		if layer._prefer2d or layer._properties.force2d
+			return exports.LayerStyle.webkitTransformForce2d(layer)
 
 		"
 		translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px) 
@@ -92,57 +102,23 @@ exports.LayerStyle =
 		rotateZ(#{layer._properties.rotationZ}deg) 
 		"
 
-
-	webkitTransformPrefer2d: (layer) ->
+	webkitTransformForce2d: (layer) ->
 
 		# This detects if we use 3d properties, if we don't it only uses
 		# 2d properties to disable gpu rendering.
 
 		css = []
 
-		if layer._properties.z != 0
-			css.push "translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px)"
-		else
-			css.push "translate(#{layer._properties.x}px,#{layer._properties.y}px)"
+		for p, v of _Force2DProperties
+			if layer._properties[p] isnt v
+				console.warn "Layer property '#{p}'' will be ignored with force2d enabled"
 
-		if layer._properties.scale != 1
-			css.push "scale(#{layer._properties.scale})"
-
-		if layer._properties.scaleX != 1 or layer._properties.scaleY != 1 or layer._properties.scaleZ != 1
-			css.push "scale3d(#{layer._properties.scaleX},#{layer._properties.scaleY},#{layer._properties.scaleZ})"
-
-		if layer._properties.skew
-			css.push "skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg)"
-
-		if layer._properties.skewX
-			css.push "skewX(#{layer._properties.skewX}deg)"
-
-		if layer._properties.skewY
-			css.push "skewY(#{layer._properties.skewY}deg)"
-
-		if layer._properties.rotationX
-			css.push "rotateX(#{layer._properties.rotationX}deg)"
-
-		if layer._properties.rotationY
-			css.push "rotateY(#{layer._properties.rotationY}deg)"
-
-		if layer._properties.rotationZ
-			css.push "rotateZ(#{layer._properties.rotationZ}deg)"
-
+		css.push "translate(#{layer._properties.x}px,#{layer._properties.y}px)"
+		css.push "scale(#{layer._properties.scale})"
+		css.push "skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg)"
+		css.push "rotate(#{layer._properties.rotationZ}deg)"
 
 		return css.join(" ")
-
-		# "
-		# translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px) 
-		# scale(#{layer._properties.scale})
-		# scale3d(#{layer._properties.scaleX},#{layer._properties.scaleY},#{layer._properties.scaleZ})
-		# skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg) 
-		# skewX(#{layer._properties.skewX}deg)  
-		# skewY(#{layer._properties.skewY}deg) 
-		# rotateX(#{layer._properties.rotationX}deg) 
-		# rotateY(#{layer._properties.rotationY}deg) 
-		# rotateZ(#{layer._properties.rotationZ}deg) 
-		# "
 
 	webkitTransformOrigin: (layer) ->
 		"#{layer._properties.originX * 100}% #{layer._properties.originY * 100}%"
