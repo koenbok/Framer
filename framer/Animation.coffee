@@ -67,7 +67,7 @@ class exports.Animation extends EventEmitter
 		if options.properties instanceof Frame
 			option.properties = option.properties.properties
 
-		@options.properties = @_filterAnimatableProperties @options.properties
+		@options.properties = @_filterAnimatableProperties(@options.properties)
 
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
@@ -91,11 +91,20 @@ class exports.Animation extends EventEmitter
 
 		for k, v of @options.properties
 
+			# Evaluate function properties
+			if _.isFunction(v)
+				v = v()
+
 			# Evaluate relative properties
-			v = evaluateRelativeProperty(@_target, k, v) if isRelativeProperty(v)
+			else if isRelativeProperty(v)
+				v = evaluateRelativeProperty(@_target, k, v)
 
 			# Filter out the properties that are equal
 			@_stateB[k] = v if @_stateA[k] != v
+
+		if _.keys(@_stateA).length is 0
+			console.warn "Animation: nothing to animate, no animatable properties"
+			return false
 
 		if _.isEqual(@_stateA, @_stateB)
 			console.warn "Animation: nothing to animate, all properties are equal to what it is now"
@@ -105,8 +114,7 @@ class exports.Animation extends EventEmitter
 		for runningAnimation in @_target.animations()
 			for key in _.keys(runningAnimation._stateA)
 				if @_stateA.hasOwnProperty(key)
-					console.warn "Animation: property #{key} is already being animated for this 
-						layer by another animation, so we bail"
+					console.warn "Animation: property #{key} is already being animated for this layer by another animation, so we bail"
 					return false
 
 		if @options.debug
@@ -184,7 +192,7 @@ class exports.Animation extends EventEmitter
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			animatableProperties[k] = v if _.isNumber(v) or isRelativeProperty(v)
+			animatableProperties[k] = v if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v)
 
 		animatableProperties
 

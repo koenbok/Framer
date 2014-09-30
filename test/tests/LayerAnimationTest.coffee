@@ -83,6 +83,21 @@ describe "LayerAnimation", ->
 					layer[p].should.equal 100
 					done()
 
+		it "should animate dynamic properties", (done) ->
+
+			layer = new Layer()
+
+			layer.animate
+				properties:
+					scale: -> layer.scale + 1
+				curve: "linear"
+				time: AnimationTime
+
+			layer.on "end", ->
+				layer.scale.should.equal 2
+				done()
+
+
 
 	describe "Basic", ->
 
