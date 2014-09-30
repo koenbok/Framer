@@ -125,7 +125,7 @@ class exports.Animation extends EventEmitter
 		# Todo: more repeat behaviours:
 		# 1) add (from end position) 2) reverse (loop between a and b)
 		if @_repeatCounter > 0
-			@on "end", =>
+			@once "end", =>
 				for k, v of @_stateA
 					@_target[k] = v
 				@_repeatCounter--

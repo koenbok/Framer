@@ -255,28 +255,27 @@ describe "LayerAnimation", ->
 					layer.x.should.be.within(30, 50)
 					done()
 
-	# describe "Repeat", ->
+	describe "Repeat", ->
 
-	# 	it "should start repeatedly", (done) ->
+		it "should start repeatedly", (done) ->
 
-	# 		layer = new Layer()
+			layer = new Layer()
 
-	# 		animation = new Animation
-	# 			layer: layer
-	# 			properties: {x: layer.x + 10}
-	# 			curve: "linear"
-	# 			time: AnimationTime
-	# 			repeat: 5
+			animation = new Animation
+				layer: layer
+				properties: {x: -> layer.x + 100}
+				curve: "linear"
+				time: AnimationTime
+				repeat: 5
 
-	# 		animation.start()
+			animation.start()
 
-	# 		c = 5
+			count = 0
 
-	# 		layer.on "end", ->
-	# 			print "hello"
-	# 			c--
-	# 			if c is 3
-	# 				done()
+			layer.on "end", ->
+				count++
+				if count is animation.options.repeat
+					done()
 
 
 	describe "AnimationLoop", ->
