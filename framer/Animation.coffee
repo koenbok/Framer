@@ -140,14 +140,12 @@ class exports.Animation extends EventEmitter
 		return true
 
 	stop: (emit=true)->
+		
 		@options.layer._context._animationList = _.without(
 			@options.layer._context._animationList, @)
 
-		if emit
-			@emit("stop")
-		
+		@emit("stop") if emit
 		Framer.Loop.off("update", @_update)
-		# _runningAnimations = _.without _runningAnimations, @
 
 	reverse: ->
 		# TODO: Add some tests
@@ -155,6 +153,8 @@ class exports.Animation extends EventEmitter
 		options.properties = @_originalState
 		animation = new Animation options
 		animation
+
+	copy: -> return new Animation(_.clone(@options))
 
 	# A bunch of common aliases to minimize frustration
 	revert: -> 	@reverse()
@@ -174,8 +174,9 @@ class exports.Animation extends EventEmitter
 	_update: (delta) =>
 		if @_animator.finished()
 			@_updateValue(1)
+			@stop(emit=false)
 			@emit("end")
-			@stop()
+			@emit("stop")
 		else
 			@_updateValue(@_animator.next(delta))
 

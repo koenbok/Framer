@@ -1,7 +1,8 @@
-layer = new Layer
+{_} = require "./Underscore"
 
+{EventEmitter} = require "./EventEmitter"
 
-class AnimationGroup extends Framer.EventEmitter
+class AnimationGroup extends EventEmitter
 
 	constructor: (animations=[]) ->
 		@setAnimations(animations)
@@ -31,35 +32,3 @@ class AnimationGroup extends Framer.EventEmitter
 
 	stop: ->
 		@_currentAnimation?.stop()
-
-
-# runAnimations = (inputAnimations) ->
-
-# 	copiedAnimations = []
-
-# 	for animation in inputAnimations
-# 		copiedAnimations.push(animation.copy())
-
-# 	_.map copiedAnimations, (animation, index) ->
-
-# 		nextAnimation = copiedAnimations[index+1]
-
-# 		if nextAnimation
-# 			animation.on Events.AnimationEnd, ->
-# 				print "Start", index
-# 				nextAnimation.start()
-
-# 	copiedAnimations[0].start()
-
-
-a = new Animation
-	layer: layer
-	properties:
-		x: -> layer.x + 100
-	time: 2
-
-
-ag = new AnimationGroup([a, a, a])
-
-
-ag.start()

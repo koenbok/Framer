@@ -11,6 +11,7 @@ Framer.BackgroundLayer = (require "./BackgroundLayer").BackgroundLayer
 Framer.VideoLayer = (require "./VideoLayer").VideoLayer
 Framer.Events = (require "./Events").Events
 Framer.Animation = (require "./Animation").Animation
+Framer.AnimationGroup = (require "./AnimationGroup").AnimationGroup
 Framer.Screen = (require "./Screen").Screen
 Framer.print = (require "./Print").print
 

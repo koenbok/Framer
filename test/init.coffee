@@ -1,18 +1,18 @@
 window.console.debug = (v) ->
 # window.console.log = print
 
-hideFramerRoot = ->
+# hideFramerRoot = ->
 	
-	element = document.getElementById "FramerRoot"
+# 	element = document.getElementById "FramerRoot"
 
-	if not element
-		return Utils.delay 0.01, hideFramerRoot
+# 	if not element
+# 		return Utils.delay 0.01, hideFramerRoot
 
-	_.extend element.style,
-		top:  "-10000000px"
-		left: "-10000000px"
+# 	_.extend element.style,
+# 		top:  "-10000000px"
+# 		left: "-10000000px"
 
-hideFramerRoot()
+# hideFramerRoot()
 
 require "./tests/EventEmitterTest"
 require "./tests/UtilsTest"
