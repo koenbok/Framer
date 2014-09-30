@@ -150,6 +150,27 @@ describe "LayerAnimation", ->
 			layer.animateStop()
 			layer.animations().should.not.contain(animation)
 
+		it "should list running animations correctly", (done) ->
+
+			layer = new Layer()
+			
+			animation = layer.animate
+				properties: {x: 100}
+				time: 0.5
+
+			count = 0
+
+			test = ->
+				layer.animations().length.should.equal 0
+				count++
+
+				if count is 2
+					done()
+
+			animation.on "end", test
+			animation.on "stop", test
+			
+
 	describe "Events", ->
 
 		it "should throw start", (done) ->
@@ -234,6 +255,30 @@ describe "LayerAnimation", ->
 					layer.x.should.be.within(30, 50)
 					done()
 
+	# describe "Repeat", ->
+
+	# 	it "should start repeatedly", (done) ->
+
+	# 		layer = new Layer()
+
+	# 		animation = new Animation
+	# 			layer: layer
+	# 			properties: {x: layer.x + 10}
+	# 			curve: "linear"
+	# 			time: AnimationTime
+	# 			repeat: 5
+
+	# 		animation.start()
+
+	# 		c = 5
+
+	# 		layer.on "end", ->
+	# 			print "hello"
+	# 			c--
+	# 			if c is 3
+	# 				done()
+
+
 	describe "AnimationLoop", ->
 
 		it "should only stop when all animations are done", (done) ->
@@ -274,6 +319,7 @@ describe "LayerAnimation", ->
 			layerA.on "end", ready
 			layerB.on "end", ready
 			layerC.on "end", ready
+
 
 	describe "Animation", ->
 
