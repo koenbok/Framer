@@ -287,8 +287,12 @@ Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 	result = toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
 
 	if limit is true
-		return toLow if result < toLow
-		return toHigh if result > toHigh
+		if toLow < toHigh
+			return toLow if result < toLow
+			return toHigh if result > toHigh
+		else
+			return toLow if result > toLow
+			return toHigh if result < toHigh
 
 	result
 
