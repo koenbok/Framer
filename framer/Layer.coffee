@@ -406,19 +406,6 @@ class exports.Layer extends BaseClass
 	copySingle: -> new Layer @properties
 
 	##############################################################
-	## ANIMATION
-
-	animate: (options) ->
-
-		options.layer = @
-		options.curveOptions = options
-
-		animation = new Animation options
-		animation.start()
-
-		animation
-
-	##############################################################
 	## IMAGE
 
 	@define "image",
@@ -660,10 +647,14 @@ class exports.Layer extends BaseClass
 
 	addListener: (eventName, originalListener) =>
 
+		# To avoid an error in Framer Studio we return if no originalListener was given
+		if not originalListener
+			return
+
 		# # Modify the scope to be the calling object, just like jquery
 		# # also add the object as the last argument
 		listener = (args...) =>
-			originalListener.call @, args..., @
+			originalListener.call(@, args..., @)
 
 		# Because we modify the listener we need to keep track of it
 		# so we can find it back when we want to unlisten again
