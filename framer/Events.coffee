@@ -28,6 +28,10 @@ Events.AnimationEnd = "end"
 # Scroll events
 Events.Scroll = "scroll"
 
+# Image events
+Events.ImageLoaded = "load"
+Events.ImageLoadError = "error"
+
 # Extract touch events for any event
 Events.touchEvent = (event) ->
 	touchEvent = event.touches?[0]
