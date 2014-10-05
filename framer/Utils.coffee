@@ -424,7 +424,7 @@ Utils.loadImage = (url, callback, context) ->
 	element.src = url
 
 ######################################################
-# GEOMERTY FUNCTIONS
+# GEOMETRY FUNCTIONS
 
 # Point
 
