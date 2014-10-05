@@ -8,6 +8,7 @@ class exports.LinearAnimator extends Animator
 
 		@options = Utils.setDefaultProperties options,
 			time: 1
+			precision: 1/1000
 
 		@_time = 0
 
@@ -20,4 +21,4 @@ class exports.LinearAnimator extends Animator
 		@_time / @options.time
 
 	finished: ->
-		@_time >= @options.time
+		@_time >= @options.time - @options.precision
