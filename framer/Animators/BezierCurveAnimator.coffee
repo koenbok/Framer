@@ -31,8 +31,6 @@ class exports.BezierCurveAnimator extends Animator
 			time: 1
 			precision: 1/1000
 
-		console.log "values", @options.values
-
 		@_unitBezier = new UnitBezier \
 			@options.values[0],
 			@options.values[1],

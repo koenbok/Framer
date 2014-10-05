@@ -21,6 +21,8 @@ AnimatorClasses =
 AnimatorClasses["spring"] = AnimatorClasses["spring-rk4"]
 AnimatorClasses["cubic-bezier"] = AnimatorClasses["bezier-curve"]
 
+AnimatorClassBezierPresets = ["ease", "ease-in", "ease-out", "ease-in-out"]
+
 numberRE = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/
 relativePropertyRE = new RegExp('^(?:([+-])=|)(' + numberRE.source + ')([a-z%]*)$', 'i')
 
@@ -202,11 +204,14 @@ class exports.Animation extends EventEmitter
 
 	_animatorClass: ->
 
-		parsedCurve = Utils.parseFunction @options.curve
+		parsedCurve = Utils.parseFunction(@options.curve)
 		animatorClassName = parsedCurve.name.toLowerCase()
 
-		if AnimatorClasses.hasOwnProperty animatorClassName
+		if AnimatorClasses.hasOwnProperty(animatorClassName)
 			return AnimatorClasses[animatorClassName]
+
+		if animatorClassName in AnimatorClassBezierPresets
+			return BezierCurveAnimator
 
 		return LinearAnimator
 
@@ -214,6 +219,7 @@ class exports.Animation extends EventEmitter
 
 		animatorClass = @_animatorClass()
 		parsedCurve = Utils.parseFunction @options.curve
+		animatorClassName = parsedCurve.name.toLowerCase()
 
 		# This is for compatibility with the direct Animation.time argument. This should
 		# ideally also be passed as a curveOption
@@ -223,6 +229,11 @@ class exports.Animation extends EventEmitter
 				@options.curveOptions =
 					values: @options.curveOptions
 
+			@options.curveOptions.time ?= @options.time
+
+		# Support ease-in etc
+		if animatorClass in [BezierCurveAnimator] and animatorClassName in AnimatorClassBezierPresets
+			@options.curveOptions.values = animatorClassName
 			@options.curveOptions.time ?= @options.time
 
 		# All this is to support curve: "spring(100,20,10)". In the future we'd like people
