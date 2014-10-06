@@ -262,6 +262,14 @@ describe "Layer", ->
 			testBorderRadius(layer, "50%")
 
 
+		it "should set perspective", ->
+
+			layer = new Layer
+			layer.perspective = 500
+
+			layer.style["-webkit-perspective"].should.equal("500")
+
+
 
 	describe "Filter Properties", ->
 

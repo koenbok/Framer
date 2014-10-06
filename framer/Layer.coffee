@@ -145,6 +145,8 @@ class exports.Layer extends BaseClass
 	@define "originY", layerProperty @, "originY", "webkitTransformOrigin", 0.5, _.isNumber
 	# @define "originZ", layerProperty @, "originZ", "WebkitTransformOrigin", 0.5
 
+	@define "perspective", layerProperty @, "perspective", "webkitPerspective", 0, _.isNumber
+
 	@define "rotationX", layerProperty @, "rotationX", "webkitTransform", 0, _.isNumber
 	@define "rotationY", layerProperty @, "rotationY", "webkitTransform", 0, _.isNumber
 	@define "rotationZ", layerProperty @, "rotationZ", "webkitTransform", 0, _.isNumber
@@ -216,13 +218,20 @@ class exports.Layer extends BaseClass
 	##############################################################
 	# Geometry
 
+	@define "point",
+		get: -> _.pick(@, ["x", "y"])
+		set: (point) ->
+			return if not point
+			for k in ["x", "y"]
+				@[k] = point[k] if point.hasOwnProperty(k)
+					
+
 	@define "frame",
 		get: -> _.pick(@, ["x", "y", "width", "height"])
 		set: (frame) ->
 			return if not frame
 			for k in ["x", "y", "width", "height"]
-				if frame.hasOwnProperty(k)
-					@[k] = frame[k]
+				@[k] = frame[k] if frame.hasOwnProperty(k)
 
 	@define "minX",
 		get: -> @x
@@ -570,6 +579,16 @@ class exports.Layer extends BaseClass
 		_.filter @_context._animationList, (animation) =>
 			animation.options.layer == @
 
+	animatingProperties: ->
+
+		properties = {}
+
+		for animation in @animations()
+			for propertyName in _.keys(animation._stateA)
+				properties[propertyName] = animation
+
+		return properties
+
 	animateStop: ->
 		_.invoke(@animations(), "stop")
 
@@ -613,6 +632,8 @@ class exports.Layer extends BaseClass
 		get: ->
 			@_draggable ?= new LayerDraggable @
 			@_draggable
+		set: ->
+			throw Error "You can't set the draggable object"
 
 	##############################################################
 	## SCROLLING

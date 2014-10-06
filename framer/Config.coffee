@@ -23,7 +23,6 @@ body {
 	-webkit-overflow-scrolling: touch;
 	-webkit-box-sizing: border-box;
 	-webkit-user-select: none;
-	-webkit-perspective: 1000;
 }
 
 .framerLayer input,
