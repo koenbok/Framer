@@ -13,7 +13,6 @@ body {
 	bottom: 0;
 	pointer-events: none;
 	overflow: hidden;
-	-webkit-perspective: 1000;
 }
 
 .framerLayer {
@@ -24,6 +23,7 @@ body {
 	-webkit-overflow-scrolling: touch;
 	-webkit-box-sizing: border-box;
 	-webkit-user-select: none;
+	-webkit-perspective: 1000;
 }
 
 .framerLayer input,
