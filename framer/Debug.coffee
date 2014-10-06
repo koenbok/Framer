@@ -50,10 +50,6 @@ errorWarning = (event) ->
 	if not _errorContext
 		_errorContext = new Context(name:"Error")
 
-	print event.message
-
-	console.log event
-
 	return if _errorShown
 
 	_errorShown = true
@@ -85,4 +81,4 @@ errorWarning = (event) ->
 
 	_errorWarningLayer = layer
 
-# _errorContext.eventManager.wrap(window).addEventListener("error", errorWarning)
+window.addEventListener("error", errorWarning)
