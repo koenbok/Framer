@@ -271,20 +271,6 @@ class exports.Layer extends BaseClass
 			else
 				@frame = Utils.convertPoint(frame, null, @superLayer)
 
-	screenScaleX: ->
-		if @superLayer
-			return @superLayer.screenScaleX()
-		else if @_context._parentLayer
-			return @_context._parentLayer.screenScaleX()
-		return @scale * @scaleX
-
-	screenScaleY: ->
-		if @superLayer
-			return @superLayer.screenScaleY()
-		else if @_context._parentLayer
-			return @_context._parentLayer.screenScaleY()
-		return @scale * @scaleY
-
 	contentFrame: ->
 		Utils.frameMerge(_.pluck(@subLayers, "frame"))
 
@@ -322,6 +308,53 @@ class exports.Layer extends BaseClass
 		@x = parseInt @x
 		@y = parseInt @y
 
+
+	##############################################################
+	# SCREEN GEOMETRY
+
+	# TODO: Account for rotation
+	# TODO: I don't think this is correct yet because you have to account 
+	# for scale+origin and rotation+origin each step in the layer hierarchy.
+
+	_superOrParentLayer: ->
+		if @superLayer
+			return @superLayer
+		if @_context._parentLayer
+			return @_context._parentLayer
+
+	screenOriginX = ->
+		if @_superOrParentLayer()
+			return @_superOrParentLayer().screenOriginX()
+		return @originX
+	
+	screenOriginY = ->
+		if @_superOrParentLayer()
+			return @_superOrParentLayer().screenOriginY()
+		return @originY
+			
+	screenScaleX: ->
+		if @_superOrParentLayer()
+			return @_superOrParentLayer().screenScaleX()
+		return @scale * @scaleX
+
+	screenScaleY: ->
+		if @_superOrParentLayer()
+			return @_superOrParentLayer().screenScaleY()
+		return @scale * @scaleY
+
+	screenRotationX: ->
+	screenRotationY: ->
+	screenRotationZ: ->
+
+	scaledScreenFrame = ->
+		frame = @screenFrame
+		frame.width  *= @screenScaleX()
+		frame.height *= @screenScaleY()
+		
+		frame.x += (@width -  frame.width)  * @screenOriginX
+		frame.y += (@height - frame.height) * @screenOriginY
+		
+		return frame
 
 	##############################################################
 	# CSS
