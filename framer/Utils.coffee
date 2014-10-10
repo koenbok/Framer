@@ -214,6 +214,13 @@ Utils.toggle = Utils.cycle
 Utils.isWebKit = ->
 	window.WebKitCSSMatrix isnt null
 
+Utils.webkitVersion = ->
+	version = -1
+	regexp = /Safari\/([\d.]+)/
+	result = regexp.exec(navigator.userAgent)
+	version = parseFloat(result[1]) if result
+	version
+
 Utils.isChrome = ->
 	(/chrome/).test(navigator.userAgent.toLowerCase())
 
