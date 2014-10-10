@@ -216,7 +216,7 @@ Utils.isWebKit = ->
 
 Utils.webkitVersion = ->
 	version = -1
-	regexp = /Safari\/([\d.]+)/
+	regexp = /AppleWebKit\/([\d.]+)/
 	result = regexp.exec(navigator.userAgent)
 	version = parseFloat(result[1]) if result
 	version

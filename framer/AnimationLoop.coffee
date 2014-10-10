@@ -18,7 +18,7 @@ class exports.AnimationLoop extends EventEmitter
 		# Workaraound for RAF bug on 10.10
 		# https://bugs.webkit.org/show_bug.cgi?id=137599
 
-		if Utils.webkitVersion() > 600 and Utils.isSafari() and Utils.isDesktop()
+		if Utils.webkitVersion() > 600 and Utils.isDesktop()
 			@raf = false
 
 		if Utils.webkitVersion() > 600 and Utils.isFramerStudio()
