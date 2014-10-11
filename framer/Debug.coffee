@@ -81,4 +81,4 @@ errorWarning = (event) ->
 
 	_errorWarningLayer = layer
 
-window.addEventListener("error", errorWarning)
+window.error = errorWarning
