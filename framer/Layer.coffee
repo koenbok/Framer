@@ -699,7 +699,7 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## EVENTS
 
-	addListener: (eventName, originalListener) =>
+	addListener: (eventNames..., originalListener) =>
 
 		# To avoid an error in Framer Studio we return if no originalListener was given
 		if not originalListener
@@ -714,32 +714,40 @@ class exports.Layer extends BaseClass
 		# so we can find it back when we want to unlisten again
 		originalListener.modifiedListener = listener
 
-		# Listen to dom events on the element
-		super eventName, listener
-		@_context.eventManager.wrap(@_element).addEventListener(eventName, listener)
+		eventNames = [eventNames] if typeof eventNames == 'string'
 
-		@_eventListeners ?= {}
-		@_eventListeners[eventName] ?= []
-		@_eventListeners[eventName].push listener
+		# # Listen to dom events on the element
+		for eventName in eventNames
+			do (eventName) =>
+				super eventName, listener
+				@_context.eventManager.wrap(@_element).addEventListener(eventName, listener)
 
-		# We want to make sure we listen to these events, but we can safely
-		# ignore it for change events
-		if not _.startsWith eventName, "change:"
-			@ignoreEvents = false
+				@_eventListeners ?= {}
+				@_eventListeners[eventName] ?= []
+				@_eventListeners[eventName].push listener
 
-	removeListener: (eventName, listener) ->
+				# We want to make sure we listen to these events, but we can safely
+				# ignore it for change events
+				if not _.startsWith eventName, "change:"
+					@ignoreEvents = false
+
+	removeListener: (eventNames..., listener) ->
 
 		# If the original listener was modified, remove that
 		# one instead
 		if listener.modifiedListener
 			listener = listener.modifiedListener
 
-		super eventName, listener
-		
-		@_context.eventManager.wrap(@_element).removeEventListener(eventName, listener)
+		eventNames = [eventNames] if typeof eventNames == 'string'
+			
+		for eventName in eventNames
+			do (eventName) =>
+				super eventName, listener
+				
+				@_context.eventManager.wrap(@_element).removeEventListener(eventName, listener)
 
-		if @_eventListeners
-			@_eventListeners[eventName] = _.without @_eventListeners[eventName], listener
+				if @_eventListeners
+					@_eventListeners[eventName] = _.without @_eventListeners[eventName], listener
 
 	removeAllListeners: ->
 
