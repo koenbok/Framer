@@ -13,12 +13,13 @@ class exports.LinearAnimator extends Animator
 		@_time = 0
 
 	next: (delta) ->
+		
+		@_time += delta
 
 		if @finished()
 			return 1
-		
-		@_time += delta
-		@_time / @options.time
+
+		return @_time / @options.time
 
 	finished: ->
 		@_time >= @options.time - @options.precision
