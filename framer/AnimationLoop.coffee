@@ -8,11 +8,18 @@ if window.performance
 else
 	getTime = -> Date.now()
 
+
+# Make the time ticks a "fixed" 1/60 of a second.
+# Framer.Loop.delta = 1/60
+
+# Include workaround for a WebKit2 browser bug
+# Framer.Loop.raf = false
+
 class exports.AnimationLoop extends EventEmitter
 
 	constructor: ->
 		
-		@fps = 60
+		@delta = null
 		@raf = true
 
 		# Workaraound for RAF bug on 10.10
@@ -31,9 +38,12 @@ class exports.AnimationLoop extends EventEmitter
 
 		update = ->
 
-			timestamp = getTime()
-			delta = (timestamp - _timestamp) / 1000
-			_timestamp = timestamp
+			if animationLoop.delta
+				delta = animationLoop.delta
+			else
+				timestamp = getTime()
+				delta = (timestamp - _timestamp) / 1000
+				_timestamp = timestamp
 
 			animationLoop.emit("update", delta)
 			animationLoop.emit("render", delta)
