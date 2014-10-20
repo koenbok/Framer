@@ -714,10 +714,8 @@ class exports.Layer extends BaseClass
 		# so we can find it back when we want to unlisten again
 		originalListener.modifiedListener = listener
 
-		eventNames = [eventNames] if typeof eventNames == 'string'
-
 		# # Listen to dom events on the element
-		for eventName in eventNames
+		for eventName in [].concat eventNames
 			do (eventName) =>
 				super eventName, listener
 				@_context.eventManager.wrap(@_element).addEventListener(eventName, listener)
@@ -738,9 +736,7 @@ class exports.Layer extends BaseClass
 		if listener.modifiedListener
 			listener = listener.modifiedListener
 
-		eventNames = [eventNames] if typeof eventNames == 'string'
-			
-		for eventName in eventNames
+		for eventName in [].concat eventNames
 			do (eventName) =>
 				super eventName, listener
 				
