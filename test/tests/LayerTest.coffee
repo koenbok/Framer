@@ -341,6 +341,22 @@ describe "Layer", ->
 			layer.ignoreEvents.should.equal true
 			layer.style["pointerEvents"].should.equal "none"
 
+		it "should listen to multiple events", ->
+
+			layer = new Layer()
+
+			count = 0
+			handler = -> count++
+
+			layer.on "click", "tap", handler
+
+			console.log layer._eventListeners
+
+			layer.emit "click"
+			layer.emit "tap"
+
+			count.should.equal 2
+
 		it "should not listen to events until a listener is added", ->
 			
 			layer = new Layer()
