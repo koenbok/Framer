@@ -42,6 +42,12 @@ class exports.LayerStates extends BaseClass
 
 		# Add a state with a name and properties
 		@_orderedStates.push stateName
+
+		if properties['enter'] || properties['exit']
+			@on Events.StateDidSwitch, (oldState, newState) =>
+				properties['enter']?.call(@layer) if newState == stateName
+				properties['exit']?.call(@layer) if oldState == stateName
+
 		@_states[stateName] = properties
 
 	remove: (stateName) ->

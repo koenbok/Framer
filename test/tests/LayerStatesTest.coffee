@@ -51,7 +51,31 @@ describe "LayerStates", ->
 
 			Framer.resetDefaults()
 
+	describe "Hooks", ->
 
+		it "should add didSwitch for enter: on .add", (done) ->
+			layer = new Layer
+			layer.states.animationOptions.time = 0.001
+			layer.states.add "new", x: 100, enter: () -> 
+				@x = 110
+			layer.states.on Events.StateDidSwitch, ->
+				layer.x.should.equal 110
+			layer.states.switch "new"
+			done()
+
+		it "should add didSwitch for exit: on .add", (done) ->
+			layer = new Layer
+			layer.states.animationOptions.time = 0.001
+
+			layer.states.add "original", x: 100, exit: () -> 
+				layer.x = 110
+			layer.states.switchInstant "original"
+
+			layer.states.add "new", x: 1
+			layer.states.on Events.StateDidSwitch, ->
+				layer.x.should.equal 110
+			layer.states.switch "new"
+			done()
 
 	describe "Switch", ->
 

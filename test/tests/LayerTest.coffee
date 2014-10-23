@@ -350,8 +350,6 @@ describe "Layer", ->
 
 			layer.on "click", "tap", handler
 
-			console.log layer._eventListeners
-
 			layer.emit "click"
 			layer.emit "tap"
 
