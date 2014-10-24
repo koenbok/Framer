@@ -83,7 +83,6 @@ figure {
 	left:50%; margin-left:-120px;
 	bottom: 24%;
 }
-
 .arrow figure {
 	-webkit-animation: bounce 1.25s ease infinite; 
 	-moz-animation:    bounce 1.25s ease infinite; 
@@ -94,7 +93,6 @@ figure {
 	-ms-transform-origin: center bottom;
 	transform-origin: center bottom;
 }
-
 @-webkit-keyframes bounce {
   0%, 100% {
     -webkit-transform: translate3d(0,0,0);
@@ -115,8 +113,13 @@ figure {
             transform: translate3d(0, -16px, 0);
   }
 }
-
-/* Close */
+/* Icons */
+.icon-close,
+.icon-framer,
+.icon-share,
+.icon-arrow {
+	background-size: cover;
+}
 .icon-close {
 	background-image: url("/static/images/mirror/icon-close.png");
 	position: absolute;
@@ -139,6 +142,25 @@ figure {
 	background-image: url("/static/images/mirror/icon-arrow.png");
 	width: 18px;
 	height: 30px; 
+}
+@media screen and (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+	.icon-close {
+	background-image: url("/static/images/mirror/icon-close.png");
+	position: absolute;
+	top:16px;
+	right:16px;
+	cursor: pointer;
+	cursor: hand;
+	}
+	.icon-framer {
+		background-image: url("/static/images/mirror/icon-framer@2x.png");
+	}
+	.icon-share {
+		background-image: url("/static/images/mirror/icon-share@2x.png");
+	}
+	.icon-arrow {
+		background-image: url("/static/images/mirror/icon-arrow@2x.png");
+	}
 }
 
 @media screen and (orientation:portrait) {
