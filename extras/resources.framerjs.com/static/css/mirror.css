@@ -175,7 +175,7 @@ figure {
 		padding-bottom: 25%;
 	}
 }
-/* Landscape modes -> No arrows and less padding */
+/* When it landscape, hide arrow and adjust spacing */
 @media screen and (orientation:landscape) {
 	.arrow {
 		display: none;
