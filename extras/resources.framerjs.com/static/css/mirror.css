@@ -88,29 +88,29 @@ figure {
 	-moz-animation:    bounce 1.25s ease infinite; 
 	-o-animation:      bounce 1.25s ease infinite; 
 	animation:         bounce 1.25s ease infinite; 
-
 	-webkit-transform-origin: center bottom;
 	-ms-transform-origin: center bottom;
 	transform-origin: center bottom;
 }
+/* Arrow animation */
 @-webkit-keyframes bounce {
   0%, 100% {
     -webkit-transform: translate3d(0,0,0);
-            transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
   }
   50% {
     -webkit-transform: translate3d(0, -16px, 0);
-            transform: translate3d(0, -16px, 0);
+    transform: translate3d(0, -16px, 0);
   }
 }
 @keyframes bounce {
   0%, 100% {
     -webkit-transform: translate3d(0,0,0);
-            transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
   }
   50% {
     -webkit-transform: translate3d(0, -16px, 0);
-            transform: translate3d(0, -16px, 0);
+    transform: translate3d(0, -16px, 0);
   }
 }
 /* Icons */
@@ -127,6 +127,8 @@ figure {
 	right:16px;
 	cursor: pointer;
 	cursor: hand;
+	width: 18px;
+	height: 18px;
 }
 .icon-framer {
 	background-image: url("/static/images/mirror/icon-framer.png");
@@ -143,14 +145,10 @@ figure {
 	width: 18px;
 	height: 30px; 
 }
+/* Retina Icons */
 @media screen and (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
 	.icon-close {
-	background-image: url("/static/images/mirror/icon-close.png");
-	position: absolute;
-	top:16px;
-	right:16px;
-	cursor: pointer;
-	cursor: hand;
+		background-image: url("/static/images/mirror/icon-close@2x.png");
 	}
 	.icon-framer {
 		background-image: url("/static/images/mirror/icon-framer@2x.png");
@@ -162,7 +160,7 @@ figure {
 		background-image: url("/static/images/mirror/icon-arrow@2x.png");
 	}
 }
-
+/* Avoid overflow scrolling when viewing in Portrait */
 @media screen and (orientation:portrait) {
 	html, body, .wrapper {
 		overflow: hidden;
@@ -177,7 +175,7 @@ figure {
 		padding-bottom: 25%;
 	}
 }
-/* Landscape modes */
+/* Landscape modes -> No arrows and less padding */
 @media screen and (orientation:landscape) {
 	.arrow {
 		display: none;
@@ -187,7 +185,7 @@ figure {
 		padding-bottom: 0;
 	}
 }
-/* iPhone 6 Portrait*/
+/* iPhone 6 Portrait */
 @media screen and (min-device-width:375px) and (max-device-width:667px) and (-webkit-min-device-pixel-ratio:2) and (orientation:portrait) {
 	.wrapper {
 		padding-top: 48%;	
