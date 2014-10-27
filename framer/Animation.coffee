@@ -112,12 +112,14 @@ class exports.Animation extends EventEmitter
 			console.warn "Animation: nothing to animate, all properties are equal to what it is now"
 			return false
 
-		# See if another animation targeting the same layer is animating the same properties
-		for runningAnimation in @_target.animations()
-			for key in _.keys(runningAnimation._stateA)
-				if @_stateA.hasOwnProperty(key)
-					console.warn "Animation: property #{key} is already being animated for this layer by another animation, so we bail"
-					return false
+		for property, animation of @_target.animatingProperties()
+			console.log(@_target.animatingProperties())
+			if @_stateA.hasOwnProperty(property)
+				# We used to ignore animations that tried animation already animating properties
+				# console.warn "Animation: property #{property} is already being animated for this layer by another animation, so we bail"
+
+				# But after some consideration, we actually just stop the animation that is animation those properties for this one
+				animation.stop()
 
 		if @options.debug
 			console.log "Animation.start"

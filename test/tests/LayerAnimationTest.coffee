@@ -118,7 +118,7 @@ describe "LayerAnimation", ->
 				layer.x.should.be.within(10, 40)
 				done()
 
-		it "should not start animating the same property", ->
+		it "should cancel previous animation for the same property", ->
 
 			layer = new Layer()
 
@@ -134,8 +134,13 @@ describe "LayerAnimation", ->
 				curve: "linear"
 				time: 0.5
 
+			stopped = false
+			animationA.on "stop", -> stopped = true
+
 			animationA.start().should.equal true
-			animationB.start().should.equal false
+			animationB.start().should.equal true
+
+			stopped.should.equal true
 
 	describe "Context", ->
 
