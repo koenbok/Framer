@@ -3,12 +3,15 @@ Utils = require "./Utils"
 {_} = require "./Underscore"
 {Config} = require "./Config"
 {EventManager} = require "./EventManager"
+{EventEmitter} = require "./EventEmitter"
 
 Counter = 1
 
-class exports.Context
+class exports.Context extends EventEmitter
 	
 	constructor: (options={}) ->
+		
+		super
 
 		Counter++
 
@@ -43,7 +46,9 @@ class exports.Context
 		@_layerList = []
 		@_animationList = []
 		@_delayTimers = []
-		@_delayIntervals = []	
+		@_delayIntervals = []
+
+		@emit("reset", @)
 
 	getRootElement: ->
 		@_rootElement

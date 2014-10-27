@@ -79,6 +79,8 @@ class exports.Layer extends BaseClass
 		# Add this layer to the current context
 		@_context._layerList.push(@)
 
+		@_id = @_context._layerList.length
+
 		# Keep track of the default values
 		# @_defaultValues = options._defaultValues
 
@@ -97,6 +99,8 @@ class exports.Layer extends BaseClass
 
 		# Set needed private variables
 		@_subLayers = []
+
+		@_context.emit("layer:create", @)
 
 	##############################################################
 	# Properties
@@ -444,6 +448,8 @@ class exports.Layer extends BaseClass
 		@removeAllListeners()
 		
 		@_context._layerList = _.without @_context._layerList, @
+
+		@_context.emit("layer:destroy", @)
 
 
 	##############################################################
