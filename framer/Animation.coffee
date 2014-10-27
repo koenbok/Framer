@@ -113,7 +113,6 @@ class exports.Animation extends EventEmitter
 			return false
 
 		for property, animation of @_target.animatingProperties()
-			console.log(@_target.animatingProperties())
 			if @_stateA.hasOwnProperty(property)
 				# We used to ignore animations that tried animation already animating properties
 				# console.warn "Animation: property #{property} is already being animated for this layer by another animation, so we bail"

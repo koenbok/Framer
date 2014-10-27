@@ -244,7 +244,7 @@ describe "Layer", ->
 
 			testBorderRadius = (layer, value) ->
 
-				if Utils.isSafari()
+				if layer.style["border-top-left-radius"] is "#{value}"
 					layer.style["border-top-left-radius"].should.equal "#{value}"
 					layer.style["border-top-right-radius"].should.equal "#{value}"
 					layer.style["border-bottom-left-radius"].should.equal "#{value}"
