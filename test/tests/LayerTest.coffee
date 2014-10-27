@@ -244,10 +244,16 @@ describe "Layer", ->
 
 			testBorderRadius = (layer, value) ->
 
-				layer.style["border-top-left-radius"].should.equal "#{value} #{value}"
-				layer.style["border-top-right-radius"].should.equal "#{value} #{value}"
-				layer.style["border-bottom-left-radius"].should.equal "#{value} #{value}"
-				layer.style["border-bottom-right-radius"].should.equal "#{value} #{value}"
+				if Utils.isSafari()
+					layer.style["border-top-left-radius"].should.equal "#{value}"
+					layer.style["border-top-right-radius"].should.equal "#{value}"
+					layer.style["border-bottom-left-radius"].should.equal "#{value}"
+					layer.style["border-bottom-right-radius"].should.equal "#{value}"
+				else
+					layer.style["border-top-left-radius"].should.equal "#{value} #{value}"
+					layer.style["border-top-right-radius"].should.equal "#{value} #{value}"
+					layer.style["border-bottom-left-radius"].should.equal "#{value} #{value}"
+					layer.style["border-bottom-right-radius"].should.equal "#{value} #{value}"
 
 			layer = new Layer
 
@@ -657,7 +663,8 @@ describe "Layer", ->
 		it "should calculate scale", ->
 			layerA = new Layer scale:0.9
 			layerB = new Layer scale:0.8, superLayer:layerA
-			layerB.screenScale().should.equal 0.9 * 0.8
+			layerB.screenScaleX().should.equal 0.9 * 0.8
+			layerB.screenScaleY().should.equal 0.9 * 0.8
 
 		it "should calculate scaled frame", ->
 			layerA = new Layer x:100, width:500, height:900, scale:0.5

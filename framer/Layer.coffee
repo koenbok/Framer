@@ -312,61 +312,64 @@ class exports.Layer extends BaseClass
 	##############################################################
 	# SCREEN GEOMETRY
 
-	# TODO: Account for rotation
-	# TODO: I don't think this is correct yet because you have to account 
-	# for scale+origin and rotation+origin each step in the layer hierarchy.
+	# TODO: Rotation/Skew
 
-	screenOriginX = ->
-		if @_superOrParentLayer()
-			return @_superOrParentLayer().screenOriginX()
-		return @originX
+	# screenOriginX = ->
+	# 	if @_superOrParentLayer()
+	# 		return @_superOrParentLayer().screenOriginX()
+	# 	return @originX
 	
-	screenOriginY = ->
-		if @_superOrParentLayer()
-			return @_superOrParentLayer().screenOriginY()
-		return @originY
-			
+	# screenOriginY = ->
+	# 	if @_superOrParentLayer()
+	# 		return @_superOrParentLayer().screenOriginY()
+	# 	return @originY
+
 	screenScaleX: ->
-		if @_superOrParentLayer()
-			return @_superOrParentLayer().screenScaleX()
-		return @scale * @scaleX
-
-	screenScaleY: ->
-		if @_superOrParentLayer()
-			return @_superOrParentLayer().screenScaleY()
-		return @scale * @scaleY
-
-	screenScale: ->
-		scale = @scale
-		for superLayer in @superLayers()
-			scale = scale * superLayer.scale
+		scale = @scale * @scaleX
+		for superLayer in @superLayers(context=true)
+			scale = scale * superLayer.scale * superLayer.scaleX
 		return scale
 
-	scaledFrame: ->
-		frame = @frame
-		frame.width *= @scale
-		frame.height *= @scale
-		frame.x += (1 - @scale) * @originX * @width
-		frame.y += (1 - @scale) * @originY * @height
-		frame
+	screenScaleY: ->
+		scale = @scale * @scaleY
+		for superLayer in @superLayers(context=true)
+			scale = scale * superLayer.scale * superLayer.scaleY
+		return scale
 
 	screenScaledFrame: ->
 		frame =
 			x: 0
 			y: 0
-			width: @width * @screenScale()
-			height: @height * @screenScale()
+			width:  @width  * @screenScaleX()
+			height: @height * @screenScaleY()
 		
 		layers = @superLayers()
 		layers.push(@)
 		layers.reverse()
 		
 		for superLayer in layers
-			factor = if superLayer.superLayer then superLayer.superLayer.screenScale() else 1
+			factorX = if superLayer.superLayer then superLayer.superLayer.screenScaleX() else 1
+			factorY = if superLayer.superLayer then superLayer.superLayer.screenScaleY() else 1
 			layerScaledFrame = superLayer.scaledFrame()
-			frame.x += layerScaledFrame.x * factor
-			frame.y += layerScaledFrame.y * factor
+			frame.x += layerScaledFrame.x * factorX
+			frame.y += layerScaledFrame.y * factorY
 
+		return frame
+
+	scaledFrame: ->
+
+		# Get the scaled frame for a layer, taking into account 
+		# the transform origins.
+
+		frame = @frame
+		scaleX = @scale * @scaleX
+		scaleY = @scale * @scaleY
+
+		frame.width  *= scaleX
+		frame.height *= scaleY
+		frame.x += (1 - scaleX) * @originX * @width
+		frame.y += (1 - scaleY) * @originY * @height
+		
 		return frame
 
 	##############################################################
@@ -562,19 +565,6 @@ class exports.Layer extends BaseClass
 
 			@emit "change:superLayer"
 
-	superLayers: ->
-
-		superLayers = []
-
-		recurse = (layer) ->
-			return if not layer.superLayer
-			superLayers.push layer.superLayer
-			recurse layer.superLayer
-
-		recurse @
-
-		superLayers
-
 	# Todo: should we have a recursive subLayers function?
 	# Let's make it when we need it.
 
@@ -606,12 +596,20 @@ class exports.Layer extends BaseClass
 	subLayersByName: (name) ->
 		_.filter @subLayers, (layer) -> layer.name == name
 
-	superLayers: ->
+	superLayers: (context=false) ->
+
 		superLayers = []
 		currentLayer = @
-		while currentLayer.superLayer
-			superLayers.push(currentLayer.superLayer)
-			currentLayer = currentLayer.superLayer
+
+		if context is false
+			while currentLayer.superLayer
+				superLayers.push(currentLayer.superLayer)
+				currentLayer = currentLayer.superLayer
+		else
+			while currentLayer._superOrParentLayer()
+				superLayers.push(currentLayer._superOrParentLayer())
+				currentLayer = currentLayer._superOrParentLayer()
+
 		return superLayers
 
 	_superOrParentLayer: ->
