@@ -795,6 +795,12 @@ class exports.Layer extends BaseClass
 	## DESCRIPTOR
 
 	toString: ->
+
+		round = (value) ->
+			if parseInt(value) == value
+				return parseInt(value)
+			return Utils.round(value, 1)
+
 		if @name
-			return "&lt;Layer id:#{@id} name:#{@name} (#{@x},#{@y}) #{@width}x#{@height}&gt;"
-		return "&lt;Layer id:#{@id} (#{@x},#{@y}) #{@width}x#{@height}&gt;"
+			return "&lt;Layer id:#{@id} name:#{@name} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}&gt;"
+		return "&lt;Layer id:#{@id} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}&gt;"
