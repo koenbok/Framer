@@ -316,44 +316,37 @@ class exports.Layer extends BaseClass
 	# TODO: I don't think this is correct yet because you have to account 
 	# for scale+origin and rotation+origin each step in the layer hierarchy.
 
-	_superOrParentLayer: ->
-		if @superLayer
-			return @superLayer
-		if @_context._parentLayer
-			return @_context._parentLayer
+	screenScale: ->
+		scale = @scale
+		for superLayer in @superLayers()
+			scale = scale * superLayer.scale
+		return scale
 
-	screenOriginX = ->
-		if @_superOrParentLayer()
-			return @_superOrParentLayer().screenOriginX()
-		return @originX
-	
-	screenOriginY = ->
-		if @_superOrParentLayer()
-			return @_superOrParentLayer().screenOriginY()
-		return @originY
-			
-	screenScaleX: ->
-		if @_superOrParentLayer()
-			return @_superOrParentLayer().screenScaleX()
-		return @scale * @scaleX
+	scaledFrame: ->
+		frame = @frame
+		frame.width *= @scale
+		frame.height *= @scale
+		frame.x += (1 - @scale) * @originX * @width
+		frame.y += (1 - @scale) * @originY * @height
+		frame
 
-	screenScaleY: ->
-		if @_superOrParentLayer()
-			return @_superOrParentLayer().screenScaleY()
-		return @scale * @scaleY
-
-	screenRotationX: ->
-	screenRotationY: ->
-	screenRotationZ: ->
-
-	scaledScreenFrame = ->
-		frame = @screenFrame
-		frame.width  *= @screenScaleX()
-		frame.height *= @screenScaleY()
+	screenScaledFrame: ->
+		frame =
+			x: 0
+			y: 0
+			width: @width * @screenScale()
+			height: @height * @screenScale()
 		
-		frame.x += (@width -  frame.width)  * @screenOriginX
-		frame.y += (@height - frame.height) * @screenOriginY
+		layers = @superLayers()
+		layers.push(@)
+		layers.reverse()
 		
+		for superLayer in layers
+			factor = if superLayer.superLayer then superLayer.superLayer.screenScale() else 1
+			layerScaledFrame = superLayer.scaledFrame()
+			frame.x += layerScaledFrame.x * factor
+			frame.y += layerScaledFrame.y * factor
+
 		return frame
 
 	##############################################################
@@ -593,6 +586,20 @@ class exports.Layer extends BaseClass
 	subLayersByName: (name) ->
 		_.filter @subLayers, (layer) -> layer.name == name
 
+	superLayers: ->
+		superLayers = []
+		currentLayer = @
+		while currentLayer.superLayer
+			superLayers.push(currentLayer.superLayer)
+			currentLayer = currentLayer.superLayer
+		return superLayers
+
+	_superOrParentLayer: ->
+		if @superLayer
+			return @superLayer
+		if @_context._parentLayer
+			return @_context._parentLayer
+
 	##############################################################
 	## ANIMATION
 
@@ -759,3 +766,11 @@ class exports.Layer extends BaseClass
 
 	on: @::addListener
 	off: @::removeListener
+
+	##############################################################
+	## DESCRIPTOR
+
+	toString: ->
+		if @name
+			return "&lt;Layer id:#{@id} name:#{@name} (#{@x},#{@y}) #{@width}x#{@height}&gt;"
+		return "&lt;Layer id:#{@id} (#{@x},#{@y}) #{@width}x#{@height}&gt;"
