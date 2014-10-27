@@ -347,7 +347,7 @@ class exports.Layer extends BaseClass
 			width:  @width  * @screenScaleX()
 			height: @height * @screenScaleY()
 		
-		layers = @superLayers()
+		layers = @superLayers(context=true)
 		layers.push(@)
 		layers.reverse()
 		
