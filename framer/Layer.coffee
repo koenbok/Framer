@@ -352,8 +352,8 @@ class exports.Layer extends BaseClass
 		layers.reverse()
 		
 		for superLayer in layers
-			factorX = if superLayer.superLayer then superLayer.superLayer.screenScaleX() else 1
-			factorY = if superLayer.superLayer then superLayer.superLayer.screenScaleY() else 1
+			factorX = if superLayer._superOrParentLayer() then superLayer._superOrParentLayer().screenScaleX() else 1
+			factorY = if superLayer._superOrParentLayer() then superLayer._superOrParentLayer().screenScaleY() else 1
 			layerScaledFrame = superLayer.scaledFrame()
 			frame.x += layerScaledFrame.x * factorX
 			frame.y += layerScaledFrame.y * factorY
