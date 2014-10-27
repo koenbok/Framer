@@ -316,6 +316,26 @@ class exports.Layer extends BaseClass
 	# TODO: I don't think this is correct yet because you have to account 
 	# for scale+origin and rotation+origin each step in the layer hierarchy.
 
+	screenOriginX = ->
+		if @_superOrParentLayer()
+			return @_superOrParentLayer().screenOriginX()
+		return @originX
+	
+	screenOriginY = ->
+		if @_superOrParentLayer()
+			return @_superOrParentLayer().screenOriginY()
+		return @originY
+			
+	screenScaleX: ->
+		if @_superOrParentLayer()
+			return @_superOrParentLayer().screenScaleX()
+		return @scale * @scaleX
+
+	screenScaleY: ->
+		if @_superOrParentLayer()
+			return @_superOrParentLayer().screenScaleY()
+		return @scale * @scaleY
+
 	screenScale: ->
 		scale = @scale
 		for superLayer in @superLayers()
