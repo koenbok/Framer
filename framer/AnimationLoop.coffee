@@ -19,7 +19,9 @@ class exports.AnimationLoop extends EventEmitter
 
 	constructor: ->
 		
-		@delta = null
+		# For now we set the delta to a fixed time because using performance.now plus
+		# raf seems to cause weird issues.
+		@delta = 1/60
 		@raf = true
 
 		# Workaraound for RAF bug on 10.10
