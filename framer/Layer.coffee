@@ -479,6 +479,9 @@ class exports.Layer extends BaseClass
 			@_getPropertyValue "image"
 		set: (value) ->
 
+			if not (_.isString(value) or value is null)
+				layerValueTypeError("image", value)
+
 			currentValue = @_getPropertyValue "image"
 
 			if currentValue == value
