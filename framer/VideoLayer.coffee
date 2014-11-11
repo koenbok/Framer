@@ -7,8 +7,10 @@ class exports.VideoLayer extends Layer
 		super options
 		
 		@player = document.createElement("video")
+		@player.setAttribute("webkit-playsinline", "true")
 		@player.style.width = "100%"
 		@player.style.height = "100%"
+
 		
 		# Make it work with .on and .off
 		# https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events
