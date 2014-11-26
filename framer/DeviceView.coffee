@@ -237,6 +237,9 @@ class exports.DeviceView extends BaseClass
 			if @_device is device
 				return
 
+			# If we switch from fullscreen to a device, we should zoom to fit
+			shouldZoomToFit = @_deviceType is "fullscreen"
+
 			@_device = device
 			@_deviceType = deviceType
 			@fullscreen = false
@@ -245,6 +248,9 @@ class exports.DeviceView extends BaseClass
 			@keyboard = false
 			@_positionKeyboard()
 			@emit("change:deviceType")
+
+			if shouldZoomToFit
+				@deviceScale = "fit"
 
 	_updateDeviceImage: =>
 		if @_shouldRenderFullScreen()
