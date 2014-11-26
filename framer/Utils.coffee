@@ -212,7 +212,7 @@ Utils.toggle = Utils.cycle
 # ENVIROMENT FUNCTIONS
 
 Utils.isWebKit = ->
-	window.WebKitCSSMatrix isnt null
+	window.WebKitCSSMatrix isnt undefined
 
 Utils.webkitVersion = ->
 	version = -1
