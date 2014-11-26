@@ -619,12 +619,37 @@ AppleWatchDevice =
 	screenWidth: 320
 	screenHeight: 400
 
-
 Devices =
 
 	"fullscreen":
 		name: "Fullscreen"
 		deviceType: "desktop"
+
+	# Desktop Browser
+	"desktop-browser-1024":
+		deviceType: "browser"
+		deviceImage: "desktop-safari-1024-600.png"
+		name: "Desktop Browser 1024 x 600"
+		screenWidth: 1024
+		screenHeight: 600
+		deviceImageWidth: 1136
+		deviceImageHeight: 760
+	"desktop-browser-1280":
+		deviceType: "browser"
+		deviceImage: "desktop-safari-1280-800.png"
+		name: "Desktop Browser 1280 x 800"
+		screenWidth: 1280
+		screenHeight: 800
+		deviceImageWidth: 1392
+		deviceImageHeight: 960
+	"desktop-browser-1440":
+		deviceType: "browser"
+		deviceImage: "desktop-safari-1440-900.png"
+		name: "Desktop Browser 1440 x 900"
+		screenWidth: 1440
+		screenHeight: 900
+		deviceImageWidth: 1552
+		deviceImageHeight: 1060
 
 	# iPhone 6
 	"iphone-6-spacegray": _.extend {}, iPhone6BaseDevice,
