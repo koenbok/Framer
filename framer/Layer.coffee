@@ -656,6 +656,10 @@ class exports.Layer extends BaseClass
 
 		return properties
 
+	@define "isAnimating",
+		exportable: false
+		get: -> @animations().length isnt 0
+
 	animateStop: ->
 		_.invoke(@animations(), "stop")
 
