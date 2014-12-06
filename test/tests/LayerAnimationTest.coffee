@@ -174,6 +174,17 @@ describe "LayerAnimation", ->
 
 			animation.on "end", test
 			animation.on "stop", test
+
+		it "should tell you if animations are running", ->
+
+			layer = new Layer()
+			animation = layer.animate
+				properties: {x: 100}
+				time: 0.5
+
+			layer.isAnimating.should.equal(true)
+			layer.animateStop()
+			layer.isAnimating.should.equal(false)
 			
 
 	describe "Events", ->
