@@ -122,7 +122,7 @@ class exports.Layer extends BaseClass
 
 	@define "scroll",
 		get: -> @scrollHorizontal is true or @scrollVertical is true
-		set: (value) -> @scrollHorizontal = @scrollVertical = true
+		set: (value) -> @scrollHorizontal = @scrollVertical = value
 
 	# Behaviour properties
 	@define "ignoreEvents", layerProperty @, "ignoreEvents", "pointerEvents", true, _.isBool
