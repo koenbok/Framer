@@ -11,3 +11,4 @@ layer.states.on Events.StateDidSwitch, ->
 
 
 layer.states.switch "stateA", {curve:"ease-in-out", time:1}
+
