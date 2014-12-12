@@ -121,6 +121,7 @@ class exports.Layer extends BaseClass
 		layer.ignoreEvents = false if value is true
 
 	@define "scroll",
+		exportable: true
 		get: -> @scrollHorizontal is true or @scrollVertical is true
 		set: (value) -> @scrollHorizontal = @scrollVertical = value
 

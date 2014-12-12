@@ -228,6 +228,14 @@ describe "Layer", ->
 			layer.scroll.should.equal false
 			layer.style["overflow"].should.equal "hidden"
 
+		it "should set scroll from properties", ->
+
+			layer = new Layer
+			layer.properties = {scroll:false}
+			layer.scroll.should.equal false
+			layer.properties = {scroll:true}
+			layer.scroll.should.equal true
+
 		it "should set scrollHorizontal", ->
 			
 			layer = new Layer

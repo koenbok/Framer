@@ -69,3 +69,56 @@ describe "LayerStates", ->
 			layer.states.switchInstant "stateB"
 			layer.states.current.should.equal "stateB"
 			layer.y.should.equal 123
+
+
+	describe "Properties", ->
+
+		it "should set scroll property", ->
+
+			layer = new Layer
+			layer.states.add
+				stateA: {scroll:true}
+				stateB: {scroll:false}
+
+			layer.states.switchInstant "stateA"
+			layer.scroll.should.equal true
+
+			layer.states.switchInstant "stateB"
+			layer.scroll.should.equal false
+
+			layer.states.switchInstant "stateA"
+			layer.scroll.should.equal true
+
+		it "should set non numeric properties with animation", (done) ->
+
+			layer = new Layer
+			layer.states.add
+				stateA: {scroll:true, backgroundColor:"red"}
+
+			layer.scroll.should.equal false
+
+			layer.states.on Events.StateDidSwitch, ->
+				layer.scroll.should.equal true
+				layer.backgroundColor.should.equal "red"
+				done()
+
+			layer.states.switch "stateA"
+
+		it "should set non and numeric properties with animation", (done) ->
+
+			layer = new Layer
+			layer.states.add
+				stateA: {x:200, backgroundColor:"red"}
+
+			# layer.scroll.should.equal false
+			layer.x.should.equal 0
+
+			layer.states.on Events.StateDidSwitch, ->
+				# layer.scroll.should.equal true
+				layer.x.should.equal 200
+				layer.backgroundColor.should.equal = "red"
+				done()
+
+			layer.states.switch "stateA", {curve:"linear", time:0.1}
+
+			

@@ -63,12 +63,12 @@ class exports.LayerStates extends BaseClass
 		# if stateName is @_currentState
 		# 	return
 
-		if not @_states.hasOwnProperty stateName
+		if not @_states.hasOwnProperty(stateName)
 			throw Error "No such state: '#{stateName}'"
 
-		@emit Events.StateWillSwitch, @_currentState, stateName, @
+		@emit(Events.StateWillSwitch, @_currentState, stateName, @)
 
-		@_previousStates.push @_currentState
+		@_previousStates.push(@_currentState)
 		@_currentState = stateName
 
 		properties = {}
@@ -89,6 +89,16 @@ class exports.LayerStates extends BaseClass
 			# Set the new value 
 			properties[propertyName] = value
 
+		# If we are only transitioning to non-animatable (numeric) properties
+		# we fallback to an instant switch
+		animatablePropertyKeys = []
+
+		for k, v of properties
+			animatablePropertyKeys.push(k) if _.isNumber(v)
+
+		if animatablePropertyKeys.length == 0
+			instant = true
+
 		if instant is true
 			# We want to switch immediately without animation
 			@layer.properties = properties
@@ -102,7 +112,13 @@ class exports.LayerStates extends BaseClass
 			@_animation?.stop()
 			@_animation = @layer.animate animationOptions
 			@_animation.on "stop", => 
+				
+				# Set all the values for keys that we couldn't animate
+				for k, v of properties
+					@layer[k] = v if not _.isNumber(v)
+
 				@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
+
 
 
 	switchInstant: (stateName) ->
@@ -117,11 +133,13 @@ class exports.LayerStates extends BaseClass
 
 	animatingKeys: ->
 
+		# Get a list of all the propeties controlled by states
+
 		keys = []
 
 		for stateName, state of @_states
 			continue if stateName is "default"
-			keys = _.union keys, _.keys state
+			keys = _.union(keys, _.keys(state))
 
 		keys
 

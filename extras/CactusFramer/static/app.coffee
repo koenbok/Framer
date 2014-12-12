@@ -1,15 +1,13 @@
-Framer.Device = new Framer.DeviceView()
-Framer.Device.setupContext()
+layer = new Layer
+layer.states.add
+	stateA: {backgroundColor:"red", x:500}
 
-Framer.Device.deviceType = "desktop-browser-1440"
+# layer.scroll.should.equal false
+# layer.x.should.equal 0
 
-f = false
-l = new Layer
+layer.states.on Events.StateDidSwitch, ->
+	print "done", layer.backgroundColor
 
-l.on Events.Click, ->
-	if f is true
-		Framer.Device.deviceType = "desktop-browser-1440"
-		f = false
-	else
-		Framer.Device.deviceType = "fullscreen"
-		f = true
+
+
+layer.states.switch "stateA", {curve:"ease-in-out", time:1}
