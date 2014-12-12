@@ -565,3 +565,24 @@ Utils.convertPoint = (input, layerA, layerB) ->
 
 _.extend exports, Utils
 
+
+Utils.globalLayers = (importedLayers) ->
+	
+	# Beta. Not sure if we should push this but it's nice to have.
+	# Use this to make all layers in an imported set available on
+	# on the top level, so without the "importedLayers" prefix.
+
+	for layerName, layer of importedLayers
+		
+		# Replace all whitespace in layer names
+		layerName = layerName.replace(/\s/g,"")
+		
+		# Check if there are global variables with the same name
+		if window.hasOwnProperty(layerName) and not window.Framer._globalWarningGiven
+			print "Warning: Cannot make layer '#{layerName}' a global, an variable with that name already exists"
+		else
+			window[layerName] = layer
+	
+	window.Framer._globalWarningGiven = true
+
+
