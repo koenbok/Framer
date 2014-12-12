@@ -563,8 +563,6 @@ Utils.convertPoint = (input, layerA, layerB) ->
 	
 	return point
 
-_.extend exports, Utils
-
 
 Utils.globalLayers = (importedLayers) ->
 	
@@ -585,4 +583,6 @@ Utils.globalLayers = (importedLayers) ->
 	
 	window.Framer._globalWarningGiven = true
 
+
+_.extend exports, Utils
 
