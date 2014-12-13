@@ -166,7 +166,7 @@ class exports.DeviceView extends BaseClass
 		if Utils.isFramerStudio() && window.FramerStudioInfo
 			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
 		else
-			resourceUrl = "http://resources.framerjs.com/static/DeviceResources"
+			resourceUrl = "//resources.framerjs.com/static/DeviceResources"
 
 		# return "#{resourceUrl}/#{name}" 
 
