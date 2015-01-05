@@ -52,15 +52,15 @@ Utils.arrayPrev = (arr, item) ->
 ######################################################
 # MATH
 
-Utils.sum = (arr) -> _.reduce arr, (a, b) -> a + b 
+Utils.sum = (arr) -> _.reduce arr, (a, b) -> a + b
 Utils.average = (arr) -> Utils.sum(arr) / arr.length
 Utils.mean = Utils.average
 Utils.median = (x) ->
 	return null if x.length is 0
-	
+
 	sorted = x.slice().sort (a, b) ->
 		a - b
-	
+
 	if sorted.length % 2 is 1
 		sorted[(sorted.length - 1) / 2]
 	else
@@ -90,7 +90,7 @@ Utils.delay = (time, f) ->
 	timer = setTimeout f, time * 1000
 	Framer.CurrentContext._delayTimers.push(timer)
 	return timer
-	
+
 Utils.interval = (time, f) ->
 	timer = setInterval f, time * 1000
 	Framer.CurrentContext._delayIntervals.push(timer)
@@ -148,7 +148,7 @@ Utils.randomNumber = (a=0, b=1) ->
 	Utils.mapRange Math.random(), 0, 1, a, b
 
 Utils.labelLayer = (layer, text, style={}) ->
-	
+
 	style = _.extend({
 		font: "10px/1em Menlo"
 		lineHeight: "#{layer.height}px"
@@ -186,18 +186,18 @@ Utils.uuid = ->
 Utils.arrayFromArguments = (args) ->
 
 	# Convert an arguments object to an array
-	
+
 	if _.isArray args[0]
 		return args[0]
-	
+
 	Array.prototype.slice.call args
 
 Utils.cycle = ->
-	
+
 	# Returns a function that cycles through a list of values with each call.
-	
+
 	args = Utils.arrayFromArguments arguments
-	
+
 	curr = -1
 	return ->
 		curr++
@@ -275,7 +275,7 @@ Utils.pathJoin = ->
 
 ######################################################
 # MATH FUNCTIONS
-		
+
 Utils.round = (value, decimals) ->
 	d = Math.pow 10, decimals
 	Math.round(value * d) / d
@@ -287,10 +287,10 @@ Utils.mapRange = (value, fromLow, fromHigh, toLow, toHigh) ->
 
 # Kind of similar as above but with a better syntax and a limiting option
 Utils.modulate = (value, rangeA, rangeB, limit=false) ->
-	
+
 	[fromLow, fromHigh] = rangeA
 	[toLow, toHigh] = rangeB
-	
+
 	result = toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
 
 	if limit is true
@@ -343,16 +343,16 @@ Utils.domCompleteCancel = (f) ->
 	__domComplete = _.without __domComplete, f
 
 Utils.domLoadScript = (url, callback) ->
-	
+
 	script = document.createElement "script"
 	script.type = "text/javascript"
 	script.src = url
-	
+
 	script.onload = callback
-	
+
 	head = document.getElementsByTagName("head")[0]
 	head.appendChild script
-	
+
 	script
 
 Utils.domLoadData = (path, callback) ->
@@ -361,11 +361,11 @@ Utils.domLoadData = (path, callback) ->
 
 	# request.addEventListener "progress", updateProgress, false
 	# request.addEventListener "abort", transferCanceled, false
-	
+
 	request.addEventListener "load", ->
 		callback null, request.responseText
 	, false
-	
+
 	request.addEventListener "error", ->
 		callback true, null
 	, false
@@ -410,24 +410,24 @@ Utils.insertCSS = (css) ->
 	styleElement = document.createElement("style")
 	styleElement.type = "text/css"
 	styleElement.innerHTML = css
-	
+
 	Utils.domComplete ->
 		document.body.appendChild(styleElement)
 
 Utils.loadImage = (url, callback, context) ->
-	
-	# Loads a single image and calls callback. 
+
+	# Loads a single image and calls callback.
 	# The callback will be called with true if there is an error.
 
 	element = new Image
 	context ?= Framer.CurrentContext
-	
+
 	context.eventManager.wrap(element).addEventListener "load", (event) ->
 		callback()
-	
+
 	context.eventManager.wrap(element).addEventListener "error", (event) ->
 		callback(true)
-	
+
 	element.src = url
 
 ######################################################
@@ -437,15 +437,15 @@ Utils.loadImage = (url, callback, context) ->
 
 Utils.pointMin = ->
 	points = Utils.arrayFromArguments arguments
-	point = 
-		x: _.min point.map (size) -> size.x
-		y: _.min point.map (size) -> size.y
+	point =
+		x: _.min points.map (size) -> size.x
+		y: _.min points.map (size) -> size.y
 
 Utils.pointMax = ->
 	points = Utils.arrayFromArguments arguments
-	point = 
-		x: _.max point.map (size) -> size.x
-		y: _.max point.map (size) -> size.y
+	point =
+		x: _.max points.map (size) -> size.x
+		y: _.max points.map (size) -> size.y
 
 Utils.pointDistance = (pointA, pointB) ->
 	distance =
@@ -491,12 +491,12 @@ Utils.sizeMax = ->
 Utils.frameGetMinX = (frame) -> frame.x
 Utils.frameSetMinX = (frame, value) -> frame.x = value
 
-Utils.frameGetMidX = (frame) -> 
+Utils.frameGetMidX = (frame) ->
 	if frame.width is 0 then 0 else frame.x + (frame.width / 2.0)
 Utils.frameSetMidX = (frame, value) ->
 	frame.x = if frame.width is 0 then 0 else value - (frame.width / 2.0)
 
-Utils.frameGetMaxX = (frame) -> 
+Utils.frameGetMaxX = (frame) ->
 	if frame.width is 0 then 0 else frame.x + frame.width
 Utils.frameSetMaxX = (frame, value) ->
 	frame.x = if frame.width is 0 then 0 else value - frame.width
@@ -504,12 +504,12 @@ Utils.frameSetMaxX = (frame, value) ->
 Utils.frameGetMinY = (frame) -> frame.y
 Utils.frameSetMinY = (frame, value) -> frame.y = value
 
-Utils.frameGetMidY = (frame) -> 
+Utils.frameGetMidY = (frame) ->
 	if frame.height is 0 then 0 else frame.y + (frame.height / 2.0)
 Utils.frameSetMidY = (frame, value) ->
 	frame.y = if frame.height is 0 then 0 else value - (frame.height / 2.0)
 
-Utils.frameGetMaxY = (frame) -> 
+Utils.frameGetMaxY = (frame) ->
 	if frame.height is 0 then 0 else frame.y + frame.height
 Utils.frameSetMaxY = (frame, value) ->
 	frame.y = if frame.height is 0 then 0 else value - frame.height
@@ -540,6 +540,12 @@ Utils.frameMerge = ->
 
 	frame
 
+Utils.frameFittingPoints = (points...) ->
+	min = Utils.pointMin(points...)
+	max = Utils.pointMax(points...)
+
+	new Frame(x: min.x, y: min.y, width: max.x - min.x, height: max.y - min.y)
+
 # Coordinate system
 
 Utils.convertPoint = (input, layerA, layerB) ->
@@ -550,9 +556,9 @@ Utils.convertPoint = (input, layerA, layerB) ->
 
 	superLayersA = layerA?.superLayers() or []
 	superLayersB = layerB?.superLayers() or []
-	
+
 	superLayersB.push layerB if layerB
-	
+
 	for layer in superLayersA
 		point.x += layer.x - layer.scrollFrame.x
 		point.y += layer.y - layer.scrollFrame.y
@@ -560,29 +566,50 @@ Utils.convertPoint = (input, layerA, layerB) ->
 	for layer in superLayersB
 		point.x -= layer.x + layer.scrollFrame.x
 		point.y -= layer.y + layer.scrollFrame.y
-	
+
 	return point
 
 
 Utils.globalLayers = (importedLayers) ->
-	
+
 	# Beta. Not sure if we should push this but it's nice to have.
 	# Use this to make all layers in an imported set available on
 	# on the top level, so without the "importedLayers" prefix.
 
 	for layerName, layer of importedLayers
-		
+
 		# Replace all whitespace in layer names
 		layerName = layerName.replace(/\s/g,"")
-		
+
 		# Check if there are global variables with the same name
 		if window.hasOwnProperty(layerName) and not window.Framer._globalWarningGiven
-			print "Warning: Cannot make layer '#{layerName}' a global, an variable with that name already exists"
+			print "Warning: Cannot make layer '#{layerName}' a global. A variable with this name already exists."
 		else
 			window[layerName] = layer
-	
+
 	window.Framer._globalWarningGiven = true
 
+# SVG Utils
+
+Utils.SVG = do ->
+	svgContext = null
+	svgNS = 'http://www.w3.org/2000/svg'
+
+	getContext = ->
+		unless svgContext
+			svgContext = document.createElementNS(svgNS, 'svg')
+			svgContext.style = "visibility: hidden; width: 0px; height: 0px; position: absolute; top: 0; left: 0"
+			document.documentElement.appendChild(svgContext)
+
+		svgContext
+
+	createElement = (name, attributes) ->
+	  el = document.createElementNS(svgNS, name)
+	  for key, value of attributes
+	    el.setAttribute(key, value)
+
+	  el
+
+	{getContext, createElement}
 
 _.extend exports, Utils
-

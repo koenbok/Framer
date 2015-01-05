@@ -37,6 +37,30 @@ evaluateRelativeProperty = (target, k, v) ->
 	else
 		return +number
 
+createDebugLayerForPath = (path) ->
+	padding = 10
+	sharedContext = Utils.SVG.getContext()
+	svg = Utils.SVG.createElement('svg', width: '100%', height: '100%')
+
+	debugLayer = new Layer width: 100, height: 100, backgroundColor: 'transparent'
+	debugLayer._element.appendChild(svg)
+	debugLayer.path = path
+
+	debugElementsGroup = path.elementForDebugRepresentation()
+	sharedContext.appendChild(debugElementsGroup)
+	bbox = debugElementsGroup.getBBox()
+
+	svg.appendChild(debugElementsGroup)
+
+	debugLayer.width = bbox.width + Math.abs(bbox.x) + padding * 2
+	debugLayer.height = bbox.height + Math.abs(bbox.y) + padding * 2
+	debugLayer.pathOffset = { x: bbox.x - padding, y: bbox.y - padding }
+	debugLayer.animatedPath = debugElementsGroup.getElementsByClassName('animated-path')?[0]
+
+	debugElementsGroup.setAttribute('transform', "translate(#{-bbox.x + padding}, #{-bbox.y + padding})")
+
+	debugLayer
+
 # _runningAnimations = []
 
 # Todo: this would normally be BaseClass but the properties keyword
@@ -61,6 +85,23 @@ class exports.Animation extends EventEmitter
 			repeat: 0
 			delay: 0
 			debug: false
+			path: null
+			pathOptions: null
+
+		if options.path
+			path = options.path
+			@options.pathLength = path.getTotalLength()
+
+			@options.properties.x = options.layer.x + path.end.x
+			@options.properties.y = options.layer.y + path.end.y
+
+			@pathOptions = Utils.setDefaultProperties (options.pathOptions || {}),
+				autoRotate: true
+
+			if @options.debug
+				@_debugLayer = createDebugLayerForPath(path)
+				@_debugLayer.x = @options.layer.midX - path.start.x + @_debugLayer.pathOffset.x
+				@_debugLayer.y = @options.layer.midY - path.start.y + @_debugLayer.pathOffset.y
 
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
@@ -143,12 +184,20 @@ class exports.Animation extends EventEmitter
 		return true
 
 	stop: (emit=true)->
-		
+
 		@options.layer._context._animationList = _.without(
 			@options.layer._context._animationList, @)
 
 		@emit("stop") if emit
 		Framer.Loop.off("update", @_update)
+
+		if @_debugLayer
+			animation = @_debugLayer.animate
+				properties: { opacity: 0 }
+				curve: 'linear'
+				time: 0.25
+			animation.on 'end', ->
+				@options.layer.destroy()
 
 	reverse: ->
 		# TODO: Add some tests
@@ -185,8 +234,24 @@ class exports.Animation extends EventEmitter
 
 	_updateValue: (value) =>
 
-		for k, v of @_stateB
+		for k, v of @_stateB when ((@options.path and k not in ['x', 'y']) or !@options.path)
 			@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
+
+		if @options.path
+			position = @options.path.getPointAtLength(@options.pathLength * value)
+			position.x += @_stateA.x - @options.path.start.x
+			position.y += @_stateA.y - @options.path.start.y
+
+			if @_debugLayer
+				@_debugLayer.animatedPath.setAttribute('stroke-dashoffset', @options.pathLength * (1 - value))
+
+			if @pathOptions.autoRotate
+				angle = Math.atan2(position.y - @_target.y, position.x - @_target.x) * 180 / Math.PI
+				if position.y != @_target.y && position.x != @_target.x
+					@_target.rotationZ = angle
+
+			@_target.x = position.x
+			@_target.y = position.y
 
 		return
 
