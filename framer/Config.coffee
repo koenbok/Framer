@@ -28,7 +28,8 @@ body {
 .framerLayer input,
 .framerLayer textarea,
 .framerLayer select,
-.framerLayer option
+.framerLayer option,
+.framerLayer div[contenteditable=true]
 {
 	pointer-events: auto;
 	-webkit-user-select: auto;
