@@ -87,8 +87,8 @@ class exports.LayerDraggable extends EventEmitter
 		touchEvent = Events.touchEvent event
 
 		delta =
-			x: touchEvent.clientX - @_start.x
-			y: touchEvent.clientY - @_start.y
+			x: touchEvent.clientX - @_lastTouch.x
+			y: touchEvent.clientY - @_lastTouch.y
 
 		# Correct for current drag speed and scale
 		correctedDelta =
@@ -97,8 +97,8 @@ class exports.LayerDraggable extends EventEmitter
 			t: event.timeStamp
 
 		# Pixel align all moves
-		newX = parseInt(@_start.x + correctedDelta.x - @_offset.x)
-		newY = parseInt(@_start.y + correctedDelta.y - @_offset.y)
+		newX = parseInt(@layer.x + correctedDelta.x)
+		newY = parseInt(@layer.y + correctedDelta.y)
 
 		if @maxDragFrame
 
@@ -117,6 +117,10 @@ class exports.LayerDraggable extends EventEmitter
 
 		@layer.x = newX
 		@layer.y = newY
+		
+		@_lastTouch =
+			x: touchEvent.clientX
+			y: touchEvent.clientY
 
 		@_deltas.push correctedDelta
 
@@ -130,7 +134,7 @@ class exports.LayerDraggable extends EventEmitter
 
 		touchEvent = Events.touchEvent event
 
-		@_start =
+		@_lastTouch =
 			x: touchEvent.clientX
 			y: touchEvent.clientY
 
