@@ -100,8 +100,9 @@ class exports.Animation extends EventEmitter
 
 			if @options.debug
 				@_debugLayer = createDebugLayerForPath(path)
-				@_debugLayer.x = @options.layer.midX - path.start.x + @_debugLayer.pathOffset.x
-				@_debugLayer.y = @options.layer.midY - path.start.y + @_debugLayer.pathOffset.y
+				layerScreenFrame = @options.layer.screenFrame
+				@_debugLayer.x = layerScreenFrame.midX - path.start.x + @_debugLayer.pathOffset.x
+				@_debugLayer.y = layerScreenFrame.midY - path.start.y + @_debugLayer.pathOffset.y
 
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"

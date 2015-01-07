@@ -96,11 +96,14 @@ Path = (init) ->
     command: 'Z'
     params: []
 
-  curve = ({ from, to, control1, control2 }) ->
+  curve = ({ from, to, control, control1, control2 }) ->
     p = Path(instructions)
 
     if from
       p = p.moveTo(from)
+
+    if control
+      control1 = control
 
     if control1 and not control2
       p = p.qcurveTo(to, control: control1)
@@ -125,6 +128,22 @@ Path = (init) ->
   smoothqCurveTo = ({x, y}) -> plus
     command: 'T'
     params: [x, y]
+
+  arc = ({from, to, rx, ry, part}) ->
+    p = Path(instructions)
+
+    if from
+      p = p.moveTo(from)
+
+    rx ||= Math.abs(to.x - from.x)
+    ry ||= Math.abs(to.y - from.y)
+
+    xrot = 0
+    largeArc = 0
+    sweep = part is 'top'
+    sweep = !sweep if to.x < from.x
+
+    p.arcTo(to, {rx, ry, xrot, largeArc, +sweep})
 
   arcTo = (to, {rx, ry, xrot, largeArc, sweep}) -> plus
       command: 'A'
@@ -294,14 +313,18 @@ Path = (init) ->
 
   # Public
   { moveTo, lineTo, hlineTo, vlineTo, closePath, curve, curveTo, smoothCurveTo,
-    qcurveTo, smoothqCurveTo, arcTo, thru, print, getPointAtLength, getTotalLength,
+    qcurveTo, smoothqCurveTo, arc, arcTo, thru, print, getPointAtLength, getTotalLength,
     getBBox, elementForDebugRepresentation, start, end, offsetX, offsetY, node }
 
+# Initializers
 Path.curve = ->
   Path().curve.apply(this, arguments)
 
 Path.thru = ->
   Path().thru.apply(this, arguments)
+
+Path.arc = ->
+  Path().arc.apply(this, arguments)
 
 Path.fromString = (path) ->
   # Parsing code adapted from https://github.com/jkroso/parse-svg-path/blob/master/index.js

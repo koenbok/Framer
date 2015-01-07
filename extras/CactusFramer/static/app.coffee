@@ -90,69 +90,69 @@
 
 # Example 3 - Flower
 
-petalWidth = 100
-petalHeight = 100
-
-numPetals = 10
-petals = for i in [0..numPetals-1]
-  petal = new Layer width: petalWidth, height: petalHeight, borderRadius: petalWidth / 2, opacity: 0, backgroundColor: Utils.randomColor(.5)
-  petal.center()
-  petal
-
-unfold = ->
-  for petal, i in petals
-    angle = (2 * Math.PI / numPetals) * i
-    distance = 200
-    x = petal.midX - Math.cos(angle) * distance
-    y = petal.midY - Math.sin(angle) * distance
-
-    cangle = (2 * Math.PI / numPetals) * (i - 1)
-    cx = petal.midX - Math.cos(cangle) * distance
-    cy = petal.midY - Math.sin(cangle) * distance
-
-    petal.animate
-      properties: { opacity: 1, scale: 1 }
-      path: new Path.curve(from: {x: petal.midX, y: petal.midY}, to: {x: x, y: y}, control1: {x: cx, y: cy})
-      debug: true
-      delay: i * 0.1
-      curve: 'spring(180,40,0)'
-
-fold = ->
-  for petal, i in petals
-    angle = (2 * Math.PI / numPetals) * i
-    distance = 200
-    x = petal.midX - Math.cos(angle) * distance
-    y = petal.midY - Math.sin(angle) * distance
-
-    cangle = (2 * Math.PI / numPetals) * (i - 1)
-    cx = petal.midX - Math.cos(cangle) * distance
-    cy = petal.midY - Math.sin(cangle) * distance
-
-    petal.animate
-      properties: { opacity: 0, x: button.x, y: button.y, scale: 0.5 }
-      curve: 'ease-out'
-      time: 0.15
-
-toggleFold = Utils.toggle unfold, fold
-
-button = new Layer width: petalWidth, height: petalHeight, borderRadius: petalWidth / 2
-button.center()
-
-button.on Events.TouchStart, ->
-  button.animate
-    properties:
-      scale: 0.75
-    curve: 'spring(300,30,0)'
-
-button.on Events.TouchEnd, ->
-  button.animate
-    properties:
-      scale: 1
-    curve: 'spring(200,10,0)'
-
-button.on Events.Click, ->
-  toggleFold()()
-
+# petalWidth = 100
+# petalHeight = 100
+#
+# numPetals = 10
+# petals = for i in [0..numPetals-1]
+#   petal = new Layer width: petalWidth, height: petalHeight, borderRadius: petalWidth / 2, opacity: 0, backgroundColor: Utils.randomColor(.5)
+#   petal.center()
+#   petal
+#
+# unfold = ->
+#   for petal, i in petals
+#     angle = (2 * Math.PI / numPetals) * i
+#     distance = 200
+#     x = petal.midX - Math.cos(angle) * distance
+#     y = petal.midY - Math.sin(angle) * distance
+#
+#     cangle = (2 * Math.PI / numPetals) * (i - 1)
+#     cx = petal.midX - Math.cos(cangle) * distance
+#     cy = petal.midY - Math.sin(cangle) * distance
+#
+#     petal.animate
+#       properties: { opacity: 1, scale: 1 }
+#       path: new Path.curve(from: {x: petal.midX, y: petal.midY}, to: {x: x, y: y}, control1: {x: cx, y: cy})
+#       debug: true
+#       delay: i * 0.1
+#       curve: 'spring(180,40,0)'
+#
+# fold = ->
+#   for petal, i in petals
+#     angle = (2 * Math.PI / numPetals) * i
+#     distance = 200
+#     x = petal.midX - Math.cos(angle) * distance
+#     y = petal.midY - Math.sin(angle) * distance
+#
+#     cangle = (2 * Math.PI / numPetals) * (i - 1)
+#     cx = petal.midX - Math.cos(cangle) * distance
+#     cy = petal.midY - Math.sin(cangle) * distance
+#
+#     petal.animate
+#       properties: { opacity: 0, x: button.x, y: button.y, scale: 0.5 }
+#       curve: 'ease-out'
+#       time: 0.15
+#
+# toggleFold = Utils.toggle unfold, fold
+#
+# button = new Layer width: petalWidth, height: petalHeight, borderRadius: petalWidth / 2
+# button.center()
+#
+# button.on Events.TouchStart, ->
+#   button.animate
+#     properties:
+#       scale: 0.75
+#     curve: 'spring(300,30,0)'
+#
+# button.on Events.TouchEnd, ->
+#   button.animate
+#     properties:
+#       scale: 1
+#     curve: 'spring(200,10,0)'
+#
+# button.on Events.Click, ->
+#   toggleFold()()
+#
 # Example 4 - Curve Fitting
 
 # circle = new Layer width: 50, height: 50, borderRadius: 25, x: 200, y: 500
@@ -262,3 +262,110 @@ button.on Events.Click, ->
 #     autoRotate: false
 #   debug: true
 #   curve: 'spring(20, 10, 0)'
+
+# Example 5 - "Consistent choreography" from here: http://www.google.com/design/spec/animation/meaningful-transitions.html#meaningful-transitions-hierarchical-timing
+container = new Layer width: 360, height: 422, backgroundColor: '#f7f7f7', shadowBlur: 1, shadowX: 0, shadowY: 1, shadowColor: 'rgba(0, 0, 0, 0.35)'
+container.center()
+
+top = new Layer width: container.width, height: Math.floor(container.height * (1 - 0.55)), y: 0, superLayer: container, backgroundColor: '#f7f7f7'
+bottom = new Layer width: container.width, height: container.height - top.height, y: top.height, superLayer: container, backgroundColor: '#f7f7f7'
+
+diameter = 55
+circles = for i in [0..3]
+  new Layer width: diameter, height: diameter, superLayer: container, x: 55 + i * diameter + i * 10, y: (container.height - diameter) / 2, borderRadius: diameter / 2, backgroundColor: '#11cfd2'
+
+expandingCircle = new Layer width: diameter, height: diameter, superLayer: top, midX: top.width / 2, midY: top.height / 2, borderRadius: diameter / 2, opacity: 0, backgroundColor: '#11cfd2'
+
+side = 70
+squareOffsetX = -10
+squareOffsetY = 80
+squares = for i in [0..3]
+  new Layer width: side, height: side, superLayer: bottom, x: 35 + i * side + (i - 1) * 10 + squareOffsetX, y: 10 + squareOffsetY, opacity: 0, backgroundColor: '#f59709'
+
+curve = 'cubic-bezier(0.4, 0, 0.2, 1)'
+expand = ->
+  for circle, i in circles when i > 0
+    circle.originX = 1
+    circle.originY = 0.5
+    circle.animate
+      properties:
+        scale: 0
+        opacity: 0
+      curve: curve
+      time: 0.25
+      delay: (i - 1) * 0.05
+
+  circles[0].animate
+    path: Path.curve(
+      from: { x: circles[0].midX, y: circles[0].midY },
+      to: { x: container.width / 2, y: top.height / 2 },
+      control1: { x: container.width / 2, y: circles[0].midY })
+    debug: true
+    pathOptions: { autoRotate: false }
+    curve: curve
+    time: 0.4
+
+  Utils.delay 0.3, ->
+    expandingCircle.opacity = 1
+    expandingCircle.animate
+      properties:
+        scale: 10
+      curve: 'spring(100,6,0)'
+
+    for square, i in squares
+      square.animate
+        properties:
+          opacity: 1
+        path: Path.curve(
+          from: { x: square.midX, y: square.midY }
+          to: { x: square.midX - squareOffsetX, y: square.midY - squareOffsetY }
+          control1: { x: square.midX - squareOffsetX, y: square.midY - squareOffsetY/2 })
+        pathOptions: { autoRotate: false }
+        debug: true
+        time: 0.3
+        curve: curve
+        delay: i * 0.05
+
+contract = ->
+  expandingCircle.animate
+    properties: { scale: 1 }
+    curve: 'ease-out-circ'
+    time: 0.3
+
+  for square, i in squares.reverse()
+    square.animate
+      properties:
+        opacity: 0
+      path: Path.curve(
+        from: { x: square.midX, y: square.midY }
+        to: { x: square.midX + squareOffsetX, y: square.midY + squareOffsetY }
+        control1: { x: square.midX, y: square.midY + squareOffsetY/2 })
+      pathOptions: { autoRotate: false }
+      debug: true
+      time: 0.3
+      curve: curve
+      delay: i * 0.05
+
+  Utils.delay 0.3, ->
+    expandingCircle.opacity = 0
+    for i in [3..0]
+      circles[i].animate
+        properties:
+          scale: 1
+          opacity: 1
+        curve: curve
+        time: 0.2
+        delay: (2 - i) * 0.05
+
+    circles[0].animate
+      path: Path.curve(
+        from: { x: circles[0].midX, y: circles[0].midY },
+        to: { x: 82.5, y: container.height / 2 },
+        control1: { x: container.width / 2, y: container.height / 2 })
+      debug: true
+      pathOptions: { autoRotate: false }
+      curve: curve
+      time: 0.4
+
+toggle = Utils.toggle(expand, contract)
+container.on Events.Click, -> toggle()()
