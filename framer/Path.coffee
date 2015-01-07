@@ -142,8 +142,9 @@ Path = (init) ->
     largeArc = 0
     sweep = part is 'top'
     sweep = !sweep if to.x < from.x
+    sweep = +sweep
 
-    p.arcTo(to, {rx, ry, xrot, largeArc, +sweep})
+    p.arcTo(to, {rx, ry, xrot, largeArc, sweep})
 
   arcTo = (to, {rx, ry, xrot, largeArc, sweep}) -> plus
       command: 'A'
@@ -306,25 +307,20 @@ Path = (init) ->
     d: print()
     fill: 'transparent'
 
+  length = getTotalLength()
   start = getPointAtLength(0)
-  end = getPointAtLength(getTotalLength())
+  end = getPointAtLength(length)
   offsetX = start.x
   offsetY = start.y
 
   # Public
   { moveTo, lineTo, hlineTo, vlineTo, closePath, curve, curveTo, smoothCurveTo,
     qcurveTo, smoothqCurveTo, arc, arcTo, thru, print, getPointAtLength, getTotalLength,
-    getBBox, elementForDebugRepresentation, start, end, offsetX, offsetY, node }
+    getBBox, elementForDebugRepresentation, start, end, length, offsetX, offsetY, node }
 
-# Initializers
-Path.curve = ->
-  Path().curve.apply(this, arguments)
-
-Path.thru = ->
-  Path().thru.apply(this, arguments)
-
-Path.arc = ->
-  Path().arc.apply(this, arguments)
+# Initializers that let you write Path.curve, instead of Path().curve
+for method in ['curve', 'arc', 'thru', 'moveTo']
+  Path[method] = ((m) -> -> Path()[m].apply(this, arguments))(method)
 
 Path.fromString = (path) ->
   # Parsing code adapted from https://github.com/jkroso/parse-svg-path/blob/master/index.js
@@ -370,33 +366,3 @@ Path.loadPath = (url) ->
   Path.fromString(path.getAttribute('d')) if path
 
 _.extend exports, {Path}
-
-# class Arc extends Path
-#   constructor: (options) ->
-#     from = options.from
-#     from = { x: from.midX, y: from.midY } if from instanceof Layer
-#
-#     to = options.to
-#     to = { x: to.midX, y: to.midY } if to instanceof Layer
-#
-#     @rx = options.rx || Math.abs(to.x - from.x)
-#     @ry = options.ry || Math.abs(to.y - from.y)
-#
-#     @frame = Utils.frameFittingPoints(from, to)
-#     @start = { x: from.x - @frame.x, y: from.y - @frame.y }
-#     @end = { x: to.x - @frame.x, y: to.y - @frame.y }
-#
-#     part = options.part || 'top'
-#     @sweep = part is 'top'
-#     @sweep = !@sweep if @end.x < @start.x
-#
-#     context = Utils.SVG.getContext()
-#     node = Utils.SVG.createElement 'path',
-#       d: @getInstructions()
-#       fill: 'transparent'
-#     context.appendChild(node)
-#
-#     super(node)
-#
-#   getInstructions: ->
-#     "M#{@start.x},#{@start.y} A#{@rx},#{@ry} 0 0,#{if @sweep then 1 else 0} #{@end.x},#{@end.y}"

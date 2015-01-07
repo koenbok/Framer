@@ -90,10 +90,8 @@ class exports.Animation extends EventEmitter
 
 		if options.path
 			path = options.path
-			@options.pathLength = path.getTotalLength()
-
-			@options.properties.x = options.layer.x + path.end.x
-			@options.properties.y = options.layer.y + path.end.y
+			@options.properties.x = options.layer.x + path.end.x - path.start.x
+			@options.properties.y = options.layer.y + path.end.y - path.start.x
 
 			@pathOptions = Utils.setDefaultProperties (options.pathOptions || {}),
 				autoRotate: true
@@ -239,12 +237,12 @@ class exports.Animation extends EventEmitter
 			@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
 
 		if @options.path
-			position = @options.path.getPointAtLength(@options.pathLength * value)
+			position = @options.path.getPointAtLength(@options.path.length * value)
 			position.x += @_stateA.x - @options.path.start.x
 			position.y += @_stateA.y - @options.path.start.y
 
 			if @_debugLayer
-				@_debugLayer.animatedPath.setAttribute('stroke-dashoffset', @options.pathLength * (1 - value))
+				@_debugLayer.animatedPath.setAttribute('stroke-dashoffset', @options.path.length * (1 - value))
 
 			if @pathOptions.autoRotate
 				angle = Math.atan2(position.y - @_target.y, position.x - @_target.x) * 180 / Math.PI
