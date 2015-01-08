@@ -112,7 +112,7 @@
 #
 #     petal.animate
 #       properties: { opacity: 1, scale: 1 }
-#       path: new Path.curve(from: {x: petal.midX, y: petal.midY}, to: {x: x, y: y}, control1: {x: cx, y: cy})
+#       path: new Path.curve(to: {x: x, y: y}, control1: {x: cx, y: cy})
 #       debug: true
 #       delay: i * 0.1
 #       curve: 'spring(180,40,0)'
@@ -155,19 +155,9 @@
 #
 # Example 4 - Curve Fitting
 
-# circle = new Layer width: 50, height: 50, borderRadius: 25, x: 200, y: 500
-# distance = 200
-# circle.animate
-#   path: new Path.CubicBezierCurve(
-#     from: circle,
-#     to: { x: circle.midX + distance, y: circle.midY },
-#     control1: { x: circle.midX + distance/4, y: circle.midY - 125 },
-#     control2: { x: circle.midX + distance/4*5, y: circle.midY + 225 })
-#   debug: true
-#   time: 5
-
+# circle = new Layer width: 50, height: 50, borderRadius: 25, x: 200, y: 200
 # path = Path.fromString('M0,0 c50,20 80,-50 100,200 0,50 140,0 200,0')
-
+#
 # p1 = { x: circle.midX, y: circle.midY }
 # p2 = { x: 300, y: 100 }
 # p3 = { x: 400, y: 350 }
@@ -297,7 +287,6 @@
 #
 #   circles[0].animate
 #     path: Path.curve(
-#       from: { x: circles[0].midX, y: circles[0].midY },
 #       to: { x: container.width / 2, y: top.height / 2 },
 #       control1: { x: container.width / 2, y: circles[0].midY })
 #     debug: true
@@ -317,7 +306,6 @@
 #         properties:
 #           opacity: 1
 #         path: Path.curve(
-#           from: { x: square.midX, y: square.midY }
 #           to: { x: square.midX - squareOffsetX, y: square.midY - squareOffsetY }
 #           control1: { x: square.midX - squareOffsetX, y: square.midY - squareOffsetY/2 })
 #         pathOptions: { autoRotate: false }
@@ -337,7 +325,6 @@
 #       properties:
 #         opacity: 0
 #       path: Path.curve(
-#         from: { x: square.midX, y: square.midY }
 #         to: { x: square.midX + squareOffsetX, y: square.midY + squareOffsetY }
 #         control1: { x: square.midX, y: square.midY + squareOffsetY/2 })
 #       pathOptions: { autoRotate: false }
@@ -359,7 +346,6 @@
 #
 #     circles[0].animate
 #       path: Path.curve(
-#         from: { x: circles[0].midX, y: circles[0].midY },
 #         to: { x: 82.5, y: container.height / 2 },
 #         control1: { x: container.width / 2, y: container.height / 2 })
 #       debug: true
@@ -372,10 +358,9 @@
 
 circle = new Layer width: 50, height: 50, borderRadius: 25, x: 200, y: 200
 
-circle.on Events.Click, ->
-  circle.animate
-    path: Path.arc(from: { x: circle.maxX, y: circle.midY }, to: { x: 400, y: 300 }, part: 'top')
-    curve: 'cubic-bezier'
-    curveOptions: 'ease-out-expo'
-    debug: true
-    time: 1
+circle.animate
+  path: Path.arc(to: { x: 400, y: 300 })
+  curve: 'cubic-bezier'
+  curveOptions: 'ease-out-expo'
+  debug: true
+  time: 1

@@ -52,6 +52,12 @@ catmullRom2Bezier = (points, closed=false, tension=0.5) ->
 Path = (init) ->
   instructions = init || []
 
+  functor = (f, args) ->
+    if typeof f is 'function'
+      f(instructions)
+    else
+      f
+
   printInstrunction = ({ command, params }) ->
     "#{ command } #{ params.join ' ' }"
 
@@ -71,6 +77,11 @@ Path = (init) ->
   push = (arr, el) ->
     copy = arr[0...arr.length]
     copy.push el
+    copy
+
+  unshift = (arr, el) ->
+    copy = arr[0...arr.length]
+    copy.unshift el
     copy
 
   plus = (instruction) ->
@@ -96,11 +107,8 @@ Path = (init) ->
     command: 'Z'
     params: []
 
-  curve = ({ from, to, control, control1, control2 }) ->
+  curve = ({ to, control, control1, control2 }) ->
     p = Path(instructions)
-
-    if from
-      p = p.moveTo(from)
 
     if control
       control1 = control
@@ -129,24 +137,26 @@ Path = (init) ->
     command: 'T'
     params: [x, y]
 
-  arc = ({from, to, rx, ry, part}) ->
-    p = Path(instructions)
+  originOrZero = (instructions) ->
+    if instructions[0]?.command is 'M'
+      { x: instructions[0].params[0], y: instructions[0].params[1] }
+    else
+      { x: 0, y: 0 }
 
-    if from
-      p = p.moveTo(from)
+  arc = ({ to, rx, ry, xrot, largeArc, sweep}) ->
+    xrot ||= 0
+    rx ||= (instructions) ->
+      o = originOrZero(instructions)
+      to.x - o.x
 
-    rx ||= Math.abs(to.x - from.x)
-    ry ||= Math.abs(to.y - from.y)
+    ry ||= (instructions) ->
+      o = originOrZero(instructions)
+      to.y - o.y
 
-    xrot = 0
-    largeArc = 0
-    sweep = part is 'top'
-    sweep = !sweep if to.x < from.x
-    sweep = +sweep
+    largeArc ||= 0
+    sweep ||= 1
 
-    p.arcTo(to, {rx, ry, xrot, largeArc, sweep})
-
-  arcTo = (to, {rx, ry, xrot, largeArc, sweep}) -> plus
+    plus
       command: 'A'
       params: [rx, ry, xrot, largeArc, sweep, to.x, to.y]
 
@@ -163,7 +173,11 @@ Path = (init) ->
     p
 
   print = ->
-    instructions.map(printInstrunction).join(' ')
+    evaluate = (instruction, i) ->
+      command: instruction.command
+      params: instruction.params.map(functor)
+
+    instructions.map(evaluate).map(printInstrunction).join(' ')
 
   points = ->
     ps = []
@@ -176,14 +190,11 @@ Path = (init) ->
 
     ps
 
-  getPointAtLength = (length) ->
+  pointAtLength = (length) ->
     node.getPointAtLength(length)
 
   getTotalLength = ->
     node.getTotalLength()
-
-  getBBox = ->
-    node.getBBox()
 
   elementForDebugRepresentation = ->
     group = Utils.SVG.createElement('g')
@@ -303,20 +314,37 @@ Path = (init) ->
 
     group
 
-  node = Utils.SVG.createElement 'path',
-    d: print()
-    fill: 'transparent'
+  hasOrigin = ->
+    'M' in _.pluck(instructions, 'command')
 
-  length = getTotalLength()
-  start = getPointAtLength(0)
-  end = getPointAtLength(length)
-  offsetX = start.x
-  offsetY = start.y
+  # modifies the path's origin, so it matches the attachment point of a layer
+  forLayer = (layer) ->
+    x = layer.midX
+    y = layer.midY
+
+    unless hasOrigin()
+      return Path unshift(instructions, command: 'M', params: [x, y])
+
+    Path(instructions)
+
+  node = null
+  length = null
+  start = null
+  end = null
+
+  if hasOrigin()
+    node = Utils.SVG.createElement 'path',
+      d: print()
+      fill: 'transparent'
+
+    length = getTotalLength()
+    start = pointAtLength(0)
+    end = pointAtLength(length)
 
   # Public
   { moveTo, lineTo, hlineTo, vlineTo, closePath, curve, curveTo, smoothCurveTo,
-    qcurveTo, smoothqCurveTo, arc, arcTo, thru, print, getPointAtLength, getTotalLength,
-    getBBox, elementForDebugRepresentation, start, end, length, offsetX, offsetY, node }
+    qcurveTo, smoothqCurveTo, arc, thru, print, pointAtLength,
+    elementForDebugRepresentation, start, end, length, node, forLayer }
 
 # Initializers that let you write Path.curve, instead of Path().curve
 for method in ['curve', 'arc', 'thru', 'moveTo']

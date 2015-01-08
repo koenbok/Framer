@@ -89,7 +89,7 @@ class exports.Animation extends EventEmitter
 			pathOptions: null
 
 		if options.path
-			path = options.path
+			@options.path = path = options.path.forLayer(options.layer)
 			@options.properties.x = options.layer.x + path.end.x - path.start.x
 			@options.properties.y = options.layer.y + path.end.y - path.start.x
 
@@ -237,7 +237,7 @@ class exports.Animation extends EventEmitter
 			@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
 
 		if @options.path
-			position = @options.path.getPointAtLength(@options.path.length * value)
+			position = @options.path.pointAtLength(@options.path.length * value)
 			position.x += @_stateA.x - @options.path.start.x
 			position.y += @_stateA.y - @options.path.start.y
 
