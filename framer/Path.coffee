@@ -58,7 +58,7 @@ Path = (init) ->
     else
       f
 
-  printInstrunction = ({ command, params }) ->
+  instructionToString = ({ command, params }) ->
     "#{ command } #{ params.join ' ' }"
 
   point = ({ command, params }, [prev_x, prev_y]) ->
@@ -172,12 +172,12 @@ Path = (init) ->
 
     p
 
-  print = ->
+  toString = ->
     evaluate = (instruction, i) ->
       command: instruction.command
       params: instruction.params.map(functor)
 
-    instructions.map(evaluate).map(printInstrunction).join(' ')
+    instructions.map(evaluate).map(instructionToString).join(' ')
 
   points = ->
     ps = []
@@ -319,8 +319,8 @@ Path = (init) ->
 
   # modifies the path's origin, so it matches the attachment point of a layer
   forLayer = (layer) ->
-    x = layer.midX
-    y = layer.midY
+    x = layer.x + layer.originX * layer.width
+    y = layer.y + layer.originY * layer.height
 
     unless hasOrigin()
       return Path unshift(instructions, command: 'M', params: [x, y])
@@ -334,7 +334,7 @@ Path = (init) ->
 
   if hasOrigin()
     node = Utils.SVG.createElement 'path',
-      d: print()
+      d: toString()
       fill: 'transparent'
 
     length = getTotalLength()

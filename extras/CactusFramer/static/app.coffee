@@ -360,6 +360,7 @@ circle = new Layer width: 50, height: 50, borderRadius: 25, x: 200, y: 200
 
 circle.animate
   path: Path.arc(to: { x: 400, y: 300 })
+  pathOptions: { autoRotate: false }
   curve: 'cubic-bezier'
   curveOptions: 'ease-out-expo'
   debug: true
