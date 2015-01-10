@@ -256,6 +256,7 @@ Path = (init) ->
         my = addy + segment.y || ly
         m.setAttribute 'cx', mx
         m.setAttribute 'cy', my
+        m.setAttribute 'class', 'debug-marker'
 
         lx = mx
         ly = my
@@ -268,9 +269,11 @@ Path = (init) ->
         c1y = addy + segment.y1
         c1.setAttribute 'cx', c1x
         c1.setAttribute 'cy', c1y
+        c1.setAttribute 'class', 'debug-control-marker'
 
         conn = connector.cloneNode()
         conn.setAttribute('d', "M#{olx},#{oly} L#{c1x},#{c1y}")
+        conn.setAttribute 'class', 'debug-connector'
 
         elements.push c1
         elements.push conn
@@ -278,7 +281,8 @@ Path = (init) ->
         # quadratic curves have a line from the control point to both anchors
         if !segment.x2
           conn2 = connector.cloneNode()
-          conn2.setAttribute('d', "M#{mx},#{my} L#{c1x},#{c1y}")
+          conn2.setAttribute 'd', "M#{mx},#{my} L#{c1x},#{c1y}"
+          conn2.setAttribute 'class', 'debug-connector'
           elements.push conn2
 
       if segment.x2
@@ -287,30 +291,33 @@ Path = (init) ->
         c2y = addy + segment.y2
         c2.setAttribute 'cx', c2x
         c2.setAttribute 'cy', c2y
+        c2.setAttribute 'class', 'debug-control-marker'
 
         conn = connector.cloneNode()
-        conn.setAttribute('d', "M#{mx},#{my} L#{c2x},#{c2y}")
+        conn.setAttribute 'd', "M#{mx},#{my} L#{c2x},#{c2y}"
+        conn.setAttribute 'class', 'debug-connector'
 
         elements.push conn
         elements.push c2
 
     group.appendChild(element) for element in elements
 
-    # debugPath.setAttribute('stroke', 'rgba(0, 0, 0, 0.1)')
-    debugPath.setAttribute('stroke', 'rgba(255, 0, 0, 0.75)')
-    debugPath.setAttribute('stroke-width', 1)
-    debugPath.setAttribute('fill', 'transparent')
+    # debugPath.setAttribute 'stroke', 'rgba(0, 0, 0, 0.1)'
+    debugPath.setAttribute 'stroke', 'rgba(255, 0, 0, 0.75)'
+    debugPath.setAttribute 'stroke-width', 1
+    debugPath.setAttribute 'fill', 'transparent'
+    debugPath.setAttribute 'class', 'debug-path'
 
     animatedPath = debugPath.cloneNode()
-    animatedPath.setAttribute('class', 'animated-path')
-    # animatedPath.setAttribute('stroke', 'rgba(255, 0, 0, 0.75)')
-    animatedPath.setAttribute('stroke', 'transparent')
-    animatedPath.setAttribute('stroke-dasharray', getTotalLength())
-    animatedPath.setAttribute('stroke-dashoffset', getTotalLength())
-    animatedPath.setAttribute('fill', 'transparent')
+    animatedPath.setAttribute 'class', 'animated-path'
+    # animatedPath.setAttribute 'stroke', 'rgba(255, 0, 0, 0.75)'
+    animatedPath.setAttribute 'stroke', 'transparent'
+    animatedPath.setAttribute 'stroke-dasharray', getTotalLength()
+    animatedPath.setAttribute 'stroke-dashoffset', getTotalLength()
+    animatedPath.setAttribute 'fill', 'transparent'
 
-    group.appendChild(animatedPath)
-    group.appendChild(debugPath)
+    group.appendChild animatedPath
+    group.appendChild debugPath
 
     group
 
@@ -343,14 +350,14 @@ Path = (init) ->
 
   # Public
   { moveTo, lineTo, hlineTo, vlineTo, closePath, curve, curveTo, smoothCurveTo,
-    qcurveTo, smoothqCurveTo, arc, thru, print, pointAtLength,
-    elementForDebugRepresentation, start, end, length, node, forLayer }
+    qcurveTo, smoothqCurveTo, arc, thru, pointAtLength,
+    elementForDebugRepresentation, start, end, length, node, forLayer, toString }
 
 # Initializers that let you write Path.curve, instead of Path().curve
 for method in ['curve', 'arc', 'thru', 'moveTo']
   Path[method] = ((m) -> -> Path()[m].apply(this, arguments))(method)
 
-Path.fromString = (path) ->
+Path.stringToInstructions = (path) ->
   # Parsing code adapted from https://github.com/jkroso/parse-svg-path/blob/master/index.js
   segment = /([astvzqmhlc])([^astvzqmhlc]*)/ig
   length = { a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0 }
@@ -379,7 +386,10 @@ Path.fromString = (path) ->
 
     	instructions.push command: command, params: args.splice(0, length[type])
 
-  Path(instructions)
+  instructions
+
+Path.fromString = (path) ->
+  Path(Path.stringToInstructions(path))
 
 Path.loadPath = (url) ->
   data = Utils.domLoadDataSync(url)
