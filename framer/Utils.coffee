@@ -466,22 +466,22 @@ Utils.pointAbs = (point) ->
 		y: Math.abs point.y
 
 Utils.pointInFrame = (point, frame) ->
-	return false  if point.x < frame.minX or point.x > frame.maxX
-	return false  if point.y < frame.minY or point.y > frame.maxY
+	return false	if point.x < frame.minX or point.x > frame.maxX
+	return false	if point.y < frame.minY or point.y > frame.maxY
 	true
 
 # Size
 
 Utils.sizeMin = ->
 	sizes = Utils.arrayFromArguments arguments
-	size  =
-		width:  _.min sizes.map (size) -> size.width
+	size	=
+		width:	_.min sizes.map (size) -> size.width
 		height: _.min sizes.map (size) -> size.height
 
 Utils.sizeMax = ->
 	sizes = Utils.arrayFromArguments arguments
-	size  =
-		width:  _.max sizes.map (size) -> size.width
+	size	=
+		width:	_.max sizes.map (size) -> size.width
 		height: _.max sizes.map (size) -> size.height
 
 # Frames
@@ -535,7 +535,7 @@ Utils.frameMerge = ->
 		x: _.min frames.map Utils.frameGetMinX
 		y: _.min frames.map Utils.frameGetMinY
 
-	frame.width  = _.max(frames.map Utils.frameGetMaxX) - frame.x
+	frame.width	= _.max(frames.map Utils.frameGetMaxX) - frame.x
 	frame.height = _.max(frames.map Utils.frameGetMaxY) - frame.y
 
 	frame
@@ -604,11 +604,11 @@ Utils.SVG = do ->
 		svgContext
 
 	createElement = (name, attributes) ->
-	  el = document.createElementNS(svgNS, name)
-	  for key, value of attributes
-	    el.setAttribute(key, value)
+		el = document.createElementNS(svgNS, name)
+		for key, value of attributes
+			el.setAttribute(key, value)
 
-	  el
+		el
 
 	{getContext, createElement}
 
