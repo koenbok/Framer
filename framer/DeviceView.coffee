@@ -403,19 +403,28 @@ class exports.DeviceView extends BaseClass
 		@phone.animateStop()
 		@viewport.animateStop()
 
+		# FIXME: After a rotation we call _update() again to set all the right
+		# dimensions, but these should be correctly animated instead of set after
+		# the animation.
+
 		if animate
 			animation = @phone.animate _.extend @animationOptions,
 				properties: phoneProperties
 			@viewport.animate _.extend @animationOptions,
 				properties: contentProperties
+
+			animation.on Events.AnimationEnd, =>
+				@_update()
 			
 			if _hadKeyboard
 				animation.on Events.AnimationEnd, =>
 					@showKeyboard(true)
+					
 		else
 			@phone.properties = phoneProperties
 			@viewport.properties = contentProperties
-			
+			@_update()
+
 			if _hadKeyboard
 				@showKeyboard(true)
 			
