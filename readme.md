@@ -5,6 +5,8 @@ Framer.js allows you to define animations and interactions, complete with filter
 
 [Framer Studio](http://framerjs.com) is a prototyping app for Mac, based on Framer.js. Framer Studio includes an editor based on CoffeeScript, instant visual feedback and much more.
 
+[Join the group](https://www.facebook.com/groups/framerjs/) at Facebook for help, ideas and general prototyping talk. Also feel free to post your work.
+
 ## Get Started
 
 - [Download] (http://framerjs.com/static/downloads/Framer.zip) (Framer.js & Framer Generator)
