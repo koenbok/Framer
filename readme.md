@@ -62,6 +62,8 @@ You can safely move things around in Sketch or Photoshop and re-import. Generato
 
 ## Contribute
 
+Check the [wanted features wiki page](https://github.com/koenbok/Framer/wiki/Contributing:-Wanted-Features#better-scrollviewpageview) for ideas to work on.
+
 ##### Building
 - Download or clone the code
 - Run `npm install` to get the dependencies
