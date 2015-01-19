@@ -28,6 +28,7 @@ Framer.LinearAnimator = (require "./Animators/LinearAnimator").LinearAnimator
 Framer.BezierCurveAnimator = (require "./Animators/BezierCurveAnimator").BezierCurveAnimator
 Framer.SpringDHOAnimator = (require "./Animators/SpringDHOAnimator").SpringDHOAnimator
 Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4Animator
+Framer.LayerDraggable = (require "./LayerDraggable").LayerDraggable
 Framer.Importer = (require "./Importer").Importer
 Framer.DeviceView = (require "./DeviceView").DeviceView
 Framer.Debug = (require "./Debug").Debug

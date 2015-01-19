@@ -652,7 +652,7 @@ class exports.Layer extends BaseClass
 		properties = {}
 
 		for animation in @animations()
-			for propertyName in _.keys(animation._stateA)
+			for propertyName in animation.animatingProperties()
 				properties[propertyName] = animation
 
 		return properties

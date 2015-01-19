@@ -1,6 +1,7 @@
 Utils = require "../Utils"
 
 {Animator} = require "../Animator"
+{Integrator} = require "../Integrator"
 
 class exports.SpringRK4Animator extends Animator
 
@@ -18,6 +19,9 @@ class exports.SpringRK4Animator extends Animator
 		@_velocity = @options.velocity
 		@_stopSpring = false
 
+		@_integrator = new Integrator (state) =>
+			return - @options.tension * state.x - @options.friction * state.v
+
 	next: (delta) ->
 
 		if @finished()
@@ -31,11 +35,9 @@ class exports.SpringRK4Animator extends Animator
 		# Calculate previous state
 		stateBefore.x = @_value - 1
 		stateBefore.v = @_velocity
-		stateBefore.tension = @options.tension
-		stateBefore.friction = @options.friction
 		
 		# Calculate new state
-		stateAfter = springIntegrateState stateBefore, delta
+		stateAfter = @_integrator.integrateState stateBefore, delta
 		@_value = 1 + stateAfter.x
 		finalVelocity = stateAfter.v
 		netFloat = stateAfter.x
@@ -52,45 +54,3 @@ class exports.SpringRK4Animator extends Animator
 
 	finished: =>
 		@_stopSpring
-
-
-springAccelerationForState = (state) ->
-	return - state.tension * state.x - state.friction * state.v
-
-springEvaluateState = (initialState) ->
-
-	output = {}
-	output.dx = initialState.v
-	output.dv = springAccelerationForState initialState
-
-	return output
-
-springEvaluateStateWithDerivative = (initialState, dt, derivative) ->
-
-	state = {}
-	state.x = initialState.x + derivative.dx * dt
-	state.v = initialState.v + derivative.dv * dt
-	state.tension = initialState.tension
-	state.friction = initialState.friction
-
-	output = {}
-	output.dx = state.v
-	output.dv = springAccelerationForState state
-
-	return output
-
-springIntegrateState = (state, speed) ->
-
-	a = springEvaluateState state
-	b = springEvaluateStateWithDerivative state, speed * 0.5, a
-	c = springEvaluateStateWithDerivative state, speed * 0.5, b
-	d = springEvaluateStateWithDerivative state, speed, c
-
-	dxdt = 1.0/6.0 * (a.dx + 2.0 * (b.dx + c.dx) + d.dx)
-	dvdt = 1.0/6.0 * (a.dv + 2.0 * (b.dv + c.dv) + d.dv)
-
-	state.x = state.x + dxdt * speed
-	state.v = state.v + dvdt * speed
-
-	return state
-

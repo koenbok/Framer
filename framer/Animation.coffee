@@ -169,6 +169,9 @@ class exports.Animation extends EventEmitter
 		# Also emit this to the layer with self as argument
 		@options.layer.emit(event, @)
 
+	animatingProperties: ->
+		_.keys(@_stateA)
+
 	_start: =>
 		@options.layer._context._animationList.push(@)
 		@emit("start")
