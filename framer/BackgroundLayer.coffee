@@ -9,7 +9,6 @@ class exports.BackgroundLayer extends Layer
 	constructor: (options={}) ->
 		
 		options.backgroundColor ?= "#fff"
-		options.name = "Background"
 		
 		super options
 		
