@@ -579,7 +579,7 @@ Utils.globalLayers = (importedLayers) ->
 		
 		# Check if there are global variables with the same name
 		if window.hasOwnProperty(layerName) and not window.Framer._globalWarningGiven
-			print "Warning: Cannot make layer '#{layerName}' a global, an variable with that name already exists"
+			print "Warning: Cannot make layer '#{layerName}' a global, a variable with that name already exists"
 		else
 			window[layerName] = layer
 	
