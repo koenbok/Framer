@@ -563,6 +563,8 @@ Utils.convertPoint = (input, layerA, layerB) ->
 	
 	return point
 
+###################################################################
+# Beta additions, use with care
 
 Utils.globalLayers = (importedLayers) ->
 	
@@ -583,6 +585,53 @@ Utils.globalLayers = (importedLayers) ->
 	
 	window.Framer._globalWarningGiven = true
 
+
+_textSizeNode = null
+
+Utils.textSize = (text, style={}, constraints={}) ->
+
+	# This function takes some text, css style and optionally a width and height and 
+	# returns the rendered text size. This can be pretty slow, so use sporadically.
+	# http://stackoverflow.com/questions/118241/calculate-text-width-with-javascript
+
+	shouldCreateNode = !_textSizeNode
+	
+	if shouldCreateNode
+		_textSizeNode = document.createElement("div")
+		_textSizeNode.id = "_textSizeNode"
+	
+	_textSizeNode.innerHTML = text
+	
+	style = _.extend style, 
+		position: "fixed"
+		display: "inline"
+		visibility: "hidden"
+		top: "-10000px"
+		left: "-10000px"
+		
+	delete style.width
+	delete style.height
+	delete style.bottom
+	delete style.right
+		
+	style.width = "#{constraints.width}px" if constraints.width
+	style.height = "#{constraints.height}px" if constraints.height
+
+	_.extend(_textSizeNode.style, style)
+
+	if shouldCreateNode
+		# This is a trick to call this function before the document ready event
+		if not window.document.body
+			document.write(_textSizeNode.outerHTML)
+			_textSizeNode = document.getElementById("_textSizeNode")
+		else
+			window.document.body.appendChild(_textSizeNode)
+
+	rect = _textSizeNode.getBoundingClientRect()
+	
+	frame =
+		width: rect.right - rect.left
+		height: rect.bottom - rect.top
 
 _.extend exports, Utils
 

@@ -1,6 +1,11 @@
-Framer.Device = new Framer.DeviceView()
-Framer.Device.setupContext()
 
-layer = new Layer width:10000, height:10000
+style = 
+	font: "20px/1em Menlo"
 
-Framer.Device.rotateRight()
+layer = new Layer
+layer.backgroundColor = "rgba(255,0,0,.4)"
+layer.style = style
+layer.html = "Hello Koen Bok"
+
+layer.frame = Utils.textSize(layer.html, style, {width:100})
+print layer.frame
