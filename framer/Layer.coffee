@@ -755,7 +755,7 @@ class exports.Layer extends BaseClass
 
 		eventNames = [eventNames] if typeof eventNames == 'string'
 
-		# # Listen to dom events on the element
+		# Listen to dom events on the element
 		for eventName in eventNames
 			do (eventName) =>
 				super eventName, listener
@@ -763,7 +763,7 @@ class exports.Layer extends BaseClass
 
 				@_eventListeners ?= {}
 				@_eventListeners[eventName] ?= []
-				@_eventListeners[eventName].push listener
+				@_eventListeners[eventName].push(listener)
 
 				# We want to make sure we listen to these events, but we can safely
 				# ignore it for change events
@@ -787,6 +787,17 @@ class exports.Layer extends BaseClass
 
 				if @_eventListeners
 					@_eventListeners[eventName] = _.without @_eventListeners[eventName], listener
+
+	once: (eventName, listener) ->
+
+		originalListener = listener
+
+		listener = (args...) =>
+			originalListener(args...)
+			@removeListener(eventName, listener)
+
+		@addListener(eventName, listener)
+
 
 	removeAllListeners: ->
 
