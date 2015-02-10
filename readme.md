@@ -41,7 +41,7 @@ imageLayer.on(Events.Click, function() {
 	imageLayer.states.next()
 })
 ```
-#### Features
+## Features
 - Spring Physics, Easing Functions and Bezier Curves
 - Hardware Accelerated (3D) Animations with 60fps
 - Events: Click, Touch, Drag, Scroll and more
