@@ -734,7 +734,6 @@ Devices =
 	"nexus-5-black-hand": Nexus5BaseDeviceHand
 
 	# Apple Watch 38mm
-	"applewatchedition-38-gold-sportband-white": AppleWatch38Device
 	"applewatchsport-38-aluminum-sportband-black": AppleWatch38Device
 	"applewatchsport-38-aluminum-sportband-blue": AppleWatch38Device
 	"applewatchsport-38-aluminum-sportband-green": AppleWatch38Device
@@ -746,8 +745,14 @@ Devices =
 	"applewatchedition-38-gold-buckle-gray": AppleWatch38Device
 	"applewatchedition-38-gold-buckle-red": AppleWatch38Device
 	"applewatchedition-38-gold-sportband-black": AppleWatch38Device
+	"applewatchedition-38-gold-sportband-white": AppleWatch38Device
 
 	# Apple Watch 42mm
+	"applewatchsport-42-aluminum-sportband-black": AppleWatch42Device
+	"applewatchsport-42-aluminum-sportband-blue": AppleWatch42Device
+	"applewatchsport-42-aluminum-sportband-green": AppleWatch42Device
+	"applewatchsport-42-aluminum-sportband-pink": AppleWatch42Device
+	"applewatchsport-42-aluminum-sportband-white": AppleWatch42Device
 	"applewatch-42-black-bracelet": AppleWatch42Device
 	"applewatch-42-steel-bracelet": AppleWatch42Device
 	"applewatchedition-42-gold-buckle-blue": AppleWatch42Device
@@ -755,11 +760,7 @@ Devices =
 	"applewatchedition-42-gold-buckle-red": AppleWatch42Device
 	"applewatchedition-42-gold-sportband-black": AppleWatch42Device
 	"applewatchedition-42-gold-sportband-white": AppleWatch42Device
-	"applewatchsport-42-aluminum-sportband-black": AppleWatch42Device
-	"applewatchsport-42-aluminum-sportband-blue": AppleWatch42Device
-	"applewatchsport-42-aluminum-sportband-green": AppleWatch42Device
-	"applewatchsport-42-aluminum-sportband-pink": AppleWatch42Device
-	"applewatchsport-42-aluminum-sportband-white": AppleWatch42Device
+
 
 
 exports.DeviceView.Devices = Devices
