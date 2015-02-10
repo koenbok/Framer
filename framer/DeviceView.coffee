@@ -738,14 +738,14 @@ Devices =
 		deviceImage: "ipad-mini-silver-hand.png"
 
 	# iPad Air
-	"ipad-air-spacegray": _.extend {}, iPadMiniBaseDevice,
+	"ipad-air-spacegray": _.extend {}, iPadAirBaseDevice,
 		deviceImage: "ipad-air-spacegray.png"
-	"ipad-air-spacegray-hand": _.extend {}, iPadMiniBaseDeviceHand,
+	"ipad-air-spacegray-hand": _.extend {}, iPadAirBaseDeviceHand,
 		deviceImage: "ipad-air-spacegray-hand.png"
 
-	"ipad-air-silver": _.extend {}, iPadMiniBaseDevice,
+	"ipad-air-silver": _.extend {}, iPadAirBaseDevice,
 		deviceImage: "ipad-mini-silver.png"
-	"ipad-air-silver-hand": _.extend {}, iPadMiniBaseDeviceHand,
+	"ipad-air-silver-hand": _.extend {}, iPadAirBaseDeviceHand,
 		deviceImage: "ipad-mini-silver-hand.png"
 
 	# Nexus 5
