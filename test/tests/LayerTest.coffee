@@ -517,6 +517,11 @@ describe "Layer", ->
 
 	describe "Layering", ->
 
+		it "should set at creation", ->
+
+			layer = new Layer index:666
+			layer.index.should.equal 666
+
 		it "should change index", ->
 
 			layer = new Layer

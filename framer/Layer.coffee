@@ -88,7 +88,7 @@ class exports.Layer extends BaseClass
 		# @_element.id = "FramerLayer-#{@id}"
 
 		for k in ["minX", "midX", "maxX", "minY", "midY", "maxY"]
-			if options.hasOwnProperty k
+			if options.hasOwnProperty(k)
 				@[k] = options[k]
 
 		# Insert the layer into the dom or the superLayer element
@@ -96,6 +96,10 @@ class exports.Layer extends BaseClass
 			@_insertElement() if not options.shadow
 		else
 			@superLayer = options.superLayer
+
+		# If an index was set, we would like to use that one
+		if options.hasOwnProperty("index")
+			@index = options.index
 
 		# Set needed private variables
 		@_subLayers = []
