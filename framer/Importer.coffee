@@ -22,7 +22,7 @@ class exports.Importer
 
 		layersByName = {}
 		layerInfo = @_loadlayerInfo()
-		
+
 		# Pass one. Create all layers build the hierarchy
 		layerInfo.map (layerItemInfo) =>
 			@_createLayer layerItemInfo
@@ -43,7 +43,7 @@ class exports.Importer
 	_loadlayerInfo: ->
 
 		# Chrome is a pain in the ass and won't allow local file access
-		# therefore I add a .js file which adds the data to 
+		# therefore I add a .js file which adds the data to
 		# window.__imported__["<path>"]
 
 		importedKey = "#{@paths.documentName}/layers.json.js"
@@ -54,7 +54,7 @@ class exports.Importer
 		return Framer.Utils.domLoadJSONSync @paths.layerInfo
 
 	_createLayer: (info, superLayer) ->
-		
+
 		LayerClass = Layer
 
 		layerInfo =
@@ -70,13 +70,16 @@ class exports.Importer
 		# Most layers will have an image, add that here
 		if info.image
 			layerInfo.frame = info.image.frame
-			layerInfo.image = Utils.pathJoin @path, info.image.path
-			
+			if info.image.path.indexOf('data:image') != -1
+				layerInfo.image = Utils.pathJoin @path, info.image.path
+			else
+				layerInfo.image = @path
+
 		# If there is a mask on this layer group, take its frame
 		if info.maskFrame
 			layerInfo.frame = info.maskFrame
 			layerInfo.clip = true
-			
+
 		# Figure out what the super layer should be. If this layer has a contentLayer
 		# (like a scroll view) we attach it to that instead.
 		if superLayer?.contentLayer

@@ -16,10 +16,10 @@ layerValueTypeError = (name, value) ->
 	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
 
 layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
-	result = 
+	result =
 		exportable: true
 		default: fallback
-		get: -> 
+		get: ->
 			@_properties[name]
 
 		set: (value) ->
@@ -117,10 +117,10 @@ class exports.Layer extends BaseClass
 	@define "opacity", layerProperty @, "opacity", "opacity", 1, _.isNumber
 	@define "index", layerProperty @, "index", "zIndex", 0, _.isNumber
 	@define "clip", layerProperty @, "clip", "overflow", true, _.isBool
-	
+
 	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBool, (layer, value) ->
 		layer.ignoreEvents = false if value is true
-	
+
 	@define "scrollVertical", layerProperty @, "scrollVertical", "overflowY", false, _.isBool, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 
@@ -197,7 +197,7 @@ class exports.Layer extends BaseClass
 	@define "name",
 		exportable: true
 		default: ""
-		get: -> 
+		get: ->
 			@_getPropertyValue "name"
 		set: (value) ->
 			@_setPropertyValue "name", value
@@ -211,7 +211,7 @@ class exports.Layer extends BaseClass
 	@define "borderRadius",
 		exportable: true
 		default: 0
-		get: -> 
+		get: ->
 			@_properties["borderRadius"]
 
 		set: (value) ->
@@ -233,7 +233,7 @@ class exports.Layer extends BaseClass
 			return if not point
 			for k in ["x", "y"]
 				@[k] = point[k] if point.hasOwnProperty(k)
-					
+
 
 	@define "frame",
 		get: -> _.pick(@, ["x", "y", "width", "height"])
@@ -304,11 +304,11 @@ class exports.Layer extends BaseClass
 	center: ->
 		@frame = @centerFrame() # Center  in superLayer
 		@
-	
+
 	centerX: (offset=0) ->
 		@x = @centerFrame().x + offset # Center x in superLayer
 		@
-	
+
 	centerY: (offset=0) ->
 		@y = @centerFrame().y + offset # Center y in superLayer
 		@
@@ -327,7 +327,7 @@ class exports.Layer extends BaseClass
 	# 	if @_superOrParentLayer()
 	# 		return @_superOrParentLayer().screenOriginX()
 	# 	return @originX
-	
+
 	# screenOriginY = ->
 	# 	if @_superOrParentLayer()
 	# 		return @_superOrParentLayer().screenOriginY()
@@ -351,11 +351,11 @@ class exports.Layer extends BaseClass
 			y: 0
 			width:  @width  * @screenScaleX()
 			height: @height * @screenScaleY()
-		
+
 		layers = @superLayers(context=true)
 		layers.push(@)
 		layers.reverse()
-		
+
 		for superLayer in layers
 			factorX = if superLayer._superOrParentLayer() then superLayer._superOrParentLayer().screenScaleX() else 1
 			factorY = if superLayer._superOrParentLayer() then superLayer._superOrParentLayer().screenScaleY() else 1
@@ -367,7 +367,7 @@ class exports.Layer extends BaseClass
 
 	scaledFrame: ->
 
-		# Get the scaled frame for a layer, taking into account 
+		# Get the scaled frame for a layer, taking into account
 		# the transform origins.
 
 		frame = @frame
@@ -378,7 +378,7 @@ class exports.Layer extends BaseClass
 		frame.height *= scaleY
 		frame.x += (1 - scaleX) * @originX * @width
 		frame.y += (1 - scaleY) * @originY * @height
-		
+
 		return frame
 
 	##############################################################
@@ -395,7 +395,7 @@ class exports.Layer extends BaseClass
 
 		getComputedStyle  = document.defaultView.getComputedStyle
 		getComputedStyle ?= window.getComputedStyle
-		
+
 		return getComputedStyle(@_element)
 
 	@define "classList",
@@ -443,7 +443,7 @@ class exports.Layer extends BaseClass
 	querySelectorAll: (query) -> @_element.querySelectorAll(query)
 
 	destroy: ->
-		
+
 		# Todo: check this
 
 		if @superLayer
@@ -451,7 +451,7 @@ class exports.Layer extends BaseClass
 
 		@_element.parentNode?.removeChild @_element
 		@removeAllListeners()
-		
+
 		@_context._layerList = _.without @_context._layerList, @
 
 		@_context.emit("layer:destroy", @)
@@ -517,7 +517,7 @@ class exports.Layer extends BaseClass
 
 			# If the file is local, we want to avoid caching
 			# if Utils.isLocal() and not (_.startsWith(imageUrl, "http://") or _.startsWith(imageUrl, "https://"))
-			if Utils.isLocal() and not imageUrl.match(/^https?:\/\//) and @_cacheImage is false
+			if Utils.isLocal() and not imageUrl.match(/^https?:\/\//) and @_cacheImage is false and imageUrl.indexOf('data:image') != -1
 				imageUrl += "?nocache=#{Date.now()}"
 
 			# As an optimization, we will only use a loader
@@ -735,7 +735,7 @@ class exports.Layer extends BaseClass
 
 	@define "scrollY",
 		get: -> @_element.scrollTop
-		set: (value) -> 
+		set: (value) ->
 			layerValueTypeError("scrollY", value) if not _.isNumber(value)
 			@_element.scrollTop = value
 
@@ -782,11 +782,11 @@ class exports.Layer extends BaseClass
 			listener = listener.modifiedListener
 
 		eventNames = [eventNames] if typeof eventNames == 'string'
-			
+
 		for eventName in eventNames
 			do (eventName) =>
 				super eventName, listener
-				
+
 				@_context.eventManager.wrap(@_element).removeEventListener(eventName, listener)
 
 				if @_eventListeners
