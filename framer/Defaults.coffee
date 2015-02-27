@@ -22,6 +22,37 @@ Originals =
 		keyboard: false
 		animationOptions:
 			curve: "spring(400,40,0)"
+	LayerDraggable:
+		momentum: true
+		momentumOptions:
+			friction: 2.1 
+			tolerance: 1/10 
+		bounce: true
+		bounceOptions:
+			friction: 40
+			tension: 200
+			tolerance: 1/10000
+		lockDirectionOptions: 
+			thresholdX: 10
+			thresholdY: 10
+		overscrollScale: 0.5
+		velocityTimeout: 100
+		velocityScale: 890
+	FrictionSimulator:
+		friction: 2
+		tolerance: 1/10
+	SpringSimulator:
+		tension: 500
+		friction: 10
+		tolerance: 1/10000
+	InertialScrollSimulator:
+		momentum:
+			friction: 2
+			tolerance: 1/10
+		bounce:
+			tension: 500
+			friction: 10
+			tolerance: 1/10000
 
 exports.Defaults =
 

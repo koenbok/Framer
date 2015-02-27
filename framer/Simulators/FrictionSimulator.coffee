@@ -1,4 +1,3 @@
-
 Utils = require "../Utils"
 
 {Simulator} = require "../Simulator"
@@ -8,11 +7,10 @@ class exports.FrictionSimulator extends Simulator
 
 	setup: (options) ->
 
+		@options = Defaults.getDefaults "FrictionSimulator", options
 		@options = Utils.setDefaultProperties options,
-			friction: 2
 			velocity: 0
 			position: 0
-			tolerance: 1/10
 
 		@_state =
 			x: @options.position
