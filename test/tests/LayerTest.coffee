@@ -424,6 +424,20 @@ describe "Layer", ->
 			clickCount.should.equal 1
 
 
+		it "should only run an event once", ->
+			
+			layerA = new Layer
+			count = 0
+
+			layerA.once "hello", (layer) ->
+				count++
+				layerA.should.equal layer
+
+			for i in [0..10]
+				layerA.emit("hello")
+
+			count.should.equal 1
+
 
 	describe "Hierarchy", ->
 		
@@ -502,6 +516,11 @@ describe "Layer", ->
 			
 
 	describe "Layering", ->
+
+		it "should set at creation", ->
+
+			layer = new Layer index:666
+			layer.index.should.equal 666
 
 		it "should change index", ->
 

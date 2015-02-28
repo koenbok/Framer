@@ -1,6 +1,6 @@
 Framer.Device = new Framer.DeviceView()
 Framer.Device.setupContext()
 
-layer = new Layer width:10000, height:10000
+Framer.Device.deviceType = "applewatchsport-42-aluminum-sportband-white"
 
-Framer.Device.rotateRight()
+new BackgroundLayer backgroundColor:"white"

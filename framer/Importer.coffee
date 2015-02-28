@@ -76,6 +76,13 @@ class exports.Importer
 		if info.maskFrame
 			layerInfo.frame = info.maskFrame
 			layerInfo.clip = true
+
+		# Possible fix for images that have a mask in Sketch
+		# So if a layer without children has a mask, Sketch imports the full image
+		# That is whay we then take the image frame over the mask frame again
+		if info.children.length is 0 and true in _.pluck(superLayer?.superLayers(), "clip")
+			layerInfo.frame = info.image.frame
+			layerInfo.clip = false
 			
 		# Figure out what the super layer should be. If this layer has a contentLayer
 		# (like a scroll view) we attach it to that instead.

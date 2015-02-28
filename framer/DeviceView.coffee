@@ -240,7 +240,7 @@ class exports.DeviceView extends BaseClass
 			# If we switch from fullscreen to a device, we should zoom to fit
 			shouldZoomToFit = @_deviceType is "fullscreen"
 
-			@_device = device
+			@_device = _.clone(device)
 			@_deviceType = deviceType
 			@fullscreen = false
 			@_updateDeviceImage()	
@@ -257,7 +257,7 @@ class exports.DeviceView extends BaseClass
 			@phone.image  = ""
 		else
 			@phone._cacheImage = true
-			@phone.image  = @_deviceImageUrl(@_device.deviceImage)
+			@phone.image  = @_deviceImageUrl("#{@_deviceType}.png")
 			@phone.width  = @_device.deviceImageWidth
 			@phone.height = @_device.deviceImageHeight
 
@@ -545,6 +545,18 @@ iPhone6BaseDeviceHand = _.extend {}, iPhone6BaseDevice,
 	deviceImageHeight: 2368
 	paddingOffset: -150
 
+iPhone6PlusBaseDevice =
+	deviceImageWidth: 1280
+	deviceImageHeight: 2524
+	screenWidth: 1080
+	screenHeight: 1920
+	deviceType: "phone"
+
+iPhone6PlusBaseDeviceHand = _.extend {}, iPhone6PlusBaseDevice,
+	deviceImageWidth: 2720
+	deviceImageHeight: 3032
+	paddingOffset: -150
+
 
 iPhone5BaseDevice =
 	deviceImageWidth: 780
@@ -628,11 +640,17 @@ Nexus5BaseDeviceHand = _.extend {}, Nexus5BaseDevice, # 2692 × 2996
 	deviceImageHeight: 2996
 	paddingOffset: -120
 
-AppleWatchDevice =
-	deviceImageWidth: 472
-	deviceImageHeight: 806
-	screenWidth: 320
-	screenHeight: 400
+AppleWatch42Device =
+	deviceImageWidth: 552
+	deviceImageHeight: 938
+	screenWidth: 312
+	screenHeight: 390
+
+AppleWatch38Device =
+	deviceImageWidth: 508
+	deviceImageHeight: 900
+	screenWidth: 272
+	screenHeight: 340
 
 Devices =
 
@@ -641,126 +659,107 @@ Devices =
 		deviceType: "desktop"
 
 	# Desktop Browser
-	"desktop-browser-1024":
+	"desktop-safari-1024-600":
 		deviceType: "browser"
-		deviceImage: "desktop-safari-1024-600.png"
-		name: "Desktop Browser 1024 x 600"
+		name: "Desktop Safari 1024 x 600"
 		screenWidth: 1024
 		screenHeight: 600
 		deviceImageWidth: 1136
 		deviceImageHeight: 760
-	"desktop-browser-1280":
+	"desktop-safari-1280-800":
 		deviceType: "browser"
-		deviceImage: "desktop-safari-1280-800.png"
-		name: "Desktop Browser 1280 x 800"
+		name: "Desktop Safari 1280 x 800"
 		screenWidth: 1280
 		screenHeight: 800
 		deviceImageWidth: 1392
 		deviceImageHeight: 960
-	"desktop-browser-1440":
+	"desktop-safari-1440-900":
 		deviceType: "browser"
-		deviceImage: "desktop-safari-1440-900.png"
-		name: "Desktop Browser 1440 x 900"
+		name: "Desktop Safari 1440 x 900"
 		screenWidth: 1440
 		screenHeight: 900
 		deviceImageWidth: 1552
 		deviceImageHeight: 1060
 
 	# iPhone 6
-	"iphone-6-spacegray": _.extend {}, iPhone6BaseDevice,
-		deviceImage: "iphone-6-spacegray.png"
-	"iphone-6-spacegray-hand": _.extend {}, iPhone6BaseDeviceHand,
-		deviceImage: "iphone-6-spacegray-hand.png"
+	"iphone-6-spacegray": iPhone6BaseDevice
+	"iphone-6-spacegray-hand": iPhone6BaseDeviceHand
+	"iphone-6-silver": iPhone6BaseDevice
+	"iphone-6-silver-hand": iPhone6BaseDeviceHand
+	"iphone-6-gold": iPhone6BaseDevice
+	"iphone-6-gold-hand": iPhone6BaseDeviceHand
 
-	"iphone-6-silver": _.extend {}, iPhone6BaseDevice,
-		deviceImage: "iphone-6-silver.png"
-	"iphone-6-silver-hand": _.extend {}, iPhone6BaseDeviceHand,
-		deviceImage: "iphone-6-silver-hand.png"
-
-	"iphone-6-gold": _.extend {}, iPhone6BaseDevice,
-		deviceImage: "iphone-6-gold.png"
-	"iphone-6-gold-hand": _.extend {}, iPhone6BaseDeviceHand,
-		deviceImage: "iphone-6-gold-hand.png"
-
+	# iPhone 6+
+	"iphone-6plus-spacegray": iPhone6PlusBaseDevice
+	"iphone-6plus-spacegray-hand": iPhone6PlusBaseDeviceHand
+	"iphone-6plus-silver": iPhone6PlusBaseDevice
+	"iphone-6plus-silver-hand": iPhone6PlusBaseDeviceHand
+	"iphone-6plus-gold": iPhone6PlusBaseDevice
+	"iphone-6plus-gold-hand": iPhone6PlusBaseDeviceHand
 
 	# iPhone 5S
-	"iphone-5s-spacegray": _.extend {}, iPhone5BaseDevice,
-		deviceImage: "iphone-5s-spacegray.png"
-	"iphone-5s-spacegray-hand": _.extend {}, iPhone5BaseDeviceHand,
-		deviceImage: "iphone-5s-spacegray-hand.png"
-	
-	"iphone-5s-silver": _.extend {}, iPhone5BaseDevice,
-		deviceImage: "iphone-5s-silver.png"
-	"iphone-5s-silver-hand": _.extend {}, iPhone5BaseDeviceHand,
-		deviceImage: "iphone-5s-silver-hand.png"
-	
-	"iphone-5s-gold": _.extend {}, iPhone5BaseDevice,
-		deviceImage: "iphone-5s-gold.png"
-	"iphone-5s-gold-hand": _.extend {}, iPhone5BaseDeviceHand,
-		deviceImage: "iphone-5s-gold-hand.png"
-
+	"iphone-5s-spacegray": iPhone5BaseDevice
+	"iphone-5s-spacegray-hand":iPhone5BaseDeviceHand
+	"iphone-5s-silver": iPhone5BaseDevice
+	"iphone-5s-silver-hand": iPhone5BaseDeviceHand
+	"iphone-5s-gold": iPhone5BaseDevice
+	"iphone-5s-gold-hand": iPhone5BaseDeviceHand
 
 	# iPhone 5C
-	"iphone-5c-green": _.extend {}, iPhone5CBaseDevice,
-		deviceImage: "iphone-5c-green.png"
-	"iphone-5c-green-hand": _.extend {}, iPhone5CBaseDeviceHand,
-		deviceImage: "iphone-5c-green-hand.png"
-
-	"iphone-5c-blue": _.extend {}, iPhone5CBaseDevice,
-		deviceImage: "iphone-5c-blue.png"
-	"iphone-5c-blue-hand": _.extend {}, iPhone5CBaseDeviceHand,
-		deviceImage: "iphone-5c-blue-hand.png"
-
-	"iphone-5c-pink": _.extend {}, iPhone5CBaseDevice,
-		deviceImage: "iphone-5c-pink.png"
-	"iphone-5c-pink-hand": _.extend {}, iPhone5CBaseDeviceHand,
-		deviceImage: "iphone-5c-pink-hand.png"
-
-	"iphone-5c-white": _.extend {}, iPhone5CBaseDevice,
-		deviceImage: "iphone-5c-white.png"
-	"iphone-5c-white-hand": _.extend {}, iPhone5CBaseDeviceHand,
-		deviceImage: "iphone-5c-white-hand.png"
-
-	"iphone-5c-yellow": _.extend {}, iPhone5CBaseDevice,
-		deviceImage: "iphone-5c-yellow.png"
-	"iphone-5c-yellow-hand": _.extend {}, iPhone5CBaseDeviceHand,
-		deviceImage: "iphone-5c-yellow-hand.png"
+	"iphone-5c-green": iPhone5CBaseDevice
+	"iphone-5c-green-hand": iPhone5CBaseDeviceHand
+	"iphone-5c-blue": iPhone5CBaseDevice
+	"iphone-5c-blue-hand": iPhone5CBaseDeviceHand
+	"iphone-5c-pink": iPhone5CBaseDevice
+	"iphone-5c-pink-hand": iPhone5CBaseDeviceHand
+	"iphone-5c-white": iPhone5CBaseDevice
+	"iphone-5c-white-hand": iPhone5CBaseDeviceHand
+	"iphone-5c-yellow": iPhone5CBaseDevice
+	"iphone-5c-yellow-hand": iPhone5CBaseDeviceHand
 
 	# iPad Mini
-	"ipad-mini-spacegray": _.extend {}, iPadMiniBaseDevice,
-		deviceImage: "ipad-mini-spacegray.png"
-	"ipad-mini-spacegray-hand": _.extend {}, iPadMiniBaseDeviceHand,
-		deviceImage: "ipad-mini-spacegray-hand.png"
-
-	"ipad-mini-silver": _.extend {}, iPadMiniBaseDevice,
-		deviceImage: "ipad-mini-silver.png"
-	"ipad-mini-silver-hand": _.extend {}, iPadMiniBaseDeviceHand,
-		deviceImage: "ipad-mini-silver-hand.png"
+	"ipad-mini-spacegray": iPadMiniBaseDevice
+	"ipad-mini-spacegray-hand": iPadMiniBaseDeviceHand
+	"ipad-mini-silver": iPadMiniBaseDevice
+	"ipad-mini-silver-hand": iPadMiniBaseDeviceHand
 
 	# iPad Air
-	"ipad-air-spacegray": _.extend {}, iPadMiniBaseDevice,
-		deviceImage: "ipad-air-spacegray.png"
-	"ipad-air-spacegray-hand": _.extend {}, iPadMiniBaseDeviceHand,
-		deviceImage: "ipad-air-spacegray-hand.png"
-
-	"ipad-air-silver": _.extend {}, iPadMiniBaseDevice,
-		deviceImage: "ipad-mini-silver.png"
-	"ipad-air-silver-hand": _.extend {}, iPadMiniBaseDeviceHand,
-		deviceImage: "ipad-mini-silver-hand.png"
+	"ipad-air-spacegray": iPadAirBaseDevice
+	"ipad-air-spacegray-hand": iPadAirBaseDeviceHand
+	"ipad-air-silver": iPadAirBaseDevice
+	"ipad-air-silver-hand": iPadAirBaseDeviceHand
 
 	# Nexus 5
-	"nexus-5-black": _.extend {}, Nexus5BaseDevice,
-		deviceImage: "nexus-5-black.png"
-	"nexus-5-black-hand": _.extend {}, Nexus5BaseDeviceHand,
-		deviceImage: "nexus-5-black-hand.png"
+	"nexus-5-black": Nexus5BaseDevice
+	"nexus-5-black-hand": Nexus5BaseDeviceHand
 
-	# Apple Watch
-	"apple-watch": _.extend {}, AppleWatchDevice,
-		deviceImage: "apple-watch.png"
-	"apple-watch-sport": _.extend {}, AppleWatchDevice,
-		deviceImage: "apple-watch-sport.png"
-	"apple-watch-edition": _.extend {}, AppleWatchDevice,
-		deviceImage: "apple-watch-edition.png"
+	# Apple Watch 38mm
+	"applewatchsport-38-aluminum-sportband-black": AppleWatch38Device
+	"applewatchsport-38-aluminum-sportband-blue": AppleWatch38Device
+	"applewatchsport-38-aluminum-sportband-green": AppleWatch38Device
+	"applewatchsport-38-aluminum-sportband-pink": AppleWatch38Device
+	"applewatchsport-38-aluminum-sportband-white": AppleWatch38Device
+	"applewatch-38-black-bracelet": AppleWatch38Device
+	"applewatch-38-steel-bracelet": AppleWatch38Device
+	"applewatchedition-38-gold-buckle-blue": AppleWatch38Device
+	"applewatchedition-38-gold-buckle-gray": AppleWatch38Device
+	"applewatchedition-38-gold-buckle-red": AppleWatch38Device
+	"applewatchedition-38-gold-sportband-black": AppleWatch38Device
+	"applewatchedition-38-gold-sportband-white": AppleWatch38Device
+
+	# Apple Watch 42mm
+	"applewatchsport-42-aluminum-sportband-black": AppleWatch42Device
+	"applewatchsport-42-aluminum-sportband-blue": AppleWatch42Device
+	"applewatchsport-42-aluminum-sportband-green": AppleWatch42Device
+	"applewatchsport-42-aluminum-sportband-pink": AppleWatch42Device
+	"applewatchsport-42-aluminum-sportband-white": AppleWatch42Device
+	"applewatch-42-black-bracelet": AppleWatch42Device
+	"applewatch-42-steel-bracelet": AppleWatch42Device
+	"applewatchedition-42-gold-buckle-blue": AppleWatch42Device
+	"applewatchedition-42-gold-buckle-gray": AppleWatch42Device
+	"applewatchedition-42-gold-buckle-red": AppleWatch42Device
+	"applewatchedition-42-gold-sportband-black": AppleWatch42Device
+	"applewatchedition-42-gold-sportband-white": AppleWatch42Device
 
 
 
