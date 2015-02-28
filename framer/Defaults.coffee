@@ -27,6 +27,7 @@ Originals =
 		momentumOptions:
 			friction: 2.1 
 			tolerance: 1/10 
+		momentumVelocityMultiplier: 890
 		bounce: true
 		bounceOptions:
 			friction: 40
@@ -35,7 +36,9 @@ Originals =
 		lockDirectionOptions: 
 			thresholdX: 10
 			thresholdY: 10
-		overscrollScale: 0.5
+		overdrag: true
+		overdragScale: 0.5
+		pixelAlign: true
 		velocityTimeout: 100
 		velocityScale: 890
 	FrictionSimulator:
@@ -45,7 +48,7 @@ Originals =
 		tension: 500
 		friction: 10
 		tolerance: 1/10000
-	InertialScrollSimulator:
+	MomentumBounceSimulator:
 		momentum:
 			friction: 2
 			tolerance: 1/10

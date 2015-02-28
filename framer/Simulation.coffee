@@ -9,7 +9,7 @@ Utils = require "./Utils"
 
 {SpringSimulator} = require "./Simulators/SpringSimulator"
 {FrictionSimulator} = require "./Simulators/FrictionSimulator"
-{InertialScrollSimulator} = require "./Simulators/InertialScrollSimulator"
+{MomentumBounceSimulator} = require "./Simulators/MomentumBounceSimulator"
 
 Events.SimulationStart = 'simulationStart'
 Events.SimulationStep = 'simulationStep'
@@ -18,7 +18,7 @@ Events.SimulationStop = 'simulationStop'
 SimulatorClasses =
 	"spring": SpringSimulator
 	"friction": FrictionSimulator
-	"inertial-scroll": InertialScrollSimulator
+	"inertial-scroll": MomentumBounceSimulator
 
 class exports.Simulation extends EventEmitter
 

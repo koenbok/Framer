@@ -1,17 +1,18 @@
 
 Utils = require "../Utils"
 
+{Defaults}   = require "../Defaults"
 {Simulator} = require "../Simulator"
 
 {SpringSimulator} = require "./SpringSimulator"
 {FrictionSimulator} = require "./FrictionSimulator"
 
-class exports.InertialScrollSimulator extends Simulator
+class exports.MomentumBounceSimulator extends Simulator
 
 	setup: (options) ->
 
-		@options = Defaults.getDefaults "InertialScrollSimulator", options
-		@options = Utils.setDefaultProperties options,
+		@options = Defaults.getDefaults("MomentumBounceSimulator", options)
+		@options = _.defaults options,
 			velocity: 0
 			position: 0
 			min: 0

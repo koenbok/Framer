@@ -10,7 +10,7 @@ Events.EventBufferUpdated = "eventbufferupdated"
 class exports.EventBuffer extends BaseClass
 
 	constructor: (options = {}) ->
-		@options = Utils.setDefaultProperties options,
+		@options = _.defaults options,
 			velocityTimeout: 100
 		@_events = []
 
@@ -43,7 +43,7 @@ class exports.EventBuffer extends BaseClass
 
 	@define "events",
 		get: ->
-			timeout = Date.now() - @options.velocityTimeOut
+			timeout = Date.now() - @options.velocityTimeout
 			return _.filter @_events, (event) => event.t > timeout
 
 	@define "angle",

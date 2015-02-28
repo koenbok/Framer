@@ -1,4 +1,5 @@
 Utils = require "../Utils"
+{Defaults}   = require "../Defaults"
 
 {Simulator} = require "../Simulator"
 {Integrator} = require "../Integrator"
@@ -8,7 +9,7 @@ class exports.SpringSimulator extends Simulator
 	setup: (options) ->
 
 		@options = Defaults.getDefaults "SpringSimulator", options
-		@options = Utils.setDefaultProperties options,
+		@options = _.defaults options,
 			velocity: 0
 			position: 0
 			offset: 0

@@ -1,8 +1,8 @@
-{_} = require "./Underscore"
+{_} = require "../Underscore"
 
-Utils        = require "./Utils"
-{BaseClass}  = require "./BaseClass"
-{Events}     = require "./Events"
+Utils        = require "../Utils"
+{BaseClass}  = require "../BaseClass"
+{Events}     = require "../Events"
 
 Events.DidStartPan = "didstartpan"
 Events.DidEndPan   = "didendpan"
@@ -34,7 +34,7 @@ class exports.PanRecognizer extends BaseClass
 		@thresholdX = @options.lockDirectionOptions.thresholdX
 		@thresholdY = @options.lockDirectionOptions.thresholdY
 
-		@eventBuffer.on Events.EventBufferReset, => @state = STATE.POSSIBLE
+		# @eventBuffer.on Events.EventBufferReset, => @state = STATE.POSSIBLE
 
 	process: ->
 

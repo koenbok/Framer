@@ -10,7 +10,7 @@ Utils = require "./Utils"
 {Frame} = require "./Frame"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
-{LayerDraggable} = require "./LayerDraggable"
+{LayerDraggable} = require "./LayerDraggable2"
 
 layerValueTypeError = (name, value) ->
 	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
@@ -233,7 +233,13 @@ class exports.Layer extends BaseClass
 			return if not point
 			for k in ["x", "y"]
 				@[k] = point[k] if point.hasOwnProperty(k)
-					
+				
+	@define "size",
+		get: -> _.pick(@, ["width", "height"])
+		set: (size) ->
+			return if not size
+			for k in ["width", "height"]
+				@[k] = size[k] if size.hasOwnProperty(k)
 
 	@define "frame",
 		get: -> _.pick(@, ["x", "y", "width", "height"])
