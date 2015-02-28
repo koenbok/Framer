@@ -19,16 +19,18 @@ Events.DidStartDecelerating  = "didstartdecelerating"
 Events.DidEndDecelerating    = "didenddecelerating"
 Events.DidStartBounce        = "didstartbounce"
 Events.DidEndBounce          = "didendbounce"
+Events.DidStartAnimation     = "didstartanimation"
+Events.DidEndAnimation       = "didendanimation"
 Events.DidStartLockDirection = "didstartlockdirection"
 
 
 class exports.LayerDraggable extends BaseClass
 
-	@define "horizontal", @simpleProperty "horizontal", true, true
-	@define "vertical", @simpleProperty "vertical", true, true
-
 	@define "speedX", @simpleProperty "speedX", 1, true
 	@define "speedY", @simpleProperty "speedY", 1, true
+
+	@define "horizontal", @simpleProperty "horizontal", true, true
+	@define "vertical", @simpleProperty "vertical", true, true
 
 	@define "lockDirection", @simpleProperty "lockDirection", false, true
 
@@ -88,6 +90,7 @@ class exports.LayerDraggable extends BaseClass
 		# @_propagateEvents = true if (@multipleDraggables && @directionLock)
 
 		@layer.animateStop()
+		@_stopSimulation()
 
 		event.preventDefault()
 		# event.stopPropagation() if ! @_propagateEvents
@@ -155,11 +158,17 @@ class exports.LayerDraggable extends BaseClass
 			y: delta.y * @speedY * (1 / @_screenScale.y)
 			t: event.timeStamp
 
+		point = 
+			x: @layer.x
+			y: @layer.y
+
+		point.x = @_cursorStartPoint.x + correctedDelta.x - @_layerCursorOffset.x if @horizontal
+		point.y = @_cursorStartPoint.y + correctedDelta.y - @_layerCursorOffset.y if @vertical
+
 		# Pixel align all moves
 		if @pixelAlign
-			point = 
-				x: parseInt(@_cursorStartPoint.x + correctedDelta.x - @_layerCursorOffset.x)
-				y: parseInt(@_cursorStartPoint.y + correctedDelta.y - @_layerCursorOffset.y)
+			point.x = parseInt(point.x)
+			point.y = parseInt(point.y)
 
 		# Constraints
 		point = @_constrainPosition(point, @_constraints) if @_constraints
@@ -354,26 +363,9 @@ class exports.LayerDraggable extends BaseClass
 				momentum: @momentumOptions
 				bounce: @bounceOptions
 
-		simulation.on Events.SimulationStep, (state) =>
-
-			# The simulation state has x as value, it can look confusing here
-			# as we're working with x and y.
-
-			if @constraints
-				if @bounce
-					@layer[axis] = state.x
-				else
-					{minX, maxX, minY, maxY} = @_calculateConstraints(@_constraints)
-					@layer[axis] = Utils.clamp(state.x, minX, maxX) if axis is "x"
-					@layer[axis] = Utils.clamp(state.x, minY, maxY) if axis is "y"
-			else
-				@layer[axis] = state.x
-
-		simulation.on Events.SimulationStop, (state) =>
-			# Round the end position to whole pixels
-			@layer[axis] = parseInt(@layer[axis]) if @pixelAlign
-
-		return simulation
+		simulation.on Events.SimulationStep, (state) => @_onSimulationStep(axis, state)
+		simulation.on Events.SimulationStop, (state) => @_onSimulationStop(axis, state)
+		simulation
 
 	_updateSimulationConstraints: (constraints) ->
 		# This is where we let the simulator know about our constraints
@@ -385,6 +377,40 @@ class exports.LayerDraggable extends BaseClass
 		else
 			@_simulation.x.setOptions({min:-Infinity, max:+Infinity})
 			@_simulation.y.setOptions({min:-Infinity, max:+Infinity})
+
+	_onSimulationStep: (axis, state) =>
+
+		return if axis is "x" and @horizontal is false
+		return if axis is "y" and @vertical is false
+
+		# The simulation state has x as value, it can look confusing here
+		# as we're working with x and y.
+
+		# TODO: Maybe we need to take speedX, speedY into account here
+		updatePoint = {}
+
+		if @constraints
+			if @bounce
+				updatePoint[axis] = state.x
+			else
+				{minX, maxX, minY, maxY} = @_calculateConstraints(@_constraints)
+				updatePoint[axis] = Utils.clamp(state.x, minX, maxX) if axis is "x"
+				updatePoint[axis] = Utils.clamp(state.x, minY, maxY) if axis is "y"
+		else
+			updatePoint[axis] = state.x
+
+		@layer[axis] = @updatePosition(updatePoint)[axis]
+
+	_onSimulationStop: (axis, state) =>
+
+		@emit(Events.DidEndAnimation, {axis:axis})
+
+		# Round the end position to whole pixels
+		@layer[axis] = parseInt(@layer[axis]) if @pixelAlign
+
+		# See if both simulators are stopped
+		if @_simulation.x.finished() and @_simulation.y.finished()
+			@_stopSimulation()
 
 	_startSimulation: ->
 
@@ -405,8 +431,11 @@ class exports.LayerDraggable extends BaseClass
 			x: @layer.y
 			v: velocity.y * @_momentumVelocityMultiplier
 
+		@emit(Events.DidStartAnimation)
+
 	_stopSimulation: =>
-		@_simulation.x?.stop()
-		@_simulation.y?.stop()
+		@_simulation?.x.stop()
+		@_simulation?.y.stop()
 		@_isAnimating = false
+		@emit(Events.DidEndAnimation)
 

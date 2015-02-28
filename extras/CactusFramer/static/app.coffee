@@ -9,6 +9,8 @@ constraintLayer.center()
 
 
 layer = new Layer superLayer:constraintLayer
+layer.center()
+
 layer.draggable.enabled = true
 layer.draggable.momentum = true
 layer.draggable.bounce = true
@@ -16,10 +18,9 @@ layer.draggable.constraints = constraintLayer.size
 layer.draggable.overdrag = true
 layer.draggable.overdragScale = 0.1
 
+
 # layer.draggable.momentumOptions =
 # 	friction:
 
 
-# layer.draggable.on Events.DragMove, ->
-# 	print layer.draggable.velocity
-# 	print layer.draggable.angle
+

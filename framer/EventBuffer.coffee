@@ -48,8 +48,11 @@ class exports.EventBuffer extends BaseClass
 
 	@define "angle",
 		get: ->
-			{x, y} = @velocity
-			Math.atan2 y, x
+			events = @events
+			return 0 if events.length < 2
+			p1 = events[0]
+			p2 = events[1]
+			return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
 
 	@define "velocity",
 		get: ->
