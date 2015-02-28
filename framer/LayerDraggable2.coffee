@@ -121,22 +121,22 @@ class exports.LayerDraggable extends BaseClass
 			t: touchEvent.timeStamp
 
 		# Store original layer position
-		@_position =
+		@_layerStartPoint =
 			x: @layer.x
 			y: @layer.y
 		
-		# if @bounce
-		# 	@_position = @_constrainPosition(@_position, @constraints, 1 / @overdragScale)
+		if @bounce
+			@_layerStartPoint = @_constrainPosition(@_layerStartPoint, @constraints, 1 / @overdragScale)
 
 		# Store start cursor position
-		@_start =
+		@_cursorStartPoint =
 			x: touchEvent.clientX
 			y: touchEvent.clientY
 
 		# Store cursor/layer offset
-		@_offset =
-			x: touchEvent.clientX - @_position.x
-			y: touchEvent.clientY - @_position.y
+		@_layerCursorOffset =
+			x: touchEvent.clientX - @_layerStartPoint.x
+			y: touchEvent.clientY - @_layerStartPoint.y
 
 		# Store the current layer scale so we can correct movement for it
 		@_screenScale =
@@ -166,8 +166,8 @@ class exports.LayerDraggable extends BaseClass
 			t: touchEvent.timeStamp
 
 		delta =
-			x: touchEvent.clientX - @_start.x
-			y: touchEvent.clientY - @_start.y
+			x: touchEvent.clientX - @_cursorStartPoint.x
+			y: touchEvent.clientY - @_cursorStartPoint.y
 
 		# Correct for current drag speed and scale
 		correctedDelta =
@@ -178,8 +178,8 @@ class exports.LayerDraggable extends BaseClass
 		# Pixel align all moves
 		if @pixelAlign
 			point = 
-				x: parseInt(@_start.x + correctedDelta.x - @_offset.x)
-				y: parseInt(@_start.y + correctedDelta.y - @_offset.y)
+				x: parseInt(@_cursorStartPoint.x + correctedDelta.x - @_layerCursorOffset.x)
+				y: parseInt(@_cursorStartPoint.y + correctedDelta.y - @_layerCursorOffset.y)
 
 		# Constraints
 		point = @_constrainPosition(point, @_constraints) if @_constraints
@@ -189,11 +189,11 @@ class exports.LayerDraggable extends BaseClass
 		# if @directionLock
 		# 	@_updateDirectionLock(correctedDelta) if ! @_directionIsLocked
 			
-		# 	@layer.x = @_position.x if @_xAxisLock
-		# 	@layer.y = @_position.y if @_yAxisLock	
+		# 	@layer.x = @_layerStartPoint.x if @_xAxisLock
+		# 	@layer.y = @_layerStartPoint.y if @_yAxisLock	
 		# else
-		# 	@layer.x = @_position.x
-		# 	@layer.y = @_position.y
+		# 	@layer.x = @_layerStartPoint.x
+		# 	@layer.y = @_layerStartPoint.y
 
 
 		_.extend(@layer, @updatePosition(point))
@@ -216,7 +216,7 @@ class exports.LayerDraggable extends BaseClass
 		# # Set _isDragging after DragEnd is fired, so that calls to calculateVelocity() 
 		# # still returns dragging velocity - both in case the user calls calculateVelocity(),
 		# # (which would return a stale value before the simulation had finished one tick)
-		# # and because @_startSimulation currently calls calculateVelocity().
+		# # and because @_start currently calls calculateVelocity().
 		@_isDragging = false
 
 
