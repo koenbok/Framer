@@ -10,27 +10,23 @@ class exports.InertialScrollSimulator extends Simulator
 
 	setup: (options) ->
 
+		@options = Defaults.getDefaults "InertialScrollSimulator", options
 		@options = Utils.setDefaultProperties options,
-			scrollFriction: 2.1
-			scrollTolerance: 1/10
-			springFriction: 40
-			springTension: 200
-			springTolerance: 1/10000
 			velocity: 0
 			position: 0
 			min: 0
 			max: 0
 
 		@_frictionSimulator = new FrictionSimulator
-			friction: @options.scrollFriction
-			tolerance: @options.scrollTolerance
+			friction: @options.momentum.friction
+			tolerance: @options.momentum.tolerance
 			velocity: @options.velocity
 			position: @options.position
 
 		@_springSimulator = new SpringSimulator
-			tension: @options.springTension
-			friction: @options.springFriction
-			tolerance: @options.springTolerance
+			tension: @options.bounce.tension
+			friction: @options.bounce.friction
+			tolerance: @options.bounce.tolerance
 			velocity: @options.velocity
 			position: @options.position
 

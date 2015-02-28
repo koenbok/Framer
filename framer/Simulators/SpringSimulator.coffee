@@ -7,10 +7,8 @@ class exports.SpringSimulator extends Simulator
 
 	setup: (options) ->
 
+		@options = Defaults.getDefaults "SpringSimulator", options
 		@options = Utils.setDefaultProperties options,
-			tension: 500
-			friction: 10
-			tolerance: 1/10000
 			velocity: 0
 			position: 0
 			offset: 0

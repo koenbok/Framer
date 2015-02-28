@@ -147,6 +147,15 @@ Utils.randomNumber = (a=0, b=1) ->
 	# Return a random number between a and b
 	Utils.mapRange Math.random(), 0, 1, a, b
 
+Utils.defineEnum = (names = [], offset = 0, geometric = 0) ->
+	Enum = {}
+	for name, i in names
+		j = i
+		j = if ! offset    then j else j + offset
+		j = if ! geometric then j else Math.pow geometric, j
+		Enum[Enum[name] = j] = name
+	return Enum
+
 Utils.labelLayer = (layer, text, style={}) ->
 	
 	style = _.extend({
@@ -279,6 +288,11 @@ Utils.pathJoin = ->
 Utils.round = (value, decimals) ->
 	d = Math.pow 10, decimals
 	Math.round(value * d) / d
+
+Utils.clamp = (value, min, max) ->
+	value = min if value < min
+	value = max if value > max
+	return value
 
 # Taken from http://jsfiddle.net/Xz464/7/
 # Used by animation engine, needs to be very performant
