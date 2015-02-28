@@ -27,7 +27,6 @@ Originals =
 		momentumOptions:
 			friction: 2.1 
 			tolerance: 1/10 
-		momentumVelocityMultiplier: 890
 		bounce: true
 		bounceOptions:
 			friction: 40

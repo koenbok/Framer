@@ -21,28 +21,6 @@ Events.DidStartBounce        = "didstartbounce"
 Events.DidEndBounce          = "didendbounce"
 Events.DidStartLockDirection = "didstartlockdirection"
 
-"""
-constraints <x:n, y:n width:n height:n> (the old maxDragFrame)
-horizontal <bool>
-vertical <bool>
-overdrag <bool>
-overdragScale <number>
-momentum <bool>
-momentumOptions <{friction:n, tolerance:n}>
-momentumVelocityMultiplier <number>
-bounce <bool>
-bounceOptions <{friction:n, tension:n, tolerance:n}>
-velocity <x:n, y:n> (readonly)
-angle <n> (readonly)
-speedX <number>
-speedY <number>
-updatePosition(<{x:n, y:n}>) (to override the actual setting with whatever)
-lockDirection <bool>
-lockDirectionOptions: <{thresholdX:n, thresholdY:n}>
-pixelAlign <bool>
-isDragging
-isAnimating
-"""
 
 class exports.LayerDraggable extends BaseClass
 
@@ -79,8 +57,6 @@ class exports.LayerDraggable extends BaseClass
 
 		@enabled = true
 
-		
-
 		# TODO: will have to change panRecognizer's horizontal/vertical etc 
 		# when they are changed on the LayerDraggable
 		# @_panRecognizer = new PanRecognizer @eventBuffer
@@ -88,6 +64,10 @@ class exports.LayerDraggable extends BaseClass
 		@_eventBuffer = new EventBuffer
 		@_constraints = null
 		@_propagateEvents = false
+
+		# We don't expose this for now because it's more a constant that maps
+		# dragging to simulator velocity correctly.
+		@_momentumVelocityMultiplier = 890
 
 		@attach()
 
@@ -391,7 +371,7 @@ class exports.LayerDraggable extends BaseClass
 
 		simulation.on Events.SimulationStop, (state) =>
 			# Round the end position to whole pixels
-			@layer[axis] = parseInt(@layer[axis])
+			@layer[axis] = parseInt(@layer[axis]) if @pixelAlign
 
 		return simulation
 
@@ -418,12 +398,12 @@ class exports.LayerDraggable extends BaseClass
 		@_simulation.x.start()
 		@_simulation.x.setState
 			x: @layer.x
-			v: velocity.x * @momentumVelocityMultiplier
+			v: velocity.x * @_momentumVelocityMultiplier
 
 		@_simulation.y.start()
 		@_simulation.y.setState
 			x: @layer.y
-			v: velocity.y * @momentumVelocityMultiplier
+			v: velocity.y * @_momentumVelocityMultiplier
 
 	_stopSimulation: =>
 		@_simulation.x?.stop()
