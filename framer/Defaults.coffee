@@ -32,9 +32,10 @@ Originals =
 			friction: 40
 			tension: 200
 			tolerance: 1/10000
-		lockDirectionOptions: 
-			thresholdX: 10
-			thresholdY: 10
+		lockDirection: false
+		lockDirectionThreshold: 
+			x: 10
+			y: 10
 		overdrag: true
 		overdragScale: 0.5
 		pixelAlign: true

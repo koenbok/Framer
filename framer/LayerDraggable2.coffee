@@ -32,7 +32,7 @@ class exports.LayerDraggable extends BaseClass
 	@define "horizontal", @simpleProperty "horizontal", true, true
 	@define "vertical", @simpleProperty "vertical", true, true
 
-	@define "lockDirection", @simpleProperty "lockDirection", false, true
+	# @define "lockDirection", @simpleProperty "lockDirection", false, true
 
 	@define "constraints",
 		get: -> @_constraints
@@ -87,10 +87,11 @@ class exports.LayerDraggable extends BaseClass
 
 	_touchStart: (event) =>
 
-		# @_propagateEvents = true if (@multipleDraggables && @directionLock)
+		# @_propagateEvents = true if (@multipleDraggables && @lockDirection)
 
 		@layer.animateStop()
 		@_stopSimulation()
+		@_resetLockDirection()
 
 		event.preventDefault()
 		# event.stopPropagation() if ! @_propagateEvents
@@ -165,27 +166,26 @@ class exports.LayerDraggable extends BaseClass
 		point.x = @_cursorStartPoint.x + correctedDelta.x - @_layerCursorOffset.x if @horizontal
 		point.y = @_cursorStartPoint.y + correctedDelta.y - @_layerCursorOffset.y if @vertical
 
+
+		# TODO: Direction lock
+
+		if @lockDirection
+			if not @_lockDirectionEnabledX and not @_lockDirectionEnabledY
+				@_updateLockDirection(correctedDelta) 
+				return
+			else
+				point.x = @_layerStartPoint.x if @_lockDirectionEnabledX
+				point.y = @_layerStartPoint.y if @_lockDirectionEnabledY
+
+		# Constraints
+		point = @_constrainPosition(point, @_constraints) if @_constraints
+
 		# Pixel align all moves
 		if @pixelAlign
 			point.x = parseInt(point.x)
 			point.y = parseInt(point.y)
 
-		# Constraints
-		point = @_constrainPosition(point, @_constraints) if @_constraints
-
-		# TODO: Direction lock
-
-		# if @directionLock
-		# 	@_updateDirectionLock(correctedDelta) if ! @_directionIsLocked
-			
-		# 	@layer.x = @_layerStartPoint.x if @_xAxisLock
-		# 	@layer.y = @_layerStartPoint.y if @_yAxisLock	
-		# else
-		# 	@layer.x = @_layerStartPoint.x
-		# 	@layer.y = @_layerStartPoint.y
-
-
-		_.extend(@layer, @updatePosition(point))
+		@layer.point = @updatePosition(point)
 
 		@emit(Events.DragMove, event)
 		@emit(Events.DragDidMove, event)
@@ -245,32 +245,6 @@ class exports.LayerDraggable extends BaseClass
 				x: Utils.clamp(point.x, minX, maxX)
 				y: Utils.clamp(point.y, minY, maxY)
 
-	# A convenience method for getting scrolling behavior from LayerDraggable.
-	# The layer will pan around within the frame passed.
-	# 
-	# If the layer dimensions are smaller then the frame passed, the layer will
-	# not move at all (unless overdrag is on, in which case the layer will
-	# move, but spring back to 0 when dragging has finished).
-	# setScrollConstraints: (constraints) ->
-	# 	layerWidthTooSmall = @layer.width < constraints.width
-	# 	layerHeightTooSmall = @layer.height < constraints.height
-
-	# 	if layerWidthTooSmall
-	# 		x = 0
-	# 		width = @layer.width
-	# 	else
-	# 		x = - @layer.width + constraints.width
-	# 		width = @layer.width * 2 - constraints.width
-
-	# 	if layerHeightTooSmall
-	# 		y = 0
-	# 		height = @layer.height
-	# 	else
-	# 		y = - @layer.height + constraints.height
-	# 		height = @layer.height * 2 - constraints.height
-
-	# 	@constraints = {x, y, width, height}
-
 	##############################################################
 	# Velocity
 
@@ -284,7 +258,6 @@ class exports.LayerDraggable extends BaseClass
 	@define "angle",
 		get: -> @_eventBuffer.angle
 		set: -> throw Error "You can't set angle on a draggable"
-
 
 	calculateVelocity: ->
 		# Compatibility method
@@ -313,28 +286,29 @@ class exports.LayerDraggable extends BaseClass
 
 		super eventName, event, @
 
-	# _updateDirectionLock: (correctedDelta) ->
+	_updateLockDirection: (correctedDelta) ->
 		
-	# 	@_xAxisLock = Math.abs(correctedDelta.x) > @constructor.DragThreshold
-	# 	@_yAxisLock = Math.abs(correctedDelta.y) > @constructor.DragThreshold
+		@_lockDirectionEnabledX = Math.abs(correctedDelta.y) > @lockDirectionThreshold.y
+		@_lockDirectionEnabledY = Math.abs(correctedDelta.x) > @lockDirectionThreshold.x
 		
-	# 	xSlightlyPreferred = Math.abs(correctedDelta.x) > @constructor.DragThreshold / 2
-	# 	ySlightlyPreferred = Math.abs(correctedDelta.y) > @constructor.DragThreshold / 2
+		xSlightlyPreferred = Math.abs(correctedDelta.y) > @lockDirectionThreshold.y / 2
+		ySlightlyPreferred = Math.abs(correctedDelta.x) > @lockDirectionThreshold.x / 2
 		
-	# 	# Allow locking in both directions at the same time
-	# 	@_xAxisLock = @_yAxisLock = true if (xSlightlyPreferred && ySlightlyPreferred)
+		# Allow locking in both directions at the same time
+		@_lockDirectionEnabledX = @_lockDirectionEnabledY = true if (xSlightlyPreferred and ySlightlyPreferred)
 
-	# 	if @_xAxisLock || @_yAxisLock
+		if @_lockDirectionEnabledX or @_lockDirectionEnabledY
 
-	# 		@_directionIsLocked = true
+			@emit Events.DirectionLock, 
+				x: @_lockDirectionEnabledX
+				y: @_lockDirectionEnabledY
 
-	# 		@emit Events.DirectionLock, 
-	# 			x: @_xAxisLock
-	# 			y: @_yAxisLock
-
-	# 		@_propagateEvents = false if @multipleDraggables
+			# @_propagateEvents = false if @multipleDraggables
 
 
+	_resetLockDirection: ->
+		@_lockDirectionEnabledX = false
+		@_lockDirectionEnabledY = false
 
 
 	##############################################################
@@ -380,8 +354,8 @@ class exports.LayerDraggable extends BaseClass
 
 	_onSimulationStep: (axis, state) =>
 
-		return if axis is "x" and @horizontal is false
-		return if axis is "y" and @vertical is false
+		return if axis is "x" and (@_lockDirectionEnabledX or @horizontal is false)
+		return if axis is "y" and (@_lockDirectionEnabledY or @vertical is false)
 
 		# The simulation state has x as value, it can look confusing here
 		# as we're working with x and y.
