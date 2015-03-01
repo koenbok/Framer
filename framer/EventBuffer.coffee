@@ -31,15 +31,11 @@ class exports.EventBuffer extends BaseClass
 	@define "offset",
 		get: ->
 			return {x:0, y:0} if events.length < 2
-
 			current = events[events.length - 1]
 			first   = events[0]
-
 			offset = 
 				x: current.x - first.x
 				y: current.y - first.y
-
-			offset
 
 	@define "events",
 		get: ->

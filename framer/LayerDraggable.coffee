@@ -52,7 +52,6 @@ class exports.LayerDraggable extends BaseClass
 			@_updateSimulationConstraints(@_constraints) if @_constraints
 
 	@define "isDragging", get: -> @_isDragging or false
-
 	@define "isAnimating", get: -> @_isAnimating or false
 
 	# TODO: what to do with this?
@@ -420,4 +419,8 @@ class exports.LayerDraggable extends BaseClass
 		@_simulation?.y.stop()
 		@_isAnimating = false
 		@emit(Events.DidEndAnimation)
+
+	animateStop: ->
+		@_stopSimulation()
+
 

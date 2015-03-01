@@ -1,5 +1,6 @@
 Utils = require "./Utils"
 
+{_} = require "./Underscore"
 {Config} = require "./Config"
 
 class exports.Simulator
@@ -25,16 +26,10 @@ class exports.Simulator
 
 	# Assume the caller may change the state object, so best to clone it.
 	setState: (state) ->
-		@_state =
-			x: state.x
-			v: state.v
+		@_state = _.clone(state)
 
 	getState: ->
-		state =
-			x: @_state.x
-			v: @_state.v
-		return state
+		_.clone(@state)
 
 	setOptions: (options={}) ->
-		for k, v of options
-			@options[k] = v
+		_.extend(@options, options)

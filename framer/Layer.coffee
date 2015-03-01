@@ -673,7 +673,8 @@ class exports.Layer extends BaseClass
 
 	animateStop: ->
 		_.invoke(@animations(), "stop")
-
+		@_draggable?.animateStop()
+		
 	##############################################################
 	## INDEX ORDERING
 
