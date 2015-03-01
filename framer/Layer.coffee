@@ -10,7 +10,7 @@ Utils = require "./Utils"
 {Frame} = require "./Frame"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
-{LayerDraggable} = require "./LayerDraggable2"
+{LayerDraggable} = require "./LayerDraggable"
 
 layerValueTypeError = (name, value) ->
 	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")

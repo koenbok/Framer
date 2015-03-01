@@ -15,6 +15,10 @@ Framer.AnimationGroup = (require "./AnimationGroup").AnimationGroup
 Framer.Screen = (require "./Screen").Screen
 Framer.print = (require "./Print").print
 
+# Components
+Framer.ScrollComponent = (require "./Components/ScrollComponent").ScrollComponent
+# Framer.PageComponent = require ("./Components/PageComponent").PageComponent
+
 _.extend window, Framer if window
 
 # Framer level modules

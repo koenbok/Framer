@@ -109,7 +109,7 @@ class exports.LayerDraggable extends BaseClass
 			x: @layer.x
 			y: @layer.y
 		
-		if @bounce
+		if @constraints and @bounce
 			@_layerStartPoint = @_constrainPosition(@_layerStartPoint, @constraints, 1 / @overdragScale)
 
 		# Store start cursor position
