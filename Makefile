@@ -17,7 +17,7 @@ build:
 	mkdir -p build
 	# $(coffee) scripts/banner.coffee > build/framer.debug.js
 	# cat vendor/react.min.js >> build/framer.debug.js
-	$(bin)/watchify -t coffeeify -d --extension=".coffee" framer/Framer.coffee -o build/framer.debug.js
+	$(browserify) framer/Framer.coffee -o build/framer.debug.js
 	cat build/framer.debug.js | $(bin)/exorcist build/framer.js.map > build/framer.js
 	# Build the minimized version
 	# cd build; ../$(bin)/uglifyjs \
