@@ -32,8 +32,10 @@
 scroll = new ScrollComponent width:window.innerWidth, height:window.innerHeight
 scroll.content.draggable.horizontal = false
 
+scroll.contentInset = {top:100, right:0, bottom:0, left:0}
+
 # scroll.content.on Events.DragMove, ->
-# 	print scroll.velocity, scroll.angle
+# 	print scroll.scrollFrame
 
 h = 400
 
@@ -46,3 +48,15 @@ for i in [0..30]
 		backgroundColor: Utils.randomColor(.5)
 	# Utils.labelLayer(layer, "Layer #{i}")
 
+Utils.delay 1, -> scroll.scrollToLayer(layer)
+
+
+scroll.content.on Events.DragMove, ->
+	print scroll.scrollY
+
+# layer = new Layer
+# content = new Layer height:500, superLayer:layer
+# layer.scroll = true
+
+# layer.on Events.Scroll, ->
+# 	print layer.scrollY

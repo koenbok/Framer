@@ -319,7 +319,6 @@ class exports.LayerDraggable extends BaseClass
 	##############################################################
 	# Inertial scroll simulation
 
-
 	_setupSimulation: ->
 		return if @_simulation
 

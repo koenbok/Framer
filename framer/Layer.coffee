@@ -674,7 +674,7 @@ class exports.Layer extends BaseClass
 	animateStop: ->
 		_.invoke(@animations(), "stop")
 		@_draggable?.animateStop()
-		
+
 	##############################################################
 	## INDEX ORDERING
 
@@ -723,7 +723,7 @@ class exports.Layer extends BaseClass
 
 	@define "scrollFrame",
 		get: ->
-			return new Frame
+			frame = 
 				x: @scrollX
 				y: @scrollY
 				width: @width
