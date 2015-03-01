@@ -2,6 +2,9 @@
 
 class exports.ScrollComponent extends Layer
 
+	@define "velocity", @proxyProperty("content.draggable.velocity", true)
+	@define "angle", @proxyProperty("content.draggable.angle", true)
+
 	constructor: ->
 		super
 
@@ -17,7 +20,7 @@ class exports.ScrollComponent extends Layer
 
 		@scrollWheelSpeedMultiplier = 0.10
 
-		@on "mousewheel", @_onMouseWheel
+		@on("mousewheel", @_onMouseWheel)
 
 	_updateContent: =>
 
@@ -34,6 +37,10 @@ class exports.ScrollComponent extends Layer
 
 	_onMouseWheel: (event) =>
 
+		# TODO: Maybe this needs to move to draggable, I'm not sure.
+		# In any case this should go through the eventBuffer from draggable
+		# so we get sensible velocity and angles back.
+
 		@content.animateStop()
 		
 		{minX, maxX, minY, maxY} = @content.draggable._calculateConstraints(
@@ -43,7 +50,12 @@ class exports.ScrollComponent extends Layer
 			x: Utils.clamp(@content.x + (event.wheelDeltaX * @scrollWheelSpeedMultiplier), minX, maxX)
 			y: Utils.clamp(@content.y + (event.wheelDeltaY * @scrollWheelSpeedMultiplier), minY, maxY)
 		
+		@content.draggable.emit(Events.DragWillMove, event)
+
 		@content.point = point
+
+		@content.draggable.emit(Events.DragMove, event)
+		@content.draggable.emit(Events.DragDidMove, event)
 
 	@define "scrollPoint",
 		get: -> 
