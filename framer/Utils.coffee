@@ -10,6 +10,18 @@ Utils.getValue = (value) ->
 	return value() if _.isFunction value
 	return value
 
+Utils.getValueForKeyPath = (obj, key) ->
+	result = obj
+	for key in key.split(".")
+		result = result[key]
+	return result
+
+Utils.setValueForKeyPath = (obj, key, value) ->
+	parts = key.split(".")
+	propertyName = _.last(parts)
+	key = parts[0..parts.length-2].join(".")
+	Utils.getValueForKeyPath(key)[propertyName] = value
+
 Utils.setDefaultProperties = (obj, defaults, warn=true) ->
 
 	result = {}
