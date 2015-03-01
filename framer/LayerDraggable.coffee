@@ -23,6 +23,16 @@ Events.DidStartAnimation     = "didstartanimation"
 Events.DidEndAnimation       = "didendanimation"
 Events.DidStartLockDirection = "didstartlockdirection"
 
+"""
+TODO:
+
+- Check if all events are thrown correctly
+- Deal with nested draggables
+	- Event propagation (click vs move)
+	- Multiple scroll moves
+	- Multiple lock directions
+	
+"""
 
 class exports.LayerDraggable extends BaseClass
 
@@ -31,8 +41,6 @@ class exports.LayerDraggable extends BaseClass
 
 	@define "horizontal", @simpleProperty "horizontal", true, true
 	@define "vertical", @simpleProperty "vertical", true, true
-
-	# @define "lockDirection", @simpleProperty "lockDirection", false, true
 
 	@define "constraints",
 		get: -> @_constraints
