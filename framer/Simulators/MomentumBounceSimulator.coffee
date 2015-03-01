@@ -48,11 +48,8 @@ class exports.MomentumBounceSimulator extends Simulator
 		return @_state
 
 	finished: =>
-
-		if @_useSpring
-		  @_springSimulator.finished()
-		else
-		  @_frictionSimulator.finished()
+		return @_springSimulator.finished() if @_useSpring
+		return @_frictionSimulator.finished()
 
 	setState: (state) ->
 
