@@ -8,6 +8,8 @@ CounterKey = "_ObjectCounter"
 DefinedPropertiesKey = "_DefinedPropertiesKey"
 DefinedPropertiesValuesKey = "_DefinedPropertiesValuesKey"
 
+capitalizeFirstLetter = (string) ->
+	string.charAt(0).toUpperCase() + string.slice(1)
 
 class exports.BaseClass extends EventEmitter
 
@@ -16,6 +18,7 @@ class exports.BaseClass extends EventEmitter
 
 	@define = (propertyName, descriptor) ->
 
+		# See if we need to add this property to the internal properties class
 		if @ isnt BaseClass and descriptor.exportable == true
 			# descriptor.enumerable = true
 			descriptor.propertyName = propertyName
@@ -23,17 +26,43 @@ class exports.BaseClass extends EventEmitter
 			@[DefinedPropertiesKey] ?= {}
 			@[DefinedPropertiesKey][propertyName] = descriptor
 
+		# If no setter was given, this must be a readonly class
 		if not descriptor.set
 			descriptor.set = -> throw Error("#{@constructor.name}.#{propertyName} property is readonly")
 
+		# Set the getter/setter as setProperty on this object so we can access and override it easily
+		getName = "get#{capitalizeFirstLetter(propertyName)}"
+		setName = "set#{capitalizeFirstLetter(propertyName)}"
+
+		@::[getName] = descriptor.get
+		@::[setName] = descriptor.set
+
+		descriptor.get = @::[getName]
+		descriptor.set = @::[setName]
+
+		# Define the property
 		Object.defineProperty(@prototype, propertyName, descriptor)
 		Object.__
 
 	@simpleProperty = (name, fallback, exportable=true) ->
+		# Default property, provides storage and fallback
 		exportable: exportable
 		default: fallback
-		get: ->  @_getPropertyValue name
-		set: (value) -> @_setPropertyValue name, value
+		get: -> @_getPropertyValue(name)
+		set: (value) -> @_setPropertyValue(name, value)
+
+	@proxyProperty = (keyPath, exportable=true) ->
+		# Allows to easily proxy properties from an instance object
+		# Object property is in the form of "object.property"
+		objectKey = keyPath.split(".")[0]
+		result = 
+			exportable: exportable
+			get: ->
+				return unless @[objectKey]
+				Utils.getValueForKeyPath(@, keyPath)
+			set: (value) -> 
+				return unless @[objectKey]
+				Utils.setValueForKeyPath(@, keyPath, value)
 
 	_setPropertyValue: (k, v) =>
 		@[DefinedPropertiesValuesKey][k] = v
