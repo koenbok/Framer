@@ -147,7 +147,7 @@ class exports.LayerDraggable extends BaseClass
 		@_eventBuffer.push
 			x: touchEvent.clientX
 			y: touchEvent.clientY
-			t: touchEvent.timeStamp
+			t: Date.now() # We don't use timeStamp because it's different on Chrome/Safari
 
 		delta =
 			x: touchEvent.clientX - @_cursorStartPoint.x
@@ -157,7 +157,7 @@ class exports.LayerDraggable extends BaseClass
 		correctedDelta =
 			x: delta.x * @speedX * (1 / @_screenScale.x)
 			y: delta.y * @speedY * (1 / @_screenScale.y)
-			t: event.timeStamp
+			t: Date.now()
 
 		point = 
 			x: @layer.x
@@ -395,15 +395,17 @@ class exports.LayerDraggable extends BaseClass
 
 		velocity = @velocity
 
-		@_simulation.x.start()
+		
 		@_simulation.x.setState
 			x: @layer.x
 			v: velocity.x * @_momentumVelocityMultiplier
+		@_simulation.x.start()
 
-		@_simulation.y.start()
+		
 		@_simulation.y.setState
 			x: @layer.y
 			v: velocity.y * @_momentumVelocityMultiplier
+		@_simulation.y.start()
 
 		@emit(Events.DidStartAnimation)
 

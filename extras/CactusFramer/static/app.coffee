@@ -21,17 +21,19 @@ layer.draggable.overdrag = true
 layer.draggable.overdragScale = 0.1
 # # layer.draggable.lockDirection = true
 
+# layer.on Events.DragMove, ->
+# 	print layer.draggable.velocity
 
 
-# scroll = new ScrollComponent width:200, height:window.innerHeight
-# scroll.content.draggable.horizontal = false
-# h = 100
+scroll = new ScrollComponent width:200, height:window.innerHeight
+scroll.content.draggable.horizontal = false
+h = 100
 
-# for i in [0..300]
-# 	new Layer
-# 		y: i * h
-# 		width: scroll.width
-# 		height: h
-# 		superLayer: scroll.content
-# 		backgroundColor: Utils.randomColor(.5)
+for i in [0..300]
+	new Layer
+		y: i * h
+		width: scroll.width
+		height: h
+		superLayer: scroll.content
+		backgroundColor: Utils.randomColor(.5)
 
