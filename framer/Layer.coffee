@@ -714,8 +714,6 @@ class exports.Layer extends BaseClass
 		get: ->
 			@_draggable ?= new LayerDraggable @
 			@_draggable
-		set: ->
-			throw Error "You can't set the draggable object"
 
 	##############################################################
 	## SCROLLING

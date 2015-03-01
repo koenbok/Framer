@@ -65,7 +65,7 @@ class exports.LayerDraggable extends BaseClass
 		
 		@_eventBuffer = new EventBuffer
 		@_constraints = null
-		@_propagateEvents = false
+		# @_propagateEvents = false
 
 		# We don't expose this for now because it's more a constant that maps
 		# dragging to simulator velocity correctly.
@@ -93,7 +93,7 @@ class exports.LayerDraggable extends BaseClass
 		@_stopSimulation()
 		@_resetLockDirection()
 
-		event.preventDefault()
+		# event.preventDefault()
 		# event.stopPropagation() if ! @_propagateEvents
 
 		# Extract the event (mobile may have multiple)
@@ -137,8 +137,8 @@ class exports.LayerDraggable extends BaseClass
 
 		return unless @enabled
 
-		event.preventDefault()
-		event.stopPropagation() unless @_propagateEvents
+		# event.preventDefault()
+		# event.stopPropagation() unless @_propagateEvents
 
 		@emit(Events.DragWillMove, event)
 
@@ -167,8 +167,7 @@ class exports.LayerDraggable extends BaseClass
 		point.y = @_cursorStartPoint.y + correctedDelta.y - @_layerCursorOffset.y if @vertical
 
 
-		# TODO: Direction lock
-
+		# Direction lock
 		if @lockDirection
 			if not @_lockDirectionEnabledX and not @_lockDirectionEnabledY
 				@_updateLockDirection(correctedDelta) 
@@ -178,7 +177,8 @@ class exports.LayerDraggable extends BaseClass
 				point.y = @_layerStartPoint.y if @_lockDirectionEnabledY
 
 		# Constraints
-		point = @_constrainPosition(point, @_constraints) if @_constraints
+		if @_constraints
+			point = @_constrainPosition(point, @_constraints)
 
 		# Pixel align all moves
 		if @pixelAlign
@@ -253,11 +253,9 @@ class exports.LayerDraggable extends BaseClass
 			return @_eventBuffer.velocity if @isDragging
 			return @_calculateSimulationVelocity() if @isAnimating
 			return {x:0, y:0}
-		set: -> throw Error "You can't set velocity on a draggable"
 
 	@define "angle",
 		get: -> @_eventBuffer.angle
-		set: -> throw Error "You can't set angle on a draggable"
 
 	calculateVelocity: ->
 		# Compatibility method

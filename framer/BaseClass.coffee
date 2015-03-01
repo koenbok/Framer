@@ -23,7 +23,10 @@ class exports.BaseClass extends EventEmitter
 			@[DefinedPropertiesKey] ?= {}
 			@[DefinedPropertiesKey][propertyName] = descriptor
 
-		Object.defineProperty @prototype, propertyName, descriptor
+		if not descriptor.set
+			descriptor.set = -> throw Error("#{@constructor.name}.#{propertyName} property is readonly")
+
+		Object.defineProperty(@prototype, propertyName, descriptor)
 		Object.__
 
 	@simpleProperty = (name, fallback, exportable=true) ->
