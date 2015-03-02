@@ -38,14 +38,6 @@ Utils.valueOrDefault = (value, defaultValue) ->
 
 	return value
 
-Utils.arrayToObject = (arr) ->
-	obj = {}
-
-	for item in arr
-		obj[item[0]] = item[1]
-
-	obj
-
 Utils.arrayNext = (arr, item) ->
 	arr[arr.indexOf(item) + 1] or _.first arr
 
