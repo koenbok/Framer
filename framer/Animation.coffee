@@ -31,20 +31,14 @@ isRelativeProperty = (v) ->
 
 evaluateRelativeProperty = (target, k, v) ->
 	[match, sign, number, unit, rest...] = relativePropertyRE.exec(v)
-
-	if sign
-		return target[k] + (sign + 1) * number
-	else
-		return +number
+	return target[k] + (sign + 1) * number if sign
+	return +number
 
 # _runningAnimations = []
 
 # Todo: this would normally be BaseClass but the properties keyword
 # is not compatible and causes problems.
 class exports.Animation extends EventEmitter
-
-	# @runningAnimations = ->
-	# 	_runningAnimations
 
 	constructor: (options={}) ->
 

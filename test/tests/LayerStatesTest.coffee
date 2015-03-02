@@ -4,8 +4,8 @@ describe "LayerStates", ->
 
 		beforeEach ->
 			@layer = new Layer()
-			@layer.states.add 'a', x: 100, y: 100
-			@layer.states.add 'b', x: 200, y: 200
+			@layer.states.add("a", {x:100, y:100})
+			@layer.states.add("b", {x:200, y:200})
 
 		it "should emit willSwitch when switching", (done) ->
 			

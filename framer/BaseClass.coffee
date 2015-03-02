@@ -77,22 +77,21 @@ class exports.BaseClass extends EventEmitter
 	_propertyList: ->
 		@constructor[DefinedPropertiesKey]
 
-	keys: ->
-		_.keys @properties
+	keys: -> _.keys(@props)
 
-	@define "properties",
+	@define "props",
 		get: ->
-			properties = {}
+			props = {}
 
 			for k, v of @constructor[DefinedPropertiesKey]
 				if v.exportable isnt false
-					properties[k] = @[k]
+					props[k] = @[k]
 
-			properties
+			props
 
 		set: (value) ->
 			for k, v of value
-				if @constructor[DefinedPropertiesKey].hasOwnProperty k
+				if @constructor[DefinedPropertiesKey].hasOwnProperty(k)
 					if @constructor[DefinedPropertiesKey].exportable isnt false
 						@[k] = v
 

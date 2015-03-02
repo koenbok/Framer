@@ -12,15 +12,24 @@ Utils.getValue = (value) ->
 
 Utils.getValueForKeyPath = (obj, key) ->
 	result = obj
-	for key in key.split(".")
-		result = result[key]
-	return result
-
-Utils.setValueForKeyPath = (obj, key, value) ->
-	parts = key.split(".")
-	propertyName = _.last(parts)
-	key = parts[0..parts.length-2].join(".")
-	Utils.getValueForKeyPath(key)[propertyName] = value
+	result = result[key] for key in key.split(".")
+	result
+	
+Utils.setValueForKeyPath = (obj, path, val) ->
+	fields = path.split('.')
+	result = obj
+	i = 0
+	n = fields.length
+	while i < n and result != undefined
+		field = fields[i]
+		if i == n - 1
+			result[field] = val
+		else
+			if typeof result[field] == 'undefined' or !_.isObject(result[field])
+				result[field] = {}
+			result = result[field]
+		i++
+	return
 
 Utils.setDefaultProperties = (obj, defaults, warn=true) ->
 

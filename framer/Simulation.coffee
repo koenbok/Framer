@@ -4,7 +4,7 @@ Utils = require "./Utils"
 
 {Config} = require "./Config"
 {Defaults} = require "./Defaults"
-{EventEmitter} = require "./EventEmitter"
+{BaseClass} = require "./BaseClass"
 {Events} = require "./Events"
 
 {SpringSimulator} = require "./Simulators/SpringSimulator"
@@ -20,7 +20,7 @@ SimulatorClasses =
 	"friction": FrictionSimulator
 	"inertial-scroll": MomentumBounceSimulator
 
-class exports.Simulation extends EventEmitter
+class exports.Simulation extends BaseClass
 
 	constructor: (options={}) ->
 
@@ -28,7 +28,7 @@ class exports.Simulation extends EventEmitter
 
 		super options
 
-		@options = Utils.setDefaultProperties options,
+		@options = _.defaults options,
 			layer: null
 			properties: {}
 			model: "spring"
@@ -69,7 +69,7 @@ class exports.Simulation extends EventEmitter
 		return true
 
 	stop: (emit=true)->
-		return if ! @_running
+		return unless @_running
 
 		@_running = false
 		
@@ -79,7 +79,7 @@ class exports.Simulation extends EventEmitter
 		@emit(Events.SimulationStop) if emit
 		Framer.Loop.off("update", @_update)
 
-	copy: -> return new Simulation(_.clone(@options))
+	# copy: -> return new Simulation(_.clone(@options))
 
 	emit: (event) ->
 		super
@@ -108,14 +108,8 @@ class exports.Simulation extends EventEmitter
 	##############################################################
 	# Passthrough to simulator
 
-	getState: ->
-		return @_simulator.getState()
+	@define "simulator",
+		get: -> @_simulator
 
-	setState: (state) ->
-		@_simulator.setState(state)
+	finished: -> @_simulator.finished()
 
-	setOptions: (options) ->
-		@_simulator.setOptions(options)
-
-	finished: ->
-		return @_simulator.finished()

@@ -28,16 +28,17 @@ describe "ExternalDocument", ->
 
 		assert.equal jsonA, jsonB
 
-	describe "External Files", ->
+	if not Utils.isChrome()
+		describe "External Files", ->
 
-		it "Android", ->
-			compareDocument "Android"
+			it "Android", ->
+				compareDocument "Android"
 
-		it "Square", ->
-			compareDocument "Square"
+			it "Square", ->
+				compareDocument "Square"
 
-		it "Test", ->
-			compareDocument "Test"
+			it "Test", ->
+				compareDocument "Test"
 
 	describe "Shady Hacks", ->
 

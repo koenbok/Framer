@@ -104,12 +104,18 @@ describe "Layer", ->
 			layer.originX = 0.1
 			layer.originY = 0.2
 
-			layer.style.webkitTransformOrigin.should.equal "10% 20%"
+			if Utils.isChrome()
+				layer.style.webkitTransformOrigin.should.equal "10% 20% 0px"
+			else
+				layer.style.webkitTransformOrigin.should.equal "10% 20%"
 
 			layer.originX = 0.5
 			layer.originY = 0.5
 
-			layer.style.webkitTransformOrigin.should.equal "50% 50%"
+			if Utils.isChrome()
+				layer.style.webkitTransformOrigin.should.equal "50% 50% 0px"
+			else
+				layer.style.webkitTransformOrigin.should.equal "50% 50%"
 
 		it "should set local image", ->
 	
@@ -126,7 +132,7 @@ describe "Layer", ->
 			layer.computedStyle()["background-size"].should.equal "cover"
 			layer.computedStyle()["background-repeat"].should.equal "no-repeat"
 
-			layer.properties.image.should.equal imagePath
+			layer.props.image.should.equal imagePath
 
 		it "should set image", ->
 			imagePath = "static/test.png"	
@@ -231,9 +237,9 @@ describe "Layer", ->
 		it "should set scroll from properties", ->
 
 			layer = new Layer
-			layer.properties = {scroll:false}
+			layer.props = {scroll:false}
 			layer.scroll.should.equal false
-			layer.properties = {scroll:true}
+			layer.props = {scroll:true}
 			layer.scroll.should.equal true
 
 		it "should set scrollHorizontal", ->

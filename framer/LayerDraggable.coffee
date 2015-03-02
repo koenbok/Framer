@@ -274,8 +274,8 @@ class exports.LayerDraggable extends BaseClass
 		yFinished = @_simulation.y.finished()
 
 		velocity = {x:0, y:0}
-		velocity.x = (@_simulation.x.getState().v / @velocityScale) if not xFinished
-		velocity.y = (@_simulation.y.getState().v / @velocityScale) if not yFinished
+		velocity.x = (@_simulation.x.simulator.state.v / @velocityScale) if not xFinished
+		velocity.y = (@_simulation.y.simulator.state.v / @velocityScale) if not yFinished
 
 		return velocity
 
@@ -350,11 +350,11 @@ class exports.LayerDraggable extends BaseClass
 		return unless @_simulation
 		if constraints
 			{minX, maxX, minY, maxY} = @_calculateConstraints(@_constraints)
-			@_simulation.x.setOptions({min:minX, max:maxX})
-			@_simulation.y.setOptions({min:minY, max:maxY})
+			@_simulation.x.simulator.options = {min:minX, max:maxX}
+			@_simulation.y.simulator.options = {min:minY, max:maxY}
 		else
-			@_simulation.x.setOptions({min:-Infinity, max:+Infinity})
-			@_simulation.y.setOptions({min:-Infinity, max:+Infinity})
+			@_simulation.x.simulator.options = {min:-Infinity, max:+Infinity}
+			@_simulation.y.simulator.options = {min:-Infinity, max:+Infinity}
 
 	_onSimulationStep: (axis, state) =>
 
@@ -399,14 +399,12 @@ class exports.LayerDraggable extends BaseClass
 
 		velocity = @velocity
 
-		
-		@_simulation.x.setState
+		@_simulation.x.simulator.setState
 			x: @layer.x
 			v: velocity.x * @_momentumVelocityMultiplier
 		@_simulation.x.start()
 
-		
-		@_simulation.y.setState
+		@_simulation.y.simulator.setState
 			x: @layer.y
 			v: velocity.y * @_momentumVelocityMultiplier
 		@_simulation.y.start()

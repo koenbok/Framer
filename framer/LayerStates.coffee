@@ -20,7 +20,7 @@ class exports.LayerStates extends BaseClass
 		@animationOptions = {}
 
 		# Always add the default state as the current
-		@add "default", @layer.properties
+		@add "default", @layer.props
 
 		@_currentState = "default"
 		@_previousStates = []
@@ -31,9 +31,9 @@ class exports.LayerStates extends BaseClass
 
 		# We also allow an object with states to be passed in
 		# like: layer.states.add({stateA: {...}, stateB: {...}})
-		if _.isObject stateName
+		if _.isObject(stateName)
 			for k, v of stateName
-				@add k, v
+				@add(k, v)
 			return
 
 		error = -> throw Error "Usage example: layer.states.add(\"someName\", {x:500})"
@@ -101,7 +101,7 @@ class exports.LayerStates extends BaseClass
 
 		if instant is true
 			# We want to switch immediately without animation
-			@layer.properties = properties
+			@layer.props = properties
 			@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
 
 		else

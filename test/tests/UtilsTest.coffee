@@ -156,30 +156,30 @@ describe "Utils", ->
 			# Bla bla. This works. Doing a visual comparison is so much easier
 			# Start the cactus project and go to /test.html
 
-	describe "domLoadData", (callback) ->
+	# describe "domLoadData", (callback) ->
 
-		it "should load data async", (callback) ->
+	# 	it "should load data async", (callback) ->
 
-			data = Utils.domLoadData "static/test.txt", (err, data) ->
-				data.should.equal "TEST HELLO"
-				callback()
+	# 		data = Utils.domLoadData "static/test.txt", (err, data) ->
+	# 			data.should.equal "TEST HELLO"
+	# 			callback()
 
-		it "should load throw error on nonexisting", (callback) ->
+	# 	it "should load throw error on nonexisting", (callback) ->
 
-			data = Utils.domLoadData "static/test123.txt", (err, data) ->
-				err.should.equal true
-				callback()
+	# 		data = Utils.domLoadData "static/test123.txt", (err, data) ->
+	# 			err.should.equal true
+	# 			callback()
 
-	describe "domLoadDataSync", ->
+	# describe "domLoadDataSync", ->
 
-		it "should load data async", ->
-			data = Utils.domLoadDataSync "static/test.txt"
-			data.should.equal "TEST HELLO"
+	# 	it "should load data async", ->
+	# 		data = Utils.domLoadDataSync "static/test.txt"
+	# 		data.should.equal "TEST HELLO"
 
-		it "should load throw error on nonexisting", ->
+	# 	it "should load throw error on nonexisting", ->
 
-			test = -> Utils.domLoadDataSync("static/nonexisting.txt")
-			test.should.throw()
+	# 		test = -> Utils.domLoadDataSync("static/nonexisting.txt")
+	# 		test.should.throw()
 
 	describe "modulate", ->
 
