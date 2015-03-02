@@ -100,7 +100,7 @@ class exports.LayerDraggable extends BaseClass
 		@_stopSimulation()
 		@_resetLockDirection()
 
-		# event.preventDefault()
+		event.preventDefault()
 		# event.stopPropagation() if ! @_propagateEvents
 
 		# Extract the event (mobile may have multiple)
@@ -144,7 +144,7 @@ class exports.LayerDraggable extends BaseClass
 
 		return unless @enabled
 
-		# event.preventDefault()
+		event.preventDefault()
 		# event.stopPropagation() unless @_propagateEvents
 
 		@emit(Events.DragWillMove, event)
