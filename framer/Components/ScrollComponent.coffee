@@ -43,12 +43,16 @@ class exports.ScrollComponent extends Layer
 	@define "speedX", @proxyProperty("content.draggable.speedX", true)
 	@define "speedY", @proxyProperty("content.draggable.speedY", true)
 
-	constructor: ->
+	constructor: (options) ->
+		
+		options.backgroundColor ?= null
+
 		super
 
 		@content = new Layer 
 			width: @width
 			height: @height
+			backgroundColor: null
 			superLayer:@
 		@content.draggable.enabled = true
 		@content.draggable.momentum = true
