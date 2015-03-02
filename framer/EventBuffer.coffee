@@ -7,6 +7,8 @@ Utils        = require "./Utils"
 Events.EventBufferReset   = "eventbufferreset"
 Events.EventBufferUpdated = "eventbufferupdated"
 
+# TODO: Replace Date.now() with Utils.getTime()
+
 class exports.EventBuffer extends BaseClass
 
 	constructor: (options = {}) ->

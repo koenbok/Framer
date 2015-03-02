@@ -76,7 +76,14 @@ window.requestAnimationFrame ?= (f) -> Utils.delay 1/60, f
 # Note: in Framer 3 we try to keep all times in seconds
 
 # Used by animation engine, needs to be very performant
+
 Utils.getTime = -> Date.now() / 1000
+if window.performance
+	Utils.getTime = -> window.performance.now() / 1000
+
+console.log Utils.getTime()
+
+# Utils.getTime = -> Date.now() / 1000
 
 # This works only in chrome, but we only use it for testing
 # if window.performance

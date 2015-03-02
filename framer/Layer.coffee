@@ -524,7 +524,7 @@ class exports.Layer extends BaseClass
 			# If the file is local, we want to avoid caching
 			# if Utils.isLocal() and not (_.startsWith(imageUrl, "http://") or _.startsWith(imageUrl, "https://"))
 			if Utils.isLocal() and not imageUrl.match(/^https?:\/\//) and @_cacheImage is false
-				imageUrl += "?nocache=#{Date.now()}"
+				imageUrl += "?nocache=#{Utils.getTime()}"
 
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
