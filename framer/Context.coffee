@@ -15,7 +15,7 @@ class exports.Context extends EventEmitter
 
 		Counter++
 
-		options = Utils.setDefaultProperties options,
+		options = _.defaults options,
 			contextName: null
 			parentLayer: null
 			name: null

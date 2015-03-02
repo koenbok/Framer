@@ -26,7 +26,7 @@ class exports.BezierCurveAnimator extends Animator
 		if _.isArray(options) and options.length is 4
 			options = { values: options }
 
-		@options = Utils.setDefaultProperties options,
+		@options = _.defaults options,
 			values: BezierCurveDefaults["ease-in-out"]
 			time: 1
 			precision: 1/1000

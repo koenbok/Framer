@@ -14,7 +14,7 @@ Utils.getValueForKeyPath = (obj, key) ->
 	result = obj
 	result = result[key] for key in key.split(".")
 	result
-	
+
 Utils.setValueForKeyPath = (obj, path, val) ->
 	fields = path.split('.')
 	result = obj
@@ -30,23 +30,6 @@ Utils.setValueForKeyPath = (obj, path, val) ->
 			result = result[field]
 		i++
 	return
-
-Utils.setDefaultProperties = (obj, defaults, warn=true) ->
-
-	result = {}
-
-	for k, v of defaults
-		if obj.hasOwnProperty k
-			result[k] = obj[k]
-		else
-			result[k] = defaults[k]
-
-	if warn
-		for k, v of obj
-			if not defaults.hasOwnProperty k
-				console.warn "Utils.setDefaultProperties: got unexpected option: '#{k} -> #{v}'", obj
-
-	result
 
 Utils.valueOrDefault = (value, defaultValue) ->
 

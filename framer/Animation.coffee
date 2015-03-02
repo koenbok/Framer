@@ -46,7 +46,7 @@ class exports.Animation extends EventEmitter
 
 		super options
 
-		@options = Utils.setDefaultProperties options,
+		@options = _.defaults options,
 			layer: null
 			properties: {}
 			curve: "linear"

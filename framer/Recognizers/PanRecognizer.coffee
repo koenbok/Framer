@@ -21,7 +21,7 @@ class exports.PanRecognizer extends BaseClass
 
 	constructor: (@eventBuffer, options = {}) ->
 
-		@options = Utils.setDefaultProperties options,
+		@options = _.defaults options,
 			horizontal: true
 			vertical: true
 			lockDirection: true

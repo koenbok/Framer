@@ -7,7 +7,7 @@ class exports.SpringRK4Animator extends Animator
 
 	setup: (options) ->
 
-		@options = Utils.setDefaultProperties options,
+		@options = _.defaults options,
 			tension: 500
 			friction: 10
 			velocity: 0
