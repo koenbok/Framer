@@ -48,11 +48,11 @@ for i in [0..30]
 		backgroundColor: Utils.randomColor(.5)
 	# Utils.labelLayer(layer, "Layer #{i}")
 
-Utils.delay 1, -> scroll.scrollToLayer(layer)
+# Utils.delay 1, -> scroll.scrollToLayer(layer)
 
 
-scroll.content.on Events.DragMove, ->
-	print scroll.scrollY
+# scroll.content.on Events.DragMove, ->
+# 	print scroll.scrollY
 
 # layer = new Layer
 # content = new Layer height:500, superLayer:layer
