@@ -34,8 +34,8 @@ scroll.content.draggable.horizontal = false
 
 scroll.contentInset = {top:100, right:0, bottom:0, left:0}
 
-# scroll.content.on Events.DragMove, ->
-# 	print scroll.scrollFrame
+scroll.content.on Events.Scroll, ->
+	console.log scroll.velocity
 
 h = 400
 

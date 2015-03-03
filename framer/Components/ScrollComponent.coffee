@@ -59,10 +59,12 @@ class exports.ScrollComponent extends Layer
 		@_updateContent()
 
 		@_contentInset = {top:100, right:0, bottom:0, left:0}
-		@scrollWheelSpeedMultiplier = 0.10
+		@scrollWheelSpeedMultiplier = .33
 
 		@content.on("change:subLayers", @_updateContent)
 		@on("mousewheel", @_onMouseWheel)
+
+		@content.draggable.on Events.DragDidMove, (event) -> @emit(Events.Scroll, event)
 
 	_updateContent: =>
 
@@ -92,12 +94,32 @@ class exports.ScrollComponent extends Layer
 			@content.draggable.constraints)
 		
 		point = 
-			x: Utils.clamp(@content.x + (event.wheelDeltaX * @scrollWheelSpeedMultiplier * @speedX), minX, maxX)
-			y: Utils.clamp(@content.y + (event.wheelDeltaY * @scrollWheelSpeedMultiplier * @speedY), minY, maxY)
+			x: @content.x + (event.wheelDeltaX * @scrollWheelSpeedMultiplier * @speedX)
+			y: @content.y + (event.wheelDeltaY * @scrollWheelSpeedMultiplier * @speedY)
 		
-		@content.draggable.emit(Events.DragWillMove, event)
+		clampedPoint =
+			x: Utils.clamp(point.x, minX, maxX)
+			y: Utils.clamp(point.y, minY, maxY)
 
-		@content.point = point
+
+		# TODO: We need to determine wether this scrollwheel is coming from a mouse
+		# or trackpad. There does not seem to be a way to do that. Also, the trackpad
+		# emulates it's own physics and you cannot distinguish emulated events from 
+		# real finger-generated events.
+
+		# I was thinking to maybe capture scroll events in a separate invisible layer
+		# with the same content height and to send them back here. I know that is how
+		# Facebook used to do it.
+
+		@content.draggable.emit(Events.DragWillMove, event)
+		@content.point = clampedPoint
+
+		event.preventDefault()
+
+		@content.draggable._eventBuffer.push
+			x: event.wheelDeltaX
+			y: event.wheelDeltaY
+			t: Date.now()
 
 		@content.draggable.emit(Events.DragMove, event)
 		@content.draggable.emit(Events.DragDidMove, event)

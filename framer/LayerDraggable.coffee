@@ -109,7 +109,7 @@ class exports.LayerDraggable extends BaseClass
 		@_eventBuffer.push
 			x: touchEvent.clientX
 			y: touchEvent.clientY
-			t: touchEvent.timeStamp
+			t: Date.now()
 
 		# Store original layer position
 		@_layerStartPoint =
@@ -257,9 +257,13 @@ class exports.LayerDraggable extends BaseClass
 
 	@define "velocity",
 		get: ->
-			return @_eventBuffer.velocity if @isDragging
 			return @_calculateSimulationVelocity() if @isAnimating
+			return @_eventBuffer.velocity 
 			return {x:0, y:0}
+
+			# return @_eventBuffer.velocity if @isDragging
+			# return @_calculateSimulationVelocity() if @isAnimating
+			# return {x:0, y:0}
 
 	@define "angle",
 		get: -> @_eventBuffer.angle
@@ -394,10 +398,9 @@ class exports.LayerDraggable extends BaseClass
 
 		return unless @momentum or @bounce
 
-		@_isAnimating = true
 		@_setupSimulation()
-
 		velocity = @velocity
+		@_isAnimating = true
 
 		@_simulation.x.simulator.setState
 			x: @layer.x
