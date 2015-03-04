@@ -23,6 +23,9 @@ class exports.SpringSimulator extends Simulator
 
 	next: (delta) ->
 		@_state = @_integrator.integrateState(@_state, delta)
+		
+		# Return a copy of the state so it cannot be modified
+		return @getState()
 
 	finished: =>
 		positionNearZero = Math.abs(@_state.x) < @options.tolerance
