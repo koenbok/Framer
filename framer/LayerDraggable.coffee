@@ -381,7 +381,10 @@ class exports.LayerDraggable extends BaseClass
 		else
 			updatePoint[axis] = state.x
 
+		@emit(Events.DragWillMove, {animation:true})
 		@layer[axis] = @updatePosition(updatePoint)[axis]
+		@emit(Events.DragMove, {animation:true})
+		@emit(Events.DragDidMove, {animation:true})
 
 	_onSimulationStop: (axis, state) =>
 
