@@ -60,7 +60,7 @@ class exports.ScrollComponent extends Layer
 		@content.draggable.momentum = true
 		
 
-		@_contentInset = {top:100, right:100, bottom:0, left:100}
+		@_contentInset = {top:50, right:100, bottom:100, left:0}
 		@scrollWheelSpeedMultiplier = .33
 
 		@content.on "change:subLayers", @_updateContent
@@ -74,16 +74,25 @@ class exports.ScrollComponent extends Layer
 		# TODO: contentInset
 		# TODO: contentOffset
 
-		contentFrame = Utils.frameInset(@content.contentFrame(), @_contentInset)
+		contentFrame = @content.contentFrame()
+		contentFrame.x += @_contentInset.left
+		contentFrame.y += @_contentInset.top
+		# contentFrame.width += @_contentInset.left
+		# contentFrame.height += @_contentInset.top
+		# contentFrame = Utils.frameInset(contentFrame, @_contentInset)
+		#contentFrame.height += @_contentInset.top + @_contentInset.bottom
+		# contentFrame.height += 50
 		@content.frame = contentFrame
 
 		constraintsFrame = @content.contentFrame()
 		constraintsFrame =
-			x: -constraintsFrame.width  + @width
-			y: -constraintsFrame.height + @height
-			width: 	constraintsFrame.width  + constraintsFrame.width  - @width
-			height: constraintsFrame.height + constraintsFrame.height - @height
-		constraintsFrame = Utils.frameInset(constraintsFrame, @_contentInset)
+			x: -constraintsFrame.width  + @width - @_contentInset.right
+			y: -constraintsFrame.height + @height - @_contentInset.bottom
+			width: 	constraintsFrame.width  + constraintsFrame.width  - @width + @_contentInset.left + @_contentInset.right
+			height: constraintsFrame.height + constraintsFrame.height - @height + @_contentInset.top + @_contentInset.bottom
+		# constraintsFrame = Utils.frameInset(constraintsFrame, @_contentInset)
+
+
 
 		@content.draggable.constraints = constraintsFrame
 
@@ -195,7 +204,10 @@ class exports.ScrollComponent extends Layer
 		@_nativeScrollCaptureLayer.frame = @screenFrame
 		@_nativeScrollCaptureLayer.width += scrollBarWidth
 		@_nativeScrollCaptureLayer.height += scrollBarWidth
-		@_nativeScrollCaptureLayer.content.frame = @content.frame
+		contentFrame = @content.frame
+		contentFrame.width += @_contentInset.right
+		contentFrame.height += @_contentInset.bottom
+		@_nativeScrollCaptureLayer.content.frame = contentFrame
 
 	_updateNativeScrollCaptureLayerScrollPoint: =>
 		# Handle a scroll event on the actual scroll component, update the capturing layer
@@ -231,8 +243,8 @@ class exports.ScrollComponent extends Layer
 			t: Date.now()
 
 		# Copy over the scroll position from the capture layer to the real scrollview
-		@content.x = -@_nativeScrollCaptureLayer.scrollX
-		@content.y = -@_nativeScrollCaptureLayer.scrollY
+		@content.x = -@_nativeScrollCaptureLayer.scrollX + @_contentInset.left
+		@content.y = -@_nativeScrollCaptureLayer.scrollY + @_contentInset.top
 
 		# Throw the scroll event
 		# TODO: Add some data that matches the other scroll events
