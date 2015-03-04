@@ -555,7 +555,14 @@ Utils.framePointForOrigin = (frame, originX, originY) ->
 		y: frame.y + (originY * frame.height)
 		width: frame.width
 		height: frame.height
-		
+
+Utils.frameInset = (frame, inset) ->
+	frame =
+		x: frame.x + inset.left
+		y: frame.y + inset.top
+		width: frame.width - inset.left - inset.right
+		height: frame.height - inset.top - inset.bottom
+
 # Coordinate system
 
 Utils.convertPoint = (input, layerA, layerB) ->

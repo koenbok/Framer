@@ -46,24 +46,27 @@ class exports.ScrollComponent extends Layer
 	constructor: (options) ->
 		
 		options.backgroundColor ?= null
+		options.clip ?= true
 
 		super
 
 		@content = new Layer 
 			width: @width
 			height: @height
+			clip: true
 			backgroundColor: null
 			superLayer:@
 		@content.draggable.enabled = true
 		@content.draggable.momentum = true
-		@_updateContent()
+		
 
-		# @_contentInset = {top:100, right:0, bottom:0, left:0}
+		@_contentInset = {top:100, right:100, bottom:0, left:100}
 		@scrollWheelSpeedMultiplier = .33
 
 		@content.on "change:subLayers", @_updateContent
 		@content.draggable.on Events.DragDidMove, (event) => @emit(Events.Scroll, event)
 
+		@_updateContent()
 		@_enableNativeScrollCapture()
 
 	_updateContent: =>
@@ -71,16 +74,18 @@ class exports.ScrollComponent extends Layer
 		# TODO: contentInset
 		# TODO: contentOffset
 
-		contentFrame = @content.contentFrame()
-		contentFrame.width  = @width  if contentFrame.width  < @width
-		contentFrame.height = @height if contentFrame.height < @height
+		contentFrame = Utils.frameInset(@content.contentFrame(), @_contentInset)
 		@content.frame = contentFrame
 
-		@content.draggable.constraints =
-			x: -contentFrame.width  + @width
-			y: -contentFrame.height + @height
-			width: 	contentFrame.width  + contentFrame.width  - @width
-			height: contentFrame.height + contentFrame.height - @height
+		constraintsFrame = @content.contentFrame()
+		constraintsFrame =
+			x: -constraintsFrame.width  + @width
+			y: -constraintsFrame.height + @height
+			width: 	constraintsFrame.width  + constraintsFrame.width  - @width
+			height: constraintsFrame.height + constraintsFrame.height - @height
+		constraintsFrame = Utils.frameInset(constraintsFrame, @_contentInset)
+
+		@content.draggable.constraints = constraintsFrame
 
 	@define "scroll",
 		exportable: true
