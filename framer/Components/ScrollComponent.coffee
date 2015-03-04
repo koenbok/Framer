@@ -4,9 +4,9 @@
 ScrollComponent
 
 content <Layer>
-contentOffset <{x:n, y:n}> TODO
 contentSize <{width:n, height:n}>
 contentInset <{top:n, right:n, bottom:n, left:n}> TODO
+contentOffset <{x:n, y:n}> TODO
 scrollFrame <{x:n, y:n, width:n, height:n}>
 scrollPoint <{x:n, y:n}>
 scrollHorizontal <bool>
@@ -58,13 +58,13 @@ class exports.ScrollComponent extends Layer
 		@content.draggable.momentum = true
 		@_updateContent()
 
-		@_contentInset = {top:100, right:0, bottom:0, left:0}
+		# @_contentInset = {top:100, right:0, bottom:0, left:0}
 		@scrollWheelSpeedMultiplier = .33
 
-		@content.on("change:subLayers", @_updateContent)
-		@on("mousewheel", @_onMouseWheel)
-
+		@content.on "change:subLayers", @_updateContent
 		@content.draggable.on Events.DragDidMove, (event) -> @emit(Events.Scroll, event)
+
+		@_enableNativeScrollCapture()
 
 	_updateContent: =>
 
@@ -81,48 +81,6 @@ class exports.ScrollComponent extends Layer
 			y: -contentFrame.height + @height
 			width: 	contentFrame.width  + contentFrame.width  - @width
 			height: contentFrame.height + contentFrame.height - @height
-
-	_onMouseWheel: (event) =>
-
-		# TODO: Maybe this needs to move to draggable, I'm not sure.
-		# In any case this should go through the eventBuffer from draggable
-		# so we get sensible velocity and angles back.
-
-		@content.animateStop()
-		
-		{minX, maxX, minY, maxY} = @content.draggable._calculateConstraints(
-			@content.draggable.constraints)
-		
-		point = 
-			x: @content.x + (event.wheelDeltaX * @scrollWheelSpeedMultiplier * @speedX)
-			y: @content.y + (event.wheelDeltaY * @scrollWheelSpeedMultiplier * @speedY)
-		
-		clampedPoint =
-			x: Utils.clamp(point.x, minX, maxX)
-			y: Utils.clamp(point.y, minY, maxY)
-
-
-		# TODO: We need to determine wether this scrollwheel is coming from a mouse
-		# or trackpad. There does not seem to be a way to do that. Also, the trackpad
-		# emulates it's own physics and you cannot distinguish emulated events from 
-		# real finger-generated events.
-
-		# I was thinking to maybe capture scroll events in a separate invisible layer
-		# with the same content height and to send them back here. I know that is how
-		# Facebook used to do it.
-
-		@content.draggable.emit(Events.DragWillMove, event)
-		@content.point = clampedPoint
-
-		event.preventDefault()
-
-		@content.draggable._eventBuffer.push
-			x: event.wheelDeltaX
-			y: event.wheelDeltaY
-			t: Date.now()
-
-		@content.draggable.emit(Events.DragMove, event)
-		@content.draggable.emit(Events.DragDidMove, event)
 
 	@define "scroll",
 		exportable: true
@@ -180,7 +138,6 @@ class exports.ScrollComponent extends Layer
 		# TODO: For now we can only scroll to top left. We should make that better.
 		@scrollToPoint(contentLayer.point, animate, animationOptions)
 
-
 	_pointInConstraints: (point) ->
 
 		{minX, maxX, minY, maxY} = @content.draggable.
@@ -191,3 +148,117 @@ class exports.ScrollComponent extends Layer
 			y: -Utils.clamp(-point.y, minY, maxY)
 
 		return point
+
+	##############################################################
+	# MouseWheel event capturing
+	
+	_enableNativeScrollCapture: ->
+		@_setupNativeScrollCaptureLayer()
+		@on "mousewheel", @_updateNativeScrollCaptureLayer
+		@content.on "change:subLayers", @_updateNativeScrollCaptureLayer
+
+		@content.draggable.on Events.DragMove, @_updateNativeScrollCaptureLayerScrollPoint
+
+	# _disableNativeScrollCapture: ->
+	# 	@_nativeScrollCaptureLayer?.destroy()
+	# 	@off "mousewheel", @_updateNativeScrollCaptureLayer
+	# 	@content.off "change:subLayers", @_updateNativeScrollCaptureLayer
+	# 	# @content.off "change:x", @_updateNativeScrollCaptureLayerScrollPoint
+	# 	# @content.off "change:y", @_updateNativeScrollCaptureLayerScrollPoint
+	
+	_setupNativeScrollCaptureLayer: (event) =>
+		if not @_nativeScrollCaptureLayer
+			# TODO: Put in separate context
+			@_nativeScrollCaptureLayer = new Layer
+				backgroundColor: null
+			@_nativeScrollCaptureLayer.content = new Layer
+				backgroundColor: null
+				superLayer: @_nativeScrollCaptureLayer
+			@_nativeScrollCaptureLayer.scroll = true
+			@_nativeScrollCaptureLayer.on "mousewheel", 
+				@_onMouseWheelCaptureLayer
+			@_nativeScrollCaptureLayer.on "scroll", 
+				@_onScrollCaptureLayer
+			@_nativeScrollCaptureLayer.on Events.TouchStart,
+				@content.draggable._touchStart
+			@_nativeScrollCaptureLayer.opacity = 0
+		@_updateNativeScrollCaptureLayer()
+
+	_updateNativeScrollCaptureLayer: (event) =>
+		return unless @_nativeScrollCaptureLayer
+		
+		scrollBarWidth = 16
+		@_nativeScrollCaptureLayer.frame = @screenFrame
+		@_nativeScrollCaptureLayer.width += scrollBarWidth
+		@_nativeScrollCaptureLayer.height += scrollBarWidth
+		@_nativeScrollCaptureLayer.content.frame = @content.frame
+
+	_updateNativeScrollCaptureLayerScrollPoint: =>
+		
+		scrollX = Utils.round(-@content.x, 0)
+		scrollY = Utils.round(-@content.y, 0)
+
+		@_ignoreNextScrollEvent = true
+		@_nativeScrollCaptureLayer._element.scrollLeft = scrollX
+		@_nativeScrollCaptureLayer._element.scrollTop = scrollY
+
+
+	_onMouseWheelCaptureLayer: (event) =>
+		@content.draggable.animateStop()
+		@_ignoreNextScrollEvent = false
+
+	_onScrollCaptureLayer: (event) =>
+		if @_ignoreNextScrollEvent is true
+			@_ignoreNextScrollEvent = false
+			return
+
+		event.preventDefault()
+		@content.animateStop()
+		@content.x = -@_nativeScrollCaptureLayer.scrollX
+		@content.y = -@_nativeScrollCaptureLayer.scrollY
+
+		@_ignoreNextScrollEvent = false
+
+
+
+	# _onMouseWheel: (event) =>
+
+	# 	# TODO: Maybe this needs to move to draggable, I'm not sure.
+	# 	# In any case this should go through the eventBuffer from draggable
+	# 	# so we get sensible velocity and angles back.
+
+	# 	@content.animateStop()
+		
+	# 	{minX, maxX, minY, maxY} = @content.draggable._calculateConstraints(
+	# 		@content.draggable.constraints)
+		
+	# 	point = 
+	# 		x: @content.x + (event.wheelDeltaX * @scrollWheelSpeedMultiplier * @speedX)
+	# 		y: @content.y + (event.wheelDeltaY * @scrollWheelSpeedMultiplier * @speedY)
+		
+	# 	clampedPoint =
+	# 		x: Utils.clamp(point.x, minX, maxX)
+	# 		y: Utils.clamp(point.y, minY, maxY)
+
+
+	# 	# TODO: We need to determine wether this scrollwheel is coming from a mouse
+	# 	# or trackpad. There does not seem to be a way to do that. Also, the trackpad
+	# 	# emulates it's own physics and you cannot distinguish emulated events from 
+	# 	# real finger-generated events.
+
+	# 	# I was thinking to maybe capture scroll events in a separate invisible layer
+	# 	# with the same content height and to send them back here. I know that is how
+	# 	# Facebook used to do it.
+
+	# 	@content.draggable.emit(Events.DragWillMove, event)
+	# 	@content.point = clampedPoint
+
+	# 	event.preventDefault()
+
+	# 	@content.draggable._eventBuffer.push
+	# 		x: event.wheelDeltaX
+	# 		y: event.wheelDeltaY
+	# 		t: Date.now()
+
+	# 	@content.draggable.emit(Events.DragMove, event)
+	# 	@content.draggable.emit(Events.DragDidMove, event)
