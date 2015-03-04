@@ -130,6 +130,21 @@ describe "Utils", ->
 			# Bla bla. This works. Doing a visual comparison is so much easier
 			# Start the cactus project and go to /test.html
 
+	describe "framePointForOrigin", ->
+
+		it "should work", ->
+			Utils.framePointForOrigin({x:100, y:100, width:100, height:100}, 0, 0).should.eql(
+				{x:100, y:100, width:100, height:100})
+			Utils.framePointForOrigin({x:100, y:100, width:100, height:100}, 0, 0).should.eql(
+				{x:100, y:100, width:100, height:100})
+			Utils.framePointForOrigin({x:100, y:100, width:100, height:100}, 0, 0).should.eql(
+				{x:100, y:100, width:100, height:100})
+			Utils.framePointForOrigin({x:100, y:100, width:100, height:100}, 0, 0).should.eql(
+				{x:100, y:100, width:100, height:100})
+
+
+
+
 	# describe "domLoadData", (callback) ->
 
 	# 	it "should load data async", (callback) ->

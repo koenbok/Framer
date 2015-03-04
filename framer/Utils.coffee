@@ -549,6 +549,13 @@ Utils.frameMerge = ->
 
 	frame
 
+Utils.framePointForOrigin = (frame, originX, originY) ->
+	frame =
+		x: frame.x + (originX * frame.width)
+		y: frame.y + (originY * frame.height)
+		width: frame.width
+		height: frame.height
+		
 # Coordinate system
 
 Utils.convertPoint = (input, layerA, layerB) ->
