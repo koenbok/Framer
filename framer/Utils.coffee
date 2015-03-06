@@ -280,7 +280,7 @@ Utils.pathJoin = ->
 ######################################################
 # MATH FUNCTIONS
 		
-Utils.round = (value, decimals) ->
+Utils.round = (value, decimals=0) ->
 	d = Math.pow 10, decimals
 	Math.round(value * d) / d
 
