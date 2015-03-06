@@ -17,7 +17,7 @@ Framer.print = (require "./Print").print
 
 # Components
 Framer.ScrollComponent = (require "./Components/ScrollComponent").ScrollComponent
-# Framer.PageComponent = require ("./Components/PageComponent").PageComponent
+Framer.PageComponent = (require "./Components/PageComponent").PageComponent
 
 _.extend window, Framer if window
 
