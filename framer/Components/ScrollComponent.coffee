@@ -1,4 +1,5 @@
 {Layer} = require "../Layer"
+{Events} = require "../Events"
 
 """
 ScrollComponent
@@ -32,6 +33,9 @@ scroll -> DragMove (html compat)
 ScrollEnd -> DragEnd
 """
 
+Events.ScrollStart = "scrollstart"
+Events.Scroll = "scroll"
+Events.ScrollEnd = "scrollend"
 
 class exports.ScrollComponent extends Layer
 
@@ -50,6 +54,10 @@ class exports.ScrollComponent extends Layer
 
 		super
 
+		@_contentInset = {top:0, right:0, bottom:0, left:0}
+		@scrollWheelSpeedMultiplier = .33
+
+		# Set up content layer
 		@content = new Layer 
 			width: @width
 			height: @height
@@ -59,15 +67,18 @@ class exports.ScrollComponent extends Layer
 		@content.draggable.enabled = true
 		@content.draggable.momentum = true
 		
+		eventMappers = {}
+		eventMappers[Events.DragStart] = Events.ScrollStart
+		eventMappers[Events.DragMove] = Events.Scroll
+		eventMappers[Events.DragEnd] = Events.ScrollEnd
 
-		@_contentInset = {top:50, right:100, bottom:100, left:0}
-		@scrollWheelSpeedMultiplier = .33
+		_.each eventMappers, (v, k) =>
+			 @content.draggable.on k, (event) => @emit(v, event)
 
-		@content.on "change:subLayers", @_updateContent
-		@content.draggable.on Events.DragDidMove, (event) => @emit(Events.Scroll, event)
-
+		@content.on("change:subLayers", @_updateContent)
 		@_updateContent()
-		@_enableNativeScrollCapture()
+		
+		# @_enableNativeScrollCapture()
 
 	_updateContent: =>
 
@@ -131,26 +142,57 @@ class exports.ScrollComponent extends Layer
 		get: -> @_contentInset
 		set: (@_contentInset) ->
 			@_updateContent()
+			@_updateNativeScrollCaptureLayer()
 
 	scrollToPoint: (point, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
 		
+		console.log "scrollToPoint", point
+
 		point = @_pointInConstraints(point)
 
+		console.log "scrollToPoint", point
+
 		if animate
-			point.x = -point.x if point.x
-			point.y = -point.y if point.y
-			animationOptions.properties = point
-			@content.animate(animationOptions)
+			_.defer =>
+				point.x = -point.x if point.x
+				point.y = -point.y if point.y
+				animationOptions.properties = point
+				@content.animateStop()
+				@content.animate(animationOptions)
 		else
 			@point = point
 
-	scrollToLayer: (contentLayer, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
+	scrollToLayer: (contentLayer, originX=0, originY=0, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
 		
 		if contentLayer.superLayer isnt @content
 			throw Error("This layer is not in the scroll component")
 
-		# TODO: For now we can only scroll to top left. We should make that better.
-		@scrollToPoint(contentLayer.point, animate, animationOptions)
+		@scrollToPoint(@_scrollPointForLayer(contentLayer, originX, originY), animate, animationOptions)
+
+	scrollToClosestLayer: (originX=0, originY=0) ->
+		@scrollToLayer(@closestContentLayer(originX, originY), originX, originY)
+
+	closestContentLayer: (originX=0, originY=0) ->
+		scrollPoint = Utils.framePointForOrigin(@scrollFrame, originX, originY)
+		return @closestContentLayerForScrollPoint(scrollPoint, originX, originY)
+
+	closestContentLayerForScrollPoint: (scrollPoint, originX=0, originY=0) ->
+		return _.first(@_contentLayersSortedByDistanceForScrollPoint(scrollPoint, originX, originY))
+
+	_scrollPointForLayer: (layer, originX=0, originY=0, clamp=true) ->
+		point = Utils.framePointForOrigin(layer.frame, originX, originY)
+		point.x -= originX * @width
+		point.y -= originY * @height
+		point = @_pointInConstraints(point) if clamp is true
+		return point
+
+	_contentLayersSortedByDistanceForScrollPoint: (scrollPoint, originX=0, originY=0) ->
+		distance = (layer) =>
+			result = Utils.pointDistance(scrollPoint, @_scrollPointForLayer(layer))
+			result = Utils.pointAbs(result)
+			result = Utils.pointTotal(result)
+
+		return @content.subLayers.sort (a, b) -> distance(a) - distance(b)
 
 	_pointInConstraints: (point) ->
 
@@ -192,6 +234,13 @@ class exports.ScrollComponent extends Layer
 			@_nativeScrollCaptureLayer.on("mousewheel", @_onMouseWheelCaptureLayer)
 			@_nativeScrollCaptureLayer.on("scroll", @_onScrollCaptureLayer)
 			@_nativeScrollCaptureLayer.on(Events.TouchStart, @content.draggable._touchStart)
+
+			# TODO: I sincerely don't know what to do here. By layering the capturing scroll view
+			# on top of the rest, I don't get any click events below. I can move the scroll view to
+			# the back, but then I don't get scroll events.
+
+			# What really I need is to have _nativeScrollCaptureLayer capture only mousewheel and scroll
+			# events, but nothing else.
 			
 		@_updateNativeScrollCaptureLayer()
 
