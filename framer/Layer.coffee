@@ -11,6 +11,7 @@ Utils = require "./Utils"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
+{LayerAnchor} = require "./LayerAnchor"
 
 layerValueTypeError = (name, value) ->
 	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
@@ -713,8 +714,13 @@ class exports.Layer extends BaseClass
 
 	@define "draggable",
 		get: ->
-			@_draggable ?= new LayerDraggable @
-			@_draggable
+			@_draggable ?= new LayerDraggable(@)
+
+	anchor: (rules) ->
+		if not @_anchor
+			@_anchor = new LayerAnchor(@, rules)
+		else
+			@_anchor.updateRules(rules)
 
 	##############################################################
 	## SCROLLING
