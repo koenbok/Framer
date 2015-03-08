@@ -262,16 +262,9 @@ Utils.isJP2Supported = ->
 	Utils.isWebKit() and not Utils.isChrome()
 
 Utils.deviceType = ->
-
-	# Taken from
 	# https://github.com/jeffmcmahan/device-detective/blob/master/bin/device-detect.js
-
-	if /(mobi)/i.test(navigator.userAgent)
-		return "phone"
-
-	if /(tablet)|(iPad)/i.test(navigator.userAgent)
-		return "tablet"
-
+	return "phone" if /(mobi)/i.test(navigator.userAgent)
+	return "tablet" if /(tablet)|(iPad)/i.test(navigator.userAgent)
 	return "desktop"
 
 Utils.pathJoin = ->
@@ -562,6 +555,29 @@ Utils.frameInset = (frame, inset) ->
 		y: frame.y + inset.top
 		width: frame.width - inset.left - inset.right
 		height: frame.height - inset.top - inset.bottom
+
+Utils.pointInPolygon = (point, vs) ->
+	# ray-casting algorithm based on
+	# http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+	x = point[0]
+	y = point[1]
+	inside = false
+	i = 0
+	j = vs.length - 1
+	while i < vs.length
+		xi = vs[i][0]
+		yi = vs[i][1]
+		xj = vs[j][0]
+		yj = vs[j][1]
+		intersect = yi > y != yj > y and x < (xj - xi) * (y - yi) / (yj - yi) + xi
+		if intersect
+			inside = !inside
+		j = i++
+	inside
+
+Utils.pointAngle = (p1, p2) ->
+	Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+
 
 # Coordinate system
 
