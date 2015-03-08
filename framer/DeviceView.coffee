@@ -59,7 +59,7 @@ class exports.DeviceView extends BaseClass
 		@animationOptions = defaults.animationOptions
 		@deviceType = defaults.deviceType
 
-		_.extend @, Utils.setDefaultProperties(options, defaults)
+		_.extend(@, _.defaults(options, defaults))
 
 	_setup: ->
 		

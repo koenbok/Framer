@@ -47,7 +47,7 @@ class exports.ScrollComponent extends Layer
 	@define "speedX", @proxyProperty("content.draggable.speedX", true)
 	@define "speedY", @proxyProperty("content.draggable.speedY", true)
 
-	constructor: (options) ->
+	constructor: (options={}) ->
 		
 		options.backgroundColor ?= null
 		options.clip ?= true
@@ -187,7 +187,6 @@ class exports.ScrollComponent extends Layer
 			result = Utils.pointDistance(scrollPoint, @_scrollPointForLayer(layer, originX, originY))
 			result = Utils.pointAbs(result)
 			result = Utils.pointTotal(result)
-			Utils.labelLayer(layer, result)
 			result
 
 		return @content.subLayers.sort (a, b) -> distance(a) - distance(b)
