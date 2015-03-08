@@ -77,7 +77,7 @@ class exports.ScrollComponent extends Layer
 
 		@content.on("change:subLayers", @_updateContent)
 		@_updateContent()
-		
+
 		# @_enableNativeScrollCapture()
 
 	_updateContent: =>
@@ -146,11 +146,7 @@ class exports.ScrollComponent extends Layer
 
 	scrollToPoint: (point, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
 		
-		console.log "scrollToPoint", point
-
 		point = @_pointInConstraints(point)
-
-		console.log "scrollToPoint", point
 
 		if animate
 			_.defer =>
@@ -188,9 +184,11 @@ class exports.ScrollComponent extends Layer
 
 	_contentLayersSortedByDistanceForScrollPoint: (scrollPoint, originX=0, originY=0) ->
 		distance = (layer) =>
-			result = Utils.pointDistance(scrollPoint, @_scrollPointForLayer(layer))
+			result = Utils.pointDistance(scrollPoint, @_scrollPointForLayer(layer, originX, originY))
 			result = Utils.pointAbs(result)
 			result = Utils.pointTotal(result)
+			Utils.labelLayer(layer, result)
+			result
 
 		return @content.subLayers.sort (a, b) -> distance(a) - distance(b)
 
