@@ -248,7 +248,7 @@ class exports.Animation extends EventEmitter
 				@options.curveOptions.values = parsedCurve.args.map (v) -> parseFloat(v) or 0
 
 			if animatorClass is SpringRK4Animator
-				for k, i in ["tension", "friction", "velocity"]
+				for k, i in ["tension", "friction", "velocity", "tolerance"]
 					value = parseFloat parsedCurve.args[i]
 					@options.curveOptions[k] = value if value
 
