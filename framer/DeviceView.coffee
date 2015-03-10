@@ -155,7 +155,13 @@ class exports.DeviceView extends BaseClass
 		if @deviceType is "fullscreen"
 			return true
 
-		if Utils.deviceType() is @_device.deviceType
+		if Utils.deviceType() is "phone" and Utils.deviceType() is @_device.deviceType
+			return true
+
+		if Utils.deviceType() is "tablet" and Utils.deviceType() is @_device.deviceType
+			return true
+
+		if Utils.deviceType() is "phone" and @_device.deviceType is "tablet"
 			return true
 
 		return false

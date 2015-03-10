@@ -262,11 +262,11 @@ Utils.deviceType = ->
 	# Taken from
 	# https://github.com/jeffmcmahan/device-detective/blob/master/bin/device-detect.js
 
+	if /(tablet)|(iPad)|(Nexus 9)/i.test(navigator.userAgent)
+		return "tablet"
+
 	if /(mobi)/i.test(navigator.userAgent)
 		return "phone"
-
-	if /(tablet)|(iPad)/i.test(navigator.userAgent)
-		return "tablet"
 
 	return "desktop"
 
