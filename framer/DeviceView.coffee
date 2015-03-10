@@ -740,6 +740,9 @@ Devices =
 	"nexus-5-black": Nexus5BaseDevice
 	"nexus-5-black-hand": Nexus5BaseDeviceHand
 
+	# Nexus 9
+	"nexus-9": Nexus9BaseDevice
+
 	# Apple Watch 38mm
 	"applewatchsport-38-aluminum-sportband-black": AppleWatch38Device
 	"applewatchsport-38-aluminum-sportband-blue": AppleWatch38Device
