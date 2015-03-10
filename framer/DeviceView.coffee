@@ -546,10 +546,10 @@ iPhone6BaseDeviceHand = _.extend {}, iPhone6BaseDevice,
 	paddingOffset: -150
 
 iPhone6PlusBaseDevice =
-	deviceImageWidth: 1280
-	deviceImageHeight: 2524
-	screenWidth: 1080
-	screenHeight: 1920
+	deviceImageWidth: 1460
+	deviceImageHeight: 2900
+	screenWidth: 1242
+	screenHeight: 2208
 	deviceType: "phone"
 
 iPhone6PlusBaseDeviceHand = _.extend {}, iPhone6PlusBaseDevice,
@@ -639,6 +639,13 @@ Nexus5BaseDeviceHand = _.extend {}, Nexus5BaseDevice, # 2692 × 2996
 	deviceImageWidth: 2692
 	deviceImageHeight: 2996
 	paddingOffset: -120
+
+Nexus9BaseDevice =
+	deviceImageWidth: 1733
+	deviceImageHeight: 2575
+	screenWidth: 1536
+	screenHeight: 2048
+	deviceType: "tablet"
 
 AppleWatch42Device =
 	deviceImageWidth: 552
