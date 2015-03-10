@@ -553,8 +553,8 @@ iPhone6PlusBaseDevice =
 	deviceType: "phone"
 
 iPhone6PlusBaseDeviceHand = _.extend {}, iPhone6PlusBaseDevice,
-	deviceImageWidth: 2720
-	deviceImageHeight: 3032
+	deviceImageWidth: 3128
+	deviceImageHeight: 3487
 	paddingOffset: -150
 
 
