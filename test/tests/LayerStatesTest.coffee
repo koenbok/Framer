@@ -51,7 +51,29 @@ describe "LayerStates", ->
 
 			Framer.resetDefaults()
 
+	describe "Hooks", ->
 
+		beforeEach ->
+			@layer = new Layer
+			@layer.states.animationOptions.time = 0.001
+
+		it "should handle a didEnter option", (done) ->
+			
+			@layer.states.add "new", x: 100, didEnter: () -> @x = 110
+			@layer.states.on Events.StateDidSwitch, => 
+				@layer.x.should.equal 110
+			@layer.states.switch "new"
+			done()
+
+		it "should handle a didExit option", (done) ->
+			
+			@layer.states.add "original", x: 100, didExit: () -> @x = 110
+			@layer.states.switchInstant "original"
+			@layer.states.add "new", x: 1
+			@layer.states.on Events.StateDidSwitch, =>
+				@layer.x.should.equal 110
+			@layer.states.switch "new"
+			done()
 
 	describe "Switch", ->
 
