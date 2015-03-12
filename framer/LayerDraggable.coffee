@@ -42,6 +42,8 @@ class exports.LayerDraggable extends BaseClass
 	@define "horizontal", @simpleProperty "horizontal", true, true
 	@define "vertical", @simpleProperty "vertical", true, true
 
+	@define "momentumVelocityMultiplier", @simpleProperty "momentumVelocityMultiplier", 1800, true, _.isNumber
+
 	@define "constraints",
 		get: -> @_constraints
 		set: (value) -> 
@@ -73,10 +75,6 @@ class exports.LayerDraggable extends BaseClass
 		@_eventBuffer = new EventBuffer
 		@_constraints = null
 		# @_propagateEvents = false
-
-		# We don't expose this for now because it's more a constant that maps
-		# dragging to simulator velocity correctly.
-		@_momentumVelocityMultiplier = 890
 
 		@attach()
 
@@ -407,12 +405,12 @@ class exports.LayerDraggable extends BaseClass
 
 		@_simulation.x.simulator.setState
 			x: @layer.x
-			v: velocity.x * @_momentumVelocityMultiplier
+			v: velocity.x * @momentumVelocityMultiplier
 		@_simulation.x.start()
 
 		@_simulation.y.simulator.setState
 			x: @layer.y
-			v: velocity.y * @_momentumVelocityMultiplier
+			v: velocity.y * @momentumVelocityMultiplier
 		@_simulation.y.start()
 
 		@emit(Events.DidStartAnimation)
