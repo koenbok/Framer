@@ -10,3 +10,4 @@ lib
 .deploy
 *.pyc
 npm-debug.log
+extras/Studio.framer/app.coffee
