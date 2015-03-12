@@ -26,6 +26,8 @@ build: clean init
 debug:
 	$(bin)/watchify -t coffeeify --extension=".coffee" framer/Framer.coffee -d -v -o build/framer.debug.js
 
+studio:
+	open -a "Framer Studio" extras/Studio.framer
 
 # Testing
 
