@@ -4,7 +4,7 @@ describe "ExternalDocument", ->
 
 	compareDocument = (name) ->
 
-		path = "static/ExternalDocument"
+		path = "../static/ExternalDocument"
 
 		layers = Framer.Importer.load Utils.pathJoin(path, name)
 		

@@ -125,9 +125,9 @@ describe "Layer", ->
 			layer.image = imagePath
 			layer.image.should.equal imagePath
 
-			layer.style["background-image"].should.contain imagePath
-			# layer.style["background-image"].should.contain "file://"
-			# layer.style["background-image"].should.contain "?nocache="
+			layer.style["background-image"].indexOf(imagePath).should.not.equal(-1)
+			# layer.style["background-image"].should.match "file://"
+			# layer.style["background-image"].should.match "?nocache="
 
 			layer.computedStyle()["background-size"].should.equal "cover"
 			layer.computedStyle()["background-repeat"].should.equal "no-repeat"
@@ -776,7 +776,7 @@ describe "Layer", ->
 			layer = new Layer
 			layer.destroy()
 
-			Framer.CurrentContext.getLayers().should.not.contain layer
+			(layer in Framer.CurrentContext.getLayers()).should.be.false
 			assert.equal layer._element.parentNode, null
 
 		it "should set text", ->

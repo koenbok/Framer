@@ -1,18 +1,9 @@
 window.console.debug = (v) ->
-# window.console.log = print
 
-# hideFramerRoot = ->
-	
-# 	element = document.getElementById "FramerRoot"
+mocha.setup('bdd')
+mocha.globals(['__import__'])
 
-# 	if not element
-# 		return Utils.delay 0.01, hideFramerRoot
-
-# 	_.extend element.style,
-# 		top:  "-10000000px"
-# 		left: "-10000000px"
-
-# hideFramerRoot()
+assert = chai.assert
 
 require "./tests/EventEmitterTest"
 require "./tests/UtilsTest"
@@ -26,3 +17,8 @@ require "./tests/ImporterTest"
 require "./tests/LayerAnimationTest"
 require "./tests/ContextTest"
 
+# Start mocha
+if window.mochaPhantomJS
+	mochaPhantomJS.run()
+else
+	mocha.run()

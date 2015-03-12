@@ -1,5 +1,5 @@
-
-bin = ./node_modules/.bin
+pwd := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+bin = $(pwd)/node_modules/.bin
 coffee = $(bin)/coffee
 
 browserify = $(bin)/browserify -t coffeeify -d --extension=".coffee"
@@ -8,32 +8,20 @@ githash = `git rev-parse --short HEAD`
 
 all: build
 
+init:
+	npm install
+
 watch:
 	$(watch) make $(cmd)
-	# make watch cmd=perf
-
-build:
-	make clean
-	mkdir -p build
-	# $(coffee) scripts/banner.coffee > build/framer.debug.js
-	# cat vendor/react.min.js >> build/framer.debug.js
-	$(browserify) framer/Framer.coffee -o build/framer.debug.js
-	cat build/framer.debug.js | $(bin)/exorcist build/framer.js.map > build/framer.js
-	# Build the minimized version
-	# cd build; ../$(bin)/uglifyjs \
-	# 	--source-map-include-sources \
-	# 	--in-source-map framer.js.map \
-	# 	--source-map framer.min.js.map \
-	# 	framer.js > framer.min.js
-	# $(coffee) scripts/fix-sourcemap.coffee
-	# Copy the file over to the cactus project
-	cp build/framer.js extras/CactusFramer/static/
-	cp build/framer.js.map extras/CactusFramer/static/
-buildw:
-	$(watch) make build
 
 clean:
 	rm -rf build
+
+build: clean init 
+	mkdir -p build
+	$(browserify) framer/Framer.coffee -o build/framer.debug.js
+	cat build/framer.debug.js | $(bin)/exorcist build/framer.js.map > build/framer.js
+
 
 debug:
 	$(bin)/watchify -t coffeeify --extension=".coffee" framer/Framer.coffee -d -v -o build/framer.debug.js
@@ -41,37 +29,17 @@ debug:
 
 # Testing
 
-test:
-	make lint
-	make build
-	mkdir -p test/lib
-	$(browserify) test/init.coffee -o test/init.js
-	$(bin)/mocha-phantomjs test/index.html
+test: build
+	$(browserify) test/tests.coffee -o test/phantomjs/tests.js
+	cd test/phantomjs; $(bin)/bower install
+	$(bin)/mocha-phantomjs --bail test/phantomjs/index.html
 testw:
 	$(watch) make test
 
-safari:
-	make build
-	mkdir -p test/lib
-	$(browserify) test/init.coffee -o test/init.js
-	# $(bin)/mocha-phantomjs test/index.html
+safari: test
 	open -g -a Safari test/index.html
 safariw:
 	$(watch) make safari
-
-
-perf:
-	$(browserify) perf/init.coffee -o perf/init.js
-	$(bin)/phantomjs perf/runner.js perf/index.html
-perfw:
-	$(watch) make perf
-
-perf-safari:
-	$(browserify) perf/init.coffee -o perf/init.js
-	open -g -a Safari perf/index.html
-perf-safariw:
-	$(watch) make perf-safari
-
 
 # Building and uploading the site
 
@@ -110,11 +78,6 @@ resources%optimize:
 	
 resources%upload:
 	cd extras/resources.framerjs.com; cactus deploy
-
-publish:
-	# Todo: update version
-	coffee -o lib/ -c framer/
-	npm publish
 
 lint:
 	./node_modules/.bin/coffeelint -f coffeelint.json -r framer

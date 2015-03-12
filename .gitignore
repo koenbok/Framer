@@ -9,3 +9,4 @@ lib
 .build
 .deploy
 *.pyc
+npm-debug.log

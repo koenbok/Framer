@@ -7,36 +7,30 @@
     "doc": "docs",
     "test": "test"
   },
-  "dependencies": {
-    "aws-sdk": "^2.0.0-rc.15",
-    "browserify": "~2.35.4",
-    "coffeeify": "~0.5.2",
-    "coffeelint": "^0.6.1",
-    "eventemitter3": "^0.1.5",
-    "exorcist": "^0.1.6",
-    "knox": "^0.8.9",
-    "lodash": "~2.4.1",
-    "mime": "^1.2.11",
-    "mocha-phantomjs": "~3.2.0",
-    "mustache": "^0.8.1",
-    "phantomjs": "~1.9.2-5",
-    "react": "^0.11.2",
-    "simulate": "0.0.3",
-    "uglify-js": "^2.4.13",
-    "underscore": "~1.5.2",
-    "underscore.string": "^2.3.3",
-    "watch": "~0.8.0",
-    "watchr": "~2.4.4"
-  },
-  "devDependencies": {
-    "coffee-script": "~1.6.3"
-  },
   "scripts": {
     "test": "make test"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/koenbok/Framer.git"
+  },
+  "dependencies": {
+    "bower": "^1.3.12",
+    "browserify": "^9.0.3",
+    "coffeeify": "^1.0.0",
+    "eventemitter3": "^0.1.6",
+    "exorcist": "^0.1.6",
+    "gulp": "^3.8.11",
+    "mocha-phantomjs": "^3.5.3",
+    "lodash": "^3.5.0",
+    "phantomjs": "^1.9.16",
+    "should": "^5.2.0",
+    "simulate": "^0.0.4",
+    "watchify": "^2.4.0",
+    "underscore.string": "^3.0.3"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.9.1"
   },
   "keywords": [
     "prototyping"
