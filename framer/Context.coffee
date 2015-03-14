@@ -71,9 +71,7 @@ class exports.Context extends EventEmitter
 		element
 
 	run: (f) ->
-
 		previousContext = Framer.CurrentContext
-
 		Framer.CurrentContext = @
 		f()
 		Framer.CurrentContext = previousContext

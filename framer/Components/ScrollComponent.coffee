@@ -47,6 +47,12 @@ class exports.ScrollComponent extends Layer
 	@define "speedX", @proxyProperty("content.draggable.speedX", true)
 	@define "speedY", @proxyProperty("content.draggable.speedY", true)
 
+	# We throw an error here, because you almost never would like the enclosing
+	# scroll component to be draggable, but it's an easy mistake to make. If you 
+	# do want this, use a LayerDraggable directly.
+	@define "draggable",
+		get: -> throw Error("You likely want to use content.draggable")
+
 	constructor: (options={}) ->
 		
 		# options.backgroundColor ?= null
@@ -75,8 +81,8 @@ class exports.ScrollComponent extends Layer
 		_.each eventMappers, (v, k) =>
 			 @content.draggable.on k, (event) => @emit(v, event)
 
-		@content.on("change:subLayers", @setNeedsUpdateContent)
-		@setNeedsUpdateContent()
+		@content.on("change:subLayers", @_updateContent)
+		@_updateContent()
 
 		# @_enableNativeScrollCapture()
 
@@ -88,17 +94,7 @@ class exports.ScrollComponent extends Layer
 		# this for example to take scaling into account.
 		@content.contentFrame()
 
-	setNeedsUpdateContent: =>
-		# Updates the content layer based on size, offset and inset. By default this
-		# gets called if you change the content sublayers, but you may want to call
-		# it yourself, for example when you change the width/height of a content layer.
-		@_needsUpdateContent = true
-		_.defer(@_updateContent)
-
 	_updateContent: (info) =>
-
-		return unless @_needsUpdateContent is true
-		@_needsUpdateContent = false
 
 		contentFrame = @calculateContentSize()
 		contentFrame.x += @_contentInset.left
@@ -164,7 +160,7 @@ class exports.ScrollComponent extends Layer
 			_.clone(@_contentInset)
 		set: (contentInset) ->
 			@_contentInset = Utils.parseRect(contentInset)
-			@setNeedsUpdateContent()
+			@_updateContent()
 			@_updateNativeScrollCaptureLayer()
 
 	scrollToPoint: (point, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
