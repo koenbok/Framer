@@ -7,7 +7,6 @@ Utils = require "./Utils"
 {BaseClass} = require "./BaseClass"
 {EventEmitter} = require "./EventEmitter"
 {Animation} = require "./Animation"
-{Frame} = require "./Frame"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
@@ -297,15 +296,10 @@ class exports.Layer extends BaseClass
 			Utils.frameSetMidX(frame, parseInt(@superLayer.width  / 2.0))
 			Utils.frameSetMidY(frame, parseInt(@superLayer.height / 2.0))
 			return frame
-		else if @_context._parentLayer
-			frame = @frame
-			Utils.frameSetMidX(frame, parseInt(@_context._parentLayer.width  / 2.0))
-			Utils.frameSetMidY(frame, parseInt(@_context._parentLayer.height / 2.0))
-			return frame
 		else
 			frame = @frame
-			Utils.frameSetMidX(frame, parseInt(window.innerWidth  / 2.0))
-			Utils.frameSetMidY(frame, parseInt(window.innerHeight / 2.0))
+			Utils.frameSetMidX(frame, parseInt(@_context.width  / 2.0))
+			Utils.frameSetMidY(frame, parseInt(@_context.height / 2.0))
 			return frame
 
 	center: ->
@@ -353,6 +347,9 @@ class exports.Layer extends BaseClass
 		return scale
 
 	screenScaledFrame: ->
+
+		# TODO: Scroll position
+
 		frame =
 			x: 0
 			y: 0

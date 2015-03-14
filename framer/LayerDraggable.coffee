@@ -3,7 +3,6 @@
 Utils        = require "./Utils"
 {BaseClass}  = require "./BaseClass"
 {Events}     = require "./Events"
-{Frame}      = require "./Frame"
 {Simulation} = require "./Simulation"
 {Defaults}   = require "./Defaults"
 

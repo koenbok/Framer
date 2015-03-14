@@ -1,13 +1,13 @@
 Utils = require "./Utils"
 
 {_} = require "./Underscore"
+{BaseClass} = require "./BaseClass"
 {Config} = require "./Config"
 {EventManager} = require "./EventManager"
-{EventEmitter} = require "./EventEmitter"
 
 Counter = 1
 
-class exports.Context extends EventEmitter
+class exports.Context extends BaseClass
 	
 	constructor: (options={}) ->
 		
@@ -54,7 +54,7 @@ class exports.Context extends EventEmitter
 		@_rootElement
 
 	getLayers: ->
-		_.clone @_layerList
+		_.clone(@_layerList)
 
 	_createRootElement: ->
 
@@ -75,3 +75,16 @@ class exports.Context extends EventEmitter
 		Framer.CurrentContext = @
 		f()
 		Framer.CurrentContext = previousContext
+
+	# @define "x"
+	# @define "y"
+
+	@define "width", 
+		get: -> 
+			return @_parentLayer.width if @_parentLayer
+			return window.innerWidth
+	@define "height",
+		get: -> 
+			return @_parentLayer.height if @_parentLayer
+			return window.innerHeight
+

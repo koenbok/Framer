@@ -5,7 +5,6 @@ Utils = require "./Utils"
 {Config} = require "./Config"
 {Defaults} = require "./Defaults"
 {EventEmitter} = require "./EventEmitter"
-{Frame} = require "./Frame"
 
 {LinearAnimator} = require "./Animators/LinearAnimator"
 {BezierCurveAnimator} = require "./Animators/BezierCurveAnimator"
@@ -58,10 +57,6 @@ class exports.Animation extends EventEmitter
 
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
-
-		# Convert a frame instance to a regular js object
-		if options.properties instanceof Frame
-			option.properties = option.properties.properties
 
 		@options.properties = @_filterAnimatableProperties(@options.properties)
 
