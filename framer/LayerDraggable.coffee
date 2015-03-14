@@ -53,8 +53,12 @@ class exports.LayerDraggable extends BaseClass
 				@_constraints = null
 			@_updateSimulationConstraints(@_constraints) if @_constraints
 
-	@define "isDragging", get: -> @_isDragging or false
+	
 	@define "isAnimating", get: -> @_isAnimating or false
+
+	# The isDraggin only is true when there was actual movement, so you can
+	# use it to determine a click from a drag event.
+	@define "isDragging", get: -> @_isDragging or false
 
 	# TODO: what to do with this?
 	# Should there be a tap event?
@@ -135,7 +139,6 @@ class exports.LayerDraggable extends BaseClass
 		document.addEventListener(Events.TouchMove, @_touchMove)
 		document.addEventListener(Events.TouchEnd, @_touchEnd)
 
-		@_isDragging = true
 		@emit(Events.DragStart, event)
 
 	_touchMove: (event) =>
@@ -171,7 +174,6 @@ class exports.LayerDraggable extends BaseClass
 		point.x = @_cursorStartPoint.x + correctedDelta.x - @_layerCursorOffset.x if @horizontal
 		point.y = @_cursorStartPoint.y + correctedDelta.y - @_layerCursorOffset.y if @vertical
 
-
 		# Direction lock
 		if @lockDirection
 			if not @_lockDirectionEnabledX and not @_lockDirectionEnabledY
@@ -189,6 +191,10 @@ class exports.LayerDraggable extends BaseClass
 		if @pixelAlign
 			point.x = parseInt(point.x)
 			point.y = parseInt(point.y)
+
+		# Update the dragging status
+		if point.x isnt @_layerStartPoint.x or point.y isnt @_layerStartPoint.y
+			@_isDragging = true
 
 		@layer.point = @updatePosition(point)
 
