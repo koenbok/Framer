@@ -21,13 +21,14 @@
     "eventemitter3": "^0.1.6",
     "exorcist": "^0.1.6",
     "gulp": "^3.8.11",
-    "mocha-phantomjs": "^3.5.3",
     "lodash": "^3.5.0",
+    "mocha-phantomjs": "^3.5.3",
     "phantomjs": "^1.9.16",
     "should": "^5.2.0",
     "simulate": "^0.0.4",
+    "underscore.string": "^3.0.3",
     "watchify": "^2.4.0",
-    "underscore.string": "^3.0.3"
+    "watchr": "^2.4.13"
   },
   "devDependencies": {
     "coffee-script": "^1.9.1"

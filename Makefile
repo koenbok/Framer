@@ -11,6 +11,10 @@ all: build
 bootstrap:
 	npm install
 
+unbootstrap:
+	rm -Rf node_modules
+	rm -Rf test/phantomjs/bower
+
 watch:
 	$(watch) make $(cmd)
 
@@ -38,10 +42,8 @@ test: build
 testw:
 	$(watch) make test
 
-safari: test
-	open -g -a Safari test/index.html
-safariw:
-	$(watch) make safari
+safari-test: test
+	open -g -a Safari test/phantomjs/index.html
 
 # Building and uploading the site
 
