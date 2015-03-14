@@ -12,3 +12,4 @@ lib
 npm-debug.log
 extras/Studio.framer/app.coffee
 extras/Studio.framer/framer/config.json
+extras/Studio.framer/imported

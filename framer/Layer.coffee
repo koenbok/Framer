@@ -30,27 +30,14 @@ layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
 			@_properties[name] = value
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
-			# @_dirtyStyle[cssProperty] = LayerStyle[cssProperty](@)
-			# @_setNeedsRender()
-
 			set?(@, value)
 			@emit("change:#{name}", value)
-
-
+			@emit("change:point", value) if name in ["x", "y"]
+			@emit("change:size", value)  if name in ["width", "height"]
+			@emit("change:frame", value) if name in ["x", "y", "width", "height"]
 
 
 class exports.Layer extends BaseClass
-
-	# _setNeedsRender: ->
-	# 	if @_needsRender is false
-	# 		Framer.Loop.once "render", @_render
-	# 		@_needsRender = true
-
-	# _render: =>
-	# 	@style = @_dirtyStyle
-	# 	# console.log "_render"
-	# 	@_dirtyStyle = {}
-	# 	@_needsRender = false
 
 	constructor: (options={}) ->
 

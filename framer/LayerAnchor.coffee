@@ -52,6 +52,11 @@ class LayerAnchor extends EventEmitter
 	constructor: (@layer, args...) ->
 		@updateRules(args...)
 
+		# TODO: We need to remove ourselves when something
+		# changes the frame from the outside like an animation
+		# @layer.on "change:frame", =>
+		# 	print "change:frame"
+
 	updateRules: ->
 		@rules = @_parseRules(arguments...)
 		@layer.on("change:superLayer", @_setupListener)
@@ -65,12 +70,9 @@ class LayerAnchor extends EventEmitter
 		@_removeListeners()
 		
 		if @layer.superLayer
-			@_addListener(@layer.superLayer, "change:x", @_setNeedsUpdate)
-			@_addListener(@layer.superLayer, "change:y", @_setNeedsUpdate)
-			@_addListener(@layer.superLayer, "change:width", @_setNeedsUpdate)
-			@_addListener(@layer.superLayer, "change:height", @_setNeedsUpdate)
+			@_addListener(@layer.superLayer, "change:frame", @_setNeedsUpdate)
 		else
-			@_addListener(Screen, "resize", @_setNeedsUpdate)
+			@_addListener(Canvas, "resize", @_setNeedsUpdate)
 			
 	_addListener: (obj, eventName, listener) =>
 		obj.on(eventName, listener)

@@ -316,3 +316,15 @@ class exports.ScrollComponent extends Layer
 		@emit(Events.Scroll, event)
 
 		@_ignoreNextScrollEvent = false
+
+
+exports.ScrollComponent.wrap = (layer) ->
+	# TODO: Correct for initial scroll position?
+	scroll = new exports.ScrollComponent
+		backgroundColor: null
+	scroll.frame = layer.frame
+	scroll.superLayer = layer.superLayer
+	scroll.content = layer
+	scroll._updateContent()
+	
+	return scroll
