@@ -32,5 +32,4 @@ framer/.*.hash
 framer/framer.debug.js
 framer/framer.generated.js
 framer/framer.modules.js
-framer/framer.js*
 framer/images/*

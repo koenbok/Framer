@@ -42,7 +42,7 @@ class exports.LayerDraggable extends BaseClass
 	@define "horizontal", @simpleProperty "horizontal", true, true
 	@define "vertical", @simpleProperty "vertical", true, true
 
-	@define "momentumVelocityMultiplier", @simpleProperty "momentumVelocityMultiplier", 1800, true, _.isNumber
+	@define "momentumVelocityMultiplier", @simpleProperty "momentumVelocityMultiplier", 800, true, _.isNumber
 
 	@define "constraints",
 		get: -> @_constraints
@@ -50,7 +50,7 @@ class exports.LayerDraggable extends BaseClass
 			if value and _.isObject(value)
 				@_constraints = _.defaults(value, {x:0, y:0, width:0, height:0})
 			else
-				@_constraints = null
+				@_constraints = {x:0, y:0, width:0, height:0}
 			@_updateSimulationConstraints(@_constraints) if @_constraints
 
 	
