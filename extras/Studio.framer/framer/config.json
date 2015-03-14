@@ -1,9 +1,9 @@
 {
   "device" : "iPhone 5S Space Gray",
-  "sharedPrototype" : 0,
+  "sharedPrototype" : 1,
   "deviceOrientation" : 0,
   "contentScale" : 1,
-  "deviceType" : "iphone-6-silver",
+  "deviceType" : "nexus-5-black",
   "updateDelay" : 0.3,
   "deviceScale" : -1,
   "delay" : 0.3

@@ -8,7 +8,7 @@ githash = `git rev-parse --short HEAD`
 
 all: build
 
-init:
+bootstrap:
 	npm install
 
 watch:
@@ -17,7 +17,7 @@ watch:
 clean:
 	rm -rf build
 
-build: clean init 
+build: clean bootstrap 
 	mkdir -p build
 	$(browserify) framer/Framer.coffee -o build/framer.debug.js
 	cat build/framer.debug.js | $(bin)/exorcist build/framer.js.map > build/framer.js
