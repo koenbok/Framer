@@ -716,11 +716,11 @@ class exports.Layer extends BaseClass
 		get: ->
 			@_draggable ?= new LayerDraggable(@)
 
-	anchor: (rules) ->
+	anchor: ->
 		if not @_anchor
-			@_anchor = new LayerAnchor(@, rules)
+			@_anchor = new LayerAnchor(@, arguments...)
 		else
-			@_anchor.updateRules(rules)
+			@_anchor.updateRules(arguments...)
 
 	##############################################################
 	## SCROLLING

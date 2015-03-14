@@ -45,13 +45,15 @@ calculateFrame = (layer, rules) ->
 		
 	return frame
 
+
+
 class LayerAnchor extends EventEmitter
 
-	constructor: (@layer, rules) ->
-		@updateRules(rules)
+	constructor: (@layer, args...) ->
+		@updateRules(args...)
 
-	updateRules: (rules) ->
-		@rules = rules
+	updateRules: ->
+		@rules = @_parseRules(arguments...)
 		@layer.on("change:superLayer", @_setupListener)
 		@_setNeedsUpdate()
 		# @_needsUpdate = false
@@ -82,5 +84,8 @@ class LayerAnchor extends EventEmitter
 			
 	_setNeedsUpdate: =>
 		@layer.frame = calculateFrame(@layer, @rules)
+
+	_parseRules: =>
+		return Utils.parseRect(Utils.arrayFromArguments(arguments))
 
 exports.LayerAnchor = LayerAnchor

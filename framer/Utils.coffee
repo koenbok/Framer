@@ -486,6 +486,24 @@ Utils.sizeMax = ->
 		width:  _.max sizes.map (size) -> size.width
 		height: _.max sizes.map (size) -> size.height
 
+# Rect
+
+Utils.zeroRect = ->
+	{top:0, right:0, bottom:0, left:0}
+
+Utils.parseRect = (args) ->
+
+	if _.isArray(args) and _.isNumber(args[0])
+		if args.length is 1
+			return Utils.parseRect({top:args[0], right:args[0], bottom:args[0], left:args[0]})
+		else
+			return Utils.parseRect({top:args[0], right:args[1], bottom:args[2], left:args[3]})
+
+	if _.isObject(args)
+		return _.defaults(args, Utils.zeroRect())
+
+	return Utils.zeroRect()
+
 # Frames
 
 # min mid max * x, y

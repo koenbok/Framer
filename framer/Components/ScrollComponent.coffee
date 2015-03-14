@@ -49,19 +49,19 @@ class exports.ScrollComponent extends Layer
 
 	constructor: (options={}) ->
 		
-		options.backgroundColor ?= null
+		# options.backgroundColor ?= null
 		options.clip ?= true
 
-		super
+		super options
 
-		@_contentInset = {top:0, right:0, bottom:0, left:0}
-		@scrollWheelSpeedMultiplier = .33
+		for k in ["contentInset", "scrollPoint", "scrollX", "scrollY", "scrollFrame"]
+			@[k] = options[k] if options.hasOwnProperty(k)
+
+		@_contentInset = Utils.zeroRect()
 
 		# Set up content layer
-		@content = new Layer 
-			width: @width
-			height: @height
-			clip: true
+		@content = new Layer _.extend options, 
+			clip: false
 			backgroundColor: null
 			superLayer:@
 		@content.draggable.enabled = true
@@ -75,24 +75,34 @@ class exports.ScrollComponent extends Layer
 		_.each eventMappers, (v, k) =>
 			 @content.draggable.on k, (event) => @emit(v, event)
 
-		@content.on("change:subLayers", @_updateContent)
-		@_updateContent()
+		@content.on("change:subLayers", @setNeedsUpdateContent)
+		@setNeedsUpdateContent()
 
 		# @_enableNativeScrollCapture()
 
-	_updateContent: =>
 
-		# TODO: contentInset
-		# TODO: contentOffset
+	
+	calculateContentSize: ->
+		# Calculates the size of the content. By default this returns the total
+		# size of all the content layers based on width and height. You can override
+		# this for example to take scaling into account.
+		@content.contentFrame()
 
-		contentFrame = @content.contentFrame()
+	setNeedsUpdateContent: =>
+		# Updates the content layer based on size, offset and inset. By default this
+		# gets called if you change the content sublayers, but you may want to call
+		# it yourself, for example when you change the width/height of a content layer.
+		@_needsUpdateContent = true
+		_.defer(@_updateContent)
+
+	_updateContent: (info) =>
+
+		return unless @_needsUpdateContent is true
+		@_needsUpdateContent = false
+
+		contentFrame = @calculateContentSize()
 		contentFrame.x += @_contentInset.left
 		contentFrame.y += @_contentInset.top
-		# contentFrame.width += @_contentInset.left
-		# contentFrame.height += @_contentInset.top
-		# contentFrame = Utils.frameInset(contentFrame, @_contentInset)
-		#contentFrame.height += @_contentInset.top + @_contentInset.bottom
-		# contentFrame.height += 50
 		@content.frame = contentFrame
 
 		constraintsFrame = @content.contentFrame()
@@ -103,12 +113,23 @@ class exports.ScrollComponent extends Layer
 			height: constraintsFrame.height + constraintsFrame.height - @height + @_contentInset.top + @_contentInset.bottom
 		# constraintsFrame = Utils.frameInset(constraintsFrame, @_contentInset)
 
+		# for layer in @content.subLayers
+		# 	layer.off
+
+		# if info?.added
+		# 	for layer in info.added
+		# 		layer.on("change:width", @_updateContent)
+		# 		layer.on("change:height", @_updateContent)
+		# if info?.removed
+		# 	for layer in info.removed
+		# 		layer.off("change:width", @_updateContent)
+		# 		layer.off("change:height", @_updateContent)
+
 
 
 		@content.draggable.constraints = constraintsFrame
 
 	@define "scroll",
-		exportable: true
 		get: -> @scrollHorizontal is true or @scrollVertical is true
 		set: (value) ->
 			@content.animateStop() if value is false
@@ -139,9 +160,11 @@ class exports.ScrollComponent extends Layer
 			rect
 
 	@define "contentInset",
-		get: -> @_contentInset
-		set: (@_contentInset) ->
-			@_updateContent()
+		get: ->
+			_.clone(@_contentInset)
+		set: (contentInset) ->
+			@_contentInset = Utils.parseRect(contentInset)
+			@setNeedsUpdateContent()
 			@_updateNativeScrollCaptureLayer()
 
 	scrollToPoint: (point, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
