@@ -173,6 +173,10 @@ Utils.stringify = (obj) ->
 	return obj.toString() if obj.toString
 	return obj
 
+Utils.inspectObjectType = (item) ->
+	objectType = item.toString().split(" ")[1]
+	objectType[0..objectType.length-2]
+
 Utils.inspect = (item, l=0, max=5) ->
 	
 	return "null" if item is null
@@ -190,9 +194,14 @@ Utils.inspect = (item, l=0, max=5) ->
 		return "[...]" if l > max
 		return "[" + _.map(item, (i) -> Utils.inspect(i, l++)).join(", ") + "]"
 	if _.isObject(item)
-		return "{...}" if l > max
-		return "{" + _.map(item, (v, k) -> "#{k}: #{Utils.inspect(v, l++)}").join(", ") + "}"
-	
+		objectType = Utils.inspectObjectType(item)
+		if l > max
+			objectInfo = "{...}"
+		else
+			objectInfo = "{" + _.map(item, (v, k) -> "#{k}: #{Utils.inspect(v, l++)}").join(", ") + "}"
+		return "<#{objectType} #{objectInfo}>"
+		# return objectInfo
+
 	return "#{item}"
 
 Utils.uuid = ->

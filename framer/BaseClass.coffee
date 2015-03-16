@@ -100,7 +100,7 @@ class exports.BaseClass extends EventEmitter
 
 	toInspect: =>
 		properties = _.map(@properties, ((v, k) -> "#{k}:#{v}"), 4)
-		"[#{@constructor.name} id:#{@id} #{properties.join " "}]"
+		"<#{@constructor.name} id:#{@id} #{properties.join " "}>"
 
 
 	#################################################################

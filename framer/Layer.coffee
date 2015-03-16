@@ -738,7 +738,7 @@ class exports.Layer extends BaseClass
 	## EVENTS
 
 	addListener: (eventNames..., originalListener) =>
-		
+
 		# To avoid an error in Framer Studio we return if no originalListener was given
 		if not originalListener
 			return
@@ -820,5 +820,5 @@ class exports.Layer extends BaseClass
 			return Utils.round(value, 1)
 
 		if @name
-			return "&lt;#{@constructor.name} id:#{@id} name:#{@name} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}&gt;"
-		return "&lt;#{@constructor.name} id:#{@id} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}&gt;"
+			return "<#{@constructor.name} id:#{@id} name:#{@name} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}>"
+		return "<#{@constructor.name} id:#{@id} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}>"
