@@ -2,7 +2,7 @@ pwd = $(CURDIR)
 bin = $(pwd)/node_modules/.bin
 coffee = "$(bin)/coffee"
 
-browserify = $(bin)/browserify -t coffeeify -d --extension=".coffee"
+browserify = "$(bin)/browserify" -t coffeeify -d --extension=".coffee"
 watch = $(coffee) scripts/watch.coffee framer,test/tests
 githash = `git rev-parse --short HEAD`
 
