@@ -375,7 +375,7 @@ class exports.LayerDraggable extends BaseClass
 		updatePoint = {}
 
 		if @constraints
-			if @bounce
+			if @bounce and @overdrag
 				updatePoint[axis] = state.x
 			else
 				{minX, maxX, minY, maxY} = @_calculateConstraints(@_constraints)
