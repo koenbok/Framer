@@ -1,6 +1,6 @@
 pwd = $(CURDIR)
 bin = $(pwd)/node_modules/.bin
-coffee = $(bin)/coffee
+coffee = "$(bin)/coffee"
 
 browserify = $(bin)/browserify -t coffeeify -d --extension=".coffee"
 watch = $(coffee) scripts/watch.coffee framer,test/tests
@@ -24,11 +24,11 @@ clean:
 build: clean bootstrap 
 	mkdir -p build
 	$(browserify) framer/Framer.coffee -o build/framer.debug.js
-	cat build/framer.debug.js | $(bin)/exorcist build/framer.js.map > build/framer.js
+	cat build/framer.debug.js | "$(bin)/exorcist" build/framer.js.map > build/framer.js
 
 
 debug:
-	$(bin)/watchify -t coffeeify --extension=".coffee" framer/Framer.coffee -d -v -o build/framer.debug.js
+	"$(bin)/watchify" -t coffeeify --extension=".coffee" framer/Framer.coffee -d -v -o build/framer.debug.js
 
 studio:
 	open -a "Framer Studio" extras/Studio.framer
@@ -37,8 +37,8 @@ studio:
 
 test: build
 	$(browserify) test/tests.coffee -o test/phantomjs/tests.js
-	cd test/phantomjs; $(bin)/bower install
-	$(bin)/mocha-phantomjs --bail test/phantomjs/index.html
+	cd test/phantomjs; "$(bin)/bower" install
+	"$(bin)/mocha-phantomjs" --bail test/phantomjs/index.html
 testw:
 	$(watch) make test
 
