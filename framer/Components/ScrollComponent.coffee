@@ -344,24 +344,25 @@ class exports.ScrollComponent extends Layer
 		@_ignoreNextScrollEvent = false
 
 
-exports.ScrollComponent.wrap = (layer) ->
+	@wrap = (layer) ->
+		# This function wraps the given layer into a scroll or page component
 
-	scroll = new exports.ScrollComponent
-		backgroundColor: null
-	scroll.frame = layer.frame
+		scroll = new @
+			backgroundColor: null
+		scroll.frame = layer.frame
 
-	layerIndex = layer.index
-	scroll.superLayer = layer.superLayer
-	scroll.index = layerIndex
-	
-	# Correct the position for the scroll content
+		layerIndex = layer.index
+		scroll.superLayer = layer.superLayer
+		scroll.index = layerIndex
+		
+		# Correct the position for the scroll content
 
-	contentFrame = layer.contentFrame()
-	layer.width =  Math.max(layer.contentFrame().width,  layer.width) + contentFrame.x
-	layer.height = Math.max(layer.contentFrame().height, layer.height) + contentFrame.y
-	layer.x = 0
-	layer.y = 0
+		contentFrame = layer.contentFrame()
+		layer.width =  Math.max(layer.contentFrame().width,  layer.width) + contentFrame.x
+		layer.height = Math.max(layer.contentFrame().height, layer.height) + contentFrame.y
+		layer.x = 0
+		layer.y = 0
 
-	scroll.content.addSubLayer(layer)
+		scroll.content.addSubLayer(layer)
 
-	return scroll
+		return scroll
