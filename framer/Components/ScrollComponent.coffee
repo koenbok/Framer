@@ -37,6 +37,11 @@ Events.ScrollStart = "scrollstart"
 Events.Scroll = "scroll"
 Events.ScrollEnd = "scrollend"
 
+EventMappers = {}
+EventMappers[Events.ScrollStart] = Events.DragStart
+EventMappers[Events.Scroll] = Events.DragMove
+EventMappers[Events.ScrollEnd] = Events.DragEnd
+
 class exports.ScrollComponent extends Layer
 
 	# Proxy properties directly from the draggable
@@ -53,10 +58,14 @@ class exports.ScrollComponent extends Layer
 	@define "draggable",
 		get: -> throw Error("You likely want to use content.draggable")
 
+	@define "content",
+		get: -> @_content
+
 	constructor: (options={}) ->
 		
 		# options.backgroundColor ?= null
 		options.clip ?= true
+		options.name ?= "ScrollComponent"
 
 		super options
 
@@ -65,34 +74,35 @@ class exports.ScrollComponent extends Layer
 
 		@_contentInset = Utils.zeroRect()
 
-		# Set up content layer
-		@content = new Layer _.extend options, 
-			clip: false
-			backgroundColor: null
-			superLayer:@
-		@content.draggable.enabled = true
-		@content.draggable.momentum = true
+		@setContentLayer(new Layer)
 		
-		eventMappers = {}
-		eventMappers[Events.DragStart] = Events.ScrollStart
-		eventMappers[Events.DragMove] = Events.Scroll
-		eventMappers[Events.DragEnd] = Events.ScrollEnd
-
-		_.each eventMappers, (v, k) =>
-			 @content.draggable.on k, (event) => @emit(v, event)
-
-		@content.on("change:subLayers", @_updateContent)
-		@_updateContent()
 
 		# @_enableNativeScrollCapture()
 
-
-	
 	calculateContentSize: ->
 		# Calculates the size of the content. By default this returns the total
 		# size of all the content layers based on width and height. You can override
 		# this for example to take scaling into account.
 		@content.contentFrame()
+
+	setContentLayer: (layer) ->
+
+		@_content.destroy() if @content
+
+		@_content = layer
+		@_content.superLayer = @
+		@_content.name = "ScrollContent"
+		@_content.clip = false
+		@_content.backgroundColor = null
+		@_content.draggable.enabled = true
+		@_content.draggable.momentum = true
+		@_content.on("change:subLayers", @_updateContent)
+
+		@_updateContent()
+		@scrollPoint = {x:0, y:0}
+
+		return @_content
+
 
 	_updateContent: (info) =>
 
@@ -222,6 +232,22 @@ class exports.ScrollComponent extends Layer
 		return point
 
 	##############################################################
+	# Map scroll events to content.draggable
+
+	addListener: (eventNames..., listener) ->
+		super
+		for eventName in eventNames
+			@content.on(EventMappers[eventName], listener) if eventName in _.keys(EventMappers)
+
+	removeListener: (eventNames..., listener) ->
+		super
+		for eventName in eventNames
+			@content.off(EventMappers[eventName], listener) if eventName in _.keys(EventMappers)
+	
+	on: @::addListener
+	off: @::removeListener
+
+	##############################################################
 	# MouseWheel event capturing
 	
 	_enableNativeScrollCapture: ->
@@ -319,12 +345,19 @@ class exports.ScrollComponent extends Layer
 
 
 exports.ScrollComponent.wrap = (layer) ->
-	# TODO: Correct for initial scroll position?
+
 	scroll = new exports.ScrollComponent
 		backgroundColor: null
 	scroll.frame = layer.frame
+
+	layerIndex = layer.index
 	scroll.superLayer = layer.superLayer
-	scroll.content = layer
-	scroll._updateContent()
+	scroll.index = layerIndex
 	
+	# Correct the position for the scroll content
+	layer.width =  Math.max(layer.contentFrame().width,  layer.width)
+	layer.height = Math.max(layer.contentFrame().height, layer.height)
+
+	scroll.content.addSubLayer(layer)
+
 	return scroll
