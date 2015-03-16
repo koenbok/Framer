@@ -1,4 +1,4 @@
-pwd := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+pwd = $(CURDIR)
 bin = $(pwd)/node_modules/.bin
 coffee = $(bin)/coffee
 
