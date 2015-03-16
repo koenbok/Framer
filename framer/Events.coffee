@@ -19,6 +19,7 @@ Events.Click = Events.TouchEnd
 Events.MouseOver = "mouseover"
 Events.MouseOut = "mouseout"
 Events.MouseMove = "mousemove"
+Events.MouseWheel = "mousewheel"
 
 # Animation events
 Events.AnimationStart = "start"
