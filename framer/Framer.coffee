@@ -46,9 +46,6 @@ window.Framer = Framer if window
 Framer.DefaultContext = new Framer.Context(name:"Default")
 Framer.CurrentContext = Framer.DefaultContext
 
-# Compatibility for Framer 2
-require "./Compat"
-
 # Fix for mobile scrolling
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
 
