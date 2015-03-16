@@ -49,7 +49,7 @@ exports.print = (args...) ->
 			printContext.eventManager.wrap(window).addEventListener("resize", update)
 		
 		printNode = document.createElement("div")
-		printNode.innerHTML = "&raquo; " + args.map(Utils.stringify).join(", ") + "<br>"
+		printNode.innerHTML = "&raquo; " + args.map(Utils.inspect).join(", ") + "<br>"
 		printNode.style["-webkit-user-select"] = "text"
 		printNode.style["cursor"] = "auto"
 		

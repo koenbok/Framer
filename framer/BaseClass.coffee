@@ -98,7 +98,7 @@ class exports.BaseClass extends EventEmitter
 	@define "id",
 		get: -> @_id
 
-	toString: =>
+	toInspect: =>
 		properties = _.map(@properties, ((v, k) -> "#{k}:#{v}"), 4)
 		"[#{@constructor.name} id:#{@id} #{properties.join " "}]"
 

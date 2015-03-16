@@ -173,6 +173,28 @@ Utils.stringify = (obj) ->
 	return obj.toString() if obj.toString
 	return obj
 
+Utils.inspect = (item, l=0, max=5) ->
+	
+	return "null" if item is null
+	return "undefined" if item is undefined
+	
+	if item.hasOwnProperty("toInspect")
+		return item.toInspect()
+	if _.isString(item)
+		return "\"#{item}\""
+	if _.isNumber(item)
+		return "#{item}"
+	if _.isFunction(item)
+		return item.toString()
+	if _.isArray(item)
+		return "[...]" if l > max
+		return "[" + _.map(item, (i) -> Utils.inspect(i, l++)).join(", ") + "]"
+	if _.isObject(item)
+		return "{...}" if l > max
+		return "{" + _.map(item, (v, k) -> "#{k}: #{Utils.inspect(v, l++)}").join(", ") + "}"
+	
+	return "#{item}"
+
 Utils.uuid = ->
 
 	chars = "0123456789abcdefghijklmnopqrstuvwxyz".split("")
@@ -188,13 +210,9 @@ Utils.uuid = ->
 	output.join ""
 
 Utils.arrayFromArguments = (args) ->
-
 	# Convert an arguments object to an array
-	
-	if _.isArray args[0]
-		return args[0]
-	
-	Array.prototype.slice.call args
+	return args[0] if _.isArray(args[0])
+	return Array.prototype.slice.call(args)
 
 Utils.cycle = ->
 	

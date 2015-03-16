@@ -812,7 +812,7 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## DESCRIPTOR
 
-	toString: ->
+	toInspect: ->
 
 		round = (value) ->
 			if parseInt(value) == value
