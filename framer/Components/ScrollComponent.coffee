@@ -355,8 +355,12 @@ exports.ScrollComponent.wrap = (layer) ->
 	scroll.index = layerIndex
 	
 	# Correct the position for the scroll content
-	layer.width =  Math.max(layer.contentFrame().width,  layer.width)
-	layer.height = Math.max(layer.contentFrame().height, layer.height)
+
+	contentFrame = layer.contentFrame()
+	layer.width =  Math.max(layer.contentFrame().width,  layer.width) + contentFrame.x
+	layer.height = Math.max(layer.contentFrame().height, layer.height) + contentFrame.y
+	layer.x = 0
+	layer.y = 0
 
 	scroll.content.addSubLayer(layer)
 
