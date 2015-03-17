@@ -415,16 +415,16 @@ class exports.LayerDraggable extends BaseClass
 		# when the cursor is outside of the dragging bounds for an axis.
 		{minX, maxX, minY, maxY} = @_calculateConstraints(@_constraints)
 
-		startSimulationX = if @overdrag is true or (@layer.x > minX and @layer.x < maxX)
-		startSimulationY = if @overdrag is true or (@layer.y > minY and @layer.y < maxY)
+		startSimulationX = @overdrag is true or (@layer.x > minX and @layer.x < maxX)
+		startSimulationY = @overdrag is true or (@layer.y > minY and @layer.y < maxY)
 
-		if startSimulationX is false and startSimulationY is false
+		if startSimulationX is startSimulationY is false
 			return
 
-		@_isAnimating = true
-		@_setupSimulation()
 		velocity = @velocity
-
+		@_setupSimulation()
+		@_isAnimating = true
+		
 		@_simulation.x.simulator.setState
 			x: @layer.x
 			v: velocity.x * @momentumVelocityMultiplier
