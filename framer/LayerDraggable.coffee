@@ -242,18 +242,23 @@ class exports.LayerDraggable extends BaseClass
 
 		return constraints
 
-	_constrainPosition: (point, bounds, scale) ->
+	_constrainPosition: (proposedPoint, bounds, scale) ->
 		
 		{minX, maxX, minY, maxY} = @_calculateConstraints(@_constraints)
 
 		if @overdrag
-			return point = 
-				x: @_clampAndScale(point.x, minX, maxX, @overdragScale)
-				y: @_clampAndScale(point.y, minY, maxY, @overdragScale)
+			point = 
+				x: @_clampAndScale(proposedPoint.x, minX, maxX, @overdragScale)
+				y: @_clampAndScale(proposedPoint.y, minY, maxY, @overdragScale)
 		else
-			return point = 
-				x: Utils.clamp(point.x, minX, maxX)
-				y: Utils.clamp(point.y, minY, maxY)
+			point = 
+				x: Utils.clamp(proposedPoint.x, minX, maxX)
+				y: Utils.clamp(proposedPoint.y, minY, maxY)
+
+		point.x = proposedPoint.x if @speedX == 0 or @horizontal is false
+		point.y = proposedPoint.y if @speedY == 0 or @vertical   is false
+
+		return point
 
 	##############################################################
 	# Velocity
@@ -371,18 +376,20 @@ class exports.LayerDraggable extends BaseClass
 		# The simulation state has x as value, it can look confusing here
 		# as we're working with x and y.
 
-		# TODO: Maybe we need to take speedX, speedY into account here
-		updatePoint = {}
-
 		if @constraints
-			if @bounce and @overdrag
-				updatePoint[axis] = state.x
+			if @bounce
+				delta = state.x - @layer[axis]
 			else
 				{minX, maxX, minY, maxY} = @_calculateConstraints(@_constraints)
-				updatePoint[axis] = Utils.clamp(state.x, minX, maxX) if axis is "x"
-				updatePoint[axis] = Utils.clamp(state.x, minY, maxY) if axis is "y"
+				delta = Utils.clamp(state.x, minX, maxX) - @layer[axis] if axis is "x"
+				delta = Utils.clamp(state.x, minY, maxY) - @layer[axis] if axis is "y"
 		else
-			updatePoint[axis] = state.x
+			delta = state.x - @layer[axis]
+
+		updatePoint = @layer.point
+		updatePoint[axis] = updatePoint[axis] + (delta * @speedX) if axis is "x"
+		updatePoint[axis] = updatePoint[axis] + (delta * @speedY) if axis is "y"
+		@updatePosition(updatePoint)
 
 		@emit(Events.DragWillMove, {animation:true})
 		@layer[axis] = @updatePosition(updatePoint)[axis]
@@ -404,19 +411,29 @@ class exports.LayerDraggable extends BaseClass
 
 		return unless @momentum or @bounce
 
+		# If overdrag is disabled, we need to not have a bounce animation
+		# when the cursor is outside of the dragging bounds for an axis.
+		{minX, maxX, minY, maxY} = @_calculateConstraints(@_constraints)
+
+		startSimulationX = if @overdrag is true or (@layer.x > minX and @layer.x < maxX)
+		startSimulationY = if @overdrag is true or (@layer.y > minY and @layer.y < maxY)
+
+		if startSimulationX is false and startSimulationY is false
+			return
+
+		@_isAnimating = true
 		@_setupSimulation()
 		velocity = @velocity
-		@_isAnimating = true
 
 		@_simulation.x.simulator.setState
 			x: @layer.x
 			v: velocity.x * @momentumVelocityMultiplier
-		@_simulation.x.start()
+		@_simulation.x.start() if startSimulationX
 
 		@_simulation.y.simulator.setState
 			x: @layer.y
 			v: velocity.y * @momentumVelocityMultiplier
-		@_simulation.y.start()
+		@_simulation.y.start() if startSimulationY
 
 		@emit(Events.DidStartAnimation)
 
