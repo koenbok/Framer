@@ -198,9 +198,9 @@ Utils.inspect = (item, l=0, max=5) ->
 		if l > max
 			objectInfo = "{...}"
 		else
-			objectInfo = "{" + _.map(item, (v, k) -> "#{k}: #{Utils.inspect(v, l++)}").join(", ") + "}"
+			objectInfo = "{" + _.map(item, (v, k) -> "#{k}:#{Utils.inspect(v, l++)}").join(", ") + "}"
+		return objectInfo if objectType is "Object"
 		return "<#{objectType} #{objectInfo}>"
-		# return objectInfo
 
 	return "#{item}"
 
@@ -515,21 +515,21 @@ Utils.sizeMax = ->
 
 # Rect
 
-Utils.zeroRect = ->
-	{top:0, right:0, bottom:0, left:0}
+Utils.zeroRect = (args={}) ->
+	return _.defaults(args, {top:0, right:0, bottom:0, left:0})
 
 Utils.parseRect = (args) ->
-
 	if _.isArray(args) and _.isNumber(args[0])
-		if args.length is 1
-			return Utils.parseRect({top:args[0], right:args[0], bottom:args[0], left:args[0]})
-		else
-			return Utils.parseRect({top:args[0], right:args[1], bottom:args[2], left:args[3]})
-
+		return Utils.parseRect({top:args[0]}) if args.length is 1
+		return Utils.parseRect({top:args[0], right:args[1]}) if args.length is 2
+		return Utils.parseRect({top:args[0], right:args[1], bottom:args[2]}) if args.length is 3
+		return Utils.parseRect({top:args[0], right:args[1], bottom:args[2], left:args[3]}) if args.length is 4
+	if _.isArray(args) and _.isObject(args[0])
+		return args[0]
 	if _.isObject(args)
-		return _.defaults(args, Utils.zeroRect())
+		return args
 
-	return Utils.zeroRect()
+	return {}
 
 # Frames
 

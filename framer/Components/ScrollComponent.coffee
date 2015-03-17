@@ -175,7 +175,7 @@ class exports.ScrollComponent extends Layer
 		get: ->
 			_.clone(@_contentInset)
 		set: (contentInset) ->
-			@_contentInset = Utils.parseRect(contentInset)
+			@_contentInset = Utils.zeroRect(Utils.parseRect(contentInset))
 			@_updateContent()
 			@_updateNativeScrollCaptureLayer()
 

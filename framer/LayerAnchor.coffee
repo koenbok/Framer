@@ -49,16 +49,16 @@ calculateFrame = (layer, rules) ->
 
 class LayerAnchor extends EventEmitter
 
-	constructor: (@layer, args...) ->
-		@updateRules(args...)
+	constructor: (@layer, rules) ->
+		@updateRules(rules)
 
 		# TODO: We need to remove ourselves when something
 		# changes the frame from the outside like an animation
 		# @layer.on "change:frame", =>
 		# 	print "change:frame"
 
-	updateRules: ->
-		@rules = @_parseRules(arguments...)
+	updateRules: (rules) ->
+		@rules = @_parseRules(rules)
 		@layer.on("change:superLayer", @_setupListener)
 		@_setNeedsUpdate()
 		# @_needsUpdate = false
