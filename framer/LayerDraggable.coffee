@@ -42,6 +42,7 @@ class exports.LayerDraggable extends BaseClass
 	@define "vertical", @simpleProperty "vertical", true, true
 
 	@define "momentumVelocityMultiplier", @simpleProperty "momentumVelocityMultiplier", 800, true, _.isNumber
+	# @define "lockDirectionThreshold", @simpleProperty "lockDirectionThreshold", {x:0, y:0}, true
 
 	@define "constraints",
 		get: -> @_constraints
@@ -230,6 +231,13 @@ class exports.LayerDraggable extends BaseClass
 
 	_calculateConstraints: (bounds) ->
 
+		if not bounds
+			return constraints = 
+				minX: Infinity
+				maxX: Infinity
+				minY: Infinity
+				maxY: Infinity
+
 		constraints = 
 			minX: Utils.frameGetMinX(bounds)
 			maxX: Utils.frameGetMaxX(bounds)
@@ -321,7 +329,6 @@ class exports.LayerDraggable extends BaseClass
 				y: @_lockDirectionEnabledY
 
 			# @_propagateEvents = false if @multipleDraggables
-
 
 	_resetLockDirection: ->
 		@_lockDirectionEnabledX = false
