@@ -28,7 +28,7 @@ class exports.BaseClass extends EventEmitter
 
 		# If no setter was given, this must be a readonly class
 		if not descriptor.set
-			descriptor.set = -> throw Error("#{@constructor.name}.#{propertyName} property is readonly")
+			descriptor.set = -> console.warn("#{@constructor.name}.#{propertyName} property is readonly")
 
 		# Set the getter/setter as setProperty on this object so we can access and override it easily
 		getName = "get#{capitalizeFirstLetter(propertyName)}"
