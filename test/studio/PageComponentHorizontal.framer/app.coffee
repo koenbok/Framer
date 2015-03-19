@@ -1,8 +1,10 @@
-page = new PageComponent width:400, height:600, backgroundColor:"#fff"
+# Test Page Component Horizontal Flicking
+
+page = new PageComponent width:Framer.Device.screen.width, height:Framer.Device.screen.height, backgroundColor:"#fff"
 page.center()
 page.scrollVertical = false
 
-for index in [0..10]
+for index in [0..30]
 	pageContent = new Layer
 		width:  page.width
 		height: page.height
@@ -15,5 +17,7 @@ for index in [0..10]
 		"font-size" : "100px"
 		"font-weight" : "100"
 		"text-align" : "center"
-		"line-height" : "600px"
+		"line-height" : "#{Framer.Device.screen.height}px"
 		}
+
+# page.velocityMultiplier = 50
