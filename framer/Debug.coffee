@@ -35,9 +35,9 @@ EventKeys =
 	Shift: 16
 	Escape: 27
 
-window.document.onkeyup = (event) ->
-	if event.keyCode == EventKeys.Escape
-		toggleDebug()()
+# window.document.onkeyup = (event) ->
+# 	if event.keyCode == EventKeys.Escape
+# 		toggleDebug()()
 
 ###############################################################
 # Error warning
