@@ -73,10 +73,11 @@ class exports.ScrollComponent extends Layer
 		# options.backgroundColor ?= null
 		options.clip ?= true
 		options.name ?= "ScrollComponent"
+		options.mouseWheelEnabled ?= false
 
 		super options
 
-		for k in ["contentInset", "scrollPoint", "scrollX", "scrollY", "scrollFrame"]
+		for k in ["contentInset", "scrollPoint", "scrollX", "scrollY", "scrollFrame", "mouseWheelEnabled"]
 			@[k] = options[k] if options.hasOwnProperty(k)
 
 		@_contentInset = Utils.zeroRect()
@@ -240,8 +241,17 @@ class exports.ScrollComponent extends Layer
 	##############################################################
 	# MouseWheel handling
 
-	_enableMouseWheelHandling: ->
-		@on(Events.MouseWheel, @_onMouseWheel)
+	@define "mouseWheelEnabled",
+		get: -> @_mouseWheelEnabled
+		set: (value) ->
+			@_mouseWheelEnabled = value
+			@_enableMouseWheelHandling(value)
+
+	_enableMouseWheelHandling: (enable) ->
+		if enable
+			@on(Events.MouseWheel, @_onMouseWheel)
+		else
+			@off(Events.MouseWheel, @_onMouseWheel)
 
 	_onMouseWheel: (event) =>
 
