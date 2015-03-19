@@ -3,13 +3,13 @@
 
 scroll = new ScrollComponent
 scroll.anchor([0,0,0,0])
+
 scroll.scrollHorizontal = false
 scroll.backgroundColor = null
 
 rows = 40
-
+width = Framer.Device.screen.width
 gutter = 8
-width  = scroll.width
 height = 200
 
 for rowIndex in [0..rows-1]
