@@ -56,7 +56,6 @@ class exports.ScrollComponent extends Layer
 	@define "speedX", @proxyProperty("content.draggable.speedX", true)
 	@define "speedY", @proxyProperty("content.draggable.speedY", true)
 	@define "isDragging", @proxyProperty("content.draggable.isDragging", true)
-	@define "isAnimating", @proxyProperty("content.draggable.isAnimating", true)
 
 	# We throw an error here, because you almost never would like the enclosing
 	# scroll component to be draggable, but it's an easy mistake to make. If you 
