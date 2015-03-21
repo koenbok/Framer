@@ -103,6 +103,7 @@ class exports.LayerDraggable extends BaseClass
 		@_resetLockDirection()
 
 		event.preventDefault()
+		event.stopPropagation()
 		# event.stopPropagation() if ! @_propagateEvents
 
 		# Extract the event (mobile may have multiple)
@@ -140,6 +141,8 @@ class exports.LayerDraggable extends BaseClass
 		document.addEventListener(Events.TouchEnd, @_touchEnd)
 
 		@emit(Events.DragStart, event)
+
+
 
 	_touchMove: (event) =>
 
