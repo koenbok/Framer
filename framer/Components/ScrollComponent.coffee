@@ -205,13 +205,13 @@ class exports.ScrollComponent extends Layer
 		return _.first(@_contentLayersSortedByDistanceForScrollPoint(scrollPoint, originX, originY))
 
 	_scrollPointForLayer: (layer, originX=0, originY=0, clamp=true) ->
-		point = Utils.framePointForOrigin(layer.frame, originX, originY)
-		point.x -= originX * @width
-		point.y -= originY * @height
-		point = @_pointInConstraints(point) if clamp is true
+		point = layer.point
+		point.x += layer.width * originX
+		point.y += layer.height * originY
 		return point
 
 	_contentLayersSortedByDistanceForScrollPoint: (scrollPoint, originX=0, originY=0) ->
+		
 		distance = (layer) =>
 			result = Utils.pointDistance(scrollPoint, @_scrollPointForLayer(layer, originX, originY))
 			result = Utils.pointAbs(result)
