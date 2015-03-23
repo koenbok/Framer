@@ -10,7 +10,8 @@ Originals =
 		width: 100
 		height: 100
 	Animation:
-		curve: "spring(400,40,0)" # Or, the Cemre-Curve
+		# curve: "spring(400,40,0)" # Or, the Cemre-Curve
+		curve: "ease"
 		time: 1
 	DeviceView:
 		fullScreen: false
