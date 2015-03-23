@@ -443,12 +443,12 @@ class exports.LayerDraggable extends BaseClass
 		
 		@_simulation.x.simulator.setState
 			x: @layer.x
-			v: velocity.x * @momentumVelocityMultiplier
+			v: velocity.x * @momentumVelocityMultiplier * @speedX
 		@_simulation.x.start() if startSimulationX
 
 		@_simulation.y.simulator.setState
 			x: @layer.y
-			v: velocity.y * @momentumVelocityMultiplier
+			v: velocity.y * @momentumVelocityMultiplier * @speedY
 		@_simulation.y.start() if startSimulationY
 
 		@emit(Events.DidStartAnimation)
