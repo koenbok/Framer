@@ -74,6 +74,7 @@ class exports.ScrollComponent extends Layer
 		options.clip ?= true
 		options.name ?= "ScrollComponent"
 		options.mouseWheelEnabled ?= false
+		options.backgroundColor ?= null
 
 		super options
 
@@ -91,10 +92,12 @@ class exports.ScrollComponent extends Layer
 		# Calculates the size of the content. By default this returns the total
 		# size of all the content layers based on width and height. You can override
 		# this for example to take scaling into account.
-		frame = @content.contentFrame()
-		frame.width = @width if frame.width < @width
-		frame.height = @height if frame.height < @height
-		return frame
+
+		contentFrame = @content.contentFrame()
+		return size = 
+			width:  Math.max(@width, contentFrame.width)
+			height: Math.max(@height, contentFrame.height)
+
 
 	setContentLayer: (layer) ->
 
@@ -104,24 +107,26 @@ class exports.ScrollComponent extends Layer
 		@_content.superLayer = @
 		@_content.name = "ScrollContent"
 		@_content.clip = false
-		@_content.backgroundColor = null
 		@_content.draggable.enabled = true
 		@_content.draggable.momentum = true
 		@_content.on("change:subLayers", @_updateContent)
+
+		# Update the content view size on resizing the ScrollComponent
+		@on("change:width", @_updateContent)
+		@on("change:height", @_updateContent)
 
 		@_updateContent()
 		@scrollPoint = {x:0, y:0}
 
 		return @_content
 
-
-	_updateContent: (info) =>
+	_updateContent: =>
 
 		# Update the constraints based on the content size and contentInset
 
 		contentFrame = @calculateContentSize()
-		contentFrame.x += @_contentInset.left
-		contentFrame.y += @_contentInset.top
+		contentFrame.x = 0 + @_contentInset.left
+		contentFrame.y = 0 + @_contentInset.top
 		@content.frame = contentFrame
 
 		constraintsFrame = @calculateContentSize()
