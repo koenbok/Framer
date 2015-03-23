@@ -91,7 +91,10 @@ class exports.ScrollComponent extends Layer
 		# Calculates the size of the content. By default this returns the total
 		# size of all the content layers based on width and height. You can override
 		# this for example to take scaling into account.
-		@content.contentFrame()
+		frame = @content.contentFrame()
+		frame.width = @width if frame.width < @width
+		frame.height = @height if frame.height < @height
+		return frame
 
 	setContentLayer: (layer) ->
 
@@ -114,32 +117,19 @@ class exports.ScrollComponent extends Layer
 
 	_updateContent: (info) =>
 
+		# Update the constraints based on the content size and contentInset
+
 		contentFrame = @calculateContentSize()
 		contentFrame.x += @_contentInset.left
 		contentFrame.y += @_contentInset.top
 		@content.frame = contentFrame
 
-		constraintsFrame = @content.contentFrame()
+		constraintsFrame = @calculateContentSize()
 		constraintsFrame =
 			x: -constraintsFrame.width  + @width - @_contentInset.right
 			y: -constraintsFrame.height + @height - @_contentInset.bottom
 			width: 	constraintsFrame.width  + constraintsFrame.width  - @width + @_contentInset.left + @_contentInset.right
 			height: constraintsFrame.height + constraintsFrame.height - @height + @_contentInset.top + @_contentInset.bottom
-		# constraintsFrame = Utils.frameInset(constraintsFrame, @_contentInset)
-
-		# for layer in @content.subLayers
-		# 	layer.off
-
-		# if info?.added
-		# 	for layer in info.added
-		# 		layer.on("change:width", @_updateContent)
-		# 		layer.on("change:height", @_updateContent)
-		# if info?.removed
-		# 	for layer in info.removed
-		# 		layer.off("change:width", @_updateContent)
-		# 		layer.off("change:height", @_updateContent)
-
-
 
 		@content.draggable.constraints = constraintsFrame
 
@@ -151,11 +141,11 @@ class exports.ScrollComponent extends Layer
 
 	@define "scrollX",
 		get: -> -@content.x
-		set: (value) -> @content.x = @_pointInConstraints({x:-value, y:0}).x
+		set: (value) -> @content.x = -@_pointInConstraints({x:value, y:0}).x
 
 	@define "scrollY",
 		get: -> -@content.y
-		set: (value) -> @content.y = @_pointInConstraints({x:0, y:-value}).y 
+		set: (value) -> @content.y = -@_pointInConstraints({x:0, y:value}).y
 
 	@define "scrollPoint",
 		get: -> 
@@ -172,6 +162,8 @@ class exports.ScrollComponent extends Layer
 			rect.width = @width
 			rect.height = @height
 			rect
+		set: (value) ->
+			@scrollPoint = value
 
 	@define "contentInset",
 		get: ->
@@ -281,117 +273,7 @@ class exports.ScrollComponent extends Layer
 
 
 	##############################################################
-	# Map scroll events to content.draggable
-
-	addListener: (eventNames..., listener) ->
-		super
-		for eventName in eventNames
-			@content.on(EventMappers[eventName], listener) if eventName in _.keys(EventMappers)
-
-	removeListener: (eventNames..., listener) ->
-		super
-		for eventName in eventNames
-			@content.off(EventMappers[eventName], listener) if eventName in _.keys(EventMappers)
-	
-	on: @::addListener
-	off: @::removeListener
-
-	# ##############################################################
-	# # MouseWheel event capturing
-	
-	# _enableNativeScrollCapture: ->
-	# 	@_setupNativeScrollCaptureLayer()
-	# 	@on("mousewheel", @_updateNativeScrollCaptureLayer)
-	# 	@content.on("change:subLayers", @_updateNativeScrollCaptureLayer)
-	# 	@content.draggable.on(Events.DragMove, @_updateNativeScrollCaptureLayerScrollPoint)
-
-	# _disableNativeScrollCapture: ->
-	# 	@_nativeScrollCaptureLayer?.destroy()
-	# 	@off("mousewheel", @_updateNativeScrollCaptureLayer)
-	# 	@content.off("change:subLayers", @_updateNativeScrollCaptureLayer)
-	# 	@content.draggable.off(Events.DragMove, @_updateNativeScrollCaptureLayerScrollPoint)
-	
-	# _setupNativeScrollCaptureLayer: (event) =>
-	# 	# Create the capturing scroll layer as an invisible overlay.
-	# 	if not @_nativeScrollCaptureLayer
-	# 		# TODO: Put in separate context
-	# 		@_nativeScrollCaptureLayer = new Layer
-	# 			backgroundColor: null
-	# 		@_nativeScrollCaptureLayer.content = new Layer
-	# 			backgroundColor: null
-	# 			superLayer: @_nativeScrollCaptureLayer
-	# 		@_nativeScrollCaptureLayer.scroll = true
-	# 		@_nativeScrollCaptureLayer.opacity = 0
-	# 		@_nativeScrollCaptureLayer.on("mousewheel", @_onMouseWheelCaptureLayer)
-	# 		@_nativeScrollCaptureLayer.on("scroll", @_onScrollCaptureLayer)
-	# 		@_nativeScrollCaptureLayer.on(Events.TouchStart, @content.draggable._touchStart)
-
-	# 		# TODO: I sincerely don't know what to do here. By layering the capturing scroll view
-	# 		# on top of the rest, I don't get any click events below. I can move the scroll view to
-	# 		# the back, but then I don't get scroll events.
-
-	# 		# What really I need is to have _nativeScrollCaptureLayer capture only mousewheel and scroll
-	# 		# events, but nothing else.
-			
-	# 	@_updateNativeScrollCaptureLayer()
-
-	# _updateNativeScrollCaptureLayer: (event) =>
-	# 	return unless @_nativeScrollCaptureLayer
-		
-	# 	# Update the capturing scroll layer to match the state of the real scroll component
-	# 	# which means the size including scrollbars and the size of the content.
-	# 	scrollBarWidth = 16
-	# 	@_nativeScrollCaptureLayer.frame = @screenFrame
-	# 	@_nativeScrollCaptureLayer.width += scrollBarWidth
-	# 	@_nativeScrollCaptureLayer.height += scrollBarWidth
-	# 	contentFrame = @content.frame
-	# 	contentFrame.width += @_contentInset.right
-	# 	contentFrame.height += @_contentInset.bottom
-	# 	@_nativeScrollCaptureLayer.content.frame = contentFrame
-
-	# _updateNativeScrollCaptureLayerScrollPoint: =>
-	# 	# Handle a scroll event on the actual scroll component, update the capturing layer
-	# 	# to have the same scroll position as the real scroll component. Because this triggers
-	# 	# a scroll event we need to not listen to then for a moment.
-	# 	@_ignoreNextScrollEvent = true
-	# 	@_nativeScrollCaptureLayer._element.scrollLeft = Utils.round(-@content.x, 0)
-	# 	@_nativeScrollCaptureLayer._element.scrollTop = Utils.round(-@content.y, 0)
-
-	# _onMouseWheelCaptureLayer: (event) =>
-	# 	# Handle a mouse wheel event, stop all running momentum/bounce animations
-	# 	# and start listening to the scroll wheel events from the user.
-	# 	@content.draggable.animateStop()
-	# 	@_ignoreNextScrollEvent = false
-
-	# _onScrollCaptureLayer: (event) =>
-	# 	# Handle a scroll event on the capturing scroll layer
-		
-	# 	# We might want to skip this scroll event if it was triggered with code
-	# 	# and not an actual scroll action by the user.
-	# 	if @_ignoreNextScrollEvent is true
-	# 		@_ignoreNextScrollEvent = false
-	# 		return
-
-	# 	event.preventDefault()
-	# 	@content.animateStop()
-
-	# 	# Update the velocity from the mouse. This won't be great for a real mousewheel, 
-	# 	# but fine for a trackpad.
-	# 	@content.draggable._eventBuffer.push
-	# 		x: @content.x - @_nativeScrollCaptureLayer.scrollX
-	# 		y: @content.y - @_nativeScrollCaptureLayer.scrollY
-	# 		t: Date.now()
-
-	# 	# Copy over the scroll position from the capture layer to the real scrollview
-	# 	@content.x = -@_nativeScrollCaptureLayer.scrollX + @_contentInset.left
-	# 	@content.y = -@_nativeScrollCaptureLayer.scrollY + @_contentInset.top
-
-	# 	# Throw the scroll event
-	# 	# TODO: Add some data that matches the other scroll events
-	# 	@emit(Events.Scroll, event)
-
-	# 	@_ignoreNextScrollEvent = false
-
+	# Convenience function to make a single layer scrollable
 
 	@wrap = (layer) ->
 		# This function wraps the given layer into a scroll or page component

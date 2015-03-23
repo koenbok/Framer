@@ -14,13 +14,23 @@ class exports.PageComponent extends ScrollComponent
 		@content.draggable.momentum = false
 		@content.draggable.bounce = false
 
-		@on(Events.ScrollEnd, @_onScrollEnd)
+		@on(Events.ScrollEnd, @snapToPage)
+		# @_content.on("change:subLayers", @snapToPage)
 
-	_onScrollEnd: =>
+	# calculateContentSize: ->
+	# 	frame = @content.contentFrame()
+	# 	frame
 
+	# _updateContent: =>
+	# 	super
+	# 	@snapToPage(false)
+
+	snapToPage: (animate=true) =>
 		velocity = @content.draggable.velocity
 		scrollPoint = @scrollPoint
 		scrollPoint.x -= velocity.x * @velocityMultiplier
 		scrollPoint.y -= velocity.y * @velocityMultiplier
 		closestLayer = @closestContentLayerForScrollPoint(scrollPoint, @originX, @originY)
-		@scrollToLayer(closestLayer, @originX, @originY, true, @animationOptions)
+		print "closestLayer", closestLayer
+		return unless closestLayer
+		@scrollToLayer(closestLayer, @originX, @originY, animate, @animationOptions)
