@@ -151,11 +151,11 @@ class exports.ScrollComponent extends Layer
 
 	@define "scrollX",
 		get: -> -@content.x
-		set: (value) -> @content.x = @_pointInConstraints({x:-value, y:0}).x
+		set: (value) -> @content.x = -@_pointInConstraints({x:value, y:0}).x
 
 	@define "scrollY",
 		get: -> -@content.y
-		set: (value) -> @content.y = @_pointInConstraints({x:0, y:-value}).y 
+		set: (value) -> @content.y = -@_pointInConstraints({x:0, y:value}).y
 
 	@define "scrollPoint",
 		get: -> 
