@@ -91,7 +91,10 @@ class exports.ScrollComponent extends Layer
 		# Calculates the size of the content. By default this returns the total
 		# size of all the content layers based on width and height. You can override
 		# this for example to take scaling into account.
-		@content.contentFrame()
+		frame = @content.contentFrame()
+		frame.width = @width if frame.width < @width
+		frame.height = @height if frame.height < @height
+		return frame
 
 	setContentLayer: (layer) ->
 
@@ -119,7 +122,7 @@ class exports.ScrollComponent extends Layer
 		contentFrame.y += @_contentInset.top
 		@content.frame = contentFrame
 
-		constraintsFrame = @content.contentFrame()
+		constraintsFrame = @calculateContentSize()
 		constraintsFrame =
 			x: -constraintsFrame.width  + @width - @_contentInset.right
 			y: -constraintsFrame.height + @height - @_contentInset.bottom
