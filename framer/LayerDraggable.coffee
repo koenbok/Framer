@@ -44,6 +44,8 @@ class exports.LayerDraggable extends BaseClass
 	@define "momentumVelocityMultiplier", @simpleProperty "momentumVelocityMultiplier", 800, true, _.isNumber
 	# @define "lockDirectionThreshold", @simpleProperty "lockDirectionThreshold", {x:0, y:0}, true
 
+	@define "ignoreEvents", @simpleProperty "ignoreEvents", true, true, _.isBool
+
 	@define "constraints",
 		get: -> @_constraints
 		set: (value) -> 
@@ -53,12 +55,10 @@ class exports.LayerDraggable extends BaseClass
 				@_constraints = {x:0, y:0, width:0, height:0}
 			@_updateSimulationConstraints(@_constraints) if @_constraints
 
-	
-	@define "isAnimating", get: -> @_isAnimating or false
-
-	# The isDraggin only is true when there was actual movement, so you can
+	# The isDragging only is true when there was actual movement, so you can
 	# use it to determine a click from a drag event.
 	@define "isDragging", get: -> @_isDragging or false
+	@define "isAnimating", get: -> @_isAnimating or false
 
 	# TODO: what to do with this?
 	# Should there be a tap event?
@@ -103,7 +103,7 @@ class exports.LayerDraggable extends BaseClass
 		@_resetLockDirection()
 
 		event.preventDefault()
-		# event.stopPropagation() if ! @_propagateEvents
+		event.stopPropagation() unless @propagateEvents
 
 		# Extract the event (mobile may have multiple)
 		touchEvent = Events.touchEvent(event)
@@ -146,7 +146,7 @@ class exports.LayerDraggable extends BaseClass
 		return unless @enabled
 
 		event.preventDefault()
-		# event.stopPropagation() unless @_propagateEvents
+		event.stopPropagation() unless @propagateEvents
 
 		@emit(Events.DragWillMove, event)
 
@@ -202,6 +202,8 @@ class exports.LayerDraggable extends BaseClass
 		@emit(Events.DragDidMove, event)
 
 	_touchEnd: (event) =>
+
+		event.stopPropagation() unless @propagateEvents
 
 		document.removeEventListener(Events.TouchMove, @_touchMove)
 		document.removeEventListener(Events.TouchEnd, @_touchEnd)
