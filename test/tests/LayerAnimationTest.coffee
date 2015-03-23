@@ -26,7 +26,7 @@ describe "LayerAnimation", ->
 				layer: new Layer()
 				properties: {x:50}
 
-			animation.options.curve.should.equal "linear"
+			animation.options.curve.should.equal "ease"
 			animation.options.time.should.equal 1
 
 	describe "Properties", ->
