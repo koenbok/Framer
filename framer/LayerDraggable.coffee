@@ -94,6 +94,11 @@ class exports.LayerDraggable extends BaseClass
 		# Override this to add your own behaviour to the update position
 		return point
 
+	touchStart: (event) =>
+		# We expose this publicly so you can start the dragging from an external event
+		# this is for example needed with the slider.
+		@_touchStart(event)
+
 	_touchStart: (event) =>
 
 		# @_propagateEvents = true if (@multipleDraggables && @lockDirection)
