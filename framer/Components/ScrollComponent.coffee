@@ -154,7 +154,8 @@ class exports.ScrollComponent extends Layer
 				y: @scrollY
 		set: (point) ->
 			@content.animateStop()
-			@content.point = @_pointInConstraints(point)
+			@scrollX = point.x
+			@scrollY = point.y
 
 	@define "scrollFrame",
 		get: ->
@@ -184,7 +185,7 @@ class exports.ScrollComponent extends Layer
 				@content.animateStop()
 				@content.animate(animationOptions)
 		else
-			@point = point
+			@scrollPoint = point
 
 	scrollToLayer: (contentLayer, originX=0, originY=0, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
 		
