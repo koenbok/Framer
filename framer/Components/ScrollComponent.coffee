@@ -197,7 +197,11 @@ class exports.ScrollComponent extends Layer
 		if contentLayer.superLayer isnt @content
 			throw Error("This layer is not in the scroll component")
 
-		@scrollToPoint(@_scrollPointForLayer(contentLayer, originX, originY), animate, animationOptions)
+		scrollPoint = @_scrollPointForLayer(contentLayer, originX, originY)
+		scrollPoint.x -= @width * originX
+		scrollPoint.y -= @height * originY
+
+		@scrollToPoint(scrollPoint, animate, animationOptions)
 
 	scrollToClosestLayer: (originX=0, originY=0) ->
 		@scrollToLayer(@closestContentLayer(originX, originY), originX, originY)
@@ -213,6 +217,8 @@ class exports.ScrollComponent extends Layer
 		point = layer.point
 		point.x += layer.width * originX
 		point.y += layer.height * originY
+		# point.x -= @width * originX
+		# point.y -= @height * originY
 		return point
 
 	_contentLayersSortedByDistanceForScrollPoint: (scrollPoint, originX=0, originY=0) ->
