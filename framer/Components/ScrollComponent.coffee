@@ -231,6 +231,22 @@ class exports.ScrollComponent extends Layer
 
 		return point
 
+##############################################################
+	# Map scroll events to content.draggable
+
+	addListener: (eventNames..., listener) ->
+		super
+		for eventName in eventNames
+			@content.on(EventMappers[eventName], listener) if eventName in _.keys(EventMappers)
+
+	removeListener: (eventNames..., listener) ->
+		super
+		for eventName in eventNames
+			@content.off(EventMappers[eventName], listener) if eventName in _.keys(EventMappers)
+	
+	on: @::addListener
+	off: @::removeListener
+
 	##############################################################
 	# MouseWheel handling
 
