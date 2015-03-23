@@ -117,6 +117,8 @@ class exports.ScrollComponent extends Layer
 
 	_updateContent: (info) =>
 
+		# Update the constraints based on the content size and contentInset
+
 		contentFrame = @calculateContentSize()
 		contentFrame.x += @_contentInset.left
 		contentFrame.y += @_contentInset.top
@@ -128,21 +130,6 @@ class exports.ScrollComponent extends Layer
 			y: -constraintsFrame.height + @height - @_contentInset.bottom
 			width: 	constraintsFrame.width  + constraintsFrame.width  - @width + @_contentInset.left + @_contentInset.right
 			height: constraintsFrame.height + constraintsFrame.height - @height + @_contentInset.top + @_contentInset.bottom
-		# constraintsFrame = Utils.frameInset(constraintsFrame, @_contentInset)
-
-		# for layer in @content.subLayers
-		# 	layer.off
-
-		# if info?.added
-		# 	for layer in info.added
-		# 		layer.on("change:width", @_updateContent)
-		# 		layer.on("change:height", @_updateContent)
-		# if info?.removed
-		# 	for layer in info.removed
-		# 		layer.off("change:width", @_updateContent)
-		# 		layer.off("change:height", @_updateContent)
-
-
 
 		@content.draggable.constraints = constraintsFrame
 
@@ -175,6 +162,8 @@ class exports.ScrollComponent extends Layer
 			rect.width = @width
 			rect.height = @height
 			rect
+		set: (value) ->
+			@scrollPoint = value
 
 	@define "contentInset",
 		get: ->
