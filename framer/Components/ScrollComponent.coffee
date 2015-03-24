@@ -95,8 +95,6 @@ class exports.ScrollComponent extends Layer
 
 		contentFrame = @content.contentFrame()
 
-		print "contentFrame", contentFrame
-
 		return size = 
 			width:  Math.max(@width,  contentFrame.x + contentFrame.width)
 			height: Math.max(@height, contentFrame.y + contentFrame.height)
@@ -318,12 +316,13 @@ class exports.ScrollComponent extends Layer
 
 		scroll = new @
 
-		# If no superlayer was set, we are going to assume 
-		if layer.superLayer
-			scroll.frame = layer.superLayer.frame
-		else
+		# If no superlayer was set, we are going to assume the scrollview will be 
+		# as big as the screen, and that you will correct it yourself afterwards.
+		if not layer.superLayer
 			scroll.width = Screen.width - scroll.x
 			scroll.height = Screen.height - scroll.y
+		else
+			scroll.size = layer.superLayer.size
 
 		layerIndex = layer.index
 		scroll.superLayer = layer.superLayer
