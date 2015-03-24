@@ -7,7 +7,7 @@ Utils = require "../Utils"
 SliderComponent
 
 knob <layer>
-knoSize <width, height>
+knobSize <width, height>
 fill <layer>
 min <number>
 max <number>
