@@ -203,8 +203,8 @@ class exports.ScrollComponent extends Layer
 
 		@scrollToPoint(scrollPoint, animate, animationOptions)
 
-	scrollToClosestLayer: (originX=0, originY=0) ->
-		@scrollToLayer(@closestContentLayer(originX, originY), originX, originY)
+	scrollToClosestLayer: (originX=0, originY=0, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
+		@scrollToLayer(@closestContentLayer(originX, originY, animate, animationOptions), originX, originY)
 
 	closestContentLayer: (originX=0, originY=0) ->
 		scrollPoint = Utils.framePointForOrigin(@scrollFrame, originX, originY)
