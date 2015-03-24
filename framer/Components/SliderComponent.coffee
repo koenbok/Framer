@@ -1,4 +1,3 @@
-
 Utils = require "../Utils"
 {Layer} = require "../Layer"
 {Events} = require "../Events"
@@ -22,8 +21,9 @@ class exports.SliderComponent extends Layer
 
 	constructor: (options={}) ->
 		options.backgroundColor ?= "#ccc"
+		options.borderRadius ?= 50
 		options.clip ?= false
-		options.width ?= 200
+		options.width ?= 300
 		options.height ?= 10
 		super options
 				
@@ -39,7 +39,7 @@ class exports.SliderComponent extends Layer
 		@knob.draggable.overdrag = false
 		@knob.draggable.momentum = true
 		@knob.draggable.momentumOptions = 
-			friction: 10
+			friction: 2
 			tolerance: 1/10 
 		@knob.draggable.bounce = false
 		@knob.borderRadius = @knob.width
@@ -49,7 +49,8 @@ class exports.SliderComponent extends Layer
 			superLayer: @
 			height: @height
 			width: 0
-		
+			borderRadius: 50
+
 		@fill.force2d = true
 		@knob.placeBefore(@fill)
 		
@@ -64,7 +65,7 @@ class exports.SliderComponent extends Layer
 			@value = @valueForPoint(event.x - @screenFrame.x)
 			@knob.draggable._touchStart(event)
 
-		@knobSize = options.knobSize or 10
+		@knobSize = options.knobSize or 30
 	
 	_updateFill: =>
 		@fill.width = @knob.midX
