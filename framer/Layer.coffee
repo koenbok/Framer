@@ -274,6 +274,7 @@ class exports.Layer extends BaseClass
 				@frame = Utils.convertPoint(frame, null, @superLayer)
 
 	contentFrame: ->
+		return {x:0, y:0, width:0, height:0} unless @subLayers.length
 		Utils.frameMerge(_.pluck(@subLayers, "frame"))
 
 	centerFrame: ->
