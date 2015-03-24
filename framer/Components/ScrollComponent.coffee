@@ -122,7 +122,8 @@ class exports.ScrollComponent extends Layer
 
 	_updateContent: =>
 
-		# Update the constraints based on the content size and contentInset
+		# Update the size of the content layer, and the dragging constraints based on the 
+		# content size and contentInset.
 
 		contentFrame = @calculateContentSize()
 		contentFrame.x = 0 + @_contentInset.left
@@ -137,6 +138,12 @@ class exports.ScrollComponent extends Layer
 			height: constraintsFrame.height + constraintsFrame.height - @height + @_contentInset.top + @_contentInset.bottom
 
 		@content.draggable.constraints = constraintsFrame
+
+		# Change the default background color if we added subLayers. We keep the default color around
+		# until you set a content layer so you can see the ScrollComponent on your screen after creation.
+		if @content.subLayers.length
+			if @content.backgroundColor == Framer.Defaults.Layer.backgroundColor
+				@content.backgroundColor = null
 
 	@define "scroll",
 		get: -> @scrollHorizontal is true or @scrollVertical is true
