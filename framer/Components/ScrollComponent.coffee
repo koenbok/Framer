@@ -94,9 +94,12 @@ class exports.ScrollComponent extends Layer
 		# this for example to take scaling into account.
 
 		contentFrame = @content.contentFrame()
+
+		print "contentFrame", contentFrame
+
 		return size = 
-			width:  Math.max(@width, contentFrame.width)
-			height: Math.max(@height, contentFrame.height)
+			width:  Math.max(@width,  contentFrame.x + contentFrame.width)
+			height: Math.max(@height, contentFrame.y + contentFrame.height)
 
 
 	setContentLayer: (layer) ->
@@ -314,21 +317,18 @@ class exports.ScrollComponent extends Layer
 		# This function wraps the given layer into a scroll or page component
 
 		scroll = new @
-			backgroundColor: null
-		scroll.frame = layer.frame
+
+		# If no superlayer was set, we are going to assume 
+		if layer.superLayer
+			scroll.frame = layer.superLayer.frame
+		else
+			scroll.width = Screen.width - scroll.x
+			scroll.height = Screen.height - scroll.y
 
 		layerIndex = layer.index
 		scroll.superLayer = layer.superLayer
 		scroll.index = layerIndex
-		
-		# Correct the position for the scroll content
 
-		contentFrame = layer.contentFrame()
-		layer.width =  Math.max(layer.contentFrame().width,  layer.width) + contentFrame.x
-		layer.height = Math.max(layer.contentFrame().height, layer.height) + contentFrame.y
-		layer.x = 0
-		layer.y = 0
-
-		scroll.content.addSubLayer(layer)
+		layer.superLayer = scroll.content
 
 		return scroll
