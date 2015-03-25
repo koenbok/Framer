@@ -27,16 +27,12 @@ class exports.BaseClass extends EventEmitter
 				@[DefinedPropertiesKey] ?= {}
 				@[DefinedPropertiesKey][propertyName] = descriptor
 
-		# If no setter was given, this must be a readonly property (and there's a
-		# proper JS flag to signal that:
-		descriptor.writeable = !!descriptor.set
-
 		# Set the getter/setter as setProperty on this object so we can access and override it easily
 		getName = "get#{capitalizeFirstLetter(propertyName)}"
 		@::[getName] = descriptor.get
 		descriptor.get = @::[getName]
 
-		if descriptor.writeable
+		if descriptor.set
 			setName = "set#{capitalizeFirstLetter(propertyName)}"
 			@::[setName] = descriptor.set
 			descriptor.set = @::[setName]
@@ -122,7 +118,7 @@ class exports.BaseClass extends EventEmitter
 
 		# Set the default values for this object
 		for name, descriptor of @constructor[DefinedPropertiesKey]
-			if descriptor.writeable
+			if descriptor.set
 				initialValue = Utils.valueOrDefault(options?[name], @_getPropertyDefaultValue(name));
 				if not (initialValue in [null, undefined])
 					@[name] = initialValue

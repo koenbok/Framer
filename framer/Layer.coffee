@@ -73,10 +73,6 @@ class exports.Layer extends BaseClass
 		# We need to explicitly set the element id again, becuase it was made by the super
 		# @_element.id = "FramerLayer-#{@id}"
 
-		for k in ["minX", "midX", "maxX", "minY", "midY", "maxY"]
-			if options.hasOwnProperty(k)
-				@[k] = options[k]
-
 		# Insert the layer into the dom or the superLayer element
 		if not options.superLayer
 			@_insertElement() if not options.shadow
