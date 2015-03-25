@@ -20,7 +20,7 @@ class exports.BaseClass extends EventEmitter
 
 		# See if we need to add this property to the internal properties class
 		if @ isnt BaseClass
-			descriptor.enumerable = descriptor.exportable == true
+			descriptor.enumerable = descriptor.enumerable || !descriptor.hasOwnProperty('enumerable')
 			descriptor.propertyName = propertyName
 
 			if not descriptor.excludeFromProps
@@ -44,19 +44,19 @@ class exports.BaseClass extends EventEmitter
 		# Define the property
 		Object.defineProperty(@prototype, propertyName, descriptor)
 
-	@simpleProperty = (name, fallback, exportable=true) ->
+	@simpleProperty = (name, fallback, enumerable=true) ->
 		# Default property, provides storage and fallback
-		exportable: exportable
+		enumerable: enumerable
 		default: fallback
 		get: -> @_getPropertyValue(name)
 		set: (value) -> @_setPropertyValue(name, value)
 
-	@proxyProperty = (keyPath, exportable=true) ->
+	@proxyProperty = (keyPath, enumerable=true) ->
 		# Allows to easily proxy properties from an instance object
 		# Object property is in the form of "object.property"
 		objectKey = keyPath.split(".")[0]
-		result = 
-			exportable: exportable
+		result =
+			enumerable: enumerable
 			get: ->
 				return unless @[objectKey]
 				Utils.getValueForKeyPath(@, keyPath)
