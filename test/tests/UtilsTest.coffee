@@ -187,20 +187,40 @@ describe "Utils", ->
 
 	describe "textSize", ->
 
-		# Todo: for some reason these don't work reliable in phantomjs
+		it "should have the right text size", ->
 
-		text  = "Hello Koen Bok"
-		style = {font:"20px/1em Menlo"}
+			# Todo: for some reason these don't work reliable in phantomjs
 
-		# it "should return the right size", ->
-		# 	Utils.textSize(text, style).should.eql({width:168, height:20})
+			text  = "Hello Koen Bok"
+			style = {font:"20px/1em Menlo"}
 
-		# it "should return the right size with width constraint", ->
-		# 	Utils.textSize(text, style, {width:100}).should.eql({width:100, height:40})
+			# it "should return the right size", ->
+			# 	Utils.textSize(text, style).should.eql({width:168, height:20})
 
-		# it "should return the right size with height constraint", ->
-		# 	Utils.textSize(text, style, {height:100}).should.eql(width:168,height:100)
+			# it "should return the right size with width constraint", ->
+			# 	Utils.textSize(text, style, {width:100}).should.eql({width:100, height:40})
 
+			# it "should return the right size with height constraint", ->
+			# 	Utils.textSize(text, style, {height:100}).should.eql(width:168,height:100)
+
+
+	describe "frameSortByAbsoluteDistance", ->
+
+		it "should sort x", ->
+
+			layerA = new Layer x:300, y:100
+			layerB = new Layer x:100, y:100
+			layerC = new Layer x:200, y:100
+
+			Utils.frameSortByAbsoluteDistance({x:0, y:0}, [layerA, layerB, layerC]).should.eql([layerB, layerC, layerA])
+
+		it "should sort", ->
+
+			layerA = new Layer x:500, y:500
+			layerB = new Layer x:300, y:300
+			layerC = new Layer x:100, y:100
+
+			Utils.frameSortByAbsoluteDistance({x:0, y:0}, [layerA, layerB, layerC]).should.eql([layerC, layerB, layerA])
 
 
 

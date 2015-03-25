@@ -601,6 +601,15 @@ Utils.frameInset = (frame, inset) ->
 		width: frame.width - inset.left - inset.right
 		height: frame.height - inset.top - inset.bottom
 
+Utils.frameSortByAbsoluteDistance = (point, frames, originX=0, originY=0) ->
+	distance = (frame) ->
+		result = Utils.pointDistance(point, Utils.framePointForOrigin(frame, originX, originY))
+		result = Utils.pointAbs(result)
+		result = Utils.pointTotal(result)
+		result
+
+	return frames.sort (a, b) -> distance(a) - distance(b)
+
 Utils.pointInPolygon = (point, vs) ->
 	# ray-casting algorithm based on
 	# http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html

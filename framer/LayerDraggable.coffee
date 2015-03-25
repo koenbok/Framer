@@ -293,6 +293,16 @@ class exports.LayerDraggable extends BaseClass
 	@define "angle",
 		get: -> @_eventBuffer.angle
 
+	@define "direction",
+		get: ->
+			velocity = @velocity
+			if Math.abs(velocity.x) > Math.abs(velocity.y)
+				return "left" if velocity.x > 0
+				return "right"
+			else
+				return "up" if velocity.y > 0
+				return "down"
+
 	calculateVelocity: ->
 		# Compatibility method
 		@velocity

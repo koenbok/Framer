@@ -72,7 +72,7 @@ class exports.ScrollComponent extends Layer
 		
 		# options.backgroundColor ?= null
 		options.clip ?= true
-		options.name ?= "ScrollComponent"
+		options.name ?= @constructor.name
 		options.mouseWheelEnabled ?= false
 		options.backgroundColor ?= null
 
@@ -106,7 +106,7 @@ class exports.ScrollComponent extends Layer
 
 		@_content = layer
 		@_content.superLayer = @
-		@_content.name = "ScrollContent"
+		@_content.name = "#{@constructor.name.replace("Component", "")}Content"
 		@_content.clip = false
 		@_content.draggable.enabled = true
 		@_content.draggable.momentum = true
@@ -211,8 +211,16 @@ class exports.ScrollComponent extends Layer
 
 		@scrollToPoint(scrollPoint, animate, animationOptions)
 
+		return contentLayer
+
 	scrollToClosestLayer: (originX=0, originY=0, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
-		@scrollToLayer(@closestContentLayer(originX, originY, animate, animationOptions), originX, originY)
+		closestLayer = @closestContentLayer(originX, originY, animate, animationOptions)
+		if closestLayer
+			@scrollToLayer(closestLayer, originX, originY)
+			return closestLayer
+		else
+			@scrollToPoint({x:0, y:0}) unless closestLayer
+			return null
 
 	closestContentLayer: (originX=0, originY=0) ->
 		scrollPoint = Utils.framePointForOrigin(@scrollFrame, originX, originY)
@@ -221,23 +229,27 @@ class exports.ScrollComponent extends Layer
 	closestContentLayerForScrollPoint: (scrollPoint, originX=0, originY=0) ->
 		return _.first(@_contentLayersSortedByDistanceForScrollPoint(scrollPoint, originX, originY))
 
+	contentLayersAbove: (point) -> _.filter @content.subLayers, (l) => 
+			Utils.framePointForOrigin(l.frame, @originX, @originY).y > point.y
+
+	contentLayersBelow: (point) -> _.filter @content.subLayers, (l) => 
+			Utils.framePointForOrigin(l.frame, @originX, @originY).y < point.y
+
+	contentLayersLeft: (point) -> _.filter @content.subLayers, (l) => 
+			Utils.framePointForOrigin(l.frame, @originX, @originY).x < point.x
+
+	contentLayersRight: (point) -> _.filter @content.subLayers, (l) => 
+			Utils.framePointForOrigin(l.frame, @originX, @originY).x > point.x
+
 	_scrollPointForLayer: (layer, originX=0, originY=0, clamp=true) ->
-		point = layer.point
-		point.x += layer.width * originX
-		point.y += layer.height * originY
-		# point.x -= @width * originX
-		# point.y -= @height * originY
-		return point
+		return Utils.framePointForOrigin(layer, originX, originY)
+		# point = layer.point
+		# point.x += layer.width * originX
+		# point.y += layer.height * originY
+		# return point
 
 	_contentLayersSortedByDistanceForScrollPoint: (scrollPoint, originX=0, originY=0) ->
-		
-		distance = (layer) =>
-			result = Utils.pointDistance(scrollPoint, @_scrollPointForLayer(layer, originX, originY))
-			result = Utils.pointAbs(result)
-			result = Utils.pointTotal(result)
-			result
-
-		return @content.subLayers.sort (a, b) -> distance(a) - distance(b)
+		return Utils.frameSortByAbsoluteDistance(scrollPoint, @content.subLayers, originX, originY)
 
 	_pointInConstraints: (point) ->
 
@@ -250,7 +262,7 @@ class exports.ScrollComponent extends Layer
 
 		return point
 
-##############################################################
+	##############################################################
 	# Map scroll events to content.draggable
 
 	addListener: (eventNames..., listener) ->
