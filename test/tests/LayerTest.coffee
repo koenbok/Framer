@@ -117,22 +117,25 @@ describe "Layer", ->
 			else
 				layer.style.webkitTransformOrigin.should.equal "50% 50%"
 
-		it.only "should set local image", ->
+		it "should set local image", ->
 	
-			imagePath = "../static/test.png"
+			prefix = "../"
+			imagePath = "static/test.png"
+			fullPath = prefix + imagePath
 			layer = new Layer
 
-			layer.image = imagePath
-			layer.image.should.equal imagePath
+			layer.image = fullPath
+			layer.image.should.equal fullPath
 
 			layer.style["background-image"].indexOf(imagePath).should.not.equal(-1)
-			# layer.style["background-image"].should.match "file://"
-			# layer.style["background-image"].should.match "?nocache="
+			layer.style["background-image"].indexOf("file://").should.not.equal(-1)
+			layer.style["background-image"].indexOf("?nocache=").should.not.equal(-1)
 
-			layer.computedStyle()["background-size"].should.equal "cover"
-			layer.computedStyle()["background-repeat"].should.equal "no-repeat"
+			#layer.computedStyle()["background-size"].should.equal "cover"
+			#layer.computedStyle()["background-repeat"].should.equal "no-repeat"
 
-			layer.props.image.should.equal imagePath
+			image = layer.props.image
+			layer.props.image.should.equal fullPath
 
 		it "should set image", ->
 			imagePath = "../static/test.png"

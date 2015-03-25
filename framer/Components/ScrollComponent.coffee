@@ -61,6 +61,7 @@ class exports.ScrollComponent extends Layer
 	# scroll component to be draggable, but it's an easy mistake to make. If you 
 	# do want this, use a LayerDraggable directly.
 	@define "draggable",
+		excludeFromProps: true
 		get: -> throw Error("You likely want to use content.draggable")
 
 	@define "content",

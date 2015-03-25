@@ -692,6 +692,7 @@ class exports.Layer extends BaseClass
 	## STATES
 
 	@define "states",
+		excludeFromProps: true,
 		get: -> @_states ?= new LayerStates @
 
 	#############################################################################

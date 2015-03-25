@@ -23,8 +23,9 @@ class exports.BaseClass extends EventEmitter
 			descriptor.enumerable = descriptor.exportable == true
 			descriptor.propertyName = propertyName
 
-			@[DefinedPropertiesKey] ?= {}
-			@[DefinedPropertiesKey][propertyName] = descriptor
+			if not descriptor.excludeFromProps
+				@[DefinedPropertiesKey] ?= {}
+				@[DefinedPropertiesKey][propertyName] = descriptor
 
 		# If no setter was given, this must be a readonly property (and there's a
 		# proper JS flag to signal that:
@@ -79,14 +80,13 @@ class exports.BaseClass extends EventEmitter
 	keys: -> _.keys(@props)
 
 	@define "props",
+		excludeFromProps: true
 		get: ->
-			props = {}
-			console.log '---'
+			value = {}
 			for k, v of @constructor[DefinedPropertiesKey]
-				console.log k
-				props[k] = @[k]
+				value[k] = @[k]
 
-			props
+			value
 
 		set: (value) ->
 			for k, v of value
