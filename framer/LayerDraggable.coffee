@@ -170,8 +170,8 @@ class exports.LayerDraggable extends BaseClass
 
 		# Correct for current drag speed and scale
 		correctedDelta =
-			x: delta.x * @speedX * (1 / @_screenScale.x)
-			y: delta.y * @speedY * (1 / @_screenScale.y)
+			x: delta.x * @speedX * (1 / @_screenScale.x) * @layer.scaleX * @layer.scale
+			y: delta.y * @speedY * (1 / @_screenScale.y) * @layer.scaleY * @layer.scale
 			t: Date.now()
 
 		point = 
