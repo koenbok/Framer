@@ -19,30 +19,29 @@ class exports.BaseClass extends EventEmitter
 	@define = (propertyName, descriptor) ->
 
 		# See if we need to add this property to the internal properties class
-		if @ isnt BaseClass and descriptor.exportable == true
-			# descriptor.enumerable = true
+		if @ isnt BaseClass
+			descriptor.enumerable = descriptor.exportable == true
 			descriptor.propertyName = propertyName
 
 			@[DefinedPropertiesKey] ?= {}
 			@[DefinedPropertiesKey][propertyName] = descriptor
 
-		# If no setter was given, this must be a readonly class
-		if not descriptor.set
-			descriptor.set = -> throw Error("#{@constructor.name}.#{propertyName} property is readonly")
+		# If no setter was given, this must be a readonly property (and there's a
+		# proper JS flag to signal that:
+		descriptor.writeable = !!descriptor.set
 
 		# Set the getter/setter as setProperty on this object so we can access and override it easily
 		getName = "get#{capitalizeFirstLetter(propertyName)}"
-		setName = "set#{capitalizeFirstLetter(propertyName)}"
-
 		@::[getName] = descriptor.get
-		@::[setName] = descriptor.set
-
 		descriptor.get = @::[getName]
-		descriptor.set = @::[setName]
+
+		if descriptor.writeable
+			setName = "set#{capitalizeFirstLetter(propertyName)}"
+			@::[setName] = descriptor.set
+			descriptor.set = @::[setName]
 
 		# Define the property
 		Object.defineProperty(@prototype, propertyName, descriptor)
-		Object.__
 
 	@simpleProperty = (name, fallback, exportable=true) ->
 		# Default property, provides storage and fallback
@@ -82,10 +81,10 @@ class exports.BaseClass extends EventEmitter
 	@define "props",
 		get: ->
 			props = {}
-
+			console.log '---'
 			for k, v of @constructor[DefinedPropertiesKey]
-				if v.exportable isnt false
-					props[k] = @[k]
+				console.log k
+				props[k] = @[k]
 
 			props
 
@@ -123,5 +122,7 @@ class exports.BaseClass extends EventEmitter
 
 		# Set the default values for this object
 		for name, descriptor of @constructor[DefinedPropertiesKey]
-			@[name] = Utils.valueOrDefault(options?[name], @_getPropertyDefaultValue(name))
-
+			if descriptor.writeable
+				initialValue = Utils.valueOrDefault(options?[name], @_getPropertyDefaultValue(name));
+				if not (initialValue in [null, undefined])
+					@[name] = initialValue

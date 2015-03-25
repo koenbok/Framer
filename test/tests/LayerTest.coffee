@@ -117,9 +117,9 @@ describe "Layer", ->
 			else
 				layer.style.webkitTransformOrigin.should.equal "50% 50%"
 
-		it "should set local image", ->
+		it.only "should set local image", ->
 	
-			imagePath = "static/test.png"			
+			imagePath = "../static/test.png"
 			layer = new Layer
 
 			layer.image = imagePath
@@ -135,17 +135,17 @@ describe "Layer", ->
 			layer.props.image.should.equal imagePath
 
 		it "should set image", ->
-			imagePath = "static/test.png"	
+			imagePath = "../static/test.png"
 			layer = new Layer image:imagePath
 			layer.image.should.equal imagePath
 
 		it "should unset image with null", ->
-			layer = new Layer image:"static/test.png"
+			layer = new Layer image:"../static/test.png"
 			layer.image = null
 			layer.image.should.equal ""
 
 		it "should unset image with empty string", ->
-			layer = new Layer image:"static/test.png"
+			layer = new Layer image:"../static/test.png"
 			layer.image = ""
 			layer.image.should.equal ""
 
