@@ -147,3 +147,36 @@ describe "BaseClass", ->
 		testClass.testA = 200
 		testClass.poop.hello.should.equal 200
 
+	it "should exclude prop from props, when excludeFromProps is set", ->
+
+		class TestClass8 extends Framer.BaseClass
+			@define "testProp",
+				get: () -> "value"
+				excludeFromProps: true
+
+		instance = new TestClass8()
+		props = instance.props
+
+		props.hasOwnProperty("testProp").should.be.false
+
+		props = {}
+		for field of instance
+			props[field] = true
+
+		props.hasOwnProperty("testProp").should.be.true
+
+	it "should exclude prop from enumeration, when enumerable is lowered", ->
+
+		class TestClass8 extends Framer.BaseClass
+			@define "testProp",
+				get: () -> "value"
+				enumerable: false
+
+		instance = new TestClass8()
+		props = {}
+		for field of instance
+			props[field] = true
+
+		props.hasOwnProperty("testProp").should.be.false
+
+
