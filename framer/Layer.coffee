@@ -17,7 +17,6 @@ layerValueTypeError = (name, value) ->
 
 layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
 	result = 
-		exportable: true
 		default: fallback
 		get: -> 
 			@_properties[name]
@@ -74,10 +73,6 @@ class exports.Layer extends BaseClass
 		# We need to explicitly set the element id again, becuase it was made by the super
 		# @_element.id = "FramerLayer-#{@id}"
 
-		for k in ["minX", "midX", "maxX", "minY", "midY", "maxY"]
-			if options.hasOwnProperty(k)
-				@[k] = options[k]
-
 		# Insert the layer into the dom or the superLayer element
 		if not options.superLayer
 			@_insertElement() if not options.shadow
@@ -112,7 +107,6 @@ class exports.Layer extends BaseClass
 		layer.ignoreEvents = false if value is true
 
 	@define "scroll",
-		exportable: true
 		get: -> @scrollHorizontal is true or @scrollVertical is true
 		set: (value) -> @scrollHorizontal = @scrollVertical = value
 
@@ -182,7 +176,6 @@ class exports.Layer extends BaseClass
 	# Identity
 
 	@define "name",
-		exportable: true
 		default: ""
 		get: -> 
 			@_getPropertyValue "name"
@@ -196,7 +189,6 @@ class exports.Layer extends BaseClass
 	# Border radius compatibility
 
 	@define "borderRadius",
-		exportable: true
 		default: 0
 		get: -> 
 			@_properties["borderRadius"]
@@ -470,7 +462,6 @@ class exports.Layer extends BaseClass
 	## IMAGE
 
 	@define "image",
-		exportable: true
 		default: ""
 		get: ->
 			@_getPropertyValue "image"
@@ -535,7 +526,8 @@ class exports.Layer extends BaseClass
 	## HIERARCHY
 
 	@define "superLayer",
-		exportable: false
+		excludeFromProps: true
+		enumerable: false
 		get: ->
 			@_superLayer or null
 		set: (layer) ->
@@ -575,11 +567,13 @@ class exports.Layer extends BaseClass
 	# Let's make it when we need it.
 
 	@define "subLayers",
-		exportable: false
+		excludeFromProps: true
+		enumerable: false
 		get: -> _.clone @_subLayers
 
 	@define "siblingLayers",
-		exportable: false
+		excludeFromProps: true
+		enumerable: false
 		get: ->
 
 			# If there is no superLayer we need to walk through the root
@@ -654,7 +648,7 @@ class exports.Layer extends BaseClass
 		return properties
 
 	@define "isAnimating",
-		exportable: false
+		enumerable: false
 		get: -> @animations().length isnt 0
 
 	animateStop: ->
@@ -692,6 +686,7 @@ class exports.Layer extends BaseClass
 	## STATES
 
 	@define "states",
+		excludeFromProps: true,
 		get: -> @_states ?= new LayerStates @
 
 	#############################################################################

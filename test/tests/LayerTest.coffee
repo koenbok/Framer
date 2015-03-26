@@ -119,33 +119,36 @@ describe "Layer", ->
 
 		it "should set local image", ->
 	
-			imagePath = "static/test.png"			
+			prefix = "../"
+			imagePath = "static/test.png"
+			fullPath = prefix + imagePath
 			layer = new Layer
 
-			layer.image = imagePath
-			layer.image.should.equal imagePath
+			layer.image = fullPath
+			layer.image.should.equal fullPath
 
 			layer.style["background-image"].indexOf(imagePath).should.not.equal(-1)
-			# layer.style["background-image"].should.match "file://"
-			# layer.style["background-image"].should.match "?nocache="
+			layer.style["background-image"].indexOf("file://").should.not.equal(-1)
+			layer.style["background-image"].indexOf("?nocache=").should.not.equal(-1)
 
-			layer.computedStyle()["background-size"].should.equal "cover"
-			layer.computedStyle()["background-repeat"].should.equal "no-repeat"
+			#layer.computedStyle()["background-size"].should.equal "cover"
+			#layer.computedStyle()["background-repeat"].should.equal "no-repeat"
 
-			layer.props.image.should.equal imagePath
+			image = layer.props.image
+			layer.props.image.should.equal fullPath
 
 		it "should set image", ->
-			imagePath = "static/test.png"	
+			imagePath = "../static/test.png"
 			layer = new Layer image:imagePath
 			layer.image.should.equal imagePath
 
 		it "should unset image with null", ->
-			layer = new Layer image:"static/test.png"
+			layer = new Layer image:"../static/test.png"
 			layer.image = null
 			layer.image.should.equal ""
 
 		it "should unset image with empty string", ->
-			layer = new Layer image:"static/test.png"
+			layer = new Layer image:"../static/test.png"
 			layer.image = ""
 			layer.image.should.equal ""
 

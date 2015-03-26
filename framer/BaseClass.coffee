@@ -19,44 +19,40 @@ class exports.BaseClass extends EventEmitter
 	@define = (propertyName, descriptor) ->
 
 		# See if we need to add this property to the internal properties class
-		if @ isnt BaseClass and descriptor.exportable == true
-			# descriptor.enumerable = true
+		if @ isnt BaseClass
+			descriptor.enumerable ?= not descriptor.hasOwnProperty('enumerable')
 			descriptor.propertyName = propertyName
 
-			@[DefinedPropertiesKey] ?= {}
-			@[DefinedPropertiesKey][propertyName] = descriptor
-
-		# If no setter was given, this must be a readonly class
-		if not descriptor.set
-			descriptor.set = -> throw Error("#{@constructor.name}.#{propertyName} property is readonly")
+			if not descriptor.excludeFromProps
+				@[DefinedPropertiesKey] ?= {}
+				@[DefinedPropertiesKey][propertyName] = descriptor
 
 		# Set the getter/setter as setProperty on this object so we can access and override it easily
 		getName = "get#{capitalizeFirstLetter(propertyName)}"
-		setName = "set#{capitalizeFirstLetter(propertyName)}"
-
 		@::[getName] = descriptor.get
-		@::[setName] = descriptor.set
-
 		descriptor.get = @::[getName]
-		descriptor.set = @::[setName]
+
+		if descriptor.set
+			setName = "set#{capitalizeFirstLetter(propertyName)}"
+			@::[setName] = descriptor.set
+			descriptor.set = @::[setName]
 
 		# Define the property
 		Object.defineProperty(@prototype, propertyName, descriptor)
-		Object.__
 
-	@simpleProperty = (name, fallback, exportable=true) ->
+	@simpleProperty = (name, fallback, enumerable=true) ->
 		# Default property, provides storage and fallback
-		exportable: exportable
+		enumerable: enumerable
 		default: fallback
 		get: -> @_getPropertyValue(name)
 		set: (value) -> @_setPropertyValue(name, value)
 
-	@proxyProperty = (keyPath, exportable=true) ->
+	@proxyProperty = (keyPath, enumerable=true) ->
 		# Allows to easily proxy properties from an instance object
 		# Object property is in the form of "object.property"
 		objectKey = keyPath.split(".")[0]
-		result = 
-			exportable: exportable
+		result =
+			enumerable: enumerable
 			get: ->
 				return unless @[objectKey]
 				Utils.getValueForKeyPath(@, keyPath)
@@ -72,7 +68,7 @@ class exports.BaseClass extends EventEmitter
 			@_getPropertyDefaultValue k
 
 	_getPropertyDefaultValue: (k) ->
-		@constructor[DefinedPropertiesKey][k]["default"]
+		@_propertyList()[k]["default"]
 
 	_propertyList: ->
 		@constructor[DefinedPropertiesKey]
@@ -80,20 +76,15 @@ class exports.BaseClass extends EventEmitter
 	keys: -> _.keys(@props)
 
 	@define "props",
+		excludeFromProps: true
 		get: ->
-			props = {}
-
-			for k, v of @constructor[DefinedPropertiesKey]
-				if v.exportable isnt false
-					props[k] = @[k]
-
-			props
+			_.pick(@, _.keys(@_propertyList()))
 
 		set: (value) ->
-			for k, v of value
-				if @constructor[DefinedPropertiesKey].hasOwnProperty(k)
-					if @constructor[DefinedPropertiesKey].exportable isnt false
-						@[k] = v
+			propertyList = @_propertyList()
+			for k,v of value
+				if propertyList.hasOwnProperty(k)
+					@[k] = v
 
 	@define "id",
 		get: -> @_id
@@ -122,6 +113,8 @@ class exports.BaseClass extends EventEmitter
 		@_id = @constructor[CounterKey]
 
 		# Set the default values for this object
-		for name, descriptor of @constructor[DefinedPropertiesKey]
-			@[name] = Utils.valueOrDefault(options?[name], @_getPropertyDefaultValue(name))
-
+		for name, descriptor of @_propertyList()
+			if descriptor.set
+				initialValue = Utils.valueOrDefault(options?[name], @_getPropertyDefaultValue(name));
+				if not (initialValue in [null, undefined])
+					@[name] = initialValue
