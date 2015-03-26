@@ -20,7 +20,7 @@ class exports.BaseClass extends EventEmitter
 
 		# See if we need to add this property to the internal properties class
 		if @ isnt BaseClass
-			descriptor.enumerable = descriptor.enumerable || !descriptor.hasOwnProperty('enumerable')
+			descriptor.enumerable ?= not descriptor.hasOwnProperty('enumerable')
 			descriptor.propertyName = propertyName
 
 			if not descriptor.excludeFromProps
@@ -68,7 +68,7 @@ class exports.BaseClass extends EventEmitter
 			@_getPropertyDefaultValue k
 
 	_getPropertyDefaultValue: (k) ->
-		@constructor[DefinedPropertiesKey][k]["default"]
+		@_propertyList()[k]["default"]
 
 	_propertyList: ->
 		@constructor[DefinedPropertiesKey]
@@ -78,17 +78,13 @@ class exports.BaseClass extends EventEmitter
 	@define "props",
 		excludeFromProps: true
 		get: ->
-			value = {}
-			for k, v of @constructor[DefinedPropertiesKey]
-				value[k] = @[k]
-
-			value
+			_.pick(@, _.keys(@_propertyList()))
 
 		set: (value) ->
-			for k, v of value
-				if @constructor[DefinedPropertiesKey].hasOwnProperty(k)
-					if @constructor[DefinedPropertiesKey].exportable isnt false
-						@[k] = v
+			propertyList = @_propertyList()
+			for k,v of value
+				if propertyList.hasOwnProperty(k)
+					@[k] = v
 
 	@define "id",
 		get: -> @_id
@@ -117,7 +113,7 @@ class exports.BaseClass extends EventEmitter
 		@_id = @constructor[CounterKey]
 
 		# Set the default values for this object
-		for name, descriptor of @constructor[DefinedPropertiesKey]
+		for name, descriptor of @_propertyList()
 			if descriptor.set
 				initialValue = Utils.valueOrDefault(options?[name], @_getPropertyDefaultValue(name));
 				if not (initialValue in [null, undefined])
