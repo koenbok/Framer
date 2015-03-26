@@ -833,7 +833,7 @@ describe "Layer", ->
 
 	describe "Copy", ->
 
-		it.only "copied Layer should hold set props", ->
+		it "copied Layer should hold set props", ->
 
 			X = 100
 			Y = 200
