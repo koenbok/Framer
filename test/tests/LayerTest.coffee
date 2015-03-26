@@ -834,6 +834,31 @@ describe "Layer", ->
 
 			layer.style.webkitTransform.should.equal "translate(0px, 0px) scale(1) skew(0deg, 0deg) rotate(0deg)"
 
+	describe "Copy", ->
+
+		it "copied Layer should hold set props", ->
+
+			X = 100
+			Y = 200
+			IMAGE = '../static/test.png'
+
+			layer = new Layer
+				x:X
+				y:Y
+				image:IMAGE
+
+			layer.x.should.eql X
+			layer.y.should.eql Y
+			layer.image.should.eql IMAGE
+
+			copy = layer.copy()
+
+			copy.x.should.eql X
+			copy.y.should.eql Y
+			copy.image.should.eql IMAGE
+
+
+
 
 
 

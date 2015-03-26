@@ -456,7 +456,7 @@ class exports.Layer extends BaseClass
 
 		layer
 
-	copySingle: -> new Layer @properties
+	copySingle: -> new Layer @props
 
 	##############################################################
 	## IMAGE
