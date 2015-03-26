@@ -61,7 +61,6 @@ class exports.ScrollComponent extends Layer
 	# scroll component to be draggable, but it's an easy mistake to make. If you 
 	# do want this, use a LayerDraggable directly.
 	@define "draggable",
-		excludeFromProps: true
 		get: -> throw Error("You likely want to use content.draggable")
 
 	@define "content",
@@ -78,6 +77,9 @@ class exports.ScrollComponent extends Layer
 		options.backgroundColor ?= null
 
 		super options
+
+		for k in ["contentInset", "scrollPoint", "scrollX", "scrollY", "scrollFrame", "mouseWheelEnabled"]
+			@[k] = options[k] if options.hasOwnProperty(k)
 
 		@_contentInset = Utils.zeroRect()
 
@@ -322,22 +324,19 @@ class exports.ScrollComponent extends Layer
 	# Convenience function to make a single layer scrollable
 
 	@wrap = (layer) ->
+
 		# This function wraps the given layer into a scroll or page component
 
 		scroll = new @
 
-		# If no superlayer was set, we are going to assume the scrollview will be 
-		# as big as the screen, and that you will correct it yourself afterwards.
-		if not layer.superLayer
-			scroll.width = Screen.width - scroll.x
-			scroll.height = Screen.height - scroll.y
-		else
-			scroll.size = layer.superLayer.size
+		for propKey in ["frame", "image", "name"]
+			scroll[propKey] = layer[propKey]
+		
+		for subLayer in layer.subLayers
+			subLayerIndex = subLayer.index
+			subLayer.superLayer = scroll.content
+			subLayer.index = subLayerIndex
 
-		layerIndex = layer.index
 		scroll.superLayer = layer.superLayer
-		scroll.index = layerIndex
-
-		layer.superLayer = scroll.content
-
+		layer.destroy()
 		return scroll
