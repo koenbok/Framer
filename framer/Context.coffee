@@ -25,7 +25,7 @@ class exports.Context extends BaseClass
 
 		@_parentLayer = options.parentLayer
 		@_name = options.name
-
+		
 		@reset()
 
 	reset: ->
@@ -47,6 +47,7 @@ class exports.Context extends BaseClass
 		@_animationList = []
 		@_delayTimers = []
 		@_delayIntervals = []
+		@_layerIdCounter = 1
 
 		@emit("reset", @)
 
@@ -55,6 +56,21 @@ class exports.Context extends BaseClass
 
 	getLayers: ->
 		_.clone(@_layerList)
+
+	addLayer: (layer) ->
+		return if layer in @_layerList
+		@_layerList.push(layer)
+		return null
+
+	removeLayer: (layer) ->
+		@_layerList = _.without(@_layerList, layer)
+		return null
+
+	layerCount: ->
+		return @_layerList.length
+
+	nextLayerId: ->
+		@_layerIdCounter++
 
 	_createRootElement: ->
 

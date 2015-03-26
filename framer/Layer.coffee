@@ -36,7 +36,6 @@ layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
 			@emit("change:size", value)  if name in ["width", "height"]
 			@emit("change:frame", value) if name in ["x", "y", "width", "height"]
 
-
 class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
@@ -64,9 +63,9 @@ class exports.Layer extends BaseClass
 		super options
 
 		# Add this layer to the current context
-		@_context._layerList.push(@)
+		@_context.addLayer(@)
 
-		@_id = @_context._layerList.length
+		@_id = @_context.nextLayerId()
 
 		# Keep track of the default values
 		# @_defaultValues = options._defaultValues
@@ -444,7 +443,7 @@ class exports.Layer extends BaseClass
 		@_element.parentNode?.removeChild @_element
 		@removeAllListeners()
 		
-		@_context._layerList = _.without @_context._layerList, @
+		@_context.removeLayer(@)
 
 		@_context.emit("layer:destroy", @)
 
@@ -584,7 +583,7 @@ class exports.Layer extends BaseClass
 
 			# If there is no superLayer we need to walk through the root
 			if @superLayer is null
-				return _.filter @_context._layerList, (layer) =>
+				return _.filter @_context.getLayers(), (layer) =>
 					layer isnt @ and layer.superLayer is null
 
 			return _.without @superLayer.subLayers, @
