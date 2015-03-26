@@ -12,6 +12,8 @@ Utils = require "./Utils"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
 
+NoCacheDateKey = Date.now()
+
 layerValueTypeError = (name, value) ->
 	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
 
@@ -518,7 +520,7 @@ class exports.Layer extends BaseClass
 			# If the file is local, we want to avoid caching
 			# if Utils.isLocal() and not (_.startsWith(imageUrl, "http://") or _.startsWith(imageUrl, "https://"))
 			if Utils.isLocal() and not imageUrl.match(/^https?:\/\//) and @_cacheImage is false
-				imageUrl += "?nocache=#{Date.now()}"
+				imageUrl += "?nocache=#{NoCacheDateKey}"
 
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
