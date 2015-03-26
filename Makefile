@@ -26,8 +26,7 @@ build: clean bootstrap
 	$(browserify) framer/Framer.coffee -o build/framer.debug.js
 	cat build/framer.debug.js | "$(bin)/exorcist" build/framer.js.map > build/framer.js
 
-
-debug:
+debug: bootstrap 
 	"$(bin)/watchify" -t coffeeify --extension=".coffee" framer/Framer.coffee -d -v -o build/framer.debug.js
 
 studio:
