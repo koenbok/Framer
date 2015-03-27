@@ -60,8 +60,8 @@ class exports.ScrollComponent extends Layer
 	# We throw an error here, because you almost never would like the enclosing
 	# scroll component to be draggable, but it's an easy mistake to make. If you 
 	# do want this, use a LayerDraggable directly.
-	@define "draggable",
-		get: -> throw Error("You likely want to use content.draggable")
+	# @define "draggable",
+	# 	get: -> throw Error("You likely want to use content.draggable")
 
 	@define "content",
 		get: -> @_content
