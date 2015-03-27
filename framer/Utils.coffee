@@ -466,9 +466,9 @@ Utils.pointAbs = (point) ->
 		y: Math.abs point.y
 
 Utils.pointInFrame = (point, frame) ->
-	return false  if point.x < frame.minX or point.x > frame.maxX
-	return false  if point.y < frame.minY or point.y > frame.maxY
-	true
+	return false if point.x < Utils.frameGetMinX(frame) or point.x > Utils.frameGetMaxX(frame)
+	return false if point.y < Utils.frameGetMinY(frame) or point.y > Utils.frameGetMaxY(frame)
+	return true
 
 # Size
 
