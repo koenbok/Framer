@@ -188,5 +188,21 @@ describe "BaseClass", ->
 		instance = new TestClass()
 		(-> instance.testProp = "foo").should.throw "setting a property that has only a getter"
 
+	it "should not set read-only prop via props setter", ->
 
+		class TestClass extends Framer.BaseClass
+
+			@define "testPropA",
+				get: -> @_propA
+				set: (value) -> @_propA = value
+
+			@define "testPropB",	get: -> "value"
+
+		instance = new TestClass()
+		instance.props =
+			testPropA: 'a'
+			testPropB: true
+
+		instance.props.testPropA.should.equal "a"
+		instance.props.testPropB.should.equal "value"
 

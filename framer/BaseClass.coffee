@@ -83,7 +83,7 @@ class exports.BaseClass extends EventEmitter
 		set: (value) ->
 			propertyList = @_propertyList()
 			for k,v of value
-				if propertyList.hasOwnProperty(k)
+				if propertyList[k]?.set
 					@[k] = v
 
 	@define "id",
