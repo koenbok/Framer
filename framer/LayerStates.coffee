@@ -42,7 +42,7 @@ class exports.LayerStates extends BaseClass
 
 		# Add a state with a name and properties
 		@_orderedStates.push stateName
-		@_states[stateName] = properties
+		@_states[stateName] = LayerStates.filterStateProperties(properties)
 
 	remove: (stateName) ->
 
@@ -166,3 +166,13 @@ class exports.LayerStates extends BaseClass
 		super
 		# Also emit this to the layer with self as argument
 		@layer.emit args...
+
+	@filterStateProperties = (properties) ->
+
+		stateProperties = {}
+
+		# TODO: Maybe we want to support advanced data structures like objects in the future too.
+		for k, v of properties
+			stateProperties[k] = v if _.isNumber(v) or _.isFunction(v) or _.isBool(v) or _.isString(v)
+
+		return stateProperties

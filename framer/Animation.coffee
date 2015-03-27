@@ -58,7 +58,7 @@ class exports.Animation extends EventEmitter
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
-		@options.properties = @_filterAnimatableProperties(@options.properties)
+		@options.properties = Animation.filterAnimatableProperties(@options.properties)
 
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
@@ -182,16 +182,6 @@ class exports.Animation extends EventEmitter
 
 		return
 
-	_filterAnimatableProperties: (properties) ->
-
-		animatableProperties = {}
-
-		# Only animate numeric properties for now
-		for k, v of properties
-			animatableProperties[k] = v if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v)
-
-		animatableProperties
-
 	_currentState: ->
 		_.pick @options.layer, _.keys(@options.properties)
 
@@ -248,3 +238,13 @@ class exports.Animation extends EventEmitter
 				for k, i in ["stiffness", "damping", "mass", "tolerance"]
 					value = parseFloat parsedCurve.args[i]
 					@options.curveOptions[k] = value if value
+
+	@filterAnimatableProperties = (properties) ->
+		# Function to filter only animatable properties out of a given set
+		animatableProperties = {}
+
+		# Only animate numeric properties for now
+		for k, v of properties
+			animatableProperties[k] = v if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v)
+
+		return animatableProperties
