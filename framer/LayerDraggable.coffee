@@ -343,7 +343,7 @@ class exports.LayerDraggable extends BaseClass
 
 		if @_lockDirectionEnabledX or @_lockDirectionEnabledY
 
-			@emit Events.DirectionLock, 
+			@emit Events.DidStartLockDirection, 
 				x: @_lockDirectionEnabledX
 				y: @_lockDirectionEnabledY
 
