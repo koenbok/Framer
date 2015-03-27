@@ -1,6 +1,22 @@
 {Events} = require "../Events"
 {ScrollComponent} = require "./ScrollComponent"
 
+"""
+PageComponent
+
+originX <number>
+originY <number>
+
+velocityThreshold <number>
+animationOptions <animationOptions={}>
+currentPage <Layer>
+closestLayer(<originX:n, originY:n>) <Layer>
+
+nextPage(direction="", currentPage)
+snapToNextPage(direction="", animate, animationOptions={})
+
+"""
+
 class exports.PageComponent extends ScrollComponent
 
 	@define "originX", @simpleProperty("originX", .5, true)
