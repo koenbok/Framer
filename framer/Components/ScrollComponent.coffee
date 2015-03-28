@@ -39,6 +39,7 @@ ScrollEnd -> DragEnd
 
 Events.ScrollStart = "scrollstart"
 Events.Scroll = "scroll"
+Events.ScrollMove = Events.Scroll
 Events.ScrollEnd = "scrollend"
 
 EventMappers = {}
@@ -64,6 +65,8 @@ class exports.ScrollComponent extends Layer
 	# 	get: -> throw Error("You likely want to use content.draggable")
 
 	@define "content",
+		importable: false
+		exportable: false
 		get: -> @_content
 
 	@define "mouseWheelSpeedMultiplier", @simpleProperty("mouseWheelSpeedMultiplier", 1, true, _.isNumber)
@@ -124,6 +127,8 @@ class exports.ScrollComponent extends Layer
 
 	_updateContent: =>
 
+		return unless @content
+
 		# Update the size of the content layer, and the dragging constraints based on the 
 		# content size and contentInset.
 
@@ -150,28 +155,42 @@ class exports.ScrollComponent extends Layer
 	@define "scroll",
 		get: -> @scrollHorizontal is true or @scrollVertical is true
 		set: (value) ->
+			return unless @content
 			@content.animateStop() if value is false
 			@scrollHorizontal = @scrollVertical = value
 
 	@define "scrollX",
-		get: -> -@content.x
-		set: (value) -> @content.x = -@_pointInConstraints({x:value, y:0}).x
+		get: -> 
+			return 0 if not @content
+			-@content.x
+		set: (value) -> 
+			return unless @content
+			@content.x = -@_pointInConstraints({x:value, y:0}).x
 
 	@define "scrollY",
-		get: -> -@content.y
-		set: (value) -> @content.y = -@_pointInConstraints({x:0, y:value}).y
+		get: -> 
+			return 0 if not @content
+			-@content.y
+		set: (value) -> 
+			return unless @content
+			@content.y = -@_pointInConstraints({x:0, y:value}).y
 
 	@define "scrollPoint",
+		importable: true
+		exportable: false
 		get: -> 
 			point =
 				x: @scrollX
 				y: @scrollY
 		set: (point) ->
+			return unless @content
 			@content.animateStop()
 			@scrollX = point.x
 			@scrollY = point.y
 
 	@define "scrollFrame",
+		importable: true
+		exportable: false
 		get: ->
 			rect = @scrollPoint
 			rect.width = @width
@@ -319,6 +338,16 @@ class exports.ScrollComponent extends Layer
 	_onMouseWheelEnd: Utils.debounce 0.3, (event) ->
 		@emit(Events.ScrollEnd, event)
 		@_mouseWheelScrolling = false
+
+	##############################################################
+	# Copying
+
+	copy: ->
+		copy = super
+		contentLayer = _.first(_.without(copy.subLayers, copy.content))
+		copy.setContentLayer(contentLayer)
+		copy.props = @props
+		return copy
 
 
 	##############################################################
