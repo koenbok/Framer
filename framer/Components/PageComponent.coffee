@@ -23,7 +23,10 @@ class exports.PageComponent extends ScrollComponent
 	@define "originY", @simpleProperty("originY", .5, true)
 	@define "velocityThreshold", @simpleProperty("velocityThreshold", 0.1, true)
 	@define "animationOptions", @simpleProperty("animationOptions", {curve:"spring(500,50,0)"}, true)
-	@define "currentPage", get: -> @closestLayer()
+	@define "currentPage", 
+		importable: false
+		exportable: false
+		get: -> @closestLayer()
 
 	constructor: ->
 		super
