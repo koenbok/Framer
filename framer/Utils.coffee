@@ -174,10 +174,13 @@ Utils.stringify = (obj) ->
 	return obj
 
 Utils.inspectObjectType = (item) ->
+	# This is a hacky way to get nice object names, it tries to
+	# parse them from the .toString methods for objects.
 	objectType = item.toString().split(" ")[1]
+	return objectType unless objectType
 	objectType[0..objectType.length-2]
 
-Utils.inspect = (item, l=0, max=5) ->
+Utils.inspect = (item, max=5, l=0) ->
 	
 	return "null" if item is null
 	return "undefined" if item is undefined
@@ -192,13 +195,13 @@ Utils.inspect = (item, l=0, max=5) ->
 		return item.toString()
 	if _.isArray(item)
 		return "[...]" if l > max
-		return "[" + _.map(item, (i) -> Utils.inspect(i, l++)).join(", ") + "]"
+		return "[" + _.map(item, (i) -> Utils.inspect(i, max, l++)).join(", ") + "]"
 	if _.isObject(item)
 		objectType = Utils.inspectObjectType(item)
 		if l > max
 			objectInfo = "{...}"
 		else
-			objectInfo = "{" + _.map(item, (v, k) -> "#{k}:#{Utils.inspect(v, l++)}").join(", ") + "}"
+			objectInfo = "{" + _.map(item, (v, k) -> "#{k}:#{Utils.inspect(v, max, l++)}").join(", ") + "}"
 		return objectInfo if objectType is "Object"
 		return "<#{objectType} #{objectInfo}>"
 
