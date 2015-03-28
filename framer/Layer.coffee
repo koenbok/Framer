@@ -204,11 +204,11 @@ class exports.Layer extends BaseClass
 			@emit("change:borderRadius", value)
 
 	# And, because it should be cornerRadius, we alias it here
-	@define "cornerRadius"
+	@define "cornerRadius",
 		importable: yes
 		exportable: no
-		@get: -> @borderRadius
-		@set: (value) -> @borderRadius = value
+		get: -> @borderRadius
+		set: (value) -> @borderRadius = value
 
 	##############################################################
 	# Geometry
