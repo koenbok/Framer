@@ -14,6 +14,7 @@ require "./tests/VideoLayerTest"
 require "./tests/ImporterTest"
 require "./tests/LayerAnimationTest"
 require "./tests/ContextTest"
+require "./tests/ScrollComponentTest"
 
 # Start mocha
 if window.mochaPhantomJS

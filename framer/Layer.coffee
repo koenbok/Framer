@@ -227,32 +227,38 @@ class exports.Layer extends BaseClass
 				@[k] = frame[k] if frame.hasOwnProperty(k)
 
 	@define "minX",
-		excludeFromProps: true
+		importable: true
+		exportable: false
 		get: -> @x
 		set: (value) -> @x = value
 
 	@define "midX",
-		excludeFromProps: true
+		importable: true
+		exportable: false
 		get: -> Utils.frameGetMidX @
 		set: (value) -> Utils.frameSetMidX @, value
 
 	@define "maxX",
-		excludeFromProps: true
+		importable: true
+		exportable: false
 		get: -> Utils.frameGetMaxX @
 		set: (value) -> Utils.frameSetMaxX @, value
 
 	@define "minY",
-		excludeFromProps: true
+		importable: true
+		exportable: false
 		get: -> @y
 		set: (value) -> @y = value
 
 	@define "midY",
-		excludeFromProps: true
+		importable: true
+		exportable: false
 		get: -> Utils.frameGetMidY @
 		set: (value) -> Utils.frameSetMidY @, value
 
 	@define "maxY",
-		excludeFromProps: true
+		importable: true
+		exportable: false
 		get: -> Utils.frameGetMaxY @
 		set: (value) -> Utils.frameSetMaxY @, value
 
@@ -374,7 +380,8 @@ class exports.Layer extends BaseClass
 	# CSS
 
 	@define "style",
-		excludeFromProps: true
+		importable: true
+		exportable: false
 		get: -> @_element.style
 		set: (value) ->
 			_.extend @_element.style, value
@@ -532,8 +539,9 @@ class exports.Layer extends BaseClass
 	## HIERARCHY
 
 	@define "superLayer",
-		excludeFromProps: true
 		enumerable: false
+		exportable: false
+		importable: true
 		get: ->
 			@_superLayer or null
 		set: (layer) ->
@@ -573,13 +581,15 @@ class exports.Layer extends BaseClass
 	# Let's make it when we need it.
 
 	@define "subLayers",
-		excludeFromProps: true
 		enumerable: false
+		exportable: false
+		importable: false
 		get: -> _.clone @_subLayers
 
 	@define "siblingLayers",
-		excludeFromProps: true
 		enumerable: false
+		exportable: false
+		importable: false
 		get: ->
 
 			# If there is no superLayer we need to walk through the root
@@ -692,14 +702,16 @@ class exports.Layer extends BaseClass
 	## STATES
 
 	@define "states",
-		excludeFromProps: true,
+		enumerable: false
+		exportable: false
+		importable: false
 		get: -> @_states ?= new LayerStates @
 
 	#############################################################################
 	## Draggable
 
 	@define "draggable",
-		excludeFromProps: true
+		importable: false
 		get: ->
 			@_draggable ?= new LayerDraggable(@)
 
@@ -715,6 +727,7 @@ class exports.Layer extends BaseClass
 	# TODO: Tests
 
 	@define "scrollFrame",
+		importable: false
 		get: ->
 			frame = 
 				x: @scrollX

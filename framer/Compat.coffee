@@ -4,7 +4,6 @@ compatWarning = (msg) ->
 	console.warn msg
 
 compatProperty = (name, originalName) ->
-	excludeFromProps: true
 	enumerable: false
 	get: -> 
 		compatWarning "#{originalName} is a deprecated property"

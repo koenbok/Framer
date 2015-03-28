@@ -20,10 +20,18 @@ class exports.BaseClass extends EventEmitter
 
 		# See if we need to add this property to the internal properties class
 		if @ isnt BaseClass
-			descriptor.enumerable ?= not descriptor.hasOwnProperty('enumerable')
 			descriptor.propertyName = propertyName
 
-			if not descriptor.excludeFromProps
+			# Have the following flags set to true when undefined:
+			descriptor.enumerable ?= true
+			descriptor.exportable ?= true
+			descriptor.importable ?= true
+
+			# Toggle importable to false when there's no setter defined:
+			descriptor.importable = descriptor.importable and descriptor.set
+
+			# Only retain options that are importable, exportable or both:
+			if descriptor.exportable or descriptor.importable
 				@[DefinedPropertiesKey] ?= {}
 				@[DefinedPropertiesKey][propertyName] = descriptor
 
@@ -40,19 +48,23 @@ class exports.BaseClass extends EventEmitter
 		# Define the property
 		Object.defineProperty(@prototype, propertyName, descriptor)
 
-	@simpleProperty = (name, fallback, enumerable=true) ->
+	@simpleProperty = (name, fallback, enumerable=true, exportable=true, importable=true) ->
 		# Default property, provides storage and fallback
 		enumerable: enumerable
+		exportable: exportable
+		importable: importable
 		default: fallback
 		get: -> @_getPropertyValue(name)
 		set: (value) -> @_setPropertyValue(name, value)
 
-	@proxyProperty = (keyPath, enumerable=true) ->
+	@proxyProperty = (keyPath, enumerable=true, exportable=true, importable=true) ->
 		# Allows to easily proxy properties from an instance object
 		# Object property is in the form of "object.property"
 		objectKey = keyPath.split(".")[0]
 		result =
 			enumerable: enumerable
+			exportable: exportable
+			importable: importable
 			get: ->
 				return unless @[objectKey]
 				Utils.getValueForKeyPath(@, keyPath)
@@ -76,21 +88,29 @@ class exports.BaseClass extends EventEmitter
 	keys: -> _.keys(@props)
 
 	@define "props",
-		excludeFromProps: true
+		importable: false
+		exportable: false
 		get: ->
-			_.pick(@, _.keys(@_propertyList()))
+			keys = []
+			propertyList = @_propertyList()
+			for key, descriptor of propertyList
+				if descriptor.exportable
+					keys.push key
+
+			_.pick(@, keys)
 
 		set: (value) ->
 			propertyList = @_propertyList()
 			for k,v of value
-				if propertyList[k]?.set
-					@[k] = v
+				# We only apply properties that we know and are marked to be
+				# importable.
+				@[k] = v if propertyList[k]?.importable
 
 	@define "id",
 		get: -> @_id
 
 	toInspect: =>
-		properties = _.map(@properties, ((v, k) -> "#{k}:#{v}"), 4)
+		properties = _.map(@props, ((v, k) -> "#{k}:#{v}"), 4)
 		"<#{@constructor.name} id:#{@id} #{properties.join " "}>"
 
 
@@ -112,9 +132,17 @@ class exports.BaseClass extends EventEmitter
 
 		@_id = @constructor[CounterKey]
 
-		# Set the default values for this object
-		for name, descriptor of @_propertyList()
+		@_applyOptionsAndDefaults options
+
+	_applyOptionsAndDefaults: (options) ->
+		for key, descriptor of @_propertyList()
+			# For each know property (registered with @define) that has a setter, fetch
+			# the value from the options object, unless the prop is not importable.
+			# When there's no user value, apply the default value:
 			if descriptor.set
-				initialValue = Utils.valueOrDefault(options?[name], @_getPropertyDefaultValue(name));
-				if not (initialValue in [null, undefined])
-					@[name] = initialValue
+				value = Utils.valueOrDefault(
+					(options?[key] if descriptor.importable),
+					@_getPropertyDefaultValue(key)
+				)
+				if not (value in [null, undefined])
+					@[key] = value

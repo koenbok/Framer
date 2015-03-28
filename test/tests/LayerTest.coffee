@@ -857,6 +857,14 @@ describe "Layer", ->
 			copy.y.should.eql Y
 			copy.image.should.eql IMAGE
 
+		it "copied Layer should have defaults", ->
+
+			layer = new Layer
+			copy = layer.copy()
+
+			copy.width.should.equal 100
+			copy.height.should.equal 100
+
 
 
 

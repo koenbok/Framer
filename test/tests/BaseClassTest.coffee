@@ -147,12 +147,12 @@ describe "BaseClass", ->
 		testClass.testA = 200
 		testClass.poop.hello.should.equal 200
 
-	it "should exclude prop from props, when excludeFromProps is set", ->
+	it "should exclude prop from props, when exportable is false", ->
 
 		class TestClass extends Framer.BaseClass
 			@define "testProp",
 				get: () -> "value"
-				excludeFromProps: true
+				exportable: false
 
 		instance = new TestClass()
 		props = instance.props

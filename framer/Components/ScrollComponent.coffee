@@ -78,12 +78,13 @@ class exports.ScrollComponent extends Layer
 
 		super options
 
-		for k in ["contentInset", "scrollPoint", "scrollX", "scrollY", "scrollFrame", "mouseWheelEnabled"]
-			@[k] = options[k] if options.hasOwnProperty(k)
-
 		@_contentInset = Utils.zeroRect()
 
 		@setContentLayer(new Layer)
+
+		# Re-apply options now that the content layer (to which a number of props proxy) is
+		# present:
+		@_applyOptionsAndDefaults(options)
 		
 		@_enableMouseWheelHandling()
 		# @_enableNativeScrollCapture()
