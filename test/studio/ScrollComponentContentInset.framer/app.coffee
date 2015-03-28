@@ -1,13 +1,13 @@
 # Verify that the click event does not get fired when scrolling
-
-
 background = new Layer
 	width: Screen.width
 	height: 400
 	image: "https://ununsplash.imgix.net/photo-1423753623104-718aaace6772"
 
+print background.index
+
 scroll = new ScrollComponent
-scroll.anchor([0,0,0,0])
+scroll.size = Screen.size
 scroll.scrollHorizontal = false
 scroll.backgroundColor = null
 scroll.contentInset = {top:background.height}
@@ -28,3 +28,6 @@ for rowIndex in [0..rows-1]
 		superLayer: scroll.content
 
 	Utils.labelLayer cellLayer, rowIndex
+
+print background.index, scroll.index
+

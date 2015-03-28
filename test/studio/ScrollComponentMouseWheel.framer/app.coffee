@@ -1,8 +1,12 @@
 scroll = new ScrollComponent
-scroll.anchor([100,100,100,100])
+	width: Screen.width - 200
+	height: Screen.height - 200
+scroll.center()
 
-info = new Layer height:30
-info.anchor({left:100, right:100, top:30})
+info = new Layer
+	height: 30
+	width: 200
+info.centerX()
 
 rows = 8
 cols = 8

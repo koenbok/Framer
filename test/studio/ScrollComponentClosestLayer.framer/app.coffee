@@ -1,5 +1,7 @@
 scroll = new ScrollComponent
-scroll.anchor([100,100,100,100])
+	width: Screen.width - 200
+	height: Screen.height - 200
+scroll.center()
 
 [originX, originY] = [.5, .5]
 size = [3000, 3000]

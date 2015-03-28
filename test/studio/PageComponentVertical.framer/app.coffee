@@ -1,6 +1,9 @@
 # Test Page Component Vertical Flicking
 
-page = new PageComponent width:Framer.Device.screen.width, height:Framer.Device.screen.height, backgroundColor:"#fff"
+page = new PageComponent
+	width:Framer.Device.screen.width
+	height:Framer.Device.screen.height
+	backgroundColor:"#fff"
 page.scrollHorizontal = false
 
 for index in [0..30]

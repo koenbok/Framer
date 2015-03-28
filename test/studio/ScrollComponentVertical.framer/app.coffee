@@ -1,5 +1,5 @@
 scroll = new ScrollComponent
-scroll.anchor([0,0,0,0])
+scroll.size = Screen.size
 scroll.scrollHorizontal = false
 scroll.backgroundColor = null
 

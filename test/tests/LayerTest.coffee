@@ -613,6 +613,7 @@ describe "Layer", ->
 			layerC = new Layer superLayer:layerB
 			layerC.superLayers().should.eql [layerB, layerA]
 
+
 	describe "Frame", ->
 
 		it "should set on create", ->

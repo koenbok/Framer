@@ -309,7 +309,7 @@ class exports.LayerDraggable extends BaseClass
 
 	@define "direction",
 		get: ->
-			return null if not @isDragging
+			# return null if not @isDragging
 			velocity = @velocity
 			if Math.abs(velocity.x) > Math.abs(velocity.y)
 				return "left" if velocity.x > 0

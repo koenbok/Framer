@@ -206,6 +206,17 @@ class exports.ScrollComponent extends Layer
 			@_contentInset = Utils.zeroRect(Utils.parseRect(contentInset))
 			@_updateContent()
 
+	@define "direction",
+		importable: false
+		exportable: false
+		get: ->
+			direction = @content.draggable.direction
+			return "up" if direction is "down"
+			return "down" if direction is "up"
+			return "left" if direction is "right"
+			return "right" if direction is "left"
+			return direction
+
 	scrollToPoint: (point, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
 		
 		point = @_pointInConstraints(point)

@@ -1,6 +1,7 @@
 page = new PageComponent
-page.anchor([100,100,100,100])
-
+	width: Screen.width - 200
+	height: Screen.height - 200
+page.center()
 
 
 rows = 3

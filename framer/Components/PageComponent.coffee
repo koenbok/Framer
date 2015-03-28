@@ -59,7 +59,7 @@ class exports.PageComponent extends ScrollComponent
 
 		layers = @contentLayersAbove(point) if direction is "up"
 		layers = @contentLayersRight(point) if direction is "right"
-		layers = @contentLayersBottom(point) if direction is "bottom"
+		layers = @contentLayersBelow(point) if direction is "down"
 		layers = @contentLayersLeft(point) if direction is "left"
 
 		# See if there is one close by that we should go to
@@ -100,10 +100,11 @@ class exports.PageComponent extends ScrollComponent
 		# to the layer closest to the scroll point.
 		if Math.max(Math.abs(velocity.x), Math.abs(velocity.y)) < @velocityThreshold
 			@scrollToClosestLayer(@originX, @originY, true, @animationOptions)
+			return 
 
 		# Figure out which direction we are scrolling to and make a sorted list of
 		# layers on that side, sorted by absolute distance so we can pick the first.
-		layer = @nextPage(@content.draggable.direction, @_currentPage)
+		layer = @nextPage(@direction, @_currentPage)
 
 		# If not, we scroll to the closest layer that we have available, often the one
 		# that we are already at.
