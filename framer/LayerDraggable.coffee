@@ -14,13 +14,13 @@ Events.DragWillMove          = "dragwillmove"
 Events.DragDidMove           = "dragmove"
 Events.DragMove              = "dragmove"
 Events.DragEnd               = "dragend"
-Events.DidStartDecelerating  = "didstartdecelerating"
-Events.DidEndDecelerating    = "didenddecelerating"
-Events.DidStartBounce        = "didstartbounce"
-Events.DidEndBounce          = "didendbounce"
-Events.DidStartAnimation     = "didstartanimation"
-Events.DidEndAnimation       = "didendanimation"
-Events.DidStartLockDirection = "didstartlockdirection"
+Events.DeceleratingDidStart  = "deceleratingdidstart"
+Events.DeceleratingDidEnd    = "deceleratingdidend"
+Events.BounceDidStart        = "bouncedidstart"
+Events.BounceDidEnd          = "bouncedidend"
+Events.AnimationDidStart     = "animationdidstart"
+Events.AnimationDidEnd       = "animationdidend"
+Events.LockDirectionDidStart = "lockdirectiondidstart"
 
 """
 TODO:
@@ -60,6 +60,17 @@ class exports.LayerDraggable extends BaseClass
 	@define "isDragging", get: -> @_isDragging or false
 	@define "isAnimating", get: -> @_isAnimating or false
 
+	@define "layerStartPoint", get: -> @_layerStartPoint or @layer.point
+	@define "cursorStartPoint", get: -> @_cursorStartPoint or {x:0, y:0}
+	@define "layerCursorOffset", get: -> @_layerCursorOffset or {x:0, y:0}
+
+	@define "offset",
+		get: ->
+			return {x:0, y:0} if not @_layerStartPoint
+			return offset = 
+				x: @layer.x - @_layerStartPoint.x
+				y: @layer.y - @_layerStartPoint.y
+
 	# TODO: what to do with this?
 	# Should there be a tap event?
 	# @define "multipleDraggables", @simpleProperty "multipleDraggables", false, true
@@ -86,7 +97,7 @@ class exports.LayerDraggable extends BaseClass
 		@layer.on Events.TouchStart, @_touchStart
 
 		# @_panRecognizer.on Events.DidStartPan, (direction) =>
-		# 	@emit Events.DidStartLockDirection direction
+		# 	@emit Events.LockDirectionDidStart direction
 
 	remove: -> @layer.off(Events.TouchStart, @_touchStart)
 
@@ -155,8 +166,6 @@ class exports.LayerDraggable extends BaseClass
 		event.preventDefault()
 		event.stopPropagation() unless @propagateEvents
 
-		@emit(Events.DragWillMove, event)
-
 		touchEvent = Events.touchEvent(event)
 
 		@_eventBuffer.push
@@ -203,10 +212,15 @@ class exports.LayerDraggable extends BaseClass
 		if point.x isnt @_layerStartPoint.x or point.y isnt @_layerStartPoint.y
 			@_isDragging = true
 
-		@layer.point = @updatePosition(point)
+		# Move literally means move. If there is no movement, we do not emit.
+		if @isDragging
+			@emit(Events.DragWillMove, event)
 
-		@emit(Events.DragMove, event)
-		@emit(Events.DragDidMove, event)
+		@layer.point = @updatePosition(point)
+ 
+		if @isDragging
+			@emit(Events.DragMove, event)
+			@emit(Events.DragDidMove, event)
 
 	_touchEnd: (event) =>
 
@@ -295,6 +309,7 @@ class exports.LayerDraggable extends BaseClass
 
 	@define "direction",
 		get: ->
+			return null if not @isDragging
 			velocity = @velocity
 			if Math.abs(velocity.x) > Math.abs(velocity.y)
 				return "left" if velocity.x > 0
@@ -302,6 +317,10 @@ class exports.LayerDraggable extends BaseClass
 			else
 				return "up" if velocity.y > 0
 				return "down"
+
+	@define "hasMoved",
+		get: ->
+			return true if @_
 
 	calculateVelocity: ->
 		# Compatibility method
@@ -343,7 +362,7 @@ class exports.LayerDraggable extends BaseClass
 
 		if @_lockDirectionEnabledX or @_lockDirectionEnabledY
 
-			@emit Events.DidStartLockDirection, 
+			@emit Events.LockDirectionDidStart, 
 				x: @_lockDirectionEnabledX
 				y: @_lockDirectionEnabledY
 
@@ -424,7 +443,7 @@ class exports.LayerDraggable extends BaseClass
 
 	_onSimulationStop: (axis, state) =>
 
-		@emit(Events.DidEndAnimation, {axis:axis})
+		@emit(Events.AnimationDidEnd, {axis:axis})
 
 		# Round the end position to whole pixels
 		@layer[axis] = parseInt(@layer[axis]) if @pixelAlign
@@ -461,13 +480,13 @@ class exports.LayerDraggable extends BaseClass
 			v: velocity.y * @momentumVelocityMultiplier * @speedY
 		@_simulation.y.start() if startSimulationY
 
-		@emit(Events.DidStartAnimation)
+		@emit(Events.AnimationDidStart)
 
 	_stopSimulation: =>
 		@_simulation?.x.stop()
 		@_simulation?.y.stop()
 		@_isAnimating = false
-		@emit(Events.DidEndAnimation)
+		@emit(Events.AnimationDidEnd)
 
 	animateStop: ->
 		@_stopSimulation()
