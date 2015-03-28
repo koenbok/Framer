@@ -19,7 +19,8 @@ layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
 	result = 
 		default: fallback
 		get: -> 
-			@_properties[name]
+			return @_properties[name] if @_properties.hasOwnProperty(name)
+			return fallback
 
 		set: (value) ->
 
@@ -202,6 +203,13 @@ class exports.Layer extends BaseClass
 
 			@emit("change:borderRadius", value)
 
+	# And, because it should be cornerRadius, we alias it here
+	@define "cornerRadius"
+		importable: yes
+		exportable: no
+		@get: -> @borderRadius
+		@set: (value) -> @borderRadius = value
+
 	##############################################################
 	# Geometry
 
@@ -268,6 +276,8 @@ class exports.Layer extends BaseClass
 		Utils.convertPoint point, null, @
 
 	@define "screenFrame",
+		importable: true
+		exportable: false
 		get: ->
 			Utils.convertPoint(@frame, @, null)
 		set: (frame) ->
@@ -396,6 +406,8 @@ class exports.Layer extends BaseClass
 		return getComputedStyle(@_element)
 
 	@define "classList",
+		importable: true
+		exportable: false
 		get: -> @_element.classList
 
 	##############################################################
@@ -412,7 +424,7 @@ class exports.Layer extends BaseClass
 
 	@define "html",
 		get: ->
-			@_elementHTML?.innerHTML
+			@_elementHTML?.innerHTML or ""
 
 		set: (value) ->
 
@@ -469,7 +481,7 @@ class exports.Layer extends BaseClass
 
 		layer
 
-	copySingle: -> new Layer @props
+	copySingle: -> new @constructor(@props)
 
 	##############################################################
 	## IMAGE
@@ -665,6 +677,7 @@ class exports.Layer extends BaseClass
 
 	@define "isAnimating",
 		enumerable: false
+		exportable: false
 		get: -> @animations().length isnt 0
 
 	animateStop: ->
@@ -712,19 +725,18 @@ class exports.Layer extends BaseClass
 
 	@define "draggable",
 		importable: false
+		exportable: false
 		get: ->
 			@_draggable ?= new LayerDraggable(@)
 
-	anchor: ->
-		if not @_anchor
-			@_anchor = new LayerAnchor(@, arguments...)
-		else
-			@_anchor.updateRules(arguments...)
+	# anchor: ->
+	# 	if not @_anchor
+	# 		@_anchor = new LayerAnchor(@, arguments...)
+	# 	else
+	# 		@_anchor.updateRules(arguments...)
 
 	##############################################################
 	## SCROLLING
-
-	# TODO: Tests
 
 	@define "scrollFrame",
 		importable: false
