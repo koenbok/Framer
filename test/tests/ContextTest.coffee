@@ -5,7 +5,7 @@ describe "Context", ->
 	describe "Reset", ->
 
 		# Todo: event cleanup
-		# Todo: paren layer on context cleanup
+		# Todo: parent layer on context cleanup
 
 	describe "Events", ->
 
