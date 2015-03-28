@@ -227,26 +227,32 @@ class exports.Layer extends BaseClass
 				@[k] = frame[k] if frame.hasOwnProperty(k)
 
 	@define "minX",
+		excludeFromProps: true
 		get: -> @x
 		set: (value) -> @x = value
 
 	@define "midX",
+		excludeFromProps: true
 		get: -> Utils.frameGetMidX @
 		set: (value) -> Utils.frameSetMidX @, value
 
 	@define "maxX",
+		excludeFromProps: true
 		get: -> Utils.frameGetMaxX @
 		set: (value) -> Utils.frameSetMaxX @, value
 
 	@define "minY",
+		excludeFromProps: true
 		get: -> @y
 		set: (value) -> @y = value
 
 	@define "midY",
+		excludeFromProps: true
 		get: -> Utils.frameGetMidY @
 		set: (value) -> Utils.frameSetMidY @, value
 
 	@define "maxY",
+		excludeFromProps: true
 		get: -> Utils.frameGetMaxY @
 		set: (value) -> Utils.frameSetMaxY @, value
 
@@ -368,6 +374,7 @@ class exports.Layer extends BaseClass
 	# CSS
 
 	@define "style",
+		excludeFromProps: true
 		get: -> @_element.style
 		set: (value) ->
 			_.extend @_element.style, value
@@ -692,6 +699,7 @@ class exports.Layer extends BaseClass
 	## Draggable
 
 	@define "draggable",
+		excludeFromProps: true
 		get: ->
 			@_draggable ?= new LayerDraggable(@)
 
