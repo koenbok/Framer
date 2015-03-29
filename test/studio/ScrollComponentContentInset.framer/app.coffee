@@ -4,8 +4,6 @@ background = new Layer
 	height: 400
 	image: "https://ununsplash.imgix.net/photo-1423753623104-718aaace6772"
 
-print background.siblingLayers
-
 scroll = new ScrollComponent
 scroll.size = Screen.size
 scroll.scrollHorizontal = false
