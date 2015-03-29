@@ -50,13 +50,13 @@ EventMappers[Events.ScrollEnd] = Events.DragEnd
 class exports.ScrollComponent extends Layer
 
 	# Proxy properties directly from the draggable
-	@define "velocity", @proxyProperty("content.draggable.velocity", true)
-	@define "angle", @proxyProperty("content.draggable.angle", true)
-	@define "scrollHorizontal", @proxyProperty("content.draggable.horizontal", true)
-	@define "scrollVertical", @proxyProperty("content.draggable.vertical", true)
-	@define "speedX", @proxyProperty("content.draggable.speedX", true)
-	@define "speedY", @proxyProperty("content.draggable.speedY", true)
-	@define "isDragging", @proxyProperty("content.draggable.isDragging", true)
+	@define "velocity", @proxyProperty("content.draggable.velocity")
+	@define "angle", @proxyProperty("content.draggable.angle")
+	@define "scrollHorizontal", @proxyProperty("content.draggable.horizontal")
+	@define "scrollVertical", @proxyProperty("content.draggable.vertical")
+	@define "speedX", @proxyProperty("content.draggable.speedX")
+	@define "speedY", @proxyProperty("content.draggable.speedY")
+	@define "isDragging", @proxyProperty("content.draggable.isDragging")
 
 	# We throw an error here, because you almost never would like the enclosing
 	# scroll component to be draggable, but it's an easy mistake to make. If you 
@@ -69,7 +69,7 @@ class exports.ScrollComponent extends Layer
 		exportable: false
 		get: -> @_content
 
-	@define "mouseWheelSpeedMultiplier", @simpleProperty("mouseWheelSpeedMultiplier", 1, true, _.isNumber)
+	@define "mouseWheelSpeedMultiplier", @simpleProperty("mouseWheelSpeedMultiplier", 1)
 
 	constructor: (options={}) ->
 		

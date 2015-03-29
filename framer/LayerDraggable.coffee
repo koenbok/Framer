@@ -35,16 +35,16 @@ TODO:
 
 class exports.LayerDraggable extends BaseClass
 
-	@define "speedX", @simpleProperty "speedX", 1, true
-	@define "speedY", @simpleProperty "speedY", 1, true
+	@define "speedX", @simpleProperty("speedX", 1)
+	@define "speedY", @simpleProperty("speedY", 1)
 
-	@define "horizontal", @simpleProperty "horizontal", true, true
-	@define "vertical", @simpleProperty "vertical", true, true
+	@define "horizontal", @simpleProperty("horizontal", true)
+	@define "vertical", @simpleProperty("vertical", true)
 
-	@define "momentumVelocityMultiplier", @simpleProperty "momentumVelocityMultiplier", 800, true, _.isNumber
+	@define "momentumVelocityMultiplier", @simpleProperty("momentumVelocityMultiplier", 800)
 	# @define "lockDirectionThreshold", @simpleProperty "lockDirectionThreshold", {x:0, y:0}, true
 
-	@define "propagateEvents", @simpleProperty "propagateEvents", true, true, _.isBoolean
+	@define "propagateEvents", @simpleProperty("propagateEvents", true)
 
 	@define "constraints",
 		get: -> @_constraints
@@ -73,7 +73,7 @@ class exports.LayerDraggable extends BaseClass
 
 	# TODO: what to do with this?
 	# Should there be a tap event?
-	# @define "multipleDraggables", @simpleProperty "multipleDraggables", false, true
+	# @define "multipleDraggables", @simpleProperty("multipleDraggables", false)
 
 	constructor: (@layer) ->
 

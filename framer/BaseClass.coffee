@@ -18,6 +18,10 @@ class exports.BaseClass extends EventEmitter
 
 	@define = (propertyName, descriptor) ->
 
+		for i in ["enumerable", "exportable", "importable"]
+			if descriptor.hasOwnProperty(i)
+				throw Error("woops #{propertyName} #{descriptor[i]}") if not _.isBoolean(descriptor[i])
+
 		# See if we need to add this property to the internal properties class
 		if @ isnt BaseClass
 			descriptor.propertyName = propertyName
@@ -48,23 +52,17 @@ class exports.BaseClass extends EventEmitter
 		# Define the property
 		Object.defineProperty(@prototype, propertyName, descriptor)
 
-	@simpleProperty = (name, fallback, enumerable=true, exportable=true, importable=true) ->
-		# Default property, provides storage and fallback
-		enumerable: enumerable
-		exportable: exportable
-		importable: importable
-		default: fallback
-		get: -> @_getPropertyValue(name)
-		set: (value) -> @_setPropertyValue(name, value)
+	@simpleProperty = (name, fallback, options={}, validator=null) ->
+		return _.extend options, 
+			default: fallback
+			get: -> @_getPropertyValue(name)
+			set: (value) -> @_setPropertyValue(name, value)
 
-	@proxyProperty = (keyPath, enumerable=true, exportable=true, importable=true) ->
+	@proxyProperty = (keyPath, options={}, validator=null) ->
 		# Allows to easily proxy properties from an instance object
 		# Object property is in the form of "object.property"
 		objectKey = keyPath.split(".")[0]
-		result =
-			enumerable: enumerable
-			exportable: exportable
-			importable: importable
+		return _.extend options,
 			get: ->
 				return unless @[objectKey]
 				Utils.getValueForKeyPath(@, keyPath)
@@ -131,11 +129,11 @@ class exports.BaseClass extends EventEmitter
 
 		@_id = @constructor[CounterKey]
 
-		@_applyOptionsAndDefaults options
+		@_applyOptionsAndDefaults(options)
 
 	_applyOptionsAndDefaults: (options) ->
 		for key, descriptor of @_propertyList()
-			# For each know property (registered with @define) that has a setter, fetch
+			# For each known property (registered with @define) that has a setter, fetch
 			# the value from the options object, unless the prop is not importable.
 			# When there's no user value, apply the default value:
 			if descriptor.set
