@@ -52,13 +52,13 @@ class exports.BaseClass extends EventEmitter
 		# Define the property
 		Object.defineProperty(@prototype, propertyName, descriptor)
 
-	@simpleProperty = (name, fallback, options={}, validator=null) ->
+	@simpleProperty = (name, fallback, options={}) ->
 		return _.extend options, 
 			default: fallback
 			get: -> @_getPropertyValue(name)
 			set: (value) -> @_setPropertyValue(name, value)
 
-	@proxyProperty = (keyPath, options={}, validator=null) ->
+	@proxyProperty = (keyPath, options={}) ->
 		# Allows to easily proxy properties from an instance object
 		# Object property is in the form of "object.property"
 		objectKey = keyPath.split(".")[0]
@@ -141,5 +141,6 @@ class exports.BaseClass extends EventEmitter
 					(options?[key] if descriptor.importable),
 					@_getPropertyDefaultValue(key)
 				)
+
 				if not (value in [null, undefined])
 					@[key] = value

@@ -306,6 +306,29 @@ describe "Layer", ->
 
 			layer.style["-webkit-perspective"].should.equal("500")
 
+		it "should set rotation", ->
+
+			layer = new Layer
+				rotationX: 200
+				rotationY: 200
+				rotationZ: 200
+
+			layer.rotationX.should.equal(200)
+			layer.rotationY.should.equal(200)
+			layer.rotationZ.should.equal(200)
+
+		it "should proxy rotation", ->
+
+			layer = new Layer
+
+			layer.rotation = 200
+			layer.rotation.should.equal(200)
+			layer.rotationZ.should.equal(200)
+
+			layer.rotationZ = 100
+			layer.rotation.should.equal(100)
+			layer.rotationZ.should.equal(100)
+
 
 
 	describe "Filter Properties", ->

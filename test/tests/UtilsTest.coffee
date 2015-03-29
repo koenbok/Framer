@@ -309,6 +309,25 @@ describe "Utils", ->
 			instance = document.createElement("div")
 			Utils.inspect(instance.style).should.equal("<CSSStyleDeclaration {}>")
 
+	describe "keyPath", ->
+
+		it "should get with single", ->
+			obj = {foo: "bar"}
+			Utils.getValueForKeyPath(obj, "foo").should.equal("bar")
+
+		it "should get with multipe", ->
+			obj = {fooA: {fooB: {fooC: "bar"}}}
+			Utils.getValueForKeyPath(obj, "fooA.fooB.fooC").should.equal("bar")
+
+		it "should set with single", ->
+			obj = {}
+			Utils.setValueForKeyPath(obj, "foo", "bar")
+			obj.should.eql({foo: "bar"})
+
+		it "should set with multiple", ->
+			obj = {fooA: {fooB: {}}}
+			Utils.setValueForKeyPath(obj, "fooA.fooB.fooC", "bar")
+			obj.should.eql({fooA: {fooB: {fooC: "bar"}}})
 
 
 
