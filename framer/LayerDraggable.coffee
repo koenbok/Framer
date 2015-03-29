@@ -157,8 +157,6 @@ class exports.LayerDraggable extends BaseClass
 
 		@emit(Events.DragStart, event)
 
-
-
 	_touchMove: (event) =>
 
 		return unless @enabled
@@ -332,8 +330,8 @@ class exports.LayerDraggable extends BaseClass
 		yFinished = @_simulation.y.finished()
 
 		velocity = {x:0, y:0}
-		velocity.x = (@_simulation.x.simulator.state.v / @velocityScale) if not xFinished
-		velocity.y = (@_simulation.y.simulator.state.v / @velocityScale) if not yFinished
+		velocity.x = (@_simulation.x.simulator.state.v / @momentumVelocityMultiplier) if not xFinished
+		velocity.y = (@_simulation.y.simulator.state.v / @momentumVelocityMultiplier) if not yFinished
 
 		return velocity
 
@@ -472,12 +470,12 @@ class exports.LayerDraggable extends BaseClass
 		
 		@_simulation.x.simulator.setState
 			x: @layer.x
-			v: velocity.x * @momentumVelocityMultiplier * @speedX
+			v: velocity.x * @momentumVelocityMultiplier * @speedX * (1 / @_screenScale.x) * @layer.scaleX * @layer.scale
 		@_simulation.x.start() if startSimulationX
 
 		@_simulation.y.simulator.setState
 			x: @layer.y
-			v: velocity.y * @momentumVelocityMultiplier * @speedY
+			v: velocity.y * @momentumVelocityMultiplier * @speedY * (1 / @_screenScale.y) * @layer.scaleY * @layer.scale
 		@_simulation.y.start() if startSimulationY
 
 		@emit(Events.AnimationDidStart)
