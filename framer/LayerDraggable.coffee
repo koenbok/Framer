@@ -44,7 +44,7 @@ class exports.LayerDraggable extends BaseClass
 	@define "momentumVelocityMultiplier", @simpleProperty "momentumVelocityMultiplier", 800, true, _.isNumber
 	# @define "lockDirectionThreshold", @simpleProperty "lockDirectionThreshold", {x:0, y:0}, true
 
-	@define "propagateEvents", @simpleProperty "propagateEvents", true, true, _.isBool
+	@define "propagateEvents", @simpleProperty "propagateEvents", true, true, _.isBoolean
 
 	@define "constraints",
 		get: -> @_constraints

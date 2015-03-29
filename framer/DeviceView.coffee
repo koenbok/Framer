@@ -195,7 +195,7 @@ class exports.DeviceView extends BaseClass
 		if @_deviceType is "fullscreen"
 			return
 
-		if not _.isBool(fullScreen)
+		if not _.isBoolean(fullScreen)
 			return
 
 		if fullScreen is @_fullScreen
@@ -474,7 +474,7 @@ class exports.DeviceView extends BaseClass
 			else
 				return
 		
-		if not _.isBool(keyboard)
+		if not _.isBoolean(keyboard)
 			return
 		
 		if keyboard is @_keyboard

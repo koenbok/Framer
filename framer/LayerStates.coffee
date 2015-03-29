@@ -173,6 +173,6 @@ class exports.LayerStates extends BaseClass
 
 		# TODO: Maybe we want to support advanced data structures like objects in the future too.
 		for k, v of properties
-			stateProperties[k] = v if _.isNumber(v) or _.isFunction(v) or _.isBool(v) or _.isString(v)
+			stateProperties[k] = v if _.isNumber(v) or _.isFunction(v) or _.isBoolean(v) or _.isString(v)
 
 		return stateProperties

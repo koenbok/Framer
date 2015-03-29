@@ -223,9 +223,91 @@ describe "Utils", ->
 			Utils.frameSortByAbsoluteDistance({x:0, y:0}, [layerA, layerB, layerC]).should.eql([layerC, layerB, layerA])
 
 
+	describe "inspect", ->
 
+		it "should work for strings", ->
+			Utils.inspect("a").should.equal("\"a\"")
 
+		it "should work for booleans", ->
+			Utils.inspect(true).should.equal("true")
 
+		it "should work for numbers", ->
+			Utils.inspect(12.34).should.equal("12.34")
+
+		it "should work for null", ->
+			Utils.inspect(null).should.equal("null")
+
+		it "should work for undefined", ->
+			Utils.inspect(undefined).should.equal("undefined")
+
+		it "should work for arrays", ->
+			Utils.inspect(["a", 1, ["b", "c"]]).should.equal("[\"a\", 1, [\"b\", \"c\"]]")
+
+		it "should work for objects", ->
+			Utils.inspect({a:1, b:[1, 2, 3]}).should.equal("{a:1, b:[1, 2, 3]}")
+
+		it "should work for functions", ->
+			test = -> return "a"
+			Utils.inspect(test).should.equal("<Function () { return \"a\"; }>")
+
+		it "should work for functions with arguments", ->
+			test = (a) -> return "a"
+			Utils.inspect(test).should.equal("<Function (a) { return \"a\"; }>")
+
+		it "should work for named functions", ->
+			# There are no named function in coffee script
+			`function test(a) { return "a"; }`
+			Utils.inspect(test).should.equal("<Function test(a) { return \"a\"; }>")
+
+		it "should work for long functions", ->
+			test = ->
+				its = 1
+				very = 1
+				rainy = 1
+				today = 1
+				down = 1
+				here = 1
+				return "a"
+			Utils.inspect(test).should.equal("<Function () { var down, here, its, rainy, today, very; its = 1; very = 1; rainy = 1; today = 1; down = 1; here = 1; return \"a\"; }>")
+			Utils.inspect([test]).should.equal("[<Function () { var down, here, its, rainy, today, very; its =… }>]")
+
+		it "should work for classes", ->
+			class TestClass
+				constructor: ->
+					@a = 1
+			instance = new TestClass
+			Utils.inspect(instance).should.equal("<TestClass {a:1}>")
+
+		it "should work for subclasses", ->
+			class TestClass
+				constructor: ->
+					@a = 1
+			class SubTestClass extends TestClass
+			instance = new SubTestClass
+			Utils.inspect(instance).should.equal("<SubTestClass {a:1}>")
+
+		it "should work with toInspect", ->
+			class TestClass
+				toInspect: -> return "Hello"
+			instance = new TestClass
+			Utils.inspect(instance).should.equal("Hello")
+
+		it "should work with WebKitCSSMatrix", ->
+			instance = new WebKitCSSMatrix()
+			Utils.inspect(instance).should.equal("<WebKitCSSMatrix {e:0, m33:1, f:0, m42:0, m44:1, m24:0, m31:0, m32:0, m21:0, m14:0, c:0, m34:0, m13:0, m12:0, m11:1, m41:0, m23:0, b:0, d:1, m22:1, a:1, m43:0}>")
+
+		it "should work with HTMLDivElement", ->
+			instance = document.createElement("div")
+			Utils.inspect(instance).should.equal("<HTMLDivElement>")
+
+		it "should work with HTMLDivElementConstructor", ->
+			instance = document.createElement("div")
+			Utils.inspectObjectType(instance.constructor).should.equal("HTMLDivElementConstructor")
+			Utils.inspect(instance.constructor).should.equal("<HTMLDivElementConstructor>")
+
+		it "should work with CSSStyleDeclaration", ->
+			instance = document.createElement("div")
+			Utils.inspect(instance.style).should.equal("<CSSStyleDeclaration {}>")
 
 
 

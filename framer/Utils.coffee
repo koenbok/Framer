@@ -176,32 +176,51 @@ Utils.stringify = (obj) ->
 Utils.inspectObjectType = (item) ->
 	# This is a hacky way to get nice object names, it tries to
 	# parse them from the .toString methods for objects.
-	objectType = item.toString().split(" ")[1]
-	return objectType unless objectType
-	objectType[0..objectType.length-2]
+
+	if item.constructor?.name? and item.constructor?.name != "Object"
+		return item.constructor.name
+
+	extract = (str) ->
+		return null unless str
+		regex = /\[object (\w+)\]/
+		match = regex.exec(str)
+		return match[1] if match
+		return null
+
+	className = extract(item.toString()) 
+	return className if className
+	className = extract(item.constructor?.toString())
+	return className.replace("Constructor", "") if className
+	return item
 
 Utils.inspect = (item, max=5, l=0) ->
 	
 	return "null" if item is null
 	return "undefined" if item is undefined
 	
-	if item.hasOwnProperty("toInspect")
+	if _.isFunction(item.toInspect)
 		return item.toInspect()
 	if _.isString(item)
 		return "\"#{item}\""
 	if _.isNumber(item)
 		return "#{item}"
 	if _.isFunction(item)
-		return item.toString()
+		code = item.toString()["function ".length..].replace(/\n/g, "").replace(/\s+/g, " ")
+		# We limit the size of a function body if it's in a strucutre
+		limit = 50
+		code = "#{_.trimRight(code[..limit])}… }" if code.length > limit and l > 0
+		return "<Function #{code}>"
 	if _.isArray(item)
 		return "[...]" if l > max
-		return "[" + _.map(item, (i) -> Utils.inspect(i, max, l++)).join(", ") + "]"
+		return "[" + _.map(item, (i) -> Utils.inspect(i, max, l+1)).join(", ") + "]"
 	if _.isObject(item)
 		objectType = Utils.inspectObjectType(item)
+		# We should not loop over dom trees because we will have a bad time
+		return "<#{objectType}>" if /HTML\w+?Element/.test(objectType)
 		if l > max
 			objectInfo = "{...}"
 		else
-			objectInfo = "{" + _.map(item, (v, k) -> "#{k}:#{Utils.inspect(v, max, l++)}").join(", ") + "}"
+			objectInfo = "{" + _.map(item, (v, k) -> "#{k}:#{Utils.inspect(v, max, l+1)}").join(", ") + "}"
 		return objectInfo if objectType is "Object"
 		return "<#{objectType} #{objectInfo}>"
 
@@ -346,7 +365,7 @@ Utils.parseFunction = (str) ->
 
 	if _.endsWith str, ")"
 		result.name = str.split("(")[0]
-		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.rtrim(a, ")"))
+		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.trimRight(a, ")"))
 	else
 		result.name = str
 

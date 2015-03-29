@@ -97,15 +97,15 @@ class exports.Layer extends BaseClass
 	@define "width",  layerProperty @, "width",  "width", 100, _.isNumber
 	@define "height", layerProperty @, "height", "height", 100, _.isNumber
 
-	@define "visible", layerProperty @, "visible", "display", true, _.isBool
+	@define "visible", layerProperty @, "visible", "display", true, _.isBoolean
 	@define "opacity", layerProperty @, "opacity", "opacity", 1, _.isNumber
 	@define "index", layerProperty @, "index", "zIndex", 0, _.isNumber, {importable:false, exportable:false}
-	@define "clip", layerProperty @, "clip", "overflow", true, _.isBool
+	@define "clip", layerProperty @, "clip", "overflow", true, _.isBoolean
 	
-	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBool, {}, (layer, value) ->
+	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBoolean, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 	
-	@define "scrollVertical", layerProperty @, "scrollVertical", "overflowY", false, _.isBool, {}, (layer, value) ->
+	@define "scrollVertical", layerProperty @, "scrollVertical", "overflowY", false, _.isBoolean, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 
 	@define "scroll",
@@ -113,7 +113,7 @@ class exports.Layer extends BaseClass
 		set: (value) -> @scrollHorizontal = @scrollVertical = value
 
 	# Behaviour properties
-	@define "ignoreEvents", layerProperty @, "ignoreEvents", "pointerEvents", true, _.isBool
+	@define "ignoreEvents", layerProperty @, "ignoreEvents", "pointerEvents", true, _.isBoolean
 
 	# Matrix properties
 	@define "x", layerProperty @, "x", "webkitTransform", 0, _.isNumber
@@ -172,7 +172,7 @@ class exports.Layer extends BaseClass
 	@define "borderColor", layerProperty @, "borderColor", "border", null, _.isString
 	@define "borderWidth", layerProperty @, "borderWidth", "border", 0, _.isNumber
 
-	@define "force2d", layerProperty @, "force2d", "webkitTransform", false, _.isBool
+	@define "force2d", layerProperty @, "force2d", "webkitTransform", false, _.isBoolean
 
 	##############################################################
 	# Identity
