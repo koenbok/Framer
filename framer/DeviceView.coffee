@@ -155,7 +155,13 @@ class exports.DeviceView extends BaseClass
 		if @deviceType is "fullscreen"
 			return true
 
-		if Utils.deviceType() is @_device.deviceType
+		if Utils.deviceType() is "phone" and Utils.deviceType() is @_device.deviceType
+			return true
+
+		if Utils.deviceType() is "tablet" and Utils.deviceType() is @_device.deviceType
+			return true
+
+		if Utils.deviceType() is "phone" and @_device.deviceType is "tablet"
 			return true
 
 		return false
@@ -546,15 +552,15 @@ iPhone6BaseDeviceHand = _.extend {}, iPhone6BaseDevice,
 	paddingOffset: -150
 
 iPhone6PlusBaseDevice =
-	deviceImageWidth: 1280
-	deviceImageHeight: 2524
-	screenWidth: 1080
-	screenHeight: 1920
+	deviceImageWidth: 1460
+	deviceImageHeight: 2900
+	screenWidth: 1242
+	screenHeight: 2208
 	deviceType: "phone"
 
 iPhone6PlusBaseDeviceHand = _.extend {}, iPhone6PlusBaseDevice,
-	deviceImageWidth: 2720
-	deviceImageHeight: 3032
+	deviceImageWidth: 3128
+	deviceImageHeight: 3487
 	paddingOffset: -150
 
 
@@ -639,6 +645,13 @@ Nexus5BaseDeviceHand = _.extend {}, Nexus5BaseDevice, # 2692 × 2996
 	deviceImageWidth: 2692
 	deviceImageHeight: 2996
 	paddingOffset: -120
+
+Nexus9BaseDevice =
+	deviceImageWidth: 1733
+	deviceImageHeight: 2575
+	screenWidth: 1536
+	screenHeight: 2048
+	deviceType: "tablet"
 
 AppleWatch42Device =
 	deviceImageWidth: 552
@@ -732,6 +745,9 @@ Devices =
 	# Nexus 5
 	"nexus-5-black": Nexus5BaseDevice
 	"nexus-5-black-hand": Nexus5BaseDeviceHand
+
+	# Nexus 9
+	"nexus-9": Nexus9BaseDevice
 
 	# Apple Watch 38mm
 	"applewatchsport-38-aluminum-sportband-black": AppleWatch38Device

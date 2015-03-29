@@ -312,10 +312,18 @@ Utils.isJP2Supported = ->
 	Utils.isWebKit() and not Utils.isChrome()
 
 Utils.deviceType = ->
+
+	# Taken from
 	# https://github.com/jeffmcmahan/device-detective/blob/master/bin/device-detect.js
-	return "phone" if /(mobi)/i.test(navigator.userAgent)
-	return "tablet" if /(tablet)|(iPad)/i.test(navigator.userAgent)
+
+	if /(tablet)|(iPad)|(Nexus 9)/i.test(navigator.userAgent)
+		return "tablet"
+
+	if /(mobi)/i.test(navigator.userAgent)
+		return "phone"
+
 	return "desktop"
+
 
 Utils.pathJoin = ->
 	Utils.arrayFromArguments(arguments).join("/")
