@@ -82,7 +82,6 @@ class exports.ScrollComponent extends Layer
 		super options
 
 		@_contentInset = Utils.zeroRect()
-
 		@setContentLayer(new Layer)
 
 		# Re-apply options now that the content layer (to which a number of props proxy) is

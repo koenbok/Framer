@@ -15,7 +15,7 @@ Utils = require "./Utils"
 layerValueTypeError = (name, value) ->
 	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
 
-layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
+layerProperty = (obj, name, cssProperty, fallback, validator, options={}, set) ->
 	result = 
 		default: fallback
 		get: -> 
@@ -35,6 +35,8 @@ layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
 			@emit("change:point", value) if name in ["x", "y"]
 			@emit("change:size", value)  if name in ["width", "height"]
 			@emit("change:frame", value) if name in ["x", "y", "width", "height"]
+
+	result = _.extend(result, options)
 
 class exports.Layer extends BaseClass
 
@@ -97,13 +99,13 @@ class exports.Layer extends BaseClass
 
 	@define "visible", layerProperty @, "visible", "display", true, _.isBool
 	@define "opacity", layerProperty @, "opacity", "opacity", 1, _.isNumber
-	@define "index", layerProperty @, "index", "zIndex", 0, _.isNumber
+	@define "index", layerProperty @, "index", "zIndex", 0, _.isNumber, {importable:false, exportable:false}
 	@define "clip", layerProperty @, "clip", "overflow", true, _.isBool
 	
-	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBool, (layer, value) ->
+	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBool, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 	
-	@define "scrollVertical", layerProperty @, "scrollVertical", "overflowY", false, _.isBool, (layer, value) ->
+	@define "scrollVertical", layerProperty @, "scrollVertical", "overflowY", false, _.isBool, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 
 	@define "scroll",

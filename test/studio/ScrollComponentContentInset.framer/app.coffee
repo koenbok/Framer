@@ -4,7 +4,7 @@ background = new Layer
 	height: 400
 	image: "https://ununsplash.imgix.net/photo-1423753623104-718aaace6772"
 
-print background.index
+print background.siblingLayers
 
 scroll = new ScrollComponent
 scroll.size = Screen.size
@@ -29,5 +29,4 @@ for rowIndex in [0..rows-1]
 
 	Utils.labelLayer cellLayer, rowIndex
 
-print background.index, scroll.index
 
