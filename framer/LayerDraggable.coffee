@@ -316,10 +316,6 @@ class exports.LayerDraggable extends BaseClass
 				return "up" if velocity.y > 0
 				return "down"
 
-	@define "hasMoved",
-		get: ->
-			return true if @_
-
 	calculateVelocity: ->
 		# Compatibility method
 		@velocity

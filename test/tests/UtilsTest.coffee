@@ -309,6 +309,10 @@ describe "Utils", ->
 			instance = document.createElement("div")
 			Utils.inspect(instance.style).should.equal("<CSSStyleDeclaration {}>")
 
+		it "should work with LayerDraggable", ->
+			layer = new Layer
+			Utils.inspectObjectType(layer.draggable).should.equal("LayerDraggable"))
+
 	describe "keyPath", ->
 
 		it "should get with single", ->

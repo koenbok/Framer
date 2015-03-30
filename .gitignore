@@ -15,3 +15,4 @@ extras/Studio.framer/framer/config.json
 extras/Studio.framer/imported
 extras/Studio.framer/app.js
 test/phantomjs/tests.js
+test/phantomjs/tests.js.map
