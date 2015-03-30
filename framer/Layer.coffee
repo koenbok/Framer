@@ -829,7 +829,7 @@ class exports.Layer extends BaseClass
 		originalListener = listener
 
 		listener = (args...) =>
-			originalListener(args...)
+			originalListener.call(@, args..., @)
 			@removeListener(eventName, listener)
 
 		@addListener(eventName, listener)

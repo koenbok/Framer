@@ -436,6 +436,18 @@ describe "Layer", ->
 
 			simulate.click myLayer._element
 
+
+		it "should modify the event scope for once", (callback) ->
+
+			myLayer = new Layer()
+
+			myLayer.once "click", (event, layer) ->
+				@id.should.equal myLayer.id
+				layer.id.should.equal myLayer.id
+				callback()
+
+			simulate.click myLayer._element
+
 		it "should remove events", ->
 
 			layer = new Layer
@@ -469,6 +481,16 @@ describe "Layer", ->
 				layerA.emit("hello")
 
 			count.should.equal 1
+
+		it "should modify scope for draggable events", (callback) ->
+			
+			layerA = new Layer
+			layerA.draggable.enabled = true
+			layerA.on "test", (args...) ->
+				@id.should.equal(layerA.id)
+				callback()
+
+			layerA.draggable.emit("test", {})
 
 
 	describe "Hierarchy", ->
