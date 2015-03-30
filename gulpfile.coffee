@@ -56,5 +56,5 @@ gulp.task "test", ["build:debug", "build:test"], ->
 		.src("test/phantomjs/index.html")
 		.pipe(phantomjs({reporter: "landing"}))
 
-gulp.task "watch", ->
+gulp.task "watch", ["test"], ->
 	gulp.watch(["./*.coffee", "framer/**", "test/tests/**"], ["test"]);
