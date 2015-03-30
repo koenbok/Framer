@@ -16,8 +16,9 @@ gulp.task "build:release", ->
 
 	config = _.extend CONFIG,
 		"entry": "./framer/Framer.coffee"
-		"output": {filename: "framer.js", pathinfo:true}
+		"output": {filename: "framer.js"}
 		"plugins": [
+			# new webpack.BannerPlugin("Framer", {}),
 			new webpack.optimize.DedupePlugin(), 
 			new webpack.optimize.UglifyJsPlugin({
 				"mangle": false,
