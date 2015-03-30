@@ -19,6 +19,8 @@ Framer.print = (require "./Print").print
 Framer.ScrollComponent = (require "./Components/ScrollComponent").ScrollComponent
 Framer.PageComponent = (require "./Components/PageComponent").PageComponent
 Framer.SliderComponent = (require "./Components/SliderComponent").SliderComponent
+Framer.DeviceComponent = (require "./Components/DeviceComponent").DeviceComponent
+Framer.DeviceView = Framer.DeviceComponent # Compat
 
 _.extend window, Framer if window
 
@@ -35,7 +37,6 @@ Framer.SpringDHOAnimator = (require "./Animators/SpringDHOAnimator").SpringDHOAn
 Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4Animator
 Framer.LayerDraggable = (require "./LayerDraggable").LayerDraggable
 Framer.Importer = (require "./Importer").Importer
-Framer.DeviceView = (require "./DeviceView").DeviceView
 Framer.Debug = (require "./Debug").Debug
 Framer.Extras = require "./Extras/Extras"
 

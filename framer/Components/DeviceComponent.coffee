@@ -1,12 +1,12 @@
-Utils = require "./Utils"
-{_}   = require "./Underscore"
+Utils = require "../Utils"
+{_}   = require "../Underscore"
 
-DeviceViewDefaultDevice = "iphone-6-silver"
+DeviceComponentDefaultDevice = "iphone-6-silver"
 
-{BaseClass} = require "./BaseClass"
-{Layer} = require "./Layer"
-{Defaults} = require "./Defaults"
-{Events} = require "./Events"
+{BaseClass} = require "../BaseClass"
+{Layer} = require "../Layer"
+{Defaults} = require "../Defaults"
+{Events} = require "../Events"
 
 ###
 
@@ -48,11 +48,13 @@ Events.DeviceKeyboardDidShow
 # 	DeviceContentScaleDidChange: "change:contentScale"
 # 	DeviceFullScreenDidChange: ""
 
-class exports.DeviceView extends BaseClass
+class exports.DeviceComponent extends BaseClass
 
 	constructor: (options={}) ->
 
+		# We still listen to DeviceView defaults here for compat
 		defaults = Defaults.getDefaults("DeviceView", options)
+		defaults = _.extend(defaults, Defaults.getDefaults("DeviceComponent", options))
 		
 		@_setup()
 		
@@ -86,7 +88,7 @@ class exports.DeviceView extends BaseClass
 		@screen.classList.add("DeviceScreen")
 
 		@viewport.backgroundColor = "transparent"
-		@viewport.classList.add("DeviceViewPort")
+		@viewport.classList.add("DeviceComponentPort")
 
 		@content.backgroundColor = "transparent"
 		@content.classList.add("DeviceContent")
@@ -779,4 +781,4 @@ Devices =
 
 
 
-exports.DeviceView.Devices = Devices
+exports.DeviceComponent.Devices = Devices

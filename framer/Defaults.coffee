@@ -13,7 +13,7 @@ Originals =
 		# curve: "spring(400,40,0)" # Or, the Cemre-Curve
 		curve: "ease"
 		time: 1
-	DeviceView:
+	DeviceComponent:
 		fullScreen: false
 		padding: 50
 		deviceType: "iphone-5s-spacegray"
