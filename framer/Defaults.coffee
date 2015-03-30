@@ -62,6 +62,9 @@ exports.Defaults =
 
 	getDefaults: (className, options) ->
 
+		return {} unless Originals.hasOwnProperty(className)
+		return {} unless Framer.Defaults.hasOwnProperty(className)
+
 		# Always start with the originals
 		defaults = _.clone Originals[className]
 

@@ -5,6 +5,6 @@
   "contentScale" : 1,
   "deviceType" : "fullscreen",
   "updateDelay" : 0.3,
-  "deviceScale" : 1,
+  "deviceScale" : -1,
   "delay" : 0.3
 }

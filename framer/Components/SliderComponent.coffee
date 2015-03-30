@@ -42,6 +42,7 @@ class exports.SliderComponent extends Layer
 			friction: 2
 			tolerance: 1/10 
 		@knob.draggable.bounce = false
+		@knob.draggable.propagateEvents = false
 		@knob.borderRadius = @knob.width
 		
 		@fill = new Layer 
@@ -61,12 +62,17 @@ class exports.SliderComponent extends Layer
 		@knob.on("change:x", @_updateFill)
 		@knob.on("change:x", @_updateValue)
 		
-		@on "mousedown", (event) =>
-			@value = @valueForPoint(event.x - @screenFrame.x)
-			@knob.draggable._touchStart(event)
+		@on(Events.MouseDown, @_touchDown)
+		@on(Events.TouchDown, @_touchDown)
 
 		@knobSize = options.knobSize or 30
 	
+	_touchDown: (event) =>
+		event.preventDefault()
+		event.stopPropagation()
+		@value = @valueForPoint(event.x - @screenFrame.x)
+		@knob.draggable._touchStart(event)
+
 	_updateFill: =>
 		@fill.width = @knob.midX
 		

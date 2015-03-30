@@ -4,7 +4,6 @@ Utils = require "../Utils"
 {Layer} = require "../Layer"
 {Events} = require "../Events"
 
-
 """
 ScrollComponent
 
@@ -22,12 +21,10 @@ delaysContentTouches <bool> TODO
 loadPreset(<"ios"|"android">) TODO
 scrollToPoint(<{x:n, y:n}>, animate=true, animationOptions={})
 scrollToLayer(contentLayer, originX=0, originY=0)
-
 scrollFrameForContentLayer(<x:n, y:n>) <{x:n, y:n, width:n, height:n}> TODO
 closestContentLayer(<x:n, y:n>) <Layer> TODO
 
-
-ScrollComponent Events TODO
+ScrollComponent Events
 
 (all of the draggable events)
 ScrollStart -> DragStart
@@ -58,12 +55,6 @@ class exports.ScrollComponent extends Layer
 	@define "speedY", @proxyProperty("content.draggable.speedY")
 	@define "isDragging", @proxyProperty("content.draggable.isDragging")
 
-	# We throw an error here, because you almost never would like the enclosing
-	# scroll component to be draggable, but it's an easy mistake to make. If you 
-	# do want this, use a LayerDraggable directly.
-	# @define "draggable",
-	# 	get: -> throw Error("You likely want to use content.draggable")
-
 	@define "content",
 		importable: false
 		exportable: false
@@ -81,17 +72,16 @@ class exports.ScrollComponent extends Layer
 
 		super options
 
-		@_contentInset = Utils.zeroRect()
+		@_contentInset = options.contentInset or Utils.zeroRect()
 		@setContentLayer(new Layer)
 
-		# Re-apply options now that the content layer (to which a number of props proxy) is
-		# present:
+		# Because we did not have a content layer before, we want to re-apply 
+		# the options again so everything gets configures properly.
 		@_applyOptionsAndDefaults(options)
-		
 		@_enableMouseWheelHandling()
-		# @_enableNativeScrollCapture()
 
 	calculateContentSize: ->
+
 		# Calculates the size of the content. By default this returns the total
 		# size of all the content layers based on width and height. You can override
 		# this for example to take scaling into account.
@@ -105,6 +95,9 @@ class exports.ScrollComponent extends Layer
 
 	setContentLayer: (layer) ->
 
+		# Sets the content layer if you happen to want to replace the default one
+		# yourself. Sets some sane defaults too.
+
 		@_content.destroy() if @content
 
 		@_content = layer
@@ -113,23 +106,28 @@ class exports.ScrollComponent extends Layer
 		@_content.clip = false
 		@_content.draggable.enabled = true
 		@_content.draggable.momentum = true
-		@_content.on("change:subLayers", @_updateContent)
+		@_content.on("change:subLayers", @updateContent)
 
 		# Update the content view size on resizing the ScrollComponent
-		@on("change:width", @_updateContent)
-		@on("change:height", @_updateContent)
+		@on("change:width", @updateContent)
+		@on("change:height", @updateContent)
 
-		@_updateContent()
+		@updateContent()
 		@scrollPoint = {x:0, y:0}
 
 		return @_content
 
-	_updateContent: =>
+	updateContent: =>
+
+		# This function re-calculates the size of the content, updates the content layer
+		# size and the dragging constraints based on the content size and contentInset.
+		# It defaults to just the direct sub layers of the content, not recursive.
+
+		# This function automatically gets called when you add or remove content layers,
+		# but not when you change the size of the content layers. It's totally okay to 
+		# call it yourself, but make sure you don't overdo it.
 
 		return unless @content
-
-		# Update the size of the content layer, and the dragging constraints based on the 
-		# content size and contentInset.
 
 		contentFrame = @calculateContentSize()
 		contentFrame.x = 0 + @_contentInset.left
@@ -140,13 +138,16 @@ class exports.ScrollComponent extends Layer
 		constraintsFrame =
 			x: -constraintsFrame.width  + @width - @_contentInset.right
 			y: -constraintsFrame.height + @height - @_contentInset.bottom
-			width: 	constraintsFrame.width  + constraintsFrame.width  - @width + @_contentInset.left + @_contentInset.right
-			height: constraintsFrame.height + constraintsFrame.height - @height + @_contentInset.top + @_contentInset.bottom
+			width: 	constraintsFrame.width  + constraintsFrame.width  - @width + 
+				@_contentInset.left + @_contentInset.right
+			height: constraintsFrame.height + constraintsFrame.height - @height + 
+				@_contentInset.top + @_contentInset.bottom
 
 		@content.draggable.constraints = constraintsFrame
 
-		# Change the default background color if we added subLayers. We keep the default color around
-		# until you set a content layer so you can see the ScrollComponent on your screen after creation.
+		# Change the default background color if we added subLayers. We keep the default 
+		# color around until you set a content layer so you can see the ScrollComponent 
+		# on your screen after creation.
 		if @content.subLayers.length
 			if @content.backgroundColor == Framer.Defaults.Layer.backgroundColor
 				@content.backgroundColor = null
@@ -203,7 +204,7 @@ class exports.ScrollComponent extends Layer
 			_.clone(@_contentInset)
 		set: (contentInset) ->
 			@_contentInset = Utils.zeroRect(Utils.parseRect(contentInset))
-			@_updateContent()
+			@updateContent()
 
 	@define "direction",
 		importable: false
@@ -218,15 +219,17 @@ class exports.ScrollComponent extends Layer
 
 	scrollToPoint: (point, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
 		
+		# We never let you scroll to a point that does not make sense (out of bounds). If you still
+		# would like to do that, access the .content.y directly.
 		point = @_pointInConstraints(point)
 
 		if animate
-			_.defer =>
-				point.x = -point.x if point.x
-				point.y = -point.y if point.y
-				animationOptions.properties = point
-				@content.animateStop()
-				@content.animate(animationOptions)
+			# _.defer =>
+			point.x = -point.x if point.x
+			point.y = -point.y if point.y
+			animationOptions.properties = point
+			@content.animateStop()
+			@content.animate(animationOptions)
 		else
 			@scrollPoint = point
 
@@ -273,10 +276,6 @@ class exports.ScrollComponent extends Layer
 
 	_scrollPointForLayer: (layer, originX=0, originY=0, clamp=true) ->
 		return Utils.framePointForOrigin(layer, originX, originY)
-		# point = layer.point
-		# point.x += layer.width * originX
-		# point.y += layer.height * originY
-		# return point
 
 	_contentLayersSortedByDistanceForScrollPoint: (scrollPoint, originX=0, originY=0) ->
 		return Utils.frameSortByAbsoluteDistance(scrollPoint, @content.subLayers, originX, originY)
@@ -365,7 +364,8 @@ class exports.ScrollComponent extends Layer
 
 	@wrap = (layer) ->
 
-		# This function wraps the given layer into a scroll or page component
+		# This function wraps the given layer into a scroll or page component. This is
+		# great for importing from Sketch or Photoshop.
 
 		scroll = new @
 

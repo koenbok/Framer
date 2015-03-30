@@ -10,7 +10,7 @@ originY <number>
 velocityThreshold <number>
 animationOptions <animationOptions={}>
 currentPage <Layer>
-closestLayer(<originX:n, originY:n>) <Layer>
+closestPage(<originX:n, originY:n>) <Layer>
 
 nextPage(direction="", currentPage)
 snapToNextPage(direction="", animate, animationOptions={})
@@ -26,7 +26,7 @@ class exports.PageComponent extends ScrollComponent
 	@define "currentPage", 
 		importable: false
 		exportable: false
-		get: -> @closestLayer()
+		get: -> @closestPage
 
 	constructor: ->
 		super
@@ -37,24 +37,24 @@ class exports.PageComponent extends ScrollComponent
 		@on(Events.ScrollStart, @_scrollStart)
 		@on(Events.ScrollEnd, @_scrollEnd)
 
-		@content.on("change:frame", _.debounce(@_scrollMove, 1))
+		@content.on("change:frame", _.debounce(@_scrollMove, 16))
 		@_content.on "change:subLayers", => 
-			@_currentLayer = @closestLayer()
+			@_currentPage = @closestPage
+			@_previousPages = []
 
-		@_currentLayer = null
+		@_currentPage = null
+		@_previousPages = []
 
-	closestLayer: ->
-		@closestContentLayerForScrollPoint(@_originScrollPoint(), @originX, @originY)
+	@define "closestPage",  get: -> @closestContentLayerForScrollPoint(@_originScrollPoint(), @originX, @originY)
+	@define "previousPage", get: -> @_previousPages[@_previousPages.length-2]
 
 	nextPage: (direction="right", currentPage=null) ->
 
 		currentPage ?= @currentPage
 
 		# Figure out the point from where to look for next layers in a direction
-		if currentPage
-			point = Utils.framePointForOrigin(currentPage, @originX, @originY)
-		else
-			point = {x:0, y:0}
+		point = {x:0, y:0}
+		point = Utils.framePointForOrigin(currentPage, @originX, @originY) if currentPage
 
 		layers = @contentLayersAbove(point) if direction is "up"
 		layers = @contentLayersRight(point) if direction is "right"
@@ -67,14 +67,19 @@ class exports.PageComponent extends ScrollComponent
 		
 		return _.first(layers)
 
+	snapToPage: (page, animate=true, animationOptions=null) ->
+		@scrollToLayer(page, @originX, @originY, true, animationOptions)
+
 	snapToNextPage: (direction="right", animate=true, animationOptions=null) ->
 		animationOptions ?= @animationOptions
-		nextPage = @nextPage(direction)
+		nextPage  = @nextPage(direction)
+		nextPage ?= @closestPage
+		@snapToPage(nextPage, animate, animationOptions)
 
-		if not nextPage
-			@scrollToClosestLayer(@originX, @originY, true, animationOptions)
-		else
-			@scrollToLayer(nextPage, @originX, @originY, true, animationOptions)
+	snapToPreviousPage: ->
+		return unless @previousPage
+		@snapToPage(@previousPage)
+		@_previousPages = @_previousPages[0..@_previousPages.length-2]
 
 	addPage: (page, direction="right") ->
 
@@ -104,10 +109,9 @@ class exports.PageComponent extends ScrollComponent
 
 		currentPage = @currentPage
 
-		if @_lastCurrentPage not in [currentPage, null]
-			@emit("change:currentPage", {old:@_lastCurrentPage, new:currentPage})
-
-		@_lastCurrentPage = currentPage
+		if currentPage not in [_.last(@_previousPages), undefined]
+			@_previousPages.push(currentPage)
+			@emit("change:currentPage", {old:@previousPage, new:currentPage})
 
 	_scrollEnd: =>
 
@@ -124,24 +128,24 @@ class exports.PageComponent extends ScrollComponent
 
 		# Figure out which direction we are scrolling to and make a sorted list of
 		# layers on that side, sorted by absolute distance so we can pick the first.
-		layer = @nextPage(@direction, @_currentPage)
+		nextPage = @nextPage(@direction, @_currentPage)
 
 		# print Math.max(Math.abs(velocity.x), Math.abs(velocity.y))
 		# print @direction, layer
 
 		# If not, we scroll to the closest layer that we have available, often the one
 		# that we are already at.
-		if not layer
-			@scrollToClosestLayer(@originX, @originY, true, @animationOptions)
-		else
-			@scrollToLayer(layer, @originX, @originY, true, @animationOptions)
-
-	# _updateCurrentPage: (currentPage): ->
-	# 	@emit("change:currentPage", {old:@_currentLayer, new:currentPage})
-	# 	@_currentLayer = currentPage
+		nextPage ?= @closestPage
+		@snapToPage(nextPage, true, @animationOptions)
 
 	_originScrollPoint: ->
 		scrollPoint = @scrollPoint
 		scrollPoint.x += @width * @originX
 		scrollPoint.y += @height * @originY
 		return scrollPoint
+
+	##############################################################
+	# Page indicator TODO
+
+	# createPageIndicator: ->
+	# updatePageIndicator: (currentPage) ->
