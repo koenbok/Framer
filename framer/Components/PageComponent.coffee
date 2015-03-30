@@ -37,7 +37,6 @@ class exports.PageComponent extends ScrollComponent
 		@on(Events.ScrollStart, @_scrollStart)
 		@on(Events.ScrollEnd, @_scrollEnd)
 
-
 		@content.on("change:frame", _.debounce(@_scrollMove, 1))
 		@_content.on "change:subLayers", => 
 			@_currentLayer = @closestLayer()
@@ -77,6 +76,27 @@ class exports.PageComponent extends ScrollComponent
 		else
 			@scrollToLayer(nextPage, @originX, @originY, true, animationOptions)
 
+	addPage: (page, direction="right") ->
+
+		# We only allow adding pages to the right and bottom for now, because it shouldn't
+		# be hard to insert them in the right order, and if we need to manage that for you
+		# we'd have to change the position of every content layer so the new page fits.
+		# Ergo: too much magic.
+		directions = ["right", "bottom"]
+
+		if not direction in directions
+			direction = "right"
+			throw new Error("#{direction} should be in #{directions}")
+
+		point = {x:0, y:0}
+
+		if @content.subLayers.length
+			point.x = Utils.frameGetMaxX(@content.contentFrame()) if direction == "right"
+			point.y = Utils.frameGetMaxY(@content.contentFrame()) if direction == "bottom"
+
+		page.point = point
+		page.superLayer = @content
+
 	_scrollStart: =>
 		@_currentPage = @currentPage
 
@@ -105,6 +125,9 @@ class exports.PageComponent extends ScrollComponent
 		# Figure out which direction we are scrolling to and make a sorted list of
 		# layers on that side, sorted by absolute distance so we can pick the first.
 		layer = @nextPage(@direction, @_currentPage)
+
+		# print Math.max(Math.abs(velocity.x), Math.abs(velocity.y))
+		# print @direction, layer
 
 		# If not, we scroll to the closest layer that we have available, often the one
 		# that we are already at.

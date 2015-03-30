@@ -310,8 +310,8 @@ class exports.LayerDraggable extends BaseClass
 			# return null if not @isDragging
 			velocity = @velocity
 			if Math.abs(velocity.x) > Math.abs(velocity.y)
-				return "left" if velocity.x > 0
-				return "right"
+				return "right" if velocity.x > 0
+				return "left"
 			else
 				return "up" if velocity.y > 0
 				return "down"

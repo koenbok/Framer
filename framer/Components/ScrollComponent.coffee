@@ -231,7 +231,7 @@ class exports.ScrollComponent extends Layer
 			@scrollPoint = point
 
 	scrollToLayer: (contentLayer, originX=0, originY=0, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
-		
+
 		if contentLayer.superLayer isnt @content
 			throw Error("This layer is not in the scroll component")
 
