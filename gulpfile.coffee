@@ -50,7 +50,7 @@ gulp.task "build:test", ->
 gulp.task "test", ["build:debug", "build:test"], ->
 	return gulp
 		.src("test/phantomjs/index.html")
-		.pipe(phantomjs({reporter: "dot"}))
+		.pipe(phantomjs({reporter: "landing"}))
 
 gulp.task "watch", ->
 	gulp.watch(["./*.coffee", "framer/**", "test/tests/**"], ["test"]);

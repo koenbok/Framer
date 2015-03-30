@@ -311,7 +311,7 @@ describe "Utils", ->
 
 		it "should work with LayerDraggable", ->
 			layer = new Layer
-			Utils.inspectObjectType(layer.draggable).should.equal("LayerDraggable"))
+			Utils.inspectObjectType(layer.draggable).should.equal("LayerDraggable")
 
 	describe "keyPath", ->
 
