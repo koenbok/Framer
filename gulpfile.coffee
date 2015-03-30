@@ -19,7 +19,10 @@ gulp.task "build:release", ->
 		"output": {filename: "framer.js", pathinfo:true}
 		"plugins": [
 			new webpack.optimize.DedupePlugin(), 
-			new webpack.optimize.UglifyJsPlugin()
+			new webpack.optimize.UglifyJsPlugin({
+				"mangle": false,
+				"compress": {warnings: false}
+			})
 		]
 
 	return gulp.src(config.entry)
