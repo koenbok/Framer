@@ -1,7 +1,8 @@
 window.console.debug = (v) ->
+window.console.warn = (v) ->
 
-mocha.setup('bdd')
-mocha.globals(['__import__'])
+mocha.setup("bdd")
+mocha.globals(["__import__"])
 
 assert = chai.assert
 

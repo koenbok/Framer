@@ -1,48 +1,38 @@
 pwd = $(CURDIR)
 bin = $(pwd)/node_modules/.bin
 coffee = "$(bin)/coffee"
-
-browserify = "$(bin)/browserify" -t coffeeify -d --extension=".coffee"
-watch = $(coffee) scripts/watch.coffee framer,test/tests
 githash = `git rev-parse --short HEAD`
+gulp = "$(bin)/gulp"
 
 all: build
 
 bootstrap:
 	npm install
+	cd test/phantomjs; "$(bin)/bower" install
 
 unbootstrap:
 	rm -Rf node_modules
 	rm -Rf test/phantomjs/bower
 
-watch:
-	$(watch) make $(cmd)
-
 clean:
 	rm -rf build
 
-build: clean bootstrap 
+build: bootstrap clean 
 	mkdir -p build
-	$(browserify) framer/Framer.coffee -o build/framer.debug.js
-	cat build/framer.debug.js | "$(bin)/exorcist" build/framer.js.map > build/framer.js
+	$(gulp) build:release
 
-debug: bootstrap 
-	"$(bin)/watchify" -t coffeeify --extension=".coffee" framer/Framer.coffee -d -v -o build/framer.debug.js
+debug: bootstrap clean 
+	mkdir -p build
+	$(gulp) build:debug
+
+watch: bootstrap 
+	$(gulp) watch
+
+test: bootstrap 
+	$(gulp) test
 
 studio:
 	open -a "Framer Studio" extras/Studio.framer
-
-# Testing
-
-test: build
-	$(browserify) test/tests.coffee -o test/phantomjs/tests.js
-	cd test/phantomjs; "$(bin)/bower" install
-	"$(bin)/mocha-phantomjs" --bail test/phantomjs/index.html
-testw:
-	$(watch) make test
-
-safari-test: test
-	open -g -a Safari test/phantomjs/index.html
 
 # Building and uploading the site
 
