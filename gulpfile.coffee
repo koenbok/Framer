@@ -9,20 +9,20 @@ CONFIG =
 		loaders: [{test: /\.coffee$/, loader: "coffee-loader"}]
 	resolve:
 		extensions: ["", ".web.coffee", ".web.js", ".coffee", ".js"]
-	"cache": true
-	"devtool": "sourcemap"
+	cache: true
+	devtool: "sourcemap"
 
 gulp.task "build:release", ->
 
 	config = _.extend CONFIG,
-		"entry": "./framer/Framer.coffee"
-		"output": {filename: "framer.js"}
-		"plugins": [
+		entry: "./framer/Framer.coffee"
+		output: {filename: "framer.js"}
+		plugins: [
 			# new webpack.BannerPlugin("Framer", {}),
 			new webpack.optimize.DedupePlugin(), 
 			new webpack.optimize.UglifyJsPlugin({
-				"mangle": false,
-				"compress": {warnings: false}
+				mangle: false,
+				compress: {warnings: false}
 			})
 		]
 
@@ -33,9 +33,9 @@ gulp.task "build:release", ->
 gulp.task "build:debug", ->
 
 	config = _.extend CONFIG,
-		"entry": "./framer/Framer.coffee"
-		"output": {filename: "framer.debug.js", pathinfo:true}
-		"debug": true
+		entry: "./framer/Framer.coffee"
+		output: {filename: "framer.debug.js", pathinfo:true}
+		debug: true
 
 	return gulp.src(config.entry)
 		.pipe(gulpWebpack(config))
@@ -58,3 +58,28 @@ gulp.task "test", ["build:debug", "build:test"], ->
 
 gulp.task "watch", ["test"], ->
 	gulp.watch(["./*.coffee", "framer/**", "test/tests/**"], ["test"]);
+
+gulp.task "build:coverage", ->
+
+	config = _.extend CONFIG,
+		entry: "./build/instrumented/Framer.js"
+		output: { filename: "framer.debug.js", pathinfo:true }
+		debug: true
+
+	return gulp.src(config.entry)
+		.pipe(gulpWebpack(config))
+		.pipe(gulp.dest("build/"))
+
+gulp.task "coverage", ["build:coverage", "build:test"], ->
+	return gulp
+		.src("test/phantomjs/index.html")
+		.pipe(phantomjs(
+			reporter: "landing"
+			phantomjs:
+				hooks: "coverage-capture"
+		))
+		.on "finish", ->
+			console.log "done"
+
+
+

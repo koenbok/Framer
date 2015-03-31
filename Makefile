@@ -31,6 +31,12 @@ watch: bootstrap
 test: bootstrap 
 	$(gulp) test
 
+coverage: bootstrap
+	$(bin)/coffeeCoverage ./framer ./build/instrumented
+	$(gulp) coverage
+	cp ./test/coverage-template/* ./build/coverage
+	open ./build/coverage/jscoverage.html
+
 studio:
 	open -a "Framer Studio" extras/Studio.framer
 
