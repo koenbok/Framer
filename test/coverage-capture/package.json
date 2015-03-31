@@ -1,7 +1,8 @@
 {
   "name": "coverage-capture",
   "version": "1.0.0",
-  "description": "",
+  "description": "A module that captures coverage data from PhantomJS and saves it to build/coverage/jscoverage.json",
   "main": "index.coffee",
-  "author": ""
+  "author": "Motif",
+  "repository": "local"
 }

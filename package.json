@@ -30,8 +30,7 @@
     "phantomjs": "^1.9.16",
     "should": "^5.2.0",
     "simulate": "^0.0.4",
-    "webpack": "^1.7.3",
-    "coverage-capture": "./test/coverage-capture"
+    "webpack": "^1.7.3"
   },
   "keywords": [
     "prototyping"
