@@ -171,18 +171,18 @@ class exports.ScrollComponent extends Layer
 	@define "scrollX",
 		get: -> 
 			return 0 if not @content
-			-@content.x
+			-@content.x + @contentInset.left
 		set: (value) -> 
 			return unless @content
-			@content.x = -@_pointInConstraints({x:value, y:0}).x
+			@content.x = -@_pointInConstraints({x:value - @contentInset.left, y:0}).x
 
 	@define "scrollY",
 		get: -> 
 			return 0 if not @content
-			-@content.y
+			-@content.y + @contentInset.top
 		set: (value) -> 
 			return unless @content
-			@content.y = -@_pointInConstraints({x:0, y:value}).y
+			@content.y = -@_pointInConstraints({x:0, y:value - @contentInset.top}).y
 
 	@define "scrollPoint",
 		importable: true

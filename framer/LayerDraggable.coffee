@@ -492,6 +492,7 @@ class exports.LayerDraggable extends BaseClass
 		return unless @_simulation
 		@_simulation.x.stop()
 		@_simulation.y.stop()
+		@emit(Events.Move)
 		@emit(Events.DragAnimationDidEnd)
 		@_simulation = null
 
