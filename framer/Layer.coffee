@@ -49,9 +49,6 @@ class exports.Layer extends BaseClass
 
 		@_properties = {}
 		@_style = {}
-		@_dirtyStyle = {}
-		@_needsRender = false
-		# @_classList = []
 
 		# Special power setting for 2d rendering path. Only enable this
 		# if you know what you are doing. See LayerStyle for more info.
@@ -60,7 +57,6 @@ class exports.Layer extends BaseClass
 
 		# We have to create the element before we set the defaults
 		@_createElement()
-		# @_setDefaultCSS()
 
 		if options.hasOwnProperty "frame"
 			options = _.extend(options, options.frame)
@@ -73,12 +69,6 @@ class exports.Layer extends BaseClass
 		@_context.addLayer(@)
 
 		@_id = @_context.nextLayerId()
-
-		# Keep track of the default values
-		# @_defaultValues = options._defaultValues
-
-		# We need to explicitly set the element id again, becuase it was made by the super
-		# @_element.id = "FramerLayer-#{@id}"
 
 		# Insert the layer into the dom or the superLayer element
 		if not options.superLayer
