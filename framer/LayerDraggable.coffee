@@ -9,29 +9,33 @@ Utils        = require "./Utils"
 {EventBuffer} = require "./EventBuffer"
 {PanRecognizer} = require "./Recognizers/PanRecognizer"
 
+Events.Move                  = "move"
 Events.DragStart             = "dragstart"
 Events.DragWillMove          = "dragwillmove"
 Events.DragMove              = "dragmove"
 Events.DragDidMove           = "dragmove"
 Events.Drag                  = "dragmove"
 Events.DragEnd               = "dragend"
-Events.DeceleratingDidStart  = "deceleratingdidstart"
-Events.DeceleratingDidEnd    = "deceleratingdidend"
-Events.BounceDidStart        = "bouncedidstart"
-Events.BounceDidEnd          = "bouncedidend"
-Events.AnimationDidStart     = "animationdidstart"
-Events.AnimationDidEnd       = "animationdidend"
+# Events.DeceleratingDidStart  = "deceleratingdidstart"
+# Events.DeceleratingDidEnd    = "deceleratingdidend"
+# Events.BounceDidStart        = "bouncedidstart"
+# Events.BounceDidEnd          = "bouncedidend"
+Events.DragAnimationDidStart = "draganimationdidstart"
+Events.DragAnimationDidEnd   = "draganimationdidend"
 Events.LockDirectionDidStart = "lockdirectiondidstart"
 
 """
-TODO:
-
-- Check if all events are thrown correctly
-- Deal with nested draggables
-	- Event propagation (click vs move)
-	- Multiple scroll moves
-	- Multiple lock directions
-	
+             
+    ┌──────┐                   │         
+    │      │                             
+    │      │  ───────────────▶ │ ◀────▶  
+    │      │                             
+    └──────┘                   │         
+                                         
+    ════════  ═════════════════ ═══════  
+                                         
+      Drag         Momentum      Bounce  
+                                             
 """
 
 class exports.LayerDraggable extends BaseClass
@@ -218,7 +222,7 @@ class exports.LayerDraggable extends BaseClass
 		@layer.point = @updatePosition(point)
  
 		if @isDragging
-			@emit(Events.DragMove, event)
+			@emit(Events.Move, event)
 			@emit(Events.DragDidMove, event)
 
 	_touchEnd: (event) =>
@@ -431,14 +435,12 @@ class exports.LayerDraggable extends BaseClass
 		updatePoint[axis] = updatePoint[axis] + (delta * @speedY) if axis is "y"
 		@updatePosition(updatePoint)
 
-		@emit(Events.DragWillMove, {animation:true})
 		@layer[axis] = @updatePosition(updatePoint)[axis]
-		@emit(Events.DragMove, {animation:true})
-		@emit(Events.DragDidMove, {animation:true})
+		@emit(Events.Move, {animation:true})
 
 	_onSimulationStop: (axis, state) =>
 
-		@emit(Events.AnimationDidEnd, {axis:axis})
+		return unless @_simulation
 
 		# Round the end position to whole pixels
 		@layer[axis] = parseInt(@layer[axis]) if @pixelAlign
@@ -462,26 +464,36 @@ class exports.LayerDraggable extends BaseClass
 			return
 
 		velocity = @velocity
+
+		velocityX = velocity.x * @momentumVelocityMultiplier * @speedX * (1 / @_screenScale.x) * @layer.scaleX * @layer.scale
+		velocityY = velocity.y * @momentumVelocityMultiplier * @speedY * (1 / @_screenScale.y) * @layer.scaleY * @layer.scale
+
+		# Don't start a simulation if we're below velocity threshold
+		if Math.abs(velocityX) < @momentumOptions.tolerance and Math.abs(velocityY) < @momentumOptions.tolerance
+			return
+
 		@_setupSimulation()
 		@_isAnimating = true
 		
 		@_simulation.x.simulator.setState
 			x: @layer.x
-			v: velocity.x * @momentumVelocityMultiplier * @speedX * (1 / @_screenScale.x) * @layer.scaleX * @layer.scale
+			v: velocityX
 		@_simulation.x.start() if startSimulationX
 
 		@_simulation.y.simulator.setState
 			x: @layer.y
-			v: velocity.y * @momentumVelocityMultiplier * @speedY * (1 / @_screenScale.y) * @layer.scaleY * @layer.scale
+			v: velocityY
 		@_simulation.y.start() if startSimulationY
 
-		@emit(Events.AnimationDidStart)
+		@emit(Events.DragAnimationDidStart)
 
 	_stopSimulation: =>
-		@_simulation?.x.stop()
-		@_simulation?.y.stop()
 		@_isAnimating = false
-		@emit(Events.AnimationDidEnd)
+		return unless @_simulation
+		@_simulation.x.stop()
+		@_simulation.y.stop()
+		@emit(Events.DragAnimationDidEnd)
+		@_simulation = null
 
 	animateStop: ->
 		@_stopSimulation()
