@@ -141,7 +141,7 @@ class exports.ScrollComponent extends Layer
 
 		contentFrame = @calculateContentFrame()
 		contentFrame.x = contentFrame.x + @_contentInset.left
-		contentFrame.y = contentFrame.x + @_contentInset.top
+		contentFrame.y = contentFrame.y + @_contentInset.top
 		@content.frame = contentFrame
 
 		constraintsFrame = @calculateContentFrame()
@@ -245,12 +245,15 @@ class exports.ScrollComponent extends Layer
 
 	scrollToLayer: (contentLayer, originX=0, originY=0, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
 
-		if contentLayer.superLayer isnt @content
-			throw Error("This layer is not in the scroll component")
+		if contentLayer and contentLayer.superLayer isnt @content
+			throw Error("This layer is not in the scroll component content")
 
-		scrollPoint = @_scrollPointForLayer(contentLayer, originX, originY)
-		scrollPoint.x -= @width * originX
-		scrollPoint.y -= @height * originY
+		if not contentLayer or @content.subLayers.length == 0
+			scrollPoint = {x:0, y:0}
+		else
+			scrollPoint = @_scrollPointForLayer(contentLayer, originX, originY)
+			scrollPoint.x -= @width * originX
+			scrollPoint.y -= @height * originY
 
 		@scrollToPoint(scrollPoint, animate, animationOptions)
 

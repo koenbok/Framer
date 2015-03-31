@@ -100,7 +100,11 @@ class exports.PageComponent extends ScrollComponent
 			point.y = Utils.frameGetMaxY(@content.contentFrame()) if direction == "bottom"
 
 		page.point = point
-		page.superLayer = @content
+		
+		if page.superLayer isnt @content
+			page.superLayer = @content
+		else
+			@updateContent()
 
 	_scrollStart: =>
 		@_currentPage = @currentPage
