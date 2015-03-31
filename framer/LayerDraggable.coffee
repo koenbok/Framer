@@ -456,6 +456,7 @@ class exports.LayerDraggable extends BaseClass
 	_startSimulation: ->
 
 		return unless @momentum or @bounce
+		return unless @isDragging
 
 		# If overdrag is disabled, we need to not have a bounce animation
 		# when the cursor is outside of the dragging bounds for an axis.
@@ -471,10 +472,6 @@ class exports.LayerDraggable extends BaseClass
 
 		velocityX = velocity.x * @momentumVelocityMultiplier * @speedX * (1 / @_screenScale.x) * @layer.scaleX * @layer.scale
 		velocityY = velocity.y * @momentumVelocityMultiplier * @speedY * (1 / @_screenScale.y) * @layer.scaleY * @layer.scale
-
-		# Don't start a simulation if we're below velocity threshold
-		if Math.abs(velocityX) < @momentumOptions.tolerance and Math.abs(velocityY) < @momentumOptions.tolerance
-			return
 
 		@_setupSimulation()
 		@_isAnimating = true
