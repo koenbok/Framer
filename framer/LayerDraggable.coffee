@@ -142,6 +142,8 @@ class exports.LayerDraggable extends BaseClass
 			x: @layer.x
 			y: @layer.y
 		
+		# If we are beyond bounds, we need to correct for the scaled clamping from the last drag, 
+		# hence the 1 / overdragScale
 		if @constraints and @bounce
 			@_layerStartPoint = @_constrainPosition(@_layerStartPoint, @constraints, 1 / @overdragScale)
 
@@ -180,8 +182,8 @@ class exports.LayerDraggable extends BaseClass
 			t: Date.now() # We don't use timeStamp because it's different on Chrome/Safari
 
 		delta =
-			x: touchEvent.clientX - @_cursorStartPoint.x
-			y: touchEvent.clientY - @_cursorStartPoint.y
+			x: touchEvent.clientX - @_layerStartPoint.x
+			y: touchEvent.clientY - @_layerStartPoint.y
 
 		# Correct for current drag speed and scale
 		correctedDelta =
@@ -193,8 +195,8 @@ class exports.LayerDraggable extends BaseClass
 			x: @layer.x
 			y: @layer.y
 
-		point.x = @_cursorStartPoint.x + correctedDelta.x - @_layerCursorOffset.x if @horizontal
-		point.y = @_cursorStartPoint.y + correctedDelta.y - @_layerCursorOffset.y if @vertical
+		point.x = @_layerStartPoint.x + correctedDelta.x - @_layerCursorOffset.x if @horizontal
+		point.y = @_layerStartPoint.y + correctedDelta.y - @_layerCursorOffset.y if @vertical
 
 		# Direction lock
 		if @lockDirection
@@ -205,9 +207,8 @@ class exports.LayerDraggable extends BaseClass
 				point.x = @_layerStartPoint.x if @_lockDirectionEnabledX
 				point.y = @_layerStartPoint.y if @_lockDirectionEnabledY
 
-		# Constraints
-		if @_constraints
-			point = @_constrainPosition(point, @_constraints)
+		# Constraints and overdrag
+		point = @_constrainPosition(point, @_constraints, @overdragScale) if @_constraints
 
 		# Pixel align all moves
 		if @pixelAlign
@@ -286,8 +287,8 @@ class exports.LayerDraggable extends BaseClass
 
 		if @overdrag
 			point = 
-				x: @_clampAndScale(proposedPoint.x, minX, maxX, @overdragScale)
-				y: @_clampAndScale(proposedPoint.y, minY, maxY, @overdragScale)
+				x: @_clampAndScale(proposedPoint.x, minX, maxX, scale)
+				y: @_clampAndScale(proposedPoint.y, minY, maxY, scale)
 		else
 			point = 
 				x: Utils.clamp(proposedPoint.x, minX, maxX)
