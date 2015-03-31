@@ -72,10 +72,10 @@ class exports.LayerDraggable extends BaseClass
 
 	@define "offset",
 		get: ->
-			return {x:0, y:0} if not @_layerStartPoint
+			return {x:0, y:0} if not @_correctedLayerStartPoint
 			return offset = 
-				x: @layer.x - @_layerStartPoint.x
-				y: @layer.y - @_layerStartPoint.y
+				x: @layer.x - @_correctedLayerStartPoint.x
+				y: @layer.y - @_correctedLayerStartPoint.y
 
 	# TODO: what to do with this?
 	# Should there be a tap event?
@@ -138,14 +138,14 @@ class exports.LayerDraggable extends BaseClass
 			t: Date.now()
 
 		# Store original layer position
-		@_layerStartPoint =
-			x: @layer.x
-			y: @layer.y
+		@_layerStartPoint = @layer.point
+		@_correctedLayerStartPoint = @layer.point
 		
 		# If we are beyond bounds, we need to correct for the scaled clamping from the last drag, 
 		# hence the 1 / overdragScale
 		if @constraints and @bounce
-			@_layerStartPoint = @_constrainPosition(@_layerStartPoint, @constraints, 1 / @overdragScale)
+			@_correctedLayerStartPoint = @_constrainPosition(
+				@_correctedLayerStartPoint, @constraints, 1 / @overdragScale)
 
 		# Store start cursor position
 		@_cursorStartPoint =
@@ -154,8 +154,8 @@ class exports.LayerDraggable extends BaseClass
 
 		# Store cursor/layer offset
 		@_layerCursorOffset =
-			x: touchEvent.clientX - @_layerStartPoint.x
-			y: touchEvent.clientY - @_layerStartPoint.y
+			x: touchEvent.clientX - @_correctedLayerStartPoint.x
+			y: touchEvent.clientY - @_correctedLayerStartPoint.y
 
 		# Store the current layer scale so we can correct movement for it
 		@_screenScale =
@@ -182,8 +182,8 @@ class exports.LayerDraggable extends BaseClass
 			t: Date.now() # We don't use timeStamp because it's different on Chrome/Safari
 
 		offset =
-			x: touchEvent.clientX - @_layerStartPoint.x - @_layerCursorOffset.x
-			y: touchEvent.clientY - @_layerStartPoint.y - @_layerCursorOffset.y
+			x: touchEvent.clientX - @_correctedLayerStartPoint.x - @_layerCursorOffset.x
+			y: touchEvent.clientY - @_correctedLayerStartPoint.y - @_layerCursorOffset.y
 
 		# Scale the offset with the screen scale for the current layer
 		offset.x = offset.x * @speedX * (1 / @_screenScale.x) * @layer.scaleX * @layer.scale
@@ -191,8 +191,8 @@ class exports.LayerDraggable extends BaseClass
 
 		# See if horizontal/vertical was set and set the offset
 		point = @layer.point
-		point.x = @_layerStartPoint.x + offset.x if @horizontal
-		point.y = @_layerStartPoint.y + offset.y if @vertical
+		point.x = @_correctedLayerStartPoint.x + offset.x if @horizontal
+		point.y = @_correctedLayerStartPoint.y + offset.y if @vertical
 
 		# Constraints and overdrag
 		point = @_constrainPosition(point, @_constraints, @overdragScale) if @_constraints
