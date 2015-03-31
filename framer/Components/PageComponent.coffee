@@ -56,10 +56,10 @@ class exports.PageComponent extends ScrollComponent
 		point = {x:0, y:0}
 		point = Utils.framePointForOrigin(currentPage, @originX, @originY) if currentPage
 
-		layers = @contentLayersAbove(point) if direction is "up"
-		layers = @contentLayersRight(point) if direction is "right"
-		layers = @contentLayersBelow(point) if direction is "down"
-		layers = @contentLayersLeft(point) if direction is "left"
+		layers = @content.subLayersAbove(point, @originX, @originY) if direction is "up"
+		layers = @content.subLayersBelow(point, @originX, @originY) if direction is "down"
+		layers = @content.subLayersRight(point, @originX, @originY) if direction is "right"
+		layers = @content.subLayersLeft(point, @originX, @originY) if direction is "left"
 
 		# See if there is one close by that we should go to
 		layers = _.without(layers, currentPage)
@@ -131,7 +131,7 @@ class exports.PageComponent extends ScrollComponent
 		nextPage = @nextPage(@direction, @_currentPage)
 
 		# print Math.max(Math.abs(velocity.x), Math.abs(velocity.y))
-		# print @direction, layer
+		# print @direction, nextPage
 
 		# If not, we scroll to the closest layer that we have available, often the one
 		# that we are already at.

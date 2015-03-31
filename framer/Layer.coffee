@@ -655,6 +655,15 @@ class exports.Layer extends BaseClass
 		if @_context._parentLayer
 			return @_context._parentLayer
 
+	subLayersAbove: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
+		Utils.framePointForOrigin(layer.frame, originX, originY).y < point.y
+	subLayersBelow: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
+		Utils.framePointForOrigin(layer.frame, originX, originY).y > point.y
+	subLayersLeft: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
+		Utils.framePointForOrigin(layer.frame, originX, originY).x < point.x
+	subLayersRight: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
+		Utils.framePointForOrigin(layer.frame, originX, originY).x > point.x
+
 	##############################################################
 	## ANIMATION
 

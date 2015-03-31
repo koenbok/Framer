@@ -11,8 +11,9 @@ Utils        = require "./Utils"
 
 Events.DragStart             = "dragstart"
 Events.DragWillMove          = "dragwillmove"
-Events.DragDidMove           = "dragmove"
 Events.DragMove              = "dragmove"
+Events.DragDidMove           = "dragmove"
+Events.Drag                  = "dragmove"
 Events.DragEnd               = "dragend"
 Events.DeceleratingDidStart  = "deceleratingdidstart"
 Events.DeceleratingDidEnd    = "deceleratingdidend"
@@ -313,8 +314,8 @@ class exports.LayerDraggable extends BaseClass
 				return "right" if velocity.x > 0
 				return "left"
 			else
-				return "up" if velocity.y > 0
-				return "down"
+				return "down" if velocity.y > 0
+				return "up"
 
 	calculateVelocity: ->
 		# Compatibility method
