@@ -57,7 +57,19 @@ gulp.task "test", ["build:debug", "build:test"], ->
 		.pipe(phantomjs({reporter: "landing"}))
 
 gulp.task "watch", ["test"], ->
-	gulp.watch(["./*.coffee", "framer/**", "test/tests/**"], ["test"]);
+	gulp.watch(["./*.coffee", "framer/**", "test/tests/**"], ["test"])
+
+gulp.task "watcher", ->
+	
+	config = _.extend CONFIG,
+		entry: "./framer/Framer.coffee"
+		output: {filename: "framer.debug.js", pathinfo:true}
+		debug: true
+		watch: true
+
+	return gulp.src(config.entry)
+		.pipe(gulpWebpack(config))
+		.pipe(gulp.dest("build/"))
 
 gulp.task "build:coverage", ->
 
