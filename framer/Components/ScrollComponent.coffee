@@ -80,7 +80,7 @@ class exports.ScrollComponent extends Layer
 		@_applyOptionsAndDefaults(options)
 		@_enableMouseWheelHandling()
 
-	calculateContentSize: ->
+	calculateContentFrame: ->
 
 		# Calculates the size of the content. By default this returns the total
 		# size of all the content layers based on width and height. You can override
@@ -89,6 +89,8 @@ class exports.ScrollComponent extends Layer
 		contentFrame = @content.contentFrame()
 
 		return size = 
+			x: 0
+			y: 0
 			width:  Math.max(@width,  contentFrame.x + contentFrame.width)
 			height: Math.max(@height, contentFrame.y + contentFrame.height)
 
@@ -129,12 +131,12 @@ class exports.ScrollComponent extends Layer
 
 		return unless @content
 
-		contentFrame = @calculateContentSize()
-		contentFrame.x = 0 + @_contentInset.left
-		contentFrame.y = 0 + @_contentInset.top
+		contentFrame = @calculateContentFrame()
+		contentFrame.x = contentFrame.x + @_contentInset.left
+		contentFrame.y = contentFrame.x + @_contentInset.top
 		@content.frame = contentFrame
 
-		constraintsFrame = @calculateContentSize()
+		constraintsFrame = @calculateContentFrame()
 		constraintsFrame =
 			x: -constraintsFrame.width  + @width - @_contentInset.right
 			y: -constraintsFrame.height + @height - @_contentInset.bottom
@@ -261,18 +263,6 @@ class exports.ScrollComponent extends Layer
 
 	closestContentLayerForScrollPoint: (scrollPoint, originX=0, originY=0) ->
 		return _.first(@_contentLayersSortedByDistanceForScrollPoint(scrollPoint, originX, originY))
-
-	contentLayersAbove: (point) -> _.filter @content.subLayers, (l) => 
-			Utils.framePointForOrigin(l.frame, @originX, @originY).y > point.y
-
-	contentLayersBelow: (point) -> _.filter @content.subLayers, (l) => 
-			Utils.framePointForOrigin(l.frame, @originX, @originY).y < point.y
-
-	contentLayersLeft: (point) -> _.filter @content.subLayers, (l) => 
-			Utils.framePointForOrigin(l.frame, @originX, @originY).x < point.x
-
-	contentLayersRight: (point) -> _.filter @content.subLayers, (l) => 
-			Utils.framePointForOrigin(l.frame, @originX, @originY).x > point.x
 
 	_scrollPointForLayer: (layer, originX=0, originY=0, clamp=true) ->
 		return Utils.framePointForOrigin(layer, originX, originY)
