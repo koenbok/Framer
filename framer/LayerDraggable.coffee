@@ -64,6 +64,7 @@ class exports.LayerDraggable extends BaseClass
 	# use it to determine a click from a drag event.
 	@define "isDragging", get: -> @_isDragging or false
 	@define "isAnimating", get: -> @_isAnimating or false
+	@define "isMoving", get: -> @_isMoving or false
 
 	@define "layerStartPoint", get: -> @_layerStartPoint or @layer.point
 	@define "cursorStartPoint", get: -> @_cursorStartPoint or {x:0, y:0}
@@ -117,7 +118,9 @@ class exports.LayerDraggable extends BaseClass
 
 	_touchStart: (event) =>
 
-		# @_propagateEvents = true if (@multipleDraggables && @lockDirection)
+		# Only reset isMoving if this was not animating when we were clicking
+		# so we can use it to detect a click versus a drag.
+		@_isMoving = @isAnimating
 
 		@layer.animateStop()
 		@_stopSimulation()
@@ -214,6 +217,7 @@ class exports.LayerDraggable extends BaseClass
 		# Update the dragging status
 		if point.x isnt @_layerStartPoint.x or point.y isnt @_layerStartPoint.y
 			@_isDragging = true
+			@_isMoving = true
 
 		# Move literally means move. If there is no movement, we do not emit.
 		if @isDragging
@@ -235,7 +239,7 @@ class exports.LayerDraggable extends BaseClass
 		# Start the simulation prior to emitting the DragEnd event.
 		# This way, if the user calls layer.animate on DragEnd, the simulation will 
 		# be canceled by the user's animation (if the user animates x and/or y).
-		@_startSimulation() if @momentum
+		@_startSimulation()
 
 		@emit(Events.DragEnd, event)
 
@@ -474,6 +478,7 @@ class exports.LayerDraggable extends BaseClass
 
 		@_setupSimulation()
 		@_isAnimating = true
+		@_isMoving = true
 		
 		@_simulation.x.simulator.setState
 			x: @layer.x
