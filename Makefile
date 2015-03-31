@@ -28,6 +28,9 @@ debug: bootstrap clean
 watch: bootstrap 
 	$(gulp) watch
 
+watcher: bootstrap 
+	$(gulp) watcher
+
 test: bootstrap 
 	$(gulp) test
 
