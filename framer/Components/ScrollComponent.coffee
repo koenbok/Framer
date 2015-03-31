@@ -38,11 +38,18 @@ Events.ScrollStart = "scrollstart"
 Events.Scroll = "scroll"
 Events.ScrollMove = Events.Scroll
 Events.ScrollEnd = "scrollend"
+Events.ScrollEnd = "scrollend"
+Events.ScrollAnimationDidStart = "scrollanimationdidstart"
+Events.ScrollAnimationDidEnd = "scrollanimationdidend"
 
 EventMappers = {}
+EventMappers[Events.Move] = Events.Move
 EventMappers[Events.ScrollStart] = Events.DragStart
-EventMappers[Events.Scroll] = Events.DragMove
+EventMappers[Events.ScrollMove] = Events.DragMove
 EventMappers[Events.ScrollEnd] = Events.DragEnd
+EventMappers[Events.ScrollAnimationDidStart] = Events.DragAnimationDidStart
+EventMappers[Events.ScrollAnimationDidEnd] = Events.DragAnimationDidEnd
+EventMappers[Events.LockDirectionDidStart] = Events.LockDirectionDidStart
 
 class exports.ScrollComponent extends Layer
 
