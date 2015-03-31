@@ -33,7 +33,17 @@ class exports.Context extends BaseClass
 		@eventManager?.reset()
 		@eventManager = new EventManager
 
-		@_rootElement?.parentNode?.removeChild?(@_rootElement)
+		if @_rootElement
+			# Clean up the current root element:
+			if @_rootElement.parentNode
+				# Already attached to the DOM - remove it:
+				@_rootElement.remove()
+			else
+				# Not on the DOM yet. Prevent it from being added (for this happens
+				# async):
+				@_rootElement.__cancelAppendChild = true
+
+		# Create a fresh root element:
 		@_rootElement = @_createRootElement()
 
 		@_delayTimers?.map (timer) -> window.clearTimeout(timer)
@@ -82,7 +92,8 @@ class exports.Context extends BaseClass
 
 		Framer.Loop.once "render", ->
 			parentElement ?= document.body
-			parentElement.appendChild(element)
+			if not element.__cancelAppendChild
+				parentElement.appendChild(element)
 
 		element
 
