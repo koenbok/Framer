@@ -181,34 +181,30 @@ class exports.LayerDraggable extends BaseClass
 			y: touchEvent.clientY
 			t: Date.now() # We don't use timeStamp because it's different on Chrome/Safari
 
-		delta =
-			x: touchEvent.clientX - @_layerStartPoint.x
-			y: touchEvent.clientY - @_layerStartPoint.y
+		offset =
+			x: touchEvent.clientX - @_layerStartPoint.x - @_layerCursorOffset.x
+			y: touchEvent.clientY - @_layerStartPoint.y - @_layerCursorOffset.y
 
-		# Correct for current drag speed and scale
-		correctedDelta =
-			x: delta.x * @speedX * (1 / @_screenScale.x) * @layer.scaleX * @layer.scale
-			y: delta.y * @speedY * (1 / @_screenScale.y) * @layer.scaleY * @layer.scale
-			t: Date.now()
+		# Scale the offset with the screen scale for the current layer
+		offset.x = offset.x * @speedX * (1 / @_screenScale.x) * @layer.scaleX * @layer.scale
+		offset.y = offset.y * @speedY * (1 / @_screenScale.y) * @layer.scaleY * @layer.scale
 
-		point = 
-			x: @layer.x
-			y: @layer.y
+		# See if horizontal/vertical was set and set the offset
+		point = @layer.point
+		point.x = @_layerStartPoint.x + offset.x if @horizontal
+		point.y = @_layerStartPoint.y + offset.y if @vertical
 
-		point.x = @_layerStartPoint.x + correctedDelta.x - @_layerCursorOffset.x if @horizontal
-		point.y = @_layerStartPoint.y + correctedDelta.y - @_layerCursorOffset.y if @vertical
+		# Constraints and overdrag
+		point = @_constrainPosition(point, @_constraints, @overdragScale) if @_constraints
 
 		# Direction lock
 		if @lockDirection
 			if not @_lockDirectionEnabledX and not @_lockDirectionEnabledY
-				@_updateLockDirection(correctedDelta) 
+				@_updateLockDirection(offset) 
 				return
 			else
 				point.x = @_layerStartPoint.x if @_lockDirectionEnabledX
 				point.y = @_layerStartPoint.y if @_lockDirectionEnabledY
-
-		# Constraints and overdrag
-		point = @_constrainPosition(point, @_constraints, @overdragScale) if @_constraints
 
 		# Pixel align all moves
 		if @pixelAlign
@@ -253,6 +249,26 @@ class exports.LayerDraggable extends BaseClass
 
 	##############################################################
 	# Constraints
+
+	@define "constraintsOffset",
+		get: ->
+			return {x:0, y:0} unless @constraints
+			{minX, maxX, minY, maxY} = @_calculateConstraints(@constraints)
+			point = @layer.point
+			constrainedPoint = 
+				x: Utils.clamp(point.x, minX, maxX)
+				y: Utils.clamp(point.y, minY, maxY)
+			offset = 
+				x: point.x - constrainedPoint.x
+				y: point.y - constrainedPoint.y
+			return offset
+
+	@define "isBeyondConstraints",
+		get: ->
+			constraintsOffset = @constraintsOffset
+			return true if constraintsOffset.x != 0
+			return true if constraintsOffset.y != 0
+			return false
 
 	_clampAndScale: (value, min, max, scale) ->
 		# TODO: Move to utils? Combine with clamp?
@@ -376,7 +392,6 @@ class exports.LayerDraggable extends BaseClass
 		@_lockDirectionEnabledX = false
 		@_lockDirectionEnabledY = false
 
-
 	##############################################################
 	# Inertial scroll simulation
 
@@ -457,7 +472,7 @@ class exports.LayerDraggable extends BaseClass
 	_startSimulation: ->
 
 		return unless @momentum or @bounce
-		return unless @isDragging
+		return if @isDragging is false and @isBeyondConstraints is false
 
 		# If overdrag is disabled, we need to not have a bounce animation
 		# when the cursor is outside of the dragging bounds for an axis.
