@@ -11,7 +11,7 @@ content <Layer>
 contentSize <{width:n, height:n}>
 contentInset <{top:n, right:n, bottom:n, left:n}> TODO
 contentOffset <{x:n, y:n}> TODO
-scrollFrame <{x:n, y:n, width:n, height:n}>
+scrollFrame <{x:n, y:n, width:n, propagateEventsheight:n}>
 scrollPoint <{x:n, y:n}>
 scrollHorizontal <bool>
 scrollVertical <bool>
@@ -252,6 +252,9 @@ class exports.ScrollComponent extends Layer
 			@content.animate(animationOptions)
 		else
 			@scrollPoint = point
+
+	scrollToTop: (animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
+		@scrollToPoint({x:0, y:0}, animate, animationOptions)
 
 	scrollToLayer: (contentLayer, originX=0, originY=0, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
 
