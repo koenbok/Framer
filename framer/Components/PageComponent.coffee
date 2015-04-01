@@ -23,10 +23,6 @@ class exports.PageComponent extends ScrollComponent
 	@define "originY", @simpleProperty("originY", .5)
 	@define "velocityThreshold", @simpleProperty("velocityThreshold", 0.1)
 	@define "animationOptions", @simpleProperty("animationOptions", {curve:"spring(500,50,0)"})
-	@define "currentPage", 
-		importable: false
-		exportable: false
-		get: -> @closestPage
 
 	constructor: ->
 		super
@@ -38,14 +34,12 @@ class exports.PageComponent extends ScrollComponent
 		@on(Events.ScrollEnd, @_scrollEnd)
 
 		@content.on("change:frame", _.debounce(@_scrollMove, 16))
-		@_content.on "change:subLayers", => 
-			@_currentPage = @closestPage
-			@_previousPages = []
+		@content.on("change:subLayers", @_resetHistory)
 
-		@_currentPage = null
-		@_previousPages = []
+		@_resetHistory()
 
 	@define "closestPage",  get: -> @closestContentLayerForScrollPoint(@_originScrollPoint(), @originX, @originY)
+	@define "currentPage",  get: -> _.last(@_previousPages)
 	@define "previousPage", get: -> @_previousPages[@_previousPages.length-2]
 
 	nextPage: (direction="right", currentPage=null) ->
@@ -68,6 +62,7 @@ class exports.PageComponent extends ScrollComponent
 		return _.first(layers)
 
 	snapToPage: (page, animate=true, animationOptions=null) ->
+		@_previousPages.push(page)
 		@scrollToLayer(page, @originX, @originY, animate, animationOptions)
 
 	snapToNextPage: (direction="right", animate=true, animationOptions=null) ->
@@ -79,7 +74,9 @@ class exports.PageComponent extends ScrollComponent
 	snapToPreviousPage: ->
 		return unless @previousPage
 		@snapToPage(@previousPage)
-		@_previousPages = @_previousPages[0..@_previousPages.length-2]
+
+		# Modify the previous page stack so we don't end up in a loop
+		@_previousPages = @_previousPages[0..@_previousPages.length-3]
 
 	addPage: (page, direction="right") ->
 
@@ -147,6 +144,10 @@ class exports.PageComponent extends ScrollComponent
 		scrollPoint.x += @width * @originX
 		scrollPoint.y += @height * @originY
 		return scrollPoint
+
+	_resetHistory: =>
+		@_currentPage = @closestPage
+		@_previousPages = [@_currentPage]
 
 	##############################################################
 	# Page indicator TODO
