@@ -20,3 +20,6 @@ for index in [0..30]
 		}
 
 # page.velocityMultiplier = 50
+
+page.on Events.Move, (point) ->
+	print "MOVE", Date.now(), point

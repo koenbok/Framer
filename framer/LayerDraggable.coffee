@@ -216,7 +216,7 @@ class exports.LayerDraggable extends BaseClass
 		@layer.point = @updatePosition(point)
  
 		if @isDragging
-			@emit(Events.Move, event)
+			@emit(Events.Move, @layer.point)
 			@emit(Events.DragDidMove, event)
 
 	_touchEnd: (event) =>
@@ -449,7 +449,7 @@ class exports.LayerDraggable extends BaseClass
 		@updatePosition(updatePoint)
 
 		@layer[axis] = @updatePosition(updatePoint)[axis]
-		@emit(Events.Move, {animation:true})
+		@emit(Events.Move, @layer.point)
 
 	_onSimulationStop: (axis, state) =>
 
@@ -503,7 +503,7 @@ class exports.LayerDraggable extends BaseClass
 		return unless @_simulation
 		@_simulation.x?.stop()
 		@_simulation.y?.stop()
-		@emit(Events.Move)
+		@emit(Events.Move, @layer.point)
 		@emit(Events.DragAnimationDidEnd)
 		@_simulation = null
 

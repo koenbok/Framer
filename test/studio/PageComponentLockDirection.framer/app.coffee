@@ -6,7 +6,7 @@ page = new PageComponent
 	backgroundColor:"#fff"
 
 page.scrollVertical = false
-page.lockDirection = true
+page.directionLock = true
 
 for index in [0..8]
 	
@@ -18,7 +18,7 @@ for index in [0..8]
 		superLayer: page.content
 	
 	pageContent.scrollHorizontal = false
-	pageContent.lockDirection = true
+	pageContent.directionLock = true
 	
 	rows = 10
 	gutter = 2

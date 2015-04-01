@@ -25,6 +25,9 @@ Events.MouseWheel = "mousewheel"
 Events.AnimationStart = "start"
 Events.AnimationStop = "stop"
 Events.AnimationEnd = "end"
+Events.AnimationDidStart = "start"
+Events.AnimationDidStop = "stop"
+Events.AnimationDidEnd = "end"
 
 # Scroll events
 Events.Scroll = "scroll"
