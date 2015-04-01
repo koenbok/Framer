@@ -52,10 +52,13 @@ class exports.DeviceComponent extends BaseClass
 
 	constructor: (options={}) ->
 
-		# We still listen to DeviceView defaults here for compat
-		defaults = Defaults.getDefaults("DeviceView", options)
-		defaults = _.extend(defaults, Defaults.getDefaults("DeviceComponent", options))
-		
+		defaults = Defaults.getDefaults("DeviceComponent", options)
+
+		# If we have defaults for DeviceView, we are likely using an older version of
+		# Framer Studio. It's best to default to those then for now.
+		if Framer.Defaults.hasOwnProperty("DeviceView")
+			defaults = _.extend(defaults, Framer.Defaults.DeviceView)
+
 		@_setup()
 		
 		@animationOptions = defaults.animationOptions
@@ -64,7 +67,7 @@ class exports.DeviceComponent extends BaseClass
 		_.extend(@, _.defaults(options, defaults))
 
 	_setup: ->
-		
+
 		if @_setupDone
 			return
 			
@@ -109,7 +112,7 @@ class exports.DeviceComponent extends BaseClass
 
 	_update: =>
 		
-		# # Todo: pixel align at zoom level 1, 0.5
+		# Todo: pixel align at zoom level 1, 0.5
 
 		contentScaleFactor = @contentScale
 		contentScaleFactor = 1 if contentScaleFactor > 1
