@@ -6,8 +6,10 @@ describe "Context", ->
 
 		it "should never append more than a single child on reset", (done) ->
 
+			c1 = document.querySelectorAll(".framerContext").length
+
 			# There's one default context:
-			document.querySelectorAll(".framerContext").length.should.equal(1)
+			document.querySelectorAll(".framerContext").length.should.equal(c1)
 
 			context = new Framer.Context(name:"Test")
 
@@ -16,7 +18,7 @@ describe "Context", ->
 			context.reset()
 
 			Framer.Loop.once "render", ->
-				context.getRootElement().parentNode.querySelectorAll(".framerContext").length.should.equal(2)
+				document.querySelectorAll(".framerContext").length.should.equal(c1+1)
 				done()
 
 	# Todo: event cleanup

@@ -37,7 +37,7 @@ class exports.Context extends BaseClass
 			# Clean up the current root element:
 			if @_rootElement.parentNode
 				# Already attached to the DOM - remove it:
-				@_rootElement.remove()
+				@_rootElement.parentNode.removeChild(@_rootElement)
 			else
 				# Not on the DOM yet. Prevent it from being added (for this happens
 				# async):
@@ -60,6 +60,12 @@ class exports.Context extends BaseClass
 		@_layerIdCounter = 1
 
 		@emit("reset", @)
+
+	destroy: ->
+		@reset()
+		if @_rootElement.parentNode
+			@_rootElement.parentNode.removeChild(@_rootElement)
+		@_rootElement.__cancelAppendChild = true
 
 	getRootElement: ->
 		@_rootElement
@@ -103,13 +109,11 @@ class exports.Context extends BaseClass
 		f()
 		Framer.CurrentContext = previousContext
 
-	# @define "x"
-	# @define "y"
-
 	@define "width", 
 		get: -> 
 			return @_parentLayer.width if @_parentLayer
 			return window.innerWidth
+
 	@define "height",
 		get: -> 
 			return @_parentLayer.height if @_parentLayer

@@ -666,14 +666,14 @@ Utils.pointAngle = (p1, p2) ->
 
 # Coordinate system
 
-Utils.convertPoint = (input, layerA, layerB) ->
+Utils.convertPoint = (input, layerA, layerB, context=false) ->
 
 	# Convert a point between two layer coordinate systems
 
 	point = _.defaults(input, {x:0, y:0})
 
-	superLayersA = layerA?.superLayers() or []
-	superLayersB = layerB?.superLayers() or []
+	superLayersA = layerA?.superLayers(context) or []
+	superLayersB = layerB?.superLayers(context) or []
 	
 	superLayersB.push layerB if layerB
 	

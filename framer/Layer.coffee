@@ -274,16 +274,27 @@ class exports.Layer extends BaseClass
 		# TODO: needs tests
 		Utils.convertPoint point, null, @
 
-	@define "screenFrame",
+	@define "canvasFrame",
 		importable: true
 		exportable: false
 		get: ->
-			Utils.convertPoint(@frame, @, null)
+			Utils.convertPoint(@frame, @, null, context=true)
 		set: (frame) ->
 			if not @superLayer
 				@frame = frame
 			else
-				@frame = Utils.convertPoint(frame, null, @superLayer)
+				@frame = Utils.convertPoint(frame, null, @superLayer, context=true)
+
+	@define "screenFrame",
+		importable: true
+		exportable: false
+		get: ->
+			Utils.convertPoint(@frame, @, null, context=false)
+		set: (frame) ->
+			if not @superLayer
+				@frame = frame
+			else
+				@frame = Utils.convertPoint(frame, null, @superLayer, context=false)
 
 	contentFrame: ->
 		return {x:0, y:0, width:0, height:0} unless @subLayers.length
@@ -334,17 +345,30 @@ class exports.Layer extends BaseClass
 	# 		return @_superOrParentLayer().screenOriginY()
 	# 	return @originY
 
-	screenScaleX: ->
+	canvasScaleX: ->
 		scale = @scale * @scaleX
 		for superLayer in @superLayers(context=true)
 			scale = scale * superLayer.scale * superLayer.scaleX
 		return scale
 
-	screenScaleY: ->
+	canvasScaleY: ->
 		scale = @scale * @scaleY
 		for superLayer in @superLayers(context=true)
 			scale = scale * superLayer.scale * superLayer.scaleY
 		return scale
+
+	screenScaleX: ->
+		scale = @scale * @scaleX
+		for superLayer in @superLayers(context=false)
+			scale = scale * superLayer.scale * superLayer.scaleX
+		return scale
+
+	screenScaleY: ->
+		scale = @scale * @scaleY
+		for superLayer in @superLayers(context=false)
+			scale = scale * superLayer.scale * superLayer.scaleY
+		return scale
+
 
 	screenScaledFrame: ->
 

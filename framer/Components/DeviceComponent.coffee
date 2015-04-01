@@ -50,6 +50,8 @@ Events.DeviceKeyboardDidShow
 
 class exports.DeviceComponent extends BaseClass
 
+	@define "context", get: -> @_context
+
 	constructor: (options={}) ->
 
 		defaults = Defaults.getDefaults("DeviceComponent", options)
@@ -109,6 +111,8 @@ class exports.DeviceComponent extends BaseClass
 		# This avoids rubber banding on mobile
 		for layer in [@background, @phone, @viewport, @content, @screen]
 			layer.on "touchmove", (event) -> event.preventDefault()
+
+		@_context = new Framer.Context(parentLayer:@content, name:"Device")
 
 	_update: =>
 		
@@ -189,7 +193,6 @@ class exports.DeviceComponent extends BaseClass
 	setupContext: ->
 		# Sets this device up as the default context so everything renders
 		# into the device screen
-		@_context = new Framer.Context(parentLayer:@content, name:"Device")
 		Framer.CurrentContext = @_context
 
 	###########################################################################
@@ -264,6 +267,10 @@ class exports.DeviceComponent extends BaseClass
 				@deviceScale = "fit"
 
 	_updateDeviceImage: =>
+
+		if /PhantomJS/.test(navigator.userAgent)
+			return
+
 		if @_shouldRenderFullScreen()
 			@phone.image  = ""
 		else

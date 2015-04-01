@@ -735,24 +735,25 @@ describe "Layer", ->
 			layer.maxY = 200
 			layer.y.should.equal 100
 
-		it "should get and set screenFrame", ->
+		it "should get and set canvasFrame", ->
+			
 			layerA = new Layer x:100, y:100, width:100, height:100
 			layerB = new Layer x:300, y:300, width:100, height:100, superLayer:layerA
 
-			assert.equal layerB.screenFrame.x, 400
-			assert.equal layerB.screenFrame.y, 400
+			assert.equal layerB.canvasFrame.x, 400
+			assert.equal layerB.canvasFrame.y, 400
 
-			layerB.screenFrame = {x:1000, y:1000}
+			layerB.canvasFrame = {x:1000, y:1000}
 
-			assert.equal layerB.screenFrame.x, 1000
-			assert.equal layerB.screenFrame.y, 1000
+			assert.equal layerB.canvasFrame.x, 1000
+			assert.equal layerB.canvasFrame.y, 1000
 
 			assert.equal layerB.x, 900
 			assert.equal layerB.y, 900
 
 			layerB.superLayer = null
-			assert.equal layerB.screenFrame.x, 900
-			assert.equal layerB.screenFrame.y, 900
+			assert.equal layerB.canvasFrame.x, 900
+			assert.equal layerB.canvasFrame.y, 900
 
 		it "should calculate scale", ->
 			layerA = new Layer scale:0.9
