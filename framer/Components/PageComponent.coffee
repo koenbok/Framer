@@ -118,9 +118,6 @@ class exports.PageComponent extends ScrollComponent
 
 	_scrollEnd: =>
 
-		if not @content.draggable.isDragging
-			return
-
 		velocity = @content.draggable.velocity
 
 		# See if we meet the minimum velocity to scroll to the next page. If not we snap
