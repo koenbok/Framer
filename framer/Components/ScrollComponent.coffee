@@ -253,6 +253,9 @@ class exports.ScrollComponent extends Layer
 		else
 			@scrollPoint = point
 
+	scrollToTop: (animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
+		@scrollToPoint({x:0, y:0}, animate, animationOptions)
+
 	scrollToLayer: (contentLayer, originX=0, originY=0, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
 
 		if contentLayer and contentLayer.superLayer isnt @content
