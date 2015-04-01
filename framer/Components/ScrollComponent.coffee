@@ -55,7 +55,6 @@ class exports.ScrollComponent extends Layer
 
 	# Proxy properties directly from the draggable
 	@define "velocity", @proxyProperty("content.draggable.velocity")
-	@define "angle", @proxyProperty("content.draggable.angle")
 	@define "scrollHorizontal", @proxyProperty("content.draggable.horizontal")
 	@define "scrollVertical", @proxyProperty("content.draggable.vertical")
 	@define "speedX", @proxyProperty("content.draggable.speedX")
@@ -230,6 +229,13 @@ class exports.ScrollComponent extends Layer
 			return "left" if direction is "right"
 			return "right" if direction is "left"
 			return direction
+
+	@define "angle",
+		importable: false
+		exportable: false
+		get: ->
+			return 0 unless @content
+			return -@content.draggable.angle
 
 	scrollToPoint: (point, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
 		
