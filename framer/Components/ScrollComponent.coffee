@@ -11,7 +11,7 @@ content <Layer>
 contentSize <{width:n, height:n}>
 contentInset <{top:n, right:n, bottom:n, left:n}> TODO
 contentOffset <{x:n, y:n}> TODO
-scrollFrame <{x:n, y:n, width:n, propagateEventsheight:n}>
+scrollFrame <{x:n, y:n, width:n, height:n}>
 scrollPoint <{x:n, y:n}>
 scrollHorizontal <bool>
 scrollVertical <bool>
