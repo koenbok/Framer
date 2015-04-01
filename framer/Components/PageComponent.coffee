@@ -114,7 +114,6 @@ class exports.PageComponent extends ScrollComponent
 		@content.on(Events.AnimationStart, @_onAminationStart)
 		@content.on(Events.AnimationStop, @_onAminationEnd)
 
-
 	_scrollStart: =>
 		@_currentPage = @currentPage
 
@@ -170,9 +169,3 @@ class exports.PageComponent extends ScrollComponent
 	_resetHistory: =>
 		@_currentPage = @closestPage
 		@_previousPages = [@_currentPage]
-
-	##############################################################
-	# Page indicator TODO
-
-	# createPageIndicator: ->
-	# updatePageIndicator: (currentPage) ->
