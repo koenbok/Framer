@@ -33,8 +33,8 @@ Originals =
 			friction: 40
 			tension: 200
 			tolerance: 1/10000
-		lockDirection: false
-		lockDirectionThreshold: 
+		directionLock: false
+		directionLockThreshold: 
 			x: 10
 			y: 10
 		overdrag: true

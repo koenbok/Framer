@@ -49,7 +49,7 @@ EventMappers[Events.ScrollMove] = Events.DragMove
 EventMappers[Events.ScrollEnd] = Events.DragEnd
 EventMappers[Events.ScrollAnimationDidStart] = Events.DragAnimationDidStart
 EventMappers[Events.ScrollAnimationDidEnd] = Events.DragAnimationDidEnd
-EventMappers[Events.LockDirectionDidStart] = Events.LockDirectionDidStart
+EventMappers[Events.directionLockDidStart] = Events.directionLockDidStart
 
 class exports.ScrollComponent extends Layer
 
@@ -63,8 +63,8 @@ class exports.ScrollComponent extends Layer
 	@define "isDragging", @proxyProperty("content.draggable.isDragging")
 	@define "isMoving", @proxyProperty("content.draggable.isMoving")
 	@define "propagateEvents", @proxyProperty("content.draggable.propagateEvents")
-	@define "lockDirection", @proxyProperty("content.draggable.lockDirection")
-	@define "lockDirectionThreshold", @proxyProperty("content.draggable.lockDirectionThreshold")
+	@define "directionLock", @proxyProperty("content.draggable.directionLock")
+	@define "directionLockThreshold", @proxyProperty("content.draggable.directionLockThreshold")
 
 	@define "content",
 		importable: false

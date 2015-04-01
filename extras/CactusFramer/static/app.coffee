@@ -23,7 +23,7 @@
 # layer.draggable.constraints = constraintLayer.size
 # layer.draggable.overdrag = true
 # layer.draggable.overdragScale = 0.1
-# # layer.draggable.lockDirection = true
+# # layer.draggable.directionLock = true
 
 # layer.on Events.DragMove, ->
 # 	print layer.draggable.velocity

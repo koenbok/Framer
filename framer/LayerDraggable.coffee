@@ -22,7 +22,7 @@ Events.DragEnd               = "dragend"
 # Events.BounceDidEnd          = "bouncedidend"
 Events.DragAnimationDidStart = "draganimationdidstart"
 Events.DragAnimationDidEnd   = "draganimationdidend"
-Events.LockDirectionDidStart = "lockdirectiondidstart"
+Events.DirectionLockDidStart = "directionlockdidstart"
 
 """
              
@@ -47,8 +47,8 @@ class exports.LayerDraggable extends BaseClass
 	@define "vertical", @simpleProperty("vertical", true)
 
 	@define "momentumVelocityMultiplier", @simpleProperty("momentumVelocityMultiplier", 800)
-	@define "lockDirection", @simpleProperty("lockDirection", true)
-	@define "lockDirectionThreshold", @simpleProperty("lockDirectionThreshold", {x:10, y:10})
+	@define "directionLock", @simpleProperty("directionLock", true)
+	@define "directionLockThreshold", @simpleProperty("directionLockThreshold", {x:10, y:10})
 	@define "propagateEvents", @simpleProperty("propagateEvents", true)
 
 	@define "constraints",
@@ -104,9 +104,6 @@ class exports.LayerDraggable extends BaseClass
 	attach: -> 
 		@layer.on Events.TouchStart, @_touchStart
 
-		# @_panRecognizer.on Events.DidStartPan, (direction) =>
-		# 	@emit Events.LockDirectionDidStart direction
-
 	remove: -> @layer.off(Events.TouchStart, @_touchStart)
 
 	updatePosition: (point) ->
@@ -126,7 +123,7 @@ class exports.LayerDraggable extends BaseClass
 
 		@layer.animateStop()
 		@_stopSimulation()
-		@_resetLockDirection()
+		@_resetdirectionLock()
 
 		event.preventDefault()
 		event.stopPropagation() unless @propagateEvents
@@ -200,13 +197,13 @@ class exports.LayerDraggable extends BaseClass
 		point = @_constrainPosition(point, @_constraints, @overdragScale) if @_constraints
 
 		# Direction lock
-		if @lockDirection
-			if not @_lockDirectionEnabledX and not @_lockDirectionEnabledY
-				@_updateLockDirection(offset) 
+		if @directionLock
+			if not @_directionLockEnabledX and not @_directionLockEnabledY
+				@_updatedirectionLock(offset) 
 				return
 			else
-				point.x = @_layerStartPoint.x if @_lockDirectionEnabledX
-				point.y = @_layerStartPoint.y if @_lockDirectionEnabledY
+				point.x = @_layerStartPoint.x if @_directionLockEnabledX
+				point.y = @_layerStartPoint.y if @_directionLockEnabledY
 
 		# Pixel align all moves
 		if @pixelAlign
@@ -374,28 +371,25 @@ class exports.LayerDraggable extends BaseClass
 	##############################################################
 	# Lock Direction
 
-	_updateLockDirection: (correctedDelta) ->
+	_updatedirectionLock: (correctedDelta) ->
 		
-		@_lockDirectionEnabledX = Math.abs(correctedDelta.y) > @lockDirectionThreshold.y
-		@_lockDirectionEnabledY = Math.abs(correctedDelta.x) > @lockDirectionThreshold.x
+		@_directionLockEnabledX = Math.abs(correctedDelta.y) > @directionLockThreshold.y
+		@_directionLockEnabledY = Math.abs(correctedDelta.x) > @directionLockThreshold.x
 		
-		xSlightlyPreferred = Math.abs(correctedDelta.y) > @lockDirectionThreshold.y / 2
-		ySlightlyPreferred = Math.abs(correctedDelta.x) > @lockDirectionThreshold.x / 2
+		xSlightlyPreferred = Math.abs(correctedDelta.y) > @directionLockThreshold.y / 2
+		ySlightlyPreferred = Math.abs(correctedDelta.x) > @directionLockThreshold.x / 2
 		
 		# Allow locking in both directions at the same time
-		@_lockDirectionEnabledX = @_lockDirectionEnabledY = true if (xSlightlyPreferred and ySlightlyPreferred)
+		@_directionLockEnabledX = @_directionLockEnabledY = true if (xSlightlyPreferred and ySlightlyPreferred)
 
-		if @_lockDirectionEnabledX or @_lockDirectionEnabledY
+		if @_directionLockEnabledX or @_directionLockEnabledY
+			@emit Events.DirectionLockDidStart, 
+				x: @_directionLockEnabledX
+				y: @_directionLockEnabledY
 
-			@emit Events.LockDirectionDidStart, 
-				x: @_lockDirectionEnabledX
-				y: @_lockDirectionEnabledY
-
-			# @_propagateEvents = false if @multipleDraggables
-
-	_resetLockDirection: ->
-		@_lockDirectionEnabledX = false
-		@_lockDirectionEnabledY = false
+	_resetdirectionLock: ->
+		@_directionLockEnabledX = false
+		@_directionLockEnabledY = false
 
 	##############################################################
 	# Inertial scroll simulation
@@ -439,8 +433,8 @@ class exports.LayerDraggable extends BaseClass
 
 	_onSimulationStep: (axis, state) =>
 
-		return if axis is "x" and (@_lockDirectionEnabledX or @horizontal is false)
-		return if axis is "y" and (@_lockDirectionEnabledY or @vertical is false)
+		return if axis is "x" and (@_directionLockEnabledX or @horizontal is false)
+		return if axis is "y" and (@_directionLockEnabledY or @vertical is false)
 
 		# The simulation state has x as value, it can look confusing here
 		# as we're working with x and y.
