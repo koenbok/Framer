@@ -24,6 +24,9 @@ page.on Events.Move, ->
 	print "currentPage", page.currentPage
 	print "previousPage", page.previousPage
 	
+page.on "change:currentPage", (currentPage) ->
+	print "*** change:currentPage", currentPage
+	
 button = new Layer
 	y: 20
 	width: 120
