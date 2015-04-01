@@ -47,8 +47,8 @@ class exports.LayerDraggable extends BaseClass
 	@define "vertical", @simpleProperty("vertical", true)
 
 	@define "momentumVelocityMultiplier", @simpleProperty("momentumVelocityMultiplier", 800)
-	# @define "lockDirectionThreshold", @simpleProperty "lockDirectionThreshold", {x:0, y:0}, true
-
+	@define "lockDirection", @simpleProperty("lockDirection", true)
+	@define "lockDirectionThreshold", @simpleProperty("lockDirectionThreshold", {x:10, y:10})
 	@define "propagateEvents", @simpleProperty("propagateEvents", true)
 
 	@define "constraints",
@@ -83,9 +83,11 @@ class exports.LayerDraggable extends BaseClass
 
 	constructor: (@layer) ->
 
-		_.extend(@, Defaults.getDefaults "LayerDraggable", {})
+		options = Defaults.getDefaults("LayerDraggable", {})
 
-		super
+		super options
+
+		_.extend(@, options)
 
 		@enabled = true
 
@@ -369,6 +371,9 @@ class exports.LayerDraggable extends BaseClass
 
 		super eventName, event, @
 
+	##############################################################
+	# Lock Direction
+
 	_updateLockDirection: (correctedDelta) ->
 		
 		@_lockDirectionEnabledX = Math.abs(correctedDelta.y) > @lockDirectionThreshold.y
@@ -508,8 +513,8 @@ class exports.LayerDraggable extends BaseClass
 	_stopSimulation: =>
 		@_isAnimating = false
 		return unless @_simulation
-		@_simulation.x.stop()
-		@_simulation.y.stop()
+		@_simulation.x?.stop()
+		@_simulation.y?.stop()
 		@emit(Events.Move)
 		@emit(Events.DragAnimationDidEnd)
 		@_simulation = null

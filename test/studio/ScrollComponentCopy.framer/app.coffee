@@ -4,7 +4,8 @@ scroll = new ScrollComponent
 scroll.centerX(-Screen.width/6)
 scroll.centerY()
 	
-scroll.scrollHorizontal = false
+#scroll.scrollHorizontal = false
+scroll.scrollVertical = false
 scroll.backgroundColor = null
 
 rows = 40
@@ -22,8 +23,6 @@ for rowIndex in [0..rows-1]
 		backgroundColor: Utils.randomColor(.5)
 		superLayer: scroll.content
 
-	
-	
 scrollCopy = scroll.copy()
 scrollCopy.centerX(Screen.width/6)
 scrollCopy.centerY()

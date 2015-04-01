@@ -63,6 +63,8 @@ class exports.ScrollComponent extends Layer
 	@define "isDragging", @proxyProperty("content.draggable.isDragging")
 	@define "isMoving", @proxyProperty("content.draggable.isMoving")
 	@define "propagateEvents", @proxyProperty("content.draggable.propagateEvents")
+	@define "lockDirection", @proxyProperty("content.draggable.lockDirection")
+	@define "lockDirectionThreshold", @proxyProperty("content.draggable.lockDirectionThreshold")
 
 	@define "content",
 		importable: false
