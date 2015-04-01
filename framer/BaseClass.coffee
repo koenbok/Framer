@@ -64,10 +64,10 @@ class exports.BaseClass extends EventEmitter
 		objectKey = keyPath.split(".")[0]
 		return _.extend options,
 			get: ->
-				return unless @[objectKey]
+				return unless _.isObject(@[objectKey])
 				Utils.getValueForKeyPath(@, keyPath)
 			set: (value) -> 
-				return unless @[objectKey]
+				return unless _.isObject(@[objectKey])
 				Utils.setValueForKeyPath(@, keyPath, value)
 
 	_setPropertyValue: (k, v) =>

@@ -164,6 +164,7 @@ class exports.ScrollComponent extends Layer
 				@content.backgroundColor = null
 
 	@define "scroll",
+		exportable: false
 		get: -> @scrollHorizontal is true or @scrollVertical is true
 		set: (value) ->
 			return unless @content

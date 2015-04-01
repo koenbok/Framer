@@ -25,5 +25,9 @@ for rowIndex in [0..rows-1]
 	
 	
 scrollCopy = scroll.copy()
-scroll.centerX(Screen.width/6)
-scroll.centerY()
+scrollCopy.centerX(Screen.width/6)
+scrollCopy.centerY()
+
+for k, v of scrollCopy.props
+	if not scroll.props[k] == v
+		print k, v
