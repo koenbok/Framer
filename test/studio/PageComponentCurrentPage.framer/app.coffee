@@ -23,3 +23,13 @@ page.on Events.Move, ->
 	print "closestPage", page.closestPage
 	print "currentPage", page.currentPage
 	print "previousPage", page.previousPage
+	
+button = new Layer
+	y: 20
+	width: 120
+	height: 30
+button.centerX()
+Utils.labelLayer(button, "previous")
+
+button.on Events.Click, ->
+	page.snapToPreviousPage()
