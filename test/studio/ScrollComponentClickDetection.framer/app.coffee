@@ -22,15 +22,10 @@ for rowIndex in [0..rows-1]
 		superLayer: scroll.content
 		
 	cellLayer.on Events.Click, (event, layer) ->
-# 		print Date.now()
-# 		print "isMoving", scroll.isMoving
-# 		print "isAnimating", scroll.isAnimating
+
 		if not scroll.isMoving
 			layer.scale = 1.5
 			layer.animate
 				properties: {scale:1}
 
 	Utils.labelLayer cellLayer, rowIndex
-	
-# scroll.on Events.Move, ->
-# 	print scroll.isMoving
