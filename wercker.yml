@@ -1,4 +1,4 @@
-box: nodesource/node:trusty
+box: wercker/nodejs
 
 build:
     steps:
