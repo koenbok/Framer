@@ -48,7 +48,7 @@ studio:
 dist:
 	make build
 	mkdir -p build/Framer
-	cp -R templates/Project build/Framer/Project
+	cp -R extras/templates/Project build/Framer/Project
 	rm -Rf build/Framer/Project/framer
 	mkdir -p build/Framer/Project/framer
 	cp build/framer.js build/Framer/Project/framer/framer.js
