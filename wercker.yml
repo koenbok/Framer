@@ -18,6 +18,17 @@ build:
 
 deploy:
     steps:
+        - script:
+            name: set up permissions
+            code: |
+                export NODE_ENV=development
+                chmod 777 -R .
+                chmod 777 -R $WERCKER_CACHE_DIR
+        - script:
+            name: install npm@2
+            code: |
+                npm cache clean
+                sudo npm i -g npm
         - install-packages:
             packages: zip
         - script:
