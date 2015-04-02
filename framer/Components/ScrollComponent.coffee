@@ -49,7 +49,7 @@ EventMappers[Events.ScrollMove] = Events.DragMove
 EventMappers[Events.ScrollEnd] = Events.DragEnd
 EventMappers[Events.ScrollAnimationDidStart] = Events.DragAnimationDidStart
 EventMappers[Events.ScrollAnimationDidEnd] = Events.DragAnimationDidEnd
-EventMappers[Events.directionLockDidStart] = Events.directionLockDidStart
+EventMappers[Events.DirectionLockDidStart] = Events.DirectionLockDidStart
 
 class exports.ScrollComponent extends Layer
 
