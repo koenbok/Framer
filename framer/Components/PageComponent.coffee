@@ -114,6 +114,12 @@ class exports.PageComponent extends ScrollComponent
 		@content.on(Events.AnimationStart, @_onAminationStart)
 		@content.on(Events.AnimationStop, @_onAminationEnd)
 
+	horizontalPageIndex: (page) ->
+		(_.sortBy(@content.subLayers, (l) -> l.x)).indexOf(page)
+
+	verticalPageIndex: (page) ->
+		(_.sortBy(@content.subLayers, (l) -> l.y)).indexOf(page)
+
 	_scrollStart: =>
 		@_currentPage = @currentPage
 
@@ -145,7 +151,7 @@ class exports.PageComponent extends ScrollComponent
 		# See if we meet the minimum velocity to scroll to the next page. If not we snap
 		# to the layer closest to the scroll point.
 		if Math.max(Math.abs(velocity.x), Math.abs(velocity.y)) < @velocityThreshold
-			@scrollToClosestLayer(@originX, @originY, true, @animationOptions)
+			@snapToPage(@closestPage, true, @animationOptions)
 			return 
 
 		# Figure out which direction we are scrolling to and make a sorted list of
