@@ -68,19 +68,20 @@ Check the [wanted features wiki page](https://github.com/koenbok/Framer/wiki/Con
 
 ##### Building
 - Download or clone the code
-- Run `npm install` to get the dependencies
 - Run `make build` to build the latest version
+- Run `make watcher` to rebuild the latest version on changes
 
 ##### Testing
 
 - Run `make test` to run the unit tests in phantomjs
-- Run `make safari` to run the tests in Safari
-- Run `make perf` to run a performance test
-- Download Cactus and open extras/CactusFramer, then go to /test.html for a list of visual tests.
+- Run `make watch` to rerun the unit tests on changes
+- Run `make coverage` to generate a test coverage report
+
+There are also a set of visual and interactive tests for Framer Studio which you can find in test/studio.
 
 ##### Reporting Issues
 
-- Please use the issue tracker and tag them with Framer3
+- Please use the issue tracker
 - Try to include an example and clearly describe expected behaviour
 
 
