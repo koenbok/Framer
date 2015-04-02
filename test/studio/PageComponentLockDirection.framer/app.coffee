@@ -8,7 +8,7 @@ page = new PageComponent
 page.scrollVertical = false
 page.directionLock = true
 
-for index in [0..8]
+for index in [0..2]
 	
 	pageContent = new ScrollComponent
 		width:  page.width
@@ -19,6 +19,9 @@ for index in [0..8]
 	
 	pageContent.scrollHorizontal = false
 	pageContent.directionLock = true
+	
+	page.on Events.DirectionLockDidStart, (direction) ->
+		print "pageContent.DirectionLockDidStart", direction
 	
 	rows = 10
 	gutter = 2
@@ -39,3 +42,6 @@ for index in [0..8]
 			"text-align": "center"
 			"line-height": "#{cellLayer.height}px"
 
+
+page.on Events.DirectionLockDidStart, (direction) ->
+	print "page.DirectionLockDidStart", direction

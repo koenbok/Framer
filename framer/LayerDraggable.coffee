@@ -370,11 +370,14 @@ class exports.LayerDraggable extends BaseClass
 		@_directionLockEnabledX = Math.abs(correctedDelta.y) > @directionLockThreshold.y
 		@_directionLockEnabledY = Math.abs(correctedDelta.x) > @directionLockThreshold.x
 		
-		xSlightlyPreferred = Math.abs(correctedDelta.y) > @directionLockThreshold.y / 2
-		ySlightlyPreferred = Math.abs(correctedDelta.x) > @directionLockThreshold.x / 2
+		# TODO: This wasn't working as advertised. We shouls have a way to scroll diagonally
+		# if we were sort of moving into both directions equally.
 		
-		# Allow locking in both directions at the same time
-		@_directionLockEnabledX = @_directionLockEnabledY = true if (xSlightlyPreferred and ySlightlyPreferred)
+		# xSlightlyPreferred = Math.abs(correctedDelta.y) > @directionLockThreshold.y / 2
+		# ySlightlyPreferred = Math.abs(correctedDelta.x) > @directionLockThreshold.x / 2
+		
+		# # Allow locking in both directions at the same time
+		# @_directionLockEnabledX = @_directionLockEnabledY = true if (xSlightlyPreferred and ySlightlyPreferred)
 
 		if @_directionLockEnabledX or @_directionLockEnabledY
 			@emit Events.DirectionLockDidStart, 
@@ -427,8 +430,8 @@ class exports.LayerDraggable extends BaseClass
 
 	_onSimulationStep: (axis, state) =>
 
-		return if axis is "x" and (@_directionLockEnabledX or @horizontal is false)
-		return if axis is "y" and (@_directionLockEnabledY or @vertical is false)
+		return if axis is "x" and @horizontal is false
+		return if axis is "y" and @vertical is false
 
 		# The simulation state has x as value, it can look confusing here
 		# as we're working with x and y.
