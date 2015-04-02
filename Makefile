@@ -1,81 +1,54 @@
-
-bin = ./node_modules/.bin
-coffee = $(bin)/coffee
-
-browserify = $(bin)/browserify -t coffeeify -d --extension=".coffee"
-watch = $(coffee) scripts/watch.coffee framer,test/tests
+pwd = $(CURDIR)
+bin = $(pwd)/node_modules/.bin
+coffee = "$(bin)/coffee"
 githash = `git rev-parse --short HEAD`
+gulp = "$(bin)/gulp"
 
 all: build
 
-watch:
-	$(watch) make $(cmd)
-	# make watch cmd=perf
+bootstrap:
+	npm install
+	cd test/phantomjs; "$(bin)/bower" install
 
-build:
-	make clean
-	mkdir -p build
-	# $(coffee) scripts/banner.coffee > build/framer.debug.js
-	# cat vendor/react.min.js >> build/framer.debug.js
-	$(browserify) framer/Framer.coffee >> build/framer.debug.js
-	cat build/framer.debug.js | $(bin)/exorcist build/framer.js.map > build/framer.js
-	# Build the minimized version
-	# cd build; ../$(bin)/uglifyjs \
-	# 	--source-map-include-sources \
-	# 	--in-source-map framer.js.map \
-	# 	--source-map framer.min.js.map \
-	# 	framer.js > framer.min.js
-	# $(coffee) scripts/fix-sourcemap.coffee
-	# Copy the file over to the cactus project
-	cp build/framer.js extras/CactusFramer/static/
-	cp build/framer.js.map extras/CactusFramer/static/
-buildw:
-	$(watch) make build
+unbootstrap:
+	rm -Rf node_modules
+	rm -Rf test/phantomjs/bower
 
 clean:
 	rm -rf build
 
+build: bootstrap clean 
+	mkdir -p build
+	$(gulp) build:release
 
-# Testing
+debug: bootstrap clean 
+	mkdir -p build
+	$(gulp) build:debug
 
-test:
-	make lint
-	make build
-	mkdir -p test/lib
-	$(browserify) test/init.coffee -o test/init.js
-	$(bin)/mocha-phantomjs test/index.html
-testw:
-	$(watch) make test
+watch: bootstrap 
+	$(gulp) watch
 
-safari:
-	make build
-	mkdir -p test/lib
-	$(browserify) test/init.coffee -o test/init.js
-	# $(bin)/mocha-phantomjs test/index.html
-	open -g -a Safari test/index.html
-safariw:
-	$(watch) make safari
+watcher: bootstrap 
+	$(gulp) watcher
 
+test: bootstrap 
+	$(gulp) test
 
-perf:
-	$(browserify) perf/init.coffee -o perf/init.js
-	$(bin)/phantomjs perf/runner.js perf/index.html
-perfw:
-	$(watch) make perf
+coverage: bootstrap
+	$(bin)/coffeeCoverage ./framer ./build/instrumented
+	$(gulp) coverage
+	cp ./test/coverage-template/* ./build/coverage
+	open ./build/coverage/jscoverage.html
 
-perf-safari:
-	$(browserify) perf/init.coffee -o perf/init.js
-	open -g -a Safari perf/index.html
-perf-safariw:
-	$(watch) make perf-safari
-
+studio:
+	open -a "Framer Studio" extras/Studio.framer
 
 # Building and uploading the site
 
 dist:
 	make build
 	mkdir -p build/Framer
-	cp -R templates/Project build/Framer/Project
+	cp -R extras/templates/Project build/Framer/Project
 	rm -Rf build/Framer/Project/framer
 	mkdir -p build/Framer/Project/framer
 	cp build/framer.js build/Framer/Project/framer/framer.js
@@ -107,11 +80,6 @@ resources%optimize:
 	
 resources%upload:
 	cd extras/resources.framerjs.com; cactus deploy
-
-publish:
-	# Todo: update version
-	coffee -o lib/ -c framer/
-	npm publish
 
 lint:
 	./node_modules/.bin/coffeelint -f coffeelint.json -r framer

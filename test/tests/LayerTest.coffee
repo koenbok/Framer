@@ -104,42 +104,51 @@ describe "Layer", ->
 			layer.originX = 0.1
 			layer.originY = 0.2
 
-			layer.style.webkitTransformOrigin.should.equal "10% 20%"
+			if Utils.isChrome()
+				layer.style.webkitTransformOrigin.should.equal "10% 20% 0px"
+			else
+				layer.style.webkitTransformOrigin.should.equal "10% 20%"
 
 			layer.originX = 0.5
 			layer.originY = 0.5
 
-			layer.style.webkitTransformOrigin.should.equal "50% 50%"
+			if Utils.isChrome()
+				layer.style.webkitTransformOrigin.should.equal "50% 50% 0px"
+			else
+				layer.style.webkitTransformOrigin.should.equal "50% 50%"
 
 		it "should set local image", ->
 	
-			imagePath = "static/test.png"			
+			prefix = "../"
+			imagePath = "static/test.png"
+			fullPath = prefix + imagePath
 			layer = new Layer
 
-			layer.image = imagePath
-			layer.image.should.equal imagePath
+			layer.image = fullPath
+			layer.image.should.equal fullPath
 
-			layer.style["background-image"].should.contain imagePath
-			# layer.style["background-image"].should.contain "file://"
-			# layer.style["background-image"].should.contain "?nocache="
+			layer.style["background-image"].indexOf(imagePath).should.not.equal(-1)
+			layer.style["background-image"].indexOf("file://").should.not.equal(-1)
+			layer.style["background-image"].indexOf("?nocache=").should.not.equal(-1)
 
-			layer.computedStyle()["background-size"].should.equal "cover"
-			layer.computedStyle()["background-repeat"].should.equal "no-repeat"
+			#layer.computedStyle()["background-size"].should.equal "cover"
+			#layer.computedStyle()["background-repeat"].should.equal "no-repeat"
 
-			layer.properties.image.should.equal imagePath
+			image = layer.props.image
+			layer.props.image.should.equal fullPath
 
 		it "should set image", ->
-			imagePath = "static/test.png"	
+			imagePath = "../static/test.png"
 			layer = new Layer image:imagePath
 			layer.image.should.equal imagePath
 
 		it "should unset image with null", ->
-			layer = new Layer image:"static/test.png"
+			layer = new Layer image:"../static/test.png"
 			layer.image = null
 			layer.image.should.equal ""
 
 		it "should unset image with empty string", ->
-			layer = new Layer image:"static/test.png"
+			layer = new Layer image:"../static/test.png"
 			layer.image = ""
 			layer.image.should.equal ""
 
@@ -231,9 +240,9 @@ describe "Layer", ->
 		it "should set scroll from properties", ->
 
 			layer = new Layer
-			layer.properties = {scroll:false}
+			layer.props = {scroll:false}
 			layer.scroll.should.equal false
-			layer.properties = {scroll:true}
+			layer.props = {scroll:true}
 			layer.scroll.should.equal true
 
 		it "should set scrollHorizontal", ->
@@ -296,6 +305,29 @@ describe "Layer", ->
 			layer.perspective = 500
 
 			layer.style["-webkit-perspective"].should.equal("500")
+
+		it "should set rotation", ->
+
+			layer = new Layer
+				rotationX: 200
+				rotationY: 200
+				rotationZ: 200
+
+			layer.rotationX.should.equal(200)
+			layer.rotationY.should.equal(200)
+			layer.rotationZ.should.equal(200)
+
+		it "should proxy rotation", ->
+
+			layer = new Layer
+
+			layer.rotation = 200
+			layer.rotation.should.equal(200)
+			layer.rotationZ.should.equal(200)
+
+			layer.rotationZ = 100
+			layer.rotation.should.equal(100)
+			layer.rotationZ.should.equal(100)
 
 
 
@@ -404,6 +436,18 @@ describe "Layer", ->
 
 			simulate.click myLayer._element
 
+
+		it "should modify the event scope for once", (callback) ->
+
+			myLayer = new Layer()
+
+			myLayer.once "click", (event, layer) ->
+				@id.should.equal myLayer.id
+				layer.id.should.equal myLayer.id
+				callback()
+
+			simulate.click myLayer._element
+
 		it "should remove events", ->
 
 			layer = new Layer
@@ -437,6 +481,16 @@ describe "Layer", ->
 				layerA.emit("hello")
 
 			count.should.equal 1
+
+		it "should modify scope for draggable events", (callback) ->
+			
+			layerA = new Layer
+			layerA.draggable.enabled = true
+			layerA.on "test", (args...) ->
+				@id.should.equal(layerA.id)
+				callback()
+
+			layerA.draggable.emit("test", {})
 
 
 	describe "Hierarchy", ->
@@ -604,6 +658,7 @@ describe "Layer", ->
 			layerC = new Layer superLayer:layerB
 			layerC.superLayers().should.eql [layerB, layerA]
 
+
 	describe "Frame", ->
 
 		it "should set on create", ->
@@ -680,24 +735,25 @@ describe "Layer", ->
 			layer.maxY = 200
 			layer.y.should.equal 100
 
-		it "should get and set screenFrame", ->
+		it "should get and set canvasFrame", ->
+			
 			layerA = new Layer x:100, y:100, width:100, height:100
 			layerB = new Layer x:300, y:300, width:100, height:100, superLayer:layerA
 
-			assert.equal layerB.screenFrame.x, 400
-			assert.equal layerB.screenFrame.y, 400
+			assert.equal layerB.canvasFrame.x, 400
+			assert.equal layerB.canvasFrame.y, 400
 
-			layerB.screenFrame = {x:1000, y:1000}
+			layerB.canvasFrame = {x:1000, y:1000}
 
-			assert.equal layerB.screenFrame.x, 1000
-			assert.equal layerB.screenFrame.y, 1000
+			assert.equal layerB.canvasFrame.x, 1000
+			assert.equal layerB.canvasFrame.y, 1000
 
 			assert.equal layerB.x, 900
 			assert.equal layerB.y, 900
 
 			layerB.superLayer = null
-			assert.equal layerB.screenFrame.x, 900
-			assert.equal layerB.screenFrame.y, 900
+			assert.equal layerB.canvasFrame.x, 900
+			assert.equal layerB.canvasFrame.y, 900
 
 		it "should calculate scale", ->
 			layerA = new Layer scale:0.9
@@ -770,7 +826,7 @@ describe "Layer", ->
 			layer = new Layer
 			layer.destroy()
 
-			Framer.CurrentContext.getLayers().should.not.contain layer
+			(layer in Framer.CurrentContext.getLayers()).should.be.false
 			assert.equal layer._element.parentNode, null
 
 		it "should set text", ->
@@ -824,6 +880,39 @@ describe "Layer", ->
 			layer.force2d = true
 
 			layer.style.webkitTransform.should.equal "translate(0px, 0px) scale(1) skew(0deg, 0deg) rotate(0deg)"
+
+	describe "Copy", ->
+
+		it "copied Layer should hold set props", ->
+
+			X = 100
+			Y = 200
+			IMAGE = '../static/test.png'
+
+			layer = new Layer
+				x:X
+				y:Y
+				image:IMAGE
+
+			layer.x.should.eql X
+			layer.y.should.eql Y
+			layer.image.should.eql IMAGE
+
+			copy = layer.copy()
+
+			copy.x.should.eql X
+			copy.y.should.eql Y
+			copy.image.should.eql IMAGE
+
+		it "copied Layer should have defaults", ->
+
+			layer = new Layer
+			copy = layer.copy()
+
+			copy.width.should.equal 100
+			copy.height.should.equal 100
+
+
 
 
 

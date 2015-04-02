@@ -10,22 +10,27 @@ Utils.getValue = (value) ->
 	return value() if _.isFunction value
 	return value
 
-Utils.setDefaultProperties = (obj, defaults, warn=true) ->
-
-	result = {}
-
-	for k, v of defaults
-		if obj.hasOwnProperty k
-			result[k] = obj[k]
-		else
-			result[k] = defaults[k]
-
-	if warn
-		for k, v of obj
-			if not defaults.hasOwnProperty k
-				console.warn "Utils.setDefaultProperties: got unexpected option: '#{k} -> #{v}'", obj
-
+Utils.getValueForKeyPath = (obj, key) ->
+	result = obj
+	return obj[key] if not "." in key
+	result = result[key] for key in key.split(".")
 	result
+
+Utils.setValueForKeyPath = (obj, path, val) ->
+	fields = path.split('.')
+	result = obj
+	i = 0
+	n = fields.length
+	while i < n and result != undefined
+		field = fields[i]
+		if i == n - 1
+			result[field] = val
+		else
+			if typeof result[field] == 'undefined' or !_.isObject(result[field])
+				result[field] = {}
+			result = result[field]
+		i++
+	return
 
 Utils.valueOrDefault = (value, defaultValue) ->
 
@@ -33,14 +38,6 @@ Utils.valueOrDefault = (value, defaultValue) ->
 		value = defaultValue
 
 	return value
-
-Utils.arrayToObject = (arr) ->
-	obj = {}
-
-	for item in arr
-		obj[item[0]] = item[1]
-
-	obj
 
 Utils.arrayNext = (arr, item) ->
 	arr[arr.indexOf(item) + 1] or _.first arr
@@ -80,19 +77,18 @@ window.requestAnimationFrame ?= (f) -> Utils.delay 1/60, f
 # Note: in Framer 3 we try to keep all times in seconds
 
 # Used by animation engine, needs to be very performant
-Utils.getTime = -> Date.now() / 1000
-
-# This works only in chrome, but we only use it for testing
-# if window.performance
-# 	Utils.getTime = -> performance.now() / 1000
+if window.performance
+	Utils.getTime = -> window.performance.now() / 1000
+else
+	Utils.getTime = -> Date.now() / 1000
 
 Utils.delay = (time, f) ->
-	timer = setTimeout f, time * 1000
+	timer = setTimeout(f, time * 1000)
 	Framer.CurrentContext._delayTimers.push(timer)
 	return timer
 	
 Utils.interval = (time, f) ->
-	timer = setInterval f, time * 1000
+	timer = setInterval(f, time * 1000)
 	Framer.CurrentContext._delayIntervals.push(timer)
 	return timer
 
@@ -147,6 +143,15 @@ Utils.randomNumber = (a=0, b=1) ->
 	# Return a random number between a and b
 	Utils.mapRange Math.random(), 0, 1, a, b
 
+Utils.defineEnum = (names = [], offset = 0, geometric = 0) ->
+	Enum = {}
+	for name, i in names
+		j = i
+		j = if ! offset    then j else j + offset
+		j = if ! geometric then j else Math.pow geometric, j
+		Enum[Enum[name] = j] = name
+	return Enum
+
 Utils.labelLayer = (layer, text, style={}) ->
 	
 	style = _.extend({
@@ -169,6 +174,59 @@ Utils.stringify = (obj) ->
 	return obj.toString() if obj.toString
 	return obj
 
+Utils.inspectObjectType = (item) ->
+	# This is a hacky way to get nice object names, it tries to
+	# parse them from the .toString methods for objects.
+
+	if item.constructor?.name? and item.constructor?.name != "Object"
+		return item.constructor.name
+
+	extract = (str) ->
+		return null unless str
+		regex = /\[object (\w+)\]/
+		match = regex.exec(str)
+		return match[1] if match
+		return null
+
+	className = extract(item.toString()) 
+	return className if className
+	className = extract(item.constructor?.toString())
+	return className.replace("Constructor", "") if className
+	return item
+
+Utils.inspect = (item, max=5, l=0) ->
+	
+	return "null" if item is null
+	return "undefined" if item is undefined
+	
+	if _.isFunction(item.toInspect)
+		return item.toInspect()
+	if _.isString(item)
+		return "\"#{item}\""
+	if _.isNumber(item)
+		return "#{item}"
+	if _.isFunction(item)
+		code = item.toString()["function ".length..].replace(/\n/g, "").replace(/\s+/g, " ")
+		# We limit the size of a function body if it's in a strucutre
+		limit = 50
+		code = "#{_.trimRight(code[..limit])}… }" if code.length > limit and l > 0
+		return "<Function #{code}>"
+	if _.isArray(item)
+		return "[...]" if l > max
+		return "[" + _.map(item, (i) -> Utils.inspect(i, max, l+1)).join(", ") + "]"
+	if _.isObject(item)
+		objectType = Utils.inspectObjectType(item)
+		# We should not loop over dom trees because we will have a bad time
+		return "<#{objectType}>" if /HTML\w+?Element/.test(objectType)
+		if l > max
+			objectInfo = "{...}"
+		else
+			objectInfo = "{" + _.map(item, (v, k) -> "#{k}:#{Utils.inspect(v, max, l+1)}").join(", ") + "}"
+		return objectInfo if objectType is "Object"
+		return "<#{objectType} #{objectInfo}>"
+
+	return "#{item}"
+
 Utils.uuid = ->
 
 	chars = "0123456789abcdefghijklmnopqrstuvwxyz".split("")
@@ -184,13 +242,9 @@ Utils.uuid = ->
 	output.join ""
 
 Utils.arrayFromArguments = (args) ->
-
 	# Convert an arguments object to an array
-	
-	if _.isArray args[0]
-		return args[0]
-	
-	Array.prototype.slice.call args
+	return args[0] if _.isArray(args[0])
+	return Array.prototype.slice.call(args)
 
 Utils.cycle = ->
 	
@@ -270,15 +324,21 @@ Utils.deviceType = ->
 
 	return "desktop"
 
+
 Utils.pathJoin = ->
 	Utils.arrayFromArguments(arguments).join("/")
 
 ######################################################
 # MATH FUNCTIONS
 		
-Utils.round = (value, decimals) ->
+Utils.round = (value, decimals=0) ->
 	d = Math.pow 10, decimals
 	Math.round(value * d) / d
+
+Utils.clamp = (value, min, max) ->
+	value = min if value < min
+	value = max if value > max
+	return value
 
 # Taken from http://jsfiddle.net/Xz464/7/
 # Used by animation engine, needs to be very performant
@@ -314,7 +374,7 @@ Utils.parseFunction = (str) ->
 
 	if _.endsWith str, ")"
 		result.name = str.split("(")[0]
-		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.rtrim(a, ")"))
+		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.trimRight(a, ")"))
 	else
 		result.name = str
 
@@ -484,6 +544,24 @@ Utils.sizeMax = ->
 		width:  _.max sizes.map (size) -> size.width
 		height: _.max sizes.map (size) -> size.height
 
+# Rect
+
+Utils.zeroRect = (args={}) ->
+	return _.defaults(args, {top:0, right:0, bottom:0, left:0})
+
+Utils.parseRect = (args) ->
+	if _.isArray(args) and _.isNumber(args[0])
+		return Utils.parseRect({top:args[0]}) if args.length is 1
+		return Utils.parseRect({top:args[0], right:args[1]}) if args.length is 2
+		return Utils.parseRect({top:args[0], right:args[1], bottom:args[2]}) if args.length is 3
+		return Utils.parseRect({top:args[0], right:args[1], bottom:args[2], left:args[3]}) if args.length is 4
+	if _.isArray(args) and _.isObject(args[0])
+		return args[0]
+	if _.isObject(args)
+		return args
+
+	return {}
+
 # Frames
 
 # min mid max * x, y
@@ -540,16 +618,62 @@ Utils.frameMerge = ->
 
 	frame
 
+Utils.framePointForOrigin = (frame, originX, originY) ->
+	frame =
+		x: frame.x + (originX * frame.width)
+		y: frame.y + (originY * frame.height)
+		width: frame.width
+		height: frame.height
+
+Utils.frameInset = (frame, inset) ->
+	frame =
+		x: frame.x + inset.left
+		y: frame.y + inset.top
+		width: frame.width - inset.left - inset.right
+		height: frame.height - inset.top - inset.bottom
+
+Utils.frameSortByAbsoluteDistance = (point, frames, originX=0, originY=0) ->
+	distance = (frame) ->
+		result = Utils.pointDistance(point, Utils.framePointForOrigin(frame, originX, originY))
+		result = Utils.pointAbs(result)
+		result = Utils.pointTotal(result)
+		result
+
+	return frames.sort (a, b) -> distance(a) - distance(b)
+
+Utils.pointInPolygon = (point, vs) ->
+	# ray-casting algorithm based on
+	# http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+	x = point[0]
+	y = point[1]
+	inside = false
+	i = 0
+	j = vs.length - 1
+	while i < vs.length
+		xi = vs[i][0]
+		yi = vs[i][1]
+		xj = vs[j][0]
+		yj = vs[j][1]
+		intersect = yi > y != yj > y and x < (xj - xi) * (y - yi) / (yj - yi) + xi
+		if intersect
+			inside = !inside
+		j = i++
+	inside
+
+Utils.pointAngle = (p1, p2) ->
+	Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+
+
 # Coordinate system
 
-Utils.convertPoint = (input, layerA, layerB) ->
+Utils.convertPoint = (input, layerA, layerB, context=false) ->
 
 	# Convert a point between two layer coordinate systems
 
 	point = _.defaults(input, {x:0, y:0})
 
-	superLayersA = layerA?.superLayers() or []
-	superLayersB = layerB?.superLayers() or []
+	superLayersA = layerA?.superLayers(context) or []
+	superLayersB = layerB?.superLayers(context) or []
 	
 	superLayersB.push layerB if layerB
 	

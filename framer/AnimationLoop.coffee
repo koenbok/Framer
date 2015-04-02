@@ -3,10 +3,12 @@ Utils = require "./Utils"
 {Config} = require "./Config"
 {EventEmitter} = require "./EventEmitter"
 
-if window.performance
-	getTime = -> window.performance.now()
-else
-	getTime = -> Date.now()
+# if window.performance
+# 	getTime = -> window.performance.now()
+# else
+# 	getTime = -> Date.now()
+
+getTime = -> Utils.getTime() * 1000
 
 
 # Make the time ticks a "fixed" 1/60 of a second.

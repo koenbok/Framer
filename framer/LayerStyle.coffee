@@ -73,8 +73,8 @@ exports.LayerStyle =
 		css = []
 
 		for [cssName, layerName, fallback, unit] in _WebkitProperties
-			if layer[layerName] != fallback
-				css.push "#{cssName}(#{filterFormat layer[layerName], unit})"
+			if layer._properties.hasOwnProperty(layerName) and layer[layerName] != fallback
+				css.push("#{cssName}(#{filterFormat(layer[layerName], unit)})")
 
 		return css.join(" ")
 

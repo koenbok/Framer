@@ -7,7 +7,6 @@ Utils = require "./Utils"
 {BaseClass} = require "./BaseClass"
 {EventEmitter} = require "./EventEmitter"
 {Animation} = require "./Animation"
-{Frame} = require "./Frame"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
@@ -17,14 +16,17 @@ NoCacheDateKey = Date.now()
 layerValueTypeError = (name, value) ->
 	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
 
-layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
+layerProperty = (obj, name, cssProperty, fallback, validator, options={}, set) ->
 	result = 
-		exportable: true
 		default: fallback
 		get: -> 
-			@_properties[name]
+			# console.log "Layer.#{name}.get #{@_properties[name]}", @_properties.hasOwnProperty(name)
+			return @_properties[name] if @_properties.hasOwnProperty(name)
+			return fallback
 
 		set: (value) ->
+
+			# console.log "Layer.#{name}.set #{value}"
 
 			if value and validator and not validator(value)
 				layerValueTypeError(name, value)
@@ -32,35 +34,21 @@ layerProperty = (obj, name, cssProperty, fallback, validator, set) ->
 			@_properties[name] = value
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
-			# @_dirtyStyle[cssProperty] = LayerStyle[cssProperty](@)
-			# @_setNeedsRender()
-
 			set?(@, value)
 			@emit("change:#{name}", value)
+			@emit("change:point", value) if name in ["x", "y"]
+			@emit("change:size", value)  if name in ["width", "height"]
+			@emit("change:frame", value) if name in ["x", "y", "width", "height"]
+			@emit("change:rotation", value) if name in ["rotationZ"]
 
-
-
+	result = _.extend(result, options)
 
 class exports.Layer extends BaseClass
-
-	# _setNeedsRender: ->
-	# 	if @_needsRender is false
-	# 		Framer.Loop.once "render", @_render
-	# 		@_needsRender = true
-
-	# _render: =>
-	# 	@style = @_dirtyStyle
-	# 	# console.log "_render"
-	# 	@_dirtyStyle = {}
-	# 	@_needsRender = false
 
 	constructor: (options={}) ->
 
 		@_properties = {}
 		@_style = {}
-		@_dirtyStyle = {}
-		@_needsRender = false
-		# @_classList = []
 
 		# Special power setting for 2d rendering path. Only enable this
 		# if you know what you are doing. See LayerStyle for more info.
@@ -69,7 +57,6 @@ class exports.Layer extends BaseClass
 
 		# We have to create the element before we set the defaults
 		@_createElement()
-		# @_setDefaultCSS()
 
 		if options.hasOwnProperty "frame"
 			options = _.extend(options, options.frame)
@@ -79,19 +66,9 @@ class exports.Layer extends BaseClass
 		super options
 
 		# Add this layer to the current context
-		@_context._layerList.push(@)
+		@_context.addLayer(@)
 
-		@_id = @_context._layerList.length
-
-		# Keep track of the default values
-		# @_defaultValues = options._defaultValues
-
-		# We need to explicitly set the element id again, becuase it was made by the super
-		# @_element.id = "FramerLayer-#{@id}"
-
-		for k in ["minX", "midX", "maxX", "minY", "midY", "maxY"]
-			if options.hasOwnProperty(k)
-				@[k] = options[k]
+		@_id = @_context.nextLayerId()
 
 		# Insert the layer into the dom or the superLayer element
 		if not options.superLayer
@@ -112,92 +89,92 @@ class exports.Layer extends BaseClass
 	# Properties
 
 	# Css properties
-	@define "width",  layerProperty @, "width",  "width", 100, _.isNumber
-	@define "height", layerProperty @, "height", "height", 100, _.isNumber
+	@define "width",  layerProperty(@, "width",  "width", 100, _.isNumber)
+	@define "height", layerProperty(@, "height", "height", 100, _.isNumber)
 
-	@define "visible", layerProperty @, "visible", "display", true, _.isBool
-	@define "opacity", layerProperty @, "opacity", "opacity", 1, _.isNumber
-	@define "index", layerProperty @, "index", "zIndex", 0, _.isNumber
-	@define "clip", layerProperty @, "clip", "overflow", true, _.isBool
+	@define "visible", layerProperty(@, "visible", "display", true, _.isBoolean)
+	@define "opacity", layerProperty(@, "opacity", "opacity", 1, _.isNumber)
+	@define "index", layerProperty(@, "index", "zIndex", 0, _.isNumber, {importable:false, exportable:false})
+	@define "clip", layerProperty(@, "clip", "overflow", true, _.isBoolean)
 	
-	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBool, (layer, value) ->
+	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBoolean, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 	
-	@define "scrollVertical", layerProperty @, "scrollVertical", "overflowY", false, _.isBool, (layer, value) ->
+	@define "scrollVertical", layerProperty @, "scrollVertical", "overflowY", false, _.isBoolean, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 
 	@define "scroll",
-		exportable: true
 		get: -> @scrollHorizontal is true or @scrollVertical is true
 		set: (value) -> @scrollHorizontal = @scrollVertical = value
 
 	# Behaviour properties
-	@define "ignoreEvents", layerProperty @, "ignoreEvents", "pointerEvents", true, _.isBool
+	@define "ignoreEvents", layerProperty(@, "ignoreEvents", "pointerEvents", true, _.isBoolean)
 
 	# Matrix properties
-	@define "x", layerProperty @, "x", "webkitTransform", 0, _.isNumber
-	@define "y", layerProperty @, "y", "webkitTransform", 0, _.isNumber
-	@define "z", layerProperty @, "z", "webkitTransform", 0, _.isNumber
+	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber)
+	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber)
+	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber)
 
-	@define "scaleX", layerProperty @, "scaleX", "webkitTransform", 1, _.isNumber
-	@define "scaleY", layerProperty @, "scaleY", "webkitTransform", 1, _.isNumber
-	@define "scaleZ", layerProperty @, "scaleZ", "webkitTransform", 1, _.isNumber
-	@define "scale", layerProperty @, "scale", "webkitTransform", 1, _.isNumber
+	@define "scaleX", layerProperty(@, "scaleX", "webkitTransform", 1, _.isNumber)
+	@define "scaleY", layerProperty(@, "scaleY", "webkitTransform", 1, _.isNumber)
+	@define "scaleZ", layerProperty(@, "scaleZ", "webkitTransform", 1, _.isNumber)
+	@define "scale", layerProperty(@, "scale", "webkitTransform", 1, _.isNumber)
 
-	@define "skewX", layerProperty @, "skewX", "webkitTransform", 0, _.isNumber
-	@define "skewY", layerProperty @, "skewY", "webkitTransform", 0, _.isNumber
-	@define "skew", layerProperty @, "skew", "webkitTransform", 0, _.isNumber
+	@define "skewX", layerProperty(@, "skewX", "webkitTransform", 0, _.isNumber)
+	@define "skewY", layerProperty(@, "skewY", "webkitTransform", 0, _.isNumber)
+	@define "skew", layerProperty(@, "skew", "webkitTransform", 0, _.isNumber)
 
 	# @define "scale",
 	# 	get: -> (@scaleX + @scaleY + @scaleZ) / 3.0
 	# 	set: (value) -> @scaleX = @scaleY = @scaleZ = value
 
-	@define "originX", layerProperty @, "originX", "webkitTransformOrigin", 0.5, _.isNumber
-	@define "originY", layerProperty @, "originY", "webkitTransformOrigin", 0.5, _.isNumber
-	# @define "originZ", layerProperty @, "originZ", "WebkitTransformOrigin", 0.5
+	@define "originX", layerProperty(@, "originX", "webkitTransformOrigin", 0.5, _.isNumber)
+	@define "originY", layerProperty(@, "originY", "webkitTransformOrigin", 0.5, _.isNumber)
+	# @define "originZ", layerProperty(@, "originZ", "WebkitTransformOrigin", 0.5
 
-	@define "perspective", layerProperty @, "perspective", "webkitPerspective", 0, _.isNumber
+	@define "perspective", layerProperty(@, "perspective", "webkitPerspective", 0, _.isNumber)
 
-	@define "rotationX", layerProperty @, "rotationX", "webkitTransform", 0, _.isNumber
-	@define "rotationY", layerProperty @, "rotationY", "webkitTransform", 0, _.isNumber
-	@define "rotationZ", layerProperty @, "rotationZ", "webkitTransform", 0, _.isNumber
-	@define "rotation", layerProperty @, "rotationZ", "webkitTransform", 0, _.isNumber
-	set_rotation: (value) -> @set_rotationZ(value)
+	@define "rotationX", layerProperty(@, "rotationX", "webkitTransform", 0, _.isNumber)
+	@define "rotationY", layerProperty(@, "rotationY", "webkitTransform", 0, _.isNumber)
+	@define "rotationZ", layerProperty(@, "rotationZ", "webkitTransform", 0, _.isNumber)
+	@define "rotation",
+		exportable: false
+		get: -> @rotationZ
+		set: (value) -> @rotationZ = value
 
 	# Filter properties
-	@define "blur", layerProperty @, "blur", "webkitFilter", 0, _.isNumber
-	@define "brightness", layerProperty @, "brightness", "webkitFilter", 100, _.isNumber
-	@define "saturate", layerProperty @, "saturate", "webkitFilter", 100, _.isNumber
-	@define "hueRotate", layerProperty @, "hueRotate", "webkitFilter", 0, _.isNumber
-	@define "contrast", layerProperty @, "contrast", "webkitFilter", 100, _.isNumber
-	@define "invert", layerProperty @, "invert", "webkitFilter", 0, _.isNumber
-	@define "grayscale", layerProperty @, "grayscale", "webkitFilter", 0, _.isNumber
-	@define "sepia", layerProperty @, "sepia", "webkitFilter", 0, _.isNumber
+	@define "blur", layerProperty(@, "blur", "webkitFilter", 0, _.isNumber)
+	@define "brightness", layerProperty(@, "brightness", "webkitFilter", 100, _.isNumber)
+	@define "saturate", layerProperty(@, "saturate", "webkitFilter", 100, _.isNumber)
+	@define "hueRotate", layerProperty(@, "hueRotate", "webkitFilter", 0, _.isNumber)
+	@define "contrast", layerProperty(@, "contrast", "webkitFilter", 100, _.isNumber)
+	@define "invert", layerProperty(@, "invert", "webkitFilter", 0, _.isNumber)
+	@define "grayscale", layerProperty(@, "grayscale", "webkitFilter", 0, _.isNumber)
+	@define "sepia", layerProperty(@, "sepia", "webkitFilter", 0, _.isNumber)
 
 	# Shadow properties
-	@define "shadowX", layerProperty @, "shadowX", "boxShadow", 0, _.isNumber
-	@define "shadowY", layerProperty @, "shadowY", "boxShadow", 0, _.isNumber
-	@define "shadowBlur", layerProperty @, "shadowBlur", "boxShadow", 0, _.isNumber
-	@define "shadowSpread", layerProperty @, "shadowSpread", "boxShadow", 0, _.isNumber
-	@define "shadowColor", layerProperty @, "shadowColor", "boxShadow", ""
+	@define "shadowX", layerProperty(@, "shadowX", "boxShadow", 0, _.isNumber)
+	@define "shadowY", layerProperty(@, "shadowY", "boxShadow", 0, _.isNumber)
+	@define "shadowBlur", layerProperty(@, "shadowBlur", "boxShadow", 0, _.isNumber)
+	@define "shadowSpread", layerProperty(@, "shadowSpread", "boxShadow", 0, _.isNumber)
+	@define "shadowColor", layerProperty(@, "shadowColor", "boxShadow", "")
 
 	# Color properties
-	@define "backgroundColor", layerProperty @, "backgroundColor", "backgroundColor", null, _.isString
-	@define "color", layerProperty @, "color", "color", null, _.isString
+	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, _.isString)
+	@define "color", layerProperty(@, "color", "color", null, _.isString)
 
 	# Border properties
 	# Todo: make this default, for compat we still allow strings but throw a warning
-	# @define "borderRadius", layerProperty @, "borderRadius", "borderRadius", 0, _.isNumber
-	@define "borderColor", layerProperty @, "borderColor", "border", null, _.isString
-	@define "borderWidth", layerProperty @, "borderWidth", "border", 0, _.isNumber
+	# @define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, _.isNumber
+	@define "borderColor", layerProperty(@, "borderColor", "border", null, _.isString)
+	@define "borderWidth", layerProperty(@, "borderWidth", "border", 0, _.isNumber)
 
-	@define "force2d", layerProperty @, "force2d", "webkitTransform", false, _.isBool
+	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
 
 	##############################################################
 	# Identity
 
 	@define "name",
-		exportable: true
 		default: ""
 		get: -> 
 			@_getPropertyValue "name"
@@ -211,7 +188,6 @@ class exports.Layer extends BaseClass
 	# Border radius compatibility
 
 	@define "borderRadius",
-		exportable: true
 		default: 0
 		get: -> 
 			@_properties["borderRadius"]
@@ -226,6 +202,13 @@ class exports.Layer extends BaseClass
 
 			@emit("change:borderRadius", value)
 
+	# And, because it should be cornerRadius, we alias it here
+	@define "cornerRadius",
+		importable: yes
+		exportable: no
+		get: -> @borderRadius
+		set: (value) -> @borderRadius = value
+
 	##############################################################
 	# Geometry
 
@@ -235,7 +218,13 @@ class exports.Layer extends BaseClass
 			return if not point
 			for k in ["x", "y"]
 				@[k] = point[k] if point.hasOwnProperty(k)
-					
+				
+	@define "size",
+		get: -> _.pick(@, ["width", "height"])
+		set: (size) ->
+			return if not size
+			for k in ["width", "height"]
+				@[k] = size[k] if size.hasOwnProperty(k)
 
 	@define "frame",
 		get: -> _.pick(@, ["x", "y", "width", "height"])
@@ -245,26 +234,38 @@ class exports.Layer extends BaseClass
 				@[k] = frame[k] if frame.hasOwnProperty(k)
 
 	@define "minX",
+		importable: true
+		exportable: false
 		get: -> @x
 		set: (value) -> @x = value
 
 	@define "midX",
+		importable: true
+		exportable: false
 		get: -> Utils.frameGetMidX @
 		set: (value) -> Utils.frameSetMidX @, value
 
 	@define "maxX",
+		importable: true
+		exportable: false
 		get: -> Utils.frameGetMaxX @
 		set: (value) -> Utils.frameSetMaxX @, value
 
 	@define "minY",
+		importable: true
+		exportable: false
 		get: -> @y
 		set: (value) -> @y = value
 
 	@define "midY",
+		importable: true
+		exportable: false
 		get: -> Utils.frameGetMidY @
 		set: (value) -> Utils.frameSetMidY @, value
 
 	@define "maxY",
+		importable: true
+		exportable: false
 		get: -> Utils.frameGetMaxY @
 		set: (value) -> Utils.frameSetMaxY @, value
 
@@ -273,16 +274,30 @@ class exports.Layer extends BaseClass
 		# TODO: needs tests
 		Utils.convertPoint point, null, @
 
-	@define "screenFrame",
+	@define "canvasFrame",
+		importable: true
+		exportable: false
 		get: ->
-			Utils.convertPoint(@frame, @, null)
+			Utils.convertPoint(@frame, @, null, context=true)
 		set: (frame) ->
 			if not @superLayer
 				@frame = frame
 			else
-				@frame = Utils.convertPoint(frame, null, @superLayer)
+				@frame = Utils.convertPoint(frame, null, @superLayer, context=true)
+
+	@define "screenFrame",
+		importable: true
+		exportable: false
+		get: ->
+			Utils.convertPoint(@frame, @, null, context=false)
+		set: (frame) ->
+			if not @superLayer
+				@frame = frame
+			else
+				@frame = Utils.convertPoint(frame, null, @superLayer, context=false)
 
 	contentFrame: ->
+		return {x:0, y:0, width:0, height:0} unless @subLayers.length
 		Utils.frameMerge(_.pluck(@subLayers, "frame"))
 
 	centerFrame: ->
@@ -292,15 +307,10 @@ class exports.Layer extends BaseClass
 			Utils.frameSetMidX(frame, parseInt(@superLayer.width  / 2.0))
 			Utils.frameSetMidY(frame, parseInt(@superLayer.height / 2.0))
 			return frame
-		else if @_context._parentLayer
-			frame = @frame
-			Utils.frameSetMidX(frame, parseInt(@_context._parentLayer.width  / 2.0))
-			Utils.frameSetMidY(frame, parseInt(@_context._parentLayer.height / 2.0))
-			return frame
 		else
 			frame = @frame
-			Utils.frameSetMidX(frame, parseInt(window.innerWidth  / 2.0))
-			Utils.frameSetMidY(frame, parseInt(window.innerHeight / 2.0))
+			Utils.frameSetMidX(frame, parseInt(@_context.width  / 2.0))
+			Utils.frameSetMidY(frame, parseInt(@_context.height / 2.0))
 			return frame
 
 	center: ->
@@ -335,19 +345,35 @@ class exports.Layer extends BaseClass
 	# 		return @_superOrParentLayer().screenOriginY()
 	# 	return @originY
 
-	screenScaleX: ->
+	canvasScaleX: ->
 		scale = @scale * @scaleX
 		for superLayer in @superLayers(context=true)
 			scale = scale * superLayer.scale * superLayer.scaleX
 		return scale
 
-	screenScaleY: ->
+	canvasScaleY: ->
 		scale = @scale * @scaleY
 		for superLayer in @superLayers(context=true)
 			scale = scale * superLayer.scale * superLayer.scaleY
 		return scale
 
+	screenScaleX: ->
+		scale = @scale * @scaleX
+		for superLayer in @superLayers(context=false)
+			scale = scale * superLayer.scale * superLayer.scaleX
+		return scale
+
+	screenScaleY: ->
+		scale = @scale * @scaleY
+		for superLayer in @superLayers(context=false)
+			scale = scale * superLayer.scale * superLayer.scaleY
+		return scale
+
+
 	screenScaledFrame: ->
+
+		# TODO: Scroll position
+
 		frame =
 			x: 0
 			y: 0
@@ -387,6 +413,8 @@ class exports.Layer extends BaseClass
 	# CSS
 
 	@define "style",
+		importable: true
+		exportable: false
 		get: -> @_element.style
 		set: (value) ->
 			_.extend @_element.style, value
@@ -401,6 +429,8 @@ class exports.Layer extends BaseClass
 		return getComputedStyle(@_element)
 
 	@define "classList",
+		importable: true
+		exportable: false
 		get: -> @_element.classList
 
 	##############################################################
@@ -417,7 +447,7 @@ class exports.Layer extends BaseClass
 
 	@define "html",
 		get: ->
-			@_elementHTML?.innerHTML
+			@_elementHTML?.innerHTML or ""
 
 		set: (value) ->
 
@@ -454,7 +484,7 @@ class exports.Layer extends BaseClass
 		@_element.parentNode?.removeChild @_element
 		@removeAllListeners()
 		
-		@_context._layerList = _.without @_context._layerList, @
+		@_context.removeLayer(@)
 
 		@_context.emit("layer:destroy", @)
 
@@ -474,13 +504,12 @@ class exports.Layer extends BaseClass
 
 		layer
 
-	copySingle: -> new Layer @properties
+	copySingle: -> new @constructor(@props)
 
 	##############################################################
 	## IMAGE
 
 	@define "image",
-		exportable: true
 		default: ""
 		get: ->
 			@_getPropertyValue "image"
@@ -545,7 +574,9 @@ class exports.Layer extends BaseClass
 	## HIERARCHY
 
 	@define "superLayer",
+		enumerable: false
 		exportable: false
+		importable: true
 		get: ->
 			@_superLayer or null
 		set: (layer) ->
@@ -585,16 +616,20 @@ class exports.Layer extends BaseClass
 	# Let's make it when we need it.
 
 	@define "subLayers",
+		enumerable: false
 		exportable: false
+		importable: false
 		get: -> _.clone @_subLayers
 
 	@define "siblingLayers",
+		enumerable: false
 		exportable: false
+		importable: false
 		get: ->
 
 			# If there is no superLayer we need to walk through the root
 			if @superLayer is null
-				return _.filter @_context._layerList, (layer) =>
+				return _.filter @_context.getLayers(), (layer) =>
 					layer isnt @ and layer.superLayer is null
 
 			return _.without @superLayer.subLayers, @
@@ -634,6 +669,15 @@ class exports.Layer extends BaseClass
 		if @_context._parentLayer
 			return @_context._parentLayer
 
+	subLayersAbove: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
+		Utils.framePointForOrigin(layer.frame, originX, originY).y < point.y
+	subLayersBelow: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
+		Utils.framePointForOrigin(layer.frame, originX, originY).y > point.y
+	subLayersLeft: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
+		Utils.framePointForOrigin(layer.frame, originX, originY).x < point.x
+	subLayersRight: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
+		Utils.framePointForOrigin(layer.frame, originX, originY).x > point.x
+
 	##############################################################
 	## ANIMATION
 
@@ -658,17 +702,19 @@ class exports.Layer extends BaseClass
 		properties = {}
 
 		for animation in @animations()
-			for propertyName in _.keys(animation._stateA)
+			for propertyName in animation.animatingProperties()
 				properties[propertyName] = animation
 
 		return properties
 
 	@define "isAnimating",
+		enumerable: false
 		exportable: false
 		get: -> @animations().length isnt 0
 
 	animateStop: ->
 		_.invoke(@animations(), "stop")
+		@_draggable?.animateStop()
 
 	##############################################################
 	## INDEX ORDERING
@@ -701,26 +747,33 @@ class exports.Layer extends BaseClass
 	## STATES
 
 	@define "states",
+		enumerable: false
+		exportable: false
+		importable: false
 		get: -> @_states ?= new LayerStates @
 
 	#############################################################################
 	## Draggable
 
 	@define "draggable",
+		importable: false
+		exportable: false
 		get: ->
-			@_draggable ?= new LayerDraggable @
-			@_draggable
-		set: ->
-			throw Error "You can't set the draggable object"
+			@_draggable ?= new LayerDraggable(@)
+
+	# anchor: ->
+	# 	if not @_anchor
+	# 		@_anchor = new LayerAnchor(@, arguments...)
+	# 	else
+	# 		@_anchor.updateRules(arguments...)
 
 	##############################################################
 	## SCROLLING
 
-	# TODO: Tests
-
 	@define "scrollFrame",
+		importable: false
 		get: ->
-			return new Frame
+			frame = 
 				x: @scrollX
 				y: @scrollY
 				width: @width
@@ -799,7 +852,7 @@ class exports.Layer extends BaseClass
 		originalListener = listener
 
 		listener = (args...) =>
-			originalListener(args...)
+			originalListener.call(@, args..., @)
 			@removeListener(eventName, listener)
 
 		@addListener(eventName, listener)
@@ -819,7 +872,7 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## DESCRIPTOR
 
-	toString: ->
+	toInspect: ->
 
 		round = (value) ->
 			if parseInt(value) == value
@@ -827,5 +880,5 @@ class exports.Layer extends BaseClass
 			return Utils.round(value, 1)
 
 		if @name
-			return "&lt;Layer id:#{@id} name:#{@name} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}&gt;"
-		return "&lt;Layer id:#{@id} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}&gt;"
+			return "<#{@constructor.name} id:#{@id} name:#{@name} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}>"
+		return "<#{@constructor.name} id:#{@id} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}>"

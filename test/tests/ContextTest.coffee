@@ -4,8 +4,25 @@ describe "Context", ->
 
 	describe "Reset", ->
 
-		# Todo: event cleanup
-		# Todo: paren layer on context cleanup
+		it "should never append more than a single child on reset", (done) ->
+
+			c1 = document.querySelectorAll(".framerContext").length
+
+			# There's one default context:
+			document.querySelectorAll(".framerContext").length.should.equal(c1)
+
+			context = new Framer.Context(name:"Test")
+
+			context.reset()
+			context.reset()
+			context.reset()
+
+			Framer.Loop.once "render", ->
+				document.querySelectorAll(".framerContext").length.should.equal(c1+1)
+				done()
+
+	# Todo: event cleanup
+		# Todo: parent layer on context cleanup
 
 	describe "Events", ->
 
@@ -58,4 +75,3 @@ describe "Context", ->
 				layer.id.should.equal 1
 				layer = new Layer
 				layer.id.should.equal 2
-

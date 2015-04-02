@@ -26,7 +26,7 @@ describe "LayerAnimation", ->
 				layer: new Layer()
 				properties: {x:50}
 
-			animation.options.curve.should.equal "linear"
+			animation.options.curve.should.equal "ease"
 			animation.options.time.should.equal 1
 
 	describe "Properties", ->
@@ -151,10 +151,10 @@ describe "LayerAnimation", ->
 				properties: {x: 100}
 				time: 0.5
 
-			layer.animations().should.contain(animation)
+			(animation in layer.animations()).should.be.true
 			layer.animateStop()
-			layer.animations().should.not.contain(animation)
-
+			(animation in layer.animations()).should.be.false
+			
 		it "should list running animations correctly", (done) ->
 
 			layer = new Layer()

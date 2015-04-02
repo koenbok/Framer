@@ -9,3 +9,10 @@ lib
 .build
 .deploy
 *.pyc
+npm-debug.log
+extras/Studio.framer/app.coffee
+extras/Studio.framer/framer/config.json
+extras/Studio.framer/imported
+extras/Studio.framer/app.js
+test/phantomjs/tests.js
+test/phantomjs/tests.js.map

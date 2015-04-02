@@ -20,7 +20,7 @@ class exports.LayerStates extends BaseClass
 		@animationOptions = {}
 
 		# Always add the default state as the current
-		@add "default", @layer.properties
+		@add "default", @layer.props
 
 		@_currentState = "default"
 		@_previousStates = []
@@ -31,9 +31,9 @@ class exports.LayerStates extends BaseClass
 
 		# We also allow an object with states to be passed in
 		# like: layer.states.add({stateA: {...}, stateB: {...}})
-		if _.isObject stateName
+		if _.isObject(stateName)
 			for k, v of stateName
-				@add k, v
+				@add(k, v)
 			return
 
 		error = -> throw Error "Usage example: layer.states.add(\"someName\", {x:500})"
@@ -42,7 +42,7 @@ class exports.LayerStates extends BaseClass
 
 		# Add a state with a name and properties
 		@_orderedStates.push stateName
-		@_states[stateName] = properties
+		@_states[stateName] = LayerStates.filterStateProperties(properties)
 
 	remove: (stateName) ->
 
@@ -101,7 +101,7 @@ class exports.LayerStates extends BaseClass
 
 		if instant is true
 			# We want to switch immediately without animation
-			@layer.properties = properties
+			@layer.props = properties
 			@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
 
 		else
@@ -166,3 +166,13 @@ class exports.LayerStates extends BaseClass
 		super
 		# Also emit this to the layer with self as argument
 		@layer.emit args...
+
+	@filterStateProperties = (properties) ->
+
+		stateProperties = {}
+
+		# TODO: Maybe we want to support advanced data structures like objects in the future too.
+		for k, v of properties
+			stateProperties[k] = v if _.isNumber(v) or _.isFunction(v) or _.isBoolean(v) or _.isString(v)
+
+		return stateProperties

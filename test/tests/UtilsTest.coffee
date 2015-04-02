@@ -1,26 +1,5 @@
 
 describe "Utils", ->
-		
-	describe "setDefaultProperties", ->
-
-		it "should set defaults", ->
-			
-			defaults = x: 100, y: 100
-
-			objectA = Utils.setDefaultProperties {}, defaults
-
-			objectA.x.should.equal 100
-			objectA.y.should.equal 100
-
-		it "should override", ->
-			
-			objectA = {x:1000}
-			defaults = x: 100, y: 100
-
-			objectA = Utils.setDefaultProperties objectA, defaults
-
-			objectA.x.should.equal 1000
-			objectA.y.should.equal 100
 
 	describe "valueOrDefault", ->
 
@@ -32,11 +11,6 @@ describe "Utils", ->
 
 		# it "should get the fallback value", ->
 		# 	Utils.valueOrDefault(undefined, undefined, 0).should.equal 0
-	
-	describe "arrayToObject", ->
-
-		it "should work", ->
-			Utils.arrayToObject([["a", 1], ["b", 2]]).should.eql({"a": 1, "b": 2})
 
 	describe "arrayFromArguments", ->
 
@@ -156,30 +130,45 @@ describe "Utils", ->
 			# Bla bla. This works. Doing a visual comparison is so much easier
 			# Start the cactus project and go to /test.html
 
-	describe "domLoadData", (callback) ->
+	describe "framePointForOrigin", ->
 
-		it "should load data async", (callback) ->
+		it "should work", ->
+			Utils.framePointForOrigin({x:100, y:100, width:100, height:100}, 0, 0).should.eql(
+				{x:100, y:100, width:100, height:100})
+			Utils.framePointForOrigin({x:100, y:100, width:100, height:100}, 0, 0).should.eql(
+				{x:100, y:100, width:100, height:100})
+			Utils.framePointForOrigin({x:100, y:100, width:100, height:100}, 0, 0).should.eql(
+				{x:100, y:100, width:100, height:100})
+			Utils.framePointForOrigin({x:100, y:100, width:100, height:100}, 0, 0).should.eql(
+				{x:100, y:100, width:100, height:100})
 
-			data = Utils.domLoadData "static/test.txt", (err, data) ->
-				data.should.equal "TEST HELLO"
-				callback()
 
-		it "should load throw error on nonexisting", (callback) ->
 
-			data = Utils.domLoadData "static/test123.txt", (err, data) ->
-				err.should.equal true
-				callback()
 
-	describe "domLoadDataSync", ->
+	# describe "domLoadData", (callback) ->
 
-		it "should load data async", ->
-			data = Utils.domLoadDataSync "static/test.txt"
-			data.should.equal "TEST HELLO"
+	# 	it "should load data async", (callback) ->
 
-		it "should load throw error on nonexisting", ->
+	# 		data = Utils.domLoadData "static/test.txt", (err, data) ->
+	# 			data.should.equal "TEST HELLO"
+	# 			callback()
 
-			test = -> Utils.domLoadDataSync("static/nonexisting.txt")
-			test.should.throw()
+	# 	it "should load throw error on nonexisting", (callback) ->
+
+	# 		data = Utils.domLoadData "static/test123.txt", (err, data) ->
+	# 			err.should.equal true
+	# 			callback()
+
+	# describe "domLoadDataSync", ->
+
+	# 	it "should load data async", ->
+	# 		data = Utils.domLoadDataSync "static/test.txt"
+	# 		data.should.equal "TEST HELLO"
+
+	# 	it "should load throw error on nonexisting", ->
+
+	# 		test = -> Utils.domLoadDataSync("static/nonexisting.txt")
+	# 		test.should.throw()
 
 	describe "modulate", ->
 
@@ -198,26 +187,151 @@ describe "Utils", ->
 
 	describe "textSize", ->
 
-		# Todo: for some reason these don't work reliable in phantomjs
+		it "should have the right text size", ->
 
-		text  = "Hello Koen Bok"
-		style = {font:"20px/1em Menlo"}
+			# Todo: for some reason these don't work reliable in phantomjs
 
-		# it "should return the right size", ->
-		# 	Utils.textSize(text, style).should.eql({width:168, height:20})
+			text  = "Hello Koen Bok"
+			style = {font:"20px/1em Menlo"}
 
-		# it "should return the right size with width constraint", ->
-		# 	Utils.textSize(text, style, {width:100}).should.eql({width:100, height:40})
+			# it "should return the right size", ->
+			# 	Utils.textSize(text, style).should.eql({width:168, height:20})
 
-		# it "should return the right size with height constraint", ->
-		# 	Utils.textSize(text, style, {height:100}).should.eql(width:168,height:100)
+			# it "should return the right size with width constraint", ->
+			# 	Utils.textSize(text, style, {width:100}).should.eql({width:100, height:40})
 
-
-
-
+			# it "should return the right size with height constraint", ->
+			# 	Utils.textSize(text, style, {height:100}).should.eql(width:168,height:100)
 
 
+	describe "frameSortByAbsoluteDistance", ->
 
+		it "should sort x", ->
+
+			layerA = new Layer x:300, y:100
+			layerB = new Layer x:100, y:100
+			layerC = new Layer x:200, y:100
+
+			Utils.frameSortByAbsoluteDistance({x:0, y:0}, [layerA, layerB, layerC]).should.eql([layerB, layerC, layerA])
+
+		it "should sort", ->
+
+			layerA = new Layer x:500, y:500
+			layerB = new Layer x:300, y:300
+			layerC = new Layer x:100, y:100
+
+			Utils.frameSortByAbsoluteDistance({x:0, y:0}, [layerA, layerB, layerC]).should.eql([layerC, layerB, layerA])
+
+
+	describe "inspect", ->
+
+		it "should work for strings", ->
+			Utils.inspect("a").should.equal("\"a\"")
+
+		it "should work for booleans", ->
+			Utils.inspect(true).should.equal("true")
+
+		it "should work for numbers", ->
+			Utils.inspect(12.34).should.equal("12.34")
+
+		it "should work for null", ->
+			Utils.inspect(null).should.equal("null")
+
+		it "should work for undefined", ->
+			Utils.inspect(undefined).should.equal("undefined")
+
+		it "should work for arrays", ->
+			Utils.inspect(["a", 1, ["b", "c"]]).should.equal("[\"a\", 1, [\"b\", \"c\"]]")
+
+		it "should work for objects", ->
+			Utils.inspect({a:1, b:[1, 2, 3]}).should.equal("{a:1, b:[1, 2, 3]}")
+
+		it "should work for functions", ->
+			test = -> return "a"
+			Utils.inspect(test).should.equal("<Function () { return \"a\"; }>")
+
+		it "should work for functions with arguments", ->
+			test = (a) -> return "a"
+			Utils.inspect(test).should.equal("<Function (a) { return \"a\"; }>")
+
+		it "should work for named functions", ->
+			# There are no named function in coffee script
+			`function test(a) { return "a"; }`
+			Utils.inspect(test).should.equal("<Function test(a) { return \"a\"; }>")
+
+		it "should work for long functions", ->
+			test = ->
+				its = 1
+				very = 1
+				rainy = 1
+				today = 1
+				down = 1
+				here = 1
+				return "a"
+			Utils.inspect(test).should.equal("<Function () { var down, here, its, rainy, today, very; its = 1; very = 1; rainy = 1; today = 1; down = 1; here = 1; return \"a\"; }>")
+			Utils.inspect([test]).should.equal("[<Function () { var down, here, its, rainy, today, very; its =… }>]")
+
+		it "should work for classes", ->
+			class TestClass
+				constructor: ->
+					@a = 1
+			instance = new TestClass
+			Utils.inspect(instance).should.equal("<TestClass {a:1}>")
+
+		it "should work for subclasses", ->
+			class TestClass
+				constructor: ->
+					@a = 1
+			class SubTestClass extends TestClass
+			instance = new SubTestClass
+			Utils.inspect(instance).should.equal("<SubTestClass {a:1}>")
+
+		it "should work with toInspect", ->
+			class TestClass
+				toInspect: -> return "Hello"
+			instance = new TestClass
+			Utils.inspect(instance).should.equal("Hello")
+
+		it "should work with WebKitCSSMatrix", ->
+			instance = new WebKitCSSMatrix()
+			Utils.inspect(instance).should.equal("<WebKitCSSMatrix {e:0, m33:1, f:0, m42:0, m44:1, m24:0, m31:0, m32:0, m21:0, m14:0, c:0, m34:0, m13:0, m12:0, m11:1, m41:0, m23:0, b:0, d:1, m22:1, a:1, m43:0}>")
+
+		it "should work with HTMLDivElement", ->
+			instance = document.createElement("div")
+			Utils.inspect(instance).should.equal("<HTMLDivElement>")
+
+		it "should work with HTMLDivElementConstructor", ->
+			instance = document.createElement("div")
+			Utils.inspectObjectType(instance.constructor).should.equal("HTMLDivElementConstructor")
+			Utils.inspect(instance.constructor).should.equal("<HTMLDivElementConstructor>")
+
+		it "should work with CSSStyleDeclaration", ->
+			instance = document.createElement("div")
+			Utils.inspect(instance.style).should.equal("<CSSStyleDeclaration {}>")
+
+		it "should work with LayerDraggable", ->
+			layer = new Layer
+			Utils.inspectObjectType(layer.draggable).should.equal("LayerDraggable")
+
+	describe "keyPath", ->
+
+		it "should get with single", ->
+			obj = {foo: "bar"}
+			Utils.getValueForKeyPath(obj, "foo").should.equal("bar")
+
+		it "should get with multipe", ->
+			obj = {fooA: {fooB: {fooC: "bar"}}}
+			Utils.getValueForKeyPath(obj, "fooA.fooB.fooC").should.equal("bar")
+
+		it "should set with single", ->
+			obj = {}
+			Utils.setValueForKeyPath(obj, "foo", "bar")
+			obj.should.eql({foo: "bar"})
+
+		it "should set with multiple", ->
+			obj = {fooA: {fooB: {}}}
+			Utils.setValueForKeyPath(obj, "fooA.fooB.fooC", "bar")
+			obj.should.eql({fooA: {fooB: {fooC: "bar"}}})
 
 
 

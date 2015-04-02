@@ -5,7 +5,6 @@ Utils = require "./Utils"
 {Config} = require "./Config"
 {Defaults} = require "./Defaults"
 {EventEmitter} = require "./EventEmitter"
-{Frame} = require "./Frame"
 
 {LinearAnimator} = require "./Animators/LinearAnimator"
 {BezierCurveAnimator} = require "./Animators/BezierCurveAnimator"
@@ -31,11 +30,8 @@ isRelativeProperty = (v) ->
 
 evaluateRelativeProperty = (target, k, v) ->
 	[match, sign, number, unit, rest...] = relativePropertyRE.exec(v)
-
-	if sign
-		return target[k] + (sign + 1) * number
-	else
-		return +number
+	return target[k] + (sign + 1) * number if sign
+	return +number
 
 # _runningAnimations = []
 
@@ -43,16 +39,13 @@ evaluateRelativeProperty = (target, k, v) ->
 # is not compatible and causes problems.
 class exports.Animation extends EventEmitter
 
-	# @runningAnimations = ->
-	# 	_runningAnimations
-
 	constructor: (options={}) ->
 
 		options = Defaults.getDefaults "Animation", options
 
 		super options
 
-		@options = Utils.setDefaultProperties options,
+		@options = _.defaults options,
 			layer: null
 			properties: {}
 			curve: "linear"
@@ -65,11 +58,7 @@ class exports.Animation extends EventEmitter
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
-		# Convert a frame instance to a regular js object
-		if options.properties instanceof Frame
-			option.properties = option.properties.properties
-
-		@options.properties = @_filterAnimatableProperties(@options.properties)
+		@options.properties = Animation.filterAnimatableProperties(@options.properties)
 
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
@@ -169,6 +158,9 @@ class exports.Animation extends EventEmitter
 		# Also emit this to the layer with self as argument
 		@options.layer.emit(event, @)
 
+	animatingProperties: ->
+		_.keys(@_stateA)
+
 	_start: =>
 		@options.layer._context._animationList.push(@)
 		@emit("start")
@@ -189,16 +181,6 @@ class exports.Animation extends EventEmitter
 			@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
 
 		return
-
-	_filterAnimatableProperties: (properties) ->
-
-		animatableProperties = {}
-
-		# Only animate numeric properties for now
-		for k, v of properties
-			animatableProperties[k] = v if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v)
-
-		animatableProperties
 
 	_currentState: ->
 		_.pick @options.layer, _.keys(@options.properties)
@@ -256,3 +238,13 @@ class exports.Animation extends EventEmitter
 				for k, i in ["stiffness", "damping", "mass", "tolerance"]
 					value = parseFloat parsedCurve.args[i]
 					@options.curveOptions[k] = value if value
+
+	@filterAnimatableProperties = (properties) ->
+		# Function to filter only animatable properties out of a given set
+		animatableProperties = {}
+
+		# Only animate numeric properties for now
+		for k, v of properties
+			animatableProperties[k] = v if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v)
+
+		return animatableProperties

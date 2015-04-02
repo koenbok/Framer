@@ -1,13 +1,13 @@
 Utils = require "./Utils"
 
 {_} = require "./Underscore"
+{BaseClass} = require "./BaseClass"
 {Config} = require "./Config"
 {EventManager} = require "./EventManager"
-{EventEmitter} = require "./EventEmitter"
 
 Counter = 1
 
-class exports.Context extends EventEmitter
+class exports.Context extends BaseClass
 	
 	constructor: (options={}) ->
 		
@@ -15,7 +15,7 @@ class exports.Context extends EventEmitter
 
 		Counter++
 
-		options = Utils.setDefaultProperties options,
+		options = _.defaults options,
 			contextName: null
 			parentLayer: null
 			name: null
@@ -25,7 +25,7 @@ class exports.Context extends EventEmitter
 
 		@_parentLayer = options.parentLayer
 		@_name = options.name
-
+		
 		@reset()
 
 	reset: ->
@@ -33,7 +33,17 @@ class exports.Context extends EventEmitter
 		@eventManager?.reset()
 		@eventManager = new EventManager
 
-		@_rootElement?.parentNode?.removeChild?(@_rootElement)
+		if @_rootElement
+			# Clean up the current root element:
+			if @_rootElement.parentNode
+				# Already attached to the DOM - remove it:
+				@_rootElement.parentNode.removeChild(@_rootElement)
+			else
+				# Not on the DOM yet. Prevent it from being added (for this happens
+				# async):
+				@_rootElement.__cancelAppendChild = true
+
+		# Create a fresh root element:
 		@_rootElement = @_createRootElement()
 
 		@_delayTimers?.map (timer) -> window.clearTimeout(timer)
@@ -47,14 +57,36 @@ class exports.Context extends EventEmitter
 		@_animationList = []
 		@_delayTimers = []
 		@_delayIntervals = []
+		@_layerIdCounter = 1
 
 		@emit("reset", @)
+
+	destroy: ->
+		@reset()
+		if @_rootElement.parentNode
+			@_rootElement.parentNode.removeChild(@_rootElement)
+		@_rootElement.__cancelAppendChild = true
 
 	getRootElement: ->
 		@_rootElement
 
 	getLayers: ->
-		_.clone @_layerList
+		_.clone(@_layerList)
+
+	addLayer: (layer) ->
+		return if layer in @_layerList
+		@_layerList.push(layer)
+		return null
+
+	removeLayer: (layer) ->
+		@_layerList = _.without(@_layerList, layer)
+		return null
+
+	layerCount: ->
+		return @_layerList.length
+
+	nextLayerId: ->
+		@_layerIdCounter++
 
 	_createRootElement: ->
 
@@ -66,14 +98,24 @@ class exports.Context extends EventEmitter
 
 		Framer.Loop.once "render", ->
 			parentElement ?= document.body
-			parentElement.appendChild(element)
+			if not element.__cancelAppendChild
+				parentElement.appendChild(element)
 
 		element
 
 	run: (f) ->
-
 		previousContext = Framer.CurrentContext
-
 		Framer.CurrentContext = @
 		f()
 		Framer.CurrentContext = previousContext
+
+	@define "width", 
+		get: -> 
+			return @_parentLayer.width if @_parentLayer
+			return window.innerWidth
+
+	@define "height",
+		get: -> 
+			return @_parentLayer.height if @_parentLayer
+			return window.innerHeight
+

@@ -23,11 +23,11 @@ highlightLayer = (event, layer) ->
 
 	event.stopPropagation()
 
-	screenFrame = layer.screenFrame
+	canvasFrame = layer.canvasFrame
 	screenLayer = new Layer
 
 	screenLayer.animate
-		properties: screenFrame
+		properties: canvasFrame
 		curve: "spring(500,50,0)"
 
 	Utils.delay 0.8, ->
