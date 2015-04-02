@@ -1,0 +1,30 @@
+# Default Framer gitignore file
+
+# Mac specific
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Framer specific
+.temp.html
+framer/*.old.*
+framer/backup.coffee
+framer/backup/*
+framer/.*.hash
