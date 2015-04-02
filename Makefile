@@ -8,7 +8,7 @@ all: build
 
 bootstrap:
 	npm install
-	cd test/phantomjs; "$(bin)/bower" install
+	cd test/phantomjs; "$(bin)/bower" -q install
 
 unbootstrap:
 	rm -Rf node_modules
