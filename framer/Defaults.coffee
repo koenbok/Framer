@@ -27,12 +27,12 @@ Originals =
 		momentum: true
 		momentumOptions:
 			friction: 2.1 
-			tolerance: 1/10 
+			tolerance: 10 
 		bounce: true
 		bounceOptions:
 			friction: 40
 			tension: 200
-			tolerance: 1/10000
+			tolerance: 1
 		directionLock: false
 		directionLockThreshold: 
 			x: 10
