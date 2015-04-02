@@ -52,11 +52,11 @@ Originals =
 	MomentumBounceSimulator:
 		momentum:
 			friction: 2
-			tolerance: 1/10
+			tolerance: 10
 		bounce:
 			tension: 500
 			friction: 10
-			tolerance: 1/10000
+			tolerance: 1
 
 exports.Defaults =
 
