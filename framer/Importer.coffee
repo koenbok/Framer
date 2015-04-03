@@ -105,7 +105,7 @@ class exports.Importer
 
 		# A layer without an image, mask or sublayers should be zero
 		if not layer.image and not info.children.length and not info.maskFrame
-			layer.frame = new Frame
+			layer.frame = Utils.zeroFrame()
 
 		_.clone(info.children).reverse().map (info) => @_createLayer info, layer
 
