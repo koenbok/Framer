@@ -45,7 +45,7 @@ class exports.Animation extends EventEmitter
 
 		super options
 
-		@options = _.defaults options,
+		@options = _.clone _.defaults options,
 			layer: null
 			properties: {}
 			curve: "linear"
@@ -141,7 +141,7 @@ class exports.Animation extends EventEmitter
 
 	reverse: ->
 		# TODO: Add some tests
-		options = _.clone @options
+		options = _.clone(@options)
 		options.properties = @_originalState
 		animation = new Animation options
 		animation
