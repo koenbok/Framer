@@ -376,12 +376,12 @@ class exports.ScrollComponent extends Layer
 	##############################################################
 	# Convenience function to make a single layer scrollable
 
-	@wrap = (layer) ->
+	@wrap = (layer, options = {}) ->
 
 		# This function wraps the given layer into a scroll or page component. This is
 		# great for importing from Sketch or Photoshop.
 
-		scroll = new @
+		scroll = new @(options)
 
 		for propKey in ["frame", "image", "name"]
 			scroll[propKey] = layer[propKey]
