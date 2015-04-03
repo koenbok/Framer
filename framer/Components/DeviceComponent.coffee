@@ -439,8 +439,8 @@ class exports.DeviceComponent extends BaseClass
 					@showKeyboard(true)
 					
 		else
-			@phone.properties = phoneProperties
-			@viewport.properties = contentProperties
+			@phone.props = phoneProperties
+			@viewport.props = contentProperties
 			@_update()
 
 			if _hadKeyboard
