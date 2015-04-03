@@ -82,7 +82,7 @@ class exports.ScrollComponent extends Layer
 
 		super options
 
-		@_contentInset = options.contentInset or Utils.zeroRect()
+		@_contentInset = options.contentInset or Utils.rectZero()
 		@setContentLayer(new Layer)
 
 		# Because we did not have a content layer before, we want to re-apply 
@@ -216,7 +216,7 @@ class exports.ScrollComponent extends Layer
 		get: ->
 			_.clone(@_contentInset)
 		set: (contentInset) ->
-			@_contentInset = Utils.zeroRect(Utils.parseRect(contentInset))
+			@_contentInset = Utils.rectZero(Utils.parseRect(contentInset))
 			@updateContent()
 
 	@define "direction",

@@ -495,6 +495,9 @@ Utils.loadImage = (url, callback, context) ->
 
 # Point
 
+Utils.pointZero = (args={}) ->
+	return _.defaults(args, {x:0, y:0})
+
 Utils.pointMin = ->
 	points = Utils.arrayFromArguments arguments
 	point = 
@@ -532,6 +535,9 @@ Utils.pointInFrame = (point, frame) ->
 
 # Size
 
+Utils.sizeZero = (args={}) ->
+	return _.defaults(args, {width:0, height:0})
+
 Utils.sizeMin = ->
 	sizes = Utils.arrayFromArguments arguments
 	size  =
@@ -546,7 +552,7 @@ Utils.sizeMax = ->
 
 # Rect
 
-Utils.zeroRect = (args={}) ->
+Utils.rectZero = (args={}) ->
 	return _.defaults(args, {top:0, right:0, bottom:0, left:0})
 
 Utils.parseRect = (args) ->
@@ -592,6 +598,8 @@ Utils.frameGetMaxY = (frame) ->
 Utils.frameSetMaxY = (frame, value) ->
 	frame.y = if frame.height is 0 then 0 else value - frame.height
 
+Utils.frameZero = (args={}) ->
+	return _.defaults(args, {top:0, right:0, bottom:0, left:0})
 
 Utils.frameSize = (frame) ->
 	size =
