@@ -7,8 +7,7 @@ describe "ScrollComponent", ->
     instance = new ScrollComponent (scrollHorizontal: false)
     instance.scrollHorizontal.should.be.false
 
-  # Currently fails:
-  it.skip "should keep scrollHorizontal value on copy", ->
+  it "should keep scrollHorizontal value on copy", ->
 
     instance = new ScrollComponent (scrollHorizontal: false)
     instance.scrollHorizontal.should.be.false

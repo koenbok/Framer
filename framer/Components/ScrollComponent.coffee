@@ -54,13 +54,13 @@ EventMappers[Events.DirectionLockDidStart] = Events.DirectionLockDidStart
 class exports.ScrollComponent extends Layer
 
 	# Proxy properties directly from the draggable
-	@define "velocity", @proxyProperty("content.draggable.velocity")
+	@define "velocity", @proxyProperty "content.draggable.velocity", importable: false
 	@define "scrollHorizontal", @proxyProperty("content.draggable.horizontal")
 	@define "scrollVertical", @proxyProperty("content.draggable.vertical")
 	@define "speedX", @proxyProperty("content.draggable.speedX")
 	@define "speedY", @proxyProperty("content.draggable.speedY")
-	@define "isDragging", @proxyProperty("content.draggable.isDragging")
-	@define "isMoving", @proxyProperty("content.draggable.isMoving")
+	@define "isDragging", @proxyProperty "content.draggable.isDragging", importable: false
+	@define "isMoving", @proxyProperty "content.draggable.isMoving", importable: false
 	@define "propagateEvents", @proxyProperty("content.draggable.propagateEvents")
 	@define "directionLock", @proxyProperty("content.draggable.directionLock")
 	@define "directionLockThreshold", @proxyProperty("content.draggable.directionLockThreshold")
@@ -73,7 +73,7 @@ class exports.ScrollComponent extends Layer
 	@define "mouseWheelSpeedMultiplier", @simpleProperty("mouseWheelSpeedMultiplier", 1)
 
 	constructor: (options={}) ->
-		
+
 		# options.backgroundColor ?= null
 		options.clip ?= true
 		options.name ?= @constructor.name
