@@ -385,6 +385,20 @@ class exports.ScrollComponent extends Layer
 
 		for propKey in ["frame", "image", "name"]
 			scroll[propKey] = layer[propKey]
+
+		# This could potentially be smart to avoid an unexpected state if
+		# you forgot to add a mask in sketch or photoshop and the scroll
+		# component size becomes the same as it's content.
+
+		# https://github.com/motif/Company/issues/208
+
+		# screenFrame = scroll.screenFrame
+
+		# if screenFrame.y + screenFrame.height > Screen.height
+		# 	scroll.height = Screen.height - screenFrame.y
+
+		# if screenFrame.x + screenFrame.width > Screen.width
+		# 	scroll.width = Screen.width - screenFrame.x
 		
 		for subLayer in layer.subLayers
 			subLayerIndex = subLayer.index
