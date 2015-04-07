@@ -27,7 +27,7 @@ Originals =
 		momentum: true
 		momentumOptions:
 			friction: 2.1 
-			tolerance: 10 
+			tolerance: 1 
 		bounce: true
 		bounceOptions:
 			friction: 40

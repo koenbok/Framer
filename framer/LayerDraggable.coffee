@@ -467,8 +467,15 @@ class exports.LayerDraggable extends BaseClass
 
 	_startSimulation: ->
 
+		# The types of simulation that we can have are:
+		# 1) Momentum inside constraints
+		# 2) Momentum inside constraints to outside constraints bounce
+		# 3) Release outside constraints bounce
+		# 4) Momentum without constraints
+
 		return unless @momentum or @bounce
-		return if @isDragging is false and @isBeyondConstraints is false
+		return if @isBeyondConstraints is false and @momentum is false
+		return if @isBeyondConstraints is false and @isDragging is false
 
 		# If overdrag is disabled, we need to not have a bounce animation
 		# when the cursor is outside of the dragging bounds for an axis.
