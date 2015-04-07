@@ -108,7 +108,7 @@ class exports.BaseClass extends EventEmitter
 		get: -> @_id
 
 	toInspect: =>
-		"<#{@constructor.name} id:#{@id} #{Utils.inspect(@props, 3)}"
+		"<#{@constructor.name} id:#{@id or null}>"
 
 
 	#################################################################
