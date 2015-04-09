@@ -406,5 +406,6 @@ class exports.ScrollComponent extends Layer
 			subLayer.index = subLayerIndex
 
 		scroll.superLayer = layer.superLayer
+		scroll.index = layer.index
 		layer.destroy()
 		return scroll
