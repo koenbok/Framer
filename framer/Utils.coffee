@@ -501,14 +501,14 @@ Utils.pointZero = (args={}) ->
 Utils.pointMin = ->
 	points = Utils.arrayFromArguments arguments
 	point = 
-		x: _.min point.map (size) -> size.x
-		y: _.min point.map (size) -> size.y
+		x: _.min points.map (size) -> size.x
+		y: _.min points.map (size) -> size.y
 
 Utils.pointMax = ->
 	points = Utils.arrayFromArguments arguments
 	point = 
-		x: _.max point.map (size) -> size.x
-		y: _.max point.map (size) -> size.y
+		x: _.max points.map (size) -> size.x
+		y: _.max points.map (size) -> size.y
 
 Utils.pointDistance = (pointA, pointB) ->
 	distance =
