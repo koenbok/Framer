@@ -158,6 +158,6 @@ exports.LayerStyle =
 		return layer._properties.borderRadius + "px"
 
 	border: (layer) ->
-		return "#{layer._properties.borderWidth}px solid #{layer._properties.borderWidth}"
+		return "#{layer._properties.borderWidth}px solid #{layer._properties.borderColor}"
 		
 
