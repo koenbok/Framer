@@ -34,7 +34,10 @@ gulp.task "build:debug", ->
 
 	config = _.extend CONFIG,
 		entry: "./framer/Framer.coffee"
-		output: {filename: "framer.debug.js", pathinfo:true}
+		output: 
+			filename: "framer.debug.js"
+			pathinfo: true
+			sourceMapFilename: "[file].map?nocache=#{Date.now()}"
 		debug: true
 
 	return gulp.src(config.entry)
@@ -63,7 +66,10 @@ gulp.task "watcher", ->
 	
 	config = _.extend CONFIG,
 		entry: "./framer/Framer.coffee"
-		output: {filename: "framer.debug.js", pathinfo:true}
+		output:
+			filename: "framer.debug.js"
+			pathinfo: true
+			sourceMapFilename: "[file].map?nocache=#{Date.now()}"
 		debug: true
 		watch: true
 
@@ -75,7 +81,10 @@ gulp.task "build:coverage", ->
 
 	config = _.extend CONFIG,
 		entry: "./build/instrumented/Framer.js"
-		output: { filename: "framer.debug.js", pathinfo:true }
+		output:
+			filename: "framer.debug.js"
+			pathinfo: true
+			sourceMapFilename: "[file].map?nocache=#{Date.now()}"
 		debug: true
 
 	return gulp.src(config.entry)
