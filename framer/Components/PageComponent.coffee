@@ -62,6 +62,7 @@ class exports.PageComponent extends ScrollComponent
 		return _.first(layers)
 
 	snapToPage: (page, animate=true, animationOptions=null) ->
+		return unless @currentPage isnt page
 		@scrollToLayer(page, @originX, @originY, animate, animationOptions)
 		@_previousPages.push(page)
 		@emit("change:previousPage", @previousPage)
