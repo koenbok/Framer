@@ -23,3 +23,6 @@ for index in [0..30]
 		}
 
 # page.velocityMultiplier = 50
+
+Utils.interval 0.5, ->
+	page.snapToNextPage("bottom")

@@ -50,10 +50,10 @@ class exports.PageComponent extends ScrollComponent
 		point = {x:0, y:0}
 		point = Utils.framePointForOrigin(currentPage, @originX, @originY) if currentPage
 
-		layers = @content.subLayersAbove(point, @originX, @originY) if direction is "up"
-		layers = @content.subLayersBelow(point, @originX, @originY) if direction is "down"
-		layers = @content.subLayersRight(point, @originX, @originY) if direction is "right"
-		layers = @content.subLayersLeft(point, @originX, @originY) if direction is "left"
+		layers = @content.subLayersAbove(point, @originX, @originY) if direction in ["up", "top", "north"]
+		layers = @content.subLayersBelow(point, @originX, @originY) if direction in ["down", "bottom", "south"]
+		layers = @content.subLayersLeft(point, @originX, @originY) if direction in ["left", "west"]
+		layers = @content.subLayersRight(point, @originX, @originY) if direction in ["right", "east"]
 
 		# See if there is one close by that we should go to
 		layers = _.without(layers, currentPage)
@@ -88,7 +88,7 @@ class exports.PageComponent extends ScrollComponent
 		# be hard to insert them in the right order, and if we need to manage that for you
 		# we'd have to change the position of every content layer so the new page fits.
 		# Ergo: too much magic.
-		directions = ["right", "bottom"]
+		directions = ["down", "bottom", "south"] + ["right", "east"]
 
 		if not direction in directions
 			direction = "right"
@@ -97,8 +97,8 @@ class exports.PageComponent extends ScrollComponent
 		point = {x:0, y:0}
 
 		if @content.subLayers.length
-			point.x = Utils.frameGetMaxX(@content.contentFrame()) if direction == "right"
-			point.y = Utils.frameGetMaxY(@content.contentFrame()) if direction == "bottom"
+			point.x = Utils.frameGetMaxX(@content.contentFrame()) if direction in ["right", "east"]
+			point.y = Utils.frameGetMaxY(@content.contentFrame()) if direction in ["down", "bottom", "south"]
 
 		page.point = point
 		
