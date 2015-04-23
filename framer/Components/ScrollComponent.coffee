@@ -38,7 +38,6 @@ Events.ScrollStart = "scrollstart"
 Events.Scroll = "scroll"
 Events.ScrollMove = Events.Scroll
 Events.ScrollEnd = "scrollend"
-Events.ScrollEnd = "scrollend"
 Events.ScrollAnimationDidStart = "scrollanimationdidstart"
 Events.ScrollAnimationDidEnd = "scrollanimationdidend"
 
