@@ -85,6 +85,7 @@ class exports.SliderComponent extends Layer
 			height: @height + @knob.height
 			
 		@knob.centerY()
+		@knob.midX = @fill.width
 			
 	_setRadius: =>
 		radius = @borderRadius
