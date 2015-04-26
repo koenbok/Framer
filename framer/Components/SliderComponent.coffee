@@ -71,7 +71,9 @@ class exports.SliderComponent extends Layer
 	_touchDown: (event) =>
 		event.preventDefault()
 		event.stopPropagation()
-		@value = @valueForPoint(event.x - @screenScaledFrame().x) / @canvasScaleX() - @min
+
+		if @min > 0 then offsetX = (@min / @canvasScaleX()) - @min else offsetX = 0
+		@value = @valueForPoint(event.x - @screenScaledFrame().x) / @canvasScaleX() - offsetX
 		@knob.draggable._touchStart(event)
 
 	_updateFill: =>
