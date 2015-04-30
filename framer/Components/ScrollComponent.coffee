@@ -171,21 +171,29 @@ class exports.ScrollComponent extends Layer
 			@content.animateStop() if value is false
 			@scrollHorizontal = @scrollVertical = value
 
+	_calculateContentPoint: (scrollPoint) ->
+		scrollPoint.x -= @contentInset.left
+		scrollPoint.y -= @contentInset.top
+		point = @_pointInConstraints(scrollPoint)
+		return Utils.pointInvert(point)
+
 	@define "scrollX",
 		get: -> 
 			return 0 if not @content
-			-@content.x + @contentInset.left
-		set: (value) -> 
+			return 0 - @content.x + @contentInset.left
+		set: (value) ->
 			return unless @content
-			@content.x = -@_pointInConstraints({x:value - @contentInset.left, y:0}).x
+			@content.draggable.animateStop()
+			@content.x = @_calculateContentPoint({x:value, y:0}).x
 
 	@define "scrollY",
 		get: -> 
 			return 0 if not @content
-			-@content.y + @contentInset.top
+			return 0 - @content.y + @contentInset.top
 		set: (value) -> 
 			return unless @content
-			@content.y = -@_pointInConstraints({x:0, y:value - @contentInset.top}).y
+			@content.draggable.animateStop()
+			@content.y = @_calculateContentPoint({x:0, y:value}).y
 
 	@define "scrollPoint",
 		importable: true
@@ -196,7 +204,6 @@ class exports.ScrollComponent extends Layer
 				y: @scrollY
 		set: (point) ->
 			return unless @content
-			@content.animateStop()
 			@scrollX = point.x
 			@scrollY = point.y
 
@@ -240,17 +247,20 @@ class exports.ScrollComponent extends Layer
 		
 		# We never let you scroll to a point that does not make sense (out of bounds). If you still
 		# would like to do that, access the .content.y directly.
-		point = @_pointInConstraints(point)
+		contentPoint = @_calculateContentPoint(point)
+
+		@content.draggable.animateStop()
 
 		if animate
 			# _.defer =>
-			point.x = -point.x if point.x
-			point.y = -point.y if point.y
+			point = {}
+			point.x = contentPoint.x if contentPoint.x
+			point.y = contentPoint.y if contentPoint.y
 			animationOptions.properties = point
 			@content.animateStop()
 			@content.animate(animationOptions)
 		else
-			@scrollPoint = point
+			@content.point = contentPoint
 
 	scrollToTop: (animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
 		@scrollToPoint({x:0, y:0}, animate, animationOptions)
