@@ -248,14 +248,12 @@ class exports.ScrollComponent extends Layer
 		# We never let you scroll to a point that does not make sense (out of bounds). If you still
 		# would like to do that, access the .content.y directly.
 		contentPoint = @_calculateContentPoint(point)
-
 		@content.draggable.animateStop()
 
 		if animate
-			# _.defer =>
 			point = {}
-			point.x = contentPoint.x if contentPoint.x
-			point.y = contentPoint.y if contentPoint.y
+			point.x = contentPoint.x if contentPoint.hasOwnProperty("x")
+			point.y = contentPoint.y if contentPoint.hasOwnProperty("y")
 			animationOptions.properties = point
 			@content.animateStop()
 			@content.animate(animationOptions)
