@@ -31,16 +31,14 @@ class exports.SliderComponent extends Layer
 			backgroundColor: "#fff"
 			superLayer: @
 			shadowY: 1
-			shadowBlur: 4
-			shadowColor: "rgba(0,0,0,0.4)"
+			shadowBlur: 3
+			shadowColor: "rgba(0,0,0,0.35)"
 		
 		@knob.draggable.enabled = true
 		@knob.draggable.speedY = 0
 		@knob.draggable.overdrag = false
 		@knob.draggable.momentum = true
-		@knob.draggable.momentumOptions = 
-			friction: 2
-			tolerance: 1/10 
+		@knob.draggable.momentumOptions = {friction: 2, tolerance: 1/10}
 		@knob.draggable.bounce = false
 		@knob.draggable.propagateEvents = false
 		@knob.borderRadius = @knob.width
@@ -56,34 +54,40 @@ class exports.SliderComponent extends Layer
 		@knob.placeBefore(@fill)
 		
 		@_updateFrame()
+
 		@on("change:frame", @_updateFrame)
 		@on("change:borderRadius", @_setRadius)
 		
 		@knob.on("change:x", @_updateFill)
 		@knob.on("change:x", @_updateValue)
-		
-		@on(Events.MouseDown, @_touchDown)
-		@on(Events.TouchDown, @_touchDown)
+		@knob.on("change:size", @_updateFrame)
+		@knob.on(Events.DragMove, @_updateFrame)
+
+		# On click/touch of the slider, update the value
+		@on(Events.TouchStart, @_touchDown)
 
 		@knobSize = options.knobSize or 30
 	
 	_touchDown: (event) =>
 		event.preventDefault()
 		event.stopPropagation()
-		@value = @valueForPoint(event.x - @canvasFrame.x)
+
+		if @min > 0 then offsetX = (@min / @canvasScaleX()) - @min else offsetX = 0
+		@value = @valueForPoint(event.x - @screenScaledFrame().x) / @canvasScaleX() - offsetX
 		@knob.draggable._touchStart(event)
 
 	_updateFill: =>
 		@fill.width = @knob.midX
-		
+
 	_updateFrame: =>
 		@knob.draggable.constraints = 
-			x: -@knobSize / 2
-			y: -@knobSize / 2
-			width: @width + @knobSize 
-			height: @height + @knobSize 
+			x: -@knob.width / 2
+			y: -@knob.height / 2
+			width: @width + @knob.width 
+			height: @height + @knob.height
 			
 		@knob.centerY()
+		@knob.midX = @fill.width
 			
 	_setRadius: =>
 		radius = @borderRadius
