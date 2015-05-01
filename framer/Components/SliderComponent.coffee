@@ -59,7 +59,7 @@ class exports.SliderComponent extends Layer
 		
 		@knob.on("change:x", @_updateFill)
 		@knob.on("change:x", @_updateValue)
-		@knob.on("change:size", @_updateFrame)
+		@knob.on("change:size", @_updateKnob)
 		@knob.on(Events.DragMove, @_updateFrame)
 
 		# On click/touch of the slider, update the value
@@ -78,6 +78,10 @@ class exports.SliderComponent extends Layer
 	_updateFill: =>
 		@fill.width = @knob.midX
 
+	_updateKnob: =>
+		@knob.midX = @fill.width
+		@knob.centerY()
+
 	_updateFrame: =>
 		@knob.draggable.constraints = 
 			x: -@knob.width / 2
@@ -86,7 +90,6 @@ class exports.SliderComponent extends Layer
 			height: @height + @knob.height
 			
 		@knob.centerY()
-		# @knob.midX = @fill.width
 			
 	_setRadius: =>
 		radius = @borderRadius
