@@ -25,15 +25,22 @@ class exports.SliderComponent extends Layer
 		options.clip ?= false
 		options.width ?= 300
 		options.height ?= 10
-		super options
 				
 		@knob = new Layer
 			backgroundColor: "#fff"
-			superLayer: @
-			shadowY: 1
-			shadowBlur: 3
+			shadowY: 1, shadowBlur: 3
 			shadowColor: "rgba(0,0,0,0.35)"
-		
+
+		@fill = new Layer 
+			backgroundColor: "#333"
+			width: 0, borderRadius: 50
+			force2d: true
+
+		super options
+
+		@knob.superLayer = @fill.superLayer = @
+		@fill.height = @height
+
 		@knob.draggable.enabled = true
 		@knob.draggable.speedY = 0
 		@knob.draggable.overdrag = false
@@ -42,15 +49,6 @@ class exports.SliderComponent extends Layer
 		@knob.draggable.bounce = false
 		@knob.draggable.propagateEvents = false
 		@knob.borderRadius = @knob.width
-		
-		@fill = new Layer 
-			backgroundColor: "#333"
-			superLayer: @
-			height: @height
-			width: 0
-			borderRadius: 50
-
-		@fill.force2d = true
 		@knob.placeBefore(@fill)
 		
 		@_updateFrame()
@@ -111,9 +109,12 @@ class exports.SliderComponent extends Layer
 		set: (value) -> @_max = value
 		
 	@define "value",
-		get: -> @valueForPoint(@knob.midX)
-		set: (value) -> @knob.midX = @pointForValue(value)
-	
+		get: -> 
+			@valueForPoint(@knob.midX)
+
+		set: (value) -> 
+			@knob.midX = @pointForValue(value)
+
 	_updateValue: =>
 		@emit("change:value", @value)
 	
@@ -123,6 +124,6 @@ class exports.SliderComponent extends Layer
 	valueForPoint: (value) ->
 		return Utils.modulate(value, [0, @width], [@min, @max], true)
 		
-	animateToValue: (value, animationOptions={curve:"spring(400,30,0)"}) ->
+	animateToValue: (value, animationOptions={curve:"spring(300,25,0)"}) ->
 		animationOptions.properties = {x:@pointForValue(value)}
 		@knob.animate(animationOptions)
