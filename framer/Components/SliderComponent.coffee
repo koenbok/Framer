@@ -38,6 +38,7 @@ class exports.SliderComponent extends Layer
 
 		super options
 
+		@knobSize = options.knobSize or 30
 		@knob.superLayer = @fill.superLayer = @
 		@fill.height = @height
 
@@ -48,11 +49,9 @@ class exports.SliderComponent extends Layer
 		@knob.draggable.momentumOptions = {friction: 2, tolerance: 1/10}
 		@knob.draggable.bounce = false
 		@knob.draggable.propagateEvents = false
-		@knob.borderRadius = 100
-		@knob.placeBefore(@fill)
+		@knob.borderRadius = "50%"
 
 		@_updateFrame()
-		@_updateFill()
 
 		@on("change:frame", @_updateFrame)
 		@on("change:borderRadius", @_setRadius)
@@ -65,13 +64,12 @@ class exports.SliderComponent extends Layer
 		# On click/touch of the slider, update the value
 		@on(Events.TouchStart, @_touchDown)
 
-		@knobSize = options.knobSize or 30
 	
 	_touchDown: (event) =>
 		event.preventDefault()
 		event.stopPropagation()
 
-		if @min > 0 then offsetX = (@min / @canvasScaleX()) - @min else offsetX = 0
+		offsetX = (@min / @canvasScaleX()) - @min
 		@value = @valueForPoint(event.x - @screenScaledFrame().x) / @canvasScaleX() - offsetX
 		@knob.draggable._touchStart(event)
 
@@ -79,15 +77,15 @@ class exports.SliderComponent extends Layer
 		@fill.width = @knob.midX
 
 	_updateKnob: =>
-		@knob.midX = @fill.width
+		@knob.midX = @fill.width		
 		@knob.centerY()
 
 	_updateFrame: =>
 		@knob.draggable.constraints = 
 			x: -@knob.width / 2
-			y: -@knob.height / 2
 			width: @width + @knob.width 
-			height: @height + @knob.height
+			# y: -@knob.height / 2
+			# height: @height + @knob.height
 			
 		@knob.centerY()
 			
@@ -113,11 +111,11 @@ class exports.SliderComponent extends Layer
 		set: (value) -> @_max = value
 		
 	@define "value",
-		get: -> 
-			@valueForPoint(@knob.midX)
+		get: -> @valueForPoint(@knob.midX)
 
 		set: (value) -> 
 			@knob.midX = @pointForValue(value)
+			@_updateFill()
 
 	_updateValue: =>
 		@emit("change:value", @value)
