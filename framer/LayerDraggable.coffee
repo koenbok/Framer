@@ -150,11 +150,6 @@ class exports.LayerDraggable extends BaseClass
 			x: touchEvent.clientX - @_correctedLayerStartPoint.x
 			y: touchEvent.clientY - @_correctedLayerStartPoint.y
 
-		# Store the current layer scale so we can correct movement for it
-		@_canvasScale =
-			x: @layer.canvasScaleX()
-			y: @layer.canvasScaleY()
-
 		document.addEventListener(Events.TouchMove, @_touchMove)
 		document.addEventListener(Events.TouchEnd, @_touchEnd)
 
@@ -179,8 +174,8 @@ class exports.LayerDraggable extends BaseClass
 			y: touchEvent.clientY - @_correctedLayerStartPoint.y - @_layerCursorOffset.y
 
 		# Scale the offset with the screen scale for the current layer
-		offset.x = offset.x * @speedX * (1 / @_canvasScale.x) * @layer.scaleX * @layer.scale
-		offset.y = offset.y * @speedY * (1 / @_canvasScale.y) * @layer.scaleY * @layer.scale
+		offset.x = offset.x * @speedX * (1 / @layer.canvasScaleX()) * @layer.scaleX * @layer.scale
+		offset.y = offset.y * @speedY * (1 / @layer.canvasScaleY()) * @layer.scaleY * @layer.scale
 
 		# See if horizontal/vertical was set and set the offset
 		point = @layer.point
@@ -489,8 +484,8 @@ class exports.LayerDraggable extends BaseClass
 
 		velocity = @velocity
 
-		velocityX = velocity.x * @momentumVelocityMultiplier * @speedX * (1 / @_canvasScale.x) * @layer.scaleX * @layer.scale
-		velocityY = velocity.y * @momentumVelocityMultiplier * @speedY * (1 / @_canvasScale.y) * @layer.scaleY * @layer.scale
+		velocityX = velocity.x * @momentumVelocityMultiplier * @speedX * (1 / @layer.canvasScaleX()) * @layer.scaleX * @layer.scale
+		velocityY = velocity.y * @momentumVelocityMultiplier * @speedY * (1 / @layer.canvasScaleY()) * @layer.scaleY * @layer.scale
 
 		@_setupSimulation()
 		@_isAnimating = true
