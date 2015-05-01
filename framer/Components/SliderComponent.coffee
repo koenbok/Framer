@@ -50,8 +50,9 @@ class exports.SliderComponent extends Layer
 		@knob.draggable.propagateEvents = false
 		@knob.borderRadius = @knob.width
 		@knob.placeBefore(@fill)
-		
+
 		@_updateFrame()
+		@_updateFill()
 
 		@on("change:frame", @_updateFrame)
 		@on("change:borderRadius", @_setRadius)
@@ -85,7 +86,7 @@ class exports.SliderComponent extends Layer
 			height: @height + @knob.height
 			
 		@knob.centerY()
-		@knob.midX = @fill.width
+		# @knob.midX = @fill.width
 			
 	_setRadius: =>
 		radius = @borderRadius
