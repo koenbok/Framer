@@ -16,14 +16,19 @@ gulp.task "build:release", ->
 
 	config = _.extend CONFIG,
 		entry: "./framer/Framer.coffee"
-		output: {filename: "framer.js"}
+		output: 
+			filename: "framer.js"
+			pathinfo: false
+		
+		# Uglify is disabled for now because it messes up the 
+		# source maps in Safari.
 		plugins: [
 			# new webpack.BannerPlugin("Framer", {}),
-			new webpack.optimize.DedupePlugin(), 
-			new webpack.optimize.UglifyJsPlugin({
-				mangle: false,
-				compress: {warnings: false}
-			})
+			# new webpack.optimize.DedupePlugin(), 
+			# new webpack.optimize.UglifyJsPlugin({
+			# 	mangle: false,
+			# 	compress: {warnings: false}
+			# })
 		]
 
 	return gulp.src(config.entry)
@@ -37,7 +42,6 @@ gulp.task "build:debug", ->
 		output: 
 			filename: "framer.debug.js"
 			pathinfo: true
-			sourceMapFilename: "[file].map?nocache=#{Date.now()}"
 		debug: true
 
 	return gulp.src(config.entry)
