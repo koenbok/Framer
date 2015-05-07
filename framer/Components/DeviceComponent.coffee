@@ -272,7 +272,11 @@ class exports.DeviceComponent extends BaseClass
 		return "#{@_deviceType}.png"
 
 	_deviceImageUrl: (name) ->
+		
 		return null unless name
+
+		if _.startsWith(name, "http://") or _.startsWith(name, "https://")
+			return name
 
 		if Utils.isFramerStudio() and window.FramerStudioInfo
 			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
