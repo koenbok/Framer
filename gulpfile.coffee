@@ -16,15 +16,15 @@ gulp.task "build:release", ->
 
 	config = _.extend CONFIG,
 		entry: "./framer/Framer.coffee"
-		output: 
+		output:
 			filename: "framer.js"
 			pathinfo: false
-		
-		# Uglify is disabled for now because it messes up the 
+
+		# Uglify is disabled for now because it messes up the
 		# source maps in Safari.
 		plugins: [
 			# new webpack.BannerPlugin("Framer", {}),
-			# new webpack.optimize.DedupePlugin(), 
+			# new webpack.optimize.DedupePlugin(),
 			# new webpack.optimize.UglifyJsPlugin({
 			# 	mangle: false,
 			# 	compress: {warnings: false}
@@ -39,7 +39,7 @@ gulp.task "build:debug", ->
 
 	config = _.extend CONFIG,
 		entry: "./framer/Framer.coffee"
-		output: 
+		output:
 			filename: "framer.debug.js"
 			pathinfo: true
 		debug: true
@@ -53,7 +53,7 @@ gulp.task "build:test", ->
 	config = _.extend CONFIG,
 		entry: "./test/tests.coffee"
 		output: {filename: "tests.js"}
-		
+
 	return gulp.src(config.entry)
 		.pipe(gulpWebpack(config))
 		.pipe(gulp.dest("test/phantomjs/"))
@@ -67,13 +67,11 @@ gulp.task "watch", ["test"], ->
 	gulp.watch(["./*.coffee", "framer/**", "test/tests/**"], ["test"])
 
 gulp.task "watcher", ->
-	
+
 	config = _.extend CONFIG,
 		entry: "./framer/Framer.coffee"
 		output:
 			filename: "framer.debug.js"
-			pathinfo: true
-			sourceMapFilename: "[file].map?nocache=#{Date.now()}"
 		debug: true
 		watch: true
 
@@ -87,8 +85,6 @@ gulp.task "build:coverage", ->
 		entry: "./build/instrumented/Framer.js"
 		output:
 			filename: "framer.debug.js"
-			pathinfo: true
-			sourceMapFilename: "[file].map?nocache=#{Date.now()}"
 		debug: true
 
 	return gulp.src(config.entry)
@@ -105,6 +101,3 @@ gulp.task "coverage", ["build:coverage", "build:test"], ->
 		))
 		.on "finish", ->
 			console.log "done"
-
-
-

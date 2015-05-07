@@ -62,7 +62,7 @@ class exports.DeviceComponent extends BaseClass
 			defaults = _.extend(defaults, Framer.Defaults.DeviceView)
 
 		@_setup()
-		
+
 		@animationOptions = defaults.animationOptions
 		@deviceType = defaults.deviceType
 
@@ -72,13 +72,13 @@ class exports.DeviceComponent extends BaseClass
 
 		if @_setupDone
 			return
-			
+
 		@_setupDone = true
-		
+
 		@background = new Layer
 		@background.clip = true
 		@background.backgroundColor = "transparent"
-		@background.classList.add("DeviceBackground")		
+		@background.classList.add("DeviceBackground")
 
 		# @phone = new Layer superLayer:@background
 		@phone = new Layer
@@ -88,7 +88,7 @@ class exports.DeviceComponent extends BaseClass
 
 		@phone.backgroundColor = "transparent"
 		@phone.classList.add("DevicePhone")
-		
+
 		@screen.backgroundColor = "transparent"
 		@screen.classList.add("DeviceScreen")
 
@@ -105,9 +105,9 @@ class exports.DeviceComponent extends BaseClass
 		@keyboardLayer.on "click", => @toggleKeyboard()
 		@keyboardLayer.classList.add("DeviceKeyboard")
 		@keyboardLayer.backgroundColor = "transparent"
-		
+
 		Framer.CurrentContext.eventManager.wrap(window).addEventListener("resize", @_update)
-		
+
 		# This avoids rubber banding on mobile
 		for layer in [@background, @phone, @viewport, @content, @screen]
 			layer.on "touchmove", (event) -> event.preventDefault()
@@ -115,7 +115,7 @@ class exports.DeviceComponent extends BaseClass
 		@_context = new Framer.Context(parentLayer:@content, name:"Device")
 
 	_update: =>
-		
+
 		# Todo: pixel align at zoom level 1, 0.5
 
 		contentScaleFactor = @contentScale
@@ -127,7 +127,7 @@ class exports.DeviceComponent extends BaseClass
 				layer.width = window.innerWidth / contentScaleFactor
 				layer.height = window.innerHeight / contentScaleFactor
 				layer.scale = 1
-			
+
 			@content.scale = contentScaleFactor
 			@_positionKeyboard()
 
@@ -143,7 +143,7 @@ class exports.DeviceComponent extends BaseClass
 			@phone.center()
 
 			[width, height] = @_getOrientationDimensions(
-				@_device.screenWidth / contentScaleFactor, 
+				@_device.screenWidth / contentScaleFactor,
 				@_device.screenHeight / contentScaleFactor)
 
 			@screen.width  = @_device.screenWidth
@@ -154,13 +154,13 @@ class exports.DeviceComponent extends BaseClass
 			@screen.center()
 
 	_shouldRenderFullScreen: ->
-		
+
 		if not @_device
 			return true
-		
+
 		if @fullScreen is true
 			return true
-		
+
 		if @deviceType is "fullscreen"
 			return true
 
@@ -174,21 +174,6 @@ class exports.DeviceComponent extends BaseClass
 			return true
 
 		return false
-		
-	_deviceImageUrl: (name) ->
-		return null unless name
-
-		if Utils.isFramerStudio() && window.FramerStudioInfo
-			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
-		else
-			resourceUrl = "//resources.framerjs.com/static/DeviceResources"
-
-		# return "#{resourceUrl}/#{name}" 
-
-		if (Utils.isJP2Supported())
-			return "#{resourceUrl}/#{name.replace(".png", ".jp2")}" 
-		else
-			return "#{resourceUrl}/#{name}" 
 
 	setupContext: ->
 		# Sets this device up as the default context so everything renders
@@ -236,18 +221,18 @@ class exports.DeviceComponent extends BaseClass
 		get: ->
 			@_deviceType
 		set: (deviceType) ->
-			
+
 			if deviceType is @_deviceType
 				return
-			
+
 			device = null
 
 			if _.isString(deviceType)
 				device = Devices[deviceType.toLowerCase()]
-			
+
 			if not device
 				throw Error "No device named #{deviceType}. Options are: #{_.keys Devices}"
-			
+
 			if @_device is device
 				return
 
@@ -257,7 +242,7 @@ class exports.DeviceComponent extends BaseClass
 			@_device = _.clone(device)
 			@_deviceType = deviceType
 			@fullscreen = false
-			@_updateDeviceImage()	
+			@_updateDeviceImage()
 			@_update()
 			@keyboard = false
 			@_positionKeyboard()
@@ -273,30 +258,49 @@ class exports.DeviceComponent extends BaseClass
 
 		if @_shouldRenderFullScreen()
 			@phone.image  = ""
+		else if not @_deviceImageUrl(@_deviceImageName())
+			@phone.image  = ""
 		else
 			@phone._cacheImage = true
-			@phone.image  = @_deviceImageUrl("#{@_deviceType}.png")
+			@phone.image  = @_deviceImageUrl(@_deviceImageName())
 			@phone.width  = @_device.deviceImageWidth
 			@phone.height = @_device.deviceImageHeight
 
+	_deviceImageName: ->
+		if @_device.hasOwnProperty("deviceImage")
+			return @_device.deviceImage
+		return "#{@_deviceType}.png"
+
+	_deviceImageUrl: (name) ->
+		return null unless name
+
+		if Utils.isFramerStudio() and window.FramerStudioInfo
+			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
+		else
+			resourceUrl = "//resources.framerjs.com/static/DeviceResources"
+
+		if Utils.isJP2Supported() and @_device.deviceImageJP2? is true
+			return "#{resourceUrl}/#{name.replace(".png", ".jp2")}"
+		else
+			return "#{resourceUrl}/#{name}"
 
 	###########################################################################
 	# DEVICE ZOOM
-	
+
 	@define "deviceScale",
 		get: ->
 			if @_shouldRenderFullScreen()
-				return 1 
+				return 1
 			return @_deviceScale or 1
 		set: (deviceScale) -> @setDeviceScale(deviceScale, false)
-	
+
 	setDeviceScale: (deviceScale, animate=false) ->
 
 		if deviceScale == "fit" or deviceScale < 0
 			deviceScale = "fit"
 		else
 			deviceScale = parseFloat(deviceScale)
-			
+
 		if deviceScale == @_deviceScale
 			return
 
@@ -304,12 +308,12 @@ class exports.DeviceComponent extends BaseClass
 
 		if @_shouldRenderFullScreen()
 			return
-		
+
 		if deviceScale == "fit"
 			phoneScale = @_calculatePhoneScale()
 		else
 			phoneScale = deviceScale
-			
+
 		@phone.animateStop()
 
 		if animate
@@ -320,12 +324,12 @@ class exports.DeviceComponent extends BaseClass
 			@phone.center()
 
 		@emit("change:deviceScale")
-			
+
 
 	_calculatePhoneScale: ->
-		
+
 		# Calculates a phone scale that fits the screen unless a fixed value is set
-		
+
 		if @_deviceScale and @_deviceScale isnt "fit"
 			return @_deviceScale
 
@@ -337,7 +341,7 @@ class exports.DeviceComponent extends BaseClass
 			(window.innerWidth  - ((@padding + paddingOffset) * 2)) / width,
 			(window.innerHeight - ((@padding + paddingOffset) * 2)) / height
 		])
-		
+
 		return phoneScale
 
 	###########################################################################
@@ -346,9 +350,9 @@ class exports.DeviceComponent extends BaseClass
 	@define "contentScale",
 		get: -> @_contentScale or 1
 		set: (contentScale) -> @setContentScale(contentScale, false)
-	
+
 	setContentScale: (contentScale, animate=false) ->
-		
+
 		contentScale = parseFloat(contentScale)
 
 		if contentScale <= 0
@@ -356,9 +360,9 @@ class exports.DeviceComponent extends BaseClass
 
 		if contentScale is @_contentScale
 			return
-		
+
 		@_contentScale = contentScale
-		
+
 		if animate
 			@content.animate _.extend @animationOptions,
 				properties: {scale: @_contentScale}
@@ -381,40 +385,40 @@ class exports.DeviceComponent extends BaseClass
 
 		if orientation == "portrait"
 			orientation = 0
-					
+
 		if orientation == "landscape"
 			orientation = 90
 
 		if @_shouldRenderFullScreen()
 			return
-		
+
 		orientation = parseInt(orientation)
-		
+
 		if orientation not in [0, 90, -90]
 			return
-		
+
 		if orientation is @_orientation
 			return
-		
+
 		@_orientation = orientation
-		
+
 		# Calculate properties for the phone
 		phoneProperties =
 			rotationZ: @_orientation
 			scale: @_calculatePhoneScale()
-		
+
 		[width, height] = @_getOrientationDimensions(@_device.screenWidth, @_device.screenHeight)
 		[x, y] = [(@screen.width - width) / 2, (@screen.height - height) / 2]
-		
+
 		contentProperties =
 			rotationZ: -@_orientation
 			width:  width
 			height: height
 			x: x
 			y: y
-		
+
 		_hadKeyboard = @keyboard
-		
+
 		if _hadKeyboard
 			@hideKeyboard(false)
 
@@ -433,11 +437,11 @@ class exports.DeviceComponent extends BaseClass
 
 			animation.on Events.AnimationEnd, =>
 				@_update()
-			
+
 			if _hadKeyboard
 				animation.on Events.AnimationEnd, =>
 					@showKeyboard(true)
-					
+
 		else
 			@phone.props = phoneProperties
 			@viewport.props = contentProperties
@@ -445,11 +449,11 @@ class exports.DeviceComponent extends BaseClass
 
 			if _hadKeyboard
 				@showKeyboard(true)
-			
+
 		@_renderKeyboard()
 
 		@emit("change:orientation")
-	
+
 	isPortrait: -> Math.abs(@_orientation) != 90
 	isLandscape: -> !@isPortrait()
 
@@ -466,7 +470,7 @@ class exports.DeviceComponent extends BaseClass
 	rotateRight: (animate=true) ->
 		return if @orientation is -90
 		@setOrientation(@orientation - 90, animate)
-		
+
 	_getOrientationDimensions: (width, height) ->
 		if @isLandscape() then [height, width] else [width, height]
 
@@ -479,7 +483,7 @@ class exports.DeviceComponent extends BaseClass
 		set: (keyboard) -> @setKeyboard(keyboard, false)
 
 	setKeyboard: (keyboard, animate=false) ->
-		
+
 		# Check if this device has a keyboard at all
 		if not @_device.hasOwnProperty("keyboards")
 			return
@@ -491,13 +495,13 @@ class exports.DeviceComponent extends BaseClass
 				keyboard = false
 			else
 				return
-		
+
 		if not _.isBoolean(keyboard)
 			return
-		
+
 		if keyboard is @_keyboard
 			return
-		
+
 		@_keyboard = keyboard
 
 		@emit("change:keyboard")
@@ -510,7 +514,7 @@ class exports.DeviceComponent extends BaseClass
 			@emit("keyboard:hide:start")
 			@_animateKeyboard @_keyboardHideY(), animate, =>
 				@emit("keyboard:hide:end")
-		
+
 	showKeyboard: (animate=true) ->
 		@setKeyboard(true, animate)
 
@@ -540,7 +544,7 @@ class exports.DeviceComponent extends BaseClass
 			@keyboardLayer.y = y
 			callback?()
 		else
-			animation = @keyboardLayer.animate _.extend @animationOptions, 
+			animation = @keyboardLayer.animate _.extend @animationOptions,
 				properties: {y:y}
 			animation.on Events.AnimationEnd, callback
 
@@ -554,6 +558,7 @@ class exports.DeviceComponent extends BaseClass
 iPhone6BaseDevice =
 	deviceImageWidth: 870
 	deviceImageHeight: 1738
+	deviceImageJP2: true
 	screenWidth: 750
 	screenHeight: 1334
 	deviceType: "phone"
@@ -561,11 +566,13 @@ iPhone6BaseDevice =
 iPhone6BaseDeviceHand = _.extend {}, iPhone6BaseDevice,
 	deviceImageWidth: 1988
 	deviceImageHeight: 2368
+	deviceImageJP2: true
 	paddingOffset: -150
 
 iPhone6PlusBaseDevice =
 	deviceImageWidth: 1460
 	deviceImageHeight: 2900
+	deviceImageJP2: true
 	screenWidth: 1242
 	screenHeight: 2208
 	deviceType: "phone"
@@ -573,12 +580,14 @@ iPhone6PlusBaseDevice =
 iPhone6PlusBaseDeviceHand = _.extend {}, iPhone6PlusBaseDevice,
 	deviceImageWidth: 3128
 	deviceImageHeight: 3487
+	deviceImageJP2: true
 	paddingOffset: -150
 
 
 iPhone5BaseDevice =
 	deviceImageWidth: 780
 	deviceImageHeight: 1608
+	deviceImageJP2: true
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
@@ -595,12 +604,14 @@ iPhone5BaseDevice =
 iPhone5BaseDeviceHand = _.extend {}, iPhone5BaseDevice,
 	deviceImageWidth: 1884
 	deviceImageHeight: 2234
+	deviceImageJP2: true
 	paddingOffset: -200
 
 
 iPhone5CBaseDevice =
 	deviceImageWidth: 776
 	deviceImageHeight: 1612
+	deviceImageJP2: true
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
@@ -617,12 +628,14 @@ iPhone5CBaseDevice =
 iPhone5CBaseDeviceHand = _.extend {}, iPhone5CBaseDevice,
 	deviceImageWidth: 1894
 	deviceImageHeight: 2244
+	deviceImageJP2: true
 	paddingOffset: -200
 
 
 iPadMiniBaseDevice =
 	deviceImageWidth: 872
 	deviceImageHeight: 1292
+	deviceImageJP2: true
 	screenWidth: 768
 	screenHeight: 1024
 	deviceType: "tablet"
@@ -630,12 +643,14 @@ iPadMiniBaseDevice =
 iPadMiniBaseDeviceHand = _.extend {}, iPadMiniBaseDevice,
 	deviceImageWidth: 1380
 	deviceImageHeight: 2072
+	deviceImageJP2: true
 	paddingOffset: -120
 
 
 iPadAirBaseDevice =
 	deviceImageWidth: 1769
 	deviceImageHeight: 2509
+	deviceImageJP2: true
 	screenWidth: 1536
 	screenHeight: 2048
 	deviceType: "tablet"
@@ -643,12 +658,14 @@ iPadAirBaseDevice =
 iPadAirBaseDeviceHand = _.extend {}, iPadAirBaseDevice,
 	deviceImageWidth: 4744
 	deviceImageHeight: 4101
+	deviceImageJP2: true
 	paddingOffset: -120
 
 
 Nexus5BaseDevice =
 	deviceImageWidth: 1208
 	deviceImageHeight: 2440
+	deviceImageJP2: true
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
@@ -656,11 +673,13 @@ Nexus5BaseDevice =
 Nexus5BaseDeviceHand = _.extend {}, Nexus5BaseDevice, # 2692 × 2996
 	deviceImageWidth: 2692
 	deviceImageHeight: 2996
+	deviceImageJP2: true
 	paddingOffset: -120
 
 Nexus9BaseDevice =
 	deviceImageWidth: 1733
 	deviceImageHeight: 2575
+	deviceImageJP2: true
 	screenWidth: 1536
 	screenHeight: 2048
 	deviceType: "tablet"
@@ -668,12 +687,14 @@ Nexus9BaseDevice =
 AppleWatch42Device =
 	deviceImageWidth: 552
 	deviceImageHeight: 938
+	deviceImageJP2: true
 	screenWidth: 312
 	screenHeight: 390
 
 AppleWatch38Device =
 	deviceImageWidth: 508
 	deviceImageHeight: 900
+	deviceImageJP2: true
 	screenWidth: 272
 	screenHeight: 340
 
@@ -691,6 +712,7 @@ Devices =
 		screenHeight: 600
 		deviceImageWidth: 1136
 		deviceImageHeight: 760
+		deviceImageJP2: true
 	"desktop-safari-1280-800":
 		deviceType: "browser"
 		name: "Desktop Safari 1280 x 800"
@@ -698,6 +720,7 @@ Devices =
 		screenHeight: 800
 		deviceImageWidth: 1392
 		deviceImageHeight: 960
+		deviceImageJP2: true
 	"desktop-safari-1440-900":
 		deviceType: "browser"
 		name: "Desktop Safari 1440 x 900"
@@ -705,6 +728,7 @@ Devices =
 		screenHeight: 900
 		deviceImageWidth: 1552
 		deviceImageHeight: 1060
+		deviceImageJP2: true
 
 	# iPhone 6
 	"iphone-6-spacegray": iPhone6BaseDevice
