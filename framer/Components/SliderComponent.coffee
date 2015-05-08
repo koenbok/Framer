@@ -46,7 +46,7 @@ class exports.SliderComponent extends Layer
 		@knob.draggable.speedY = 0
 		@knob.draggable.overdrag = false
 		@knob.draggable.momentum = true
-		@knob.draggable.momentumOptions = {friction: 2, tolerance: 1/10}
+		@knob.draggable.momentumOptions = {friction: 5, tolerance: 0.25}
 		@knob.draggable.bounce = false
 		@knob.draggable.propagateEvents = false
 		@knob.borderRadius = "50%"

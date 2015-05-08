@@ -138,7 +138,7 @@ class exports.Layer extends BaseClass
 	@define "rotationY", layerProperty(@, "rotationY", "webkitTransform", 0, _.isNumber)
 	@define "rotationZ", layerProperty(@, "rotationZ", "webkitTransform", 0, _.isNumber)
 	@define "rotation",
-		exportable: false
+		#exportable: false
 		get: -> @rotationZ
 		set: (value) -> @rotationZ = value
 
@@ -205,7 +205,7 @@ class exports.Layer extends BaseClass
 	# And, because it should be cornerRadius, we alias it here
 	@define "cornerRadius",
 		importable: yes
-		exportable: no
+		# exportable: no
 		get: -> @borderRadius
 		set: (value) -> @borderRadius = value
 
