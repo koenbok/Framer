@@ -54,7 +54,7 @@ imageLayer.on(Events.Click, function() {
 ## Framer Generator
 With a Sketch or Photoshop file open, open Framer Generator and click **Import**. Only layer groups are imported; single layers are ignored. The hierarchy of your layer groups is respected. 
 
-You can safely move things around in Sketch or Photoshop and re-import. Generator will update the images and any changes in hierarchy, but leave your code intact. [See our documentation](http://framerjs.com/learn/importing/) for more.
+You can safely move things around in Sketch or Photoshop and re-import. Generator will update the images and any changes in hierarchy, but leave your code intact. [See our documentation](http://framerjs.com/learn/import/) for more.
 
 - Access any layer by its group name
 - Groups within groups will become subLayers
