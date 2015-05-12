@@ -153,6 +153,7 @@ class exports.PageComponent extends ScrollComponent
 		# See if we meet the minimum velocity to scroll to the next page. If not we snap
 		# to the layer closest to the scroll point.
 		if Math.max(Math.abs(velocity.x), Math.abs(velocity.y)) < @velocityThreshold
+			print "velocity"
 			@snapToPage(@closestPage, true, @animationOptions)
 			return 
 
@@ -160,12 +161,13 @@ class exports.PageComponent extends ScrollComponent
 		# layers on that side, sorted by absolute distance so we can pick the first.
 		nextPage = @nextPage(@direction, @_currentPage)
 
-		# print Math.max(Math.abs(velocity.x), Math.abs(velocity.y))
-		# print @direction, nextPage
-
 		# If not, we scroll to the closest layer that we have available, often the one
 		# that we are already at.
 		nextPage ?= @closestPage
+
+		print Math.max(Math.abs(velocity.x), Math.abs(velocity.y))
+		print @direction, nextPage
+		
 		@snapToPage(nextPage, true, @animationOptions)
 
 	_originScrollPoint: ->

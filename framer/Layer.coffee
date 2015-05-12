@@ -546,14 +546,27 @@ class exports.Layer extends BaseClass
 			# Optional base image value
 			# imageUrl = Config.baseUrl + imageUrl
 
-			# If the file is local, we want to avoid caching
-			# if Utils.isLocal() and not (_.startsWith(imageUrl, "http://") or _.startsWith(imageUrl, "https://"))
-			if Utils.isLocal() and not imageUrl.match(/^https?:\/\//) and @_cacheImage is false
+
+			# See if we need to cache the image
+			shoudUseImageCache = true
+
+			# We can always disable the cache with this property
+			if @_cacheImage is false
+				shoudUseImageCache = false
+
+			# If this is a file url, we don't use any cache
+			else if Utils.isLocalUrl(imageUrl)
+				shoudUseImageCache = false
+			
+			# If this is a locally served prototype over http (like in studio) we skip the cache
+			else if imageUrl.indexOf("127.0.0.1") != -1 or imageUrl.indexOf("localhost") != -1
+				shoudUseImageCache = false
+
+			if shoudUseImageCache is false
 				imageUrl += "?nocache=#{NoCacheDateKey}"
 
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
-
 			if @events?.hasOwnProperty "load" or @events?.hasOwnProperty "error"
 
 				loader = new Image()
