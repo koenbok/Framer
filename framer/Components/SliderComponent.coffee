@@ -33,20 +33,21 @@ class exports.SliderComponent extends Layer
 
 		@fill = new Layer 
 			backgroundColor: "#333"
-			width: 0, borderRadius: 50
-			force2d: true
+			width: 0, force2d: true
 
 		super options
 
 		@knobSize = options.knobSize or 30
 		@knob.superLayer = @fill.superLayer = @
+
 		@fill.height = @height
+		@fill.borderRadius = @borderRadius
 
 		@knob.draggable.enabled = true
 		@knob.draggable.speedY = 0
 		@knob.draggable.overdrag = false
 		@knob.draggable.momentum = true
-		@knob.draggable.momentumOptions = {friction: 2, tolerance: 1/10}
+		@knob.draggable.momentumOptions = {friction: 5, tolerance: 0.25}
 		@knob.draggable.bounce = false
 		@knob.draggable.propagateEvents = false
 		@knob.borderRadius = "50%"
@@ -87,6 +88,7 @@ class exports.SliderComponent extends Layer
 			# y: -@knob.height / 2
 			# height: @height + @knob.height
 			
+		@fill.height = @height
 		@knob.centerY()
 			
 	_setRadius: =>
