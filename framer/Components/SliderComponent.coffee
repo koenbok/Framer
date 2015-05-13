@@ -53,6 +53,7 @@ class exports.SliderComponent extends Layer
 		@knob.borderRadius = "50%"
 
 		@_updateFrame()
+		@_updateFill()
 
 		@on("change:frame", @_updateFrame)
 		@on("change:borderRadius", @_setRadius)
