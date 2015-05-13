@@ -55,7 +55,7 @@ class exports.SliderComponent extends Layer
 		@_updateFrame()
 		@_updateFill()
 
-		@on("change:frame", @_updateFrame)
+		@on("change:size", @_updateFrame)
 		@on("change:borderRadius", @_setRadius)
 		
 		@knob.on("change:x", @_updateFill)
@@ -88,9 +88,9 @@ class exports.SliderComponent extends Layer
 	_updateFrame: =>
 		@knob.draggable.constraints = 
 			x: -@knob.width / 2
+			y: -@knob.height / 2
 			width: @width + @knob.width 
-			# y: -@knob.height / 2
-			# height: @height + @knob.height
+			height: @height + @knob.height
 			
 		@fill.height = @height
 		@knob.centerY()
