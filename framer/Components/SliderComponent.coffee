@@ -66,6 +66,9 @@ class exports.SliderComponent extends Layer
 		# On click/touch of the slider, update the value
 		@on(Events.TouchStart, @_touchDown)
 
+		# Set default value
+		@value = @max / 2
+
 	
 	_touchDown: (event) =>
 		event.preventDefault()
