@@ -25,7 +25,7 @@ class exports.SliderComponent extends Layer
 		options.clip ?= false
 		options.width ?= 300
 		options.height ?= 10
-				
+
 		@knob = new Layer
 			backgroundColor: "#fff"
 			shadowY: 1, shadowBlur: 3
@@ -37,6 +37,7 @@ class exports.SliderComponent extends Layer
 
 		super options
 
+		if options.value is undefined then @value = (@max / 2)
 		@knobSize = options.knobSize or 30
 		@knob.superLayer = @fill.superLayer = @
 
@@ -53,6 +54,7 @@ class exports.SliderComponent extends Layer
 		@knob.borderRadius = "50%"
 
 		@_updateFrame()
+		@_updateKnob()
 		@_updateFill()
 
 		@on("change:size", @_updateFrame)
@@ -65,9 +67,6 @@ class exports.SliderComponent extends Layer
 
 		# On click/touch of the slider, update the value
 		@on(Events.TouchStart, @_touchDown)
-
-		# Set default value
-		@value = @max / 2
 
 	
 	_touchDown: (event) =>
