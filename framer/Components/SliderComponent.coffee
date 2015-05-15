@@ -75,7 +75,7 @@ class exports.SliderComponent extends Layer
 		event.stopPropagation()
 
 		offsetX = (@min / @canvasScaleX()) - @min
-		@value = @valueForPoint(event.x - @screenScaledFrame().x) / @canvasScaleX() - offsetX
+		@value = @valueForPoint(Events.touchEvent(event).clientX - @screenScaledFrame().x) / @canvasScaleX() - offsetX
 		@knob.draggable._touchStart(event)
 		@_updateValue()
 
