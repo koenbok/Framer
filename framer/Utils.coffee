@@ -49,15 +49,15 @@ Utils.arrayPrev = (arr, item) ->
 ######################################################
 # MATH
 
-Utils.sum = (arr) -> _.reduce arr, (a, b) -> a + b 
+Utils.sum = (arr) -> _.reduce arr, (a, b) -> a + b
 Utils.average = (arr) -> Utils.sum(arr) / arr.length
 Utils.mean = Utils.average
 Utils.median = (x) ->
 	return null if x.length is 0
-	
+
 	sorted = x.slice().sort (a, b) ->
 		a - b
-	
+
 	if sorted.length % 2 is 1
 		sorted[(sorted.length - 1) / 2]
 	else
@@ -86,7 +86,7 @@ Utils.delay = (time, f) ->
 	timer = setTimeout(f, time * 1000)
 	Framer.CurrentContext._delayTimers.push(timer)
 	return timer
-	
+
 Utils.interval = (time, f) ->
 	timer = setInterval(f, time * 1000)
 	Framer.CurrentContext._delayIntervals.push(timer)
@@ -153,7 +153,7 @@ Utils.defineEnum = (names = [], offset = 0, geometric = 0) ->
 	return Enum
 
 Utils.labelLayer = (layer, text, style={}) ->
-	
+
 	style = _.extend({
 		font: "10px/1em Menlo"
 		lineHeight: "#{layer.height}px"
@@ -188,17 +188,17 @@ Utils.inspectObjectType = (item) ->
 		return match[1] if match
 		return null
 
-	className = extract(item.toString()) 
+	className = extract(item.toString())
 	return className if className
 	className = extract(item.constructor?.toString())
 	return className.replace("Constructor", "") if className
 	return item
 
 Utils.inspect = (item, max=5, l=0) ->
-	
+
 	return "null" if item is null
 	return "undefined" if item is undefined
-	
+
 	if _.isFunction(item.toInspect)
 		return item.toInspect()
 	if _.isString(item)
@@ -247,11 +247,11 @@ Utils.arrayFromArguments = (args) ->
 	return Array.prototype.slice.call(args)
 
 Utils.cycle = ->
-	
+
 	# Returns a function that cycles through a list of values with each call.
-	
+
 	args = Utils.arrayFromArguments arguments
-	
+
 	curr = -1
 	return ->
 		curr++
@@ -330,7 +330,7 @@ Utils.pathJoin = ->
 
 ######################################################
 # MATH FUNCTIONS
-		
+
 Utils.round = (value, decimals=0) ->
 	d = Math.pow 10, decimals
 	Math.round(value * d) / d
@@ -347,10 +347,10 @@ Utils.mapRange = (value, fromLow, fromHigh, toLow, toHigh) ->
 
 # Kind of similar as above but with a better syntax and a limiting option
 Utils.modulate = (value, rangeA, rangeB, limit=false) ->
-	
+
 	[fromLow, fromHigh] = rangeA
 	[toLow, toHigh] = rangeB
-	
+
 	result = toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
 
 	if limit is true
@@ -403,16 +403,16 @@ Utils.domCompleteCancel = (f) ->
 	__domComplete = _.without __domComplete, f
 
 Utils.domLoadScript = (url, callback) ->
-	
+
 	script = document.createElement "script"
 	script.type = "text/javascript"
 	script.src = url
-	
+
 	script.onload = callback
-	
+
 	head = document.getElementsByTagName("head")[0]
 	head.appendChild script
-	
+
 	script
 
 Utils.domLoadData = (path, callback) ->
@@ -421,11 +421,11 @@ Utils.domLoadData = (path, callback) ->
 
 	# request.addEventListener "progress", updateProgress, false
 	# request.addEventListener "abort", transferCanceled, false
-	
+
 	request.addEventListener "load", ->
 		callback null, request.responseText
 	, false
-	
+
 	request.addEventListener "error", ->
 		callback true, null
 	, false
@@ -440,20 +440,31 @@ Utils.domLoadJSON = (path, callback) ->
 Utils.domLoadDataSync = (path) ->
 
 	request = new XMLHttpRequest()
-	request.open "GET", path, false
+	request.open("GET", path, false)
 
 	# This does not work in Safari, see below
 	try
-		request.send null
+		request.send(null)
 	catch e
-		console.debug "XMLHttpRequest.error", e
+		console.debug("XMLHttpRequest.error", e)
 
-	data = request.responseText
+	handleError = ->
+		throw Error "Utils.domLoadDataSync: #{path} -> [#{request.status} #{request.statusText}]"
+
+	request.onerror = handleError
+
+	if request.status not in [200, 0]
+		handleError()
 
 	# Because I can't catch the actual 404 with Safari, I just assume something
 	# went wrong if there is no text data returned from the request.
-	if not data
-		throw Error "Utils.domLoadDataSync: no data was loaded (url not found?)"
+	if not request.responseText
+		handleError()
+
+	# console.log "domLoadDataSync", path
+	# console.log "xhr.readyState", request.readyState
+	# console.log "xhr.status", request.status
+	# console.log "xhr.responseText", request.responseText
 
 	return request.responseText
 
@@ -470,24 +481,24 @@ Utils.insertCSS = (css) ->
 	styleElement = document.createElement("style")
 	styleElement.type = "text/css"
 	styleElement.innerHTML = css
-	
+
 	Utils.domComplete ->
 		document.body.appendChild(styleElement)
 
 Utils.loadImage = (url, callback, context) ->
-	
-	# Loads a single image and calls callback. 
+
+	# Loads a single image and calls callback.
 	# The callback will be called with true if there is an error.
 
 	element = new Image
 	context ?= Framer.CurrentContext
-	
+
 	context.eventManager.wrap(element).addEventListener "load", (event) ->
 		callback()
-	
+
 	context.eventManager.wrap(element).addEventListener "error", (event) ->
 		callback(true)
-	
+
 	element.src = url
 
 ######################################################
@@ -500,13 +511,13 @@ Utils.pointZero = (args={}) ->
 
 Utils.pointMin = ->
 	points = Utils.arrayFromArguments arguments
-	point = 
+	point =
 		x: _.min points.map (size) -> size.x
 		y: _.min points.map (size) -> size.y
 
 Utils.pointMax = ->
 	points = Utils.arrayFromArguments arguments
-	point = 
+	point =
 		x: _.max points.map (size) -> size.x
 		y: _.max points.map (size) -> size.y
 
@@ -575,12 +586,12 @@ Utils.parseRect = (args) ->
 Utils.frameGetMinX = (frame) -> frame.x
 Utils.frameSetMinX = (frame, value) -> frame.x = value
 
-Utils.frameGetMidX = (frame) -> 
+Utils.frameGetMidX = (frame) ->
 	if frame.width is 0 then 0 else frame.x + (frame.width / 2.0)
 Utils.frameSetMidX = (frame, value) ->
 	frame.x = if frame.width is 0 then 0 else value - (frame.width / 2.0)
 
-Utils.frameGetMaxX = (frame) -> 
+Utils.frameGetMaxX = (frame) ->
 	if frame.width is 0 then 0 else frame.x + frame.width
 Utils.frameSetMaxX = (frame, value) ->
 	frame.x = if frame.width is 0 then 0 else value - frame.width
@@ -588,12 +599,12 @@ Utils.frameSetMaxX = (frame, value) ->
 Utils.frameGetMinY = (frame) -> frame.y
 Utils.frameSetMinY = (frame, value) -> frame.y = value
 
-Utils.frameGetMidY = (frame) -> 
+Utils.frameGetMidY = (frame) ->
 	if frame.height is 0 then 0 else frame.y + (frame.height / 2.0)
 Utils.frameSetMidY = (frame, value) ->
 	frame.y = if frame.height is 0 then 0 else value - (frame.height / 2.0)
 
-Utils.frameGetMaxY = (frame) -> 
+Utils.frameGetMaxY = (frame) ->
 	if frame.height is 0 then 0 else frame.y + frame.height
 Utils.frameSetMaxY = (frame, value) ->
 	frame.y = if frame.height is 0 then 0 else value - frame.height
@@ -682,9 +693,9 @@ Utils.convertPoint = (input, layerA, layerB, context=false) ->
 
 	superLayersA = layerA?.superLayers(context) or []
 	superLayersB = layerB?.superLayers(context) or []
-	
+
 	superLayersB.push(layerB) if layerB
-	
+
 	for layer in superLayersA
 		point.x += layer.x #- layer.scrollFrame.x
 		point.y += layer.y #- layer.scrollFrame.y
@@ -692,29 +703,29 @@ Utils.convertPoint = (input, layerA, layerB, context=false) ->
 	for layer in superLayersB
 		point.x -= layer.x #+ layer.scrollFrame.x
 		point.y -= layer.y #+ layer.scrollFrame.y
-	
+
 	return point
 
 ###################################################################
 # Beta additions, use with care
 
 Utils.globalLayers = (importedLayers) ->
-	
+
 	# Beta. Not sure if we should push this but it's nice to have.
 	# Use this to make all layers in an imported set available on
 	# on the top level, so without the "importedLayers" prefix.
 
 	for layerName, layer of importedLayers
-		
+
 		# Replace all whitespace in layer names
 		layerName = layerName.replace(/\s/g,"")
-		
+
 		# Check if there are global variables with the same name
 		if window.hasOwnProperty(layerName) and not window.Framer._globalWarningGiven
 			print "Warning: Cannot make layer '#{layerName}' a global, a variable with that name already exists"
 		else
 			window[layerName] = layer
-	
+
 	window.Framer._globalWarningGiven = true
 
 
@@ -722,30 +733,30 @@ _textSizeNode = null
 
 Utils.textSize = (text, style={}, constraints={}) ->
 
-	# This function takes some text, css style and optionally a width and height and 
+	# This function takes some text, css style and optionally a width and height and
 	# returns the rendered text size. This can be pretty slow, so use sporadically.
 	# http://stackoverflow.com/questions/118241/calculate-text-width-with-javascript
 
 	shouldCreateNode = !_textSizeNode
-	
+
 	if shouldCreateNode
 		_textSizeNode = document.createElement("div")
 		_textSizeNode.id = "_textSizeNode"
-	
+
 	_textSizeNode.innerHTML = text
-	
-	style = _.extend style, 
+
+	style = _.extend style,
 		position: "fixed"
 		display: "inline"
 		visibility: "hidden"
 		top: "-10000px"
 		left: "-10000px"
-		
+
 	delete style.width
 	delete style.height
 	delete style.bottom
 	delete style.right
-		
+
 	style.width = "#{constraints.width}px" if constraints.width
 	style.height = "#{constraints.height}px" if constraints.height
 
@@ -760,10 +771,9 @@ Utils.textSize = (text, style={}, constraints={}) ->
 			window.document.body.appendChild(_textSizeNode)
 
 	rect = _textSizeNode.getBoundingClientRect()
-	
+
 	frame =
 		width: rect.right - rect.left
 		height: rect.bottom - rect.top
 
 _.extend exports, Utils
-
