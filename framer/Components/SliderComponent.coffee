@@ -41,7 +41,11 @@ class exports.SliderComponent extends Layer
 		@knobSize = options.knobSize or 30
 		@knob.superLayer = @fill.superLayer = @
 
-		@fill.height = @height
+		if @width > @height
+			@fill.height = @height
+		else 
+			@fill.width = @width
+			
 		@fill.borderRadius = @borderRadius
 
 		@knob.draggable.enabled = true
@@ -82,7 +86,13 @@ class exports.SliderComponent extends Layer
 		event.stopPropagation()
 
 		offsetX = (@min / @canvasScaleX()) - @min
-		@value = @valueForPoint(Events.touchEvent(event).clientX - @screenScaledFrame().x) / @canvasScaleX() - offsetX
+		offsetY = (@min / @canvasScaleY()) - @min
+
+		if @width > @height 
+			@value = @valueForPoint(Events.touchEvent(event).clientX - @screenScaledFrame().x) / @canvasScaleX() - offsetX
+		else 
+			@value = @valueForPoint(Events.touchEvent(event).clientY - @screenScaledFrame().y) / @canvasScaleY() - offsetY
+
 		@knob.draggable._touchStart(event)
 		@_updateValue()
 
@@ -144,9 +154,11 @@ class exports.SliderComponent extends Layer
 		set: (value) -> 
 			if @width > @height 
 				@knob.midX = @pointForValue(value)
+				@_updateFill()
 			else 
 				@knob.midY = @pointForValue(value)
-			@_updateFill()
+				@_updateFill()
+			
 
 	_updateValue: =>
 		@emit("change:value", @value)
@@ -164,5 +176,9 @@ class exports.SliderComponent extends Layer
 			return Utils.modulate(value, [0, @height], [@min, @max], true)
 		
 	animateToValue: (value, animationOptions={curve:"spring(300,25,0)"}) ->
-		animationOptions.properties = {x:@pointForValue(value)}
+		if @width > @height
+			animationOptions.properties = {x: @pointForValue(value)}
+		else 
+			animationOptions.properties = {y: @pointForValue(value)}
+
 		@knob.animate(animationOptions)
