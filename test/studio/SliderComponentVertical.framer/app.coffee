@@ -1,4 +1,3 @@
-# Remove framer cursor
 document.body.style.cursor = "auto"
 
 slider = new SliderComponent 
@@ -25,7 +24,5 @@ val.html = slider.value
 val.center()
 val.x -= 75
 
-
 slider.on "change:value", ->
 	val.html = Math.round this.value
-	
