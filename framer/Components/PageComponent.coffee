@@ -79,14 +79,14 @@ class exports.PageComponent extends ScrollComponent
 		return unless @previousPage
 		@snapToPage(@previousPage)
 
-		# Modify the previous page stack so we don't end up in a loop
+		# Modify the previous page stack so we don"t end up in a loop
 		@_previousPages = @_previousPages[0..@_previousPages.length-3]
 
 	addPage: (page, direction="right") ->
 
-		# We only allow adding pages to the right and bottom for now, because it shouldn't
+		# We only allow adding pages to the right and bottom for now, because it shouldn"t
 		# be hard to insert them in the right order, and if we need to manage that for you
-		# we'd have to change the position of every content layer so the new page fits.
+		# we"d have to change the position of every content layer so the new page fits.
 		# Ergo: too much magic.
 		directions = ["down", "bottom", "south"] + ["right", "east"]
 
@@ -152,9 +152,11 @@ class exports.PageComponent extends ScrollComponent
 
 		# See if we meet the minimum velocity to scroll to the next page. If not we snap
 		# to the layer closest to the scroll point.
-		if Math.max(Math.abs(velocity.x), Math.abs(velocity.y)) < @velocityThreshold or
-			(@content.draggable._directionLockEnabledX and (@direction == 'right' or @direction == 'left')) or
-			(@content.draggable._directionLockEnabledY and (@direction == 'down' or @direction == 'up'))
+
+		xLock = @content.draggable._directionLockEnabledX and (@direction == "right" or @direction == "left")
+		yLock = @content.draggable._directionLockEnabledY and (@direction == "down" or @direction == "up")
+
+		if Math.max(Math.abs(velocity.x), Math.abs(velocity.y)) < @velocityThreshold or xLock or yLock
 			# print "velocity"
 			@snapToPage(@closestPage, true, @animationOptions)
 			return 
