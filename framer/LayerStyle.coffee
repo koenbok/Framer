@@ -81,6 +81,7 @@ exports.LayerStyle =
 
 	webkitTransform: (layer) ->
 
+
 		# We have a special rendering path for layers that prefer 2d rendering.
 		# This definitely decreases performance, but is handy in complex drawing
 		# scenarios with rounded corners and shadows where gpu drawing gets weird
@@ -90,6 +91,7 @@ exports.LayerStyle =
 			return exports.LayerStyle.webkitTransformForce2d(layer)
 
 		"
+		translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px) 
 		scale(#{layer._properties.scale})
 		scale3d(#{layer._properties.scaleX},#{layer._properties.scaleY},#{layer._properties.scaleZ})
 		skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg) 
@@ -98,7 +100,6 @@ exports.LayerStyle =
 		rotateX(#{layer._properties.rotationX}deg) 
 		rotateY(#{layer._properties.rotationY}deg) 
 		rotateZ(#{layer._properties.rotationZ}deg) 
-		translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px) 
 		"
 
 	webkitTransformForce2d: (layer) ->

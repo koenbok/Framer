@@ -84,7 +84,7 @@ describe "Layer", ->
 			layer.y.should.equal 50
 			
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
-			layer.style.webkitTransform.should.equal "scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translate3d(100px, 50px, 0px)"
+			layer.style.webkitTransform.should.equal "translate3d(100px, 50px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
 			
 		it "should set scale", ->
 			
@@ -95,7 +95,7 @@ describe "Layer", ->
 			layer.scaleZ = 100
 
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 50)"
-			layer.style.webkitTransform.should.equal "scale(1) scale3d(100, 100, 100) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translate3d(0px, 0px, 0px)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(100, 100, 100) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
 
 		it "should set origin", ->
 			
@@ -875,7 +875,7 @@ describe "Layer", ->
 
 			layer = new Layer
 
-			layer.style.webkitTransform.should.equal "scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translate3d(0px, 0px, 0px)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
 
 			layer.force2d = true
 
