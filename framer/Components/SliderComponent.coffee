@@ -41,6 +41,7 @@ class exports.SliderComponent extends Layer
 		@knobSize = options.knobSize or 30
 		@knob.superLayer = @fill.superLayer = @
 
+		# Set fill initially
 		if @width > @height
 			@fill.height = @height
 		else 
@@ -70,7 +71,6 @@ class exports.SliderComponent extends Layer
 		else 
 			@knob.draggable.speedX = 0
 			@knob.on("change:y", @_updateFill)
-		
 		
 		@knob.on("change:size", @_updateKnob)
 
@@ -159,7 +159,6 @@ class exports.SliderComponent extends Layer
 				@knob.midY = @pointForValue(value)
 				@_updateFill()
 			
-
 	_updateValue: =>
 		@emit("change:value", @value)
 	
