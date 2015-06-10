@@ -23,6 +23,27 @@ val.style = {
 val.html = slider.value
 val.center()
 val.x -= 75
+	
+slider2 = new SliderComponent 
+	width: 200
+	height: 6
+	min: 0, max: 50
+	value: 25
+	knobSize: 30
+
+slider2.center()
+slider2.y -= 150
+slider2.x -= 50
+
+slider.animateToValue(50)
 
 slider.on "change:value", ->
 	val.html = Math.round this.value
+	slider2.value = this.value 
+
+
+slider2.on "change:value", ->
+	val.html = Math.round this.value
+	slider.value = this.value 
+	
+	

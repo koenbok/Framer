@@ -42,11 +42,7 @@ class exports.SliderComponent extends Layer
 		@knob.superLayer = @fill.superLayer = @
 
 		# Set fill initially
-		if @width > @height
-			@fill.height = @height
-		else 
-			@fill.width = @width
-			
+		if @width > @height then @fill.height = @height else @fill.width = @width
 		@fill.borderRadius = @borderRadius
 
 		@knob.draggable.enabled = true
@@ -177,7 +173,9 @@ class exports.SliderComponent extends Layer
 	animateToValue: (value, animationOptions={curve:"spring(300,25,0)"}) ->
 		if @width > @height
 			animationOptions.properties = {x: @pointForValue(value)}
+			@knob.on("change:x", @_updateValue)
 		else 
 			animationOptions.properties = {y: @pointForValue(value)}
+			@knob.on("change:y", @_updateValue)
 
 		@knob.animate(animationOptions)
