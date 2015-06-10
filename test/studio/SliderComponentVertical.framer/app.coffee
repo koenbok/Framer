@@ -4,7 +4,7 @@ slider = new SliderComponent
 	width: 6
 	height: 200
 	min: 0, max: 50
-	value: 25
+	value: 0
 	knobSize: 30
 
 slider.center()
@@ -25,25 +25,27 @@ val.center()
 val.x -= 75
 	
 slider2 = new SliderComponent 
-	width: 200
-	height: 6
+	width: 6
+	height:200
 	min: 0, max: 50
 	value: 25
 	knobSize: 30
 
 slider2.center()
-slider2.y -= 150
-slider2.x -= 50
+slider2.x -= 220
 
-slider.animateToValue(50)
+slider.animateToValue(25)
+slider.knob.on Events.AnimationEnd, ->
+	slider.animateToValue(0, time: 2)
 
 slider.on "change:value", ->
+	
 	val.html = Math.round this.value
 	slider2.value = this.value 
 
 
 slider2.on "change:value", ->
-	val.html = Math.round this.value
+	val.html = this.value
 	slider.value = this.value 
 	
 	

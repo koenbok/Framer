@@ -172,10 +172,10 @@ class exports.SliderComponent extends Layer
 		
 	animateToValue: (value, animationOptions={curve:"spring(300,25,0)"}) ->
 		if @width > @height
-			animationOptions.properties = {x: @pointForValue(value)}
+			animationOptions.properties = {x: @pointForValue(value) - (@knob.width/2)}
 			@knob.on("change:x", @_updateValue)
 		else 
-			animationOptions.properties = {y: @pointForValue(value)}
+			animationOptions.properties = {y: @pointForValue(value) - (@knob.height/2)}
 			@knob.on("change:y", @_updateValue)
 
 		@knob.animate(animationOptions)
