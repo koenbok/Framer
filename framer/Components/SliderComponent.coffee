@@ -42,7 +42,11 @@ class exports.SliderComponent extends Layer
 		@knob.superLayer = @fill.superLayer = @
 
 		# Set fill initially
-		if @width > @height then @fill.height = @height else @fill.width = @width
+		if @width > @height
+			@fill.height = @height 
+		else 
+			@fill.width = @width
+
 		@fill.borderRadius = @borderRadius
 
 		@knob.draggable.enabled = true
