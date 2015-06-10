@@ -41,11 +41,15 @@ class exports.SliderComponent extends Layer
 		@knobSize = options.knobSize or 30
 		@knob.superLayer = @fill.superLayer = @
 
-		@fill.height = @height
+		# Set fill initially
+		if @width > @height
+			@fill.height = @height 
+		else 
+			@fill.width = @width
+
 		@fill.borderRadius = @borderRadius
 
 		@knob.draggable.enabled = true
-		@knob.draggable.speedY = 0
 		@knob.draggable.overdrag = false
 		@knob.draggable.momentum = true
 		@knob.draggable.momentumOptions = {friction: 5, tolerance: 0.25}
@@ -59,8 +63,15 @@ class exports.SliderComponent extends Layer
 
 		@on("change:size", @_updateFrame)
 		@on("change:borderRadius", @_setRadius)
+
+		# Check for vertical sliders
+		if @width > @height 
+			@knob.draggable.speedY = 0
+			@knob.on("change:x", @_updateFill)
+		else 
+			@knob.draggable.speedX = 0
+			@knob.on("change:y", @_updateFill)
 		
-		@knob.on("change:x", @_updateFill)
 		@knob.on("change:size", @_updateKnob)
 
 		@knob.on Events.Move, =>
@@ -75,16 +86,29 @@ class exports.SliderComponent extends Layer
 		event.stopPropagation()
 
 		offsetX = (@min / @canvasScaleX()) - @min
-		@value = @valueForPoint(Events.touchEvent(event).clientX - @screenScaledFrame().x) / @canvasScaleX() - offsetX
+		offsetY = (@min / @canvasScaleY()) - @min
+
+		if @width > @height 
+			@value = @valueForPoint(Events.touchEvent(event).clientX - @screenScaledFrame().x) / @canvasScaleX() - offsetX
+		else 
+			@value = @valueForPoint(Events.touchEvent(event).clientY - @screenScaledFrame().y) / @canvasScaleY() - offsetY
+
 		@knob.draggable._touchStart(event)
 		@_updateValue()
 
 	_updateFill: =>
-		@fill.width = @knob.midX
+		if @width > @height
+			@fill.width = @knob.midX
+		else 
+			@fill.height = @knob.midY
 
 	_updateKnob: =>
-		@knob.midX = @fill.width		
-		@knob.centerY()
+		if @width > @height 
+			@knob.midX = @fill.width		
+			@knob.centerY()
+		else 
+			@knob.midY = @fill.height		
+			@knob.centerX()
 
 	_updateFrame: =>
 		@knob.draggable.constraints = 
@@ -93,8 +117,12 @@ class exports.SliderComponent extends Layer
 			width: @width + @knob.width 
 			height: @height + @knob.height
 			
-		@fill.height = @height
-		@knob.centerY()
+		if @width > @height 
+			@fill.height = @height
+			@knob.centerY()
+		else 
+			@fill.width = @width
+			@knob.centerX()
 			
 	_setRadius: =>
 		radius = @borderRadius
@@ -106,7 +134,6 @@ class exports.SliderComponent extends Layer
 			@_knobSize = value
 			@knob.width = @_knobSize
 			@knob.height = @_knobSize
-			@knob.centerY()
 			@_updateFrame()
 	
 	@define "min",
@@ -118,21 +145,41 @@ class exports.SliderComponent extends Layer
 		set: (value) -> @_max = value
 		
 	@define "value",
-		get: -> @valueForPoint(@knob.midX)
+		get: -> 
+			if @width > @height 
+				@valueForPoint(@knob.midX)
+			else 
+				@valueForPoint(@knob.midY)
 
 		set: (value) -> 
-			@knob.midX = @pointForValue(value)
-			@_updateFill()
-
+			if @width > @height 
+				@knob.midX = @pointForValue(value)
+				@_updateFill()
+			else 
+				@knob.midY = @pointForValue(value)
+				@_updateFill()
+			
 	_updateValue: =>
 		@emit("change:value", @value)
 	
 	pointForValue: (value) ->
-		return Utils.modulate(value, [@min, @max], [0, @width], true)
+		if @width > @height
+			return Utils.modulate(value, [@min, @max], [0, @width], true)
+		else 
+			return Utils.modulate(value, [@min, @max], [0, @height], true)
 			
 	valueForPoint: (value) ->
-		return Utils.modulate(value, [0, @width], [@min, @max], true)
+		if @width > @height
+			return Utils.modulate(value, [0, @width], [@min, @max], true)
+		else 
+			return Utils.modulate(value, [0, @height], [@min, @max], true)
 		
 	animateToValue: (value, animationOptions={curve:"spring(300,25,0)"}) ->
-		animationOptions.properties = {x:@pointForValue(value)}
+		if @width > @height
+			animationOptions.properties = {x: @pointForValue(value) - (@knob.width/2)}
+			@knob.on("change:x", @_updateValue)
+		else 
+			animationOptions.properties = {y: @pointForValue(value) - (@knob.height/2)}
+			@knob.on("change:y", @_updateValue)
+
 		@knob.animate(animationOptions)
