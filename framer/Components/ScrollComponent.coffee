@@ -75,7 +75,6 @@ class exports.ScrollComponent extends Layer
 
 		# options.backgroundColor ?= null
 		options.clip ?= true
-		options.name ?= @constructor.name
 		options.mouseWheelEnabled ?= false
 		options.backgroundColor ?= null
 
