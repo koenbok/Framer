@@ -283,7 +283,7 @@ class exports.DeviceComponent extends BaseClass
 		else
 			resourceUrl = "//resources.framerjs.com/static/DeviceResources"
 
-		if Utils.isJP2Supported() and @_device.deviceImageJP2? is true
+		if Utils.isJP2Supported() and @_device.deviceImageJP2 isnt false
 			return "#{resourceUrl}/#{name.replace(".png", ".jp2")}"
 		else
 			return "#{resourceUrl}/#{name}"
