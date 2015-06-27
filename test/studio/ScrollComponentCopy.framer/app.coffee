@@ -4,8 +4,8 @@ scroll = new ScrollComponent
 scroll.centerX(-Screen.width/6)
 scroll.centerY()
 	
-#scroll.scrollHorizontal = false
-scroll.scrollVertical = false
+scroll.scrollHorizontal = false
+#scroll.scrollVertical = false
 scroll.backgroundColor = null
 
 rows = 40
