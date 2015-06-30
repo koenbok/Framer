@@ -743,9 +743,11 @@ Utils.textSize = (text, style={}, constraints={}) ->
 		_textSizeNode = document.createElement("div")
 		_textSizeNode.id = "_textSizeNode"
 
+	# Reset all the previous styles and set the content
+	_textSizeNode.removeAttribute("style")
 	_textSizeNode.innerHTML = text
 
-	style = _.extend style,
+	style = _.extend _.clone(style),
 		position: "fixed"
 		display: "inline"
 		visibility: "hidden"
