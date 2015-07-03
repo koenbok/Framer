@@ -98,8 +98,9 @@ class exports.DeviceComponent extends BaseClass
 		@content.backgroundColor = "transparent"
 		@content.classList.add("DeviceContent")
 
-		@content.originX = 0
-		@content.originY = 0
+		@viewport.originX = @viewport.originY =
+		@content.originX = @content.originY = 0
+		@content.scale = 1
 
 		@keyboardLayer = new Layer superLayer:@viewport
 		@keyboardLayer.on "click", => @toggleKeyboard()
@@ -119,16 +120,14 @@ class exports.DeviceComponent extends BaseClass
 		# Todo: pixel align at zoom level 1, 0.5
 
 		contentScaleFactor = @contentScale
-		contentScaleFactor = 1 if contentScaleFactor > 1
 
 		if @_shouldRenderFullScreen()
 			for layer in [@background, @phone, @viewport, @content, @screen]
 				layer.x = layer.y = 0
-				layer.width = window.innerWidth / contentScaleFactor
-				layer.height = window.innerHeight / contentScaleFactor
+				layer.width = window.innerWidth
+				layer.height = window.innerHeight
 				layer.scale = 1
 
-			@content.scale = contentScaleFactor
 			@_positionKeyboard()
 
 		else
@@ -149,8 +148,10 @@ class exports.DeviceComponent extends BaseClass
 			@screen.width  = @_device.screenWidth
 			@screen.height = @_device.screenHeight
 
+			@viewport.scale = contentScaleFactor
 			@viewport.width  = @content.width  = width
 			@viewport.height = @content.height = height
+
 			@screen.center()
 
 	_shouldRenderFullScreen: ->
