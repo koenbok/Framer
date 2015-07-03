@@ -410,7 +410,10 @@ class exports.DeviceComponent extends BaseClass
 			scale: @_calculatePhoneScale()
 
 		[width, height] = @_getOrientationDimensions(@_device.screenWidth, @_device.screenHeight)
-		[x, y] = [(@screen.width - width) / 2, (@screen.height - height) / 2]
+		[x, y] = [
+			if @_orientation >= 0 then 0 else @screen.width,
+			if @_orientation <= 0 then 0 else @screen.height
+		]
 
 		contentProperties =
 			rotationZ: -@_orientation
