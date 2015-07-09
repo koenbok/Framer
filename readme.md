@@ -68,6 +68,7 @@ Check the [wanted features wiki page](https://github.com/koenbok/Framer/wiki/Con
 
 ##### Building
 - Download or clone the code
+- Make sure you have node and npm >= 2 installed
 - Run `make build` to build the latest version
 - Run `make watcher` to rebuild the latest version on changes
 
