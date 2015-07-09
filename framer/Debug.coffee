@@ -3,43 +3,6 @@ Utils = require "./Utils"
 {Context} = require "./Context"
 
 ###############################################################
-# Debug overview
-
-_debugStyle =
-	border: "1px solid rgba(50,150,200,.35)"
-	backgroundColor: "rgba(50,150,200,.35)"
-
-showDebug = -> 
-
-	for layer in Framer.CurrentContext.getLayers()
-		
-		layer._debugStyle = _.pick(layer.style, _.keys(_debugStyle))
-		layer.style = _debugStyle
-
-		layer._debugElement = document.createElement("div")
-		layer._debugElement.innerHTML = layer.name or layer.id
-		layer._debugElement.classList.add("framerDebug")
-		
-		layer._element.appendChild(layer._debugElement)
-
-hideDebug = ->
-	
-	for layer in Framer.CurrentContext.getLayers()
-		layer.style = layer._debugStyle
-		layer._debugElement.parentElement.removeChild(layer._debugElement)
-		layer._debugElement = null
-
-toggleDebug = Utils.toggle(showDebug, hideDebug)
-
-EventKeys =
-	Shift: 16
-	Escape: 27
-
-# window.document.onkeyup = (event) ->
-# 	if event.keyCode == EventKeys.Escape
-# 		toggleDebug()()
-
-###############################################################
 # Error warning
 
 _errorContext = null
