@@ -185,6 +185,14 @@ describe "Utils", ->
 			Utils.modulate(0, [1, 2], [100, 0], true).should.equal 100
 			Utils.modulate(0, [1, 2], [100, 0], false).should.equal 200
 
+	describe "clamp", ->
+
+		it "should have the right results", ->
+			Utils.clamp(3, 4, 6).should.equal 4
+			Utils.clamp(3, 6, 4).should.equal 4
+			Utils.clamp(5, 6, 4).should.equal 5
+			Utils.clamp(5, 6, -4).should.equal 5
+
 	describe "textSize", ->
 
 		it "should have the right text size", ->
