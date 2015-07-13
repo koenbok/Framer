@@ -335,7 +335,11 @@ Utils.round = (value, decimals=0) ->
 	d = Math.pow 10, decimals
 	Math.round(value * d) / d
 
-Utils.clamp = (value, min, max) ->
+Utils.clamp = (value, a, b) ->
+
+	min = Math.min(a, b)
+	max = Math.max(a, b)
+
 	value = min if value < min
 	value = max if value > max
 	return value
