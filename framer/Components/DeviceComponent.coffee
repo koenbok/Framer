@@ -8,6 +8,8 @@ DeviceComponentDefaultDevice = "iphone-6-silver"
 {Defaults} = require "../Defaults"
 {Events} = require "../Events"
 
+viewportMetaElement = null
+
 ###
 
 Device._setup()
@@ -148,7 +150,6 @@ class exports.DeviceComponent extends BaseClass
 			@screen.width  = @_device.screenWidth
 			@screen.height = @_device.screenHeight
 
-			@viewport.scale = contentScaleFactor
 			@viewport.width  = @content.width  = width
 			@viewport.height = @content.height = height
 
@@ -349,6 +350,7 @@ class exports.DeviceComponent extends BaseClass
 
 		return phoneScale
 
+
 	###########################################################################
 	# CONTENT SCALE
 
@@ -369,11 +371,33 @@ class exports.DeviceComponent extends BaseClass
 		@_contentScale = contentScale
 
 		if animate
-			@content.animate @animationOptions
+			@viewport.animate _.extend @animationOptions,
+				properties: {scale: @_contentScale}
 
-		@_update()
+			@viewport.once Events.AnimationEnd, =>
+				@_setViewportScale()
+				@_update()
+		else
+			@viewport.scale = @_contentScale
+			@_setViewportScale()
+			@_update()
+
 
 		@emit("change:contentScale")
+
+
+	_setViewportScale: ->
+		scale = @contentScale / window.devicePixelRatio
+		unless viewportMetaElement
+			viewportMetaElement = document.querySelector "meta[name='viewport']"
+
+		viewportMetaElement.content = """
+			width=device-width,
+			height=device-height,
+			initial-scale=#{scale},
+			maximum-scale=#{scale},
+			user-scalable=no,
+			user-scalable=no"""
 
 
 	###########################################################################
