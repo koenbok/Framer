@@ -18,6 +18,8 @@ body {
 .framerLayer {
 	display: block;
 	position: absolute;
+	left: 0;
+	top: 0;
 	background-repeat: no-repeat;
 	background-size: cover;
 	-webkit-overflow-scrolling: touch;
