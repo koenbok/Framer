@@ -838,6 +838,13 @@ describe "Layer", ->
 			layer._elementHTML.innerHTML.should.equal "Hello"
 			layer.ignoreEvents.should.equal true
 
+		it "should not effect subLayers", ->
+
+			layer = new Layer
+			layer.html = "Hello"
+			subLayer = new Layer superLayer: layer
+
+			subLayer._element.offsetTop.should.equal 0
 
 		it "should set interactive html and allow pointer events", ->
 
