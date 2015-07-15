@@ -296,11 +296,27 @@ Utils.isTablet = ->
 Utils.isMobile = ->
 	Utils.isPhone() or Utils.isTablet()
 
-Utils.isLocal = ->
-	Utils.isLocalUrl window.location.href
+Utils.isFileUrl = (url) ->
+	return _.startsWith(url, "file://")
+
+Utils.isRelativeUrl = (url) ->
+	return true if _.startsWith(url, ".")
+	return true if _.startsWith(url, "./")
+	return true if _.startsWith(url, "../")
+	return false
+
+Utils.isLocalServerUrl = (url) ->
+	return url.indexOf("127.0.0.1") != -1 or url.indexOf("localhost")  != -1
 
 Utils.isLocalUrl = (url) ->
-	url[0..6] == "file://"
+	return true if Utils.isFileUrl(url)
+	return true if Utils.isLocalServerUrl(url)
+	return false
+
+Utils.isLocalAssetUrl = (url) ->
+	return true if Utils.isLocalUrl(url)
+	return true if Utils.isRelativeUrl(url) and Utils.isLocalUrl(window.location.href)
+	return false
 
 Utils.isFramerStudio = ->
 	navigator.userAgent.indexOf("FramerStudio") != -1

@@ -53,7 +53,7 @@ class exports.Layer extends BaseClass
 		# Special power setting for 2d rendering path. Only enable this
 		# if you know what you are doing. See LayerStyle for more info.
 		@_prefer2d = false
-		@_cacheImage = false
+		@_cacheImage = true
 
 		# We have to create the element before we set the defaults
 		@_createElement()
@@ -555,11 +555,7 @@ class exports.Layer extends BaseClass
 				shoudUseImageCache = false
 
 			# If this is a file url, we don't use any cache
-			else if Utils.isLocalUrl(imageUrl)
-				shoudUseImageCache = false
-			
-			# If this is a locally served prototype over http (like in studio) we skip the cache
-			else if imageUrl.indexOf("127.0.0.1") != -1 or imageUrl.indexOf("localhost") != -1
+			else if Utils.isLocalAssetUrl(imageUrl)
 				shoudUseImageCache = false
 
 			if shoudUseImageCache is false
