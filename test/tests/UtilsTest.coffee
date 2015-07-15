@@ -341,7 +341,35 @@ describe "Utils", ->
 			Utils.setValueForKeyPath(obj, "fooA.fooB.fooC", "bar")
 			obj.should.eql({fooA: {fooB: {fooC: "bar"}}})
 
+	describe "isFileUrl", ->
+		it "should work", ->
+			Utils.isFileUrl("file:///Users/koen/Desktop/index.html").should.equal(true)
+			Utils.isFileUrl("http://apple.com/index.html").should.equal(false)
+			Utils.isFileUrl("https://apple.com/index.html").should.equal(false)
 
+	describe "isRelativeUrl", ->
+		it "should work", ->
+			Utils.isRelativeUrl("Desktop/index.html").should.equal(true)
+			Utils.isRelativeUrl("/Desktop/index.html").should.equal(true)
+			Utils.isRelativeUrl("./Desktop/index.html").should.equal(true)
+			Utils.isRelativeUrl(".././Desktop/index.html").should.equal(true)
+			Utils.isRelativeUrl("https://apple.com/index.html").should.equal(false)
 
+	describe "isLocalServerUrl", ->
+		it "should work", ->
+			Utils.isLocalServerUrl("/Desktop/index.html").should.equal(false)
+			Utils.isLocalServerUrl("http://localhost/index.html").should.equal(true)
+			Utils.isLocalServerUrl("http://127.0.0.1/index.html").should.equal(true)
+			Utils.isLocalServerUrl("https://localhost/index.html").should.equal(true)
+			Utils.isLocalServerUrl("https://127.0.0.1/index.html").should.equal(true)
+			Utils.isLocalServerUrl(".././Desktop/index.html").should.equal(false)
+			Utils.isLocalServerUrl("https://apple.com/index.html").should.equal(false)
 
-			
+	describe "isLocalAssetUrl", ->
+		it "should work", ->
+			Utils.isLocalAssetUrl("Desktop/index.html", "http://localhost/index.html").should.equal(true)
+			Utils.isLocalAssetUrl("/Desktop/index.html", "http://localhost/index.html").should.equal(true)
+			Utils.isLocalAssetUrl("Desktop/index.html", "http://127.0.0.1/index.html").should.equal(true)
+			Utils.isLocalAssetUrl("Desktop/index.html", "http://apple.com/index.html").should.equal(false)
+			Utils.isLocalAssetUrl("file:///Desktop/index.html", "http://apple.com/index.html").should.equal(true)
+			Utils.isLocalAssetUrl("http://apple.com/index.html", "http://127.0.0.1/index.html").should.equal(false)

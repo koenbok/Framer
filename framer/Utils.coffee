@@ -300,10 +300,7 @@ Utils.isFileUrl = (url) ->
 	return _.startsWith(url, "file://")
 
 Utils.isRelativeUrl = (url) ->
-	return true if _.startsWith(url, ".")
-	return true if _.startsWith(url, "./")
-	return true if _.startsWith(url, "../")
-	return false
+	!/^([a-zA-Z]{1,8}:\/\/).*$/.test(url)
 
 Utils.isLocalServerUrl = (url) ->
 	return url.indexOf("127.0.0.1") != -1 or url.indexOf("localhost")  != -1
@@ -313,9 +310,10 @@ Utils.isLocalUrl = (url) ->
 	return true if Utils.isLocalServerUrl(url)
 	return false
 
-Utils.isLocalAssetUrl = (url) ->
+Utils.isLocalAssetUrl = (url, baseUrl) ->
+	baseUrl ?= window.location.href
 	return true if Utils.isLocalUrl(url)
-	return true if Utils.isRelativeUrl(url) and Utils.isLocalUrl(window.location.href)
+	return true if Utils.isRelativeUrl(url) and Utils.isLocalUrl(baseUrl)
 	return false
 
 Utils.isFramerStudio = ->
