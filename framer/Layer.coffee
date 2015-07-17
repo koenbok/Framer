@@ -53,7 +53,7 @@ class exports.Layer extends BaseClass
 		# Special power setting for 2d rendering path. Only enable this
 		# if you know what you are doing. See LayerStyle for more info.
 		@_prefer2d = false
-		@_cacheImage = true
+		@_alwaysUseImageCache = false
 
 		# We have to create the element before we set the defaults
 		@_createElement()
@@ -547,18 +547,12 @@ class exports.Layer extends BaseClass
 			# imageUrl = Config.baseUrl + imageUrl
 
 
-			# See if we need to cache the image
-			shoudUseImageCache = true
+			print imageUrl
+			print "@_cacheImage", @_cacheImage
+			print "Utils.isLocalAssetUrl(imageUrl)", Utils.isLocalAssetUrl(imageUrl)
 
-			# We can always disable the cache with this property
-			if @_cacheImage is false
-				shoudUseImageCache = false
 
-			# If this is a file url, we don't use any cache
-			else if Utils.isLocalAssetUrl(imageUrl)
-				shoudUseImageCache = false
-
-			if shoudUseImageCache is false
+			if @_alwaysUseImageCache is false and Utils.isLocalAssetUrl(imageUrl)
 				imageUrl += "?nocache=#{NoCacheDateKey}"
 
 			# As an optimization, we will only use a loader
@@ -769,6 +763,8 @@ class exports.Layer extends BaseClass
 		exportable: false
 		get: ->
 			@_draggable ?= new LayerDraggable(@)
+		set: (value) ->
+			@draggable.enabled = value if _.isBoolean(value)
 
 	# anchor: ->
 	# 	if not @_anchor

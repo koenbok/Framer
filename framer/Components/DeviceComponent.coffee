@@ -261,7 +261,7 @@ class exports.DeviceComponent extends BaseClass
 		else if not @_deviceImageUrl(@_deviceImageName())
 			@phone.image  = ""
 		else
-			@phone._cacheImage = true
+			@phone._alwaysUseImageCache = true
 			@phone.image  = @_deviceImageUrl(@_deviceImageName())
 			@phone.width  = @_device.deviceImageWidth
 			@phone.height = @_device.deviceImageHeight
