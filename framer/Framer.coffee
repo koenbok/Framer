@@ -41,7 +41,7 @@ Framer.Debug = (require "./Debug").Debug
 Framer.Extras = require "./Extras/Extras"
 
 Framer.Loop = new Framer.AnimationLoop()
-Utils.domComplete Framer.Loop.start
+Utils.domComplete(Framer.Loop.start)
 
 window.Framer = Framer if window
 

@@ -1,3 +1,5 @@
+Utils = require "./Utils"
+
 EventManagerIdCounter = 0
 
 class EventManagerElement
@@ -6,21 +8,27 @@ class EventManagerElement
 		@_events = {}
 
 	addEventListener: (eventName, listener) ->
+		
+		# Filter out all the events that are not dom valid
+		if not Utils.domValidEvent(@element, eventName)
+			return
+
 		@_events[eventName] ?= []
-		@_events[eventName].push listener
+		@_events[eventName].push(listener)
+		
 		@element.addEventListener(eventName, listener)
 
-	removeEventListener: (event, listener) ->
+	removeEventListener: (eventName, listener) ->
 		return unless @_events
-		return unless @_events[event]
-		
-		@_events[event] = _.without @_events[event], listener		
-		@element.removeEventListener(event, listener)
+		return unless @_events[eventName]
+
+		@_events[eventName] = _.without @_events[eventName], listener		
+		@element.removeEventListener(eventName, listener)
 
 		return
 
 	removeAllEventListeners: (eventName) ->
-		
+
 		events = if eventName then [eventName] else _.keys(@_events)
 
 		for eventName in events

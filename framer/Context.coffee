@@ -44,7 +44,7 @@ class exports.Context extends BaseClass
 				@_rootElement.__cancelAppendChild = true
 
 		# Create a fresh root element:
-		@_rootElement = @_createRootElement()
+		@_createRootElement()
 
 		@_delayTimers?.map (timer) -> window.clearTimeout(timer)
 		@_delayIntervals?.map (timer) -> window.clearInterval(timer)
@@ -65,7 +65,7 @@ class exports.Context extends BaseClass
 		@reset()
 		if @_rootElement.parentNode
 			@_rootElement.parentNode.removeChild(@_rootElement)
-		@_rootElement.__cancelAppendChild = true
+		Utils.domCompleteCancel(@_appendRootElement)
 
 	getRootElement: ->
 		@_rootElement
@@ -90,18 +90,19 @@ class exports.Context extends BaseClass
 
 	_createRootElement: ->
 
-		element = document.createElement("div")
-		element.id = "FramerContextRoot-#{@_name}"
-		element.classList.add("framerContext")
+		@_rootElement = document.createElement("div")
+		@_rootElement.id = "FramerContextRoot-#{@_name}"
+		@_rootElement.classList.add("framerContext")
 
+		if @_parentLayer
+			@_appendRootElement()
+		else
+			Utils.domComplete(@_appendRootElement)
+
+	_appendRootElement: =>
 		parentElement = @_parentLayer?._element
-
-		Framer.Loop.once "render", ->
-			parentElement ?= document.body
-			if not element.__cancelAppendChild
-				parentElement.appendChild(element)
-
-		element
+		parentElement ?= document.body
+		parentElement.appendChild(@_rootElement)
 
 	run: (f) ->
 		previousContext = Framer.CurrentContext

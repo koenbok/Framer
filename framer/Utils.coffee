@@ -420,6 +420,9 @@ Utils.domComplete = (f) ->
 Utils.domCompleteCancel = (f) ->
 	__domComplete = _.without __domComplete, f
 
+Utils.domValidEvent = (element, eventName) ->
+	return typeof(element["on#{eventName.toLowerCase()}"]) isnt "undefined"
+
 Utils.domLoadScript = (url, callback) ->
 
 	script = document.createElement "script"
