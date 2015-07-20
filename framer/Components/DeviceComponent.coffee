@@ -374,19 +374,16 @@ class exports.DeviceComponent extends BaseClass
 			@viewport.animate _.extend @animationOptions,
 				properties: {scale: @_contentScale}
 
-			@viewport.once Events.AnimationEnd, =>
-				@_setViewportScale()
-				@_update()
+			@viewport.once Events.AnimationEnd, @_setViewportScale
 		else
 			@viewport.scale = @_contentScale
 			@_setViewportScale()
-			@_update()
 
 
 		@emit("change:contentScale")
 
 
-	_setViewportScale: ->
+	_setViewportScale: =>
 		scale = @contentScale / window.devicePixelRatio
 		unless viewportMetaElement
 			viewportMetaElement = document.querySelector "meta[name='viewport']"
@@ -396,8 +393,9 @@ class exports.DeviceComponent extends BaseClass
 			height=device-height,
 			initial-scale=#{scale},
 			maximum-scale=#{scale},
-			user-scalable=no,
 			user-scalable=no"""
+
+		@_update()
 
 
 	###########################################################################
