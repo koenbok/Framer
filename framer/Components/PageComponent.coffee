@@ -42,13 +42,15 @@ class exports.PageComponent extends ScrollComponent
 	@define "currentPage",  get: -> _.last(@_previousPages)
 	@define "previousPage", get: -> @_previousPages[@_previousPages.length-2]
 
-	nextPage: (direction="right", currentPage=null) ->
+	nextPage: (direction="right", currentPage=null, withoutCurrentPage=true) ->
 
 		currentPage ?= @currentPage
 
 		# Figure out the point from where to look for next layers in a direction
 		point = {x:0, y:0}
 		point = Utils.framePointForOrigin(currentPage, @originX, @originY) if currentPage
+		if !withoutCurrentPage
+			point = {x:@scrollX + (@originX * @width), y:@scrollY + (@originY * @height)}
 
 		layers = @content.subLayersAbove(point, @originX, @originY) if direction in ["up", "top", "north"]
 		layers = @content.subLayersBelow(point, @originX, @originY) if direction in ["down", "bottom", "south"]
@@ -56,7 +58,9 @@ class exports.PageComponent extends ScrollComponent
 		layers = @content.subLayersRight(point, @originX, @originY) if direction in ["right", "east"]
 
 		# See if there is one close by that we should go to
-		layers = _.without(layers, currentPage)
+		if withoutCurrentPage
+			layers = _.without(layers, currentPage)
+
 		layers = Utils.frameSortByAbsoluteDistance(point, layers, @originX, @originY)
 		
 		return _.first(layers)
@@ -166,7 +170,7 @@ class exports.PageComponent extends ScrollComponent
 
 		# Figure out which direction we are scrolling to and make a sorted list of
 		# layers on that side, sorted by absolute distance so we can pick the first.
-		nextPage = @nextPage(@direction, @_currentPage)
+		nextPage = @nextPage(@direction, @_currentPage, false)
 
 		# If not, we scroll to the closest layer that we have available, often the one
 		# that we are already at.

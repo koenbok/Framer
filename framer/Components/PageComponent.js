@@ -60,13 +60,16 @@ exports.PageComponent = (function(superClass) {
     }
   });
 
-  PageComponent.prototype.nextPage = function(direction, currentPage) {
+  PageComponent.prototype.nextPage = function(direction, currentPage, withoutCurrentPage) {
     var layers, point;
     if (direction == null) {
       direction = "right";
     }
     if (currentPage == null) {
       currentPage = null;
+    }
+    if (withoutCurrentPage == null) {
+      withoutCurrentPage = true;
     }
     if (currentPage == null) {
       currentPage = this.currentPage;
@@ -77,6 +80,12 @@ exports.PageComponent = (function(superClass) {
     };
     if (currentPage) {
       point = Utils.framePointForOrigin(currentPage, this.originX, this.originY);
+    }
+    if (!withoutCurrentPage) {
+      point = {
+        x: this.scrollX + (this.originX * this.width),
+        y: this.scrollY + (this.originY * this.height)
+      };
     }
     if (direction === "up" || direction === "top" || direction === "north") {
       layers = this.content.subLayersAbove(point, this.originX, this.originY);
@@ -90,7 +99,9 @@ exports.PageComponent = (function(superClass) {
     if (direction === "right" || direction === "east") {
       layers = this.content.subLayersRight(point, this.originX, this.originY);
     }
-    layers = _.without(layers, currentPage);
+    if (withoutCurrentPage) {
+      layers = _.without(layers, currentPage);
+    }
     layers = Utils.frameSortByAbsoluteDistance(point, layers, this.originX, this.originY);
     return _.first(layers);
   };
@@ -235,7 +246,7 @@ exports.PageComponent = (function(superClass) {
       this.snapToPage(this.closestPage, true, this.animationOptions);
       return;
     }
-    nextPage = this.nextPage(this.direction, this._currentPage);
+    nextPage = this.nextPage(this.direction, this._currentPage, false);
     if (nextPage == null) {
       nextPage = this.closestPage;
     }
