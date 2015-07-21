@@ -321,6 +321,12 @@ describe "Utils", ->
 			layer = new Layer
 			Utils.inspectObjectType(layer.draggable).should.equal("LayerDraggable")
 
+		it "should work with a layer on an object", ->
+			varName = "123"
+			g = {}
+			g[varName] = new Layer
+			Utils.inspect(_.keys(g)).should.equal("[\"123\"]")
+
 	describe "keyPath", ->
 
 		it "should get with single", ->
