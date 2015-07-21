@@ -153,10 +153,13 @@ class exports.PageComponent extends ScrollComponent
 		# See if we meet the minimum velocity to scroll to the next page. If not we snap
 		# to the layer closest to the scroll point.
 
+		xDisabled = !@scrollHorizontal and (@direction == "right" or @direction == "left")
+		yDisabled = !@scrollVertical and (@direction == "down" or @direction == "up")
+
 		xLock = @content.draggable._directionLockEnabledX and (@direction == "right" or @direction == "left")
 		yLock = @content.draggable._directionLockEnabledY and (@direction == "down" or @direction == "up")
 
-		if Math.max(Math.abs(velocity.x), Math.abs(velocity.y)) < @velocityThreshold or xLock or yLock
+		if Math.max(Math.abs(velocity.x), Math.abs(velocity.y)) < @velocityThreshold or xLock or yLock or xDisabled or yDisabled
 			# print "velocity"
 			@snapToPage(@closestPage, true, @animationOptions)
 			return 
