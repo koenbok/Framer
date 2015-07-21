@@ -236,14 +236,18 @@ exports.PageComponent = (function(superClass) {
   };
 
   PageComponent.prototype._scrollEnd = function() {
-    var nextPage, velocity, xDisabled, xLock, yDisabled, yLock;
+    var end, nextPage, start, velocity, xDisabled, xLock, yDisabled, yLock;
     velocity = this.content.draggable.velocity;
     xDisabled = !this.scrollHorizontal && (this.direction === "right" || this.direction === "left");
     yDisabled = !this.scrollVertical && (this.direction === "down" || this.direction === "up");
     xLock = this.content.draggable._directionLockEnabledX && (this.direction === "right" || this.direction === "left");
     yLock = this.content.draggable._directionLockEnabledY && (this.direction === "down" || this.direction === "up");
     if (Math.max(Math.abs(velocity.x), Math.abs(velocity.y)) < this.velocityThreshold || xLock || yLock || xDisabled || yDisabled) {
-      this.snapToPage(this.closestPage, true, this.animationOptions);
+      start = this.content.draggable._layerStartPoint;
+      end = this.content.draggable.layer.point;
+      if (start.x !== end.x || start.y !== end.y) {
+        this.snapToPage(this.closestPage, true, this.animationOptions);
+      }
       return;
     }
     nextPage = this.nextPage(this.direction, this._currentPage, false);

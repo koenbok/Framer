@@ -165,7 +165,13 @@ class exports.PageComponent extends ScrollComponent
 
 		if Math.max(Math.abs(velocity.x), Math.abs(velocity.y)) < @velocityThreshold or xLock or yLock or xDisabled or yDisabled
 			# print "velocity"
-			@snapToPage(@closestPage, true, @animationOptions)
+
+			start = @content.draggable._layerStartPoint
+			end = @content.draggable.layer.point
+
+			if start.x != end.x || start.y != end.y
+				@snapToPage(@closestPage, true, @animationOptions)
+
 			return 
 
 		# Figure out which direction we are scrolling to and make a sorted list of
