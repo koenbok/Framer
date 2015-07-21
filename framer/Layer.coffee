@@ -546,12 +546,6 @@ class exports.Layer extends BaseClass
 			# Optional base image value
 			# imageUrl = Config.baseUrl + imageUrl
 
-
-			print imageUrl
-			print "@_cacheImage", @_cacheImage
-			print "Utils.isLocalAssetUrl(imageUrl)", Utils.isLocalAssetUrl(imageUrl)
-
-
 			if @_alwaysUseImageCache is false and Utils.isLocalAssetUrl(imageUrl)
 				imageUrl += "?nocache=#{NoCacheDateKey}"
 
