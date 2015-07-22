@@ -275,14 +275,19 @@ class exports.DeviceComponent extends BaseClass
 		
 		return null unless name
 
+		# If the image is externally hosted, we'd like to use that
 		if _.startsWith(name, "http://") or _.startsWith(name, "https://")
 			return name
 
+		# If we're running Framer Studio and have local files, we'd like to use those
 		if Utils.isFramerStudio() and window.FramerStudioInfo
 			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
+		
+		# If not, we want to get these image from our public resources server
 		else
 			resourceUrl = "//resources.framerjs.com/static/DeviceResources"
 
+		# We'd like to use jp2 if possible, or check if we don't for this specific device
 		if Utils.isJP2Supported() and @_device.deviceImageJP2 isnt false
 			return "#{resourceUrl}/#{name.replace(".png", ".jp2")}"
 		else
@@ -735,87 +740,87 @@ Devices =
 		deviceImageJP2: true
 
 	# iPhone 6
-	"iphone-6-spacegray": iPhone6BaseDevice
-	"iphone-6-spacegray-hand": iPhone6BaseDeviceHand
-	"iphone-6-silver": iPhone6BaseDevice
-	"iphone-6-silver-hand": iPhone6BaseDeviceHand
-	"iphone-6-gold": iPhone6BaseDevice
-	"iphone-6-gold-hand": iPhone6BaseDeviceHand
+	"iphone-6-spacegray": _.clone(iPhone6BaseDevice)
+	"iphone-6-spacegray-hand": _.clone(iPhone6BaseDeviceHand)
+	"iphone-6-silver": _.clone(iPhone6BaseDevice)
+	"iphone-6-silver-hand": _.clone(iPhone6BaseDeviceHand)
+	"iphone-6-gold": _.clone(iPhone6BaseDevice)
+	"iphone-6-gold-hand": _.clone(iPhone6BaseDeviceHand)
 
 	# iPhone 6+
-	"iphone-6plus-spacegray": iPhone6PlusBaseDevice
-	"iphone-6plus-spacegray-hand": iPhone6PlusBaseDeviceHand
-	"iphone-6plus-silver": iPhone6PlusBaseDevice
-	"iphone-6plus-silver-hand": iPhone6PlusBaseDeviceHand
-	"iphone-6plus-gold": iPhone6PlusBaseDevice
-	"iphone-6plus-gold-hand": iPhone6PlusBaseDeviceHand
+	"iphone-6plus-spacegray": _.clone(iPhone6PlusBaseDevice)
+	"iphone-6plus-spacegray-hand": _.clone(iPhone6PlusBaseDeviceHand)
+	"iphone-6plus-silver": _.clone(iPhone6PlusBaseDevice)
+	"iphone-6plus-silver-hand": _.clone(iPhone6PlusBaseDeviceHand)
+	"iphone-6plus-gold": _.clone(iPhone6PlusBaseDevice)
+	"iphone-6plus-gold-hand": _.clone(iPhone6PlusBaseDeviceHand)
 
 	# iPhone 5S
-	"iphone-5s-spacegray": iPhone5BaseDevice
-	"iphone-5s-spacegray-hand":iPhone5BaseDeviceHand
-	"iphone-5s-silver": iPhone5BaseDevice
-	"iphone-5s-silver-hand": iPhone5BaseDeviceHand
-	"iphone-5s-gold": iPhone5BaseDevice
-	"iphone-5s-gold-hand": iPhone5BaseDeviceHand
+	"iphone-5s-spacegray": _.clone(iPhone5BaseDevice)
+	"iphone-5s-spacegray-hand":_.clone(iPhone5BaseDeviceHand)
+	"iphone-5s-silver": _.clone(iPhone5BaseDevice)
+	"iphone-5s-silver-hand": _.clone(iPhone5BaseDeviceHand)
+	"iphone-5s-gold": _.clone(iPhone5BaseDevice)
+	"iphone-5s-gold-hand": _.clone(iPhone5BaseDeviceHand)
 
 	# iPhone 5C
-	"iphone-5c-green": iPhone5CBaseDevice
-	"iphone-5c-green-hand": iPhone5CBaseDeviceHand
-	"iphone-5c-blue": iPhone5CBaseDevice
-	"iphone-5c-blue-hand": iPhone5CBaseDeviceHand
-	"iphone-5c-pink": iPhone5CBaseDevice
-	"iphone-5c-pink-hand": iPhone5CBaseDeviceHand
-	"iphone-5c-white": iPhone5CBaseDevice
-	"iphone-5c-white-hand": iPhone5CBaseDeviceHand
-	"iphone-5c-yellow": iPhone5CBaseDevice
-	"iphone-5c-yellow-hand": iPhone5CBaseDeviceHand
+	"iphone-5c-green": _.clone(iPhone5CBaseDevice)
+	"iphone-5c-green-hand": _.clone(iPhone5CBaseDeviceHand)
+	"iphone-5c-blue": _.clone(iPhone5CBaseDevice)
+	"iphone-5c-blue-hand": _.clone(iPhone5CBaseDeviceHand)
+	"iphone-5c-pink": _.clone(iPhone5CBaseDevice)
+	"iphone-5c-pink-hand": _.clone(iPhone5CBaseDeviceHand)
+	"iphone-5c-white": _.clone(iPhone5CBaseDevice)
+	"iphone-5c-white-hand": _.clone(iPhone5CBaseDeviceHand)
+	"iphone-5c-yellow": _.clone(iPhone5CBaseDevice)
+	"iphone-5c-yellow-hand": _.clone(iPhone5CBaseDeviceHand)
 
 	# iPad Mini
-	"ipad-mini-spacegray": iPadMiniBaseDevice
-	"ipad-mini-spacegray-hand": iPadMiniBaseDeviceHand
-	"ipad-mini-silver": iPadMiniBaseDevice
-	"ipad-mini-silver-hand": iPadMiniBaseDeviceHand
+	"ipad-mini-spacegray": _.clone(iPadMiniBaseDevice)
+	"ipad-mini-spacegray-hand": _.clone(iPadMiniBaseDeviceHand)
+	"ipad-mini-silver": _.clone(iPadMiniBaseDevice)
+	"ipad-mini-silver-hand": _.clone(iPadMiniBaseDeviceHand)
 
 	# iPad Air
-	"ipad-air-spacegray": iPadAirBaseDevice
-	"ipad-air-spacegray-hand": iPadAirBaseDeviceHand
-	"ipad-air-silver": iPadAirBaseDevice
-	"ipad-air-silver-hand": iPadAirBaseDeviceHand
+	"ipad-air-spacegray": _.clone(iPadAirBaseDevice)
+	"ipad-air-spacegray-hand": _.clone(iPadAirBaseDeviceHand)
+	"ipad-air-silver": _.clone(iPadAirBaseDevice)
+	"ipad-air-silver-hand": _.clone(iPadAirBaseDeviceHand)
 
 	# Nexus 5
-	"nexus-5-black": Nexus5BaseDevice
-	"nexus-5-black-hand": Nexus5BaseDeviceHand
+	"nexus-5-black": _.clone(Nexus5BaseDevice)
+	"nexus-5-black-hand": _.clone(Nexus5BaseDeviceHand)
 
 	# Nexus 9
-	"nexus-9": Nexus9BaseDevice
+	"nexus-9": _.clone(Nexus9BaseDevice)
 
 	# Apple Watch 38mm
-	"applewatchsport-38-aluminum-sportband-black": AppleWatch38Device
-	"applewatchsport-38-aluminum-sportband-blue": AppleWatch38Device
-	"applewatchsport-38-aluminum-sportband-green": AppleWatch38Device
-	"applewatchsport-38-aluminum-sportband-pink": AppleWatch38Device
-	"applewatchsport-38-aluminum-sportband-white": AppleWatch38Device
-	"applewatch-38-black-bracelet": AppleWatch38Device
-	"applewatch-38-steel-bracelet": AppleWatch38Device
-	"applewatchedition-38-gold-buckle-blue": AppleWatch38Device
-	"applewatchedition-38-gold-buckle-gray": AppleWatch38Device
-	"applewatchedition-38-gold-buckle-red": AppleWatch38Device
-	"applewatchedition-38-gold-sportband-black": AppleWatch38Device
-	"applewatchedition-38-gold-sportband-white": AppleWatch38Device
+	"applewatchsport-38-aluminum-sportband-black": _.clone(AppleWatch38Device)
+	"applewatchsport-38-aluminum-sportband-blue": _.clone(AppleWatch38Device)
+	"applewatchsport-38-aluminum-sportband-green": _.clone(AppleWatch38Device)
+	"applewatchsport-38-aluminum-sportband-pink": _.clone(AppleWatch38Device)
+	"applewatchsport-38-aluminum-sportband-white": _.clone(AppleWatch38Device)
+	"applewatch-38-black-bracelet": _.clone(AppleWatch38Device)
+	"applewatch-38-steel-bracelet": _.clone(AppleWatch38Device)
+	"applewatchedition-38-gold-buckle-blue": _.clone(AppleWatch38Device)
+	"applewatchedition-38-gold-buckle-gray": _.clone(AppleWatch38Device)
+	"applewatchedition-38-gold-buckle-red": _.clone(AppleWatch38Device)
+	"applewatchedition-38-gold-sportband-black": _.clone(AppleWatch38Device)
+	"applewatchedition-38-gold-sportband-white": _.clone(AppleWatch38Device)
 
 	# Apple Watch 42mm
-	"applewatchsport-42-aluminum-sportband-black": AppleWatch42Device
-	"applewatchsport-42-aluminum-sportband-blue": AppleWatch42Device
-	"applewatchsport-42-aluminum-sportband-green": AppleWatch42Device
-	"applewatchsport-42-aluminum-sportband-pink": AppleWatch42Device
-	"applewatchsport-42-aluminum-sportband-white": AppleWatch42Device
-	"applewatch-42-black-bracelet": AppleWatch42Device
-	"applewatch-42-steel-bracelet": AppleWatch42Device
-	"applewatchedition-42-gold-buckle-blue": AppleWatch42Device
-	"applewatchedition-42-gold-buckle-gray": AppleWatch42Device
-	"applewatchedition-42-gold-buckle-red": AppleWatch42Device
-	"applewatchedition-42-gold-sportband-black": AppleWatch42Device
-	"applewatchedition-42-gold-sportband-white": AppleWatch42Device
+	"applewatchsport-42-aluminum-sportband-black": _.clone(AppleWatch42Device)
+	"applewatchsport-42-aluminum-sportband-blue": _.clone(AppleWatch42Device)
+	"applewatchsport-42-aluminum-sportband-green": _.clone(AppleWatch42Device)
+	"applewatchsport-42-aluminum-sportband-pink": _.clone(AppleWatch42Device)
+	"applewatchsport-42-aluminum-sportband-white": _.clone(AppleWatch42Device)
+	"applewatch-42-black-bracelet": _.clone(AppleWatch42Device)
+	"applewatch-42-steel-bracelet": _.clone(AppleWatch42Device)
+	"applewatchedition-42-gold-buckle-blue": _.clone(AppleWatch42Device)
+	"applewatchedition-42-gold-buckle-gray": _.clone(AppleWatch42Device)
+	"applewatchedition-42-gold-buckle-red": _.clone(AppleWatch42Device)
+	"applewatchedition-42-gold-sportband-black": _.clone(AppleWatch42Device)
+	"applewatchedition-42-gold-sportband-white": _.clone(AppleWatch42Device)
 
 
 
