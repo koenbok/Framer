@@ -652,6 +652,16 @@ describe "Layer", ->
 			layerA.subLayersByName("B").should.eql [layerB]
 			layerA.subLayersByName("C").should.eql [layerC, layerD]
 
+		it "should get a siblinglayer by name", ->
+
+			layerA = new Layer
+			layerB = new Layer name:"B", superLayer:layerA
+			layerC = new Layer name:"C", superLayer:layerA
+			layerD = new Layer name:"C", superLayer:layerA
+
+			layerB.siblingLayersByName("C").should.eql [layerC, layerD]
+			layerD.siblingLayersByName("B").should.eql [layerB]
+
 		it "should get a superlayers", ->
 			layerA = new Layer
 			layerB = new Layer superLayer:layerA

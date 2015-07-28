@@ -644,6 +644,9 @@ class exports.Layer extends BaseClass
 	subLayersByName: (name) ->
 		_.filter @subLayers, (layer) -> layer.name == name
 
+	siblingLayersByName: (name) ->
+		_.filter @siblingLayers, (layer) -> layer.name == name
+
 	superLayers: (context=false) ->
 
 		superLayers = []
