@@ -506,11 +506,11 @@ class exports.LayerDraggable extends BaseClass
 	_stopSimulation: =>
 		@_isAnimating = false
 		return unless @_simulation
-		@_simulation.x.stop?() if @_simulation.x
-		@_simulation.y.stop?() if @_simulation.y
+		@_simulation?.x.stop()
+		@_simulation?.y.stop()
+		@_simulation = null
 		@emit(Events.Move, @layer.point)
 		@emit(Events.DragAnimationDidEnd)
-		@_simulation = null
 
 	animateStop: ->
 		@_stopSimulation()
