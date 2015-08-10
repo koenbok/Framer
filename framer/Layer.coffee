@@ -551,7 +551,7 @@ class exports.Layer extends BaseClass
 
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
-			if @events?.hasOwnProperty "load" or @events?.hasOwnProperty "error"
+			if @_eventListeners?.hasOwnProperty "load" or @_eventListeners?.hasOwnProperty "error"
 
 				loader = new Image()
 				loader.name = imageUrl
