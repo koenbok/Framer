@@ -98,7 +98,10 @@ class exports.PageComponent extends ScrollComponent
 			direction = "right"
 			throw new Error("#{direction} should be in #{directions}")
 
-		point = {x:0, y:0}
+		# For allowing pages added with 'addPage' to behave consistently with pages added 
+		# to the PageComponent using 'superLayer', keep the original page point
+		# so one of the two coordinates is left untouched after the page is added
+		point = page.point
 
 		if @content.subLayers.length
 			point.x = Utils.frameGetMaxX(@content.contentFrame()) if direction in ["right", "east"]
