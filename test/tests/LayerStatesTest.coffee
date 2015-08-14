@@ -121,4 +121,17 @@ describe "LayerStates", ->
 
 			layer.states.switch "stateA", {curve:"linear", time:0.1}
 
-			
+		it "should restore the default state when using non exportable properties", ->
+
+			layer = new Layer
+			layer.states.add
+				stateA: {midX:200}
+
+			layer.x.should.equal 0
+
+			layer.states.switchInstant "stateA"
+			layer.x.should.equal 200 - (layer.width // 2)
+
+			layer.states.switchInstant "default"
+			layer.x.should.equal 0
+
