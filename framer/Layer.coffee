@@ -88,6 +88,8 @@ class exports.Layer extends BaseClass
 	##############################################################
 	# Properties
 
+	@define "user", @simpleProperty("user", undefined)
+
 	# Css properties
 	@define "width",  layerProperty(@, "width",  "width", 100, _.isNumber)
 	@define "height", layerProperty(@, "height", "height", 100, _.isNumber)
