@@ -4,22 +4,26 @@ Utils = require "./Utils"
 
 Events = {}
 
-if Utils.isTouch()
-	Events.TouchStart = "touchstart"
-	Events.TouchEnd = "touchend"
-	Events.TouchMove = "touchmove"
-else
-	Events.TouchStart = "mousedown"
-	Events.TouchEnd = "mouseup"
-	Events.TouchMove = "mousemove"
-
-Events.Click = Events.TouchEnd
+# Standard touch events
+Events.TouchStart = "touchstart"
+Events.TouchEnd = "touchend"
+Events.TouchMove = "touchmove"
 
 # Standard dom events
+Events.MouseUp = "mouseup"
+Events.MouseDown = "mousedown"
 Events.MouseOver = "mouseover"
 Events.MouseOut = "mouseout"
 Events.MouseMove = "mousemove"
 Events.MouseWheel = "mousewheel"
+
+# Let's make sure the touch events work on desktop too
+if not Utils.isTouch()
+	Events.TouchStart = Events.MouseDown
+	Events.TouchEnd = Events.MouseUp
+	Events.TouchMove = Events.MouseMove
+
+Events.Click = Events.TouchEnd
 
 # Animation events
 Events.AnimationStart = "start"
