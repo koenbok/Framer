@@ -88,6 +88,9 @@ class exports.Layer extends BaseClass
 	##############################################################
 	# Properties
 
+	# A placeholder for layer bound properties defined by the user:
+	@define "custom", @simpleProperty("custom", undefined)
+
 	# Css properties
 	@define "width",  layerProperty(@, "width",  "width", 100, _.isNumber)
 	@define "height", layerProperty(@, "height", "height", 100, _.isNumber)
