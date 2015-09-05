@@ -40,6 +40,8 @@ Framer.Importer = (require "./Importer").Importer
 Framer.Debug = (require "./Debug").Debug
 Framer.Extras = require "./Extras/Extras"
 
+Framer.ReactRender = require "./ReactRender"
+
 Framer.Loop = new Framer.AnimationLoop()
 Utils.domComplete(Framer.Loop.start)
 

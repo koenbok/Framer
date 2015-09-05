@@ -35,6 +35,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, options={}, set) -
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
 			set?(@, value)
+			@emit("change", {"#{name}": value})
 			@emit("change:#{name}", value)
 			@emit("change:point", value) if name in ["x", "y"]
 			@emit("change:size", value)  if name in ["width", "height"]
@@ -111,46 +112,46 @@ class exports.Layer extends BaseClass
 	@define "ignoreEvents", layerProperty(@, "ignoreEvents", "pointerEvents", true, _.isBoolean)
 
 	# Matrix properties
-	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber)
-	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber)
-	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber)
+	@define "x", layerProperty(@, "x", "WebkitTransform", 0, _.isNumber)
+	@define "y", layerProperty(@, "y", "WebkitTransform", 0, _.isNumber)
+	@define "z", layerProperty(@, "z", "WebkitTransform", 0, _.isNumber)
 
-	@define "scaleX", layerProperty(@, "scaleX", "webkitTransform", 1, _.isNumber)
-	@define "scaleY", layerProperty(@, "scaleY", "webkitTransform", 1, _.isNumber)
-	@define "scaleZ", layerProperty(@, "scaleZ", "webkitTransform", 1, _.isNumber)
-	@define "scale", layerProperty(@, "scale", "webkitTransform", 1, _.isNumber)
+	@define "scaleX", layerProperty(@, "scaleX", "WebkitTransform", 1, _.isNumber)
+	@define "scaleY", layerProperty(@, "scaleY", "WebkitTransform", 1, _.isNumber)
+	@define "scaleZ", layerProperty(@, "scaleZ", "WebkitTransform", 1, _.isNumber)
+	@define "scale", layerProperty(@, "scale", "WebkitTransform", 1, _.isNumber)
 
-	@define "skewX", layerProperty(@, "skewX", "webkitTransform", 0, _.isNumber)
-	@define "skewY", layerProperty(@, "skewY", "webkitTransform", 0, _.isNumber)
-	@define "skew", layerProperty(@, "skew", "webkitTransform", 0, _.isNumber)
+	@define "skewX", layerProperty(@, "skewX", "WebkitTransform", 0, _.isNumber)
+	@define "skewY", layerProperty(@, "skewY", "WebkitTransform", 0, _.isNumber)
+	@define "skew", layerProperty(@, "skew", "WebkitTransform", 0, _.isNumber)
 
 	# @define "scale",
 	# 	get: -> (@scaleX + @scaleY + @scaleZ) / 3.0
 	# 	set: (value) -> @scaleX = @scaleY = @scaleZ = value
 
-	@define "originX", layerProperty(@, "originX", "webkitTransformOrigin", 0.5, _.isNumber)
-	@define "originY", layerProperty(@, "originY", "webkitTransformOrigin", 0.5, _.isNumber)
+	@define "originX", layerProperty(@, "originX", "WebkitTransformOrigin", 0.5, _.isNumber)
+	@define "originY", layerProperty(@, "originY", "WebkitTransformOrigin", 0.5, _.isNumber)
 	# @define "originZ", layerProperty(@, "originZ", "WebkitTransformOrigin", 0.5
 
-	@define "perspective", layerProperty(@, "perspective", "webkitPerspective", 0, _.isNumber)
+	@define "perspective", layerProperty(@, "perspective", "WebkitPerspective", 0, _.isNumber)
 
-	@define "rotationX", layerProperty(@, "rotationX", "webkitTransform", 0, _.isNumber)
-	@define "rotationY", layerProperty(@, "rotationY", "webkitTransform", 0, _.isNumber)
-	@define "rotationZ", layerProperty(@, "rotationZ", "webkitTransform", 0, _.isNumber)
+	@define "rotationX", layerProperty(@, "rotationX", "WebkitTransform", 0, _.isNumber)
+	@define "rotationY", layerProperty(@, "rotationY", "WebkitTransform", 0, _.isNumber)
+	@define "rotationZ", layerProperty(@, "rotationZ", "WebkitTransform", 0, _.isNumber)
 	@define "rotation",
 		#exportable: false
 		get: -> @rotationZ
 		set: (value) -> @rotationZ = value
 
 	# Filter properties
-	@define "blur", layerProperty(@, "blur", "webkitFilter", 0, _.isNumber)
-	@define "brightness", layerProperty(@, "brightness", "webkitFilter", 100, _.isNumber)
-	@define "saturate", layerProperty(@, "saturate", "webkitFilter", 100, _.isNumber)
-	@define "hueRotate", layerProperty(@, "hueRotate", "webkitFilter", 0, _.isNumber)
-	@define "contrast", layerProperty(@, "contrast", "webkitFilter", 100, _.isNumber)
-	@define "invert", layerProperty(@, "invert", "webkitFilter", 0, _.isNumber)
-	@define "grayscale", layerProperty(@, "grayscale", "webkitFilter", 0, _.isNumber)
-	@define "sepia", layerProperty(@, "sepia", "webkitFilter", 0, _.isNumber)
+	@define "blur", layerProperty(@, "blur", "WebkitFilter", 0, _.isNumber)
+	@define "brightness", layerProperty(@, "brightness", "WebkitFilter", 100, _.isNumber)
+	@define "saturate", layerProperty(@, "saturate", "WebkitFilter", 100, _.isNumber)
+	@define "hueRotate", layerProperty(@, "hueRotate", "WebkitFilter", 0, _.isNumber)
+	@define "contrast", layerProperty(@, "contrast", "WebkitFilter", 100, _.isNumber)
+	@define "invert", layerProperty(@, "invert", "WebkitFilter", 0, _.isNumber)
+	@define "grayscale", layerProperty(@, "grayscale", "WebkitFilter", 0, _.isNumber)
+	@define "sepia", layerProperty(@, "sepia", "WebkitFilter", 0, _.isNumber)
 
 	# Shadow properties
 	@define "shadowX", layerProperty(@, "shadowX", "boxShadow", 0, _.isNumber)
@@ -169,7 +170,7 @@ class exports.Layer extends BaseClass
 	@define "borderColor", layerProperty(@, "borderColor", "border", null, _.isString)
 	@define "borderWidth", layerProperty(@, "borderWidth", "border", 0, _.isNumber)
 
-	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
+	@define "force2d", layerProperty(@, "force2d", "WebkitTransform", false, _.isBoolean)
 
 	##############################################################
 	# Identity
@@ -443,7 +444,7 @@ class exports.Layer extends BaseClass
 
 	_insertElement: ->
 		@bringToFront()
-		@_context.getRootElement().appendChild(@_element)
+		# @_context.getRootElement().appendChild(@_element)
 
 	@define "html",
 		get: ->

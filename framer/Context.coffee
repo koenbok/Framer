@@ -8,7 +8,8 @@ Utils = require "./Utils"
 Counter = 1
 
 class exports.Context extends BaseClass
-	
+
+
 	constructor: (options={}) ->
 		
 		super
@@ -24,24 +25,27 @@ class exports.Context extends BaseClass
 			throw Error("Contexts need a name")
 
 		@_parentLayer = options.parentLayer
+		@_parentLayer.childContext = @ if @_parentLayer
 		@_name = options.name
 		
 		@reset()
+
+
 
 	reset: ->
 
 		@eventManager?.reset()
 		@eventManager = new EventManager
 
-		if @_rootElement
-			# Clean up the current root element:
-			if @_rootElement.parentNode
-				# Already attached to the DOM - remove it:
-				@_rootElement.parentNode.removeChild(@_rootElement)
-			else
-				# Not on the DOM yet. Prevent it from being added (for this happens
-				# async):
-				@_rootElement.__cancelAppendChild = true
+		# if @_rootElement
+		# 	# Clean up the current root element:
+		# 	if @_rootElement.parentNode
+		# 		# Already attached to the DOM - remove it:
+		# 		@_rootElement.parentNode.removeChild(@_rootElement)
+		# 	else
+		# 		# Not on the DOM yet. Prevent it from being added (for this happens
+		# 		# async):
+		# 		@_rootElement.__cancelAppendChild = true
 
 		# Create a fresh root element:
 		@_createRootElement()
@@ -100,9 +104,9 @@ class exports.Context extends BaseClass
 			Utils.domComplete(@_appendRootElement)
 
 	_appendRootElement: =>
-		parentElement = @_parentLayer?._element
-		parentElement ?= document.body
-		parentElement.appendChild(@_rootElement)
+		# parentElement = @_parentLayer?._element
+		# parentElement ?= document.body
+		# parentElement.appendChild(@_rootElement)
 
 	run: (f) ->
 		previousContext = Framer.CurrentContext

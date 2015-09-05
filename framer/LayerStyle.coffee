@@ -64,7 +64,10 @@ exports.LayerStyle =
 	zIndex: (layer) ->
 		layer._properties.index
 
-	webkitFilter: (layer) ->
+	backgroundImage: (layer) ->
+		"url('#{layer.image}')"
+
+	WebkitFilter: (layer) ->
 
 		# This is mostly an optimization for Chrome. If you pass in the Webkit filters
 		# with the defaults, it still takes a shitty rendering path. So I compare them
@@ -79,7 +82,7 @@ exports.LayerStyle =
 		return css.join(" ")
 
 
-	webkitTransform: (layer) ->
+	WebkitTransform: (layer) ->
 
 
 		# We have a special rendering path for layers that prefer 2d rendering.
@@ -88,7 +91,7 @@ exports.LayerStyle =
 		# results.
 
 		if layer._prefer2d or layer._properties.force2d
-			return exports.LayerStyle.webkitTransformForce2d(layer)
+			return exports.LayerStyle.WebkitTransformForce2d(layer)
 
 		"
 		translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px) 
@@ -102,31 +105,31 @@ exports.LayerStyle =
 		rotateZ(#{layer._properties.rotationZ}deg) 
 		"
 
-	webkitTransformForce2d: (layer) ->
+	# WebkitTransformForce2d: (layer) ->
 
-		# This detects if we use 3d properties, if we don't it only uses
-		# 2d properties to disable gpu rendering.
+	# 	# This detects if we use 3d properties, if we don't it only uses
+	# 	# 2d properties to disable gpu rendering.
 
-		css = []
+	# 	css = []
 
-		for p, v of _Force2DProperties
-			if layer._properties[p] isnt v
-				console.warn "Layer property '#{p}'' will be ignored with force2d enabled"
+	# 	for p, v of _Force2DProperties
+	# 		if layer._properties[p] isnt v
+	# 			console.warn "Layer property '#{p}'' will be ignored with force2d enabled"
 
-		css.push "translate(#{layer._properties.x}px,#{layer._properties.y}px)"
-		css.push "scale(#{layer._properties.scale})"
-		css.push "skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg)"
-		css.push "rotate(#{layer._properties.rotationZ}deg)"
+	# 	css.push "translate(#{layer._properties.x}px,#{layer._properties.y}px)"
+	# 	css.push "scale(#{layer._properties.scale})"
+	# 	css.push "skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg)"
+	# 	css.push "rotate(#{layer._properties.rotationZ}deg)"
 
-		return css.join(" ")
+	# 	return css.join(" ")
 
-	webkitTransformOrigin: (layer) ->
+	WebkitTransformOrigin: (layer) ->
 		"#{layer._properties.originX * 100}% #{layer._properties.originY * 100}%"
 
 		# Todo: Origin z is in pixels. I need to read up on this.
 		# "#{layer._properties.originX * 100}% #{layer._properties.originY * 100}% #{layer._properties.originZ * 100}%"
 
-	webkitPerspective: (layer) ->
+	WebkitPerspective: (layer) ->
 		"#{layer._properties.perspective}"
 
 	pointerEvents: (layer) ->
