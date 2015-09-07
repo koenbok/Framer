@@ -138,7 +138,6 @@ class exports.LayerStates extends BaseClass
 		keys = []
 
 		for stateName, state of @_states
-			continue if stateName is "default"
 			keys = _.union(keys, _.keys(state))
 
 		keys
