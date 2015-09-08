@@ -88,6 +88,9 @@ class exports.ScrollComponent extends Layer
 		@_applyOptionsAndDefaults(options)
 		@_enableMouseWheelHandling()
 
+		if options.hasOwnProperty("wrap")
+			wrapComponent(@, options.wrap)
+
 	calculateContentFrame: ->
 
 		# Calculates the size of the content. By default this returns the total
@@ -382,67 +385,71 @@ class exports.ScrollComponent extends Layer
 	##############################################################
 	# Convenience function to make a single layer scrollable
 
-	@wrap = (layer, options = {correct:true}) ->
-
-		# This function wraps the given layer into a scroll or page component. This is
-		# great for importing from Sketch or Photoshop.
-
-		scroll = new @(options)
-
-		# If we actually forgot to add a sub layer, so for example if
-		# there is just one layer and we want to make it scrollable we
-		# correct that here.
-
-		if options.correct is true
-			if layer.subLayers.length is 0
-				wrapper = new Layer
-				wrapper.name = "ScrollComponent"
-				wrapper.frame = layer.frame
-				layer.superLayer = wrapper
-				layer.x = layer.y = 0
-				layer = wrapper
-
-				console.log "Corrected the scroll component without sub layers"
-
-		for propKey in ["frame", "image", "name"]
-			scroll[propKey] = layer[propKey]
-
-		# https://github.com/motif/Company/issues/208
-
-		# This could potentially be smart to avoid an unexpected state if
-		# you forgot to add a mask in sketch or photoshop and the scroll
-		# component size becomes the same as it's content.
-
-		# This only makes sense if your scroll component is on the screen
-		# to begin with so we check that first. Because maybe you put it 
-		# offscreen to move it onscreen later.
-
-		# You can turn this off by setting correct to false
-
-		if options.correct is true
-
-			screenFrame = scroll.screenFrame
-
-			if screenFrame.x < Screen.width
-				if screenFrame.x + screenFrame.width > Screen.width
-					scroll.width = Screen.width - screenFrame.x
-					console.log "Corrected the scroll width to #{scroll.width}"
-
-			if screenFrame.y < Screen.height
-				if screenFrame.y + screenFrame.height > Screen.height
-					scroll.height = Screen.height - screenFrame.y
-					console.log "Corrected the scroll height to #{scroll.height}"
+	@wrap = (layer, options) ->
+		return wrapComponent(new @(options), layer, options)
 
 
-		# Now copy over all the content to the new scroll component
-		for subLayer in layer.subLayers
-			subLayerIndex = subLayer.index
-			subLayer.superLayer = scroll.content
-			subLayer.index = subLayerIndex
+wrapComponent = (instance, layer, options = {correct:true}) ->
 
-		scroll.superLayer = layer.superLayer
-		scroll.index = layer.index
-		
-		layer.destroy()
-		
-		return scroll
+	# This function wraps the given layer into a scroll or page component. This is
+	# great for importing from Sketch or Photoshop.
+
+	scroll = instance
+
+	# If we actually forgot to add a sub layer, so for example if
+	# there is just one layer and we want to make it scrollable we
+	# correct that here.
+
+	if options.correct is true
+		if layer.subLayers.length is 0
+			wrapper = new Layer
+			wrapper.name = "ScrollComponent"
+			wrapper.frame = layer.frame
+			layer.superLayer = wrapper
+			layer.x = layer.y = 0
+			layer = wrapper
+
+			console.log "Corrected the scroll component without sub layers"
+
+	for propKey in ["frame", "image", "name"]
+		scroll[propKey] = layer[propKey]
+
+	# https://github.com/motif/Company/issues/208
+
+	# This could potentially be smart to avoid an unexpected state if
+	# you forgot to add a mask in sketch or photoshop and the scroll
+	# component size becomes the same as it's content.
+
+	# This only makes sense if your scroll component is on the screen
+	# to begin with so we check that first. Because maybe you put it 
+	# offscreen to move it onscreen later.
+
+	# You can turn this off by setting correct to false
+
+	if options.correct is true
+
+		screenFrame = scroll.screenFrame
+
+		if screenFrame.x < Screen.width
+			if screenFrame.x + screenFrame.width > Screen.width
+				scroll.width = Screen.width - screenFrame.x
+				console.log "Corrected the scroll width to #{scroll.width}"
+
+		if screenFrame.y < Screen.height
+			if screenFrame.y + screenFrame.height > Screen.height
+				scroll.height = Screen.height - screenFrame.y
+				console.log "Corrected the scroll height to #{scroll.height}"
+
+
+	# Now copy over all the content to the new scroll component
+	for subLayer in layer.subLayers
+		subLayerIndex = subLayer.index
+		subLayer.superLayer = scroll.content
+		subLayer.index = subLayerIndex
+
+	scroll.superLayer = layer.superLayer
+	scroll.index = layer.index
+	
+	layer.destroy()
+	
+	return scroll
