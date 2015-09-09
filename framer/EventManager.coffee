@@ -1,4 +1,5 @@
 Utils = require "./Utils"
+{GestureManager} = require "./GestureManager"
 
 EventManagerIdCounter = 0
 
@@ -6,24 +7,31 @@ class EventManagerElement
 
 	constructor: (@element) ->
 		@_events = {}
+		@_gestureManager = new GestureManager(@element)
 
 	addEventListener: (eventName, listener) ->
 		
-		# Filter out all the events that are not dom valid
-		if not Utils.domValidEvent(@element, eventName)
-			return
-
+		# Filter out all the events that are not dom valid or a gesture
+		return unless Utils.domValidEvent(@element, eventName) or Events.isGestureEvent eventName
+		
 		@_events[eventName] ?= []
 		@_events[eventName].push(listener)
 		
-		@element.addEventListener(eventName, listener)
+		if Events.isGestureEvent eventName
+			@_gestureManager.addEventListener(eventName, listener)
+		else
+			@element.addEventListener(eventName, listener)
 
 	removeEventListener: (eventName, listener) ->
 		return unless @_events
 		return unless @_events[eventName]
 
 		@_events[eventName] = _.without @_events[eventName], listener		
-		@element.removeEventListener(eventName, listener)
+		
+		if Events.isGestureEvent eventName
+			@_gestureManager.removeEventListener(eventName, listener)
+		else
+			@element.removeEventListener(eventName, listener)
 
 		return
 

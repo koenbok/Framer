@@ -33,12 +33,29 @@ Events.AnimationDidStart = "start"
 Events.AnimationDidStop = "stop"
 Events.AnimationDidEnd = "end"
 
+# Gesture events
+_gestures = []
+_gestures.push Events.Press = "press"
+_gestures.push Events.PressUp = "pressup"
+_gestures.push Events.Pinch = "pinch"
+_gestures.push Events.PinchStart = "pinchstart"
+_gestures.push Events.PinchEnd = "pinchend"
+_gestures.push Events.Pan = "pan"
+_gestures.push Events.Swipe = "swipe"
+_gestures.push Events.SwipeLeft = "swipeleft"
+_gestures.push Events.SwipeRight = "swiperight"
+_gestures.push Events.SwipeUp = "swipeup"
+_gestures.push Events.SwipeDown = "swipedown"
+
 # Scroll events
 Events.Scroll = "scroll"
 
 # Image events
 Events.ImageLoaded = "load"
 Events.ImageLoadError = "error"
+
+Events.isGestureEvent = (eventName) ->
+	return eventName in _gestures
 
 # Extract touch events for any event
 Events.touchEvent = (event) ->

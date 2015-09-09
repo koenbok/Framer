@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "eventemitter3": "^0.1.6",
+    "hammerjs": "^2.0.4",
     "lodash": "^3.5.0"
   },
   "devDependencies": {
