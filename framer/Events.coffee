@@ -17,6 +17,12 @@ Events.MouseOut = "mouseout"
 Events.MouseMove = "mousemove"
 Events.MouseWheel = "mousewheel"
 
+# Apple force touch events
+Events.MouseForceWillBegin = "webkitmouseforcewillbegin"
+Events.MouseForceDown = "webkitmouseforcedown"
+Events.MouseForceUp = "webkitmouseforceup"
+Events.MouseForceChanged = "webkitmouseforcechanged"
+
 # Let's make sure the touch events work on desktop too
 if not Utils.isTouch()
 	Events.TouchStart = Events.MouseDown
