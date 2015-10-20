@@ -48,6 +48,7 @@ class exports.Animation extends EventEmitter
 		@options = _.clone _.defaults options,
 			layer: null
 			properties: {}
+			transformers: {}
 			curve: "linear"
 			curveOptions: {}
 			time: 1
@@ -58,7 +59,7 @@ class exports.Animation extends EventEmitter
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
-		@options.properties = Animation.filterAnimatableProperties(@options.properties)
+		@options.properties = Animation.filterAnimatableProperties(@options.properties, @options.transformers)
 
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
@@ -178,7 +179,15 @@ class exports.Animation extends EventEmitter
 	_updateValue: (value) =>
 
 		for k, v of @_stateB
-			@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
+			mapRange = Utils.mapRange
+
+			# See if there's a transformation that needs to be applied:
+			transformers = @options.transformers[k]
+			if transformers?
+				mapRange = transformers.mapRange
+				console.log mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
+
+			@_target[k] = mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
 
 		return
 
@@ -239,12 +248,18 @@ class exports.Animation extends EventEmitter
 					value = parseFloat parsedCurve.args[i]
 					@options.curveOptions[k] = value if value
 
-	@filterAnimatableProperties = (properties) ->
+	@filterAnimatableProperties = (properties, transformers) ->
 		# Function to filter only animatable properties out of a given set
 		animatableProperties = {}
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			animatableProperties[k] = v if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v)
+			if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v)
+				animatableProperties[k] = v
+			else if Utils.isColorString(v)
+				animatableProperties[k] = v
+				transformers[k] = {
+					mapRange: Utils.mapRangeColor
+				}
 
 		return animatableProperties

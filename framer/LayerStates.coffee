@@ -94,7 +94,7 @@ class exports.LayerStates extends BaseClass
 		animatablePropertyKeys = []
 
 		for k, v of properties
-			animatablePropertyKeys.push(k) if _.isNumber(v)
+			animatablePropertyKeys.push(k) if _.isNumber(v) or Utils.isColorString(v)
 
 		if animatablePropertyKeys.length == 0
 			instant = true
@@ -115,7 +115,7 @@ class exports.LayerStates extends BaseClass
 				
 				# Set all the values for keys that we couldn't animate
 				for k, v of properties
-					@layer[k] = v if not _.isNumber(v)
+					@layer[k] = v if not (_.isNumber(v) or Utils.isColorString(v))
 
 				@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
 

@@ -1,6 +1,64 @@
 
 describe "Utils", ->
 
+	describe "color hash tools", ->
+
+		it "should extract color hash #abc", ->
+			{r,g,b} = Utils.colorHashToRGB("#abc")
+			r.should.eql(0xaa)
+			g.should.eql(0xbb)
+			b.should.eql(0xcc)
+
+		it "should extract color hash #abcdef", ->
+			{r,g,b} = Utils.colorHashToRGB("#abcdef")
+			r.should.eql(0xab)
+			g.should.eql(0xcd)
+			b.should.eql(0xef)
+
+		it "should not extract color hash #abcd", ->
+			rgb = Utils.colorHashToRGB("#abcd")
+			r = !rgb?
+			r.should.be.true
+
+		it "should not extract color hash #abcd", ->
+			rgb = Utils.colorHashToRGB("#abcdef")
+			hash = Utils.rgbToColorHash(rgb)
+			hash.should.eql("#abcdef")
+
+		it "should test color types correctly", ->
+
+			Utils.isColorHash("#abc").should.be.true
+			Utils.isColorHash("#abcdef").should.be.true
+			Utils.isRGBString("rgb(1,2,3)").should.be.true
+			Utils.isRGBAString("rgba(1,2,3, .5)").should.true
+
+			Utils.isColorHash("#ac").should.be.false
+			Utils.isColorHash("#abcef").should.be.false
+			Utils.isRGBString("rgba(1,2,3)").should.be.false
+			Utils.isRGBAString("rgb(1,2,3, .5)").should.false
+
+		it "should convert any color to RGBA and back", ->
+			{r,g,b,a} = Utils.colorToRGB("#102030")
+			r.should.equal(0x10)
+			g.should.equal(0x20)
+			b.should.equal(0x30)
+			a.should.equal(1)
+
+			{r,g,b,a} = Utils.colorToRGB("rgb(1,2,3)")
+			r.should.equal(1)
+			g.should.equal(2)
+			b.should.equal(3)
+			a.should.equal(1)
+
+			{r,g,b,a} = Utils.colorToRGB("rgba(1,2,3, .5)")
+			r.should.equal(1)
+			g.should.equal(2)
+			b.should.equal(3)
+			a.should.equal(.5)
+
+			rgbaString = Utils.rgbToString(Utils.colorToRGB("rgba(1,2,3, .5)"))
+			rgbaString.should.equal("rgba(1, 2, 3, 0.5)")
+
 	describe "valueOrDefault", ->
 
 		it "should get a value", ->

@@ -363,6 +363,13 @@ Utils.clamp = (value, a, b) ->
 Utils.mapRange = (value, fromLow, fromHigh, toLow, toHigh) ->
 	toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
 
+Utils.mapColor = (value, from, to) ->
+	r = from.r + (value * (to.r - from.r))
+	g = from.g + (value * (to.g - from.g))
+	b = from.b + (value * (to.b - from.b))
+	result = "#" + ("000000" + Math.round((r << 16) + (g << 8) + b).toString(16)).substr(-6)
+	result
+
 # Kind of similar as above but with a better syntax and a limiting option
 Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 
@@ -380,7 +387,6 @@ Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 			return toHigh if result < toHigh
 
 	result
-
 
 
 ######################################################
@@ -800,4 +806,106 @@ Utils.textSize = (text, style={}, constraints={}) ->
 		width: rect.right - rect.left
 		height: rect.bottom - rect.top
 
+######################################################
+# COLOR FUNCTIONS
+
+colorHashRE = /(#([0-9a-fA-F]{6})$)|(#([0-9a-fA-F]{3})$)/
+rgbRE = /rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/
+rgbaRE = /rgba\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([0-9]+(\.[0-9]+)?|\.[0-9]+)\s*\)/
+
+Utils.isColorHash = (value) ->
+	colorHashRE.test(value)
+
+Utils.colorHashToRGB = (value) ->
+	if Utils.isColorHash(value)
+		matches = colorHashRE.exec(value)
+		if long = matches[2]
+			return {
+				r: parseInt("0x" + long[0] + long[1]),
+				g: parseInt("0x" + long[2] + long[3]),
+				b: parseInt("0x" + long[4] + long[5])
+				a: 1
+			}
+		else
+			short = matches[4]
+			return {
+				r: parseInt("0x" + short[0] + short[0]),
+				g: parseInt("0x" + short[1] + short[1]),
+				b: parseInt("0x" + short[2] + short[2])
+				a: 1
+			}
+	undefined
+
+Utils.isRGBString = (value) ->
+	rgbRE.test(value)
+
+Utils.rgbStringToRGB = (value) ->
+	if Utils.isRGBString(value)
+		matches = rgbRE.exec(value)
+		return {
+			r: parseInt(matches[1]),
+			g: parseInt(matches[2]),
+			b: parseInt(matches[3]),
+			a: 1
+		}
+	undefined
+
+Utils.isRGBAString = (value) ->
+	rgbaRE.test(value)
+
+Utils.rgbaStringToRGBA = (value) ->
+	if Utils.isRGBAString(value)
+		matches = rgbaRE.exec(value)
+		return {
+		r: parseInt(matches[1]),
+		g: parseInt(matches[2]),
+		b: parseInt(matches[3]),
+		a: parseFloat(matches[4])
+		}
+	undefined
+
+Utils.isColorString = (value) ->
+	Utils.isColorHash(value) || Utils.isRGBAString(value) || Utils.isRGBString(value)
+
+Utils.colorToRGB = (value) ->
+	if Utils.isColorHash(value)
+		Utils.colorHashToRGB(value)
+	else if Utils.isRGBString(value)
+		Utils.rgbStringToRGB(value)
+	else if Utils.isRGBAString(value)
+		Utils.rgbaStringToRGBA(value)
+
+Utils.rgbToColorHash = (rgb) ->
+	{r, g, b} = rgb
+	"#" + ("000000" + Math.round((r << 16) + (g << 8) + b).toString(16)).substr(-6)
+
+Utils.rgbToString = (rgba) ->
+	{r, g, b, a} = rgba
+	a = 1 if not a?
+	"rgba(#{r}, #{g}, #{b}, #{a})"
+
+Utils.colorHashToNumber = (value) ->
+	{r,g,b} = Utils.colorHashToRGB(value)
+	Math.round((r << 16) + (g << 8) + b)
+
+Utils.numberToColorHash = (value) ->
+	Utils.rgbToColorHash(
+		r: (value & 0xff0000) >> 16
+		g: (value & 0xff00) >> 8
+		b: value & 0xff
+	)
+
+Utils.mapRangeColor =  (value, fromLow, fromHigh, toLowColor, toHighColor) ->
+	lrgb = Utils.colorToRGB(toLowColor)
+	hrgb = Utils.colorToRGB(toHighColor)
+	f = (value - fromLow) / (fromHigh - fromLow)
+	rgba = {
+		r: Math.round(lrgb.r + f * (hrgb.r - lrgb.r))
+		g: Math.round(lrgb.g + f * (hrgb.g - lrgb.g))
+		b: Math.round(lrgb.b + f * (hrgb.b - lrgb.b))
+		a: lrgb.a + f * (hrgb.a - lrgb.a)
+	}
+	Utils.rgbToString(rgba)
+
 _.extend exports, Utils
+
