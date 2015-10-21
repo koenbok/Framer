@@ -185,7 +185,6 @@ class exports.Animation extends EventEmitter
 			transformers = @options.transformers[k]
 			if transformers?
 				mapRange = transformers.mapRange
-				console.log mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
 
 			@_target[k] = mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
 
@@ -248,6 +247,32 @@ class exports.Animation extends EventEmitter
 					value = parseFloat parsedCurve.args[i]
 					@options.curveOptions[k] = value if value
 
+	@transformers = [
+		# Color transformer:
+		canTransform: Utils.isColorString
+		mapRange: Utils.mapRangeColor
+	]
+
+	# A transformer in an object that has two methods:
+	#
+	#	canTransform(value) -> Bool
+	#
+	# returns 'true', if the given value is transformable by this transformer
+	#
+	#	mapRange(value, valueLow, valueHigh, fromTarget, toTarget)
+	#
+	# returns the transformed value given an input value that's between 'valueLow' and 'valueHigh', and
+	# a 'fromTarget' and 'toTarget' that defines the target value range.
+	#
+	@registerTransformer = (transformer) ->
+		transformers.push(transformers)
+
+	@isAnimatableValue = (value) ->
+		for transformer in Animation.transformers
+			if transformer.canTransform value
+				return transformer
+		return undefined
+
 	@filterAnimatableProperties = (properties, transformers) ->
 		# Function to filter only animatable properties out of a given set
 		animatableProperties = {}
@@ -256,10 +281,11 @@ class exports.Animation extends EventEmitter
 		for k, v of properties
 			if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v)
 				animatableProperties[k] = v
-			else if Utils.isColorString(v)
+			else if transformer = Animation.isAnimatableValue(v)
 				animatableProperties[k] = v
 				transformers[k] = {
-					mapRange: Utils.mapRangeColor
+					mapRange: transformer.mapRange
 				}
+				break
 
 		return animatableProperties

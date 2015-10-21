@@ -363,13 +363,6 @@ Utils.clamp = (value, a, b) ->
 Utils.mapRange = (value, fromLow, fromHigh, toLow, toHigh) ->
 	toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
 
-Utils.mapColor = (value, from, to) ->
-	r = from.r + (value * (to.r - from.r))
-	g = from.g + (value * (to.g - from.g))
-	b = from.b + (value * (to.b - from.b))
-	result = "#" + ("000000" + Math.round((r << 16) + (g << 8) + b).toString(16)).substr(-6)
-	result
-
 # Kind of similar as above but with a better syntax and a limiting option
 Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 
