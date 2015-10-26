@@ -3,6 +3,32 @@ React = require "React"
 {LayerStyle} = require "./LayerStyle"
 
 
+LayerComponent = React.createClass
+
+	getInitialState: ->
+		return {x:100}
+
+	componentDidMount: ->
+		console.log "componentDidMount"
+
+	componentDidUpdate: ->
+		console.log "componentDidUpdate"
+
+	shouldComponentUpdate: (nextProps, nextState) ->
+		return true
+
+	calculateStyleProperties: ->
+
+	setStyleProperties: (properties) ->
+		node = React.findDOMNode(@)
+		return unless node
+		_.extend(node.style, properties)
+		return null
+
+	render: ->
+		React.createElement('div', reactPropsForLayer(@props.layer), 
+			_.map(@props.layer.subLayers, reactElementForLayer))
+
 framerGetStyleProperties = (layer) ->
 
 	css = {}
@@ -15,7 +41,6 @@ framerGetStyleProperties = (layer) ->
 
 framerGetRootLayersForContext = (context) ->
 	return _.filter context._layerList, (layer) -> layer.superLayer is null
-
 
 reactElementForContext = (context) ->
 
@@ -41,9 +66,10 @@ reactElementForLayer = (layer) ->
 	if layer.childContext
 		return reactElementForContext(layer.childContext)	
 
-	return React.createElement "div", 
-		reactPropsForLayer(layer), 
-		_.map(layer.subLayers, reactElementForLayer)
+	if not layer._reactElement
+		layer._reactElement = React.createElement LayerComponent, {key:layer.id, layer:layer}
+
+	return layer._reactElement
 
 mountNode = null
 
@@ -52,11 +78,11 @@ render = ->
 
 	React.render(reactElementForContext(Framer.DefaultContext), mountNode)
 
-	#setTimeout(render, 1000)
+	setTimeout(render, 200)
 
 	# console.log "render"
 
-	requestAnimationFrame(render)
+	# requestAnimationFrame(render)
 
 document.addEventListener "DOMContentLoaded", ->
 
