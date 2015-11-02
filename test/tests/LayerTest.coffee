@@ -929,8 +929,13 @@ describe "Layer", ->
 			copy.width.should.equal 100
 			copy.height.should.equal 100
 
+		it "copied layer should copy styles", ->
 
+			layer = new Layer
+			layer.style.backgroundColor = "yellow"
 
+			layer2 = layer.copy()
+			layer2.style.backgroundColor.should.equal "yellow"
 
 
 
