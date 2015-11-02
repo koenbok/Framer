@@ -905,21 +905,26 @@ describe "Layer", ->
 			X = 100
 			Y = 200
 			IMAGE = '../static/test.png'
+			BORDERRADIUS = 20
 
 			layer = new Layer
 				x:X
 				y:Y
 				image:IMAGE
 
+			layer.borderRadius = BORDERRADIUS
+
 			layer.x.should.eql X
 			layer.y.should.eql Y
 			layer.image.should.eql IMAGE
+			layer.borderRadius.should.eql BORDERRADIUS
 
 			copy = layer.copy()
 
 			copy.x.should.eql X
 			copy.y.should.eql Y
 			copy.image.should.eql IMAGE
+			copy.borderRadius.should.eql BORDERRADIUS
 
 		it "copied Layer should have defaults", ->
 
@@ -929,13 +934,13 @@ describe "Layer", ->
 			copy.width.should.equal 100
 			copy.height.should.equal 100
 
-		it "copied layer should copy styles", ->
+		# it "copied layer should copy styles", ->
 
-			layer = new Layer
-			layer.style.backgroundColor = "yellow"
+		# 	layer = new Layer
+		# 	layer.style.backgroundColor = "yellow"
 
-			layer2 = layer.copy()
-			layer2.style.backgroundColor.should.equal "yellow"
+		# 	layer2 = layer.copy()
+		# 	layer2.style.backgroundColor.should.equal "yellow"
 
 
 

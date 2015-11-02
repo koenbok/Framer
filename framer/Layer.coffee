@@ -191,6 +191,8 @@ class exports.Layer extends BaseClass
 	# Border radius compatibility
 
 	@define "borderRadius",
+		importable: true
+		exportable: true
 		default: 0
 		get: -> 
 			@_properties["borderRadius"]
@@ -207,7 +209,8 @@ class exports.Layer extends BaseClass
 
 	# And, because it should be cornerRadius, we alias it here
 	@define "cornerRadius",
-		importable: yes
+		importable: false
+		exportable: false
 		# exportable: no
 		get: -> @borderRadius
 		set: (value) -> @borderRadius = value
@@ -509,7 +512,6 @@ class exports.Layer extends BaseClass
 
 	copySingle: ->
 		copy = new @constructor(@props)
-		copy.style = @style
 		return copy
 
 	##############################################################
