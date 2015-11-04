@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "eventemitter3": "^0.1.6",
+    "gl-matrix": "^2.3.1",
     "lodash": "^3.5.0"
   },
   "devDependencies": {

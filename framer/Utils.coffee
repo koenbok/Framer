@@ -218,6 +218,7 @@ Utils.inspect = (item, max=5, l=0) ->
 		objectType = Utils.inspectObjectType(item)
 		# We should not loop over dom trees because we will have a bad time
 		return "<#{objectType}>" if /HTML\w+?Element/.test(objectType)
+		return "<#{objectType} #{item.toString()}>" if /WebKitCSSMatrix/.test(objectType)
 		if l > max
 			objectInfo = "{...}"
 		else
@@ -566,6 +567,10 @@ Utils.pointInFrame = (point, frame) ->
 	return false if point.y < Utils.frameGetMinY(frame) or point.y > Utils.frameGetMaxY(frame)
 	return true
 
+Utils.pointMatrix = (point) ->
+	return new WebKitCSSMatrix()
+		.translate(point.x, point.y, 0)
+
 # Size
 
 Utils.sizeZero = (args={}) ->
@@ -728,6 +733,14 @@ Utils.convertPoint = (input, layerA, layerB, context=false) ->
 
 	return point
 
+# Rotation
+
+Utils.radians = (degrees) ->
+	return degrees * Math.PI / 180
+
+Math.degrees = (radians) ->
+	return radians * 180 / Math.PI
+	
 ###################################################################
 # Beta additions, use with care
 

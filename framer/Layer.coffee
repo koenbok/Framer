@@ -1,4 +1,5 @@
 {_} = require "./Underscore"
+{vec3, mat4} = require "gl-matrix"
 
 Utils = require "./Utils"
 
@@ -490,6 +491,49 @@ class exports.Layer extends BaseClass
 		@_context.removeLayer(@)
 
 		@_context.emit("layer:destroy", @)
+
+	##############################################################
+	# MATRIX
+
+	@define "matrix",
+		importable: false
+		exportable: false
+		get: ->			
+			matrix = mat4.create()
+			mat4.translate(matrix, matrix, vec3.fromValues(@x, @y, @x))
+			mat4.scale(matrix, matrix, vec3.fromValues(@scaleX, @scaleY, @scale))
+			mat4.rotateX(matrix, matrix, Utils.radians(@rotationX))
+			mat4.rotateY(matrix, matrix, Utils.radians(@rotationY))
+			mat4.rotateZ(matrix, matrix, Utils.radians(@rotationZ))
+			return matrix
+
+	@define "offsetVector",
+		importable: false
+		exportable: false
+		get: ->
+			return vec3.fromValues(@originX * @width, @originY * @height, 0)
+
+	calculateMatrixPoint: (point) ->
+		
+		point = vec3.fromValues(point.x, point.y, 0)
+		offset = @offsetVector
+
+		vec3.sub(point, point, offset)
+		vec3.transformMat4(point, point, @matrix)
+		vec3.add(point, point, offset)
+
+		return point =
+			x: point[0]
+			y: point[1]
+
+	@traverseUp: (layer=null, context=false) ->
+		layer = @
+		layers = [layer]
+
+		while layer.superlayer
+			layer = layer.superlayer
+			layers.push(layer)
+
 
 
 	##############################################################
