@@ -6,6 +6,7 @@ Utils = require "./Utils"
 {Defaults} = require "./Defaults"
 {BaseClass} = require "./BaseClass"
 {EventEmitter} = require "./EventEmitter"
+{Color} = require "./Color"
 {Animation} = require "./Animation"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
@@ -16,7 +17,7 @@ NoCacheDateKey = Date.now()
 layerValueTypeError = (name, value) ->
 	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
 
-layerProperty = (obj, name, cssProperty, fallback, validator, options={}, set) ->
+layerProperty = (obj, name, cssProperty, fallback, validator, transformer, options={}, set) ->
 	result = 
 		default: fallback
 		get: -> 
@@ -27,6 +28,9 @@ layerProperty = (obj, name, cssProperty, fallback, validator, options={}, set) -
 		set: (value) ->
 
 			# console.log "Layer.#{name}.set #{value}"
+
+			if value and transformer
+				value = transformer(value)
 
 			if value and validator and not validator(value)
 				layerValueTypeError(name, value)
@@ -97,13 +101,13 @@ class exports.Layer extends BaseClass
 
 	@define "visible", layerProperty(@, "visible", "display", true, _.isBoolean)
 	@define "opacity", layerProperty(@, "opacity", "opacity", 1, _.isNumber)
-	@define "index", layerProperty(@, "index", "zIndex", 0, _.isNumber, {importable:false, exportable:false})
+	@define "index", layerProperty(@, "index", "zIndex", 0, _.isNumber, null, {importable:false, exportable:false})
 	@define "clip", layerProperty(@, "clip", "overflow", true, _.isBoolean)
 	
-	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBoolean, {}, (layer, value) ->
+	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBoolean, null, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 	
-	@define "scrollVertical", layerProperty @, "scrollVertical", "overflowY", false, _.isBoolean, {}, (layer, value) ->
+	@define "scrollVertical", layerProperty @, "scrollVertical", "overflowY", false, _.isBoolean, null, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 
 	@define "scroll",
@@ -163,8 +167,8 @@ class exports.Layer extends BaseClass
 	@define "shadowColor", layerProperty(@, "shadowColor", "boxShadow", "")
 
 	# Color properties
-	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, _.isString)
-	@define "color", layerProperty(@, "color", "color", null, _.isString)
+	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, Color.isColor, Color.toColor)
+	@define "color", layerProperty(@, "color", "color", null, Color.isColor, Color.toColor)
 
 	# Border properties
 	# Todo: make this default, for compat we still allow strings but throw a warning
