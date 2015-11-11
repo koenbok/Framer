@@ -39,7 +39,7 @@ describe "Layer", ->
 					
 			layer = new Layer()
 			
-			layer.style.backgroundColor.should.equal "red"
+			layer.style.backgroundColor.should.equal new Color("red").toString()
 			#layer.backgroundColor.should.equal "red"
 
 
@@ -261,8 +261,8 @@ describe "Layer", ->
 		it "should set style properties on create", ->
 
 			layer = new Layer backgroundColor: "red"
-			layer.backgroundColor.should.equal "red"
-			layer.style["backgroundColor"].should.equal "red"
+			layer.backgroundColor.should.eql new Color("red")
+			layer.style["backgroundColor"].should.equal new Color("red").toString()
 
 		it "should check value type", ->
 
