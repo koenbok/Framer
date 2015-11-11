@@ -129,7 +129,7 @@ describe "LayerStates", ->
 
 			layer.states.on Events.StateDidSwitch, ->
 				layer.scroll.should.equal true
-				layer.backgroundColor.should.equal "red"
+				layer.backgroundColor.should.eql new Color("red")
 				done()
 
 			layer.states.switch "stateA"
