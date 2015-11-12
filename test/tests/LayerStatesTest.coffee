@@ -129,7 +129,7 @@ describe "LayerStates", ->
 
 			layer.states.on Events.StateDidSwitch, ->
 				layer.scroll.should.equal true
-				layer.backgroundColor.should.eql new Color("red")
+				layer.style.backgroundColor.should.equal new Color("red").toString()
 				done()
 
 			layer.states.switch "stateA"
@@ -146,7 +146,7 @@ describe "LayerStates", ->
 			layer.states.on Events.StateDidSwitch, ->
 				# layer.scroll.should.equal true
 				layer.x.should.equal 200
-				layer.backgroundColor.should.equal = "red"
+				layer.style.backgroundColor.should.equal new Color("red").toString()
 				done()
 
 			layer.states.switch "stateA", {curve:"linear", time:0.1}
