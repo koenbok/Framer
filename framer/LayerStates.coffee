@@ -94,7 +94,10 @@ class exports.LayerStates extends BaseClass
 		animatablePropertyKeys = []
 
 		for k, v of properties
-			animatablePropertyKeys.push(k) if _.isNumber(v)
+			if _.isNumber(v)
+				animatablePropertyKeys.push(k)
+			else if v instanceof Color
+				animatablePropertyKeys.push(k)
 
 		if animatablePropertyKeys.length == 0
 			instant = true
@@ -172,6 +175,10 @@ class exports.LayerStates extends BaseClass
 
 		# TODO: Maybe we want to support advanced data structures like objects in the future too.
 		for k, v of properties
-			stateProperties[k] = v if _.isNumber(v) or _.isFunction(v) or _.isBoolean(v) or _.isString(v)
+
+			if _.isString(v) && Color.isColorString(v)
+				stateProperties[k] = new Color(v)
+			else if _.isNumber(v) or _.isFunction(v) or _.isBoolean(v) or _.isString(v) or v instanceof Color
+				stateProperties[k] = v
 
 		return stateProperties
