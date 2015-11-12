@@ -173,7 +173,7 @@ class exports.Layer extends BaseClass
 	# Border properties
 	# Todo: make this default, for compat we still allow strings but throw a warning
 	# @define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, _.isNumber
-	@define "borderColor", layerProperty(@, "borderColor", "border", null, _.isString)
+	@define "borderColor", layerProperty(@, "borderColor", "border", null, Color.isColor, Color.toColor)
 	@define "borderWidth", layerProperty(@, "borderWidth", "border", 0, _.isNumber)
 
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
