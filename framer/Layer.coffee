@@ -33,6 +33,8 @@ layerProperty = (obj, name, cssProperty, fallback, validator, options={}, set) -
 
 			@_properties[name] = value
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
+			for property in options.relatedCssProperties ? []
+				@_element.style[property] = LayerStyle[property](@)
 
 			set?(@, value)
 			@emit("change:#{name}", value)
