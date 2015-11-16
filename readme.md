@@ -9,7 +9,7 @@ Framer.js allows you to define animations and interactions, complete with filter
 
 ## Get Started
 
-- [Download] (http://framerjs.com/static/downloads/Framer.zip) (Framer.js & Framer Generator)
+- [Download] (http://framerjs.com/assets/static/downloads/Framer.zip) (Framer.js & Framer Generator)
 - Open **index.html** in a WebKit browser and you'll see an image animate on click
 - Edit the **app.js** to add interactions and animations (see example code below)
 
