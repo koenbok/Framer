@@ -121,10 +121,9 @@ exports.LayerStyle =
 		return css.join(" ")
 
 	webkitTransformOrigin: (layer) ->
-		"#{layer._properties.originX * 100}% #{layer._properties.originY * 100}%"
-
-		# Todo: Origin z is in pixels. I need to read up on this.
-		# "#{layer._properties.originX * 100}% #{layer._properties.originY * 100}% #{layer._properties.originZ * 100}%"
+		perspective = layer.superLayer?._properties.perspective ? 0
+		zOffset = (layer._properties.originZ*2 - 1) * perspective
+		"#{layer._properties.originX * 100}% #{layer._properties.originY * 100}% #{zOffset}px"
 
 	webkitPerspective: (layer) ->
 		"#{layer._properties.perspective}"

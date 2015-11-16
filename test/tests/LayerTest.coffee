@@ -98,24 +98,31 @@ describe "Layer", ->
 			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(100, 100, 100) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
 
 		it "should set origin", ->
-			
+			superLayer = new Layer
+				perspective: 100
+
 			layer = new Layer
+
+			layer.style.webkitTransformOrigin.should.equal "50% 50% 0px"
+
+			layer.superLayer = superLayer
 
 			layer.originX = 0.1
 			layer.originY = 0.2
 
-			if Utils.isChrome()
-				layer.style.webkitTransformOrigin.should.equal "10% 20% 0px"
-			else
-				layer.style.webkitTransformOrigin.should.equal "10% 20%"
+			layer.style.webkitTransformOrigin.should.equal "10% 20% 0px"
 
 			layer.originX = 0.5
 			layer.originY = 0.5
+			layer.originZ = 0
 
-			if Utils.isChrome()
-				layer.style.webkitTransformOrigin.should.equal "50% 50% 0px"
-			else
-				layer.style.webkitTransformOrigin.should.equal "50% 50%"
+			layer.style.webkitTransformOrigin.should.equal "50% 50% -100px"
+
+			layer = new Layer
+				originZ: 0.75
+				originY: 0
+				superLayer: superLayer
+			layer.style.webkitTransformOrigin.should.equal "50% 0% 50px"
 
 		it "should set local image", ->
 	

@@ -133,7 +133,7 @@ class exports.Layer extends BaseClass
 
 	@define "originX", layerProperty(@, "originX", "webkitTransformOrigin", 0.5, _.isNumber)
 	@define "originY", layerProperty(@, "originY", "webkitTransformOrigin", 0.5, _.isNumber)
-	# @define "originZ", layerProperty(@, "originZ", "WebkitTransformOrigin", 0.5
+	@define "originZ", layerProperty(@, "originZ", "webkitTransformOrigin", 0.5, _.isNumber)
 
 	@define "perspective", layerProperty(@, "perspective", "webkitPerspective", 0, _.isNumber)
 
@@ -611,6 +611,8 @@ class exports.Layer extends BaseClass
 
 			# Set the superlayer
 			@_superLayer = layer
+			if @_superLayer?.perspective != 0
+				@_element.style["webkitTransformOrigin"] = LayerStyle["webkitTransformOrigin"](@)
 
 			# Place this layer on top of its siblings
 			@bringToFront()
