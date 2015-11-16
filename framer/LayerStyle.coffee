@@ -121,9 +121,7 @@ exports.LayerStyle =
 		return css.join(" ")
 
 	webkitTransformOrigin: (layer) ->
-		perspective = layer.superLayer?._properties.perspective ? 0
-		zOffset = (layer._properties.originZ*2 - 1) * perspective
-		"#{layer._properties.originX * 100}% #{layer._properties.originY * 100}% #{zOffset}px"
+		"#{layer._properties.originX * 100}% #{layer._properties.originY * 100}% #{layer._properties.originZ}px"
 
 	webkitPerspective: (layer) ->
 		"#{layer._properties.perspective}"
