@@ -118,6 +118,12 @@ describe "Layer", ->
 			layer.style.webkitTransformOrigin.should.equal "50% 50% -50px"
 			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, -50px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
 
+			it "should set transform-style when superlayer has perspective", ->
+				superLayer = new Layer
+					perspective: 100
+				layer = new Layer
+					superLayer: superLayer
+				layer._element.style.webkitTransformStyle.should.equal "preserve-3d"
 
 		it "should set local image", ->
 	

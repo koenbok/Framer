@@ -614,7 +614,7 @@ class exports.Layer extends BaseClass
 			# Set the superlayer
 			@_superLayer = layer
 			if @_superLayer?.perspective != 0
-				@_element.style["webkitTransformOrigin"] = LayerStyle["webkitTransformOrigin"](@)
+				@_element.style["webkitTransformStyle"] = "preserve-3d"
 
 			# Place this layer on top of its siblings
 			@bringToFront()
