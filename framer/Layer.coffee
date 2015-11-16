@@ -118,7 +118,7 @@ class exports.Layer extends BaseClass
 	# Matrix properties
 	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber)
 	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber)
-	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber)
+	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber, {relatedCssProperties: ['webkitTransformOrigin']})
 
 	@define "scaleX", layerProperty(@, "scaleX", "webkitTransform", 1, _.isNumber)
 	@define "scaleY", layerProperty(@, "scaleY", "webkitTransform", 1, _.isNumber)
@@ -135,7 +135,7 @@ class exports.Layer extends BaseClass
 
 	@define "originX", layerProperty(@, "originX", "webkitTransformOrigin", 0.5, _.isNumber)
 	@define "originY", layerProperty(@, "originY", "webkitTransformOrigin", 0.5, _.isNumber)
-	@define "originZ", layerProperty(@, "originZ", "webkitTransformOrigin", 0.5, _.isNumber)
+	@define "originZ", layerProperty(@, "originZ", "webkitTransformOrigin", 0, _.isNumber, {relatedCssProperties: ['webkitTransform']})
 
 	@define "perspective", layerProperty(@, "perspective", "webkitPerspective", 0, _.isNumber)
 
