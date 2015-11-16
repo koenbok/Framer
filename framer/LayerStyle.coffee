@@ -91,15 +91,15 @@ exports.LayerStyle =
 			return exports.LayerStyle.webkitTransformForce2d(layer)
 
 		"
-		translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px) 
+		translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z+layer._properties.originZ}px)
 		scale(#{layer._properties.scale})
 		scale3d(#{layer._properties.scaleX},#{layer._properties.scaleY},#{layer._properties.scaleZ})
-		skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg) 
-		skewX(#{layer._properties.skewX}deg)  
-		skewY(#{layer._properties.skewY}deg) 
-		rotateX(#{layer._properties.rotationX}deg) 
-		rotateY(#{layer._properties.rotationY}deg) 
-		rotateZ(#{layer._properties.rotationZ}deg) 
+		skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg)
+		skewX(#{layer._properties.skewX}deg)
+		skewY(#{layer._properties.skewY}deg)
+		rotateX(#{layer._properties.rotationX}deg)
+		rotateY(#{layer._properties.rotationY}deg)
+		rotateZ(#{layer._properties.rotationZ}deg)
 		"
 
 	webkitTransformForce2d: (layer) ->
