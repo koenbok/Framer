@@ -9,6 +9,14 @@ class exports.Color extends BaseClass
 		# If input is already a Color object, return itself
 		if (color instanceof Color) then return color
 
+		if @color == null
+			@_r = 0
+			@_g = 0
+			@_b = 0
+			@_a = 0
+			@_roundA = 0
+			return
+
 		# Convert input to RGB
 		rgb = inputToRGB(color)
 
