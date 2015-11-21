@@ -1,5 +1,5 @@
 Utils = require "./Utils"
-{GestureManager} = require "./GestureManager"
+{GestureManagerElement} = require "./GestureManager"
 
 EventManagerIdCounter = 0
 
@@ -7,7 +7,7 @@ class EventManagerElement
 
 	constructor: (@element) ->
 		@_events = {}
-		@_gestureManager = new GestureManager(@element)
+		@_elementGestureManager = new GestureManagerElement(@element)
 
 	addEventListener: (eventName, listener) ->
 		
@@ -18,7 +18,7 @@ class EventManagerElement
 		@_events[eventName].push(listener)
 		
 		if Events.isGestureEvent eventName
-			@_gestureManager.addEventListener(eventName, listener)
+			@_elementGestureManager.addEventListener(eventName, listener)
 		else
 			@element.addEventListener(eventName, listener)
 
@@ -29,7 +29,7 @@ class EventManagerElement
 		@_events[eventName] = _.without @_events[eventName], listener		
 		
 		if Events.isGestureEvent eventName
-			@_gestureManager.removeEventListener(eventName, listener)
+			@_elementGestureManager.removeEventListener(eventName, listener)
 		else
 			@element.removeEventListener(eventName, listener)
 

@@ -1,6 +1,6 @@
 Hammer = require "hammerjs"
 
-class exports.GestureManager
+class exports.GestureManagerElement
 
 	constructor: (@element) ->
 		@_events = {}
