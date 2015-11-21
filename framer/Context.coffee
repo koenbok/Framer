@@ -20,11 +20,17 @@ class exports.Context extends BaseClass
 			parentLayer: null
 			name: null
 
+
 		if not options.name
 			throw Error("Contexts need a name")
 
 		@_parentLayer = options.parentLayer
 		@_name = options.name
+		
+		if options.perspective != undefined
+			@perspective = options.perspective
+		else
+			@perspective = 800
 		
 		@reset()
 
@@ -58,6 +64,8 @@ class exports.Context extends BaseClass
 		@_delayTimers = []
 		@_delayIntervals = []
 		@_layerIdCounter = 1
+
+		@perspective = @perspective
 
 		@emit("reset", @)
 
@@ -119,4 +127,11 @@ class exports.Context extends BaseClass
 		get: -> 
 			return @_parentLayer.height if @_parentLayer
 			return window.innerHeight
+
+	@define "perspective",
+		get: ->
+			return @_perspective
+		set: (value) ->
+			@_perspective = value
+			@_rootElement?.style["perspective"] = @_perspective
 

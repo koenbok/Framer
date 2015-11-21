@@ -60,6 +60,8 @@ class exports.Layer extends BaseClass
 		# We have to create the element before we set the defaults
 		@_createElement()
 
+		@_element.style["webkitTransformStyle"] = "preserve-3d"
+
 		if options.hasOwnProperty "frame"
 			options = _.extend(options, options.frame)
 
@@ -613,8 +615,6 @@ class exports.Layer extends BaseClass
 
 			# Set the superlayer
 			@_superLayer = layer
-			if @_superLayer?.perspective != 0
-				@_element.style["webkitTransformStyle"] = "preserve-3d"
 
 			# Place this layer on top of its siblings
 			@bringToFront()
