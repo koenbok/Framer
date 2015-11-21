@@ -31,6 +31,8 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 			if value and transformer
 				value = transformer(value)
+			else if value == null and transformer
+				value = transformer(value)
 
 			if value and validator and not validator(value)
 				layerValueTypeError(name, value)

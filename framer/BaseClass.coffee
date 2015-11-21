@@ -142,5 +142,5 @@ class exports.BaseClass extends EventEmitter
 					@_getPropertyDefaultValue(key)
 				)
 
-				if not (value in [null, undefined])
+				if not (value in [undefined])
 					@[key] = value
