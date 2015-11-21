@@ -18,25 +18,6 @@ class exports.Color extends BaseClass
 		@_a = rgb.a
 		@_roundA = Math.round(100*@_a) / 100
 
-	modulateToColor: (toColor, fraction) ->
-
-		r = @_r
-		g = @_g
-		b = @_b
-		a = @_a
-
-		result = null
-
-		if toColor instanceof Color
-
-			result = new Color
-				r: Utils.modulate(fraction, [0, 1], [@_r, toColor._r], true)
-				g: Utils.modulate(fraction, [0, 1], [@_g, toColor._g], true)
-				b: Utils.modulate(fraction, [0, 1], [@_b, toColor._b], true)
-				a: Utils.modulate(fraction, [0, 1], [@_a, toColor._a], true)
-
-		return result
-
 	toHex: (allow3Char) ->
 		return rgbToHex(@_r, @_g, @_b, allow3Char)
 
@@ -112,6 +93,37 @@ class exports.Color extends BaseClass
 
 	toString: ->
 		return @toRgbString()
+
+	copy: ->
+		copy = new Color
+			r: @_r
+			g: @_g
+			b: @_b
+			a: @_a
+		return copy
+
+	@modulateFromToColor: (fromColor, toColor, fraction) ->
+
+		result = null
+
+		if fromColor not instanceof Color and toColor instanceof Color
+			fromColor = toColor.copy().setAlpha(0)
+		else if fromColor instanceof Color and fromColor._a == 0 and toColor instanceof Color and toColor._a != 0
+			fromColor = toColor.copy().setAlpha(0)
+		else if toColor not instanceof Color and fromColor instanceof Color
+			toColor = fromColor.copy().setAlpha(0)
+		else if toColor instanceof Color and toColor._a == 0 and fromColor instanceof Color and fromColor._a != 0
+			toColor = fromColor.copy().setAlpha(0)
+
+		if toColor instanceof Color
+
+			result = new Color
+				r: Utils.modulate(fraction, [0, 1], [fromColor._r, toColor._r], true)
+				g: Utils.modulate(fraction, [0, 1], [fromColor._g, toColor._g], true)
+				b: Utils.modulate(fraction, [0, 1], [fromColor._b, toColor._b], true)
+				a: Utils.modulate(fraction, [0, 1], [fromColor._a, toColor._a], true)
+
+		return result
 
 	@toColor: (color) -> return new Color(color)
 	@isColor: (color) -> return color instanceof Color

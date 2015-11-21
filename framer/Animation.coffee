@@ -192,7 +192,7 @@ class exports.Animation extends EventEmitter
 		for k, v of @_stateB
 
 			if v instanceof Color
-				@_target[k] = @_stateA[k].modulateToColor(@_stateB[k], value)
+				@_target[k] = Color.modulateFromToColor(@_stateA[k], @_stateB[k], value)
 			else
 				@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
 
