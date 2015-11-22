@@ -39,9 +39,10 @@ class exports.GestureManagerElement
 		return eventFamily
 
 
-	_getExistingRecognizersForEventFamily: (eventFamily) ->
+	_getDependentRecognizersForEventFamily: (eventFamily) ->
 
-		# We need to mix recognizers for some gestures to be detected together
+		# We need to add simultaneous recognition for certain gestures to be detected together
+		# See http://hammerjs.github.io/recognize-with/
 		# All these dependencies come from https://cdn.rawgit.com/hammerjs/hammer.js/master/tests/manual/visual.html
 		existingRecognizers = []
 		
@@ -70,6 +71,11 @@ class exports.GestureManagerElement
 					existingRecognizers.push(pan)
 				if rotate = @_manager.get(Events.Pinch)
 					existingRecognizers.push(rotate)
+
+			when Events.DoubleTap # DoubleTap depends on Tap
+				if tap = @_manager.get(Events.Tap)
+					existingRecognizers.push(tap)
+			
 			else
 		
 		return existingRecognizers			
@@ -121,7 +127,7 @@ class exports.GestureManagerElement
 
 		if recognizer
 			# Add other recognizers if they existed already
-			existingRecognizers = @_getExistingRecognizersForEventFamily(eventFamily)
+			existingRecognizers = @_getDependentRecognizersForEventFamily(eventFamily)
 			if existingRecognizers.length > 0
 				@_manager.add(recognizer).recognizeWith(existingRecognizers)
 			else
