@@ -76,8 +76,8 @@ _gestures.push Events.SwipeDown = "swipedown"
 
 # Tap
 _gestures.push Events.Tap = "tap"
-_gestures.push Events.SingleTap = "singletap" # Helper. Has no event string correspondance in HammerJS
-_gestures.push Events.DoubleTap = "doubletap" # Helper. Has no event string correspondance in HammerJS
+_gestures.push Events.SingleTap = "singletap"
+_gestures.push Events.DoubleTap = "doubletap"
 
 # Scroll events
 Events.Scroll = "scroll"

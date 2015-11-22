@@ -137,3 +137,7 @@ class exports.GestureManagerElement
 			@_manager.on eventName, listener
 
 	removeEventListener: (eventName, listener) ->
+		# The EventManager already checks that the listener has been registered
+		# so we can remove it safely
+		# -- Should we remove the recognizers as well?? --
+		@_manager.off eventName, listener
