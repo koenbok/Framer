@@ -119,6 +119,13 @@ class exports.SliderComponent extends Layer
 			width: @width + @knob.width
 			height: @height + @knob.height
 
+		if @bounded
+			@knob.draggable.constraints =
+				x: 0
+				y: -@knob.height / 2
+				width: @width
+				height: @height + @knob.height
+
 		if @width > @height
 			@fill.height = @height
 			@knob.centerY()
@@ -129,6 +136,8 @@ class exports.SliderComponent extends Layer
 	_setRadius: =>
 		radius = @borderRadius
 		@fill.style.borderRadius = "#{radius}px 0 0 #{radius}px"
+
+	@define "bounded", @simpleProperty("bounded", false)
 
 	@define "knobSize",
 		get: -> @_knobSize
@@ -166,13 +175,20 @@ class exports.SliderComponent extends Layer
 
 	pointForValue: (value) ->
 		if @width > @height
-			return Utils.modulate(value, [@min, @max], [0, @width], true)
+
+			if @bounded
+				return Utils.modulate(value, [@min, @max], [0 + (@knob.width / 2), @width - (@knob.width / 2)], true)
+			else
+				return Utils.modulate(value, [@min, @max], [0, @width], true)
 		else
 			return Utils.modulate(value, [@min, @max], [0, @height], true)
 
 	valueForPoint: (value) ->
 		if @width > @height
-			return Utils.modulate(value, [0, @width], [@min, @max], true)
+			if @bounded
+				return Utils.modulate(value, [0 + (@knob.width / 2), @width - (@knob.width / 2)], [@min, @max], true)
+			else
+				return Utils.modulate(value, [0, @width], [@min, @max], true)
 		else
 			return Utils.modulate(value, [0, @height], [@min, @max], true)
 
