@@ -5,41 +5,41 @@ class exports.Color extends BaseClass
 
 		color = @color
 
-		# If input is already a Color object, return itself
+		# If input is already a Color object, return a copy
 		if (color instanceof Color) then return color
 
 		if @color == null
-			@_r = 0
-			@_g = 0
-			@_b = 0
-			@_a = 0
-			@_roundA = 0
+			@r = 0
+			@g = 0
+			@b = 0
+			@a = 0
 			return
 
 		# Convert input to RGB
 		rgb = inputToRGB(color)
 
-		@_r = rgb.r
-		@_g = rgb.g
-		@_b = rgb.b
-		@_a = rgb.a
-		@_roundA = Math.round(100*@_a) / 100
+		@r = rgb.r
+		@g = rgb.g
+		@b = rgb.b
+		@a = rgb.a
 
 	@define "r",
 		get: -> @_r
-		set: (value) -> throw "r is readonly"
+		set: (value) -> @_r = Utils.clamp(value, 0, 255)
 
 	@define "g",
 		get: -> @_g
-		set: (value) -> throw "g is readonly"
+		set: (value) -> @_g = Utils.clamp(value, 0, 255)
 
 	@define "b",
 		get: -> @_b
-		set: (value) -> throw "b is readonly"
+		set: (value) -> @_b = Utils.clamp(value, 0, 255)
 
 	@define "a",
 		get: -> @_a
-		set: (value) -> throw "a is readonly"
+		set: (value) ->
+			@_a = Utils.clamp(value, 0, 1)
+			@_roundA = Math.round(100*@_a) / 100
 
 	toHex: (allow3Char) ->
 		return rgbToHex(@_r, @_g, @_b, allow3Char)
