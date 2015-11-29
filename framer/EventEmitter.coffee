@@ -36,6 +36,11 @@ class exports.EventEmitter
 
 		@[EventKey][eventName] = (l for l in @[EventKey][eventName] when l isnt listener)
 
+		# This is not really needed, but cleans the keys for event listeners when
+		# there are none left. Avoids confusion when looking at .listeners()
+		if not @listenersForEvent(eventName).length
+			delete @[EventKey][eventName]
+
 		return null
 
 	callListener: (eventName, listener, args...) ->
