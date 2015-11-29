@@ -515,10 +515,10 @@ Utils.loadImage = (url, callback, context) ->
 	element = new Image
 	context ?= Framer.CurrentContext
 
-	context.eventManager.wrap(element).addEventListener "load", (event) ->
+	context.domEventManager.wrap(element).addEventListener "load", (event) ->
 		callback()
 
-	context.eventManager.wrap(element).addEventListener "error", (event) ->
+	context.domEventManager.wrap(element).addEventListener "error", (event) ->
 		callback(true)
 
 	element.src = url

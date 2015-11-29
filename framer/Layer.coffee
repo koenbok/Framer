@@ -803,7 +803,7 @@ class exports.Layer extends BaseClass
 	## EVENTS
 
 	@define "_domEventManager",
-		get: -> @_context.eventManager.wrap(@_element)
+		get: -> @_context.domEventManager.wrap(@_element)
 
 	addListener: (eventName, listener) =>
 
@@ -826,7 +826,7 @@ class exports.Layer extends BaseClass
 		# Do cleanup for dom events if this is the last one of it's type.
 		# We are assuming we're the only ones adding dom events to the manager.
 		if not @listenersForEvent(eventName).length
-			@_domEventManager.removeEventListeners(eventName)
+			@_domEventManager.removeListeners(eventName)
 
 	callListener: (eventName, listener, args...) ->
 		# Modify the scope for this listener and add the layer

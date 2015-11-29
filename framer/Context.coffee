@@ -3,7 +3,7 @@ Utils = require "./Utils"
 {_} = require "./Underscore"
 {BaseClass} = require "./BaseClass"
 {Config} = require "./Config"
-{EventManager} = require "./EventManager"
+{DOMEventManager} = require "./DOMEventManager"
 
 Counter = 1
 
@@ -30,8 +30,8 @@ class exports.Context extends BaseClass
 
 	reset: ->
 
-		@eventManager?.reset()
-		@eventManager = new EventManager
+		@domEventManager?.reset()
+		@domEventManager = new DOMEventManager
 
 		if @_rootElement
 			# Clean up the current root element:

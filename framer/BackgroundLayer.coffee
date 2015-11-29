@@ -14,7 +14,7 @@ class exports.BackgroundLayer extends Layer
 		
 		@sendToBack()
 		@layout()
-		@_context.eventManager.wrap(window).addEventListener("resize", @layout)
+		@_context.domEventManager.wrap(window).addEventListener("resize", @layout)
 	
 	layout: =>
 	

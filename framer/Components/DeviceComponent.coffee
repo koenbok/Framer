@@ -106,7 +106,7 @@ class exports.DeviceComponent extends BaseClass
 		@keyboardLayer.classList.add("DeviceKeyboard")
 		@keyboardLayer.backgroundColor = "transparent"
 
-		Framer.CurrentContext.eventManager.wrap(window).addEventListener("resize", @_update)
+		Framer.CurrentContext.domEventManager.wrap(window).addEventListener("resize", @_update)
 
 		# This avoids rubber banding on mobile
 		for layer in [@background, @phone, @viewport, @content, @screen]

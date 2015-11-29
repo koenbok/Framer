@@ -490,7 +490,8 @@ describe "Layer", ->
 			handler = -> console.log "hello"
 			layerA.on("test", handler)
 			layerA.removeAllListeners()
-			layerA.listeners().should.eql({test: []})
+			layerA.listenersForEvent("test").should.eql([])
+			layerA.listeners().should.eql({})
 
 
 	describe "Hierarchy", ->

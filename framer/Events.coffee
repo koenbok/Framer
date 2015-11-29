@@ -48,6 +48,6 @@ Events.touchEvent = (event) ->
 	touchEvent
 
 Events.wrap = (element) ->
-	Framer.CurrentContext.eventManager.wrap(element)
+	Framer.CurrentContext.domEventManager.wrap(element)
 	
 exports.Events = Events
