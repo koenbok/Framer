@@ -401,19 +401,6 @@ describe "Layer", ->
 			layer.ignoreEvents.should.equal true
 			layer.style["pointerEvents"].should.equal "none"
 
-		it "should listen to multiple events", ->
-
-			layer = new Layer()
-
-			count = 0
-			handler = -> count++
-
-			layer.on "click", "tap", handler
-
-			layer.emit "click"
-			layer.emit "tap"
-
-			count.should.equal 2
 
 		it "should not listen to events until a listener is added", ->
 			
@@ -491,6 +478,19 @@ describe "Layer", ->
 				callback()
 
 			layerA.draggable.emit("test", {})
+
+		it "should list all events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+			layerA.on("test", handler)
+			layerA.listeners().should.eql({"test": [handler]})
+
+		it "should remove all events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+			layerA.on("test", handler)
+			layerA.removeAllListeners()
+			layerA.listeners().should.eql({test: []})
 
 
 	describe "Hierarchy", ->

@@ -802,74 +802,36 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## EVENTS
 
-	addListener: (eventNames..., originalListener) =>
+	@define "_domEventManager",
+		get: -> @_context.eventManager.wrap(@_element)
 
-		# To avoid an error in Framer Studio we return if no originalListener was given
-		if not originalListener
-			return
+	addListener: (eventName, listener) =>
 
-		# # Modify the scope to be the calling object, just like jquery
-		# # also add the object as the last argument
-		listener = (args...) =>
-			originalListener.call(@, args..., @)
+		super(eventName, listener)
 
-		# Because we modify the listener we need to keep track of it
-		# so we can find it back when we want to unlisten again
-		originalListener.modifiedListener = listener
+		# If this is a dom event, we want the actual dom node to let us know
+		# when it gets triggered, so we can emit the event through the system.
+		if not @_domEventManager.listenersForEvent(eventName).length
+			@_domEventManager.addEventListener eventName, (event) =>
+				@emit(eventName, event)
 
-		eventNames = [eventNames] if typeof eventNames == 'string'
+		# Make sure we stop ignoring events once we add a user event listener
+		if not _.startsWith eventName, "change:"
+			@ignoreEvents = false
 
-		# Listen to dom events on the element
-		for eventName in eventNames
-			do (eventName) =>
-				super eventName, listener
-				@_context.eventManager.wrap(@_element).addEventListener(eventName, listener)
+	removeListener: (eventName, listener) ->
+		
+		super(eventName, listener)
 
-				@_eventListeners ?= {}
-				@_eventListeners[eventName] ?= []
-				@_eventListeners[eventName].push(listener)
+		# Do cleanup for dom events if this is the last one of it's type.
+		# We are assuming we're the only ones adding dom events to the manager.
+		if not @listenersForEvent(eventName).length
+			@_domEventManager.removeEventListeners(eventName)
 
-				# We want to make sure we listen to these events, but we can safely
-				# ignore it for change events
-				if not _.startsWith eventName, "change:"
-					@ignoreEvents = false
-
-	removeListener: (eventNames..., listener) ->
-
-		# If the original listener was modified, remove that
-		# one instead
-		if listener.modifiedListener
-			listener = listener.modifiedListener
-
-		eventNames = [eventNames] if typeof eventNames == 'string'
-			
-		for eventName in eventNames
-			do (eventName) =>
-				super eventName, listener
-				
-				@_context.eventManager.wrap(@_element).removeEventListener(eventName, listener)
-
-				if @_eventListeners
-					@_eventListeners[eventName] = _.without @_eventListeners[eventName], listener
-
-	once: (eventName, listener) ->
-
-		originalListener = listener
-
-		listener = (args...) =>
-			originalListener.call(@, args..., @)
-			@removeListener(eventName, listener)
-
-		@addListener(eventName, listener)
-
-
-	removeAllListeners: ->
-
-		return if not @_eventListeners
-
-		for eventName, listeners of @_eventListeners
-			for listener in listeners
-				@removeListener eventName, listener
+	callListener: (eventName, listener, args...) ->
+		# Modify the scope for this listener and add the layer
+		# as the last object, so we can easliy access it in a loop.
+		listener.call(@, args..., @)
 
 	on: @::addListener
 	off: @::removeListener
