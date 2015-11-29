@@ -4,6 +4,8 @@
 # exports.EventEmitter = EventEmitter
 
 EventKey = "_events"
+EventListenersCountKey = "_eventsListenersCount"
+DefaultMaximumListeners = 100
 
 class exports.EventEmitter
 
@@ -16,25 +18,35 @@ class exports.EventEmitter
 	addListener: (eventName, listener) ->
 
 		if not eventName
-			throw Error "addListener needs an eventName"
+			throw new Error "addListener needs an eventName"
 
 		if not listener
-			throw Error "addListener needs a listener"
+			throw new Error "addListener needs a listener"
 
 		@[EventKey] = {} if not @[EventKey]
 		@[EventKey][eventName] = [] if not @[EventKey][eventName]
 		@[EventKey][eventName].push(listener)
+
+		@[EventListenersCountKey] ?= 0
+		@[EventListenersCountKey]++
+
+		maximumListeners = @maximumListeners or DefaultMaximumListeners
+
+		if @[EventListenersCountKey] > maximumListeners
+			throw new Error "More than the maximum allowed listeners #{@[EventListenersCountKey]}, possible leak. You can increase the maximum by setting .maximumListeners"
+
 		return null
 
 	removeListener: (eventName, listener) ->
 
 		if not listener
-			throw Error "removeListener needs a listener object. You can use removeListeners(eventName)"
+			throw new Error "removeListener needs a listener object. You can use removeListeners(eventName)"
 
 		return @ unless @[EventKey]
 		return @ unless @[EventKey][eventName]
 
 		@[EventKey][eventName] = (l for l in @[EventKey][eventName] when l isnt listener)
+		@[EventListenersCountKey]--
 
 		# This is not really needed, but cleans the keys for event listeners when
 		# there are none left. Avoids confusion when looking at .listeners()
