@@ -100,7 +100,6 @@ class exports.Color extends BaseClass
 
 	lighten: (amount) ->
 		hsl = @toHsl()
-		print hsl
 		hsl.l += amount / 100
 		hsl.l = Math.min(1, Math.max(0, hsl.l))
 		return new Color(hsl)
