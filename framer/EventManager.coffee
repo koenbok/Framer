@@ -1,3 +1,5 @@
+{_} = require "./Underscore"
+
 Utils = require "./Utils"
 
 EventManagerIdCounter = 0
@@ -27,15 +29,27 @@ class EventManagerElement
 
 		return
 
+	removeEventListeners: (eventName) ->
+		@removeAllEventListeners(eventName)
+
 	removeAllEventListeners: (eventName) ->
 
 		events = if eventName then [eventName] else _.keys(@_events)
 
 		for eventName in events
+			continue unless @_events[eventName]
 			for eventListener in @_events[eventName]
 				@removeEventListener eventName, eventListener
 
 		return
+
+	listeners: ->
+		return _.clone(@_events)
+
+	listenersForEvent: (eventName) ->
+		return [] unless @_events
+		return [] unless @_events[eventName]
+		return _.clone(@_events[eventName])
 
 	once: (event, listener) ->
 
