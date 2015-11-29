@@ -5,41 +5,65 @@ class exports.Color extends BaseClass
 
 		color = @color
 
-		# If input is already a Color object, return a copy
+		# If input is already a Color object return input
 		if (color instanceof Color) then return color
 
 		if @color == null
-			@r = 0
-			@g = 0
-			@b = 0
-			@a = 0
+			@red = 0
+			@green = 0
+			@blue = 0
+			@alpha = 0
 			return
 
 		# Convert input to RGB
 		rgb = inputToRGB(color)
 
-		@r = rgb.r
-		@g = rgb.g
-		@b = rgb.b
-		@a = rgb.a
+		@red = rgb.r
+		@green = rgb.g
+		@blue = rgb.b
+		@alpha = rgb.a
 
-	@define "r",
+	@define "red",
 		get: -> @_r
-		set: (value) -> @_r = Utils.clamp(value, 0, 255)
+		set: (value) ->
+			if isNumeric(value)
+				@_r = Utils.clamp(value, 0, 255)
 
-	@define "g",
+	@define "green",
 		get: -> @_g
-		set: (value) -> @_g = Utils.clamp(value, 0, 255)
+		set: (value) ->
+			if isNumeric(value)
+				@_g = Utils.clamp(value, 0, 255)
 
-	@define "b",
+	@define "blue",
 		get: -> @_b
-		set: (value) -> @_b = Utils.clamp(value, 0, 255)
+		set: (value) ->
+			if isNumeric(value)
+				@_b = Utils.clamp(value, 0, 255)
 
-	@define "a",
+	@define "alpha",
 		get: -> @_a
 		set: (value) ->
-			@_a = Utils.clamp(value, 0, 1)
-			@_roundA = Math.round(100*@_a) / 100
+			if isNumeric(value)
+				@_a = Utils.clamp(value, 0, 1)
+				@_roundA = Math.round(100*@_a) / 100
+
+	# rgba aliases
+	@define "r",
+		get: -> @red
+		set: (value) -> @red = value
+
+	@define "g",
+		get: -> @green
+		set: (value) -> @green = value
+
+	@define "b",
+		get: -> @blue
+		set: (value) -> @blue = value
+
+	@define "a",
+		get: -> @alpha
+		set: (value) -> @alpha = value
 
 	toHex: (allow3Char) ->
 		return rgbToHex(@_r, @_g, @_b, allow3Char)
@@ -74,45 +98,40 @@ class exports.Color extends BaseClass
 		if @_a < 1 then return false
 		return cssNames[rgbToHex(@_r, @_g, @_b, @)] or false
 
-	setAlpha: (value) ->
-		@_a = boundAlpha(value)
-		@_roundA = Math.round(100*@_a) / 100
-		return @
-
 	lighten: (amount) ->
 		hsl = @toHsl()
 		print hsl
 		hsl.l += amount / 100
 		hsl.l = Math.min(1, Math.max(0, hsl.l))
-		return new Color(hsl).toRgbString()
+		return new Color(hsl)
 
 	brighten: (amount) ->
 		rgb = @toRgb()
 		rgb.r = Math.max(0, Math.min(255, rgb.r - Math.round(255 * -(amount / 100))))
 		rgb.g = Math.max(0, Math.min(255, rgb.g - Math.round(255 * -(amount / 100))))
 		rgb.b = Math.max(0, Math.min(255, rgb.b - Math.round(255 * -(amount / 100))))
-		return new Color(rgb).toRgbString()
+		return new Color(rgb)
 
 	darken: (amount) ->
 		hsl = @toHsl()
 		hsl.l -= amount / 100
 		hsl.l = Math.min(1, Math.max(0, hsl.l))
-		return new Color(hsl).toRgbString()
+		return new Color(hsl)
 
 	desaturate: (amount) ->
 		hsl = @toHsl()
 		hsl.s -= amount / 100
 		hsl.s = Math.min(1, Math.max(0, hsl.s))
-		new Color(hsl).toRgbString()
+		new Color(hsl)
 
 	saturate: (amount) ->
 		hsl = @toHsl()
 		hsl.s += amount / 100
 		hsl.s = Math.min(1, Math.max(0, hsl.s))
-		return new Color(hsl).toRgbString()
+		return new Color(hsl)
 
 	greyscale: ->
-		return new Color(hsl).desaturate(100).toRgbString()
+		return new Color(hsl).desaturate(100)
 
 	toString: ->
 		return @toRgbString()
@@ -133,13 +152,17 @@ class exports.Color extends BaseClass
 		result = null
 
 		if fromColor not instanceof Color and toColor instanceof Color
-			fromColor = toColor.copy().setAlpha(0)
+			fromColor = toColor.copy()
+			fromColor.a = 0
 		else if fromColor instanceof Color and fromColor._a == 0 and toColor instanceof Color and toColor._a != 0
-			fromColor = toColor.copy().setAlpha(0)
+			fromColor = toColor.copy()
+			fromColor.a = 0
 		else if toColor not instanceof Color and fromColor instanceof Color
-			toColor = fromColor.copy().setAlpha(0)
+			toColor = fromColor.copy()
+			toColor.a = 0
 		else if toColor instanceof Color and toColor._a == 0 and fromColor instanceof Color and fromColor._a != 0
-			toColor = fromColor.copy().setAlpha(0)
+			toColor = fromColor.copy()
+			toColor.a = 0
 
 		if toColor instanceof Color
 
@@ -166,24 +189,33 @@ inputToRGB = (color) ->
 		color = stringToObject(color)
 
 	if typeof color == 'object'
-		if color.hasOwnProperty('r') and color.hasOwnProperty('g') and color.hasOwnProperty('b')
+
+		if color.hasOwnProperty('red') or color.hasOwnProperty('green') or color.hasOwnProperty('blue')
+			rgb = rgbToRgb(color.red, color.green, color.blue)
+			ok = true
+
+		else if color.hasOwnProperty('r') or color.hasOwnProperty('g') or color.hasOwnProperty('b')
 			rgb = rgbToRgb(color.r, color.g, color.b)
 			ok = true
 
-		else if color.hasOwnProperty('h') and color.hasOwnProperty('s') and color.hasOwnProperty('v')
-			color.s = convertToPercentage(color.s)
-			color.v = convertToPercentage(color.v)
-			rgb = hsvToRgb(color.h, color.s, color.v)
-			ok = true
+		else if color.hasOwnProperty('h') or color.hasOwnProperty('s')
 
-		else if color.hasOwnProperty('h') and color.hasOwnProperty('s') and color.hasOwnProperty('l')
-			color.s = convertToPercentage(color.s)
-			color.l = convertToPercentage(color.l)
-			rgb = hslToRgb(color.h, color.s, color.l)
+			h = if isNumeric(color.h) then color.h else 0
+			s = if isNumeric(color.s) then convertToPercentage(color.s) else 1
+
+			if color.hasOwnProperty('v')
+				v = if isNumeric(color.v) then convertToPercentage(color.v) else 0
+				rgb = hsvToRgb(h, s, v)
+			else
+				l = if isNumeric(color.l) then convertToPercentage(color.l) else 50
+				rgb = hslToRgb(h, s, l)
+
 			ok = true
 
 		if color.hasOwnProperty('a')
 			a = color.a
+		else if color.hasOwnProperty('alpha')
+			a = color.alpha
 
 	a = correctAlpha(a)
 
@@ -198,9 +230,9 @@ inputToRGB = (color) ->
 # Conversion Functions
 # RGB to RGB
 rgbToRgb = (r, g, b) ->
-	r: bound01(r, 255) * 255
-	g: bound01(g, 255) * 255
-	b: bound01(b, 255) * 255
+	r: if isNumeric(r) then bound01(r, 255) * 255 else 0
+	g: if isNumeric(g) then bound01(g, 255) * 255 else 0
+	b: if isNumeric(b) then bound01(b, 255) * 255 else 0
 
 # RGB to HEX
 rgbToHex = (r, g, b, allow3Char) ->
@@ -373,6 +405,9 @@ matchers = do ->
 	hex3: /^([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/
 	hex6: /^([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/
 	}
+
+isNumeric = (value) ->
+	return !isNaN(value) && isFinite(value)
 
 stringToObject = (color) ->
 	trimLeft = /^[\s,#]+/
