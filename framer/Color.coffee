@@ -5,7 +5,7 @@ class exports.Color extends BaseClass
 
 		color = @color
 
-		# If input is already a Color object return input
+		# If input already is a Color object return input
 		if (color instanceof Color) then return color
 
 		if @color == null
@@ -305,11 +305,10 @@ rgbToHsv = (r, g, b) ->
 	max = mathMax(r, g, b)
 	min = mathMin(r, g, b)
 	h
-	s
 	v = max
 
 	d = max - min
-	s = max is 0 ? 0 : d / max
+	s = if max is 0 then 0 else d / max
 
 	if(max == min)
 		h = 0  # achromatic
