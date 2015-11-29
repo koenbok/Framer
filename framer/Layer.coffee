@@ -166,7 +166,7 @@ class exports.Layer extends BaseClass
 	@define "shadowY", layerProperty(@, "shadowY", "boxShadow", 0, _.isNumber)
 	@define "shadowBlur", layerProperty(@, "shadowBlur", "boxShadow", 0, _.isNumber)
 	@define "shadowSpread", layerProperty(@, "shadowSpread", "boxShadow", 0, _.isNumber)
-	@define "shadowColor", layerProperty(@, "shadowColor", "boxShadow", "")
+	@define "shadowColor", layerProperty(@, "shadowColor", "boxShadow", "", Color.isColor, Color.toColor)
 
 	# Color properties
 	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, Color.isColor, Color.toColor)

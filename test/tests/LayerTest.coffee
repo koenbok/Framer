@@ -375,13 +375,13 @@ describe "Layer", ->
 
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = "red"
-			layer.shadowColor.should.equal "red"
+			layer.shadowColor.r.should.equal 255
 			
-			layer.style.boxShadow.should.equal "red 10px 10px 10px 10px"
+			layer.style.boxShadow.should.equal "rgb(255, 0, 0) 10px 10px 10px 10px"
 
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = null
-			layer.style.boxShadow.should.equal ""
+			layer.style.boxShadow.should.equal "rgba(0, 0, 0, 0) 10px 10px 10px 10px"
 
 	describe "Events", ->
 
