@@ -90,17 +90,27 @@ exports.LayerStyle =
 		if layer._prefer2d or layer._properties.force2d
 			return exports.LayerStyle.webkitTransformForce2d(layer)
 
+		m = layer.matrix
+
+		return "matrix3d(
+			#{m[0]}, #{m[1]}, #{m[2]}, #{m[3]}, 
+			#{m[4]}, #{m[5]}, #{m[6]}, #{m[7]}, 
+			#{m[8]}, #{m[9]}, #{m[10]}, #{m[11]}, 
+			#{m[12]}, #{m[13]}, #{m[14]}, #{m[15]}
+		)
 		"
-		translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px) 
-		scale(#{layer._properties.scale})
-		scale3d(#{layer._properties.scaleX},#{layer._properties.scaleY},#{layer._properties.scaleZ})
-		skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg) 
-		skewX(#{layer._properties.skewX}deg)  
-		skewY(#{layer._properties.skewY}deg) 
-		rotateX(#{layer._properties.rotationX}deg) 
-		rotateY(#{layer._properties.rotationY}deg) 
-		rotateZ(#{layer._properties.rotationZ}deg) 
-		"
+
+		# "
+		# translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px) 
+		# scale(#{layer._properties.scale})
+		# scale3d(#{layer._properties.scaleX},#{layer._properties.scaleY},#{layer._properties.scaleZ})
+		# skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg) 
+		# skewX(#{layer._properties.skewX}deg)  
+		# skewY(#{layer._properties.skewY}deg) 
+		# rotateX(#{layer._properties.rotationX}deg) 
+		# rotateY(#{layer._properties.rotationY}deg) 
+		# rotateZ(#{layer._properties.rotationZ}deg) 
+		# "
 
 	webkitTransformForce2d: (layer) ->
 
