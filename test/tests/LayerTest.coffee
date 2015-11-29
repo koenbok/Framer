@@ -493,6 +493,26 @@ describe "Layer", ->
 			layerA.listenersForEvent("test").should.eql([])
 			layerA.listeners().should.eql({})
 
+		it "should add and clean up dom events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+
+			layerA.on(Events.Click, handler)
+
+			# A dom event should be added
+			layerA._domEventManager.listenersForEvent(Events.Click).length.should.equal(1)
+
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+
+			# But never more then one
+			layerA._domEventManager.listenersForEvent(Events.Click).length.should.equal(1)
+
+			layerA.removeAllListeners()
+
+			# And on removal, we should get rid of the dom event
+			layerA._domEventManager.listenersForEvent(Events.Click).length.should.equal(0)
 
 	describe "Hierarchy", ->
 		
