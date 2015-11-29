@@ -376,6 +376,9 @@ describe "Layer", ->
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = "red"
 			layer.shadowColor.r.should.equal 255
+			layer.shadowColor.g.should.equal 0
+			layer.shadowColor.b.should.equal 0
+			layer.shadowColor.a.should.equal 1
 			
 			layer.style.boxShadow.should.equal "rgb(255, 0, 0) 10px 10px 10px 10px"
 
