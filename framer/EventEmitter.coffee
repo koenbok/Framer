@@ -83,10 +83,12 @@ class exports.EventEmitter
 		return @ unless @[EventKey][eventName]
 		for listener in @[EventKey][eventName]
 			@removeListener(eventName, listener)
+		return @
 
 	removeAllListeners: ->
 		return @ unless @[EventKey]
 		for eventName, eventListeners of @[EventKey]
 			for listener in eventListeners
 				@removeListener(eventName, listener)
+		return @
 
