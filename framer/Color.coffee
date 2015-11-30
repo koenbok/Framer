@@ -98,6 +98,7 @@ class exports.Color extends BaseClass
 		return new Color(hsl)
 
 	greyscale: ->
+		hsl = @toHsl()
 		return new Color(hsl).desaturate(100)
 
 	toString: ->
