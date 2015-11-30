@@ -8,62 +8,30 @@ class exports.Color extends BaseClass
 		# If input already is a Color object return input
 		if (color instanceof Color) then return color
 
-		if @color == null
-			@red = 0
-			@green = 0
-			@blue = 0
-			@alpha = 0
-			return
-
 		# Convert input to RGB
 		rgb = inputToRGB(color)
 
-		@red = rgb.r
-		@green = rgb.g
-		@blue = rgb.b
-		@alpha = rgb.a
+		@_r = rgb.r
+		@_g = rgb.g
+		@_b = rgb.b
+		@_a = rgb.a
+		@_roundA = Math.round(100*@_a) / 100
 
-	@define "red",
-		get: -> @_r
-		set: (value) ->
-			if isNumeric(value)
-				@_r = Utils.clamp(value, 0, 255)
-
-	@define "green",
-		get: -> @_g
-		set: (value) ->
-			if isNumeric(value)
-				@_g = Utils.clamp(value, 0, 255)
-
-	@define "blue",
-		get: -> @_b
-		set: (value) ->
-			if isNumeric(value)
-				@_b = Utils.clamp(value, 0, 255)
-
-	@define "alpha",
-		get: -> @_a
-		set: (value) ->
-			if isNumeric(value)
-				@_a = Utils.clamp(value, 0, 1)
-				@_roundA = Math.round(100*@_a) / 100
-
-	# rgba aliases
 	@define "r",
-		get: -> @red
-		set: (value) -> @red = value
+		get: -> @_r
+		set: (value) -> throw "r is readonly"
 
 	@define "g",
-		get: -> @green
-		set: (value) -> @green = value
+		get: -> @_g
+		set: (value) -> throw "g is readonly"
 
 	@define "b",
-		get: -> @blue
-		set: (value) -> @blue = value
+		get: -> @_b
+		set: (value) -> throw "b is readonly"
 
 	@define "a",
-		get: -> @alpha
-		set: (value) -> @alpha = value
+		get: -> @_a
+		set: (value) -> throw "a is readonly"
 
 	toHex: (allow3Char) ->
 		return rgbToHex(@_r, @_g, @_b, allow3Char)
@@ -152,16 +120,16 @@ class exports.Color extends BaseClass
 
 		if fromColor not instanceof Color and toColor instanceof Color
 			fromColor = toColor.copy()
-			fromColor.a = 0
+			fromColor._a = 0
 		else if fromColor instanceof Color and fromColor._a == 0 and toColor instanceof Color and toColor._a != 0
 			fromColor = toColor.copy()
-			fromColor.a = 0
+			fromColor._a = 0
 		else if toColor not instanceof Color and fromColor instanceof Color
 			toColor = fromColor.copy()
-			toColor.a = 0
+			toColor._a = 0
 		else if toColor instanceof Color and toColor._a == 0 and fromColor instanceof Color and fromColor._a != 0
 			toColor = fromColor.copy()
-			toColor.a = 0
+			toColor._a = 0
 
 		if toColor instanceof Color
 
@@ -174,7 +142,7 @@ class exports.Color extends BaseClass
 		return result
 
 	@toColor: (color) -> return new Color(color)
-	@isColor: (color) -> return color instanceof Color
+	@isColor: (color) -> return color instanceof Color or color == null
 
 	@isColorString: (colorString) -> stringToObject(colorString) != false
 
@@ -184,37 +152,37 @@ inputToRGB = (color) ->
 	a = 1
 	ok = false
 
-	if typeof color == 'string'
-		color = stringToObject(color)
+	if color == null
+		a = 0
+	else
 
-	if typeof color == 'object'
+		if typeof color == 'string'
+			color = stringToObject(color)
 
-		if color.hasOwnProperty('red') or color.hasOwnProperty('green') or color.hasOwnProperty('blue')
-			rgb = rgbToRgb(color.red, color.green, color.blue)
-			ok = true
+		if typeof color == 'object'
 
-		else if color.hasOwnProperty('r') or color.hasOwnProperty('g') or color.hasOwnProperty('b')
-			rgb = rgbToRgb(color.r, color.g, color.b)
-			ok = true
+			if color.hasOwnProperty('r') or color.hasOwnProperty('g') or color.hasOwnProperty('b')
+				rgb = rgbToRgb(color.r, color.g, color.b)
+				ok = true
 
-		else if color.hasOwnProperty('h') or color.hasOwnProperty('s')
+			else if color.hasOwnProperty('h') or color.hasOwnProperty('s')
 
-			h = if isNumeric(color.h) then color.h else 0
-			s = if isNumeric(color.s) then convertToPercentage(color.s) else 1
+				h = if isNumeric(color.h) then color.h else 0
+				s = if isNumeric(color.s) then convertToPercentage(color.s) else 1
 
-			if color.hasOwnProperty('v')
-				v = if isNumeric(color.v) then convertToPercentage(color.v) else 0
-				rgb = hsvToRgb(h, s, v)
-			else
-				l = if isNumeric(color.l) then convertToPercentage(color.l) else 50
-				rgb = hslToRgb(h, s, l)
+				if color.hasOwnProperty('v')
+					v = if isNumeric(color.v) then convertToPercentage(color.v) else 0
+					rgb = hsvToRgb(h, s, v)
+				else
+					l = if isNumeric(color.l) then convertToPercentage(color.l) else 50
+					rgb = hslToRgb(h, s, l)
 
-			ok = true
+				ok = true
 
-		if color.hasOwnProperty('a')
-			a = color.a
-		else if color.hasOwnProperty('alpha')
-			a = color.alpha
+			if color.hasOwnProperty('a')
+				a = color.a
+			else if color.hasOwnProperty('alpha')
+				a = color.alpha
 
 	a = correctAlpha(a)
 
