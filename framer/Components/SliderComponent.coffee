@@ -38,10 +38,18 @@ class exports.SliderComponent extends Layer
 			width: 0, force2d: true
 			name: "fill"
 
+		@knobOverlay = new Layer
+			opacity: 0.75
+			name: "knobOverlay"
+
+		@sliderOverlay = new Layer
+			opacity: 0.75
+			name: "sliderOverlay"
+
 		super options
 
 		@knobSize = options.knobSize or 30
-		@knob.superLayer = @fill.superLayer = @
+		@knob.superLayer = @fill.superLayer = @knobOverlay.superLayer = @sliderOverlay.superLayer = @
 
 		# Set fill initially
 		if @width > @height
@@ -49,7 +57,14 @@ class exports.SliderComponent extends Layer
 		else
 			@fill.width = @width
 
-		@fill.borderRadius = @borderRadius
+		# Link knobOverlay to knob
+		@knobOverlay.on Events.Move, ->
+			if @width > @height
+				@knob.x = @x
+			else
+				@knob.y = @y
+
+		@fill.borderRadius = @sliderOverlay.borderRadius = @borderRadius
 
 		@knob.draggable.enabled = true
 		@knob.draggable.overdrag = false
@@ -57,7 +72,12 @@ class exports.SliderComponent extends Layer
 		@knob.draggable.momentumOptions = {friction: 5, tolerance: 0.25}
 		@knob.draggable.bounce = false
 		@knob.draggable.propagateEvents = false
-		@knob.borderRadius = "50%"
+		@knob.borderRadius = @knobOverlay.borderRadius = "50%"
+
+		# If tapSize isn't defined, remove the overlays
+		if not @tapSize
+			@knobOverlay.destroy()
+			@sliderOverlay.destroy()
 
 		@_updateFrame()
 		@_updateKnob()
@@ -65,6 +85,7 @@ class exports.SliderComponent extends Layer
 
 		@on("change:size", @_updateFrame)
 		@on("change:borderRadius", @_setRadius)
+		@knob.on("change:borderRadius", @_setOverlayRadius)
 
 		# Check for vertical sliders
 		if @width > @height
@@ -82,6 +103,7 @@ class exports.SliderComponent extends Layer
 
 		# On click/touch of the slider, update the value
 		@on(Events.TouchStart, @_touchDown)
+		@sliderOverlay.on(Events.TouchStart, @_touchDown)
 
 	_touchDown: (event) =>
 		event.preventDefault()
@@ -100,17 +122,19 @@ class exports.SliderComponent extends Layer
 
 	_updateFill: =>
 		if @width > @height
-			@fill.width = @knob.midX
+			@fill.width = @knobOverlay.midX = @knob.midX
 		else
-			@fill.height = @knob.midY
+			@fill.height = @knobOverlay.midY = @knob.midY
 
 	_updateKnob: =>
 		if @width > @height
-			@knob.midX = @fill.width
+			@knob.midX = @knobOverlay.midX = @fill.width
 			@knob.centerY()
+
 		else
-			@knob.midY = @fill.height
+			@knob.midY = @knobOverlay.midX = @fill.height
 			@knob.centerX()
+			@knobOverlay.midY = @knob.midY
 
 	_updateFrame: =>
 		@knob.draggable.constraints =
@@ -129,13 +153,20 @@ class exports.SliderComponent extends Layer
 		if @width > @height
 			@fill.height = @height
 			@knob.centerY()
+			@knobOverlay.centerY()
+			@sliderOverlay.center()
 		else
 			@fill.width = @width
 			@knob.centerX()
+			@knobOverlay.centerX()
+			@sliderOverlay.center()
 
 	_setRadius: =>
 		radius = @borderRadius
 		@fill.style.borderRadius = "#{radius}px 0 0 #{radius}px"
+
+	_setOverlayRadius: =>
+		@knobOverlay.borderRadius = @knob.borderRadius
 
 	@define "bounded", @simpleProperty("bounded", false)
 
@@ -146,6 +177,22 @@ class exports.SliderComponent extends Layer
 			@knob.width = @_knobSize
 			@knob.height = @_knobSize
 			@_updateFrame()
+
+	@define "tapSize",
+		get: -> @_tapSize
+
+		set: (value) ->
+
+			@_tapSize = value
+
+			@knobOverlay.props =
+				width: @knobSize or 30 + @_tapSize
+				height:	@knobSize or 30 + @_tapSize
+
+			@sliderOverlay.props =
+				width: @width + @_tapSize
+				height:	@height + @_tapSize
+
 
 	@define "min",
 		get: -> @_min or 0
