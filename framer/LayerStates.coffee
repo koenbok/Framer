@@ -98,6 +98,8 @@ class exports.LayerStates extends BaseClass
 				animatablePropertyKeys.push(k)
 			else if v instanceof Color
 				animatablePropertyKeys.push(k)
+			else if v == null
+				animatablePropertyKeys.push(k)
 
 		if animatablePropertyKeys.length == 0
 			instant = true
@@ -178,7 +180,7 @@ class exports.LayerStates extends BaseClass
 
 			if _.isString(v) && Color.isColorString(v)
 				stateProperties[k] = new Color(v)
-			else if _.isNumber(v) or _.isFunction(v) or _.isBoolean(v) or _.isString(v) or v instanceof Color
+			else if _.isNumber(v) or _.isFunction(v) or _.isBoolean(v) or _.isString(v) or v instanceof Color or v == null
 				stateProperties[k] = v
 
 		return stateProperties
