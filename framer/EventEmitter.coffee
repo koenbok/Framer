@@ -1,3 +1,3 @@
-{EventEmitter} = require "eventemitter3"
+EventEmitter = require "eventemitter3"
 
 exports.EventEmitter = EventEmitter
