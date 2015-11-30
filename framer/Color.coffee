@@ -112,33 +112,41 @@ class exports.Color extends BaseClass
 			a: @_a
 		return copy
 
+	blend: (colorB, fraction) ->
+		return Color.blend(@, colorB, fraction)
+
 	##############################################################
 	## Class methods
 
-	@modulateFromToColor: (fromColor, toColor, fraction) ->
+	@blend: (colorA, colorB, fraction) ->
 
 		result = null
 
-		if fromColor not instanceof Color and toColor instanceof Color
-			fromColor = toColor.copy()
-			fromColor._a = 0
-		else if fromColor instanceof Color and fromColor._a == 0 and toColor instanceof Color and toColor._a != 0
-			fromColor = toColor.copy()
-			fromColor._a = 0
-		else if toColor not instanceof Color and fromColor instanceof Color
-			toColor = fromColor.copy()
-			toColor._a = 0
-		else if toColor instanceof Color and toColor._a == 0 and fromColor instanceof Color and fromColor._a != 0
-			toColor = fromColor.copy()
-			toColor._a = 0
+		if typeof colorA is "string" && @isColorString(colorA)
+			colorA = new Color colorA
+		if typeof colorB is "string" && @isColorString(colorB)
+			colorB = new Color colorB
 
-		if toColor instanceof Color
+		if colorA not instanceof Color and colorB instanceof Color
+			colorA = colorB.copy()
+			colorA._a = 0
+		else if colorA instanceof Color and colorA._a == 0 and colorB instanceof Color and colorB._a != 0
+			colorA = colorB.copy()
+			colorA._a = 0
+		else if colorB not instanceof Color and colorA instanceof Color
+			colorB = colorA.copy()
+			colorB._a = 0
+		else if colorB instanceof Color and colorB._a == 0 and colorA instanceof Color and colorA._a != 0
+			colorB = colorA.copy()
+			colorB._a = 0
+
+		if colorB instanceof Color
 
 			result = new Color
-				r: Utils.modulate(fraction, [0, 1], [fromColor._r, toColor._r], true)
-				g: Utils.modulate(fraction, [0, 1], [fromColor._g, toColor._g], true)
-				b: Utils.modulate(fraction, [0, 1], [fromColor._b, toColor._b], true)
-				a: Utils.modulate(fraction, [0, 1], [fromColor._a, toColor._a], true)
+				r: Utils.modulate(fraction, [0, 1], [colorA._r, colorB._r], true)
+				g: Utils.modulate(fraction, [0, 1], [colorA._g, colorB._g], true)
+				b: Utils.modulate(fraction, [0, 1], [colorA._b, colorB._b], true)
+				a: Utils.modulate(fraction, [0, 1], [colorA._a, colorB._a], true)
 
 		return result
 
