@@ -191,7 +191,7 @@ class exports.Animation extends EventEmitter
 
 		for k, v of @_stateB
 
-			if v instanceof Color
+			if v instanceof Color or @_stateA[k] instanceof Color
 				@_target[k] = Color.modulateFromToColor(@_stateA[k], @_stateB[k], value)
 			else
 				@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
@@ -261,7 +261,7 @@ class exports.Animation extends EventEmitter
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or v instanceof Color
+			if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or v instanceof Color or v == null
 				animatableProperties[k] = v
 			else if _.isString(v)
 				if Color.isColorString(v)
