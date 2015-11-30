@@ -154,12 +154,12 @@ class exports.SliderComponent extends Layer
 			@fill.height = @height
 			@knob.centerY()
 			@knobOverlay.centerY()
-			@sliderOverlay.center()
 		else
 			@fill.width = @width
 			@knob.centerX()
 			@knobOverlay.centerX()
-			@sliderOverlay.center()
+
+		@sliderOverlay.center()
 
 	_setRadius: =>
 		radius = @borderRadius
@@ -192,7 +192,6 @@ class exports.SliderComponent extends Layer
 			@sliderOverlay.props =
 				width: @width + @_tapSize
 				height:	@height + @_tapSize
-
 
 	@define "min",
 		get: -> @_min or 0
