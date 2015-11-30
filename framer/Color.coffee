@@ -122,6 +122,9 @@ class exports.Color extends BaseClass
 
 		result = null
 
+		if isNaN(fraction)
+			fraction = .5
+
 		if typeof colorA is "string" && @isColorString(colorA)
 			colorA = new Color colorA
 		if typeof colorB is "string" && @isColorString(colorB)
