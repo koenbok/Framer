@@ -146,9 +146,9 @@ class exports.SliderComponent extends Layer
 		if @bounded
 			@knob.draggable.constraints =
 				x: 0
-				y: -@knob.height / 2
+				y: 0
 				width: @width
-				height: @height + @knob.height
+				height: @height
 
 		if @width > @height
 			@fill.height = @height
@@ -222,13 +222,15 @@ class exports.SliderComponent extends Layer
 
 	pointForValue: (value) ->
 		if @width > @height
-
 			if @bounded
 				return Utils.modulate(value, [@min, @max], [0 + (@knob.width / 2), @width - (@knob.width / 2)], true)
 			else
-				return Utils.modulate(value, [@min, @max], [0, @width], true)
+				return Utils.modulate(value, [@min, @max], [0 , @width], true)
 		else
-			return Utils.modulate(value, [@min, @max], [0, @height], true)
+			if @bounded
+				return Utils.modulate(value, [@min, @max], [0 + (@knob.height / 2), @height - (@knob.height / 2)], true)
+			else
+				return Utils.modulate(value, [@min, @max], [0, @height], true)
 
 	valueForPoint: (value) ->
 		if @width > @height
@@ -237,7 +239,10 @@ class exports.SliderComponent extends Layer
 			else
 				return Utils.modulate(value, [0, @width], [@min, @max], true)
 		else
-			return Utils.modulate(value, [0, @height], [@min, @max], true)
+			if @bounded
+				return Utils.modulate(value, [0 + (@knob.height / 2), @height - (@knob.height / 2)], [@min, @max], true)
+			else
+				return Utils.modulate(value, [0, @height], [@min, @max], true)
 
 	animateToValue: (value, animationOptions={curve:"spring(300,25,0)"}) ->
 		if @width > @height
