@@ -15,20 +15,20 @@
     "url": "https://github.com/koenbok/Framer.git"
   },
   "dependencies": {
-    "eventemitter3": "^0.1.6",
+    "eventemitter3": "^1.1.1",
     "lodash": "^3.5.0"
   },
   "devDependencies": {
     "bower": "^1.3.12",
-    "coffee-coverage": "^0.4.5",
+    "coffee-coverage": "^0.7.0",
     "coffee-loader": "^0.7.2",
     "coffee-script": "^1.9.1",
     "gulp": "^3.8.11",
-    "gulp-mocha-phantomjs": "^0.5.3",
+    "gulp-mocha-phantomjs": "^0.10.1",
     "gulp-webpack": "^1.3.1",
-    "mocha-phantomjs": "^3.5.3",
-    "should": "^5.2.0",
-    "simulate": "^0.0.4",
+    "mocha-phantomjs": "^4.0.1",
+    "should": "^7.1.1",
+    "simulate": "^0.0.5",
     "webpack": "^1.7.3",
     "knox": "^0.9.2",
     "mime": "^1.3.4",
