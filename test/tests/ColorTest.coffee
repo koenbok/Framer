@@ -26,7 +26,7 @@ describe "Color", ->
 		color = new Color hexColor
 		color.toHexString().should.eql hexColor
 
-	it "should constraint constructor options", ->
+	it "should clamp constructor options", ->
 
 		color = new Color
 			r: -10
