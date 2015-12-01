@@ -66,32 +66,32 @@ class exports.Color extends BaseClass
 		if @_a < 1 then return false
 		return cssNames[rgbToHex(@_r, @_g, @_b, @)] or false
 
-	lighten: (amount) ->
+	lighten: (amount = 10) ->
 		hsl = @toHsl()
 		hsl.l += amount / 100
 		hsl.l = Math.min(1, Math.max(0, hsl.l))
 		return new Color(hsl)
 
-	brighten: (amount) ->
+	brighten: (amount = 10) ->
 		rgb = @toRgb()
 		rgb.r = Math.max(0, Math.min(255, rgb.r - Math.round(255 * -(amount / 100))))
 		rgb.g = Math.max(0, Math.min(255, rgb.g - Math.round(255 * -(amount / 100))))
 		rgb.b = Math.max(0, Math.min(255, rgb.b - Math.round(255 * -(amount / 100))))
 		return new Color(rgb)
 
-	darken: (amount) ->
+	darken: (amount = 10) ->
 		hsl = @toHsl()
 		hsl.l -= amount / 100
 		hsl.l = Math.min(1, Math.max(0, hsl.l))
 		return new Color(hsl)
 
-	desaturate: (amount) ->
+	desaturate: (amount = 10) ->
 		hsl = @toHsl()
 		hsl.s -= amount / 100
 		hsl.s = Math.min(1, Math.max(0, hsl.s))
 		new Color(hsl)
 
-	saturate: (amount) ->
+	saturate: (amount = 10) ->
 		hsl = @toHsl()
 		hsl.s += amount / 100
 		hsl.s = Math.min(1, Math.max(0, hsl.s))
