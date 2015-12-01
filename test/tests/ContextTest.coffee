@@ -24,7 +24,7 @@ describe "Context", ->
 	# Todo: event cleanup
 		# Todo: parent layer on context cleanup
 
-	describe.only "Freezing", ->
+	describe "Freezing", ->
 
 		it "should remove events", ->
 
