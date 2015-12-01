@@ -6,7 +6,7 @@ class exports.Color extends BaseClass
 		color = @color
 
 		# If input already is a Color object return input
-		if (color instanceof Color) then return color
+		if Color.isColor(color) then return color
 
 		# Convert input to RGB
 		rgb = inputToRGB(color)
@@ -37,7 +37,7 @@ class exports.Color extends BaseClass
 		return rgbToHex(@_r, @_g, @_b, allow3Char)
 
 	toHexString: (allow3Char) ->
-		return '#' + @toHex(allow3Char)
+		return "#" + @toHex(allow3Char)
 
 	toRgb: ->
 		r: Math.round(@_r)
@@ -46,8 +46,8 @@ class exports.Color extends BaseClass
 		a: @_a
 
 	toRgbString: ->
-		if @_a == 1 then "rgb(#{Utils.round(@_r, 0)}, #{Utils.round(@_g, 0)}, #{Utils.round(@_b, 0)})"
-		else "rgba(#{Utils.round(@_r, 0)}, #{Utils.round(@_g, 0)}, #{Utils.round(@_b, 0)}, #{@_roundA})"
+		if @_a == 1 then "rgb(#{Math.round(@_r)}, #{Math.round(@_g)}, #{Math.round(@_b)})"
+		else "rgba(#{Math.round(@_r)}, #{Math.round(@_g)}, #{Math.round(@_b)}, #{@_roundA})"
 
 	toHsl: ->
 		hsl = rgbToHsl(@_r, @_g, @_b)
@@ -112,13 +112,13 @@ class exports.Color extends BaseClass
 			a: @_a
 		return copy
 
-	blend: (colorB, fraction) ->
-		return Color.blend(@, colorB, fraction)
+	mix: (colorB, fraction) ->
+		return Color.mix(@, colorB, fraction)
 
 	##############################################################
 	## Class methods
 
-	@blend: (colorA, colorB, fraction) ->
+	@mix: (colorA, colorB, fraction) ->
 
 		result = null
 
@@ -154,7 +154,8 @@ class exports.Color extends BaseClass
 		return result
 
 	@toColor: (color) -> return new Color(color)
-	@isColor: (color) -> return color instanceof Color or color == null
+	@isColor: (color) -> return color instanceof Color
+	@validColorValue: (color) -> return color instanceof Color or color == null
 
 	@isColorString: (colorString) -> stringToObject(colorString) != false
 
@@ -168,32 +169,32 @@ inputToRGB = (color) ->
 		a = 0
 	else
 
-		if typeof color == 'string'
+		if typeof color == "string"
 			color = stringToObject(color)
 
-		if typeof color == 'object'
+		if typeof color == "object"
 
-			if color.hasOwnProperty('r') or color.hasOwnProperty('g') or color.hasOwnProperty('b')
+			if color.hasOwnProperty("r") or color.hasOwnProperty("g") or color.hasOwnProperty("b")
 				rgb = rgbToRgb(color.r, color.g, color.b)
 				ok = true
 
-			else if color.hasOwnProperty('h') or color.hasOwnProperty('s')
+			else if color.hasOwnProperty("h") or color.hasOwnProperty("s")
 
-				h = if isNumeric(color.h) then color.h else 0
-				s = if isNumeric(color.s) then convertToPercentage(color.s) else 1
+				h = if _.isNumber(color.h) then color.h else 0
+				s = if _.isNumber(color.s) then convertToPercentage(color.s) else 1
 
-				if color.hasOwnProperty('v')
-					v = if isNumeric(color.v) then convertToPercentage(color.v) else 0
+				if color.hasOwnProperty("v")
+					v = if _.isNumber(color.v) then convertToPercentage(color.v) else 0
 					rgb = hsvToRgb(h, s, v)
 				else
-					l = if isNumeric(color.l) then convertToPercentage(color.l) else 50
+					l = if _.isNumber(color.l) then convertToPercentage(color.l) else 50
 					rgb = hslToRgb(h, s, l)
 
 				ok = true
 
-			if color.hasOwnProperty('a')
+			if color.hasOwnProperty("a")
 				a = color.a
-			else if color.hasOwnProperty('alpha')
+			else if color.hasOwnProperty("alpha")
 				a = color.alpha
 
 	a = correctAlpha(a)
@@ -209,9 +210,9 @@ inputToRGB = (color) ->
 # Conversion Functions
 # RGB to RGB
 rgbToRgb = (r, g, b) ->
-	r: if isNumeric(r) then bound01(r, 255) * 255 else 0
-	g: if isNumeric(g) then bound01(g, 255) * 255 else 0
-	b: if isNumeric(b) then bound01(b, 255) * 255 else 0
+	r: if _.isNumber(r) then bound01(r, 255) * 255 else 0
+	g: if _.isNumber(g) then bound01(g, 255) * 255 else 0
+	b: if _.isNumber(b) then bound01(b, 255) * 255 else 0
 
 # RGB to HEX
 rgbToHex = (r, g, b, allow3Char) ->
@@ -222,7 +223,7 @@ rgbToHex = (r, g, b, allow3Char) ->
 	]
 	if allow3Char and hex[0].charAt(0) == hex[0].charAt(1) and hex[1].charAt(0) == hex[1].charAt(1) and hex[2].charAt(0) == hex[2].charAt(1)
 		return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0)
-	hex.join ''
+	hex.join ""
 
 # RGB to HSL
 rgbToHsl = (r, g, b) ->
@@ -458,9 +459,9 @@ stringToObject = (color) ->
 
 	if match = matchers.hex3.exec(color) or match = matchers.hex3.exec(cssNames[color])
 		return {
-		r: parseInt(match[1] + '' + match[1], 16)
-		g: parseInt(match[2] + '' + match[2], 16)
-		b: parseInt(match[3] + '' + match[3], 16)
+		r: parseInt(match[1] + "" + match[1], 16)
+		g: parseInt(match[2] + "" + match[2], 16)
+		b: parseInt(match[3] + "" + match[3], 16)
 		}
 	else return false
 
