@@ -166,16 +166,16 @@ class exports.Layer extends BaseClass
 	@define "shadowY", layerProperty(@, "shadowY", "boxShadow", 0, _.isNumber)
 	@define "shadowBlur", layerProperty(@, "shadowBlur", "boxShadow", 0, _.isNumber)
 	@define "shadowSpread", layerProperty(@, "shadowSpread", "boxShadow", 0, _.isNumber)
-	@define "shadowColor", layerProperty(@, "shadowColor", "boxShadow", "", Color.isColor, Color.toColor)
+	@define "shadowColor", layerProperty(@, "shadowColor", "boxShadow", "", Color.validColorValue, Color.toColor)
 
 	# Color properties
-	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, Color.isColor, Color.toColor)
-	@define "color", layerProperty(@, "color", "color", null, Color.isColor, Color.toColor)
+	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, Color.validColorValue, Color.toColor)
+	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor)
 
 	# Border properties
 	# Todo: make this default, for compat we still allow strings but throw a warning
 	# @define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, _.isNumber
-	@define "borderColor", layerProperty(@, "borderColor", "border", null, Color.isColor, Color.toColor)
+	@define "borderColor", layerProperty(@, "borderColor", "border", null, Color.validColorValue, Color.toColor)
 	@define "borderWidth", layerProperty(@, "borderWidth", "border", 0, _.isNumber)
 
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
