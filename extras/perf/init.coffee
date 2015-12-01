@@ -40,7 +40,7 @@ _contextLayer.style.border = "1px solid grey"
 
 run = (options, callback) ->
 	
-	context = new Framer.Context(name:"TestRun", parentLayer:_contextLayer)
+	context = new Framer.Context(name:"TestRun", parent:_contextLayer)
 	context.run -> _run options, (results) ->
 		context.reset()
 		callback(results)

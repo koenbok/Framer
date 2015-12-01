@@ -415,7 +415,7 @@ Utils.domComplete = (f) ->
 	if document.readyState is "complete"
 		f()
 	else
-		__domComplete.push f
+		__domComplete.push(f)
 
 Utils.domCompleteCancel = (f) ->
 	__domComplete = _.without __domComplete, f

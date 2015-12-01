@@ -7,8 +7,44 @@ Utils = require "./Utils"
 
 Counter = 1
 
-class exports.Context extends BaseClass
+###
+
+Context
+	name
+	parent
+	domEventManager
+	--
+	setup()
+	run(fn)
+	--
+	reset()
+	destroy()
+	--
+	freeze()
+	unfreeze()
+	--
+	width √
+	heigh √
+	size √
+	frame √
+	--
+	patch()
+	unpatch()
+	--
+	resetTimers()
+	resetIntervals()
+	--
+	addLayer()
+	removeLayer()
+	layers
 	
+###
+
+class exports.Context extends BaseClass
+
+	@define "parent",
+		get: -> @_parent
+
 	constructor: (options={}) ->
 		
 		super
@@ -17,13 +53,13 @@ class exports.Context extends BaseClass
 
 		options = _.defaults options,
 			contextName: null
-			parentLayer: null
+			parent: null
 			name: null
 
 		if not options.name
 			throw Error("Contexts need a name")
 
-		@_parentLayer = options.parentLayer
+		@_parent = options.parent
 		@_name = options.name
 		
 		@reset()
@@ -33,39 +69,25 @@ class exports.Context extends BaseClass
 		@domEventManager?.reset()
 		@domEventManager = new DOMEventManager
 
-		if @_rootElement
-			# Clean up the current root element:
-			if @_rootElement.parentNode
-				# Already attached to the DOM - remove it:
-				@_rootElement.parentNode.removeChild(@_rootElement)
-			else
-				# Not on the DOM yet. Prevent it from being added (for this happens
-				# async):
-				@_rootElement.__cancelAppendChild = true
-
 		# Create a fresh root element:
 		@_createRootElement()
 
 		@_delayTimers?.map (timer) -> window.clearTimeout(timer)
 		@_delayIntervals?.map (timer) -> window.clearInterval(timer)
 
-		if @_animationList
-			for animation in @_animationList
-				animation.stop(false)
+		@stopAnimations()
 
 		@_layerList = []
 		@_animationList = []
 		@_delayTimers = []
 		@_delayIntervals = []
 		@_layerIdCounter = 1
+		@_frozenEvents = null
 
 		@emit("reset", @)
 
 	destroy: ->
 		@reset()
-		if @_rootElement.parentNode
-			@_rootElement.parentNode.removeChild(@_rootElement)
-		Utils.domCompleteCancel(@_appendRootElement)
 
 	getRootElement: ->
 		@_rootElement
@@ -88,21 +110,6 @@ class exports.Context extends BaseClass
 	nextLayerId: ->
 		@_layerIdCounter++
 
-	_createRootElement: ->
-
-		@_rootElement = document.createElement("div")
-		@_rootElement.id = "FramerContextRoot-#{@_name}"
-		@_rootElement.classList.add("framerContext")
-
-		if @_parentLayer
-			@_appendRootElement()
-		else
-			Utils.domComplete(@_appendRootElement)
-
-	_appendRootElement: =>
-		parentElement = @_parentLayer?._element
-		parentElement ?= document.body
-		parentElement.appendChild(@_rootElement)
 
 	run: (f) ->
 		previousContext = Framer.CurrentContext
@@ -110,13 +117,77 @@ class exports.Context extends BaseClass
 		f()
 		Framer.CurrentContext = previousContext
 
+	stopAnimations: ->
+		if @_animationList
+			for animation in @_animationList
+				animation.stop(false)
+
+	# Freezing
+
+	freeze: ->
+
+		events = {}
+
+		for layer in @_layerList
+			events[@_layerList.indexOf(layer)] = layer.listeners()
+			layer.removeAllListeners()
+
+
+		@stopAnimations()
+
+		@_frozenEvents = events
+
+
+	resume: ->
+
+		for layerId, events of @_frozenEvents
+			layer = @_layerList[layerId]
+			for eventName, listeners of events
+				for listener in listeners
+					layer.on(eventName, listener)
+
+
+	# DOM
+
+	_destroyRootElement: ->
+
+		if @_rootElement?.parentNode
+			@_rootElement.parentNode.removeChild(@_rootElement)
+
+		if @__pendingElementAppend
+			Utils.domCompleteCancel(@__pendingElementAppend)
+			@__pendingElementAppend = null
+
+		@_rootElement = null
+
+	_createRootElement: ->
+
+		@_destroyRootElement()
+
+		@_rootElement = document.createElement("div")
+		@_rootElement.id = "FramerContextRoot-#{@_name}"
+		@_rootElement.classList.add("framerContext")
+
+		@__pendingElementAppend = =>
+			parentElement = @_parent?._element
+			parentElement ?= document.body
+			parentElement.appendChild(@_rootElement)
+
+		Utils.domComplete(@__pendingElementAppend)
+
+	# Geometry
+
 	@define "width", 
 		get: -> 
-			return @_parentLayer.width if @_parentLayer
+			return @parent.width if @parent
 			return window.innerWidth
 
 	@define "height",
 		get: -> 
-			return @_parentLayer.height if @_parentLayer
+			return @parent.height if @parent
 			return window.innerHeight
+
+	@define "frame", get: -> {x:0, y:0, width:@width, height:@height}
+	@define "size",  get: -> _.pluck(@frame, ["x", "y"])
+	@define "point", get: -> _.pluck(@frame, ["width", "height"])
 

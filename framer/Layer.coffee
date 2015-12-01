@@ -674,8 +674,8 @@ class exports.Layer extends BaseClass
 	_superOrParentLayer: ->
 		if @superLayer
 			return @superLayer
-		if @_context._parentLayer
-			return @_context._parentLayer
+		if @_context._parent
+			return @_context._parent
 
 	subLayersAbove: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
 		Utils.framePointForOrigin(layer.frame, originX, originY).y < point.y
