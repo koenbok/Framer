@@ -84,12 +84,12 @@ else
 
 Utils.delay = (time, f) ->
 	timer = setTimeout(f, time * 1000)
-	Framer.CurrentContext._delayTimers.push(timer)
+	Framer.CurrentContext.addTimer(timer)
 	return timer
 
 Utils.interval = (time, f) ->
 	timer = setInterval(f, time * 1000)
-	Framer.CurrentContext._delayIntervals.push(timer)
+	Framer.CurrentContext.addInterval(timer)
 	return timer
 
 Utils.debounce = (threshold=0.1, fn, immediate) ->

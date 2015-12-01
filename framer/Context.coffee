@@ -1,43 +1,31 @@
-Utils = require "./Utils"
-
 {_} = require "./Underscore"
+
+Utils = require "./Utils"
 {BaseClass} = require "./BaseClass"
 {Config} = require "./Config"
 {DOMEventManager} = require "./DOMEventManager"
 
-Counter = 1
-
 ###
 
-Context
-	name
-	parent
-	domEventManager
-	--
-	setup()
-	run(fn)
-	--
-	reset()
-	destroy()
-	--
-	freeze()
-	unfreeze()
-	--
-	width √
-	heigh √
-	size √
-	frame √
-	--
-	patch()
-	unpatch()
-	--
-	resetTimers()
-	resetIntervals()
-	--
-	addLayer()
-	removeLayer()
-	layers
-	
+An easy way to think of the context is a bucket of things related to a set of layers. There
+is always at least one context on the screen, but often many more. For example, the device has
+a special context and replaces the default one (so it renders in the screen), and the print
+function uses on to draw the console.
+
+The default context lives under Framer.DefaultContext and the current one in 
+Framer.CurrentContext. You can create layers in any context by using the run function.
+
+A context keeps track of everyting around those layers, so it can clean it up again. We use
+this a lot in Framer Studio's autocomplete function. Async things like running animations and
+timers get stopped too.
+
+Contexts can live inside another context (with a layer as a parent) so you can only reload
+a part of a prototype. This is mainly how device works.
+
+Another feature is to temporarily freeze/resume a context. If you freeze it, all user event
+will temporarily get blocked so in theory nothing will change in the context. You can restore
+these at any time.
+
 ###
 
 class exports.Context extends BaseClass
@@ -45,14 +33,14 @@ class exports.Context extends BaseClass
 	@define "parent",
 		get: -> @_parent
 
+	@define "element",
+		get: -> @_element
+
 	constructor: (options={}) ->
 		
 		super
 
-		Counter++
-
 		options = _.defaults options,
-			contextName: null
 			parent: null
 			name: null
 
@@ -66,116 +54,176 @@ class exports.Context extends BaseClass
 
 	reset: ->
 
-		@domEventManager?.reset()
-		@domEventManager = new DOMEventManager
-
-		# Create a fresh root element:
+		@_createDOMEventManager()
 		@_createRootElement()
 
-		@_delayTimers?.map (timer) -> window.clearTimeout(timer)
-		@_delayIntervals?.map (timer) -> window.clearInterval(timer)
-
-		@stopAnimations()
-
-		@_layerList = []
-		@_animationList = []
-		@_delayTimers = []
-		@_delayIntervals = []
-		@_layerIdCounter = 1
-		@_frozenEvents = null
+		@resetLayers()
+		@resetAnimations()
+		@resetTimers()
+		@resetIntervals()
 
 		@emit("reset", @)
 
-	destroy: ->
-		@reset()
+	# destroy: ->
+	# 	@reset()
 
-	getRootElement: ->
-		@_rootElement
 
-	getLayers: ->
-		_.clone(@_layerList)
+	##############################################################
+	# Collections
 
+	# Layers
+	@define "layers", get: -> _.clone(@_layers)
+	@define "layerCounter", get: -> @_layerCounter
+	
 	addLayer: (layer) ->
-		return if layer in @_layerList
-		@_layerList.push(layer)
-		return null
-
+		return if layer in @_layers
+		@_layerCounter++
+		@_layers.push(layer)
+		
 	removeLayer: (layer) ->
-		@_layerList = _.without(@_layerList, layer)
-		return null
-
-	layerCount: ->
-		return @_layerList.length
-
-	nextLayerId: ->
-		@_layerIdCounter++
+		@_layers = _.without(@_layers, layer)
+	
+	resetLayers: ->
+		@_layers = []
+		@_layerCounter = 0
 
 
-	run: (f) ->
-		previousContext = Framer.CurrentContext
-		Framer.CurrentContext = @
-		f()
-		Framer.CurrentContext = previousContext
+	# Animations
+	@define "animations", get: -> _.clone(@_animations)
+	
+	addAnimation: (animation) ->
+		return if animation in @_animations
+		@_animations.push(animation)
+		
+	removeAnimation: (animation) ->
+		@_animations = _.without(@_animations, animation)
+	
+	resetAnimations: ->
+		@stopAnimations()
+		@_animations = []
 
 	stopAnimations: ->
-		if @_animationList
-			for animation in @_animationList
-				animation.stop(false)
+		return unless @_animations
+		@_animations.map (animation) -> animation.stop(true)
 
+
+	# Timers
+	@define "timers", get: -> _.clone(@_timers)
+	
+	addTimer: (timer) ->
+		return if timer in @_timers
+		@_timers.push(timer)
+		
+	removeTimer: (timer) ->
+		@_timers = _.without(@_timers, timer)
+	
+	resetTimers: ->
+		@_timers.map(window.clearTimeout) if @_timers
+		@_timers = []
+
+
+	# Intervals
+	@define "intervals", get: -> _.clone(@_intervals)
+	
+	addInterval: (interval) ->
+		return if interval in @_intervals
+		@_intervals.push(interval)
+		
+	removeInterval: (interval) ->
+		@_intervals = _.without(@_intervals, interval)
+	
+	resetIntervals: ->
+		@_intervals.map(window.clearInterval) if @_intervals
+		@_intervals = []
+
+
+	##############################################################
+	# Run
+
+	run: (fn) ->
+		previousContext = Framer.CurrentContext
+		Framer.CurrentContext = @
+		fn()
+		Framer.CurrentContext = previousContext
+
+
+	##############################################################
 	# Freezing
 
 	freeze: ->
 
-		events = {}
+		if @_frozenEvents
+			throw new Error "Context is already frozen"
 
-		for layer in @_layerList
-			events[@_layerList.indexOf(layer)] = layer.listeners()
+		@_frozenEvents = {}
+
+		for layer in @_layers
+
+			layerListeners = layer.listeners()
+			layerId = @_layers.indexOf(layer)
 			layer.removeAllListeners()
 
-
+			@_frozenEvents[layerId] = layerListeners
+			
 		@stopAnimations()
 
-		@_frozenEvents = events
-
+		# TODO: It would be nice to continue at least intervals after a resume
+		@resetTimers()
+		@resetIntervals()
 
 	resume: ->
 
+		if not @_frozenEvents
+			throw new Error "Context is not frozen, cannot resume"
+
 		for layerId, events of @_frozenEvents
-			layer = @_layerList[layerId]
+			layer = @_layers[layerId]
 			for eventName, listeners of events
 				for listener in listeners
 					layer.on(eventName, listener)
 
+		delete @_frozenEvents
 
+
+	##############################################################
 	# DOM
+
+	_createDOMEventManager: ->
+		@domEventManager?.reset()
+		@domEventManager = new DOMEventManager
 
 	_destroyRootElement: ->
 
-		if @_rootElement?.parentNode
-			@_rootElement.parentNode.removeChild(@_rootElement)
+		if @_element?.parentNode
+			@_element.parentNode.removeChild(@_element)
 
 		if @__pendingElementAppend
 			Utils.domCompleteCancel(@__pendingElementAppend)
 			@__pendingElementAppend = null
 
-		@_rootElement = null
+		@_element = null
 
 	_createRootElement: ->
 
 		@_destroyRootElement()
 
-		@_rootElement = document.createElement("div")
-		@_rootElement.id = "FramerContextRoot-#{@_name}"
-		@_rootElement.classList.add("framerContext")
+		@_element = document.createElement("div")
+		@_element.id = "FramerContextRoot-#{@_name}"
+		@_element.classList.add("framerContext")
 
 		@__pendingElementAppend = =>
 			parentElement = @_parent?._element
 			parentElement ?= document.body
-			parentElement.appendChild(@_rootElement)
+			parentElement.appendChild(@_element)
 
 		Utils.domComplete(@__pendingElementAppend)
 
+
+	##############################################################
 	# Geometry
+
+	# Remember the context doesn't really have height. These are just a reference
+	# to it's parent or document.
 
 	@define "width", 
 		get: -> 

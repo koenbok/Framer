@@ -68,7 +68,7 @@ class exports.Layer extends BaseClass
 		# Add this layer to the current context
 		@_context.addLayer(@)
 
-		@_id = @_context.nextLayerId()
+		@_id = @_context.layerCounter
 
 		# Insert the layer into the dom or the superLayer element
 		if not options.superLayer
@@ -87,6 +87,9 @@ class exports.Layer extends BaseClass
 
 	##############################################################
 	# Properties
+
+	# Readonly context property
+	@define "context", get: -> @_context
 
 	# A placeholder for layer bound properties defined by the user:
 	@define "custom", @simpleProperty("custom", undefined)
@@ -449,7 +452,7 @@ class exports.Layer extends BaseClass
 
 	_insertElement: ->
 		@bringToFront()
-		@_context.getRootElement().appendChild(@_element)
+		@_context.element.appendChild(@_element)
 
 	@define "html",
 		get: ->
@@ -702,7 +705,7 @@ class exports.Layer extends BaseClass
 
 	animations: ->
 		# Current running animations on this layer
-		_.filter @_context._animationList, (animation) =>
+		_.filter @_context.animations, (animation) =>
 			animation.options.layer == @
 
 	animatingProperties: ->
