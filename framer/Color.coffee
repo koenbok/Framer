@@ -125,9 +125,9 @@ class exports.Color extends BaseClass
 		if isNaN(fraction)
 			fraction = .5
 
-		if typeof colorA is "string" && @isColorString(colorA)
+		if typeof colorA is "string" and @isColorString(colorA)
 			colorA = new Color colorA
-		if typeof colorB is "string" && @isColorString(colorB)
+		if typeof colorB is "string" and @isColorString(colorB)
 			colorB = new Color colorB
 
 		if colorA not instanceof Color and colorB instanceof Color
@@ -184,14 +184,14 @@ inputToRGB = (color) ->
 
 			else if color.hasOwnProperty("h") or color.hasOwnProperty("s")
 
-				h = if isNumeric(color.h) then color.h else 0
-				s = if isNumeric(color.s) then convertToPercentage(color.s) else 1
+				h = if _.isNumber(color.h) then color.h else 0
+				s = if _.isNumber(color.s) then convertToPercentage(color.s) else 1
 
 				if color.hasOwnProperty("v")
-					v = if isNumeric(color.v) then convertToPercentage(color.v) else 0
+					v = if _.isNumber(color.v) then convertToPercentage(color.v) else 0
 					rgb = hsvToRgb(h, s, v)
 				else
-					l = if isNumeric(color.l) then convertToPercentage(color.l) else 50
+					l = if _.isNumber(color.l) then convertToPercentage(color.l) else 50
 					rgb = hslToRgb(h, s, l)
 
 				ok = true
@@ -214,9 +214,9 @@ inputToRGB = (color) ->
 # Conversion Functions
 # RGB to RGB
 rgbToRgb = (r, g, b) ->
-	r: if isNumeric(r) then bound01(r, 255) * 255 else 0
-	g: if isNumeric(g) then bound01(g, 255) * 255 else 0
-	b: if isNumeric(b) then bound01(b, 255) * 255 else 0
+	r: if _.isNumber(r) then bound01(r, 255) * 255 else 0
+	g: if _.isNumber(g) then bound01(g, 255) * 255 else 0
+	b: if _.isNumber(b) then bound01(b, 255) * 255 else 0
 
 # RGB to HEX
 rgbToHex = (r, g, b, allow3Char) ->
@@ -388,9 +388,6 @@ matchers = do ->
 	hex3: /^([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/
 	hex6: /^([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/
 	}
-
-isNumeric = (value) ->
-	return !isNaN(value) && isFinite(value)
 
 stringToObject = (color) ->
 	trimLeft = /^[\s,#]+/
