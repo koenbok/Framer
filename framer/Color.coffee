@@ -37,7 +37,7 @@ class exports.Color extends BaseClass
 		return rgbToHex(@_r, @_g, @_b, allow3Char)
 
 	toHexString: (allow3Char) ->
-		return '#' + @toHex(allow3Char)
+		return "#" + @toHex(allow3Char)
 
 	toRgb: ->
 		r: Math.round(@_r)
@@ -169,21 +169,21 @@ inputToRGB = (color) ->
 		a = 0
 	else
 
-		if typeof color == 'string'
+		if typeof color == "string"
 			color = stringToObject(color)
 
-		if typeof color == 'object'
+		if typeof color == "object"
 
-			if color.hasOwnProperty('r') or color.hasOwnProperty('g') or color.hasOwnProperty('b')
+			if color.hasOwnProperty("r") or color.hasOwnProperty("g") or color.hasOwnProperty("b")
 				rgb = rgbToRgb(color.r, color.g, color.b)
 				ok = true
 
-			else if color.hasOwnProperty('h') or color.hasOwnProperty('s')
+			else if color.hasOwnProperty("h") or color.hasOwnProperty("s")
 
 				h = if isNumeric(color.h) then color.h else 0
 				s = if isNumeric(color.s) then convertToPercentage(color.s) else 1
 
-				if color.hasOwnProperty('v')
+				if color.hasOwnProperty("v")
 					v = if isNumeric(color.v) then convertToPercentage(color.v) else 0
 					rgb = hsvToRgb(h, s, v)
 				else
@@ -192,9 +192,9 @@ inputToRGB = (color) ->
 
 				ok = true
 
-			if color.hasOwnProperty('a')
+			if color.hasOwnProperty("a")
 				a = color.a
-			else if color.hasOwnProperty('alpha')
+			else if color.hasOwnProperty("alpha")
 				a = color.alpha
 
 	a = correctAlpha(a)
@@ -223,7 +223,7 @@ rgbToHex = (r, g, b, allow3Char) ->
 	]
 	if allow3Char and hex[0].charAt(0) == hex[0].charAt(1) and hex[1].charAt(0) == hex[1].charAt(1) and hex[2].charAt(0) == hex[2].charAt(1)
 		return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0)
-	hex.join ''
+	hex.join ""
 
 # RGB to HSL
 rgbToHsl = (r, g, b) ->
@@ -327,7 +327,7 @@ boundAlpha = (a) ->
 	return a
 
 convertToPercentage = (n) ->
-	if n <= 1 then n = n * 100 + '%'
+	if n <= 1 then n = n * 100 + "%"
 	return n
 
 # Ensure there's always a correct alpha value.
@@ -340,7 +340,7 @@ correctAlpha = (a) ->
 # Take input from [0, n] and return it as [0, 1]
 bound01 = (n, max) ->
 	if isOnePointZero(n)
-		n = '100%'
+		n = "100%"
 	processPercent = isPercentage(n)
 	n = Math.min(max, Math.max(0, parseFloat(n)))
 
@@ -355,16 +355,16 @@ bound01 = (n, max) ->
 
 
 isOnePointZero = (n) ->
-	return typeof n == 'string' and n.indexOf('.') != -1 and parseFloat(n) == 1
+	return typeof n == "string" and n.indexOf(".") != -1 and parseFloat(n) == 1
 
 # Check to see if string passed in is a percentage
 isPercentage = (n) ->
-	return typeof n == 'string' and n.indexOf('%') != -1
+	return typeof n == "string" and n.indexOf("%") != -1
 
 # Force hex to have 2 characters.
 pad2 = (char) ->
-	if char.length == 1 then '0' + char
-	else '' + char
+	if char.length == 1 then "0" + char
+	else "" + char
 
 # Matchers
 matchers = do ->
@@ -392,7 +392,7 @@ stringToObject = (color) ->
 	trimLeft = /^[\s,#]+/
 	trimRight = /\s+$/
 
-	color = color.replace(trimLeft, '').replace(trimRight, '').toLowerCase()
+	color = color.replace(trimLeft, "").replace(trimRight, "").toLowerCase()
 
 	named = false
 
@@ -400,7 +400,7 @@ stringToObject = (color) ->
 		color = cssNames[color]
 		named = true
 
-	else if color == 'transparent'
+	else if color == "transparent"
 		return { r:0, g:0, b:0, a:0 }
 
 	match = undefined
@@ -459,9 +459,9 @@ stringToObject = (color) ->
 
 	if match = matchers.hex3.exec(color) or match = matchers.hex3.exec(cssNames[color])
 		return {
-		r: parseInt(match[1] + '' + match[1], 16)
-		g: parseInt(match[2] + '' + match[2], 16)
-		b: parseInt(match[3] + '' + match[3], 16)
+		r: parseInt(match[1] + "" + match[1], 16)
+		g: parseInt(match[2] + "" + match[2], 16)
+		b: parseInt(match[3] + "" + match[3], 16)
 		}
 	else return false
 
