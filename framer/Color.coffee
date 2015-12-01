@@ -19,19 +19,15 @@ class exports.Color extends BaseClass
 
 	@define "r",
 		get: -> @_r
-		set: (value) -> throw "r is readonly"
 
 	@define "g",
 		get: -> @_g
-		set: (value) -> throw "g is readonly"
 
 	@define "b",
 		get: -> @_b
-		set: (value) -> throw "b is readonly"
 
 	@define "a",
 		get: -> @_a
-		set: (value) -> throw "a is readonly"
 
 	toHex: (allow3Char) ->
 		return rgbToHex(@_r, @_g, @_b, allow3Char)
