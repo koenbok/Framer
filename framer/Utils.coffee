@@ -133,8 +133,7 @@ Utils.memoize = (fn) -> ->
 # HANDY FUNCTIONS
 
 Utils.randomColor = (alpha = 1.0) ->
-	c = -> parseInt(Math.random() * 255)
-	"rgba(#{c()}, #{c()}, #{c()}, #{alpha})"
+	return Color.random(alpha)
 
 Utils.randomChoice = (arr) ->
 	arr[Math.floor(Math.random() * arr.length)]

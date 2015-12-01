@@ -153,6 +153,10 @@ class exports.Color extends BaseClass
 
 		return result
 
+	@random: (alpha = 1.0) ->
+		c = -> parseInt(Math.random() * 255)
+		return new Color "rgba(#{c()}, #{c()}, #{c()}, #{alpha})"
+
 	@toColor: (color) -> return new Color(color)
 	@isColor: (color) -> return color instanceof Color
 	@validColorValue: (color) -> return color instanceof Color or color == null
