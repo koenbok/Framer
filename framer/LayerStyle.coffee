@@ -97,9 +97,11 @@ exports.LayerStyle =
 		skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg)
 		skewX(#{layer._properties.skewX}deg)
 		skewY(#{layer._properties.skewY}deg)
+		translateZ(-#{layer._properties.originZ}px)
 		rotateX(#{layer._properties.rotationX}deg)
 		rotateY(#{layer._properties.rotationY}deg)
 		rotateZ(#{layer._properties.rotationZ}deg)
+		translateZ(#{layer._properties.originZ}px)
 		"
 
 	webkitTransformForce2d: (layer) ->
