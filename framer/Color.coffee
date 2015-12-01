@@ -112,13 +112,13 @@ class exports.Color extends BaseClass
 			a: @_a
 		return copy
 
-	blend: (colorB, fraction) ->
+	mix: (colorB, fraction) ->
 		return Color.blend(@, colorB, fraction)
 
 	##############################################################
 	## Class methods
 
-	@blend: (colorA, colorB, fraction) ->
+	@mix: (colorA, colorB, fraction) ->
 
 		result = null
 
@@ -154,7 +154,8 @@ class exports.Color extends BaseClass
 		return result
 
 	@toColor: (color) -> return new Color(color)
-	@isColor: (color) -> return color instanceof Color or color == null
+	@isColor: (color) -> return color instanceof Color
+	@validColorValue: (color) -> return color instanceof Color or color == null
 
 	@isColorString: (colorString) -> stringToObject(colorString) != false
 
