@@ -1,7 +1,7 @@
 {BaseClass} = require "./BaseClass"
 
 class exports.Color extends BaseClass
-	constructor: (@color) ->
+	constructor: (@color, r, g, b) ->
 
 		color = @color
 
@@ -9,7 +9,7 @@ class exports.Color extends BaseClass
 		if Color.isColor(color) then return color
 
 		# Convert input to RGB
-		rgb = inputToRGB(color)
+		rgb = inputToRGB(color, r, g, b)
 
 		@_r = rgb.r
 		@_g = rgb.g
@@ -164,13 +164,22 @@ class exports.Color extends BaseClass
 	@isColorString: (colorString) -> stringToObject(colorString) != false
 
 # Functions 
-inputToRGB = (color) ->
+inputToRGB = (color, g, b, alpha) ->
 	rgb = { r:0, g:0, b:0 }
 	a = 1
 	ok = false
 
 	if color == null
 		a = 0
+	else if _.isNumber(color)
+		rgb.r = color
+
+		if _.isNumber(g)
+			rgb.g = g
+		if _.isNumber(b)
+			rgb.b = b
+		if _.isNumber(alpha)
+			a = alpha
 	else
 
 		if typeof color == "string"
