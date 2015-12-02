@@ -109,7 +109,7 @@ class exports.Color extends BaseClass
 		return copy
 
 	mix: (colorB, fraction) ->
-		return Color.blend(@, colorB, fraction)
+		return Color.mix(@, colorB, fraction)
 
 	##############################################################
 	## Class methods
