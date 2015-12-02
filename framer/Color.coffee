@@ -100,14 +100,6 @@ class exports.Color extends BaseClass
 	toString: ->
 		return @toRgbString()
 
-	copy: ->
-		copy = new Color
-			r: @_r
-			g: @_g
-			b: @_b
-			a: @_a
-		return copy
-
 	mix: (colorB, fraction) ->
 		return Color.mix(@, colorB, fraction)
 
