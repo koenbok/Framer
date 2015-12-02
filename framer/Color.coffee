@@ -191,12 +191,15 @@ inputToRGB = (color, g, b, alpha) ->
 
 				h = if isNumeric(color.h) then color.h else 0
 				s = if isNumeric(color.s) then convertToPercentage(color.s) else 1
+				if _.isString(color.s) then s = numberFromString(color.s)
 
 				if color.hasOwnProperty("v")
 					v = if isNumeric(color.v) then convertToPercentage(color.v) else 0
+					if _.isString(color.v) then v = numberFromString(color.v)
 					rgb = hsvToRgb(h, s, v)
 				else
 					l = if isNumeric(color.l) then convertToPercentage(color.l) else 50
+					if _.isString(color.l) then l = numberFromString(color.l)
 					rgb = hslToRgb(h, s, l)
 
 				ok = true
@@ -215,6 +218,9 @@ inputToRGB = (color, g, b, alpha) ->
 	b: Math.min(255, Math.max(rgb.b, 0))
 	a: a
 	}
+
+numberFromString = (string) ->
+	return string.match(/\d+/)[0]
 
 # Conversion Functions
 # RGB to RGB
