@@ -514,7 +514,7 @@ describe "Layer", ->
 			# And on removal, we should get rid of the dom event
 			layerA._domEventManager.listenersForEvent(Events.Click).length.should.equal(0)
 
-		it.only "should work with event helpers", (done) ->
+		it "should work with event helpers", (done) ->
 
 			layer = new Layer
 

@@ -16,6 +16,7 @@ Events.MouseOver = "mouseover"
 Events.MouseOut = "mouseout"
 Events.MouseMove = "mousemove"
 Events.MouseWheel = "mousewheel"
+Events.DoubleClick = "dblclick"
 
 # Let's make sure the touch events work on desktop too
 if not Utils.isTouch()
@@ -42,7 +43,7 @@ Events.ImageLoadError = "error"
 
 # Extract touch events for any event
 Events.touchEvent = (event) ->
-	touchEvent = event.touches?[0]
+	touchEvent =  event.touches?[0]
 	touchEvent ?= event.changedTouches?[0]
 	touchEvent ?= event
 	touchEvent
