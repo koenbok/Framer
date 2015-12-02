@@ -46,8 +46,8 @@ class exports.Color extends BaseClass
 		else "rgba(#{Utils.round(@_r, 0)}, #{Utils.round(@_g, 0)}, #{Utils.round(@_b, 0)}, #{@_roundA})"
 
 	toHsl: ->
-		hsl = rgbToHsl(@_r, @_g, @_b)
-		return { h: hsl.h * 360, s: hsl.s, l: hsl.l, a: @_a }
+		@_hsl = rgbToHsl(@_r, @_g, @_b) if @_hsl == undefined
+		return { h: @_hsl.h * 360, s: @_hsl.s, l: @_hsl.l, a: @_a }
 
 	toHslString: ->
 		hsl = rgbToHsl(@_r, @_g, @_b)
@@ -116,7 +116,7 @@ class exports.Color extends BaseClass
 	##############################################################
 	## Class methods
 
-	@mix: (colorA, colorB, fraction = .5, limit = false) ->
+	@mix: (colorA, colorB, fraction = .5, limit = false, model = "husl") ->
 
 		result = null
 
@@ -136,11 +136,28 @@ class exports.Color extends BaseClass
 
 		if colorB instanceof Color
 
-			result = new Color
-				r: Utils.modulate(fraction, [0, 1], [colorA._r, colorB._r], limit)
-				g: Utils.modulate(fraction, [0, 1], [colorA._g, colorB._g], limit)
-				b: Utils.modulate(fraction, [0, 1], [colorA._b, colorB._b], limit)
-				a: Utils.modulate(fraction, [0, 1], [colorA._a, colorB._a], limit)
+			if model == "husl"
+
+				hslA = colorA.toHsl()
+				hslB = colorB.toHsl()
+
+				if hslA.s == 0
+					hslA.h = hslB.h
+				else if hslB.s == 0
+					hslB.h = hslA.h
+
+				result = new Color
+					h: Utils.modulate(fraction, [0, 1], [hslA.h, hslB.h], limit)
+					s: Utils.modulate(fraction, [0, 1], [hslA.s, hslB.s], limit)
+					l: Utils.modulate(fraction, [0, 1], [hslA.l, hslB.l], limit)
+					a: Utils.modulate(fraction, [0, 1], [hslA.a, hslB.a], limit)
+
+			else
+				result = new Color
+					r: Utils.modulate(fraction, [0, 1], [colorA._r, colorB._r], limit)
+					g: Utils.modulate(fraction, [0, 1], [colorA._g, colorB._g], limit)
+					b: Utils.modulate(fraction, [0, 1], [colorA._b, colorB._b], limit)
+					a: Utils.modulate(fraction, [0, 1], [colorA._a, colorB._a], limit)
 
 		return result
 
