@@ -103,6 +103,9 @@ class exports.Color extends BaseClass
 	mix: (colorB, fraction) ->
 		return Color.mix(@, colorB, fraction)
 
+	toInspect: =>
+		"<#{@constructor.name} r:#{@r} g:#{@g} b:#{@b} a:#{@a}>"
+
 	##############################################################
 	## Class methods
 
