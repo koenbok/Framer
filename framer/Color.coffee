@@ -100,6 +100,13 @@ class exports.Color extends BaseClass
 	toString: ->
 		return @toRgbString()
 
+	transparent: ->
+		result = new Color
+			r: @r
+			g: @g
+			b: @b
+			a: 0
+
 	mix: (colorB, fraction) ->
 		return Color.mix(@, colorB, fraction)
 
@@ -122,17 +129,13 @@ class exports.Color extends BaseClass
 			colorB = new Color colorB
 
 		if colorA not instanceof Color and colorB instanceof Color
-			colorA = colorB.copy()
-			colorA._a = 0
+			colorA = colorB.transparent()
 		else if colorA instanceof Color and colorA._a == 0 and colorB instanceof Color and colorB._a != 0
-			colorA = colorB.copy()
-			colorA._a = 0
+			colorA = colorB.transparent()
 		else if colorB not instanceof Color and colorA instanceof Color
-			colorB = colorA.copy()
-			colorB._a = 0
+			colorB = colorA.transparent()
 		else if colorB instanceof Color and colorB._a == 0 and colorA instanceof Color and colorA._a != 0
-			colorB = colorA.copy()
-			colorB._a = 0
+			colorB = colorA.transparent()
 
 		if colorB instanceof Color
 
