@@ -294,6 +294,10 @@ describe "Utils", ->
 			instance = new SubTestClass
 			Utils.inspect(instance).should.equal("<SubTestClass {a:1}>")
 
+		it "should work with Colors", ->
+			instance = new Color "red"
+			Utils.inspect(instance).should.equal("<Color r:255 g:0 b:0 a:1>")
+
 		it "should work with toInspect", ->
 			class TestClass
 				toInspect: -> return "Hello"
