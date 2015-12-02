@@ -107,8 +107,8 @@ class exports.Color extends BaseClass
 			b: @b
 			a: 0
 
-	mix: (colorB, fraction) ->
-		return Color.mix(@, colorB, fraction)
+	mix: (colorB, fraction, limit = false) ->
+		return Color.mix(@, colorB, fraction, limit)
 
 	toInspect: =>
 		"<#{@constructor.name} r:#{@r} g:#{@g} b:#{@b} a:#{@a}>"
@@ -116,12 +116,9 @@ class exports.Color extends BaseClass
 	##############################################################
 	## Class methods
 
-	@mix: (colorA, colorB, fraction) ->
+	@mix: (colorA, colorB, fraction = .5, limit = false) ->
 
 		result = null
-
-		if isNaN(fraction)
-			fraction = .5
 
 		if typeof colorA is "string" and @isColorString(colorA)
 			colorA = new Color colorA
@@ -140,10 +137,10 @@ class exports.Color extends BaseClass
 		if colorB instanceof Color
 
 			result = new Color
-				r: Utils.modulate(fraction, [0, 1], [colorA._r, colorB._r], true)
-				g: Utils.modulate(fraction, [0, 1], [colorA._g, colorB._g], true)
-				b: Utils.modulate(fraction, [0, 1], [colorA._b, colorB._b], true)
-				a: Utils.modulate(fraction, [0, 1], [colorA._a, colorB._a], true)
+				r: Utils.modulate(fraction, [0, 1], [colorA._r, colorB._r], limit)
+				g: Utils.modulate(fraction, [0, 1], [colorA._g, colorB._g], limit)
+				b: Utils.modulate(fraction, [0, 1], [colorA._b, colorB._b], limit)
+				a: Utils.modulate(fraction, [0, 1], [colorA._a, colorB._a], limit)
 
 		return result
 
