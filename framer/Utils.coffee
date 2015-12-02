@@ -368,6 +368,12 @@ Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 	[fromLow, fromHigh] = rangeA
 	[toLow, toHigh] = rangeB
 
+	# if rangeB consists of Colors we return a color tween
+	if Color.isColor(toLow) || _.isString(toLow) && Color.isColorString(toLow)
+		ratio = Utils.modulate(value, rangeA, [0, 1])
+		result = Color.mix(toLow, toHigh, ratio)
+		return result
+
 	result = toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
 
 	if limit is true
