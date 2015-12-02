@@ -152,7 +152,7 @@ class exports.Context extends BaseClass
 
 	freeze: ->
 
-		if @_frozenEvents
+		if @_frozenEvents?
 			throw new Error "Context is already frozen"
 
 		@_frozenEvents = {}
@@ -173,7 +173,7 @@ class exports.Context extends BaseClass
 
 	resume: ->
 
-		if not @_frozenEvents
+		if not @_frozenEvents?
 			throw new Error "Context is not frozen, cannot resume"
 
 		for layerId, events of @_frozenEvents
@@ -189,21 +189,18 @@ class exports.Context extends BaseClass
 	# DOM
 
 	_createDOMEventManager: ->
+
+		# This manages all dom events for any node in this context centrally,
+		# so we can clean them up on a reset, avoiding memory leaks and whatnot.
+		
 		@domEventManager?.reset()
 		@domEventManager = new DOMEventManager
 
-	_destroyRootElement: ->
-
-		if @_element?.parentNode
-			@_element.parentNode.removeChild(@_element)
-
-		if @__pendingElementAppend
-			Utils.domCompleteCancel(@__pendingElementAppend)
-			@__pendingElementAppend = null
-
-		@_element = null
-
 	_createRootElement: ->
+
+		# Everything under the context lives in a single div that we either insert
+		# directly on the root, or attach to the parent layer. The element append
+		# can be pending if the document isn't ready yet.
 
 		@_destroyRootElement()
 
@@ -217,6 +214,20 @@ class exports.Context extends BaseClass
 			parentElement.appendChild(@_element)
 
 		Utils.domComplete(@__pendingElementAppend)
+
+	_destroyRootElement: ->
+
+		# This removes the context element and cancels async insertion if the
+		# document wasn't ready yet.
+
+		if @_element?.parentNode
+			@_element.parentNode.removeChild(@_element)
+
+		if @__pendingElementAppend
+			Utils.domCompleteCancel(@__pendingElementAppend)
+			@__pendingElementAppend = null
+
+		@_element = null
 
 
 	##############################################################

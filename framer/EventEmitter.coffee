@@ -9,8 +9,7 @@ DefaultMaximumListeners = 100
 class exports.EventEmitter
 
 	emit: (eventName, args...) ->
-		return false unless @[EventKey]
-		return false unless @[EventKey][eventName]
+		return false unless @[EventKey]?[eventName]?
 		@callListener(eventName, listener, args...) for listener in @[EventKey][eventName]
 		return true
 
@@ -41,8 +40,7 @@ class exports.EventEmitter
 		if not listener
 			throw new Error "removeListener needs a listener object. You can use removeListeners(eventName)"
 
-		return @ unless @[EventKey]
-		return @ unless @[EventKey][eventName]
+		return @ unless @[EventKey]?[eventName]?
 
 		@[EventKey][eventName] = (l for l in @[EventKey][eventName] when l isnt listener)
 		@[EventListenersCountKey]--
@@ -74,13 +72,11 @@ class exports.EventEmitter
 		return _.clone(@[EventKey])
 
 	listenersForEvent: (eventName) ->
-		return [] unless @[EventKey]
-		return [] unless @[EventKey][eventName]
+		return [] unless @[EventKey]?[eventName]?
 		return _.clone(@[EventKey][eventName])
 
 	removeListeners: (eventName) ->
-		return @ unless @[EventKey]
-		return @ unless @[EventKey][eventName]
+		return [] unless @[EventKey]?[eventName]?
 		for listener in @[EventKey][eventName]
 			@removeListener(eventName, listener)
 		return @
