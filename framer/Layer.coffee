@@ -3,6 +3,7 @@
 Utils = require "./Utils"
 
 {Config} = require "./Config"
+{Events} = require "./Events"
 {Defaults} = require "./Defaults"
 {BaseClass} = require "./BaseClass"
 {EventEmitter} = require "./EventEmitter"
@@ -857,3 +858,6 @@ class exports.Layer extends BaseClass
 		if @name
 			return "<#{@constructor.name} id:#{@id} name:#{@name} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}>"
 		return "<#{@constructor.name} id:#{@id} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}>"
+
+# Add event helpers for the layer dynamically
+Events.addHelpers(exports.Layer)

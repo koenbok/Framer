@@ -49,5 +49,18 @@ Events.touchEvent = (event) ->
 
 Events.wrap = (element) ->
 	Framer.CurrentContext.domEventManager.wrap(element)
-	
+
+Events.addHelpers = (obj) ->
+
+	# Add event helpers to an object like:
+	# layer.onClick, layer.onScroll, etc.
+
+	_.keys(Events).map (eventName) ->
+		return unless _.isString(eventName)
+		obj::["on#{eventName}"] = (callback) ->
+			@on(Events[eventName], callback)
+
+	obj::onChange = (p, callback) ->
+		@on("change:#{p}", callback)
+
 exports.Events = Events

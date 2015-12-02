@@ -514,6 +514,17 @@ describe "Layer", ->
 			# And on removal, we should get rid of the dom event
 			layerA._domEventManager.listenersForEvent(Events.Click).length.should.equal(0)
 
+		it.only "should work with event helpers", (done) ->
+
+			layer = new Layer
+
+			layer.onMouseOver (event, aLayer) ->
+				aLayer.should.equal(layer)
+				@should.equal(layer)
+				done()
+
+			simulate.mouseover(layer._element)
+
 	describe "Hierarchy", ->
 		
 		it "should insert in dom", ->
