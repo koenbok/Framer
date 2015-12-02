@@ -54,6 +54,7 @@ class exports.Animation extends EventEmitter
 			repeat: 0
 			delay: 0
 			debug: false
+			colorModel: "husl"
 
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
@@ -192,7 +193,7 @@ class exports.Animation extends EventEmitter
 		for k, v of @_stateB
 
 			if Color.isColor(v) or Color.isColor(@_stateA[k])
-				@_target[k] = Color.mix(@_stateA[k], @_stateB[k], value)
+				@_target[k] = Color.mix(@_stateA[k], @_stateB[k], value, false, @options.colorModel)
 			else
 				@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
 
