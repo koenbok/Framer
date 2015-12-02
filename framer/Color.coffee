@@ -136,7 +136,15 @@ class exports.Color extends BaseClass
 
 		if colorB instanceof Color
 
-			if model == "husl"
+			if model == "rgba" || model == "rgb"
+
+				result = new Color
+					r: Utils.modulate(fraction, [0, 1], [colorA._r, colorB._r], limit)
+					g: Utils.modulate(fraction, [0, 1], [colorA._g, colorB._g], limit)
+					b: Utils.modulate(fraction, [0, 1], [colorA._b, colorB._b], limit)
+					a: Utils.modulate(fraction, [0, 1], [colorA._a, colorB._a], limit)
+
+			else
 
 				hslA = colorA.toHsl()
 				hslB = colorB.toHsl()
@@ -151,13 +159,6 @@ class exports.Color extends BaseClass
 					s: Utils.modulate(fraction, [0, 1], [hslA.s, hslB.s], limit)
 					l: Utils.modulate(fraction, [0, 1], [hslA.l, hslB.l], limit)
 					a: Utils.modulate(fraction, [0, 1], [hslA.a, hslB.a], limit)
-
-			else
-				result = new Color
-					r: Utils.modulate(fraction, [0, 1], [colorA._r, colorB._r], limit)
-					g: Utils.modulate(fraction, [0, 1], [colorA._g, colorB._g], limit)
-					b: Utils.modulate(fraction, [0, 1], [colorA._b, colorB._b], limit)
-					a: Utils.modulate(fraction, [0, 1], [colorA._a, colorB._a], limit)
 
 		return result
 
