@@ -116,7 +116,7 @@ class exports.Color extends BaseClass
 	##############################################################
 	## Class methods
 
-	@mix: (colorA, colorB, fraction = .5, limit = false, model = "husl") ->
+	@mix: (colorA, colorB, fraction = .5, limit = false, model = "hsl") ->
 
 		result = null
 
@@ -138,6 +138,7 @@ class exports.Color extends BaseClass
 
 			if model == "rgba" || model == "rgb"
 
+				# rgb model
 				result = new Color
 					r: Utils.modulate(fraction, [0, 1], [colorA._r, colorB._r], limit)
 					g: Utils.modulate(fraction, [0, 1], [colorA._g, colorB._g], limit)
@@ -146,6 +147,7 @@ class exports.Color extends BaseClass
 
 			else
 
+				# hsl model
 				hslA = colorA.toHsl()
 				hslB = colorB.toHsl()
 
@@ -154,8 +156,17 @@ class exports.Color extends BaseClass
 				else if hslB.s == 0
 					hslB.h = hslA.h
 
+				fromH = hslA.h
+				toH = hslB.h
+				deltaH = toH - fromH
+
+				if deltaH > 180
+					deltaH = (toH - 360) - fromH
+				else if deltaH < 180
+					deltaH = (toH + 360) - fromH
+
 				result = new Color
-					h: Utils.modulate(fraction, [0, 1], [hslA.h, hslB.h], limit)
+					h: Utils.modulate(fraction, [0, 1], [fromH, fromH + deltaH], limit)
 					s: Utils.modulate(fraction, [0, 1], [hslA.s, hslB.s], limit)
 					l: Utils.modulate(fraction, [0, 1], [hslA.l, hslB.l], limit)
 					a: Utils.modulate(fraction, [0, 1], [hslA.a, hslB.a], limit)
@@ -203,6 +214,7 @@ inputToRGB = (color, g, b, alpha) ->
 			else if color.hasOwnProperty("h") or color.hasOwnProperty("s")
 
 				h = if isNumeric(color.h) then color.h else 0
+				h = (h + 360) % 360
 				s = if isNumeric(color.s) then convertToPercentage(color.s) else 1
 				if _.isString(color.s) then s = numberFromString(color.s)
 
