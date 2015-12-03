@@ -143,9 +143,6 @@ class exports.Color extends BaseClass
 
 		if colorB instanceof Color
 
-
-			print model
-
 			if model == "rgba" || model == "rgb"
 
 				# rgb model
