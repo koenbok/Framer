@@ -114,8 +114,8 @@ class exports.Color extends BaseClass
 			b: @b
 			a: 0
 
-	mix: (colorB, fraction, limit = false) ->
-		return Color.mix(@, colorB, fraction, limit)
+	mix: (colorB, fraction, limit = false, model) ->
+		return Color.mix(@, colorB, fraction, limit, model)
 
 	toInspect: =>
 		"<#{@constructor.name} r:#{@r} g:#{@g} b:#{@b} a:#{@a}>"
@@ -123,7 +123,7 @@ class exports.Color extends BaseClass
 	##############################################################
 	## Class methods
 
-	@mix: (colorA, colorB, fraction = .5, limit = false, model = "husl") ->
+	@mix: (colorA, colorB, fraction = .5, limit = false, model) ->
 
 		result = null
 
@@ -142,6 +142,9 @@ class exports.Color extends BaseClass
 			colorB = colorA.transparent()
 
 		if colorB instanceof Color
+
+
+			print model
 
 			if model == "rgba" || model == "rgb"
 
