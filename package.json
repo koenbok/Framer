@@ -15,6 +15,7 @@
     "url": "https://github.com/koenbok/Framer.git"
   },
   "dependencies": {
+    "eventemitter3": "^1.1.1",
     "lodash": "^3.5.0"
   },
   "devDependencies": {

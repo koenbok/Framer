@@ -814,13 +814,26 @@ class exports.Layer extends BaseClass
 	@define "_domEventManager",
 		get: -> @_context.domEventManager.wrap(@_element)
 
-	addListener: (eventName, listener) =>
+	emit: (args...) ->
+		super(args..., @)
 
+	once: (eventName, listener) =>
 		super(eventName, listener)
+		@_addListener(eventName, listener)
+
+	addListener: (eventName, listener) =>
+		super(eventName, listener)
+		@_addListener(eventName, listener)
+
+	removeListener: (eventName, listener) ->
+		super(eventName, listener)
+		@_removeListener(eventName, listener)
+
+	_addListener: (eventName, listener) ->
 
 		# If this is a dom event, we want the actual dom node to let us know
 		# when it gets triggered, so we can emit the event through the system.
-		if not @_domEventManager.listenersForEvent(eventName).length
+		if not @_domEventManager.listeners(eventName).length
 			@_domEventManager.addEventListener eventName, (event) =>
 				@emit(eventName, event)
 
@@ -828,19 +841,12 @@ class exports.Layer extends BaseClass
 		if not _.startsWith eventName, "change:"
 			@ignoreEvents = false
 
-	removeListener: (eventName, listener) ->
-		
-		super(eventName, listener)
+	_removeListener: (eventName, listener) ->
 
 		# Do cleanup for dom events if this is the last one of it's type.
 		# We are assuming we're the only ones adding dom events to the manager.
-		if not @listenersForEvent(eventName).length
-			@_domEventManager.removeListeners(eventName)
-
-	callListener: (eventName, listener, args...) ->
-		# Modify the scope for this listener and add the layer
-		# as the last object, so we can easliy access it in a loop.
-		listener.call(@, args..., @)
+		if not @listeners(eventName).length
+			@_domEventManager.removeAllListeners(eventName)
 
 	on: @::addListener
 	off: @::removeListener

@@ -38,9 +38,9 @@ describe "Context", ->
 				layer.on(Events.Click, handler)
 
 			# We should have a click listener
-			layer.listenersForEvent(Events.Click).should.eql([handler])
+			layer.listeners(Events.Click).should.eql([handler])
 			context.freeze()
-			layer.listenersForEvent(Events.Click).should.eql([])
+			layer.listeners(Events.Click).should.eql([])
 
 		it "should restore events", ->
 
@@ -57,7 +57,7 @@ describe "Context", ->
 			context.resume()
 
 			# Now it should have been restored
-			layer.listenersForEvent(Events.Click).should.eql([handler])
+			layer.listeners(Events.Click).should.eql([handler])
 
 		it "should stop animations", ->
 

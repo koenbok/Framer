@@ -40,14 +40,23 @@ describe "EventEmitter", ->
 
 		count.should.equal 1
 
-	it "should have a sane maximum", ->
-
-		tester = new Framer.EventEmitter
-
-		for i in [0..99]
-			tester.on "test", ->
-
-		f = -> tester.on "test", ->
+	it "should list listeners", ->
 		
-		f.should.throw()
+		handler = ->
+		tester = new Framer.EventEmitter
+		tester.on("test", handler)
+
+		tester.listeners("test").length.should.equal 1
+
+
+	# it "should have a sane maximum", ->
+
+	# 	tester = new Framer.EventEmitter
+
+	# 	for i in [0..99]
+	# 		tester.on "test", ->
+
+	# 	f = -> tester.on "test", ->
+		
+	# 	f.should.throw()
 

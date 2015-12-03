@@ -159,9 +159,13 @@ class exports.Context extends BaseClass
 
 		for layer in @_layers
 
-			layerListeners = layer.listeners()
+			layerListeners = {}
+
+			for eventName in layer.listenerEvents()
+				layerListeners[eventName] = layer.listeners(eventName)
+
 			layerId = @_layers.indexOf(layer)
-			layer.removeAllListeners()
+			layer.removeAllListeners(eventName)
 
 			@_frozenEvents[layerId] = layerListeners
 			

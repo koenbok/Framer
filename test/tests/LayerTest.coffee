@@ -483,36 +483,31 @@ describe "Layer", ->
 			layerA = new Layer
 			handler = -> console.log "hello"
 			layerA.on("test", handler)
-			layerA.listeners().should.eql({"test": [handler]})
+			layerA.listeners("test").length.should.equal 1
 
 		it "should remove all events", ->
 			layerA = new Layer
 			handler = -> console.log "hello"
 			layerA.on("test", handler)
-			layerA.removeAllListeners()
-			layerA.listenersForEvent("test").should.eql([])
-			layerA.listeners().should.eql({})
+			layerA.removeAllListeners("test")
+			layerA.listeners("test").length.should.equal 0
 
 		it "should add and clean up dom events", ->
 			layerA = new Layer
 			handler = -> console.log "hello"
 
 			layerA.on(Events.Click, handler)
-
-			# A dom event should be added
-			layerA._domEventManager.listenersForEvent(Events.Click).length.should.equal(1)
-
 			layerA.on(Events.Click, handler)
 			layerA.on(Events.Click, handler)
 			layerA.on(Events.Click, handler)
 
 			# But never more then one
-			layerA._domEventManager.listenersForEvent(Events.Click).length.should.equal(1)
+			layerA._domEventManager.listeners(Events.Click).length.should.equal(1)
 
-			layerA.removeAllListeners()
+			layerA.removeAllListeners(Events.Click)
 
 			# And on removal, we should get rid of the dom event
-			layerA._domEventManager.listenersForEvent(Events.Click).length.should.equal(0)
+			layerA._domEventManager.listeners(Events.Click).length.should.equal(0)
 
 		it "should work with event helpers", (done) ->
 
