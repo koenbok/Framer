@@ -162,7 +162,7 @@ class exports.Color extends BaseClass
 
 				if deltaH > 180
 					deltaH = (toH - 360) - fromH
-				else if deltaH < 180
+				else if deltaH < -180
 					deltaH = (toH + 360) - fromH
 
 				result = new Color

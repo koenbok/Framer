@@ -59,7 +59,7 @@ describe "Color", ->
 		
 		Red = new Color "red"
 		Yellow = new Color "yellow"
-		Orange = Red.mix(Yellow)
+		Orange = Red.mix(Yellow, .5, true, "rgb")
 
 		Orange.r.should.equal 255
 		Orange.g.should.equal 127.5
