@@ -221,10 +221,12 @@ ColorModel =
 	HSLA: "hsla"
 
 ColorModel.isRGB = (colorModel) ->
-	return colorModel.toLowerCase() in [ColorModel.RGB, ColorModel.RGBA]
+	return colorModel.toLowerCase() in [ColorModel.RGB, ColorModel.RGBA] if _.isString(colorModel)
+	return false
 
 ColorModel.isHSL = (colorModel) ->
-	return colorModel.toLowerCase() in [ColorModel.HSL, ColorModel.HSLA]
+	return colorModel.toLowerCase() in [ColorModel.HSL, ColorModel.HSLA] if _.isString(colorModel)
+	return false
 
 # Functions 
 inputToRGB = (color, g, b, alpha) ->
