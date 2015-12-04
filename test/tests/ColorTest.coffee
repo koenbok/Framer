@@ -57,66 +57,66 @@ describe "Color", ->
 
 	it "should mix colors with HUSL by default", ->
 
-		Orange = new Color "orange"
-		Yellow = new Color "yellow"
-		Mix = Orange.mix(Yellow, .5)
+		orange = new Color "orange"
+		yellow = new Color "yellow"
+		mix = orange.mix(yellow, .5)
 
-		g = Math.floor(Mix.g)
-		b = Math.floor(Mix.b)
+		g = Math.floor(mix.g)
+		b = Math.floor(mix.b)
 
-		Mix.r.should.equal 255
+		mix.r.should.equal 255
 		g.should.equal 210
 		b.should.equal 67
 
 	it "should mix colors with HSL", ->
 
-		Blue = new Color "blue"
-		Yellow = new Color "yellow"
-		Mix = Blue.mix(Yellow, .5, true, "hsl")
+		blue = new Color "blue"
+		yellow = new Color "yellow"
+		mix = blue.mix(yellow, .5, true, "hsl")
 
-		b = Math.floor(Mix.b)
+		b = Math.floor(mix.b)
 
-		Mix.r.should.equal 0
-		Mix.g.should.equal 255
+		mix.r.should.equal 0
+		mix.g.should.equal 255
 		b.should.equal 127
 
 	it "should mix colors with RGB", ->
 		
-		Red = new Color "red"
-		Yellow = new Color "yellow"
-		Orange = Red.mix(Yellow, .5, true, "rgb")
+		red = new Color "red"
+		yellow = new Color "yellow"
+		orange = red.mix(yellow, .5, true, "rgb")
 
-		Orange.r.should.equal 255
-		Orange.g.should.equal 127.5
-		Orange.b.should.equal 0
+		orange.r.should.equal 255
+		orange.g.should.equal 127.5
+		orange.b.should.equal 0
 
 	it "should match hue values if one of colors is transparent", ->
 
-		Red = new Color "red"
-		WhiteTransparent = new Color "rgba(255, 255, 255, 0)"
-		Mix = Red.mix(WhiteTransparent, .5, true, "hsl")
+		red = new Color "red"
+		whiteTransparent = new Color "rgba(255, 255, 255, 0)"
+		mix = red.mix(whiteTransparent, .5, true, "hsl")
 
-		Mix.r.should.equal 255
-		Mix.g.should.equal 0
-		Mix.b.should.equal 0
-		Mix.a.should.equal 0.5
+		mix.r.should.equal 255
+		mix.g.should.equal 0
+		mix.b.should.equal 0
+		mix.a.should.equal 0.5
 
 	it "should match hue values if one of colors is gray", ->
 
-		Blue = new Color "blue"
-		White = new Color "hsl(200, 100, 100)"
-		Mix = Blue.mix(White, .5, true, "hsl")
+		blue = new Color "blue"
+		white = new Color "hsl(200, 100, 100)"
+		mix = blue.mix(white, .5, true, "hsl")
 
-		Blue.toHsl().h.should.eql Mix.toHsl().h
+		blue.toHsl().h.should.eql mix.toHsl().h
 
 	it "should return css name if possible", ->
 
-		Aqua = "aqua"
+		aqua = "aqua"
 
 		layer = new Layer
-			backgroundColor: Aqua
+			backgroundColor: aqua
 
-		layer.backgroundColor.toName().should.eql Aqua
+		layer.backgroundColor.toName().should.eql aqua
 
 	it "should clamp constructor options", ->
 
