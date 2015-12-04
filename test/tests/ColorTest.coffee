@@ -55,7 +55,27 @@ describe "Color", ->
 		color = new Color hexColor
 		color.toHexString().should.eql hexColor
 
-	it "should mix colors", ->
+	it "should mix colors with HUSL by default", ->
+
+		Orange = new Color "orange"
+		Yellow = new Color "yellow"
+		Mix = Orange.mix(Yellow, .5)
+
+		Mix.r.should.equal 255
+		Mix.g.should.equal 210.58135701286875
+		Mix.b.should.equal 67.9689343699608
+
+	it "should mix colors with HSL", ->
+
+		Blue = new Color "blue"
+		Yellow = new Color "yellow"
+		Mix = Blue.mix(Yellow, .5, true, "hsl")
+
+		Mix.r.should.equal 0
+		Mix.g.should.equal 255
+		Mix.b.should.equal 127.50000000000006
+
+	it "should mix colors with RGB", ->
 		
 		Red = new Color "red"
 		Yellow = new Color "yellow"
@@ -64,6 +84,34 @@ describe "Color", ->
 		Orange.r.should.equal 255
 		Orange.g.should.equal 127.5
 		Orange.b.should.equal 0
+
+	it "should match hue values if one of colors is transparent", ->
+
+		Red = new Color "red"
+		WhiteTransparent = new Color "rgba(255, 255, 255, 0)"
+		Mix = Red.mix(WhiteTransparent, .5, true, "hsl")
+
+		Mix.r.should.equal 255
+		Mix.g.should.equal 0
+		Mix.b.should.equal 0
+		Mix.a.should.equal 0.5
+
+	it "should match hue values if one of colors is gray", ->
+
+		Blue = new Color "blue"
+		White = new Color "hsl(200, 100, 100)"
+		Mix = Blue.mix(White, .5, true, "hsl")
+
+		Blue.toHsl().h.should.eql Mix.toHsl().h
+
+	it "should return css name if possible", ->
+
+		Aqua = "aqua"
+
+		layer = new Layer
+			backgroundColor: Aqua
+
+		layer.backgroundColor.toName().should.eql Aqua
 
 	it "should clamp constructor options", ->
 
