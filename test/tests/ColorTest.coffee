@@ -61,9 +61,12 @@ describe "Color", ->
 		Yellow = new Color "yellow"
 		Mix = Orange.mix(Yellow, .5)
 
+		g = Math.floor(Mix.g)
+		b = Math.floor(Mix.b)
+
 		Mix.r.should.equal 255
-		Mix.g.should.equal 210.58135701286875
-		Mix.b.should.equal 67.9689343699608
+		g.should.equal 210
+		b.should.equal 67
 
 	it "should mix colors with HSL", ->
 
@@ -71,9 +74,11 @@ describe "Color", ->
 		Yellow = new Color "yellow"
 		Mix = Blue.mix(Yellow, .5, true, "hsl")
 
+		b = Math.floor(Mix.b)
+
 		Mix.r.should.equal 0
 		Mix.g.should.equal 255
-		Mix.b.should.equal 127.50000000000006
+		b.should.equal 127
 
 	it "should mix colors with RGB", ->
 		
