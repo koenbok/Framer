@@ -127,6 +127,7 @@ class exports.Color extends BaseClass
 
 		result = null
 
+		# 
 		if typeof colorA is "string" and @isColorString(colorA)
 			colorA = new Color colorA
 		if typeof colorB is "string" and @isColorString(colorB)
@@ -143,7 +144,7 @@ class exports.Color extends BaseClass
 
 		if colorB instanceof Color
 
-			if model == "rgba" || model == "rgb"
+			if ColorModel.isRGB(model)
 
 				# rgb model
 				result = new Color
@@ -157,7 +158,7 @@ class exports.Color extends BaseClass
 				hslA
 				hslB
 
-				if model == "hsl" || model == "hsla"
+				if ColorModel.isHSL(model)
 					# hsl model
 					hslA = colorA.toHsl()
 					hslB = colorB.toHsl()
@@ -186,7 +187,7 @@ class exports.Color extends BaseClass
 					l: Utils.modulate(fraction, [0, 1], [hslA.l, hslB.l], limit)
 					a: Utils.modulate(fraction, [0, 1], [colorA.a, colorB.a], limit)
 
-				if model == "hsl" || model == "hsla"
+				if ColorModel.isHSL(model)
 					# hsl model
 					result = new Color tween
 				else
@@ -204,6 +205,19 @@ class exports.Color extends BaseClass
 	@validColorValue: (color) -> return color instanceof Color or color == null
 
 	@isColorString: (colorString) -> stringToObject(colorString) != false
+
+# Color models, husl is default
+ColorModel =
+	RGB: "rgb"
+	RGBA: "rgba"
+	HSL: "hsl"
+	HSLA: "hsla"
+
+ColorModel.isRGB = (colorModel) ->
+	return colorModel.toLowerCase() in [ColorModel.RGB, ColorModel.RGBA]
+
+ColorModel.isHSL = (colorModel) ->
+	return colorModel.toLowerCase() in [ColorModel.HSL, ColorModel.HSLA]
 
 # Functions 
 inputToRGB = (color, g, b, alpha) ->
