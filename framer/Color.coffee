@@ -67,7 +67,14 @@ class exports.Color extends BaseClass
 	toName: ->
 		if @_a is 0 then return "transparent"
 		if @_a < 1 then return false
-		return cssNames[rgbToHex(@_r, @_g, @_b, @)] or false
+		hex = rgbToHex(@_r, @_g, @_b, true)
+
+		for key in _.keys cssNames
+			value = cssNames[key]
+			if value == hex
+				return key
+		
+		return false
 
 	lighten: (amount = 10) ->
 		hsl = @toHsl()
