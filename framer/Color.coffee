@@ -188,19 +188,10 @@ class exports.Color extends BaseClass
 
 				if model == "hsl" || model == "hsla"
 					# hsl model
-					result = new Color
-						h: tween.h
-						s: tween.s
-						l: tween.l
-						a: tween.a
+					result = new Color tween
 				else
-					rgb = xyzToRgb luvToXyz lchToLuv huslToLch([tween.h, tween.s, tween.l])
-
-					result = new Color
-						r: rgb[0] * 255
-						g: rgb[1] * 255
-						b: rgb[2] * 255
-						a: tween.a
+					# husl model
+					result = new Color rgbaFromHusl(tween)
 
 		return result
 
@@ -276,6 +267,15 @@ inputToRGB = (color, g, b, alpha) ->
 	}
 
 #HUSL
+
+rgbaFromHusl = (husl) ->
+	rgb = xyzToRgb luvToXyz lchToLuv huslToLch([husl.h, husl.s, husl.l])
+	rgba =
+		r: rgb[0] * 255
+		g: rgb[1] * 255
+		b: rgb[2] * 255
+		a: husl.a
+	return rgba
 
 m =
 	R: [  3.2409699419045214,   -1.5373831775700935, -0.49861076029300328  ]
