@@ -288,8 +288,6 @@ inputToRGB = (color, g, b, alpha) ->
 
 			if color.hasOwnProperty("a")
 				a = color.a
-			else if color.hasOwnProperty("alpha")
-				a = color.alpha
 
 	a = correctAlpha(a)
 
@@ -374,31 +372,6 @@ hslToRgb = (h, s, l) ->
 
 	return { r:r*255, g:g*255, b:b*255 }
 
-# RGB to HSV
-rgbToHsv = (r, g, b) ->
-	r = bound01(r, 255);
-	g = bound01(g, 255);
-	b = bound01(b, 255);
-
-	max = mathMax(r, g, b)
-	min = mathMin(r, g, b)
-	h
-	v = max
-
-	d = max - min
-	s = if max is 0 then 0 else d / max
-
-	if(max == min)
-		h = 0  # achromatic
-	else
-		h = switch(max)
-			when r then (g - b) / d + (g < b ? 6 : 0)
-			when g then (b - r) / d + 2
-			when b then (r - g) / d + 4
-		h /= 6;
-
-	h: h, s: s, v: v
-
 # HSV to RGB
 hsvToRgb = (h, s, v) ->
 
@@ -419,10 +392,6 @@ hsvToRgb = (h, s, v) ->
 	return { r: r * 255, g: g * 255, b: b * 255 }
 
 # Utility Functions
-boundAlpha = (a) ->
-	a = parseFloat(a)
-	if isNaN(a) or a < 0 or a > 1 then a = 1
-	return a
 
 convertToPercentage = (n) ->
 	if n <= 1 then n = n * 100 + "%"
