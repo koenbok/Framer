@@ -23,6 +23,102 @@ describe "Color", ->
 		color.g.should.equal 255
 		color.b.should.equal 0
 
+	it "should export rgb object", ->
+
+		color = new Color(0, 255, 30)
+		rgb = color.toRgb()
+
+		rgb.r.should.equal 0
+		rgb.g.should.equal 255
+		rgb.b.should.equal 30
+
+		color = new Color(0, 255, 30, .5)
+		rgb = color.toRgb()
+
+		rgb.r.should.equal 0
+		rgb.g.should.equal 255
+		rgb.b.should.equal 30
+		rgb.a.should.equal .5
+
+	it "should show export hsl string", ->
+
+		hsla = "hsla(20, 100%, 60%, 0.7)"
+
+		color = new Color(hsla)
+		color.toHslString().should.eql hsla
+
+	it "should allow hsv input", ->
+
+		color = new Color "hsv(100, 50, 50)"
+
+		color.r.should.equal 85
+		color.g.should.equal 127.5
+		color.b.should.equal 63.75
+
+		color = new Color "hsva(100, 50, 50, .5)"
+
+		color.r.should.equal 85
+		color.g.should.equal 127.5
+		color.b.should.equal 63.75
+		color.a.should.equal 0.5
+
+	it "should lighten color", ->
+
+		orange = new Color "orange"
+		mix = orange.lighten(100)
+
+		mix.r.should.equal 255
+		mix.g.should.equal 255
+		mix.b.should.equal 255
+
+	it "should brighten color", ->
+
+		orange = new Color "orange"
+		mix = orange.brighten(10)
+
+		mix.r.should.equal 255
+		mix.g.should.equal 190
+		mix.b.should.equal 25
+
+	it "should darken color", ->
+
+		red = new Color "red"
+		mix = red.darken()
+
+		mix.r.should.equal 204
+		mix.g.should.equal 0
+		mix.b.should.equal 0
+
+	it "should grayscale color", ->
+
+		red = new Color "red"
+		mix = red.greyscale()
+
+		mix.r.should.equal 127.5
+		mix.g.should.equal 127.5
+		mix.b.should.equal 127.5
+
+	it "should saturate color", ->
+
+		red = new Color "hsl(0, 50, 50)"
+		mix = red.saturate(100)
+
+		mix.toHsl().s.should.eql 1
+
+	it "should desaturate color", ->
+
+		green = new Color "hsl(120, 50, 50)"
+		mix = green.desaturate(100)
+
+		mix.toHsl().s.should.eql 0
+
+	it "should make transparent", ->
+
+		red = new Color "red"
+		trans = red.transparent()
+
+		trans.a.should.equal 0
+
 	it "should allow rgba string in css format", ->
 
 		color = new Color "rgba(255, 0, 0, 1)"
@@ -47,6 +143,11 @@ describe "Color", ->
 	it "should be transparent when constructor option is null", ->
 					
 		color = new Color null
+		color.a.should.equal 0
+
+	it "should be transparent when option is transparent", ->
+
+		color = new Color "transparent"
 		color.a.should.equal 0
 
 	it "hex input should be same as hex output", ->
@@ -101,6 +202,28 @@ describe "Color", ->
 		mix.b.should.equal 0
 		mix.a.should.equal 0.5
 
+		color = new Color 255, 0, 0, 0
+		color2 = new Color 0, 255, 0, 1
+		mix = Color.mix(color, color2, .5, true, "rgb")
+
+		mix.r.should.equal 0
+		mix.g.should.equal 255
+		mix.b.should.equal 0
+		mix.a.should.equal 0.5
+
+	it "should mix with css format color strings", ->
+
+		mix = Color.mix("red", "yellow")
+		Color.isColor(mix).should.eql true
+
+	it "should mix color if only one input is color", ->
+
+		mix = Color.mix("red")
+		Color.isColor(mix).should.eql true
+
+		mix = Color.mix("redfjkdsajfalfa", "yellow")
+		Color.isColor(mix).should.eql true
+
 	it "should match hue values if one of colors is gray", ->
 
 		blue = new Color "blue"
@@ -117,6 +240,16 @@ describe "Color", ->
 			backgroundColor: aqua
 
 		layer.backgroundColor.toName().should.eql aqua
+
+	it "should return false if not css name", ->
+
+		color = new Color "#123456"
+		color.toName().should.eql false
+
+	it "should return random color", ->
+
+		color = Color.random()
+		Color.isColor(color).should.eql true
 
 	it "should clamp constructor options", ->
 
