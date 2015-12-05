@@ -4,6 +4,7 @@ gulp = require("gulp")
 phantomjs = require("gulp-mocha-phantomjs")
 webpack = require("webpack")
 gulpWebpack = require("gulp-webpack")
+rename = require("gulp-rename")
 template = require("gulp-template")
 {exec} = require("child_process")
 
@@ -102,8 +103,12 @@ gulp.task "version", (callback) ->
 
 		console.log "version:#{info.branch}/#{info.hash} build:#{info.build}"
 		 
-		task = gulp.src("framer/Version.coffee")
+		task = gulp.src("framer/Version.coffee.template")
 			.pipe(template(info))
+			.pipe(rename({
+				basename: "Version",
+				extname: ".coffee"
+			}))
 			.pipe(gulp.dest("framer"))
 
 		callback(null, task)
