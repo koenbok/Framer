@@ -64,7 +64,7 @@ class exports.Color extends BaseClass
 		s = Math.round(hsl.s * 100)
 		l = Math.round(hsl.l * 100)
 		if @_a == 1 then "hsl(#{h}, #{s}%, #{l}%)"
-		else "hsl(#{h}, #{s}%, #{l}%, #{@_roundA})"
+		else "hsla(#{h}, #{s}%, #{l}%, #{@_roundA})"
 
 	toName: ->
 		if @_a is 0 then return "transparent"
