@@ -1,7 +1,7 @@
 {BaseClass} = require "./BaseClass"
 libhusl		= require "husl"
 
-# the Color class is inspirated by TinyColor https://github.com/bgrins/TinyColor
+# the Color class is inspired by TinyColor https://github.com/bgrins/TinyColor
 
 class exports.Color extends BaseClass
 	constructor: (@color, r, g, b) ->
