@@ -56,7 +56,7 @@ gulp.task "build:debug", ["version"], ->
 		.pipe(gulpWebpack(config))
 		.pipe(gulp.dest("build/"))
 
-gulp.task "build:test", ["version"], ->
+gulp.task "build:test", ->
 
 	config = _.extend CONFIG,
 		entry: "./test/tests.coffee"
@@ -69,10 +69,10 @@ gulp.task "build:test", ["version"], ->
 gulp.task "test", ["build:debug", "build:test"], ->
 	return gulp
 		.src("test/phantomjs/index.html")
-		.pipe(phantomjs({reporter: "landing"}))
+		.pipe(phantomjs({reporter:"dot"}))
 
 gulp.task "watch", ["test"], ->
-	gulp.watch(["./*.coffee", "framer/**", "test/tests/**"], ["test"])
+	gulp.watch(["./*.coffee", "framer/**", "test/tests/**", "!Version.coffee"], ["test"])
 
 gulp.task "watcher", ->
 
@@ -109,7 +109,7 @@ gulp.task "version", (callback) ->
 				basename: "Version",
 				extname: ".coffee"
 			}))
-			.pipe(gulp.dest("framer"))
+			.pipe(gulp.dest("build"))
 
 		callback(null, task)
 
