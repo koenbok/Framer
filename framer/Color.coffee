@@ -39,17 +39,21 @@ class exports.Color extends BaseClass
 		return "#" + @toHex(allow3Char)
 
 	toRgb: ->
-		r: Math.round(@_r)
-		g: Math.round(@_g)
-		b: Math.round(@_b)
-		a: @_a
+		if @_rgb == undefined
+			@_rgb =
+				r: Math.round(@_r)
+				g: Math.round(@_g)
+				b: Math.round(@_b)
+				a: @_a
+		return @_rgb
 
 	toRgbString: ->
 		if @_a == 1 then "rgb(#{Utils.round(@_r, 0)}, #{Utils.round(@_g, 0)}, #{Utils.round(@_b, 0)})"
 		else "rgba(#{Utils.round(@_r, 0)}, #{Utils.round(@_g, 0)}, #{Utils.round(@_b, 0)}, #{@_roundA})"
 
 	toHsl: ->
-		@_hsl = rgbToHsl(@_r, @_g, @_b) if @_hsl == undefined
+		if @_hsl == undefined
+			@_hsl = rgbToHsl(@_r, @_g, @_b)
 		return { h: @_hsl.h * 360, s: @_hsl.s, l: @_hsl.l, a: @_a }
 
 	toHusl: ->
@@ -61,12 +65,16 @@ class exports.Color extends BaseClass
 		return @_husl
 
 	toHslString: ->
-		hsl = rgbToHsl(@_r, @_g, @_b)
-		h = Math.round(hsl.h * 360)
-		s = Math.round(hsl.s * 100)
-		l = Math.round(hsl.l * 100)
-		if @_a == 1 then "hsl(#{h}, #{s}%, #{l}%)"
-		else "hsla(#{h}, #{s}%, #{l}%, #{@_roundA})"
+		if @_hslString == undefined
+			hsl = @toHsl()
+			h = Math.round(hsl.h)
+			s = Math.round(hsl.s * 100)
+			l = Math.round(hsl.l * 100)
+			if @_a == 1
+				@_hslString = "hsl(#{h}, #{s}%, #{l}%)"
+			else
+				@_hslString = "hsla(#{h}, #{s}%, #{l}%, #{@_roundA})"
+		return @_hslString
 
 	toName: ->
 		if @_a is 0 then return "transparent"
