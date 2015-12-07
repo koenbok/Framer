@@ -136,6 +136,9 @@ class exports.Color extends BaseClass
 	mix: (colorB, fraction, limit = false, model) ->
 		return Color.mix(@, colorB, fraction, limit, model)
 
+	isEqual: (colorB) ->
+		return Color.equal(@, colorB)
+
 	toInspect: =>
 		"<#{@constructor.name} r:#{@r} g:#{@g} b:#{@b} a:#{@a}>"
 
@@ -224,6 +227,18 @@ class exports.Color extends BaseClass
 	@validColorValue: (color) -> return color instanceof Color or color == null
 
 	@isColorString: (colorString) -> stringToObject(colorString) != false
+
+	@equal: (colorA, colorB) ->
+		if !@validColorValue(colorA)
+			if !Color.isColorString(colorA)
+				return false
+		if !@validColorValue(colorB)
+			if !Color.isColorString(colorB)
+				return false
+		colorA = new Color(colorA)
+		colorB = new Color(colorB)
+
+		return colorA.r == colorB.r && colorA.g == colorB.g && colorA.b == colorB.b && colorA.a == colorB.a
 
 # Color models, husl is default
 ColorModel =
