@@ -77,7 +77,7 @@ describe "Color", ->
 	it "should grayscale color", ->
 
 		red = new Color "red"
-		mix = red.greyscale()
+		mix = red.grayscale()
 
 		mix.r.should.equal 127.5
 		mix.g.should.equal 127.5
@@ -208,14 +208,6 @@ describe "Color", ->
 
 		mix = Color.mix("redfjkdsajfalfa", "yellow")
 		Color.isColor(mix).should.eql true
-
-	it "should match hue values if one of colors is gray", ->
-
-		blue = new Color "blue"
-		white = new Color "hsl(200, 100, 100)"
-		mix = blue.mix(white, .5, true, "hsl")
-
-		blue.toHsl().h.should.eql mix.toHsl().h
 
 	it "should return css name if possible", ->
 
