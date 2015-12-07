@@ -310,8 +310,8 @@ describe "Utils", ->
 
 			instance = new Color
 				h: 200
-				s: 100
-				l: 20
+				s: 1
+				l: .2
 				a: 1
 			Utils.inspect(instance).should.equal("<Color h:200 s:1 l:0.2 a:1>")
 

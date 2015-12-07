@@ -72,8 +72,12 @@ class exports.Color extends BaseClass
 
 	toHsl: ->
 		if @_hsl == undefined
-			@_hsl = rgbToHsl(@_r, @_g, @_b)
-		return { h: @_hsl.h * 360, s: @_hsl.s, l: @_hsl.l, a: @_a }
+			@_hsl =
+				h: @h
+				s: @s
+				l: @l
+				a: @a
+		return @_hsl
 
 	toHusl: ->
 		if @_husl == undefined
@@ -138,7 +142,7 @@ class exports.Color extends BaseClass
 		hsl.s = Math.min(1, Math.max(0, hsl.s))
 		return new Color(hsl)
 
-	greyscale: ->
+	grayscale: ->
 		hsl = @toHsl()
 		return new Color(hsl).desaturate(100)
 
@@ -264,6 +268,9 @@ class exports.Color extends BaseClass
 
 		return colorA.r == colorB.r && colorA.g == colorB.g && colorA.b == colorB.b && colorA.a == colorB.a
 
+	@rgbToHsl: (a, b, c) ->
+		return rgbToHsl(a, b, c)
+
 # Color models, husl is default
 ColorModel =
 	RGB: "rgb"
@@ -325,17 +332,17 @@ inputData = (color, g, b, alpha) ->
 
 				h = if isNumeric(color.h) then parseFloat(color.h) else 0
 				h = (h + 360) % 360
-				s = if isNumeric(color.s) then convertToPercentage(color.s) else 1
+				s = if isNumeric(color.s) then color.s else 1
 				if _.isString(color.s) then s = numberFromString(color.s)
-
-				l = if isNumeric(color.l) then convertToPercentage(color.l) else 50
+				l = if isNumeric(color.l) then color.l else 50
 				if _.isString(color.l) then l = numberFromString(color.l)
+
 				rgb = hslToRgb(h, s, l)
 				type = ColorType.HSL
 				hsl =
 					h: h
-					s: s / 100
-					l: l / 100
+					s: s
+					l: l
 
 			if color.hasOwnProperty("a")
 				a = color.a
@@ -397,7 +404,7 @@ rgbToHsl = (r, g, b) ->
 			when g then h = (b - r) / d + 2
 			when b then h = (r - g) / d + 4
 		h /= 6
-	return { h:h, s:s, l:l }
+	return { h:h * 360, s:s, l:l }
 
 # HSL to RGB
 hslToRgb = (h, s, l) ->
@@ -406,8 +413,8 @@ hslToRgb = (h, s, l) ->
 	b = undefined
 
 	h = bound01(h, 360)
-	s = bound01(s, 100)
-	l = bound01(l, 100)
+	s = bound01(s * 100, 100)
+	l = bound01(l * 100, 100)
 
 	hue2rgb = (p, q, t) ->
 		if t < 0 then t += 1
@@ -428,25 +435,6 @@ hslToRgb = (h, s, l) ->
 		b = hue2rgb(p, q, h - (1 / 3))
 
 	return { r:r*255, g:g*255, b:b*255 }
-
-# HSV to RGB
-hsvToRgb = (h, s, v) ->
-
-	h = bound01(h, 360) * 6;
-	s = bound01(s, 100);
-	v = bound01(v, 100);
-
-	i = Math.floor(h)
-	f = h - i
-	p = v * (1 - s)
-	q = v * (1 - f * s)
-	t = v * (1 - (1 - f) * s)
-	mod = i % 6
-	r = [v, q, p, p, t, v][mod]
-	g = [t, v, v, q, p, p][mod]
-	b = [p, p, t, v, v, q][mod]
-
-	return { r: r * 255, g: g * 255, b: b * 255 }
 
 # Utility Functions
 
@@ -503,14 +491,15 @@ matchers = do ->
 	rgba: new RegExp('rgba' + permissive_match4)
 	hsl: new RegExp('hsl' + permissive_match3)
 	hsla: new RegExp('hsla' + permissive_match4)
-	hsv: new RegExp('hsv' + permissive_match3)
-	hsva: new RegExp('hsva' + permissive_match4)
 	hex3: /^([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/
 	hex6: /^([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/
 	}
 
 isNumeric = (value) ->
 	return !isNaN(value) && isFinite(value)
+
+percentToFraction = (percentage) ->
+	return numberFromString(percentage) / 100
 
 stringToObject = (color) ->
 	trimLeft = /^[\s,#]+/
@@ -554,15 +543,15 @@ stringToObject = (color) ->
 	if match = matchers.hsl.exec(color)
 		return {
 		h: match[1]
-		s: match[2]
-		l: match[3]
+		s: percentToFraction(match[2])
+		l: percentToFraction(match[3])
 		}
 
 	if match = matchers.hsla.exec(color)
 		return {
 		h: match[1]
-		s: match[2]
-		l: match[3]
+		s: percentToFraction(match[2])
+		l: percentToFraction(match[3])
 		a: match[4]
 		}
 
