@@ -6,7 +6,7 @@ Utils = require "./Utils"
 
 Originals = 
 	Layer:
-		backgroundColor: "rgba(0,124,255,.5)"
+		backgroundColor: "rgba(0, 124, 255, 0.5)"
 		width: 100
 		height: 100
 	Animation:
