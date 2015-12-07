@@ -35,7 +35,7 @@ describe "Layer", ->
 			
 			# if the default background color is not set the content layer of scrollcomponent is not hidden when layers are added
 			layer = new Layer()
-			layer.backgroundColor.toString().should.eql Framer.Defaults.Layer.backgroundColor
+			Color.equal(layer.backgroundColor, Framer.Defaults.Layer.backgroundColor).should.be.true
 
 			Framer.Defaults =
 				Layer:
@@ -44,8 +44,6 @@ describe "Layer", ->
 			layer = new Layer()
 			
 			layer.style.backgroundColor.should.equal new Color("red").toString()
-			#layer.backgroundColor.should.equal "red"
-
 
 			Framer.resetDefaults()
 

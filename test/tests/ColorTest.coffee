@@ -251,6 +251,15 @@ describe "Color", ->
 		color = Color.random()
 		Color.isColor(color).should.eql true
 
+	it "should compare colors", ->
+
+		red = new Color "red"
+		red.isEqual("rgb(255,0,0)").should.be.true
+
+		purple = new Color 128, 0, 128
+
+		Color.equal("purple", purple).should.be.true
+
 	it "should clamp constructor options", ->
 
 		color = new Color
