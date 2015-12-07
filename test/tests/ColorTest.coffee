@@ -47,21 +47,6 @@ describe "Color", ->
 		color = new Color(hsla)
 		color.toHslString().should.eql hsla
 
-	it "should allow hsv input", ->
-
-		color = new Color "hsv(100, 50, 50)"
-
-		color.r.should.equal 85
-		color.g.should.equal 127.5
-		color.b.should.equal 63.75
-
-		color = new Color "hsva(100, 50, 50, .5)"
-
-		color.r.should.equal 85
-		color.g.should.equal 127.5
-		color.b.should.equal 63.75
-		color.a.should.equal 0.5
-
 	it "should lighten color", ->
 
 		orange = new Color "orange"

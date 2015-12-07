@@ -3,6 +3,12 @@ libhusl		= require "husl"
 
 # the Color class is inspired by TinyColor https://github.com/bgrins/TinyColor
 
+ColorType =
+	RGB: "rgb"
+	HSL: "hsl"
+	HEX: "hex"
+	NAME: "name"
+
 class exports.Color extends BaseClass
 	constructor: (@color, r, g, b) ->
 
@@ -12,12 +18,16 @@ class exports.Color extends BaseClass
 		if Color.isColor(color) then return color
 
 		# Convert input to RGB
-		rgb = inputToRGB(color, r, g, b)
+		input = inputData(color, r, g, b)
 
-		@_r = rgb.r
-		@_g = rgb.g
-		@_b = rgb.b
-		@_a = rgb.a
+		@_type = input.type
+		@_r = input.r
+		@_g = input.g
+		@_b = input.b
+		@_a = input.a
+		@_h = input.h
+		@_s = input.s
+		@_l = input.l
 		@_roundA = Math.round(100*@_a) / 100
 
 	@define "r",
@@ -31,6 +41,15 @@ class exports.Color extends BaseClass
 
 	@define "a",
 		get: -> @_a
+
+	@define "h",
+		get: -> @_h
+
+	@define "s",
+		get: -> @_s
+
+	@define "l",
+		get: -> @_l
 
 	toHex: (allow3Char) ->
 		return rgbToHex(@_r, @_g, @_b, allow3Char)
@@ -140,7 +159,12 @@ class exports.Color extends BaseClass
 		return Color.equal(@, colorB)
 
 	toInspect: =>
-		"<#{@constructor.name} r:#{@r} g:#{@g} b:#{@b} a:#{@a}>"
+		if @_type == ColorType.HSL
+			return "<#{@constructor.name} h:#{@h} s:#{@s} l:#{@l} a:#{@a}>"
+		else if @_type == ColorType.HEX || @_type == ColorType.NAME
+			return "<#{@constructor.name} \"#{@color}\">"
+		else
+			return "<#{@constructor.name} r:#{@r} g:#{@g} b:#{@b} a:#{@a}>"
 
 	##############################################################
 	## Class methods
@@ -266,10 +290,12 @@ rgbaFromHusl = (husl) ->
 	return rgba
 
 # Functions 
-inputToRGB = (color, g, b, alpha) ->
+inputData = (color, g, b, alpha) ->
 	rgb = { r:0, g:0, b:0 }
+	hsl = { h:0, s:0, l:0 }
 	a = 1
 	ok = false
+	type = ColorType.RGB
 
 	if color == null
 		a = 0
@@ -287,41 +313,47 @@ inputToRGB = (color, g, b, alpha) ->
 		if typeof color == "string"
 			color = stringToObject(color)
 
+			if color.hasOwnProperty("type")
+				type = color.type
+
 		if typeof color == "object"
 
 			if color.hasOwnProperty("r") or color.hasOwnProperty("g") or color.hasOwnProperty("b")
 				rgb = rgbToRgb(color.r, color.g, color.b)
-				ok = true
 
-			else if color.hasOwnProperty("h") or color.hasOwnProperty("s")
+			else if color.hasOwnProperty("h") or color.hasOwnProperty("s") or color.hasOwnProperty("l")
 
 				h = if isNumeric(color.h) then parseFloat(color.h) else 0
 				h = (h + 360) % 360
 				s = if isNumeric(color.s) then convertToPercentage(color.s) else 1
 				if _.isString(color.s) then s = numberFromString(color.s)
 
-				if color.hasOwnProperty("v")
-					v = if isNumeric(color.v) then convertToPercentage(color.v) else 0
-					if _.isString(color.v) then v = numberFromString(color.v)
-					rgb = hsvToRgb(h, s, v)
-				else
-					l = if isNumeric(color.l) then convertToPercentage(color.l) else 50
-					if _.isString(color.l) then l = numberFromString(color.l)
-					rgb = hslToRgb(h, s, l)
-
-				ok = true
+				l = if isNumeric(color.l) then convertToPercentage(color.l) else 50
+				if _.isString(color.l) then l = numberFromString(color.l)
+				rgb = hslToRgb(h, s, l)
+				type = ColorType.HSL
+				hsl =
+					h: h
+					s: s / 100
+					l: l / 100
 
 			if color.hasOwnProperty("a")
 				a = color.a
 
 	a = correctAlpha(a)
 
+	if type != ColorType.HSL
+		hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
+
 	return {
-	ok: ok
-	r: Math.min(255, Math.max(rgb.r, 0))
-	g: Math.min(255, Math.max(rgb.g, 0))
-	b: Math.min(255, Math.max(rgb.b, 0))
-	a: a
+		type: type
+		r: Math.min(255, Math.max(rgb.r, 0))
+		g: Math.min(255, Math.max(rgb.g, 0))
+		b: Math.min(255, Math.max(rgb.b, 0))
+		h: Utils.clamp(hsl.h, 0, 360)
+		s: Utils.clamp(hsl.s, 0, 1)
+		l: Utils.clamp(hsl.l, 0, 1)
+		a: a
 	}
 
 # extract number from string
@@ -491,9 +523,16 @@ stringToObject = (color) ->
 	if cssNames[color]
 		color = cssNames[color]
 		named = true
+		type: ColorType.NAME
 
 	else if color == "transparent"
-		return { r:0, g:0, b:0, a:0 }
+		return {
+			r:0
+			g:0
+			b:0
+			a:0
+			type: ColorType.NAME
+		}
 
 	match = undefined
 
@@ -527,26 +566,13 @@ stringToObject = (color) ->
 		a: match[4]
 		}
 
-	if match = matchers.hsv.exec(color)
-		return {
-		h: match[1]
-		s: match[2]
-		v: match[3]
-		}
-
-	if match = matchers.hsva.exec(color)
-		return {
-		h: match[1]
-		s: match[2]
-		v: match[3]
-		a: match[4]
-		}
 	if match = matchers.hex6.exec(color) or match = matchers.hex6.exec(cssNames[color])
 		return {
 		r: parseInt(match[1], 16)
 		g: parseInt(match[2], 16)
 		b: parseInt(match[3], 16)
 		a: 1
+		type: ColorType.HEX
 		}
 
 	if match = matchers.hex3.exec(color) or match = matchers.hex3.exec(cssNames[color])
@@ -554,6 +580,7 @@ stringToObject = (color) ->
 		r: parseInt(match[1] + "" + match[1], 16)
 		g: parseInt(match[2] + "" + match[2], 16)
 		b: parseInt(match[3] + "" + match[3], 16)
+		type: ColorType.HEX
 		}
 	else return false
 
