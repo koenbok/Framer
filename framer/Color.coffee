@@ -334,7 +334,7 @@ inputData = (color, g, b, alpha) ->
 				h = (h + 360) % 360
 				s = if isNumeric(color.s) then color.s else 1
 				if _.isString(color.s) then s = numberFromString(color.s)
-				l = if isNumeric(color.l) then color.l else 50
+				l = if isNumeric(color.l) then color.l else 0.5
 				if _.isString(color.l) then l = numberFromString(color.l)
 
 				rgb = hslToRgb(h, s, l)
