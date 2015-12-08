@@ -199,15 +199,15 @@ describe "Color", ->
 	it "should mix with css format color strings", ->
 
 		mix = Color.mix("red", "yellow")
-		Color.isColor(mix).should.eql true
+		Color.isColorObject(mix).should.eql true
 
 	it "should mix color if only one input is color", ->
 
 		mix = Color.mix("red")
-		Color.isColor(mix).should.eql true
+		Color.isColorObject(mix).should.eql true
 
 		mix = Color.mix("redfjkdsajfalfa", "yellow")
-		Color.isColor(mix).should.eql true
+		Color.isColorObject(mix).should.eql true
 
 	it "should return css name if possible", ->
 
@@ -226,7 +226,15 @@ describe "Color", ->
 	it "should return random color", ->
 
 		color = Color.random()
-		Color.isColor(color).should.eql true
+		Color.isColorObject(color).should.eql true
+
+	it "should check if valid color or color Object", ->
+
+		color = "red"
+		Color.isColor(color).should.be.true
+
+		color = new Color "red"
+		Color.isColor(color).should.be.true
 
 	it "should compare colors", ->
 
