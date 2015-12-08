@@ -16,6 +16,10 @@ extras/Studio.framer/imported
 extras/Studio.framer/app.js
 test/phantomjs/tests.js
 test/phantomjs/tests.js.map
+framer/**/*.js
+framer/**/*.js.map
+test/tests/**/*.js
+test/tests/**/*.js.map
 
 .DS_Store
 .AppleDouble
