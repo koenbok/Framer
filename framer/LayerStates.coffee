@@ -96,7 +96,7 @@ class exports.LayerStates extends BaseClass
 		for k, v of properties
 			if _.isNumber(v)
 				animatablePropertyKeys.push(k)
-			else if Color.isColor(v)
+			else if Color.isColorObject(v)
 				animatablePropertyKeys.push(k)
 			else if v == null
 				animatablePropertyKeys.push(k)
@@ -120,7 +120,7 @@ class exports.LayerStates extends BaseClass
 				
 				# Set all the values for keys that we couldn't animate
 				for k, v of properties
-					@layer[k] = v unless _.isNumber(v) or Color.isColor(v)
+					@layer[k] = v unless _.isNumber(v) or Color.isColorObject(v)
 
 				@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
 
@@ -180,7 +180,7 @@ class exports.LayerStates extends BaseClass
 
 			if _.isString(v) && Color.isColorString(v)
 				stateProperties[k] = new Color(v)
-			else if _.isNumber(v) or _.isFunction(v) or _.isBoolean(v) or _.isString(v) or Color.isColor(v) or v == null
+			else if _.isNumber(v) or _.isFunction(v) or _.isBoolean(v) or _.isString(v) or Color.isColorObject(v) or v == null
 				stateProperties[k] = v
 
 		return stateProperties

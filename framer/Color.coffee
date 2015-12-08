@@ -15,7 +15,7 @@ class exports.Color extends BaseClass
 		color = @color
 
 		# If input already is a Color object return input
-		if Color.isColor(color) then return color
+		if Color.isColorObject(color) then return color
 
 		# Convert input to RGB
 		input = inputData(color, r, g, b)
@@ -251,8 +251,15 @@ class exports.Color extends BaseClass
 		return new Color "rgba(#{c()}, #{c()}, #{c()}, #{alpha})"
 
 	@toColor: (color) -> return new Color(color)
-	@isColor: (color) -> return color instanceof Color
 	@validColorValue: (color) -> return color instanceof Color or color == null
+
+	@isColor: (color) ->
+		if _.isString(color)
+			return @isColorString(color)
+		else
+			return @isColorObject(color)
+
+	@isColorObject: (color) -> return color instanceof Color
 
 	@isColorString: (colorString) ->
 		if _.isString(colorString)

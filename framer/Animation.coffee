@@ -192,7 +192,7 @@ class exports.Animation extends EventEmitter
 
 		for k, v of @_stateB
 
-			if Color.isColor(v) or Color.isColor(@_stateA[k])
+			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
 				@_target[k] = Color.mix(@_stateA[k], @_stateB[k], value, false, @options.colorModel)
 			else
 				@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
@@ -262,7 +262,7 @@ class exports.Animation extends EventEmitter
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColor(v) or v == null
+			if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or v == null
 				animatableProperties[k] = v
 			else if _.isString(v)
 				if Color.isColorString(v)
