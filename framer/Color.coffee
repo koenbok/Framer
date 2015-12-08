@@ -254,7 +254,10 @@ class exports.Color extends BaseClass
 	@isColor: (color) -> return color instanceof Color
 	@validColorValue: (color) -> return color instanceof Color or color == null
 
-	@isColorString: (colorString) -> stringToObject(colorString) != false
+	@isColorString: (colorString) ->
+		if _.isString(colorString)
+			return stringToObject(colorString) != false
+		return false
 
 	@equal: (colorA, colorB) ->
 		if !@validColorValue(colorA)
