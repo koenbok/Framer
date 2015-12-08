@@ -21,6 +21,9 @@ framer/**/*.js.map
 test/tests/**/*.js
 test/tests/**/*.js.map
 
+# Discard version changes
+framer/Version.coffee
+
 .DS_Store
 .AppleDouble
 .LSOverride
@@ -46,3 +49,4 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
