@@ -129,7 +129,7 @@ gulp.task "coverage", ["build:coverage", "build:test"], ->
 	return gulp
 		.src("test/phantomjs/index.html")
 		.pipe(phantomjs(
-			reporter: "landing"
+			# reporter: "landing"
 			phantomjs:
 				hooks: "coverage-capture"
 		))

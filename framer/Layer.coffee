@@ -3,6 +3,7 @@
 Utils = require "./Utils"
 
 {Config} = require "./Config"
+{Events} = require "./Events"
 {Defaults} = require "./Defaults"
 {BaseClass} = require "./BaseClass"
 {EventEmitter} = require "./EventEmitter"
@@ -74,7 +75,7 @@ class exports.Layer extends BaseClass
 		# Add this layer to the current context
 		@_context.addLayer(@)
 
-		@_id = @_context.nextLayerId()
+		@_id = @_context.layerCounter
 
 		# Insert the layer into the dom or the superLayer element
 		if not options.superLayer
@@ -93,6 +94,9 @@ class exports.Layer extends BaseClass
 
 	##############################################################
 	# Properties
+
+	# Readonly context property
+	@define "context", get: -> @_context
 
 	# A placeholder for layer bound properties defined by the user:
 	@define "custom", @simpleProperty("custom", undefined)
@@ -455,7 +459,7 @@ class exports.Layer extends BaseClass
 
 	_insertElement: ->
 		@bringToFront()
-		@_context.getRootElement().appendChild(@_element)
+		@_context.element.appendChild(@_element)
 
 	@define "html",
 		get: ->
@@ -680,8 +684,8 @@ class exports.Layer extends BaseClass
 	_superOrParentLayer: ->
 		if @superLayer
 			return @superLayer
-		if @_context._parentLayer
-			return @_context._parentLayer
+		if @_context._parent
+			return @_context._parent
 
 	subLayersAbove: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
 		Utils.framePointForOrigin(layer.frame, originX, originY).y < point.y
@@ -708,7 +712,7 @@ class exports.Layer extends BaseClass
 
 	animations: ->
 		# Current running animations on this layer
-		_.filter @_context._animationList, (animation) =>
+		_.filter @_context.animations, (animation) =>
 			animation.options.layer == @
 
 	animatingProperties: ->
@@ -813,74 +817,42 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## EVENTS
 
-	addListener: (eventNames..., originalListener) =>
+	@define "_domEventManager",
+		get: -> @_context.domEventManager.wrap(@_element)
 
-		# To avoid an error in Framer Studio we return if no originalListener was given
-		if not originalListener
-			return
+	emit: (args...) ->
+		super(args..., @)
 
-		# # Modify the scope to be the calling object, just like jquery
-		# # also add the object as the last argument
-		listener = (args...) =>
-			originalListener.call(@, args..., @)
+	once: (eventName, listener) =>
+		super(eventName, listener)
+		@_addListener(eventName, listener)
 
-		# Because we modify the listener we need to keep track of it
-		# so we can find it back when we want to unlisten again
-		originalListener.modifiedListener = listener
+	addListener: (eventName, listener) =>
+		super(eventName, listener)
+		@_addListener(eventName, listener)
 
-		eventNames = [eventNames] if typeof eventNames == 'string'
+	removeListener: (eventName, listener) ->
+		super(eventName, listener)
+		@_removeListener(eventName, listener)
 
-		# Listen to dom events on the element
-		for eventName in eventNames
-			do (eventName) =>
-				super eventName, listener
-				@_context.eventManager.wrap(@_element).addEventListener(eventName, listener)
+	_addListener: (eventName, listener) ->
 
-				@_eventListeners ?= {}
-				@_eventListeners[eventName] ?= []
-				@_eventListeners[eventName].push(listener)
+		# If this is a dom event, we want the actual dom node to let us know
+		# when it gets triggered, so we can emit the event through the system.
+		if not @_domEventManager.listeners(eventName).length
+			@_domEventManager.addEventListener eventName, (event) =>
+				@emit(eventName, event)
 
-				# We want to make sure we listen to these events, but we can safely
-				# ignore it for change events
-				if not _.startsWith eventName, "change:"
-					@ignoreEvents = false
+		# Make sure we stop ignoring events once we add a user event listener
+		if not _.startsWith eventName, "change:"
+			@ignoreEvents = false
 
-	removeListener: (eventNames..., listener) ->
+	_removeListener: (eventName, listener) ->
 
-		# If the original listener was modified, remove that
-		# one instead
-		if listener.modifiedListener
-			listener = listener.modifiedListener
-
-		eventNames = [eventNames] if typeof eventNames == 'string'
-			
-		for eventName in eventNames
-			do (eventName) =>
-				super eventName, listener
-				
-				@_context.eventManager.wrap(@_element).removeEventListener(eventName, listener)
-
-				if @_eventListeners
-					@_eventListeners[eventName] = _.without @_eventListeners[eventName], listener
-
-	once: (eventName, listener) ->
-
-		originalListener = listener
-
-		listener = (args...) =>
-			originalListener.call(@, args..., @)
-			@removeListener(eventName, listener)
-
-		@addListener(eventName, listener)
-
-
-	removeAllListeners: ->
-
-		return if not @_eventListeners
-
-		for eventName, listeners of @_eventListeners
-			for listener in listeners
-				@removeListener eventName, listener
+		# Do cleanup for dom events if this is the last one of it's type.
+		# We are assuming we're the only ones adding dom events to the manager.
+		if not @listeners(eventName).length
+			@_domEventManager.removeAllListeners(eventName)
 
 	on: @::addListener
 	off: @::removeListener
@@ -898,3 +870,6 @@ class exports.Layer extends BaseClass
 		if @name
 			return "<#{@constructor.name} id:#{@id} name:#{@name} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}>"
 		return "<#{@constructor.name} id:#{@id} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}>"
+
+# Add event helpers for the layer dynamically
+Events.addHelpers(exports.Layer)

@@ -1,3 +1,14 @@
-EventEmitter = require "eventemitter3"
+{_} = require "./Underscore"
 
-exports.EventEmitter = EventEmitter
+EventEmitter3 = require "EventEmitter3"
+
+EventKey = "_events"
+
+class exports.EventEmitter extends EventEmitter3
+
+	listenerEvents: ->
+		return _.keys(@[EventKey])
+
+	removeAllListeners: (eventName) ->
+		for listener in @listeners(eventName)
+			@removeListener(eventName, listener)
