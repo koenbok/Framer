@@ -50,3 +50,8 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+extras/perf/init.js.map
+gulpfile.js
+gulpfile.js.map
+test/tests.js
+test/tests.js.map
