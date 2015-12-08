@@ -134,4 +134,4 @@ class exports.Context extends BaseClass
 		set: (value) ->
 			@_perspective = value
 			@_rootElement?.style["perspective"] = @_perspective
-
+			@_rootElement?.style["webkitPerspective"] = @_perspective
