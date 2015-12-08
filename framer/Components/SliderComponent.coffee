@@ -38,10 +38,18 @@ class exports.SliderComponent extends Layer
 			width: 0, force2d: true
 			name: "fill"
 
+		@knobOverlay = new Layer
+			backgroundColor: null
+			name: "knobOverlay"
+
+		@sliderOverlay = new Layer
+			backgroundColor: null
+			name: "sliderOverlay"
+
 		super options
 
 		@knobSize = options.knobSize or 30
-		@knob.superLayer = @fill.superLayer = @
+		@knob.superLayer = @fill.superLayer = @knobOverlay.superLayer = @sliderOverlay.superLayer = @
 
 		# Set fill initially
 		if @width > @height
@@ -49,7 +57,14 @@ class exports.SliderComponent extends Layer
 		else
 			@fill.width = @width
 
-		@fill.borderRadius = @borderRadius
+		# Link knobOverlay to knob
+		@knobOverlay.on Events.Move, ->
+			if @width > @height
+				@knob.x = @x
+			else
+				@knob.y = @y
+
+		@fill.borderRadius = @sliderOverlay.borderRadius = @borderRadius
 
 		@knob.draggable.enabled = true
 		@knob.draggable.overdrag = false
@@ -58,12 +73,18 @@ class exports.SliderComponent extends Layer
 		@knob.draggable.bounce = false
 		@knob.draggable.propagateEvents = false
 
+		# If tapSize isn't defined, remove the overlays
+		if not @tapSize
+			@knobOverlay.destroy()
+			@sliderOverlay.destroy()
+
 		@_updateFrame()
 		@_updateKnob()
 		@_updateFill()
 
 		@on("change:size", @_updateFrame)
 		@on("change:borderRadius", @_setRadius)
+		@knob.on("change:borderRadius", @_setOverlayRadius)
 
 		# Check for vertical sliders
 		if @width > @height
@@ -81,6 +102,7 @@ class exports.SliderComponent extends Layer
 
 		# On click/touch of the slider, update the value
 		@on(Events.TouchStart, @_touchDown)
+		@sliderOverlay.on(Events.TouchStart, @_touchDown)
 
 	_touchDown: (event) =>
 		event.preventDefault()
@@ -99,17 +121,19 @@ class exports.SliderComponent extends Layer
 
 	_updateFill: =>
 		if @width > @height
-			@fill.width = @knob.midX
+			@fill.width = @knobOverlay.midX = @knob.midX
 		else
-			@fill.height = @knob.midY
+			@fill.height = @knobOverlay.midY = @knob.midY
 
 	_updateKnob: =>
 		if @width > @height
-			@knob.midX = @fill.width
+			@knob.midX = @knobOverlay.midX = @fill.width
 			@knob.centerY()
+
 		else
-			@knob.midY = @fill.height
+			@knob.midY = @knobOverlay.midX = @fill.height
 			@knob.centerX()
+			@knobOverlay.midY = @knob.midY
 
 	_updateFrame: =>
 		@knob.draggable.constraints =
@@ -118,16 +142,32 @@ class exports.SliderComponent extends Layer
 			width: @width + @knob.width
 			height: @height + @knob.height
 
+		if @bounded
+			@knob.draggable.constraints =
+				x: 0
+				y: 0
+				width: @width
+				height: @height
+
 		if @width > @height
 			@fill.height = @height
 			@knob.centerY()
+			@knobOverlay.centerY()
 		else
 			@fill.width = @width
 			@knob.centerX()
+			@knobOverlay.centerX()
+
+		@sliderOverlay.center()
 
 	_setRadius: =>
 		radius = @borderRadius
 		@fill.style.borderRadius = "#{radius}px 0 0 #{radius}px"
+	_setOverlayRadius: =>
+
+		@knobOverlay.borderRadius = @knob.borderRadius
+
+	@define "bounded", @simpleProperty("bounded", false)
 
 	@define "knobSize",
 		get: -> @_knobSize
@@ -137,6 +177,21 @@ class exports.SliderComponent extends Layer
 			@knob.height = @_knobSize
 			@knob.borderRadius = @knobSize / 2
 			@_updateFrame()
+
+	@define "tapSize",
+		get: -> @_tapSize
+
+		set: (value) ->
+
+			@_tapSize = value
+
+			@knobOverlay.props =
+				width: @knobSize or 30 + @_tapSize
+				height:	@knobSize or 30 + @_tapSize
+
+			@sliderOverlay.props =
+				width: @width + @_tapSize
+				height:	@height + @_tapSize
 
 	@define "min",
 		get: -> @_min or 0
@@ -166,15 +221,27 @@ class exports.SliderComponent extends Layer
 
 	pointForValue: (value) ->
 		if @width > @height
-			return Utils.modulate(value, [@min, @max], [0, @width], true)
+			if @bounded
+				return Utils.modulate(value, [@min, @max], [0 + (@knob.width / 2), @width - (@knob.width / 2)], true)
+			else
+				return Utils.modulate(value, [@min, @max], [0 , @width], true)
 		else
-			return Utils.modulate(value, [@min, @max], [0, @height], true)
+			if @bounded
+				return Utils.modulate(value, [@min, @max], [0 + (@knob.height / 2), @height - (@knob.height / 2)], true)
+			else
+				return Utils.modulate(value, [@min, @max], [0, @height], true)
 
 	valueForPoint: (value) ->
 		if @width > @height
-			return Utils.modulate(value, [0, @width], [@min, @max], true)
+			if @bounded
+				return Utils.modulate(value, [0 + (@knob.width / 2), @width - (@knob.width / 2)], [@min, @max], true)
+			else
+				return Utils.modulate(value, [0, @width], [@min, @max], true)
 		else
-			return Utils.modulate(value, [0, @height], [@min, @max], true)
+			if @bounded
+				return Utils.modulate(value, [0 + (@knob.height / 2), @height - (@knob.height / 2)], [@min, @max], true)
+			else
+				return Utils.modulate(value, [0, @height], [@min, @max], true)
 
 	animateToValue: (value, animationOptions={curve:"spring(300,25,0)"}) ->
 		if @width > @height
