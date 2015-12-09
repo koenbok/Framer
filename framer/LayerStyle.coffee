@@ -128,7 +128,7 @@ exports.LayerStyle =
 		return css.join(" ")
 
 	webkitTransformOrigin: (layer) ->
-		"#{layer._properties.originX * 100}% #{layer._properties.originY * 100}% #{layer._properties.originZ}px"
+		"#{layer._properties.originX * 100}% #{layer._properties.originY * 100}%"
 
 	webkitPerspective: (layer) ->
 		"#{layer._properties.perspective}"
