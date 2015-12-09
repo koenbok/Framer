@@ -40,6 +40,12 @@ exports.LayerStyle =
 	opacity: (layer) ->
 		layer._properties.opacity
 
+	webkitTransformStyle: (layer) ->
+		if layer._properties.flat
+			return "flat"
+		else
+			return "preserve-3d"
+
 	overflow: (layer) ->
 		if layer._properties.scrollHorizontal is true or layer._properties.scrollVertical is true
 			return "auto"
@@ -77,7 +83,6 @@ exports.LayerStyle =
 				css.push("#{cssName}(#{filterFormat(layer[layerName], unit)})")
 
 		return css.join(" ")
-
 
 	webkitTransform: (layer) ->
 

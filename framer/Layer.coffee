@@ -59,8 +59,6 @@ class exports.Layer extends BaseClass
 		# We have to create the element before we set the defaults
 		@_createElement()
 
-		@_element.style["webkitTransformStyle"] = "preserve-3d"
-
 		if options.hasOwnProperty "frame"
 			options = _.extend(options, options.frame)
 
@@ -176,6 +174,7 @@ class exports.Layer extends BaseClass
 	@define "borderWidth", layerProperty(@, "borderWidth", "border", 0, _.isNumber)
 
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
+	@define "flat", layerProperty(@, "flat", "webkitTransformStyle", false, _.isBoolean)
 
 	##############################################################
 	# Identity
