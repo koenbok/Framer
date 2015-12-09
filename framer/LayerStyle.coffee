@@ -133,6 +133,9 @@ exports.LayerStyle =
 	webkitPerspective: (layer) ->
 		"#{layer._properties.perspective}"
 
+	webkitPerspectiveOrigin: (layer) ->
+		"#{layer._properties.perspectiveOriginX * 100}% #{layer._properties.perspectiveOriginY * 100}%"
+
 	pointerEvents: (layer) ->
 		if layer._properties.ignoreEvents
 			return "none"

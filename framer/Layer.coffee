@@ -137,6 +137,8 @@ class exports.Layer extends BaseClass
 	@define "originZ", layerProperty(@, "originZ", null, 0, _.isNumber)
 
 	@define "perspective", layerProperty(@, "perspective", "webkitPerspective", 0, _.isNumber)
+	@define "perspectiveOriginX", layerProperty(@, "perspectiveOriginX", "webkitPerspectiveOrigin", 0.5, _.isNumber)
+	@define "perspectiveOriginY", layerProperty(@, "perspectiveOriginY", "webkitPerspectiveOrigin", 0.5, _.isNumber)
 
 	@define "rotationX", layerProperty(@, "rotationX", "webkitTransform", 0, _.isNumber)
 	@define "rotationY", layerProperty(@, "rotationY", "webkitTransform", 0, _.isNumber)
