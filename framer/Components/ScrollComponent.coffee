@@ -162,7 +162,7 @@ class exports.ScrollComponent extends Layer
 		# color around until you set a content layer so you can see the ScrollComponent 
 		# on your screen after creation.
 		if @content.subLayers.length
-			if @content.backgroundColor == Framer.Defaults.Layer.backgroundColor
+			if @content.backgroundColor.isEqual(Framer.Defaults.Layer.backgroundColor)
 				@content.backgroundColor = null
 
 	@define "scroll",

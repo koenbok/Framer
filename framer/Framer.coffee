@@ -5,6 +5,7 @@ Framer = {}
 # Root level modules
 Framer._ = _
 Framer.Utils = (require "./Utils")
+Framer.Color = (require "./Color").Color
 Framer.Layer = (require "./Layer").Layer
 Framer.BackgroundLayer = (require "./BackgroundLayer").BackgroundLayer
 Framer.VideoLayer = (require "./VideoLayer").VideoLayer

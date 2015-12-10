@@ -94,7 +94,12 @@ class exports.LayerStates extends BaseClass
 		animatablePropertyKeys = []
 
 		for k, v of properties
-			animatablePropertyKeys.push(k) if _.isNumber(v)
+			if _.isNumber(v)
+				animatablePropertyKeys.push(k)
+			else if Color.isColorObject(v)
+				animatablePropertyKeys.push(k)
+			else if v == null
+				animatablePropertyKeys.push(k)
 
 		if animatablePropertyKeys.length == 0
 			instant = true
@@ -115,7 +120,7 @@ class exports.LayerStates extends BaseClass
 				
 				# Set all the values for keys that we couldn't animate
 				for k, v of properties
-					@layer[k] = v if not _.isNumber(v)
+					@layer[k] = v unless _.isNumber(v) or Color.isColorObject(v)
 
 				@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
 
@@ -172,6 +177,10 @@ class exports.LayerStates extends BaseClass
 
 		# TODO: Maybe we want to support advanced data structures like objects in the future too.
 		for k, v of properties
-			stateProperties[k] = v if _.isNumber(v) or _.isFunction(v) or _.isBoolean(v) or _.isString(v)
+
+			if _.isString(v) && Color.isColorString(v)
+				stateProperties[k] = new Color(v)
+			else if _.isNumber(v) or _.isFunction(v) or _.isBoolean(v) or _.isString(v) or Color.isColorObject(v) or v == null
+				stateProperties[k] = v
 
 		return stateProperties
