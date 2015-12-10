@@ -197,15 +197,3 @@ describe "LayerEvents", ->
 			layerA.on(Events.Pinch, handler)
 			layerA.removeAllListeners(Events.Pinch)
 			layerA.listeners(Events.Pinch).length.should.equal 0
-
-		# it "should work with event helpers", (done) ->
-
-		# 	layer = new Layer
-
-		# 	layer.onMouseOver (event, aLayer) ->
-		# 		aLayer.should.equal(layer)
-		# 		@should.equal(layer)
-		# 		done()
-
-		# 	simulate.mouseover(layer._element)
-
