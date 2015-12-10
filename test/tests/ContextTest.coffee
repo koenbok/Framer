@@ -24,6 +24,80 @@ describe "Context", ->
 	# Todo: event cleanup
 		# Todo: parent layer on context cleanup
 
+	describe "Freezing", ->
+
+		it "should remove events", ->
+
+			context = new Framer.Context(name:"Test")
+			
+			layer = null
+			handler = ->
+
+			context.run ->
+				layer = new Layer
+				layer.on(Events.Click, handler)
+
+			# We should have a click listener
+			layer.listeners(Events.Click).should.eql([handler])
+			context.freeze()
+			layer.listeners(Events.Click).should.eql([])
+
+		it "should restore events", ->
+
+			context = new Framer.Context(name:"Test")
+			
+			layer = null
+			handler = ->
+
+			context.run ->
+				layer = new Layer
+				layer.on(Events.Click, handler)
+
+			context.freeze()
+			context.resume()
+
+			# Now it should have been restored
+			layer.listeners(Events.Click).should.eql([handler])
+
+		it "should stop animations", ->
+
+			context = new Framer.Context(name:"Test")
+			
+			layer = null
+			animation = null
+
+			handler = ->
+
+			context.run ->
+				layer = new Layer
+				animation = layer.animate
+					properties:
+						x: 100
+
+			# We should have a click listener
+			context.animations.should.eql [animation]
+			context.freeze()
+			context.animations.should.eql []
+
+		it "should stop timers", ->
+
+			context = new Framer.Context(name:"Test")
+			
+			layer = null
+			timer = null
+
+			handler = ->
+
+			context.run ->
+				layer = new Layer
+				timer = Utils.delay(1, handler)
+
+			# We should have a click listener
+			context.timers.should.eql [timer]
+			context.freeze()
+			context.timers.should.eql []
+
+
 	describe "Events", ->
 
 		it "should emit reset", (callback) ->

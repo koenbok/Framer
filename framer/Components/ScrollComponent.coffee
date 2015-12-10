@@ -115,7 +115,7 @@ class exports.ScrollComponent extends Layer
 
 		@_content = layer
 		@_content.superLayer = @
-		@_content.name = "#{@constructor.name.replace("Component", "")}Content"
+		@_content.name = "content"
 		@_content.clip = false
 		@_content.draggable.enabled = true
 		@_content.draggable.momentum = true

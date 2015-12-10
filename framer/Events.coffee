@@ -16,6 +16,7 @@ Events.MouseOver = "mouseover"
 Events.MouseOut = "mouseout"
 Events.MouseMove = "mousemove"
 Events.MouseWheel = "mousewheel"
+Events.DoubleClick = "dblclick"
 
 # Let's make sure the touch events work on desktop too
 if not Utils.isTouch()
@@ -91,12 +92,25 @@ Events.isGestureEvent = (eventName) ->
 
 # Extract touch events for any event
 Events.touchEvent = (event) ->
-	touchEvent = event.touches?[0]
+	touchEvent =  event.touches?[0]
 	touchEvent ?= event.changedTouches?[0]
 	touchEvent ?= event
 	touchEvent
 
 Events.wrap = (element) ->
-	Framer.CurrentContext.eventManager.wrap(element)
-	
+	Framer.CurrentContext.domEventManager.wrap(element)
+
+Events.addHelpers = (obj) ->
+
+	# Add event helpers to an object like:
+	# layer.onClick, layer.onScroll, etc.
+
+	_.keys(Events).map (eventName) ->
+		return unless _.isString(eventName)
+		obj::["on#{eventName}"] = (callback) ->
+			@on(Events[eventName], callback)
+
+	obj::onChange = (p, callback) ->
+		@on("change:#{p}", callback)
+
 exports.Events = Events

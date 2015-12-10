@@ -401,19 +401,6 @@ describe "Layer", ->
 			layer.ignoreEvents.should.equal true
 			layer.style["pointerEvents"].should.equal "none"
 
-		it "should listen to multiple events", ->
-
-			layer = new Layer()
-
-			count = 0
-			handler = -> count++
-
-			layer.on "click", "tap", handler
-
-			layer.emit "click"
-			layer.emit "tap"
-
-			count.should.equal 2
 
 		it "should not listen to events until a listener is added", ->
 			
@@ -492,6 +479,46 @@ describe "Layer", ->
 
 			layerA.draggable.emit("test", {})
 
+		it "should list all events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+			layerA.on("test", handler)
+			layerA.listeners("test").length.should.equal 1
+
+		it "should remove all events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+			layerA.on("test", handler)
+			layerA.removeAllListeners("test")
+			layerA.listeners("test").length.should.equal 0
+
+		it "should add and clean up dom events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+
+			# But never more then one
+			layerA._domEventManager.listeners(Events.Click).length.should.equal(1)
+
+			layerA.removeAllListeners(Events.Click)
+
+			# And on removal, we should get rid of the dom event
+			layerA._domEventManager.listeners(Events.Click).length.should.equal(0)
+
+		it "should work with event helpers", (done) ->
+
+			layer = new Layer
+
+			layer.onMouseOver (event, aLayer) ->
+				aLayer.should.equal(layer)
+				@should.equal(layer)
+				done()
+
+			simulate.mouseover(layer._element)
 
 	describe "Hierarchy", ->
 		
@@ -905,21 +932,26 @@ describe "Layer", ->
 			X = 100
 			Y = 200
 			IMAGE = '../static/test.png'
+			BORDERRADIUS = 20
 
 			layer = new Layer
 				x:X
 				y:Y
 				image:IMAGE
 
+			layer.borderRadius = BORDERRADIUS
+
 			layer.x.should.eql X
 			layer.y.should.eql Y
 			layer.image.should.eql IMAGE
+			layer.borderRadius.should.eql BORDERRADIUS
 
 			copy = layer.copy()
 
 			copy.x.should.eql X
 			copy.y.should.eql Y
 			copy.image.should.eql IMAGE
+			copy.borderRadius.should.eql BORDERRADIUS
 
 		it "copied Layer should have defaults", ->
 
@@ -929,8 +961,13 @@ describe "Layer", ->
 			copy.width.should.equal 100
 			copy.height.should.equal 100
 
+		# it "copied layer should copy styles", ->
 
+		# 	layer = new Layer
+		# 	layer.style.backgroundColor = "yellow"
 
+		# 	layer2 = layer.copy()
+		# 	layer2.style.backgroundColor.should.equal "yellow"
 
 
 

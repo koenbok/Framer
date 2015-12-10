@@ -35,6 +35,9 @@ class exports.AnimationLoop extends EventEmitter
 		if Utils.webkitVersion() > 600 and Utils.isFramerStudio()
 			@raf = false
 
+		# To avoid event emitter warning
+		@maximumListeners = Infinity
+
 	start: =>
 		
 		animationLoop = @

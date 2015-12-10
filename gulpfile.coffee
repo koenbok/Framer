@@ -61,7 +61,7 @@ gulp.task "build:test", ->
 gulp.task "test", ["build:debug", "build:test"], ->
 	return gulp
 		.src("test/phantomjs/index.html")
-		.pipe(phantomjs({reporter: "landing"}))
+		.pipe(phantomjs({reporter: "dot"}))
 
 gulp.task "watch", ["test"], ->
 	gulp.watch(["./*.coffee", "framer/**", "test/tests/**"], ["test"])
@@ -95,7 +95,7 @@ gulp.task "coverage", ["build:coverage", "build:test"], ->
 	return gulp
 		.src("test/phantomjs/index.html")
 		.pipe(phantomjs(
-			reporter: "landing"
+			# reporter: "landing"
 			phantomjs:
 				hooks: "coverage-capture"
 		))

@@ -101,12 +101,24 @@ class exports.Animation extends EventEmitter
 			console.warn "Animation: nothing to animate, all properties are equal to what it is now"
 			return false
 
+		# If this animation wants to animate a property that is already being animated, it stops
+		# that currently running animation. If not, it allows them both to continue.
 		for property, animation of @_target.animatingProperties()
-			if @_stateA.hasOwnProperty(property)
-				# We used to ignore animations that tried animation already animating properties
-				# console.warn "Animation: property #{property} is already being animated for this layer by another animation, so we bail"
 
-				# But after some consideration, we actually just stop the animation that is animation those properties for this one
+			if @_stateA.hasOwnProperty(property)
+				animation.stop()
+
+			# We also need to account for derivatives from x, y
+			if property is "x" and (
+				@_stateA.hasOwnProperty("minX") or 
+				@_stateA.hasOwnProperty("midX") or 
+				@_stateA.hasOwnProperty("maxX"))
+				animation.stop()
+
+			if property is "y" and (
+				@_stateA.hasOwnProperty("minY") or 
+				@_stateA.hasOwnProperty("midY") or 
+				@_stateA.hasOwnProperty("maxY"))
 				animation.stop()
 
 		if @options.debug
@@ -133,8 +145,7 @@ class exports.Animation extends EventEmitter
 
 	stop: (emit=true)->
 		
-		@options.layer._context._animationList = _.without(
-			@options.layer._context._animationList, @)
+		@options.layer.context.removeAnimation(@)
 
 		@emit("stop") if emit
 		Framer.Loop.off("update", @_update)
@@ -162,7 +173,7 @@ class exports.Animation extends EventEmitter
 		_.keys(@_stateA)
 
 	_start: =>
-		@options.layer._context._animationList.push(@)
+		@options.layer.context.addAnimation(@)
 		@emit("start")
 		Framer.Loop.on("update", @_update)
 

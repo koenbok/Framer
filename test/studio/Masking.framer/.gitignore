@@ -1,29 +1,13 @@
-.DS_Store
-node_modules
-test/init.js
-test/lib/framer.js
-*.swp
-build/template
-build
-lib
-.build
-.deploy
-*.pyc
-npm-debug.log
-extras/Studio.framer/app.coffee
-extras/Studio.framer/framer/config.json
-extras/Studio.framer/imported
-extras/Studio.framer/app.js
-test/phantomjs/tests.js
-test/phantomjs/tests.js.map
+# Framer Git Ignore
+
+# General OSX
 
 .DS_Store
 .AppleDouble
 .LSOverride
 
 # Icon must end with two \r
-Icon
-
+Icon
 
 # Thumbnails
 ._*
@@ -42,3 +26,11 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+
+# Framer Specific
+.temp.html
+framer/*.old.*
+framer/backup.coffee
+framer/backups/*
+framer/.*.hash
