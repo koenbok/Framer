@@ -30,7 +30,7 @@ class exports.Context extends BaseClass
 		if options.perspective != undefined
 			@perspective = options.perspective
 		else
-			@perspective = 800
+			@perspective = 1200
 		
 		@reset()
 
