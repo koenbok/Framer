@@ -43,6 +43,9 @@ coverage: bootstrap
 studio:
 	open -a "Framer Studio" extras/Studio.framer
 
+perf:
+	open -a "Framer Studio" extras/Perf.framer
+
 # Building and uploading the site
 
 dist:
