@@ -132,6 +132,33 @@ class exports.Context extends BaseClass
 		get: ->
 			return @_perspective
 		set: (value) ->
-			@_perspective = value
-			@_rootElement?.style["perspective"] = @_perspective
-			@_rootElement?.style["webkitPerspective"] = @_perspective
+			if _.isNumber(value)
+				@_perspective = value
+				@_rootElement?.style["perspective"] = @_perspective
+				@_rootElement?.style["webkitPerspective"] = @_perspective
+
+	_updatePerspective: ->
+		@_rootElement?.style["webkitPerspectiveOrigin"] = "#{@perspectiveOriginX * 100}% #{@perspectiveOriginY * 100}%"
+
+	@define "perspectiveOriginX",
+		get: ->
+			if _.isNumber(@_perspectiveOriginX)
+				return @_perspectiveOriginX
+			else
+				return .5
+		set: (value) ->
+			if _.isNumber(value)
+				@_perspectiveOriginX = value
+				@_updatePerspective()
+
+	@define "perspectiveOriginY",
+		get: ->
+			if _.isNumber(@_perspectiveOriginY)
+				return @_perspectiveOriginY
+			else
+				return .5
+		set: (value) ->
+			if _.isNumber(value)
+				@_perspectiveOriginY = value
+				@_updatePerspective()
+
