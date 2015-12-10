@@ -7,6 +7,13 @@ class ScreenClass extends BaseClass
 	@define "size", get: -> {width:@width, height:@height}
 	@define "frame", get: -> {x:0, y:0, width:@width, height:@height}
 
+	@define "backgroundColor",
+		importable: false
+		exportable: false
+		get: -> Framer.CurrentContext.backgroundColor
+		set: (value) ->
+			Framer.CurrentContext.backgroundColor = value
+
 	@define "perspective",
 		importable: false
 		exportable: false

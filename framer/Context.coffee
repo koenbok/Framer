@@ -128,6 +128,13 @@ class exports.Context extends BaseClass
 			return @_parentLayer.height if @_parentLayer
 			return window.innerHeight
 
+	@define "backgroundColor",
+		get: ->
+			return @_rootElement?.style["backgroundColor"]
+		set: (value) ->
+			if Color.isColor(value)
+				@_rootElement?.style["backgroundColor"] = new Color value.toString()
+
 	@define "perspective",
 		get: ->
 			return @_perspective
