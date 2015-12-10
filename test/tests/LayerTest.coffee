@@ -33,26 +33,25 @@ describe "Layer", ->
 
 		it "should set default background color", ->
 			
+			# if the default background color is not set the content layer of scrollcomponent is not hidden when layers are added
+			layer = new Layer()
+			Color.equal(layer.backgroundColor, Framer.Defaults.Layer.backgroundColor).should.be.true
+
 			Framer.Defaults =
 				Layer:
 					backgroundColor: "red"
 					
 			layer = new Layer()
 			
-			layer.style.backgroundColor.should.equal "red"
-			#layer.backgroundColor.should.equal "red"
-
+			layer.style.backgroundColor.should.equal new Color("red").toString()
 
 			Framer.resetDefaults()
-		
 
 		it "should set defaults with override", ->
 			
 			layer = new Layer x:50, y:50
 			layer.x.should.equal 50
 			layer.x.should.equal 50
-
-
 
 	describe "Properties", ->
 
@@ -269,8 +268,8 @@ describe "Layer", ->
 		it "should set style properties on create", ->
 
 			layer = new Layer backgroundColor: "red"
-			layer.backgroundColor.should.equal "red"
-			layer.style["backgroundColor"].should.equal "red"
+			layer.backgroundColor.should.eql new Color("red")
+			layer.style["backgroundColor"].should.equal new Color("red").toString()
 
 		it "should check value type", ->
 
@@ -379,17 +378,20 @@ describe "Layer", ->
 			layer.shadowBlur.should.equal 10
 			layer.shadowSpread.should.equal 10
 
-			layer.style.boxShadow.should.equal ""
+			layer.style.boxShadow.should.equal "rgb(0, 0, 0) 10px 10px 10px 10px"
 
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = "red"
-			layer.shadowColor.should.equal "red"
+			layer.shadowColor.r.should.equal 255
+			layer.shadowColor.g.should.equal 0
+			layer.shadowColor.b.should.equal 0
+			layer.shadowColor.a.should.equal 1
 			
-			layer.style.boxShadow.should.equal "red 10px 10px 10px 10px"
+			layer.style.boxShadow.should.equal "rgb(255, 0, 0) 10px 10px 10px 10px"
 
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = null
-			layer.style.boxShadow.should.equal ""
+			layer.style.boxShadow.should.equal "rgba(0, 0, 0, 0) 10px 10px 10px 10px"
 
 	describe "Events", ->
 
