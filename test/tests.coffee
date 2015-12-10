@@ -17,6 +17,7 @@ require "./tests/LayerAnimationTest"
 require "./tests/ContextTest"
 require "./tests/ScrollComponentTest"
 require "./tests/ColorTest"
+require "./tests/DeviceComponentTest"
 
 # Start mocha
 if window.mochaPhantomJS
