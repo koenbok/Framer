@@ -1,4 +1,4 @@
-box: nodesource/node
+box: nolimitid/node-phantom-npm3
 
 build:
     steps:
