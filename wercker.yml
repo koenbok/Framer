@@ -5,6 +5,7 @@ build:
         - script:
             name: load git revisions
             code: |
+                ssh-keyscan github.com >> ~/.ssh/known_hosts
                 cd $WERCKER_SOURCE_DIR
                 git fetch --unshallow
         - script:
