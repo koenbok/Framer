@@ -1,4 +1,4 @@
-box: nodesource/trusty
+box: nodesource/node
 
 build:
     steps:
