@@ -1,10 +1,11 @@
-box: wercker/nodejs
+box: nodesource/trusty
 
 build:
     steps:
         - script:
             name: load git revisions
             code: |
+                cd $WERCKER_SOURCE_DIR
                 git fetch --unshallow
         - script:
             name: set up permissions
