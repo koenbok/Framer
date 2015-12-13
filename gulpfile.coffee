@@ -6,6 +6,7 @@ webpack = require("webpack")
 gulpWebpack = require("gulp-webpack")
 rename = require("gulp-rename")
 template = require("gulp-template")
+gutil = require "gulp-util"
 {exec} = require("child_process")
 
 command = (cmd, cb) ->
@@ -101,7 +102,7 @@ gulp.task "version", (callback) ->
 			build: results[2]
 			date: Math.floor(Date.now() / 1000)
 
-		console.log "version:#{info.branch}/#{info.hash} build:#{info.build}"
+		gutil.log "Building ", gutil.colors.green("#{info.branch}/#{info.hash} @#{info.build}")
 		 
 		task = gulp.src("framer/Version.coffee.template")
 			.pipe(template(info))

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "eventemitter3": "^1.1.1",
+    "gulp-util": "^3.0.7",
     "lodash": "^3.5.0"
   },
   "devDependencies": {
@@ -38,7 +39,6 @@
     "simulate": "^0.0.5",
     "webpack": "^1.7.3",
     "mocha": "^2.3.4",
-    "should": "^7.1.1",
     "chai": "^3.4.1"
   },
   "keywords": [
