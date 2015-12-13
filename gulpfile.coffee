@@ -90,29 +90,38 @@ gulp.task "watcher", ->
 
 gulp.task "version", (callback) ->
 
-	async.series [
-		(cb) -> command("git rev-parse --abbrev-ref HEAD", cb) # branch
-		(cb) -> command("git describe --always --dirty", cb) # hash
-		(cb) -> command("git rev-list --count HEAD", cb) # build
-	], (err, results) ->
+	# This is needed for a complete build number
+	command "git fetch --unshallow", (err) ->
 
-		info = 
-			branch: results[0]
-			hash: results[1]
-			build: results[2]
-			date: Math.floor(Date.now() / 1000)
+		async.series [
+			(cb) -> command("git rev-parse --abbrev-ref HEAD", cb) # branch
+			(cb) -> command("git describe --always --dirty", cb) # hash
+			(cb) -> command("git rev-list --count HEAD", cb) # build
+		], (err, results) ->			
 
-		gutil.log "Building ", gutil.colors.green("#{info.branch}/#{info.hash} @#{info.build}")
-		 
-		task = gulp.src("framer/Version.coffee.template")
-			.pipe(template(info))
-			.pipe(rename({
-				basename: "Version",
-				extname: ".coffee"
-			}))
-			.pipe(gulp.dest("build"))
+			info = 
+				branch: results[0]
+				hash: results[1]
+				build: results[2]
+				date: Math.floor(Date.now() / 1000)
 
-		callback(null, task)
+			# If we are on the wercker platform, we need to get the branch
+			# name from the env variables and remove the dirty vrom version.
+			if process.env.WERCKER_GIT_BRANCH
+				info.branch = process.env.WERCKER_GIT_BRANCH
+				info.hash = info.hash.replace("-dirty", "")
+
+			gutil.log "Building ", gutil.colors.green("#{info.branch}/#{info.hash} @#{info.build}")
+			 
+			task = gulp.src("framer/Version.coffee.template")
+				.pipe(template(info))
+				.pipe(rename({
+					basename: "Version",
+					extname: ".coffee"
+				}))
+				.pipe(gulp.dest("build"))
+
+			callback(null, task)
 
 gulp.task "build:coverage", ->
 
