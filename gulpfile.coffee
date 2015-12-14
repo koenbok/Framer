@@ -75,7 +75,7 @@ gulp.task "test", ["build:debug", "build:test"], ->
 gulp.task "watch", ["test"], ->
 	gulp.watch(["./*.coffee", "framer/**", "test/tests/**", "!Version.coffee"], ["test"])
 
-gulp.task "watcher", ->
+gulp.task "watcher", ["version"], ->
 
 	config = _.extend CONFIG,
 		entry: "./framer/Framer.coffee"
