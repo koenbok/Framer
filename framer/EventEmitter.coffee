@@ -1,6 +1,6 @@
 {_} = require "./Underscore"
 
-EventEmitter3 = require "EventEmitter3"
+EventEmitter3 = require "eventemitter3"
 
 EventKey = "_events"
 
