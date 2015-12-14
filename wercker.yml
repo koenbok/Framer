@@ -2,13 +2,10 @@ box: nolimitid/node-phantom-npm3
 
 build:
     steps:
-        - add-to-known_hosts:
-            hostname: github.com
-            fingerprint: 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48
         - script:
             name: load git revisions
             code: |
-                ssh-keygen -t rsa -f ~/.ssh/ssh_host_rsa_key
+                git remote set-url origin https://github.com/$WERCKER_GIT_OWNER/$WERCKER_GIT_REPOSITORY.git
                 cd $WERCKER_SOURCE_DIR
                 git fetch --unshallow
         - script:
