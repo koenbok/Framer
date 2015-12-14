@@ -645,15 +645,13 @@ class exports.Layer extends BaseClass
 
 			return _.without @superLayer.subLayers, @
 
-	addSubLayer: (layer) ->
-		layer.superLayer = @
+	addSubLayer: (layers...) ->
+		for layer in layers
+			layer.superLayer = @
 
-	removeSubLayer: (layer) ->
-
-		if layer not in @subLayers
-			return
-
-		layer.superLayer = null
+	removeSubLayer: (layers...) ->
+		for layer in layers
+			layer.superLayer = null if layer in @subLayers
 
 	subLayersByName: (name) ->
 		_.filter @subLayers, (layer) -> layer.name == name
