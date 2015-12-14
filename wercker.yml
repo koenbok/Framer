@@ -8,12 +8,6 @@ build:
                 git remote set-url origin https://github.com/$WERCKER_GIT_OWNER/$WERCKER_GIT_REPOSITORY.git
                 cd $WERCKER_SOURCE_DIR
                 git fetch --unshallow
-        - script:
-            name: set up permissions
-            code: |
-                export NODE_ENV=development
-                chmod 777 -R .
-                chmod 777 -R $WERCKER_CACHE_DIR
         - npm-test
 
 deploy:
