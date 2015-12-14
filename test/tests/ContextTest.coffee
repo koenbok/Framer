@@ -211,3 +211,24 @@ describe "Context", ->
 				layer.id.should.equal 1
 				layer = new Layer
 				layer.id.should.equal 2
+
+	describe "Styling", ->
+
+		it "should set backgroundColor", ->
+			
+			context = new Framer.Context(name:"Test")
+			context.backgroundColor = "red"
+			color = new Color "red"
+			colorString = color.toString()
+			context._element.style["backgroundColor"].should.equal colorString
+
+		it "should have a default perspective of 1200", ->
+
+			context = new Framer.Context(name:"Test")
+			context._element.style["webkitPerspective"].should.equal "1200"
+
+		it "should allow the perspective to be changed", ->
+
+			context = new Framer.Context(name:"Test")
+			context.perspective = 800
+			context._element.style["webkitPerspective"].should.equal "800"
