@@ -262,10 +262,10 @@ class exports.Context extends BaseClass
 
 	@define "backgroundColor",
 		get: ->
-			return @_rootElement?.style["backgroundColor"]
+			return @_element?.style["backgroundColor"]
 		set: (value) ->
 			if Color.isColor(value)
-				@_rootElement?.style["backgroundColor"] = new Color value.toString()
+				@_element?.style["backgroundColor"] = new Color value.toString()
 
 	@define "perspective",
 		get: ->
