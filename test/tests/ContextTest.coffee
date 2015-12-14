@@ -59,6 +59,68 @@ describe "Context", ->
 			# Now it should have been restored
 			layer.listeners(Events.Click).should.eql([handler])
 
+		it "should freeze and restore multiple events on multiple layers", ->
+
+			context = new Framer.Context(name:"Test")
+			
+			layerA = layerB = null
+			handlerA = ->
+			handlerB = ->
+			handlerC = ->
+			handlerD = ->
+
+			context.run ->
+				
+				layerA = new Layer
+				layerA.on(Events.Click, handlerA)
+				layerA.on(Events.Click, handlerB)
+				
+				layerB = new Layer
+				layerB.on(Events.Scroll, handlerC)
+				layerB.on(Events.Scroll, handlerD)
+
+			# We should have a click listener
+			layerA.listeners(Events.Click).should.eql([handlerA, handlerB])
+			layerB.listeners(Events.Scroll).should.eql([handlerC, handlerD])
+
+			context.freeze()
+			layerA.listeners(Events.Click).should.eql([])
+			layerB.listeners(Events.Click).should.eql([])
+
+			context.resume()
+			layerA.listeners(Events.Click).should.eql([handlerA, handlerB])
+			layerB.listeners(Events.Scroll).should.eql([handlerC, handlerD])
+
+		it "should freeze and restore multiple events a layer", ->
+
+			context = new Framer.Context(name:"Test")
+			
+			layerA = null
+			handlerA = ->
+			handlerB = ->
+			handlerC = ->
+			handlerD = ->
+
+			context.run ->
+				
+				layerA = new Layer
+				layerA.on(Events.Click, handlerA)
+				layerA.on(Events.Click, handlerB)
+				layerA.on(Events.Scroll, handlerC)
+				layerA.on(Events.Scroll, handlerD)
+
+			# We should have a click listener
+			layerA.listeners(Events.Click).should.eql([handlerA, handlerB])
+			layerA.listeners(Events.Scroll).should.eql([handlerC, handlerD])
+
+			context.freeze()
+			layerA.listeners(Events.Click).should.eql([])
+
+			context.resume()
+			layerA.listeners(Events.Click).should.eql([handlerA, handlerB])
+			layerA.listeners(Events.Scroll).should.eql([handlerC, handlerD])
+
+
 		it "should stop animations", ->
 
 			context = new Framer.Context(name:"Test")
