@@ -163,9 +163,11 @@ class exports.Context extends BaseClass
 
 			for eventName in layer.listenerEvents()
 				layerListeners[eventName] = layer.listeners(eventName)
-				layer.removeAllListeners(eventName)
-
-			@_frozenEvents[@_layers.indexOf(layer)] = layerListeners
+			
+			layer.removeAllListeners()
+			layerId = @_layers.indexOf(layer)
+			
+			@_frozenEvents[layerId] = layerListeners
 			
 		@stopAnimations()
 
