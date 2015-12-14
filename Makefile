@@ -8,11 +8,9 @@ all: build
 
 bootstrap:
 	npm install
-	cd test/phantomjs; "$(bin)/bower" --config.analytics=false install
 
 unbootstrap:
 	rm -Rf node_modules
-	rm -Rf test/phantomjs/bower
 
 clean:
 	rm -rf build

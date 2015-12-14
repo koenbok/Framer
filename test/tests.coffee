@@ -1,10 +1,11 @@
+window.chai = require("chai")
+window.should = require("should")
+
 window.console.debug = (v) ->
 window.console.warn = (v) ->
 
-mocha.setup("bdd")
+mocha.setup({ui:"bdd", bail:true, reporter:"dot"})
 mocha.globals(["__import__"])
-
-assert = chai.assert
 
 require "./tests/EventEmitterTest"
 require "./tests/UtilsTest"
@@ -16,10 +17,7 @@ require "./tests/ImporterTest"
 require "./tests/LayerAnimationTest"
 require "./tests/ContextTest"
 require "./tests/ScrollComponentTest"
+require "./tests/VersionTest"
 require "./tests/ColorTest"
 
-# Start mocha
-if window.mochaPhantomJS
-	mochaPhantomJS.run()
-else
-	mocha.run()
+mocha.run()

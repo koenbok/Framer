@@ -416,19 +416,6 @@ describe "Layer", ->
 			layer.ignoreEvents.should.equal true
 			layer.style["pointerEvents"].should.equal "none"
 
-		it "should listen to multiple events", ->
-
-			layer = new Layer()
-
-			count = 0
-			handler = -> count++
-
-			layer.on "click", "tap", handler
-
-			layer.emit "click"
-			layer.emit "tap"
-
-			count.should.equal 2
 
 		it "should not listen to events until a listener is added", ->
 			
@@ -507,6 +494,46 @@ describe "Layer", ->
 
 			layerA.draggable.emit("test", {})
 
+		it "should list all events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+			layerA.on("test", handler)
+			layerA.listeners("test").length.should.equal 1
+
+		it "should remove all events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+			layerA.on("test", handler)
+			layerA.removeAllListeners("test")
+			layerA.listeners("test").length.should.equal 0
+
+		it "should add and clean up dom events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+
+			# But never more then one
+			layerA._domEventManager.listeners(Events.Click).length.should.equal(1)
+
+			layerA.removeAllListeners(Events.Click)
+
+			# And on removal, we should get rid of the dom event
+			layerA._domEventManager.listeners(Events.Click).length.should.equal(0)
+
+		it "should work with event helpers", (done) ->
+
+			layer = new Layer
+
+			layer.onMouseOver (event, aLayer) ->
+				aLayer.should.equal(layer)
+				@should.equal(layer)
+				done()
+
+			simulate.mouseover(layer._element)
 
 	describe "Hierarchy", ->
 		
