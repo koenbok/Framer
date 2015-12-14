@@ -124,6 +124,8 @@ class exports.LayerStates extends BaseClass
 
 				@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
 
+			@_animation
+
 
 
 	switchInstant: (stateName) ->
