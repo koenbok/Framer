@@ -73,8 +73,7 @@ class exports.Simulation extends BaseClass
 
 		@_running = false
 		
-		@options.layer._context._animationList = _.without(
-			@options.layer._context._animationList, @)
+		@options.layer.context.removeAnimation(@)
 
 		@emit(Events.SimulationStop) if emit
 		Framer.Loop.off("update", @_update)
@@ -91,7 +90,7 @@ class exports.Simulation extends BaseClass
 
 		@_running = true
 
-		@options.layer._context._animationList.push(@)
+		@options.layer.context.addAnimation(@)
 
 		@emit(Events.SimulationStart)
 		Framer.Loop.on("update", @_update)
