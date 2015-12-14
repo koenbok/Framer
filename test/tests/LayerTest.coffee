@@ -73,56 +73,61 @@ describe "Layer", ->
 			layer.width.should.equal 200
 			layer.style.width.should.equal "200px"
 
-		# it "should set x and y", ->
+		it "should set x and y", ->
 			
-		# 	layer = new Layer
+			layer = new Layer
 			
-		# 	layer.x = 100
-		# 	layer.x.should.equal 100
-		# 	layer.y = 50
-		# 	layer.y.should.equal 50
+			layer.x = 100
+			layer.x.should.equal 100
+			layer.y = 50
+			layer.y.should.equal 50
 			
-		# 	# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
-		# 	layer.style.webkitTransform.should.equal "translate3d(100px, 50px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
+			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
+			layer.style.webkitTransform.should.equal "translate3d(100px, 50px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 			
-		# it "should set scale", ->
+		it "should set scale", ->
 			
-		# 	layer = new Layer
+			layer = new Layer
 
-		# 	layer.scaleX = 100
-		# 	layer.scaleY = 100
-		# 	layer.scaleZ = 100
+			layer.scaleX = 100
+			layer.scaleY = 100
+			layer.scaleZ = 100
 
-		# 	# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 50)"
-		# 	layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(100, 100, 100) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
+			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 50)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(100, 100, 100) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 
-		# it "should set origin", ->
+		it "should set origin", ->
 
-		# 	layer = new Layer
+			layer = new Layer
+				originZ: 80
 
-		# 	layer.style.webkitTransformOrigin.should.equal "50% 50% 0px"
-		# 	layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
+			layer.style.webkitTransformOrigin.should.equal "50% 50%"
 
-		# 	layer.originX = 0.1
-		# 	layer.originY = 0.2
-		# 	layer.originZ = 80
+			layer.originX = 0.1
+			layer.originY = 0.2
 
-		# 	layer.style.webkitTransformOrigin.should.equal "10% 20% 80px"
-		# 	layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 80px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
+			layer.style.webkitTransformOrigin.should.equal "10% 20%"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(80px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(-80px)"
 
-		# 	layer.originX = 0.5
-		# 	layer.originY = 0.5
-		# 	layer.originZ = -50
+			layer.originX = 0.5
+			layer.originY = 0.5
 
-		# 	layer.style.webkitTransformOrigin.should.equal "50% 50% -50px"
-		# 	layer.style.webkitTransform.should.equal "translate3d(0px, 0px, -50px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
+			layer.style.webkitTransformOrigin.should.equal "50% 50%"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(80px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(-80px)"
 
-		# 	it "should set transform-style when superlayer has perspective", ->
-		# 		superLayer = new Layer
-		# 			perspective: 100
-		# 		layer = new Layer
-		# 			superLayer: superLayer
-		# 		layer._element.style.webkitTransformStyle.should.equal "preserve-3d"
+		it "should preserve 3D by default", ->
+
+			layer = new Layer
+
+			layer._element.style.webkitTransformStyle.should.equal "preserve-3d"
+
+		it "should flatten layer", ->
+
+			layer = new Layer
+				flat: true
+
+			layer._element.style.webkitTransformStyle.should.equal "flat"
+
 
 		it "should set local image", ->
 	
