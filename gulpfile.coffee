@@ -3,10 +3,10 @@ async = require("async")
 gulp = require("gulp")
 phantomjs = require("gulp-mocha-phantomjs")
 webpack = require("webpack")
-gulpWebpack = require("gulp-webpack")
+gulpWebpack = require("webpack-stream")
 rename = require("gulp-rename")
 template = require("gulp-template")
-gutil = require "gulp-util"
+gutil = require("gulp-util")
 {exec} = require("child_process")
 
 command = (cmd, cb) ->
