@@ -211,10 +211,10 @@ class exports.SliderComponent extends Layer
 		set: (value) ->
 			if @width > @height
 				@knob.midX = @pointForValue(value)
-				@_updateFill()
 			else
 				@knob.midY = @pointForValue(value)
-				@_updateFill()
+			@_updateFill()
+			@_updateValue()
 
 	_updateValue: =>
 		@emit("change:value", @value)
