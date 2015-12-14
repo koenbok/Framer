@@ -46,6 +46,12 @@ exports.LayerStyle =
 		else
 			return "preserve-3d"
 
+	webkitBackfaceVisibility: (layer) ->
+		if layer._properties.backfaceVisible
+			return "visible"
+		else
+			return "hidden"
+
 	overflow: (layer) ->
 		if layer._properties.scrollHorizontal is true or layer._properties.scrollVertical is true
 			return "auto"

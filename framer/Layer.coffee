@@ -186,6 +186,7 @@ class exports.Layer extends BaseClass
 
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
 	@define "flat", layerProperty(@, "flat", "webkitTransformStyle", false, _.isBoolean)
+	@define "backfaceVisible", layerProperty(@, "backfaceVisible", "webkitBackfaceVisibility", true, _.isBoolean)
 
 	##############################################################
 	# Identity

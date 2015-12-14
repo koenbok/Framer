@@ -318,6 +318,17 @@ describe "Layer", ->
 
 			layer.style["-webkit-perspective"].should.equal("500")
 
+		it "should have its backface visible by default", ->
+
+			layer = new Layer
+			layer.style["webkitBackfaceVisibility"].should.equal "visible"
+
+		it "should allow backface to be hidden", ->
+
+			layer = new Layer
+			layer.backfaceVisible = false
+			layer.style["webkitBackfaceVisibility"].should.equal "hidden"
+
 		it "should set rotation", ->
 
 			layer = new Layer
