@@ -1,5 +1,7 @@
 # Framer.js
 
+[![wercker status](https://app.wercker.com/status/8e5d02248bfd387acebdf177fba5f6b1/m/master "wercker status")](https://app.wercker.com/project/bykey/8e5d02248bfd387acebdf177fba5f6b1)
+
 **Framer.js** is an open source JavaScript framework for rapid prototyping.
 Framer.js allows you to define animations and interactions, complete with filters, spring physics, 3D effects and more. It's bundled with **Framer Generator**, an application that allows you to import layers directly out of Photoshop and Sketch. 
 
@@ -90,5 +92,3 @@ There are also a set of visual and interactive tests for Framer Studio which you
 - [Framer Studio](http://framerjs.com) - Prototyping application for OS X, built on Framer
 - [Latest Builds](http://builds.framerjs.com) - Latest builds of Framer.js
 - [Framer 3 Changes](https://github.com/koenbok/Framer/wiki/Framer-3-Changes) - What's new in Framer 3
-
-[![wercker status](https://app.wercker.com/status/8e5d02248bfd387acebdf177fba5f6b1/m "wercker status")](https://app.wercker.com/project/bykey/8e5d02248bfd387acebdf177fba5f6b1)
