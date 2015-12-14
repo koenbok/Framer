@@ -294,6 +294,27 @@ describe "Utils", ->
 			instance = new SubTestClass
 			Utils.inspect(instance).should.equal("<SubTestClass {a:1}>")
 
+		it "should work with Colors", ->
+			instance = new Color "red"
+			Utils.inspect(instance).should.equal("<Color \"red\">")
+
+			instance = new Color "#28affa"
+			Utils.inspect(instance).should.equal("<Color \"#28affa\">")
+
+			instance = new Color
+				r: 200
+				g: 100
+				b: 20
+				a: 1
+			Utils.inspect(instance).should.equal("<Color r:200 g:100 b:20 a:1>")
+
+			instance = new Color
+				h: 200
+				s: 1
+				l: .2
+				a: 1
+			Utils.inspect(instance).should.equal("<Color h:200 s:1 l:0.2 a:1>")
+
 		it "should work with toInspect", ->
 			class TestClass
 				toInspect: -> return "Hello"

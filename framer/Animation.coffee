@@ -54,6 +54,7 @@ class exports.Animation extends EventEmitter
 			repeat: 0
 			delay: 0
 			debug: false
+			colorModel: "husl"
 
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
@@ -190,7 +191,11 @@ class exports.Animation extends EventEmitter
 	_updateValue: (value) =>
 
 		for k, v of @_stateB
-			@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
+
+			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
+				@_target[k] = Color.mix(@_stateA[k], @_stateB[k], value, false, @options.colorModel)
+			else
+				@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
 
 		return
 
@@ -257,6 +262,11 @@ class exports.Animation extends EventEmitter
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			animatableProperties[k] = v if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v)
+			if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or v == null
+				animatableProperties[k] = v
+			else if _.isString(v)
+				if Color.isColorString(v)
+					animatableProperties[k] = new Color(v)
+			
 
 		return animatableProperties

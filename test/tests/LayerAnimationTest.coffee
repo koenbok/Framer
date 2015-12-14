@@ -97,7 +97,20 @@ describe "LayerAnimation", ->
 				layer.scale.should.equal 2
 				done()
 
+		it "should animate colors", (done) ->
 
+			color = "red"
+			layer = new Layer()
+
+			layer.animate
+				properties:
+					backgroundColor: color
+				curve: "linear"
+				time: AnimationTime
+
+			layer.on "end", ->
+				layer.backgroundColor.toName().should.eql color
+				done()
 
 	describe "Basic", ->
 

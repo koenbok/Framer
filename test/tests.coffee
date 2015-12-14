@@ -18,5 +18,6 @@ require "./tests/LayerAnimationTest"
 require "./tests/ContextTest"
 require "./tests/ScrollComponentTest"
 require "./tests/VersionTest"
+require "./tests/ColorTest"
 
 mocha.run()

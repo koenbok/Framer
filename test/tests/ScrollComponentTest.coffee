@@ -22,6 +22,9 @@ describe "ScrollComponent", ->
         scrollVertical: false
         mouseWheelEnabled: true
         name: "is a name"
+        backgroundColor: new Color r:0, g:0, b:0, a:0
+        color: new Color r:255, g:255, b:255, a:1
+        shadowColor: new Color r:0, g:0, b:0, a:1
 
       # 'wrap' ports the 'name' of the layer onto the ScrollComponent
       layer = new Layer name: options.name
