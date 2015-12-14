@@ -54,8 +54,10 @@ class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
 
+		# Set needed private variables
 		@_properties = {}
 		@_style = {}
+		@_subLayers = []
 
 		# Special power setting for 2d rendering path. Only enable this
 		# if you know what you are doing. See LayerStyle for more info.
@@ -86,9 +88,6 @@ class exports.Layer extends BaseClass
 		# If an index was set, we would like to use that one
 		if options.hasOwnProperty("index")
 			@index = options.index
-
-		# Set needed private variables
-		@_subLayers = []
 
 		@_context.emit("layer:create", @)
 

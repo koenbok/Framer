@@ -41,6 +41,9 @@ Framer.Importer = (require "./Importer").Importer
 Framer.Debug = (require "./Debug").Debug
 Framer.Extras = require "./Extras/Extras"
 
+# Add version info
+Framer.Version = require "../build/Version"
+
 Framer.Loop = new Framer.AnimationLoop()
 Utils.domComplete(Framer.Loop.start)
 
