@@ -5,6 +5,7 @@ Framer = {}
 # Root level modules
 Framer._ = _
 Framer.Utils = (require "./Utils")
+Framer.Color = (require "./Color").Color
 Framer.Layer = (require "./Layer").Layer
 Framer.BackgroundLayer = (require "./BackgroundLayer").BackgroundLayer
 Framer.VideoLayer = (require "./VideoLayer").VideoLayer
@@ -39,6 +40,9 @@ Framer.LayerDraggable = (require "./LayerDraggable").LayerDraggable
 Framer.Importer = (require "./Importer").Importer
 Framer.Debug = (require "./Debug").Debug
 Framer.Extras = require "./Extras/Extras"
+
+# Add version info
+Framer.Version = require "../build/Version"
 
 Framer.Loop = new Framer.AnimationLoop()
 Utils.domComplete(Framer.Loop.start)

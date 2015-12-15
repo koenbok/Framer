@@ -3,9 +3,11 @@
 Utils = require "./Utils"
 
 {Config} = require "./Config"
+{Events} = require "./Events"
 {Defaults} = require "./Defaults"
 {BaseClass} = require "./BaseClass"
 {EventEmitter} = require "./EventEmitter"
+{Color} = require "./Color"
 {Animation} = require "./Animation"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
@@ -16,17 +18,25 @@ NoCacheDateKey = Date.now()
 layerValueTypeError = (name, value) ->
 	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
 
-layerProperty = (obj, name, cssProperty, fallback, validator, options={}, set) ->
+layerProperty = (obj, name, cssProperty, fallback, validator, transformer, options={}, set) ->
 	result = 
 		default: fallback
 		get: -> 
+			
 			# console.log "Layer.#{name}.get #{@_properties[name]}", @_properties.hasOwnProperty(name)
+			
 			return @_properties[name] if @_properties.hasOwnProperty(name)
 			return fallback
 
 		set: (value) ->
 
-			# console.log "Layer.#{name}.set #{value}"
+			# console.log "Layer.#{name}.set #{value} current:#{@[name]}"
+
+			if transformer and (value or value is null) 
+				value = transformer(value)
+
+			# Return unless we get a new value
+			return if value is @_properties[name]
 
 			if value and validator and not validator(value)
 				layerValueTypeError(name, value)
@@ -47,8 +57,10 @@ class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
 
+		# Set needed private variables
 		@_properties = {}
 		@_style = {}
+		@_subLayers = []
 
 		# Special power setting for 2d rendering path. Only enable this
 		# if you know what you are doing. See LayerStyle for more info.
@@ -68,7 +80,7 @@ class exports.Layer extends BaseClass
 		# Add this layer to the current context
 		@_context.addLayer(@)
 
-		@_id = @_context.nextLayerId()
+		@_id = @_context.layerCounter
 
 		# Insert the layer into the dom or the superLayer element
 		if not options.superLayer
@@ -80,13 +92,13 @@ class exports.Layer extends BaseClass
 		if options.hasOwnProperty("index")
 			@index = options.index
 
-		# Set needed private variables
-		@_subLayers = []
-
 		@_context.emit("layer:create", @)
 
 	##############################################################
 	# Properties
+
+	# Readonly context property
+	@define "context", get: -> @_context
 
 	# A placeholder for layer bound properties defined by the user:
 	@define "custom", @simpleProperty("custom", undefined)
@@ -97,13 +109,13 @@ class exports.Layer extends BaseClass
 
 	@define "visible", layerProperty(@, "visible", "display", true, _.isBoolean)
 	@define "opacity", layerProperty(@, "opacity", "opacity", 1, _.isNumber)
-	@define "index", layerProperty(@, "index", "zIndex", 0, _.isNumber, {importable:false, exportable:false})
+	@define "index", layerProperty(@, "index", "zIndex", 0, _.isNumber, null, {importable:false, exportable:false})
 	@define "clip", layerProperty(@, "clip", "overflow", true, _.isBoolean)
 	
-	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBoolean, {}, (layer, value) ->
+	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBoolean, null, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 	
-	@define "scrollVertical", layerProperty @, "scrollVertical", "overflowY", false, _.isBoolean, {}, (layer, value) ->
+	@define "scrollVertical", layerProperty @, "scrollVertical", "overflowY", false, _.isBoolean, null, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 
 	@define "scroll",
@@ -160,16 +172,16 @@ class exports.Layer extends BaseClass
 	@define "shadowY", layerProperty(@, "shadowY", "boxShadow", 0, _.isNumber)
 	@define "shadowBlur", layerProperty(@, "shadowBlur", "boxShadow", 0, _.isNumber)
 	@define "shadowSpread", layerProperty(@, "shadowSpread", "boxShadow", 0, _.isNumber)
-	@define "shadowColor", layerProperty(@, "shadowColor", "boxShadow", "")
+	@define "shadowColor", layerProperty(@, "shadowColor", "boxShadow", "", Color.validColorValue, Color.toColor)
 
 	# Color properties
-	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, _.isString)
-	@define "color", layerProperty(@, "color", "color", null, _.isString)
+	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, Color.validColorValue, Color.toColor)
+	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor)
 
 	# Border properties
 	# Todo: make this default, for compat we still allow strings but throw a warning
 	# @define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, _.isNumber
-	@define "borderColor", layerProperty(@, "borderColor", "border", null, _.isString)
+	@define "borderColor", layerProperty(@, "borderColor", "border", null, Color.validColorValue, Color.toColor)
 	@define "borderWidth", layerProperty(@, "borderWidth", "border", 0, _.isNumber)
 
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
@@ -449,7 +461,7 @@ class exports.Layer extends BaseClass
 
 	_insertElement: ->
 		@bringToFront()
-		@_context.getRootElement().appendChild(@_element)
+		@_context.element.appendChild(@_element)
 
 	@define "html",
 		get: ->
@@ -674,8 +686,8 @@ class exports.Layer extends BaseClass
 	_superOrParentLayer: ->
 		if @superLayer
 			return @superLayer
-		if @_context._parentLayer
-			return @_context._parentLayer
+		if @_context._parent
+			return @_context._parent
 
 	subLayersAbove: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
 		Utils.framePointForOrigin(layer.frame, originX, originY).y < point.y
@@ -702,7 +714,7 @@ class exports.Layer extends BaseClass
 
 	animations: ->
 		# Current running animations on this layer
-		_.filter @_context._animationList, (animation) =>
+		_.filter @_context.animations, (animation) =>
 			animation.options.layer == @
 
 	animatingProperties: ->
@@ -807,77 +819,84 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## EVENTS
 
-	addListener: (eventNames..., originalListener) =>
+	@define "_domEventManager",
+		get: -> @_context.domEventManager.wrap(@_element)
 
-		# To avoid an error in Framer Studio we return if no originalListener was given
-		if not originalListener
-			return
+	emit: (args...) ->
+		super(args..., @)
 
-		# # Modify the scope to be the calling object, just like jquery
-		# # also add the object as the last argument
-		listener = (args...) =>
-			originalListener.call(@, args..., @)
+	once: (eventName, listener) =>
+		super(eventName, listener)
+		@_addListener(eventName, listener)
 
-		# Because we modify the listener we need to keep track of it
-		# so we can find it back when we want to unlisten again
-		originalListener.modifiedListener = listener
+	addListener: (eventName, listener) =>
+		super(eventName, listener)
+		@_addListener(eventName, listener)
 
-		eventNames = [eventNames] if typeof eventNames == 'string'
+	removeListener: (eventName, listener) ->
+		super(eventName, listener)
+		@_removeListener(eventName, listener)
 
-		# Listen to dom events on the element
-		for eventName in eventNames
-			do (eventName) =>
-				super eventName, listener
-				@_context.eventManager.wrap(@_element).addEventListener(eventName, listener)
+	_addListener: (eventName, listener) ->
 
-				@_eventListeners ?= {}
-				@_eventListeners[eventName] ?= []
-				@_eventListeners[eventName].push(listener)
+		# If this is a dom event, we want the actual dom node to let us know
+		# when it gets triggered, so we can emit the event through the system.
+		if not @_domEventManager.listeners(eventName).length
+			@_domEventManager.addEventListener eventName, (event) =>
+				@emit(eventName, event)
 
-				# We want to make sure we listen to these events, but we can safely
-				# ignore it for change events
-				if not _.startsWith eventName, "change:"
-					@ignoreEvents = false
+		# Make sure we stop ignoring events once we add a user event listener
+		if not _.startsWith eventName, "change:"
+			@ignoreEvents = false
 
-	removeListener: (eventNames..., listener) ->
+	_removeListener: (eventName, listener) ->
 
-		# If the original listener was modified, remove that
-		# one instead
-		if listener.modifiedListener
-			listener = listener.modifiedListener
-
-		eventNames = [eventNames] if typeof eventNames == 'string'
-			
-		for eventName in eventNames
-			do (eventName) =>
-				super eventName, listener
-				
-				@_context.eventManager.wrap(@_element).removeEventListener(eventName, listener)
-
-				if @_eventListeners
-					@_eventListeners[eventName] = _.without @_eventListeners[eventName], listener
-
-	once: (eventName, listener) ->
-
-		originalListener = listener
-
-		listener = (args...) =>
-			originalListener.call(@, args..., @)
-			@removeListener(eventName, listener)
-
-		@addListener(eventName, listener)
-
-
-	removeAllListeners: ->
-
-		return if not @_eventListeners
-
-		for eventName, listeners of @_eventListeners
-			for listener in listeners
-				@removeListener eventName, listener
+		# Do cleanup for dom events if this is the last one of it's type.
+		# We are assuming we're the only ones adding dom events to the manager.
+		if not @listeners(eventName).length
+			@_domEventManager.removeAllListeners(eventName)
 
 	on: @::addListener
 	off: @::removeListener
+
+	##############################################################
+	## EVENT HELPERS
+
+	onClick: (cb) -> @on(Events.Click, cb)
+	onDoubleClick: (cb) -> @on(Events.DoubleClick, cb)
+	onScroll: (cb) -> @on(Events.Scroll, cb)
+	
+	onTouchStart: (cb) -> @on(Events.TouchStart, cb)
+	onTouchEnd: (cb) -> @on(Events.TouchEnd, cb)
+	onTouchMove: (cb) -> @on(Events.TouchMove, cb)
+
+	onMouseUp: (cb) -> @on(Events.MouseUp, cb)
+	onMouseDown: (cb) -> @on(Events.MouseDown, cb)
+	onMouseOver: (cb) -> @on(Events.MouseOver, cb)
+	onMouseOut: (cb) -> @on(Events.MouseOut, cb)
+	onMouseMove: (cb) -> @on(Events.MouseMove, cb)
+	onMouseWheel: (cb) -> @on(Events.MouseWheel, cb)
+
+	onAnimationStart: (cb) -> @on(Events.AnimationStart, cb)
+	onAnimationStop: (cb) -> @on(Events.AnimationStop, cb)
+	onAnimationEnd: (cb) -> @on(Events.AnimationEnd, cb)
+	onAnimationDidStart: (cb) -> @on(Events.AnimationDidStart, cb)
+	onAnimationDidStop: (cb) -> @on(Events.AnimationDidStop, cb)
+	onAnimationDidEnd: (cb) -> @on(Events.AnimationDidEnd, cb)
+
+	onImageLoaded: (cb) -> @on(Events.ImageLoaded, cb)
+	onImageLoadError: (cb) -> @on(Events.ImageLoadError, cb)
+	
+	onMove: (cb) -> @on(Events.Move, cb)
+	onDragStart: (cb) -> @on(Events.DragStart, cb)
+	onDragWillMove: (cb) -> @on(Events.DragWillMove, cb)
+	onDragMove: (cb) -> @on(Events.DragMove, cb)
+	onDragDidMove: (cb) -> @on(Events.DragDidMove, cb)
+	onDrag: (cb) -> @on(Events.Drag, cb)
+	onDragEnd: (cb) -> @on(Events.DragEnd, cb)
+	onDragAnimationDidStart: (cb) -> @on(Events.DragAnimationDidStart, cb)
+	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
+	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
 
 	##############################################################
 	## DESCRIPTOR
