@@ -22,5 +22,6 @@ deploy:
         - script:
             name: builds.framerjs.com
             code: |
+                npm rebuild
                 make site%build
                 make site%upload
