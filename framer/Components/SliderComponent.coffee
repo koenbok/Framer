@@ -39,11 +39,9 @@ class exports.SliderComponent extends Layer
 			name: "fill"
 
 		@knobOverlay = new Layer
-			backgroundColor: null
 			name: "knobOverlay"
 
 		@sliderOverlay = new Layer
-			backgroundColor: null
 			name: "sliderOverlay"
 
 		super options
@@ -72,7 +70,8 @@ class exports.SliderComponent extends Layer
 		@knob.draggable.momentumOptions = {friction: 5, tolerance: 0.25}
 		@knob.draggable.bounce = false
 		@knob.draggable.propagateEvents = false
-		@knob.borderRadius = @knobOverlay.borderRadius = @knobSize / 2
+		@knob.borderRadius = @knobSize / 2
+		@knobOverlay.borderRadius = (@knob.borderRadius * 2) + (@hitArea / 4)
 
 		# If hitArea isn't defined, remove the overlays
 		if not @hitArea
@@ -166,7 +165,7 @@ class exports.SliderComponent extends Layer
 		@fill.style.borderRadius = "#{radius}px 0 0 #{radius}px"
 
 	_setOverlayRadius: =>
-		@knobOverlay.borderRadius = @knob.borderRadius
+		@knobOverlay.borderRadius = (@knob.borderRadius * 2) + (@hitArea / 4)
 
 	@define "bounded", @simpleProperty("bounded", false)
 
