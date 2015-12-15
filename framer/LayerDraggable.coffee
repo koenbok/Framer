@@ -150,8 +150,8 @@ class exports.LayerDraggable extends BaseClass
 			x: touchEvent.clientX - @_correctedLayerStartPoint.x
 			y: touchEvent.clientY - @_correctedLayerStartPoint.y
 
-		document.addEventListener(Events.TouchMove, @_touchMove)
-		document.addEventListener(Events.TouchEnd, @_touchEnd)
+		@layer._context.domEventManager.wrap(document).addEventListener(Events.TouchMove, @_touchMove)
+		@layer._context.domEventManager.wrap(document).addEventListener(Events.TouchEnd, @_touchEnd)
 
 		@emit(Events.DragStart, event)
 
@@ -218,8 +218,8 @@ class exports.LayerDraggable extends BaseClass
 
 		event.stopPropagation() unless @propagateEvents
 
-		document.removeEventListener(Events.TouchMove, @_touchMove)
-		document.removeEventListener(Events.TouchEnd, @_touchEnd)
+		@layer._context.domEventManager.wrap(document).removeEventListener(Events.TouchMove, @_touchMove)
+		@layer._context.domEventManager.wrap(document).removeEventListener(Events.TouchEnd, @_touchEnd)
 
 		# Start the simulation prior to emitting the DragEnd event.
 		# This way, if the user calls layer.animate on DragEnd, the simulation will 
