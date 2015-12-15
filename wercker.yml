@@ -16,4 +16,6 @@ deploy:
             packages: zip
         - script:
             name: builds.framerjs.com
-            code: make deploy
+            code: |
+                cd $WERCKER_SOURCE_DIR
+                make deploy
