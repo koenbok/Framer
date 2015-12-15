@@ -12,12 +12,6 @@ build:
 
 deploy:
     steps:
-        - script:
-            name: load git revisions
-            code: |
-                git remote set-url origin https://github.com/$WERCKER_GIT_OWNER/$WERCKER_GIT_REPOSITORY.git
-                cd $WERCKER_SOURCE_DIR
-                git fetch --unshallow
         - install-packages:
             packages: zip
         - script:
