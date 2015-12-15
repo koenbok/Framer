@@ -16,6 +16,17 @@ extras/Studio.framer/imported
 extras/Studio.framer/app.js
 test/phantomjs/tests.js
 test/phantomjs/tests.js.map
+framer/**/*.js
+framer/**/*.js.map
+test/tests/**/*.js
+test/tests/**/*.js.map
+extras/Perf.framer/**/*.js
+extras/Perf.framer/**/*.js.map
+gulpfile.js
+gulpfile.js.map
+
+# Discard version changes
+framer/Version.coffee
 
 .DS_Store
 .AppleDouble
@@ -42,3 +53,9 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Docker
+_cache
+_steps
+_builds
+_projects

@@ -8,22 +8,20 @@ all: build
 
 bootstrap:
 	npm install
-	cd test/phantomjs; "$(bin)/bower" --config.analytics=false install
 
 unbootstrap:
 	rm -Rf node_modules
-	rm -Rf test/phantomjs/bower
 
 clean:
 	rm -rf build
 
 build: bootstrap clean 
 	mkdir -p build
-	$(gulp) build:release
+	$(gulp) build-release
 
 debug: bootstrap clean 
 	mkdir -p build
-	$(gulp) build:debug
+	$(gulp) build-debug
 
 watch: bootstrap 
 	$(gulp) watch
@@ -41,12 +39,18 @@ coverage: bootstrap
 	open ./build/coverage/jscoverage.html
 
 studio:
+	rm -Rf extras/Studio.framer/framer/framer.debug.js
+	rm -Rf extras/Studio.framer/framer/framer.debug.js.map
+	cd extras/Studio.framer/framer/; ln -s ../../../build/framer.debug.js
+	cd extras/Studio.framer/framer/; ln -s ../../../build/framer.debug.js.map
 	open -a "Framer Studio" extras/Studio.framer
+
+perf:
+	open -a "Framer Studio" extras/Perf.framer
 
 # Building and uploading the site
 
-dist:
-	make build
+dist: build
 	mkdir -p build/Framer
 	cp -R extras/templates/Project build/Framer/Project
 	rm -Rf build/Framer/Project/framer
@@ -57,7 +61,6 @@ dist:
 	cd build; zip -r Framer.zip Framer
 
 site%build:
-	make dist
 	mkdir -p build/builds.framerjs.com
 	$(coffee) scripts/site-deploy.coffee build
 	cp -R extras/builds.framerjs.com/static build/builds.framerjs.com/static
