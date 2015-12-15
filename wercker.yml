@@ -2,6 +2,8 @@ box: nolimitid/node-phantom
 
 build:
     steps:
+        - install-packages:
+            packages: zip
         - script:
             name: load git revisions
             code: |
@@ -10,26 +12,15 @@ build:
                 git fetch --unshallow || true
         - npm-install
         - npm-test
-        # - script:
-        #     name: builds.framerjs.com
-        #     code: |
-        #         node_modules/.bin/gulp build-release
-
+        - script:
+            name: release build
+            code: |
+                make dist
 
 deploy:
     steps:
         - script:
-            name: load git revisions
-            code: |
-                git remote set-url origin https://github.com/$WERCKER_GIT_OWNER/$WERCKER_GIT_REPOSITORY.git
-                cd $WERCKER_SOURCE_DIR
-                git fetch --unshallow || true
-        - npm-install
-        - install-packages:
-            packages: zip
-        - script:
             name: builds.framerjs.com
             code: |
-                npm rebuild
-                node_modules/.bin/gulp build-release
-                ls -la build
+                make site%build
+                make site%upload
