@@ -21,7 +21,7 @@ CONFIG =
 	cache: true
 	devtool: "sourcemap"
 
-gulp.task "release", ["version"], ->
+gulp.task "build-release", ["version"], ->
 
 	config = _.extend CONFIG,
 		entry: "./framer/Framer.coffee"
@@ -44,7 +44,7 @@ gulp.task "release", ["version"], ->
 		.pipe(gulpWebpack(config))
 		.pipe(gulp.dest("build/"))
 
-gulp.task "debug", ["version"], ->
+gulp.task "build-debug", ["version"], ->
 
 	config = _.extend CONFIG,
 		entry: "./framer/Framer.coffee"
@@ -57,7 +57,7 @@ gulp.task "debug", ["version"], ->
 		.pipe(gulpWebpack(config))
 		.pipe(gulp.dest("build/"))
 
-gulp.task "test", ->
+gulp.task "build-test", ->
 
 	config = _.extend CONFIG,
 		entry: "./test/tests.coffee"
@@ -67,7 +67,7 @@ gulp.task "test", ->
 		.pipe(gulpWebpack(config))
 		.pipe(gulp.dest("test/phantomjs/"))
 
-gulp.task "test", ["debug", "test"], ->
+gulp.task "test", ["build-debug", "build-test"], ->
 	return gulp
 		.src("test/phantomjs/index.html")
 		.pipe(phantomjs({reporter:"dot"}))
@@ -120,7 +120,7 @@ gulp.task "version", (callback) ->
 
 		callback(null, task)
 
-gulp.task "coverage", ->
+gulp.task "build-coverage", ->
 
 	config = _.extend CONFIG,
 		entry: "./build/instrumented/Framer.js"
@@ -132,7 +132,7 @@ gulp.task "coverage", ->
 		.pipe(gulpWebpack(config))
 		.pipe(gulp.dest("build/"))
 
-gulp.task "coverage", ["coverage", "test"], ->
+gulp.task "coverage", ["build-coverage", "build-test"], ->
 	return gulp
 		.src("test/phantomjs/index.html")
 		.pipe(phantomjs(
