@@ -137,7 +137,11 @@ exports.LayerStyle =
 
 	boxShadow: (layer) ->
 
-		if not layer._properties.shadowColor
+		props = layer._properties
+
+		if not props.shadowColor
+			return ""
+		else if props.shadowX == 0 and props.shadowY == 0 and props.shadowBlur == 0 and props.shadowSpread == 0
 			return ""
 		
 		return "#{layer._properties.shadowX}px #{layer._properties.shadowY}px #{layer._properties.shadowBlur}px #{layer._properties.shadowSpread}px #{layer._properties.shadowColor}"

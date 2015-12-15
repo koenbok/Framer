@@ -46,7 +46,7 @@ exports.print = (args...) ->
 
 			update()
 
-			printContext.eventManager.wrap(window).addEventListener("resize", update)
+			printContext.domEventManager.wrap(window).addEventListener("resize", update)
 		
 		printPrefix = "» "
 		printNode = document.createElement("div")

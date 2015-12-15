@@ -84,12 +84,12 @@ else
 
 Utils.delay = (time, f) ->
 	timer = setTimeout(f, time * 1000)
-	Framer.CurrentContext._delayTimers.push(timer)
+	Framer.CurrentContext.addTimer(timer)
 	return timer
 
 Utils.interval = (time, f) ->
 	timer = setInterval(f, time * 1000)
-	Framer.CurrentContext._delayIntervals.push(timer)
+	Framer.CurrentContext.addInterval(timer)
 	return timer
 
 Utils.debounce = (threshold=0.1, fn, immediate) ->
@@ -133,8 +133,7 @@ Utils.memoize = (fn) -> ->
 # HANDY FUNCTIONS
 
 Utils.randomColor = (alpha = 1.0) ->
-	c = -> parseInt(Math.random() * 255)
-	"rgba(#{c()}, #{c()}, #{c()}, #{alpha})"
+	return Color.random(alpha)
 
 Utils.randomChoice = (arr) ->
 	arr[Math.floor(Math.random() * arr.length)]
@@ -369,6 +368,12 @@ Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 	[fromLow, fromHigh] = rangeA
 	[toLow, toHigh] = rangeB
 
+	# if rangeB consists of Colors we return a color tween
+	# if Color.isColor(toLow) || _.isString(toLow) && Color.isColorString(toLow)
+	# 	ratio = Utils.modulate(value, rangeA, [0, 1])
+	# 	result = Color.mix(toLow, toHigh, ratio)
+	# 	return result
+
 	result = toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
 
 	if limit is true
@@ -415,7 +420,7 @@ Utils.domComplete = (f) ->
 	if document.readyState is "complete"
 		f()
 	else
-		__domComplete.push f
+		__domComplete.push(f)
 
 Utils.domCompleteCancel = (f) ->
 	__domComplete = _.without __domComplete, f
@@ -515,10 +520,10 @@ Utils.loadImage = (url, callback, context) ->
 	element = new Image
 	context ?= Framer.CurrentContext
 
-	context.eventManager.wrap(element).addEventListener "load", (event) ->
+	context.domEventManager.wrap(element).addEventListener "load", (event) ->
 		callback()
 
-	context.eventManager.wrap(element).addEventListener "error", (event) ->
+	context.domEventManager.wrap(element).addEventListener "error", (event) ->
 		callback(true)
 
 	element.src = url

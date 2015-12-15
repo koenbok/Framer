@@ -33,26 +33,25 @@ describe "Layer", ->
 
 		it "should set default background color", ->
 			
+			# if the default background color is not set the content layer of scrollcomponent is not hidden when layers are added
+			layer = new Layer()
+			Color.equal(layer.backgroundColor, Framer.Defaults.Layer.backgroundColor).should.be.true
+
 			Framer.Defaults =
 				Layer:
 					backgroundColor: "red"
 					
 			layer = new Layer()
 			
-			layer.style.backgroundColor.should.equal "red"
-			#layer.backgroundColor.should.equal "red"
-
+			layer.style.backgroundColor.should.equal new Color("red").toString()
 
 			Framer.resetDefaults()
-		
 
 		it "should set defaults with override", ->
 			
 			layer = new Layer x:50, y:50
 			layer.x.should.equal 50
 			layer.x.should.equal 50
-
-
 
 	describe "Properties", ->
 
@@ -261,8 +260,8 @@ describe "Layer", ->
 		it "should set style properties on create", ->
 
 			layer = new Layer backgroundColor: "red"
-			layer.backgroundColor.should.equal "red"
-			layer.style["backgroundColor"].should.equal "red"
+			layer.backgroundColor.should.eql new Color("red")
+			layer.style["backgroundColor"].should.equal new Color("red").toString()
 
 		it "should check value type", ->
 
@@ -371,17 +370,20 @@ describe "Layer", ->
 			layer.shadowBlur.should.equal 10
 			layer.shadowSpread.should.equal 10
 
-			layer.style.boxShadow.should.equal ""
+			layer.style.boxShadow.should.equal "rgb(0, 0, 0) 10px 10px 10px 10px"
 
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = "red"
-			layer.shadowColor.should.equal "red"
+			layer.shadowColor.r.should.equal 255
+			layer.shadowColor.g.should.equal 0
+			layer.shadowColor.b.should.equal 0
+			layer.shadowColor.a.should.equal 1
 			
-			layer.style.boxShadow.should.equal "red 10px 10px 10px 10px"
+			layer.style.boxShadow.should.equal "rgb(255, 0, 0) 10px 10px 10px 10px"
 
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = null
-			layer.style.boxShadow.should.equal ""
+			layer.style.boxShadow.should.equal "rgba(0, 0, 0, 0) 10px 10px 10px 10px"
 
 	describe "Events", ->
 
@@ -401,19 +403,6 @@ describe "Layer", ->
 			layer.ignoreEvents.should.equal true
 			layer.style["pointerEvents"].should.equal "none"
 
-		it "should listen to multiple events", ->
-
-			layer = new Layer()
-
-			count = 0
-			handler = -> count++
-
-			layer.on "click", "tap", handler
-
-			layer.emit "click"
-			layer.emit "tap"
-
-			count.should.equal 2
 
 		it "should not listen to events until a listener is added", ->
 			
@@ -492,6 +481,46 @@ describe "Layer", ->
 
 			layerA.draggable.emit("test", {})
 
+		it "should list all events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+			layerA.on("test", handler)
+			layerA.listeners("test").length.should.equal 1
+
+		it "should remove all events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+			layerA.on("test", handler)
+			layerA.removeAllListeners("test")
+			layerA.listeners("test").length.should.equal 0
+
+		it "should add and clean up dom events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+
+			# But never more then one
+			layerA._domEventManager.listeners(Events.Click).length.should.equal(1)
+
+			layerA.removeAllListeners(Events.Click)
+
+			# And on removal, we should get rid of the dom event
+			layerA._domEventManager.listeners(Events.Click).length.should.equal(0)
+
+		it "should work with event helpers", (done) ->
+
+			layer = new Layer
+
+			layer.onMouseOver (event, aLayer) ->
+				aLayer.should.equal(layer)
+				@should.equal(layer)
+				done()
+
+			simulate.mouseover(layer._element)
 
 	describe "Hierarchy", ->
 		

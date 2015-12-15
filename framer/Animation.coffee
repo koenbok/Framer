@@ -54,6 +54,7 @@ class exports.Animation extends EventEmitter
 			repeat: 0
 			delay: 0
 			debug: false
+			colorModel: "husl"
 
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
@@ -145,8 +146,7 @@ class exports.Animation extends EventEmitter
 
 	stop: (emit=true)->
 		
-		@options.layer._context._animationList = _.without(
-			@options.layer._context._animationList, @)
+		@options.layer.context.removeAnimation(@)
 
 		@emit("stop") if emit
 		Framer.Loop.off("update", @_update)
@@ -174,7 +174,7 @@ class exports.Animation extends EventEmitter
 		_.keys(@_stateA)
 
 	_start: =>
-		@options.layer._context._animationList.push(@)
+		@options.layer.context.addAnimation(@)
 		@emit("start")
 		Framer.Loop.on("update", @_update)
 
@@ -190,7 +190,11 @@ class exports.Animation extends EventEmitter
 	_updateValue: (value) =>
 
 		for k, v of @_stateB
-			@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
+
+			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
+				@_target[k] = Color.mix(@_stateA[k], @_stateB[k], value, false, @options.colorModel)
+			else
+				@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
 
 		return
 
@@ -257,6 +261,21 @@ class exports.Animation extends EventEmitter
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			animatableProperties[k] = v if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v)
+			if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or v == null
+				animatableProperties[k] = v
+			else if _.isString(v)
+				if Color.isColorString(v)
+					animatableProperties[k] = new Color(v)
+			
 
 		return animatableProperties
+
+	##############################################################
+	## EVENT HELPERS
+	
+	onAnimationStart: (cb) -> @on(Events.AnimationStart, cb)
+	onAnimationStop: (cb) -> @on(Events.AnimationStop, cb)
+	onAnimationEnd: (cb) -> @on(Events.AnimationEnd, cb)
+	onAnimationDidStart: (cb) -> @on(Events.AnimationDidStart, cb)
+	onAnimationDidStop: (cb) -> @on(Events.AnimationDidStop, cb)
+	onAnimationDidEnd: (cb) -> @on(Events.AnimationDidEnd, cb)
