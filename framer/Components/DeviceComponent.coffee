@@ -73,8 +73,6 @@ class exports.DeviceComponent extends BaseClass
 		if @_setupDone
 			return
 
-		@_buildInDevices = _.keys Devices
-
 		@_setupDone = true
 
 		@background = new Layer
@@ -280,9 +278,10 @@ class exports.DeviceComponent extends BaseClass
 		# If the image is externally hosted, we'd like to use that
 		if _.startsWith(name, "http://") or _.startsWith(name, "https://")
 			return name
-
-		if @_deviceType in @_buildInDevices
-
+		else if @_deviceType not in BuiltInDevices
+			# If this device is added by the user we use the name as it is
+			return name
+		else
 			# If we're running Framer Studio and have local files, we'd like to use those
 			if Utils.isFramerStudio() and window.FramerStudioInfo
 				resourceUrl = window.FramerStudioInfo.deviceImagesUrl
@@ -296,9 +295,6 @@ class exports.DeviceComponent extends BaseClass
 				return "#{resourceUrl}/#{name.replace(".png", ".jp2")}"
 			else
 				return "#{resourceUrl}/#{name}"
-		else
-			# If this device is added by the user we use the name as it is
-			return name
 
 	###########################################################################
 	# DEVICE ZOOM
@@ -830,5 +826,6 @@ Devices =
 	"applewatchedition-42-gold-sportband-white": _.clone(AppleWatch42Device)
 
 
-
 exports.DeviceComponent.Devices = Devices
+
+BuiltInDevices = _.keys(Devices)
