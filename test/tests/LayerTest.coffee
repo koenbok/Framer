@@ -941,7 +941,7 @@ describe "Layer", ->
 
 	describe "Force 2D", ->
 
-		it.only "should switch to 2d rendering", ->
+		it "should switch to 2d rendering", ->
 
 			layer = new Layer
 

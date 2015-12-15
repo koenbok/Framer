@@ -1,8 +1,11 @@
 {_} = require "./Underscore"
 
 Utils = require "./Utils"
-{BaseClass} = require "./BaseClass"
+
 {Config} = require "./Config"
+{Defaults} = require "./Defaults"
+
+{BaseClass} = require "./BaseClass"
 {DOMEventManager} = require "./DOMEventManager"
 
 ###
@@ -37,12 +40,10 @@ class exports.Context extends BaseClass
 		get: -> @_element
 
 	constructor: (options={}) ->
-		
-		super
 
-		options = _.defaults options,
-			parent: null
-			name: null
+		options = Defaults.getDefaults("Context", options)
+
+		super
 
 		if not options.name
 			throw Error("Contexts need a name")
@@ -50,9 +51,9 @@ class exports.Context extends BaseClass
 		@_parent = options.parent
 		@_name = options.name
 		
-		@perspective = 1200
-		@perspectiveOriginX = 0.5
-		@perspectiveOriginY = 0.5
+		@perspective = options.perspective
+		@perspectiveOriginX = options.perspectiveOriginX
+		@perspectiveOriginY = options.perspectiveOriginY
 
 		@reset()
 
