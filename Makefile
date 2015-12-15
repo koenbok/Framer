@@ -46,8 +46,7 @@ perf:
 
 # Building and uploading the site
 
-dist:
-	make build
+dist: build
 	mkdir -p build/Framer
 	cp -R extras/templates/Project build/Framer/Project
 	rm -Rf build/Framer/Project/framer
@@ -57,8 +56,7 @@ dist:
 	find build/Framer -name ".DS_Store" -depth -exec rm {} \;
 	cd build; zip -r Framer.zip Framer
 
-site%build:
-	make dist
+site%build: dist
 	mkdir -p build/builds.framerjs.com
 	$(coffee) scripts/site-deploy.coffee build
 	cp -R extras/builds.framerjs.com/static build/builds.framerjs.com/static
