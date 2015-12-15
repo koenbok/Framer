@@ -5,7 +5,7 @@ Framer = {}
 # Root level modules
 Framer._ = _
 Framer.Utils = (require "./Utils")
-Framer.Frame = (require "./Frame").Frame
+Framer.Color = (require "./Color").Color
 Framer.Layer = (require "./Layer").Layer
 Framer.BackgroundLayer = (require "./BackgroundLayer").BackgroundLayer
 Framer.VideoLayer = (require "./VideoLayer").VideoLayer
@@ -14,7 +14,15 @@ Framer.Animation = (require "./Animation").Animation
 Framer.AnimationGroup = (require "./AnimationGroup").AnimationGroup
 Framer.Screen = (require "./Screen").Screen
 Framer.Path = (require "./Path").Path
+Framer.Canvas = (require "./Canvas").Canvas
 Framer.print = (require "./Print").print
+
+# Components
+Framer.ScrollComponent = (require "./Components/ScrollComponent").ScrollComponent
+Framer.PageComponent = (require "./Components/PageComponent").PageComponent
+Framer.SliderComponent = (require "./Components/SliderComponent").SliderComponent
+Framer.DeviceComponent = (require "./Components/DeviceComponent").DeviceComponent
+Framer.DeviceView = Framer.DeviceComponent # Compat
 
 _.extend window, Framer if window
 
@@ -29,21 +37,21 @@ Framer.LinearAnimator = (require "./Animators/LinearAnimator").LinearAnimator
 Framer.BezierCurveAnimator = (require "./Animators/BezierCurveAnimator").BezierCurveAnimator
 Framer.SpringDHOAnimator = (require "./Animators/SpringDHOAnimator").SpringDHOAnimator
 Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4Animator
+Framer.LayerDraggable = (require "./LayerDraggable").LayerDraggable
 Framer.Importer = (require "./Importer").Importer
-Framer.DeviceView = (require "./DeviceView").DeviceView
 Framer.Debug = (require "./Debug").Debug
 Framer.Extras = require "./Extras/Extras"
 
+# Add version info
+Framer.Version = require "../build/Version"
+
 Framer.Loop = new Framer.AnimationLoop()
-Utils.domComplete Framer.Loop.start
+Utils.domComplete(Framer.Loop.start)
 
 window.Framer = Framer if window
 
 Framer.DefaultContext = new Framer.Context(name:"Default")
 Framer.CurrentContext = Framer.DefaultContext
-
-# Compatibility for Framer 2
-require "./Compat"
 
 # Fix for mobile scrolling
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()

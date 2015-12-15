@@ -10,22 +10,27 @@ Utils.getValue = (value) ->
 	return value() if _.isFunction value
 	return value
 
-Utils.setDefaultProperties = (obj, defaults, warn=true) ->
-
-	result = {}
-
-	for k, v of defaults
-		if obj.hasOwnProperty k
-			result[k] = obj[k]
-		else
-			result[k] = defaults[k]
-
-	if warn
-		for k, v of obj
-			if not defaults.hasOwnProperty k
-				console.warn "Utils.setDefaultProperties: got unexpected option: '#{k} -> #{v}'", obj
-
+Utils.getValueForKeyPath = (obj, key) ->
+	result = obj
+	return obj[key] if not "." in key
+	result = result[key] for key in key.split(".")
 	result
+
+Utils.setValueForKeyPath = (obj, path, val) ->
+	fields = path.split('.')
+	result = obj
+	i = 0
+	n = fields.length
+	while i < n and result != undefined
+		field = fields[i]
+		if i == n - 1
+			result[field] = val
+		else
+			if typeof result[field] == 'undefined' or !_.isObject(result[field])
+				result[field] = {}
+			result = result[field]
+		i++
+	return
 
 Utils.valueOrDefault = (value, defaultValue) ->
 
@@ -33,14 +38,6 @@ Utils.valueOrDefault = (value, defaultValue) ->
 		value = defaultValue
 
 	return value
-
-Utils.arrayToObject = (arr) ->
-	obj = {}
-
-	for item in arr
-		obj[item[0]] = item[1]
-
-	obj
 
 Utils.arrayNext = (arr, item) ->
 	arr[arr.indexOf(item) + 1] or _.first arr
@@ -80,20 +77,19 @@ window.requestAnimationFrame ?= (f) -> Utils.delay 1/60, f
 # Note: in Framer 3 we try to keep all times in seconds
 
 # Used by animation engine, needs to be very performant
-Utils.getTime = -> Date.now() / 1000
-
-# This works only in chrome, but we only use it for testing
-# if window.performance
-# 	Utils.getTime = -> performance.now() / 1000
+if window.performance
+	Utils.getTime = -> window.performance.now() / 1000
+else
+	Utils.getTime = -> Date.now() / 1000
 
 Utils.delay = (time, f) ->
-	timer = setTimeout f, time * 1000
-	Framer.CurrentContext._delayTimers.push(timer)
+	timer = setTimeout(f, time * 1000)
+	Framer.CurrentContext.addTimer(timer)
 	return timer
 
 Utils.interval = (time, f) ->
-	timer = setInterval f, time * 1000
-	Framer.CurrentContext._delayIntervals.push(timer)
+	timer = setInterval(f, time * 1000)
+	Framer.CurrentContext.addInterval(timer)
 	return timer
 
 Utils.debounce = (threshold=0.1, fn, immediate) ->
@@ -137,8 +133,7 @@ Utils.memoize = (fn) -> ->
 # HANDY FUNCTIONS
 
 Utils.randomColor = (alpha = 1.0) ->
-	c = -> parseInt(Math.random() * 255)
-	"rgba(#{c()}, #{c()}, #{c()}, #{alpha})"
+	return Color.random(alpha)
 
 Utils.randomChoice = (arr) ->
 	arr[Math.floor(Math.random() * arr.length)]
@@ -146,6 +141,15 @@ Utils.randomChoice = (arr) ->
 Utils.randomNumber = (a=0, b=1) ->
 	# Return a random number between a and b
 	Utils.mapRange Math.random(), 0, 1, a, b
+
+Utils.defineEnum = (names = [], offset = 0, geometric = 0) ->
+	Enum = {}
+	for name, i in names
+		j = i
+		j = if ! offset    then j else j + offset
+		j = if ! geometric then j else Math.pow geometric, j
+		Enum[Enum[name] = j] = name
+	return Enum
 
 Utils.labelLayer = (layer, text, style={}) ->
 
@@ -169,6 +173,59 @@ Utils.stringify = (obj) ->
 	return obj.toString() if obj.toString
 	return obj
 
+Utils.inspectObjectType = (item) ->
+	# This is a hacky way to get nice object names, it tries to
+	# parse them from the .toString methods for objects.
+
+	if item.constructor?.name? and item.constructor?.name != "Object"
+		return item.constructor.name
+
+	extract = (str) ->
+		return null unless str
+		regex = /\[object (\w+)\]/
+		match = regex.exec(str)
+		return match[1] if match
+		return null
+
+	className = extract(item.toString())
+	return className if className
+	className = extract(item.constructor?.toString())
+	return className.replace("Constructor", "") if className
+	return item
+
+Utils.inspect = (item, max=5, l=0) ->
+
+	return "null" if item is null
+	return "undefined" if item is undefined
+
+	if _.isFunction(item.toInspect)
+		return item.toInspect()
+	if _.isString(item)
+		return "\"#{item}\""
+	if _.isNumber(item)
+		return "#{item}"
+	if _.isFunction(item)
+		code = item.toString()["function ".length..].replace(/\n/g, "").replace(/\s+/g, " ")
+		# We limit the size of a function body if it's in a strucutre
+		limit = 50
+		code = "#{_.trimRight(code[..limit])}… }" if code.length > limit and l > 0
+		return "<Function #{code}>"
+	if _.isArray(item)
+		return "[...]" if l > max
+		return "[" + _.map(item, (i) -> Utils.inspect(i, max, l+1)).join(", ") + "]"
+	if _.isObject(item)
+		objectType = Utils.inspectObjectType(item)
+		# We should not loop over dom trees because we will have a bad time
+		return "<#{objectType}>" if /HTML\w+?Element/.test(objectType)
+		if l > max
+			objectInfo = "{...}"
+		else
+			objectInfo = "{" + _.map(item, (v, k) -> "#{k}:#{Utils.inspect(v, max, l+1)}").join(", ") + "}"
+		return objectInfo if objectType is "Object"
+		return "<#{objectType} #{objectInfo}>"
+
+	return "#{item}"
+
 Utils.uuid = ->
 
 	chars = "0123456789abcdefghijklmnopqrstuvwxyz".split("")
@@ -184,13 +241,9 @@ Utils.uuid = ->
 	output.join ""
 
 Utils.arrayFromArguments = (args) ->
-
 	# Convert an arguments object to an array
-
-	if _.isArray args[0]
-		return args[0]
-
-	Array.prototype.slice.call args
+	return args[0] if _.isArray(args[0])
+	return Array.prototype.slice.call(args)
 
 Utils.cycle = ->
 
@@ -242,11 +295,25 @@ Utils.isTablet = ->
 Utils.isMobile = ->
 	Utils.isPhone() or Utils.isTablet()
 
-Utils.isLocal = ->
-	Utils.isLocalUrl window.location.href
+Utils.isFileUrl = (url) ->
+	return _.startsWith(url, "file://")
+
+Utils.isRelativeUrl = (url) ->
+	!/^([a-zA-Z]{1,8}:\/\/).*$/.test(url)
+
+Utils.isLocalServerUrl = (url) ->
+	return url.indexOf("127.0.0.1") != -1 or url.indexOf("localhost")  != -1
 
 Utils.isLocalUrl = (url) ->
-	url[0..6] == "file://"
+	return true if Utils.isFileUrl(url)
+	return true if Utils.isLocalServerUrl(url)
+	return false
+
+Utils.isLocalAssetUrl = (url, baseUrl) ->
+	baseUrl ?= window.location.href
+	return true if Utils.isLocalUrl(url)
+	return true if Utils.isRelativeUrl(url) and Utils.isLocalUrl(baseUrl)
+	return false
 
 Utils.isFramerStudio = ->
 	navigator.userAgent.indexOf("FramerStudio") != -1
@@ -262,13 +329,14 @@ Utils.deviceType = ->
 	# Taken from
 	# https://github.com/jeffmcmahan/device-detective/blob/master/bin/device-detect.js
 
+	if /(tablet)|(iPad)|(Nexus 9)/i.test(navigator.userAgent)
+		return "tablet"
+
 	if /(mobi)/i.test(navigator.userAgent)
 		return "phone"
 
-	if /(tablet)|(iPad)/i.test(navigator.userAgent)
-		return "tablet"
-
 	return "desktop"
+
 
 Utils.pathJoin = ->
 	Utils.arrayFromArguments(arguments).join("/")
@@ -276,9 +344,18 @@ Utils.pathJoin = ->
 ######################################################
 # MATH FUNCTIONS
 
-Utils.round = (value, decimals) ->
+Utils.round = (value, decimals=0) ->
 	d = Math.pow 10, decimals
 	Math.round(value * d) / d
+
+Utils.clamp = (value, a, b) ->
+
+	min = Math.min(a, b)
+	max = Math.max(a, b)
+
+	value = min if value < min
+	value = max if value > max
+	return value
 
 # Taken from http://jsfiddle.net/Xz464/7/
 # Used by animation engine, needs to be very performant
@@ -290,6 +367,12 @@ Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 
 	[fromLow, fromHigh] = rangeA
 	[toLow, toHigh] = rangeB
+
+	# if rangeB consists of Colors we return a color tween
+	# if Color.isColor(toLow) || _.isString(toLow) && Color.isColorString(toLow)
+	# 	ratio = Utils.modulate(value, rangeA, [0, 1])
+	# 	result = Color.mix(toLow, toHigh, ratio)
+	# 	return result
 
 	result = toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
 
@@ -314,7 +397,7 @@ Utils.parseFunction = (str) ->
 
 	if _.endsWith str, ")"
 		result.name = str.split("(")[0]
-		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.rtrim(a, ")"))
+		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.trimRight(a, ")"))
 	else
 		result.name = str
 
@@ -337,10 +420,14 @@ Utils.domComplete = (f) ->
 	if document.readyState is "complete"
 		f()
 	else
-		__domComplete.push f
+		__domComplete.push(f)
 
 Utils.domCompleteCancel = (f) ->
 	__domComplete = _.without __domComplete, f
+
+Utils.domValidEvent = (element, eventName) ->
+	return if not eventName
+	return typeof(element["on#{eventName.toLowerCase()}"]) isnt "undefined"
 
 Utils.domLoadScript = (url, callback) ->
 
@@ -380,20 +467,31 @@ Utils.domLoadJSON = (path, callback) ->
 Utils.domLoadDataSync = (path) ->
 
 	request = new XMLHttpRequest()
-	request.open "GET", path, false
+	request.open("GET", path, false)
 
 	# This does not work in Safari, see below
 	try
-		request.send null
+		request.send(null)
 	catch e
-		console.debug "XMLHttpRequest.error", e
+		console.debug("XMLHttpRequest.error", e)
 
-	data = request.responseText
+	handleError = ->
+		throw Error "Utils.domLoadDataSync: #{path} -> [#{request.status} #{request.statusText}]"
+
+	request.onerror = handleError
+
+	if request.status not in [200, 0]
+		handleError()
 
 	# Because I can't catch the actual 404 with Safari, I just assume something
 	# went wrong if there is no text data returned from the request.
-	if not data
-		throw Error "Utils.domLoadDataSync: no data was loaded (url not found?)"
+	if not request.responseText
+		handleError()
+
+	# console.log "domLoadDataSync", path
+	# console.log "xhr.readyState", request.readyState
+	# console.log "xhr.status", request.status
+	# console.log "xhr.responseText", request.responseText
 
 	return request.responseText
 
@@ -422,10 +520,10 @@ Utils.loadImage = (url, callback, context) ->
 	element = new Image
 	context ?= Framer.CurrentContext
 
-	context.eventManager.wrap(element).addEventListener "load", (event) ->
+	context.domEventManager.wrap(element).addEventListener "load", (event) ->
 		callback()
 
-	context.eventManager.wrap(element).addEventListener "error", (event) ->
+	context.domEventManager.wrap(element).addEventListener "error", (event) ->
 		callback(true)
 
 	element.src = url
@@ -434,6 +532,9 @@ Utils.loadImage = (url, callback, context) ->
 # GEOMETRY FUNCTIONS
 
 # Point
+
+Utils.pointZero = (args={}) ->
+	return _.defaults(args, {x:0, y:0})
 
 Utils.pointMin = ->
 	points = Utils.arrayFromArguments arguments
@@ -466,11 +567,14 @@ Utils.pointAbs = (point) ->
 		y: Math.abs point.y
 
 Utils.pointInFrame = (point, frame) ->
-	return false	if point.x < frame.minX or point.x > frame.maxX
-	return false	if point.y < frame.minY or point.y > frame.maxY
-	true
+	return false if point.x < Utils.frameGetMinX(frame) or point.x > Utils.frameGetMaxX(frame)
+	return false if point.y < Utils.frameGetMinY(frame) or point.y > Utils.frameGetMaxY(frame)
+	return true
 
 # Size
+
+Utils.sizeZero = (args={}) ->
+	return _.defaults(args, {width:0, height:0})
 
 Utils.sizeMin = ->
 	sizes = Utils.arrayFromArguments arguments
@@ -483,6 +587,24 @@ Utils.sizeMax = ->
 	size	=
 		width:	_.max sizes.map (size) -> size.width
 		height: _.max sizes.map (size) -> size.height
+
+# Rect
+
+Utils.rectZero = (args={}) ->
+	return _.defaults(args, {top:0, right:0, bottom:0, left:0})
+
+Utils.parseRect = (args) ->
+	if _.isArray(args) and _.isNumber(args[0])
+		return Utils.parseRect({top:args[0]}) if args.length is 1
+		return Utils.parseRect({top:args[0], right:args[1]}) if args.length is 2
+		return Utils.parseRect({top:args[0], right:args[1], bottom:args[2]}) if args.length is 3
+		return Utils.parseRect({top:args[0], right:args[1], bottom:args[2], left:args[3]}) if args.length is 4
+	if _.isArray(args) and _.isObject(args[0])
+		return args[0]
+	if _.isObject(args)
+		return args
+
+	return {}
 
 # Frames
 
@@ -514,6 +636,8 @@ Utils.frameGetMaxY = (frame) ->
 Utils.frameSetMaxY = (frame, value) ->
 	frame.y = if frame.height is 0 then 0 else value - frame.height
 
+Utils.frameZero = (args={}) ->
+	return _.defaults(args, {top:0, right:0, bottom:0, left:0})
 
 Utils.frameSize = (frame) ->
 	size =
@@ -546,29 +670,77 @@ Utils.frameFittingPoints = (points...) ->
 
 	new Frame(x: min.x, y: min.y, width: max.x - min.x, height: max.y - min.y)
 
+Utils.framePointForOrigin = (frame, originX, originY) ->
+	frame =
+		x: frame.x + (originX * frame.width)
+		y: frame.y + (originY * frame.height)
+		width: frame.width
+		height: frame.height
+
+Utils.frameInset = (frame, inset) ->
+	frame =
+		x: frame.x + inset.left
+		y: frame.y + inset.top
+		width: frame.width - inset.left - inset.right
+		height: frame.height - inset.top - inset.bottom
+
+Utils.frameSortByAbsoluteDistance = (point, frames, originX=0, originY=0) ->
+	distance = (frame) ->
+		result = Utils.pointDistance(point, Utils.framePointForOrigin(frame, originX, originY))
+		result = Utils.pointAbs(result)
+		result = Utils.pointTotal(result)
+		result
+
+	return frames.sort (a, b) -> distance(a) - distance(b)
+
+Utils.pointInPolygon = (point, vs) ->
+	# ray-casting algorithm based on
+	# http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+	x = point[0]
+	y = point[1]
+	inside = false
+	i = 0
+	j = vs.length - 1
+	while i < vs.length
+		xi = vs[i][0]
+		yi = vs[i][1]
+		xj = vs[j][0]
+		yj = vs[j][1]
+		intersect = yi > y != yj > y and x < (xj - xi) * (y - yi) / (yj - yi) + xi
+		if intersect
+			inside = !inside
+		j = i++
+	inside
+
+Utils.pointAngle = (p1, p2) ->
+	Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+
+
 # Coordinate system
 
-Utils.convertPoint = (input, layerA, layerB) ->
+Utils.convertPoint = (input, layerA, layerB, context=false) ->
 
 	# Convert a point between two layer coordinate systems
 
 	point = _.defaults(input, {x:0, y:0})
 
-	superLayersA = layerA?.superLayers() or []
-	superLayersB = layerB?.superLayers() or []
+	superLayersA = layerA?.superLayers(context) or []
+	superLayersB = layerB?.superLayers(context) or []
 
-	superLayersB.push layerB if layerB
+	superLayersB.push(layerB) if layerB
 
 	for layer in superLayersA
-		point.x += layer.x - layer.scrollFrame.x
-		point.y += layer.y - layer.scrollFrame.y
+		point.x += layer.x #- layer.scrollFrame.x
+		point.y += layer.y #- layer.scrollFrame.y
 
 	for layer in superLayersB
-		point.x -= layer.x + layer.scrollFrame.x
-		point.y -= layer.y + layer.scrollFrame.y
+		point.x -= layer.x #+ layer.scrollFrame.x
+		point.y -= layer.y #+ layer.scrollFrame.y
 
 	return point
 
+###################################################################
+# Beta additions, use with care
 
 Utils.globalLayers = (importedLayers) ->
 
@@ -583,7 +755,7 @@ Utils.globalLayers = (importedLayers) ->
 
 		# Check if there are global variables with the same name
 		if window.hasOwnProperty(layerName) and not window.Framer._globalWarningGiven
-			print "Warning: Cannot make layer '#{layerName}' a global. A variable with this name already exists."
+			print "Warning: Cannot make layer '#{layerName}' a global, a variable with that name already exists"
 		else
 			window[layerName] = layer
 
@@ -611,5 +783,54 @@ Utils.SVG = do ->
 		el
 
 	{getContext, createElement}
+
+_textSizeNode = null
+
+Utils.textSize = (text, style={}, constraints={}) ->
+
+	# This function takes some text, css style and optionally a width and height and
+	# returns the rendered text size. This can be pretty slow, so use sporadically.
+	# http://stackoverflow.com/questions/118241/calculate-text-width-with-javascript
+
+	shouldCreateNode = !_textSizeNode
+
+	if shouldCreateNode
+		_textSizeNode = document.createElement("div")
+		_textSizeNode.id = "_textSizeNode"
+
+	# Reset all the previous styles and set the content
+	_textSizeNode.removeAttribute("style")
+	_textSizeNode.innerHTML = text
+
+	style = _.extend _.clone(style),
+		position: "fixed"
+		display: "inline"
+		visibility: "hidden"
+		top: "-10000px"
+		left: "-10000px"
+
+	delete style.width
+	delete style.height
+	delete style.bottom
+	delete style.right
+
+	style.width = "#{constraints.width}px" if constraints.width
+	style.height = "#{constraints.height}px" if constraints.height
+
+	_.extend(_textSizeNode.style, style)
+
+	if shouldCreateNode
+		# This is a trick to call this function before the document ready event
+		if not window.document.body
+			document.write(_textSizeNode.outerHTML)
+			_textSizeNode = document.getElementById("_textSizeNode")
+		else
+			window.document.body.appendChild(_textSizeNode)
+
+	rect = _textSizeNode.getBoundingClientRect()
+
+	frame =
+		width: rect.right - rect.left
+		height: rect.bottom - rect.top
 
 _.extend exports, Utils

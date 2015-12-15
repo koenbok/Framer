@@ -4,8 +4,8 @@ describe "LayerStates", ->
 
 		beforeEach ->
 			@layer = new Layer()
-			@layer.states.add 'a', x: 100, y: 100
-			@layer.states.add 'b', x: 200, y: 200
+			@layer.states.add("a", {x:100, y:100})
+			@layer.states.add("b", {x:200, y:200})
 
 		it "should emit willSwitch when switching", (done) ->
 			
@@ -73,6 +73,36 @@ describe "LayerStates", ->
 
 	describe "Properties", ->
 
+		it "should bring back the 'default' state values when using 'next'", (done) ->
+
+			layer = new Layer
+			layer.states.add
+				stateA: {x:100, rotation: 90}
+				stateB: {x:200, rotation: 180}
+			layer.states.animationOptions =
+				curve: "linear"
+				time: 0.05
+			
+			layer.x.should.equal 0
+
+			ready = (animation, layer) ->
+				switch layer.states.current
+					when "stateA"
+						layer.x.should.equal 100
+						layer.rotation.should.equal 90
+						layer.states.next()
+					when "stateB"
+						layer.x.should.equal 200
+						layer.rotation.should.equal 180
+						layer.states.next()
+					when "default"
+						layer.x.should.equal 0
+						layer.rotation.should.equal 0
+						done()
+
+			layer.on "end", ready
+			layer.states.next()
+			
 		it "should set scroll property", ->
 
 			layer = new Layer
@@ -99,7 +129,7 @@ describe "LayerStates", ->
 
 			layer.states.on Events.StateDidSwitch, ->
 				layer.scroll.should.equal true
-				layer.backgroundColor.should.equal "red"
+				layer.style.backgroundColor.should.equal new Color("red").toString()
 				done()
 
 			layer.states.switch "stateA"
@@ -116,9 +146,22 @@ describe "LayerStates", ->
 			layer.states.on Events.StateDidSwitch, ->
 				# layer.scroll.should.equal true
 				layer.x.should.equal 200
-				layer.backgroundColor.should.equal = "red"
+				layer.style.backgroundColor.should.equal new Color("red").toString()
 				done()
 
 			layer.states.switch "stateA", {curve:"linear", time:0.1}
 
-			
+		it "should restore the default state when using non exportable properties", ->
+
+			layer = new Layer
+			layer.states.add
+				stateA: {midX:200}
+
+			layer.x.should.equal 0
+
+			layer.states.switchInstant "stateA"
+			layer.x.should.equal 200 - (layer.width // 2)
+
+			layer.states.switchInstant "default"
+			layer.x.should.equal 0
+

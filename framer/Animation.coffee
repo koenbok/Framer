@@ -5,7 +5,6 @@ Utils = require "./Utils"
 {Config} = require "./Config"
 {Defaults} = require "./Defaults"
 {EventEmitter} = require "./EventEmitter"
-{Frame} = require "./Frame"
 
 {LinearAnimator} = require "./Animators/LinearAnimator"
 {BezierCurveAnimator} = require "./Animators/BezierCurveAnimator"
@@ -31,11 +30,8 @@ isRelativeProperty = (v) ->
 
 evaluateRelativeProperty = (target, k, v) ->
 	[match, sign, number, unit, rest...] = relativePropertyRE.exec(v)
-
-	if sign
-		return target[k] + (sign + 1) * number
-	else
-		return +number
+	return target[k] + (sign + 1) * number if sign
+	return +number
 
 createDebugLayerForPath = (path) ->
 	padding = 10
@@ -67,16 +63,13 @@ createDebugLayerForPath = (path) ->
 # is not compatible and causes problems.
 class exports.Animation extends EventEmitter
 
-	# @runningAnimations = ->
-	# 	_runningAnimations
-
 	constructor: (options={}) ->
 
 		options = Defaults.getDefaults "Animation", options
 
 		super options
 
-		@options = Utils.setDefaultProperties options,
+		@options = _.clone _.defaults options,
 			layer: null
 			properties: {}
 			curve: "linear"
@@ -87,6 +80,7 @@ class exports.Animation extends EventEmitter
 			debug: false
 			path: null
 			pathOptions: null
+			colorModel: "husl"
 
 		if options.path
 			@options.path = path = options.path.forLayer(options.layer)
@@ -107,11 +101,7 @@ class exports.Animation extends EventEmitter
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
-		# Convert a frame instance to a regular js object
-		if options.properties instanceof Frame
-			option.properties = option.properties.properties
-
-		@options.properties = @_filterAnimatableProperties(@options.properties)
+		@options.properties = Animation.filterAnimatableProperties(@options.properties)
 
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
@@ -154,12 +144,24 @@ class exports.Animation extends EventEmitter
 			console.warn "Animation: nothing to animate, all properties are equal to what it is now"
 			return false
 
+		# If this animation wants to animate a property that is already being animated, it stops
+		# that currently running animation. If not, it allows them both to continue.
 		for property, animation of @_target.animatingProperties()
-			if @_stateA.hasOwnProperty(property)
-				# We used to ignore animations that tried animation already animating properties
-				# console.warn "Animation: property #{property} is already being animated for this layer by another animation, so we bail"
 
-				# But after some consideration, we actually just stop the animation that is animation those properties for this one
+			if @_stateA.hasOwnProperty(property)
+				animation.stop()
+
+			# We also need to account for derivatives from x, y
+			if property is "x" and (
+				@_stateA.hasOwnProperty("minX") or
+				@_stateA.hasOwnProperty("midX") or
+				@_stateA.hasOwnProperty("maxX"))
+				animation.stop()
+
+			if property is "y" and (
+				@_stateA.hasOwnProperty("minY") or
+				@_stateA.hasOwnProperty("midY") or
+				@_stateA.hasOwnProperty("maxY"))
 				animation.stop()
 
 		if @options.debug
@@ -186,8 +188,7 @@ class exports.Animation extends EventEmitter
 
 	stop: (emit=true)->
 
-		@options.layer._context._animationList = _.without(
-			@options.layer._context._animationList, @)
+		@options.layer.context.removeAnimation(@)
 
 		@emit("stop") if emit
 		Framer.Loop.off("update", @_update)
@@ -202,7 +203,7 @@ class exports.Animation extends EventEmitter
 
 	reverse: ->
 		# TODO: Add some tests
-		options = _.clone @options
+		options = _.clone(@options)
 		options.properties = @_originalState
 		animation = new Animation options
 		animation
@@ -219,8 +220,11 @@ class exports.Animation extends EventEmitter
 		# Also emit this to the layer with self as argument
 		@options.layer.emit(event, @)
 
+	animatingProperties: ->
+		_.keys(@_stateA)
+
 	_start: =>
-		@options.layer._context._animationList.push(@)
+		@options.layer.context.addAnimation(@)
 		@emit("start")
 		Framer.Loop.on("update", @_update)
 
@@ -236,7 +240,11 @@ class exports.Animation extends EventEmitter
 	_updateValue: (value) =>
 
 		for k, v of @_stateB when ((@options.path and k not in ['x', 'y']) or !@options.path)
-			@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
+
+			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
+				@_target[k] = Color.mix(@_stateA[k], @_stateB[k], value, false, @options.colorModel)
+			else
+				@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
 
 		if @options.path
 			position = @options.path.pointAtLength(@options.path.length * value)
@@ -255,16 +263,6 @@ class exports.Animation extends EventEmitter
 			@_target.y = position.y
 
 		return
-
-	_filterAnimatableProperties: (properties) ->
-
-		animatableProperties = {}
-
-		# Only animate numeric properties for now
-		for k, v of properties
-			animatableProperties[k] = v if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v)
-
-		animatableProperties
 
 	_currentState: ->
 		_.pick @options.layer, _.keys(@options.properties)
@@ -314,7 +312,7 @@ class exports.Animation extends EventEmitter
 				@options.curveOptions.values = parsedCurve.args.map (v) -> parseFloat(v) or 0
 
 			if animatorClass is SpringRK4Animator
-				for k, i in ["tension", "friction", "velocity"]
+				for k, i in ["tension", "friction", "velocity", "tolerance"]
 					value = parseFloat parsedCurve.args[i]
 					@options.curveOptions[k] = value if value
 
@@ -322,3 +320,18 @@ class exports.Animation extends EventEmitter
 				for k, i in ["stiffness", "damping", "mass", "tolerance"]
 					value = parseFloat parsedCurve.args[i]
 					@options.curveOptions[k] = value if value
+
+	@filterAnimatableProperties = (properties) ->
+		# Function to filter only animatable properties out of a given set
+		animatableProperties = {}
+
+		# Only animate numeric properties for now
+		for k, v of properties
+			if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or v == null
+				animatableProperties[k] = v
+			else if _.isString(v)
+				if Color.isColorString(v)
+					animatableProperties[k] = new Color(v)
+
+
+		return animatableProperties

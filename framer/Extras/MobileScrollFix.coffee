@@ -32,8 +32,11 @@ exports.enable = ->
 		constructor: (options) ->
 			super options
 
-			@on "change:scrollVertical", @_updateScrollListeners
-			@_updateScrollListeners()
+			# Only do this for bare layers, it messes with the 
+			# Scroll and Page Component for now.
+			if @constructor.name == "Layer"
+				@on "change:scrollVertical", @_updateScrollListeners
+				@_updateScrollListeners()
 
 		_updateScrollListeners: =>
 			

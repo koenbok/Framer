@@ -3,10 +3,12 @@ Utils = require "./Utils"
 {Config} = require "./Config"
 {EventEmitter} = require "./EventEmitter"
 
-if window.performance
-	getTime = -> window.performance.now()
-else
-	getTime = -> Date.now()
+# if window.performance
+# 	getTime = -> window.performance.now()
+# else
+# 	getTime = -> Date.now()
+
+getTime = -> Utils.getTime() * 1000
 
 
 # Make the time ticks a "fixed" 1/60 of a second.
@@ -32,6 +34,9 @@ class exports.AnimationLoop extends EventEmitter
 
 		if Utils.webkitVersion() > 600 and Utils.isFramerStudio()
 			@raf = false
+
+		# To avoid event emitter warning
+		@maximumListeners = Infinity
 
 	start: =>
 		

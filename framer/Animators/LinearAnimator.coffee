@@ -6,7 +6,7 @@ class exports.LinearAnimator extends Animator
 	
 	setup: (options) ->
 
-		@options = Utils.setDefaultProperties options,
+		@options = _.defaults options,
 			time: 1
 			precision: 1/1000
 

@@ -18,6 +18,8 @@ body {
 .framerLayer {
 	display: block;
 	position: absolute;
+	left: 0;
+	top: 0;
 	background-repeat: no-repeat;
 	background-size: cover;
 	-webkit-overflow-scrolling: touch;
@@ -28,7 +30,8 @@ body {
 .framerLayer input,
 .framerLayer textarea,
 .framerLayer select,
-.framerLayer option
+.framerLayer option,
+.framerLayer div[contenteditable=true]
 {
 	pointer-events: auto;
 	-webkit-user-select: auto;

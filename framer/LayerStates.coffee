@@ -20,7 +20,7 @@ class exports.LayerStates extends BaseClass
 		@animationOptions = {}
 
 		# Always add the default state as the current
-		@add "default", @layer.properties
+		@add "default", @layer.props
 
 		@_currentState = "default"
 		@_previousStates = []
@@ -31,9 +31,9 @@ class exports.LayerStates extends BaseClass
 
 		# We also allow an object with states to be passed in
 		# like: layer.states.add({stateA: {...}, stateB: {...}})
-		if _.isObject stateName
+		if _.isObject(stateName)
 			for k, v of stateName
-				@add k, v
+				@add(k, v)
 			return
 
 		error = -> throw Error "Usage example: layer.states.add(\"someName\", {x:500})"
@@ -42,7 +42,7 @@ class exports.LayerStates extends BaseClass
 
 		# Add a state with a name and properties
 		@_orderedStates.push stateName
-		@_states[stateName] = properties
+		@_states[stateName] = LayerStates.filterStateProperties(properties)
 
 	remove: (stateName) ->
 
@@ -94,14 +94,19 @@ class exports.LayerStates extends BaseClass
 		animatablePropertyKeys = []
 
 		for k, v of properties
-			animatablePropertyKeys.push(k) if _.isNumber(v)
+			if _.isNumber(v)
+				animatablePropertyKeys.push(k)
+			else if Color.isColorObject(v)
+				animatablePropertyKeys.push(k)
+			else if v == null
+				animatablePropertyKeys.push(k)
 
 		if animatablePropertyKeys.length == 0
 			instant = true
 
 		if instant is true
 			# We want to switch immediately without animation
-			@layer.properties = properties
+			@layer.props = properties
 			@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
 
 		else
@@ -115,7 +120,7 @@ class exports.LayerStates extends BaseClass
 				
 				# Set all the values for keys that we couldn't animate
 				for k, v of properties
-					@layer[k] = v if not _.isNumber(v)
+					@layer[k] = v unless _.isNumber(v) or Color.isColorObject(v)
 
 				@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
 
@@ -138,7 +143,6 @@ class exports.LayerStates extends BaseClass
 		keys = []
 
 		for stateName, state of @_states
-			continue if stateName is "default"
 			keys = _.union(keys, _.keys(state))
 
 		keys
@@ -166,3 +170,17 @@ class exports.LayerStates extends BaseClass
 		super
 		# Also emit this to the layer with self as argument
 		@layer.emit args...
+
+	@filterStateProperties = (properties) ->
+
+		stateProperties = {}
+
+		# TODO: Maybe we want to support advanced data structures like objects in the future too.
+		for k, v of properties
+
+			if _.isString(v) && Color.isColorString(v)
+				stateProperties[k] = new Color(v)
+			else if _.isNumber(v) or _.isFunction(v) or _.isBoolean(v) or _.isString(v) or Color.isColorObject(v) or v == null
+				stateProperties[k] = v
+
+		return stateProperties

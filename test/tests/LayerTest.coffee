@@ -33,26 +33,25 @@ describe "Layer", ->
 
 		it "should set default background color", ->
 			
+			# if the default background color is not set the content layer of scrollcomponent is not hidden when layers are added
+			layer = new Layer()
+			Color.equal(layer.backgroundColor, Framer.Defaults.Layer.backgroundColor).should.be.true
+
 			Framer.Defaults =
 				Layer:
 					backgroundColor: "red"
 					
 			layer = new Layer()
 			
-			layer.style.backgroundColor.should.equal "red"
-			#layer.backgroundColor.should.equal "red"
-
+			layer.style.backgroundColor.should.equal new Color("red").toString()
 
 			Framer.resetDefaults()
-		
 
 		it "should set defaults with override", ->
 			
 			layer = new Layer x:50, y:50
 			layer.x.should.equal 50
 			layer.x.should.equal 50
-
-
 
 	describe "Properties", ->
 
@@ -104,42 +103,51 @@ describe "Layer", ->
 			layer.originX = 0.1
 			layer.originY = 0.2
 
-			layer.style.webkitTransformOrigin.should.equal "10% 20%"
+			if Utils.isChrome()
+				layer.style.webkitTransformOrigin.should.equal "10% 20% 0px"
+			else
+				layer.style.webkitTransformOrigin.should.equal "10% 20%"
 
 			layer.originX = 0.5
 			layer.originY = 0.5
 
-			layer.style.webkitTransformOrigin.should.equal "50% 50%"
+			if Utils.isChrome()
+				layer.style.webkitTransformOrigin.should.equal "50% 50% 0px"
+			else
+				layer.style.webkitTransformOrigin.should.equal "50% 50%"
 
 		it "should set local image", ->
 	
-			imagePath = "static/test.png"			
+			prefix = "../"
+			imagePath = "static/test.png"
+			fullPath = prefix + imagePath
 			layer = new Layer
 
-			layer.image = imagePath
-			layer.image.should.equal imagePath
+			layer.image = fullPath
+			layer.image.should.equal fullPath
 
-			layer.style["background-image"].should.contain imagePath
-			# layer.style["background-image"].should.contain "file://"
-			# layer.style["background-image"].should.contain "?nocache="
+			layer.style["background-image"].indexOf(imagePath).should.not.equal(-1)
+			layer.style["background-image"].indexOf("file://").should.not.equal(-1)
+			layer.style["background-image"].indexOf("?nocache=").should.not.equal(-1)
 
-			layer.computedStyle()["background-size"].should.equal "cover"
-			layer.computedStyle()["background-repeat"].should.equal "no-repeat"
+			#layer.computedStyle()["background-size"].should.equal "cover"
+			#layer.computedStyle()["background-repeat"].should.equal "no-repeat"
 
-			layer.properties.image.should.equal imagePath
+			image = layer.props.image
+			layer.props.image.should.equal fullPath
 
 		it "should set image", ->
-			imagePath = "static/test.png"	
+			imagePath = "../static/test.png"
 			layer = new Layer image:imagePath
 			layer.image.should.equal imagePath
 
 		it "should unset image with null", ->
-			layer = new Layer image:"static/test.png"
+			layer = new Layer image:"../static/test.png"
 			layer.image = null
 			layer.image.should.equal ""
 
 		it "should unset image with empty string", ->
-			layer = new Layer image:"static/test.png"
+			layer = new Layer image:"../static/test.png"
 			layer.image = ""
 			layer.image.should.equal ""
 
@@ -231,9 +239,9 @@ describe "Layer", ->
 		it "should set scroll from properties", ->
 
 			layer = new Layer
-			layer.properties = {scroll:false}
+			layer.props = {scroll:false}
 			layer.scroll.should.equal false
-			layer.properties = {scroll:true}
+			layer.props = {scroll:true}
 			layer.scroll.should.equal true
 
 		it "should set scrollHorizontal", ->
@@ -252,8 +260,8 @@ describe "Layer", ->
 		it "should set style properties on create", ->
 
 			layer = new Layer backgroundColor: "red"
-			layer.backgroundColor.should.equal "red"
-			layer.style["backgroundColor"].should.equal "red"
+			layer.backgroundColor.should.eql new Color("red")
+			layer.style["backgroundColor"].should.equal new Color("red").toString()
 
 		it "should check value type", ->
 
@@ -297,6 +305,29 @@ describe "Layer", ->
 
 			layer.style["-webkit-perspective"].should.equal("500")
 
+		it "should set rotation", ->
+
+			layer = new Layer
+				rotationX: 200
+				rotationY: 200
+				rotationZ: 200
+
+			layer.rotationX.should.equal(200)
+			layer.rotationY.should.equal(200)
+			layer.rotationZ.should.equal(200)
+
+		it "should proxy rotation", ->
+
+			layer = new Layer
+
+			layer.rotation = 200
+			layer.rotation.should.equal(200)
+			layer.rotationZ.should.equal(200)
+
+			layer.rotationZ = 100
+			layer.rotation.should.equal(100)
+			layer.rotationZ.should.equal(100)
+
 
 
 	describe "Filter Properties", ->
@@ -339,17 +370,20 @@ describe "Layer", ->
 			layer.shadowBlur.should.equal 10
 			layer.shadowSpread.should.equal 10
 
-			layer.style.boxShadow.should.equal ""
+			layer.style.boxShadow.should.equal "rgb(0, 0, 0) 10px 10px 10px 10px"
 
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = "red"
-			layer.shadowColor.should.equal "red"
+			layer.shadowColor.r.should.equal 255
+			layer.shadowColor.g.should.equal 0
+			layer.shadowColor.b.should.equal 0
+			layer.shadowColor.a.should.equal 1
 			
-			layer.style.boxShadow.should.equal "red 10px 10px 10px 10px"
+			layer.style.boxShadow.should.equal "rgb(255, 0, 0) 10px 10px 10px 10px"
 
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = null
-			layer.style.boxShadow.should.equal ""
+			layer.style.boxShadow.should.equal "rgba(0, 0, 0, 0) 10px 10px 10px 10px"
 
 	describe "Events", ->
 
@@ -369,19 +403,6 @@ describe "Layer", ->
 			layer.ignoreEvents.should.equal true
 			layer.style["pointerEvents"].should.equal "none"
 
-		it "should listen to multiple events", ->
-
-			layer = new Layer()
-
-			count = 0
-			handler = -> count++
-
-			layer.on "click", "tap", handler
-
-			layer.emit "click"
-			layer.emit "tap"
-
-			count.should.equal 2
 
 		it "should not listen to events until a listener is added", ->
 			
@@ -398,6 +419,18 @@ describe "Layer", ->
 			myLayer = new Layer()
 
 			myLayer.on "click", (event, layer) ->
+				@id.should.equal myLayer.id
+				layer.id.should.equal myLayer.id
+				callback()
+
+			simulate.click myLayer._element
+
+
+		it "should modify the event scope for once", (callback) ->
+
+			myLayer = new Layer()
+
+			myLayer.once "click", (event, layer) ->
 				@id.should.equal myLayer.id
 				layer.id.should.equal myLayer.id
 				callback()
@@ -424,6 +457,70 @@ describe "Layer", ->
 			clickCount.should.equal 1
 
 
+		it "should only run an event once", ->
+			
+			layerA = new Layer
+			count = 0
+
+			layerA.once "hello", (layer) ->
+				count++
+				layerA.should.equal layer
+
+			for i in [0..10]
+				layerA.emit("hello")
+
+			count.should.equal 1
+
+		it "should modify scope for draggable events", (callback) ->
+			
+			layerA = new Layer
+			layerA.draggable.enabled = true
+			layerA.on "test", (args...) ->
+				@id.should.equal(layerA.id)
+				callback()
+
+			layerA.draggable.emit("test", {})
+
+		it "should list all events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+			layerA.on("test", handler)
+			layerA.listeners("test").length.should.equal 1
+
+		it "should remove all events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+			layerA.on("test", handler)
+			layerA.removeAllListeners("test")
+			layerA.listeners("test").length.should.equal 0
+
+		it "should add and clean up dom events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+
+			# But never more then one
+			layerA._domEventManager.listeners(Events.Click).length.should.equal(1)
+
+			layerA.removeAllListeners(Events.Click)
+
+			# And on removal, we should get rid of the dom event
+			layerA._domEventManager.listeners(Events.Click).length.should.equal(0)
+
+		it "should work with event helpers", (done) ->
+
+			layer = new Layer
+
+			layer.onMouseOver (event, aLayer) ->
+				aLayer.should.equal(layer)
+				@should.equal(layer)
+				done()
+
+			simulate.mouseover(layer._element)
 
 	describe "Hierarchy", ->
 		
@@ -503,6 +600,11 @@ describe "Layer", ->
 
 	describe "Layering", ->
 
+		it "should set at creation", ->
+
+			layer = new Layer index:666
+			layer.index.should.equal 666
+
 		it "should change index", ->
 
 			layer = new Layer
@@ -579,11 +681,22 @@ describe "Layer", ->
 			layerA.subLayersByName("B").should.eql [layerB]
 			layerA.subLayersByName("C").should.eql [layerC, layerD]
 
+		it "should get a siblinglayer by name", ->
+
+			layerA = new Layer
+			layerB = new Layer name:"B", superLayer:layerA
+			layerC = new Layer name:"C", superLayer:layerA
+			layerD = new Layer name:"C", superLayer:layerA
+
+			layerB.siblingLayersByName("C").should.eql [layerC, layerD]
+			layerD.siblingLayersByName("B").should.eql [layerB]
+
 		it "should get a superlayers", ->
 			layerA = new Layer
 			layerB = new Layer superLayer:layerA
 			layerC = new Layer superLayer:layerB
 			layerC.superLayers().should.eql [layerB, layerA]
+
 
 	describe "Frame", ->
 
@@ -661,24 +774,25 @@ describe "Layer", ->
 			layer.maxY = 200
 			layer.y.should.equal 100
 
-		it "should get and set screenFrame", ->
+		it "should get and set canvasFrame", ->
+			
 			layerA = new Layer x:100, y:100, width:100, height:100
 			layerB = new Layer x:300, y:300, width:100, height:100, superLayer:layerA
 
-			assert.equal layerB.screenFrame.x, 400
-			assert.equal layerB.screenFrame.y, 400
+			assert.equal layerB.canvasFrame.x, 400
+			assert.equal layerB.canvasFrame.y, 400
 
-			layerB.screenFrame = {x:1000, y:1000}
+			layerB.canvasFrame = {x:1000, y:1000}
 
-			assert.equal layerB.screenFrame.x, 1000
-			assert.equal layerB.screenFrame.y, 1000
+			assert.equal layerB.canvasFrame.x, 1000
+			assert.equal layerB.canvasFrame.y, 1000
 
 			assert.equal layerB.x, 900
 			assert.equal layerB.y, 900
 
 			layerB.superLayer = null
-			assert.equal layerB.screenFrame.x, 900
-			assert.equal layerB.screenFrame.y, 900
+			assert.equal layerB.canvasFrame.x, 900
+			assert.equal layerB.canvasFrame.y, 900
 
 		it "should calculate scale", ->
 			layerA = new Layer scale:0.9
@@ -751,7 +865,7 @@ describe "Layer", ->
 			layer = new Layer
 			layer.destroy()
 
-			Framer.CurrentContext.getLayers().should.not.contain layer
+			(layer in Framer.CurrentContext.getLayers()).should.be.false
 			assert.equal layer._element.parentNode, null
 
 		it "should set text", ->
@@ -763,6 +877,13 @@ describe "Layer", ->
 			layer._elementHTML.innerHTML.should.equal "Hello"
 			layer.ignoreEvents.should.equal true
 
+		it "should not effect subLayers", ->
+
+			layer = new Layer
+			layer.html = "Hello"
+			subLayer = new Layer superLayer: layer
+
+			subLayer._element.offsetTop.should.equal 0
 
 		it "should set interactive html and allow pointer events", ->
 
@@ -806,6 +927,49 @@ describe "Layer", ->
 
 			layer.style.webkitTransform.should.equal "translate(0px, 0px) scale(1) skew(0deg, 0deg) rotate(0deg)"
 
+	describe "Copy", ->
+
+		it "copied Layer should hold set props", ->
+
+			X = 100
+			Y = 200
+			IMAGE = '../static/test.png'
+			BORDERRADIUS = 20
+
+			layer = new Layer
+				x:X
+				y:Y
+				image:IMAGE
+
+			layer.borderRadius = BORDERRADIUS
+
+			layer.x.should.eql X
+			layer.y.should.eql Y
+			layer.image.should.eql IMAGE
+			layer.borderRadius.should.eql BORDERRADIUS
+
+			copy = layer.copy()
+
+			copy.x.should.eql X
+			copy.y.should.eql Y
+			copy.image.should.eql IMAGE
+			copy.borderRadius.should.eql BORDERRADIUS
+
+		it "copied Layer should have defaults", ->
+
+			layer = new Layer
+			copy = layer.copy()
+
+			copy.width.should.equal 100
+			copy.height.should.equal 100
+
+		# it "copied layer should copy styles", ->
+
+		# 	layer = new Layer
+		# 	layer.style.backgroundColor = "yellow"
+
+		# 	layer2 = layer.copy()
+		# 	layer2.style.backgroundColor.should.equal "yellow"
 
 
 

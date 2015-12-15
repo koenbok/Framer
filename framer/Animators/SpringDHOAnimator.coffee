@@ -6,7 +6,7 @@ class exports.SpringDHOAnimator extends Animator
 
 	setup: (options) ->
 
-		@options = Utils.setDefaultProperties options,
+		@options = _.defaults options,
 			velocity: 0
 			tolerance: 1/10000
 			stiffness: 50

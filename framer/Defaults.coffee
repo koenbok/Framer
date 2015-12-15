@@ -6,13 +6,16 @@ Utils = require "./Utils"
 
 Originals = 
 	Layer:
-		backgroundColor: "rgba(0,124,255,.5)"
+		backgroundColor: "rgba(0, 124, 255, 0.5)"
+		color: "white"
+		shadowColor: "black"
 		width: 100
 		height: 100
 	Animation:
-		curve: "linear"
+		# curve: "spring(400,40,0)" # Or, the Cemre-Curve
+		curve: "ease"
 		time: 1
-	DeviceView:
+	DeviceComponent:
 		fullScreen: false
 		padding: 50
 		deviceType: "iphone-5s-spacegray"
@@ -22,10 +25,47 @@ Originals =
 		keyboard: false
 		animationOptions:
 			curve: "spring(400,40,0)"
+	LayerDraggable:
+		momentum: true
+		momentumOptions:
+			friction: 2.1 
+			tolerance: 1 
+		bounce: true
+		bounceOptions:
+			friction: 40
+			tension: 200
+			tolerance: 1
+		directionLock: false
+		directionLockThreshold: 
+			x: 10
+			y: 10
+		overdrag: true
+		overdragScale: 0.5
+		pixelAlign: true
+		velocityTimeout: 100
+		velocityScale: 890
+	FrictionSimulator:
+		friction: 2
+		tolerance: 1/10
+	SpringSimulator:
+		tension: 500
+		friction: 10
+		tolerance: 1/10000
+	MomentumBounceSimulator:
+		momentum:
+			friction: 2
+			tolerance: 10
+		bounce:
+			tension: 500
+			friction: 10
+			tolerance: 1
 
 exports.Defaults =
 
 	getDefaults: (className, options) ->
+
+		return {} unless Originals.hasOwnProperty(className)
+		return {} unless Framer.Defaults.hasOwnProperty(className)
 
 		# Always start with the originals
 		defaults = _.clone Originals[className]
