@@ -50,6 +50,7 @@ gulp.task "build-debug", ["version"], ->
 		entry: "./framer/Framer.coffee"
 		output:
 			filename: "framer.debug.js"
+			sourceMapFilename: "[file].map?hash=[hash]"
 			pathinfo: true
 		debug: true
 
@@ -81,6 +82,7 @@ gulp.task "watcher", ["version"], ->
 		entry: "./framer/Framer.coffee"
 		output:
 			filename: "framer.debug.js"
+			sourceMapFilename: "[file].map?hash=[hash]"
 		debug: true
 		watch: true
 
