@@ -74,8 +74,8 @@ class exports.SliderComponent extends Layer
 		@knob.draggable.propagateEvents = false
 		@knob.borderRadius = @knobOverlay.borderRadius = @knobSize / 2
 
-		# If tapSize isn't defined, remove the overlays
-		if not @tapSize
+		# If hitArea isn't defined, remove the overlays
+		if not @hitArea
 			@knobOverlay.destroy()
 			@sliderOverlay.destroy()
 
@@ -178,20 +178,20 @@ class exports.SliderComponent extends Layer
 			@knob.height = @_knobSize
 			@_updateFrame()
 
-	@define "tapSize",
-		get: -> @_tapSize
+	@define "hitArea",
+		get: -> @_hitArea
 
 		set: (value) ->
 
-			@_tapSize = value
+			@_hitArea = value
 
 			@knobOverlay.props =
-				width: @knobSize or 30 + @_tapSize
-				height:	@knobSize or 30 + @_tapSize
+				width: @knobSize or 30 + @_hitArea
+				height:	@knobSize or 30 + @_hitArea
 
 			@sliderOverlay.props =
-				width: @width + @_tapSize
-				height:	@height + @_tapSize
+				width: @width + @_hitArea
+				height:	@height + @_hitArea
 
 	@define "min",
 		get: -> @_min or 0
