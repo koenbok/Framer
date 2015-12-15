@@ -17,11 +17,11 @@ clean:
 
 build: bootstrap clean 
 	mkdir -p build
-	$(gulp) build:release
+	$(gulp) release
 
 debug: bootstrap clean 
 	mkdir -p build
-	$(gulp) build:debug
+	$(gulp) debug
 
 watch: bootstrap 
 	$(gulp) watch
