@@ -56,7 +56,7 @@ dist: build
 	find build/Framer -name ".DS_Store" -depth -exec rm {} \;
 	cd build; zip -r Framer.zip Framer
 
-site%build: dist
+site%build:
 	mkdir -p build/builds.framerjs.com
 	$(coffee) scripts/site-deploy.coffee build
 	cp -R extras/builds.framerjs.com/static build/builds.framerjs.com/static
