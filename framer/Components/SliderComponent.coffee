@@ -177,7 +177,6 @@ class exports.SliderComponent extends Layer
 			@_knobSize = value
 			@knob.width = @_knobSize
 			@knob.height = @_knobSize
-			@knob.borderRadius = @knobSize / 2
 			@_updateFrame()
 
 	@define "hitArea",
@@ -217,7 +216,7 @@ class exports.SliderComponent extends Layer
 				@knob.midY = @pointForValue(value)
 
 			@_updateFill()
-			@_updateValue() unless value = null
+			@_updateValue()
 
 	_updateValue: =>
 		@emit("change:value", @value)
