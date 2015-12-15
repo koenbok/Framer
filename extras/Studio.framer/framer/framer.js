@@ -1,1 +1,1 @@
-../../../build/framer.js
+../../../build/framer.debug.js
