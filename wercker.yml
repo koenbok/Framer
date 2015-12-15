@@ -1,38 +1,25 @@
-box: wercker/nodejs
+box: nolimitid/node-phantom-npm3
 
 build:
     steps:
         - script:
-            name: set up permissions
+            name: load git revisions
             code: |
-                export NODE_ENV=development
-                chmod 777 -R .
-                chmod 777 -R $WERCKER_CACHE_DIR
-        - script:
-            name: install npm@2
-            code: |
-                npm cache clean
-                sudo npm i -g npm
-        - npm-install
+                git remote set-url origin https://github.com/$WERCKER_GIT_OWNER/$WERCKER_GIT_REPOSITORY.git
+                cd $WERCKER_SOURCE_DIR
+                git fetch --unshallow
         - npm-test
 
 deploy:
     steps:
         - script:
-            name: set up permissions
+            name: load git revisions
             code: |
-                export NODE_ENV=development
-                chmod 777 -R .
-                chmod 777 -R $WERCKER_CACHE_DIR
-        - script:
-            name: install npm@2
-            code: |
-                npm cache clean
-                sudo npm i -g npm
+                git remote set-url origin https://github.com/$WERCKER_GIT_OWNER/$WERCKER_GIT_REPOSITORY.git
+                cd $WERCKER_SOURCE_DIR
+                git fetch --unshallow
         - install-packages:
             packages: zip
         - script:
             name: builds.framerjs.com
             code: make deploy
-
-# $WERCKER_OUTPUT_DIR
