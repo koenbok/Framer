@@ -72,7 +72,7 @@ class exports.SliderComponent extends Layer
 		@knob.draggable.momentumOptions = {friction: 5, tolerance: 0.25}
 		@knob.draggable.bounce = false
 		@knob.draggable.propagateEvents = false
-		@knob.borderRadius = @knobOverlay.borderRadius = "50%"
+		@knob.borderRadius = @knobOverlay.borderRadius = @knobSize / 2
 
 		# If tapSize isn't defined, remove the overlays
 		if not @tapSize
@@ -211,10 +211,11 @@ class exports.SliderComponent extends Layer
 		set: (value) ->
 			if @width > @height
 				@knob.midX = @pointForValue(value)
-				@_updateFill()
 			else
 				@knob.midY = @pointForValue(value)
-				@_updateFill()
+
+			@_updateFill()
+			# @_updateValue()
 
 	_updateValue: =>
 		@emit("change:value", @value)

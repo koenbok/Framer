@@ -12,6 +12,8 @@ lib
 npm-debug.log
 extras/Studio.framer/app.coffee
 extras/Studio.framer/framer/config.json
+extras/Studio.framer/framer/.bowerrc
+extras/Studio.framer/framer/init.js
 extras/Studio.framer/imported
 extras/Studio.framer/app.js
 test/phantomjs/tests.js
