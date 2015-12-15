@@ -32,13 +32,11 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 			# console.log "Layer.#{name}.set #{value} current:#{@[name]}"
 
+			if transformer and (value or value is null) 
+				value = transformer(value)
+
 			# Return unless we get a new value
 			return if value is @_properties[name]
-
-			if value and transformer
-				value = transformer(value)
-			else if value == null and transformer
-				value = transformer(value)
 
 			if value and validator and not validator(value)
 				layerValueTypeError(name, value)
