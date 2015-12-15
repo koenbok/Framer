@@ -39,9 +39,11 @@ class exports.SliderComponent extends Layer
 			name: "fill"
 
 		@knobOverlay = new Layer
+			backgroundColor: null
 			name: "knobOverlay"
 
 		@sliderOverlay = new Layer
+			backgroundColor: null
 			name: "sliderOverlay"
 
 		super options
