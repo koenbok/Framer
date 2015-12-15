@@ -14,8 +14,6 @@
     "type": "git",
     "url": "https://github.com/koenbok/Framer.git"
   },
-  "dependencies": {
-  },
   "devDependencies": {
     "eventemitter3": "^1.1.1",
     "gulp-util": "^3.0.7",

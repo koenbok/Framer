@@ -334,3 +334,13 @@ class exports.Animation extends EventEmitter
 
 
 		return animatableProperties
+
+	##############################################################
+	## EVENT HELPERS
+	
+	onAnimationStart: (cb) -> @on(Events.AnimationStart, cb)
+	onAnimationStop: (cb) -> @on(Events.AnimationStop, cb)
+	onAnimationEnd: (cb) -> @on(Events.AnimationEnd, cb)
+	onAnimationDidStart: (cb) -> @on(Events.AnimationDidStart, cb)
+	onAnimationDidStop: (cb) -> @on(Events.AnimationDidStop, cb)
+	onAnimationDidEnd: (cb) -> @on(Events.AnimationDidEnd, cb)

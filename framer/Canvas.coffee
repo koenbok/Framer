@@ -16,6 +16,8 @@ class CanvasClass extends BaseClass
 		super(eventName, listener)
 
 	on: @::addListener
+
+	onResize: (cb) -> @on("resize", cb)
 	
 # We use this as a singleton
 exports.Canvas = new CanvasClass
