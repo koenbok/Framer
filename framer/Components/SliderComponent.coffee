@@ -215,7 +215,7 @@ class exports.SliderComponent extends Layer
 				@knob.midY = @pointForValue(value)
 
 			@_updateFill()
-			# @_updateValue()
+			@_updateValue() unless value = null
 
 	_updateValue: =>
 		@emit("change:value", @value)
