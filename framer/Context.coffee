@@ -67,8 +67,6 @@ class exports.Context extends BaseClass
 		@resetTimers()
 		@resetIntervals()
 
-		@perspective = @perspective
-
 		@emit("reset", @)
 
 	# destroy: ->
@@ -218,6 +216,7 @@ class exports.Context extends BaseClass
 		@_element = document.createElement("div")
 		@_element.id = "FramerContextRoot-#{@_name}"
 		@_element.classList.add("framerContext")
+		@_element.style["webkitPerspective"] = @perspective
 
 		@__pendingElementAppend = =>
 			parentElement = @_parent?._element
@@ -274,7 +273,6 @@ class exports.Context extends BaseClass
 		set: (value) ->
 			if _.isNumber(value)
 				@_perspective = value
-				@_element?.style["perspective"] = @_perspective
 				@_element?.style["webkitPerspective"] = @_perspective
 
 	_updatePerspective: ->
@@ -282,10 +280,8 @@ class exports.Context extends BaseClass
 
 	@define "perspectiveOriginX",
 		get: ->
-			if _.isNumber(@_perspectiveOriginX)
-				return @_perspectiveOriginX
-			else
-				return .5
+			return @_perspectiveOriginX if _.isNumber(@_perspectiveOriginX)
+			return 0.5
 		set: (value) ->
 			if _.isNumber(value)
 				@_perspectiveOriginX = value
@@ -293,9 +289,7 @@ class exports.Context extends BaseClass
 
 	@define "perspectiveOriginY",
 		get: ->
-			if _.isNumber(@_perspectiveOriginY)
-				return @_perspectiveOriginY
-			else
+				return @_perspectiveOriginY if _.isNumber(@_perspectiveOriginY)
 				return .5
 		set: (value) ->
 			if _.isNumber(value)
