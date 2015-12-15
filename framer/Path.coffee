@@ -253,8 +253,8 @@ Path = (init) ->
 
 			if segment.x || segment.y
 				m = marker.cloneNode()
-				mx = addx + segment.x || lx
-				my = addy + segment.y || ly
+				mx = addx + (if typeof segment.x is 'undefined' then lx else segment.x)
+				my = addy + (if typeof segment.y is 'undefined' then ly else segment.y)
 				m.setAttribute 'cx', mx
 				m.setAttribute 'cy', my
 				m.setAttribute 'class', 'debug-marker'

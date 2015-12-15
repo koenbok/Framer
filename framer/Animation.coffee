@@ -87,8 +87,7 @@ class exports.Animation extends EventEmitter
 			@options.properties.x = options.layer.x + path.end.x - path.start.x
 			@options.properties.y = options.layer.y + path.end.y - path.start.x
 
-			@pathOptions = Utils.setDefaultProperties (options.pathOptions || {}),
-				autoRotate: true
+			@pathOptions = _.defaults((options.pathOptions || {}), autoRotate: true)
 
 			if @options.debug
 				@_debugLayer = createDebugLayerForPath(path)
