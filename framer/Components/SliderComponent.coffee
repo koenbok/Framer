@@ -72,7 +72,6 @@ class exports.SliderComponent extends Layer
 		@knob.draggable.momentumOptions = {friction: 5, tolerance: 0.25}
 		@knob.draggable.bounce = false
 		@knob.draggable.propagateEvents = false
-<<<<<<< HEAD
 		@knob.borderRadius = @knobSize / 2
 		@knobOverlay.borderRadius = (@knob.borderRadius * 2) + (@hitArea / 4)
 
@@ -80,8 +79,6 @@ class exports.SliderComponent extends Layer
 		if not @hitArea
 			@knobOverlay.destroy()
 			@sliderOverlay.destroy()
-=======
->>>>>>> master
 
 		@_updateFrame()
 		@_updateKnob()
