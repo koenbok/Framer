@@ -41,6 +41,10 @@ coverage: bootstrap
 	open ./build/coverage/jscoverage.html
 
 studio:
+	rm -Rf extras/Studio.framer/framer/framer.debug.js
+	rm -Rf extras/Studio.framer/framer/framer.debug.js.map
+	cd extras/Studio.framer/framer/; ln -s ../../../build/framer.debug.js
+	cd extras/Studio.framer/framer/; ln -s ../../../build/framer.debug.js.map
 	open -a "Framer Studio" extras/Studio.framer
 
 # Building and uploading the site
