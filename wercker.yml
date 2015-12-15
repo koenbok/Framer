@@ -10,6 +10,11 @@ build:
                 git fetch --unshallow || true
         - npm-install
         - npm-test
+        # - script:
+        #     name: builds.framerjs.com
+        #     code: |
+        #         node_modules/.bin/gulp build-release
+
 
 deploy:
     steps:
@@ -25,5 +30,7 @@ deploy:
         - script:
             name: builds.framerjs.com
             code: |
+                rm -Rf build
+                npm rebuild
                 node_modules/.bin/gulp build-release
                 ls -la build
