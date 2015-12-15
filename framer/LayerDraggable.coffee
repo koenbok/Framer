@@ -515,4 +515,17 @@ class exports.LayerDraggable extends BaseClass
 	animateStop: ->
 		@_stopSimulation()
 
+	##############################################################
+	## EVENT HELPERS
+	
+	onMove: (cb) -> @on(Events.Move, cb)
+	onDragStart: (cb) -> @on(Events.DragStart, cb)
+	onDragWillMove: (cb) -> @on(Events.DragWillMove, cb)
+	onDragMove: (cb) -> @on(Events.DragMove, cb)
+	onDragDidMove: (cb) -> @on(Events.DragDidMove, cb)
+	onDrag: (cb) -> @on(Events.Drag, cb)
+	onDragEnd: (cb) -> @on(Events.DragEnd, cb)
+	onDragAnimationDidStart: (cb) -> @on(Events.DragAnimationDidStart, cb)
+	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
+	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
 
