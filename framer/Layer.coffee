@@ -22,13 +22,18 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 	result = 
 		default: fallback
 		get: -> 
+			
 			# console.log "Layer.#{name}.get #{@_properties[name]}", @_properties.hasOwnProperty(name)
+			
 			return @_properties[name] if @_properties.hasOwnProperty(name)
 			return fallback
 
 		set: (value) ->
 
-			# console.log "Layer.#{name}.set #{value}"
+			# console.log "Layer.#{name}.set #{value} current:#{@[name]}"
+
+			# Return unless we get a new value
+			return if value is @_properties[name]
 
 			if value and transformer
 				value = transformer(value)
