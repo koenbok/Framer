@@ -26,4 +26,4 @@ deploy:
             name: builds.framerjs.com
             code: |
                 cd $WERCKER_SOURCE_DIR
-                make deploy
+                node_modules/.bin/gulp build-release
