@@ -30,7 +30,6 @@ deploy:
         - script:
             name: builds.framerjs.com
             code: |
-                rm -Rf build
                 npm rebuild
                 node_modules/.bin/gulp build-release
                 ls -la build
