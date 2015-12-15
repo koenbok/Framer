@@ -6,13 +6,25 @@ Importing layers is currently only supported on Safari. If you really want it to
 open -a Google\ Chrome -–allow-file-access-from-files
 """
 
+resizeFrame = (scale, frame) ->
+	
+	return frame if scale == 1
+
+	result = {}
+
+	for key in ["x", "y", "width", "height"]
+		if frame.hasOwnProperty(key)
+			result[key] = frame[key] * scale
+
+	return result
+
 class exports.Importer
 
-	constructor: (@path, @extraLayerProperties={}) ->
+	constructor: (@path, @scale, @extraLayerProperties={}) ->
 
 		@paths =
-			layerInfo: Utils.pathJoin @path, "layers.json"
-			images: Utils.pathJoin @path, "images"
+			layerInfo: Utils.pathJoin(@path, "layers.json")
+			images: Utils.pathJoin(@path, "images")
 			documentName: @path.split("/").pop()
 
 		@_createdLayers = []
@@ -38,7 +50,7 @@ class exports.Importer
 			if not layer.superLayer
 				layer.superLayer = null
 
-		@_createdLayersByName
+		return @_createdLayersByName
 
 	_loadlayerInfo: ->
 
@@ -49,11 +61,16 @@ class exports.Importer
 		importedKey = "#{@paths.documentName}/layers.json.js"
 
 		if window.__imported__?.hasOwnProperty(importedKey)
-			return window.__imported__[importedKey]
+			return _.cloneDeep(window.__imported__[importedKey])
 
 		return Framer.Utils.domLoadJSONSync @paths.layerInfo
 
 	_createLayer: (info, superLayer) ->
+
+		# Resize the layer frames
+		info.layerFrame = resizeFrame(@scale, info.layerFrame) if info.layerFrame
+		info.maskFrame = resizeFrame(@scale, info.maskFrame) if info.maskFrame
+		info.image.frame = resizeFrame(@scale, info.image.frame) if info.image?.frame?
 		
 		LayerClass = Layer
 
@@ -95,6 +112,9 @@ class exports.Importer
 		layer = new LayerClass layerInfo
 		layer.name = layerInfo.name
 
+		# Record the imported path for layers (for the inferencer)
+		layer.__framerImportedFromPath = @path
+
 		# Set scroll to true if scroll is in the layer name
 		if layerInfo.name.toLowerCase().indexOf("scroll") != -1
 			layer.scroll = true
@@ -131,6 +151,6 @@ class exports.Importer
 		if not layer.superLayer
 			traverse layer
 
-exports.Importer.load = (path) ->
-	importer = new exports.Importer path
-	importer.load()
+exports.Importer.load = (path, scale=1) ->
+	importer = new exports.Importer(path, scale)
+	return importer.load()
