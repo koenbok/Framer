@@ -27,7 +27,8 @@ getScaleFromName = (str) ->
 
 	return null
 
-
+startsWithNumber = (str) ->
+	return (new RegExp("^[0-9]")).test(str)
 
 class exports.Importer
 
@@ -122,6 +123,10 @@ class exports.Importer
 			layerInfo.superLayer = superLayer.contentLayer
 		else if superLayer
 			layerInfo.superLayer = superLayer
+
+		# Layer names cannot start with a number
+		if startsWithNumber(layerInfo.name)
+			throw new Error("(#{layerInfo.name}) Layer or Artboard names can not start with a number")
 
 		# Sanitize the layer names so mylayer.jpg gets converted to mylayer
 		for suffix in [".jpg", ".pdf"]
