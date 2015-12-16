@@ -192,7 +192,7 @@ window.__imported__["Android/layers.json.js"] = [
 	},
 	{
 		"id": 43,
-		"name": "Top Bar",
+		"name": "Top-Bar _",
 		"layerFrame": {
 			"x": 0,
 			"y": 0,

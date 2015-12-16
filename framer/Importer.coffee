@@ -124,9 +124,11 @@ class exports.Importer
 			layerInfo.superLayer = superLayer
 
 		# Sanitize the layer names so mylayer.jpg gets converted to mylayer
-		for suffix in ["*", ".jpg", ".pdf"]
-			layerInfo.name = _.trimRight(layerInfo.name, suffix)
-			layerInfo.name = _.trimRight(layerInfo.name, suffix.toUpperCase())
+		for suffix in [".jpg", ".pdf"]
+			layerInfo.name = layerInfo.name.replace(suffix, "") if _.endsWith(layerInfo.name, suffix)
+			layerInfo.name = layerInfo.name.replace(suffix.toUpperCase(), "") if _.endsWith(layerInfo.name.toUpperCase(), suffix)
+
+		layerInfo.name = layerInfo.name.replace(/\W/g, "")
 
 		# We can create the layer here
 		layer = new LayerClass(layerInfo)
