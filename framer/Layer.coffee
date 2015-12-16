@@ -22,18 +22,21 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 	result = 
 		default: fallback
 		get: -> 
+			
 			# console.log "Layer.#{name}.get #{@_properties[name]}", @_properties.hasOwnProperty(name)
+			
 			return @_properties[name] if @_properties.hasOwnProperty(name)
 			return fallback
 
 		set: (value) ->
 
-			# console.log "Layer.#{name}.set #{value}"
+			# console.log "Layer.#{name}.set #{value} current:#{@[name]}"
 
-			if value and transformer
+			if transformer and (value or value is null) 
 				value = transformer(value)
-			else if value == null and transformer
-				value = transformer(value)
+
+			# Return unless we get a new value
+			return if value is @_properties[name]
 
 			if value and validator and not validator(value)
 				layerValueTypeError(name, value)
@@ -857,6 +860,45 @@ class exports.Layer extends BaseClass
 	off: @::removeListener
 
 	##############################################################
+	## EVENT HELPERS
+
+	onClick: (cb) -> @on(Events.Click, cb)
+	onDoubleClick: (cb) -> @on(Events.DoubleClick, cb)
+	onScroll: (cb) -> @on(Events.Scroll, cb)
+	
+	onTouchStart: (cb) -> @on(Events.TouchStart, cb)
+	onTouchEnd: (cb) -> @on(Events.TouchEnd, cb)
+	onTouchMove: (cb) -> @on(Events.TouchMove, cb)
+
+	onMouseUp: (cb) -> @on(Events.MouseUp, cb)
+	onMouseDown: (cb) -> @on(Events.MouseDown, cb)
+	onMouseOver: (cb) -> @on(Events.MouseOver, cb)
+	onMouseOut: (cb) -> @on(Events.MouseOut, cb)
+	onMouseMove: (cb) -> @on(Events.MouseMove, cb)
+	onMouseWheel: (cb) -> @on(Events.MouseWheel, cb)
+
+	onAnimationStart: (cb) -> @on(Events.AnimationStart, cb)
+	onAnimationStop: (cb) -> @on(Events.AnimationStop, cb)
+	onAnimationEnd: (cb) -> @on(Events.AnimationEnd, cb)
+	onAnimationDidStart: (cb) -> @on(Events.AnimationDidStart, cb)
+	onAnimationDidStop: (cb) -> @on(Events.AnimationDidStop, cb)
+	onAnimationDidEnd: (cb) -> @on(Events.AnimationDidEnd, cb)
+
+	onImageLoaded: (cb) -> @on(Events.ImageLoaded, cb)
+	onImageLoadError: (cb) -> @on(Events.ImageLoadError, cb)
+	
+	onMove: (cb) -> @on(Events.Move, cb)
+	onDragStart: (cb) -> @on(Events.DragStart, cb)
+	onDragWillMove: (cb) -> @on(Events.DragWillMove, cb)
+	onDragMove: (cb) -> @on(Events.DragMove, cb)
+	onDragDidMove: (cb) -> @on(Events.DragDidMove, cb)
+	onDrag: (cb) -> @on(Events.Drag, cb)
+	onDragEnd: (cb) -> @on(Events.DragEnd, cb)
+	onDragAnimationDidStart: (cb) -> @on(Events.DragAnimationDidStart, cb)
+	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
+	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
+
+	##############################################################
 	## DESCRIPTOR
 
 	toInspect: ->
@@ -869,6 +911,3 @@ class exports.Layer extends BaseClass
 		if @name
 			return "<#{@constructor.name} id:#{@id} name:#{@name} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}>"
 		return "<#{@constructor.name} id:#{@id} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}>"
-
-# Add event helpers for the layer dynamically
-Events.addHelpers(exports.Layer)

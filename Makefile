@@ -17,11 +17,11 @@ clean:
 
 build: bootstrap clean 
 	mkdir -p build
-	$(gulp) build:release
+	$(gulp) build-release
 
 debug: bootstrap clean 
 	mkdir -p build
-	$(gulp) build:debug
+	$(gulp) build-debug
 
 watch: bootstrap 
 	$(gulp) watch
@@ -46,8 +46,7 @@ perf:
 
 # Building and uploading the site
 
-dist:
-	make build
+dist: build
 	mkdir -p build/Framer
 	cp -R extras/templates/Project build/Framer/Project
 	rm -Rf build/Framer/Project/framer
@@ -58,7 +57,6 @@ dist:
 	cd build; zip -r Framer.zip Framer
 
 site%build:
-	make dist
 	mkdir -p build/builds.framerjs.com
 	$(coffee) scripts/site-deploy.coffee build
 	cp -R extras/builds.framerjs.com/static build/builds.framerjs.com/static
