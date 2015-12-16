@@ -18,9 +18,20 @@ resizeFrame = (scale, frame) ->
 
 	return result
 
+getScaleFromName = (str) ->
+
+	re = /@([\d]+|[\d]+.[\d]+)x/
+	m = undefined
+	if (m = re.exec(str)) != null
+		return parseFloat(m[1]) if m[1]
+
+	return null
+
+
+
 class exports.Importer
 
-	constructor: (@path, @scale, @extraLayerProperties={}) ->
+	constructor: (@path, @scale=1, @extraLayerProperties={}) ->
 
 		@paths =
 			layerInfo: Utils.pathJoin(@path, "layers.json")
@@ -112,6 +123,11 @@ class exports.Importer
 		else if superLayer
 			layerInfo.superLayer = superLayer
 
+		# Sanitize the layer names so mylayer.jpg gets converted to mylayer
+		for suffix in ["*", ".jpg", ".pdf"]
+			layerInfo.name = _.trimRight(layerInfo.name, suffix)
+			layerInfo.name = _.trimRight(layerInfo.name, suffix.toUpperCase())
+
 		# We can create the layer here
 		layer = new LayerClass(layerInfo)
 		layer.name = layerInfo.name
@@ -179,6 +195,10 @@ class exports.Importer
 		if not layer.superLayer
 			traverse(layer)
 
-exports.Importer.load = (path, scale=1) ->
+exports.Importer.load = (path, scale) ->
+
+	scale ?= getScaleFromName(path)
+	scale ?= 1
+
 	importer = new exports.Importer(path, scale)
 	return importer.load()
