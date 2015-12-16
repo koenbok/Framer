@@ -37,12 +37,16 @@ class exports.Importer
 		
 		# Pass one. Create all layers build the hierarchy
 		layerInfo.map (layerItemInfo) =>
-			@_createLayer layerItemInfo
+			@_createLayer(layerItemInfo)
 
 		# Pass two. Adjust position on screen for all layers
 		# based on the hierarchy.
 		for layer in @_createdLayers
-			@_correctLayer layer
+			@_correctLayer(layer)
+
+		# Pass three, correct artboard positions, and reset top left
+		# to the minimum x, y of all artboards
+		@_correctArtboards(@_createdLayers)
 
 		# Pass three, insert the layers into the dom
 		# (they were not inserted yet because of the shadow keyword)
@@ -82,12 +86,12 @@ class exports.Importer
 			backgroundColor: null
 			visible: info.visible ? true
 
-		_.extend layerInfo, @extraLayerProperties
+		_.extend(layerInfo, @extraLayerProperties)
 
 		# Most layers will have an image, add that here
 		if info.image
 			layerInfo.frame = info.image.frame
-			layerInfo.image = Utils.pathJoin @path, info.image.path
+			layerInfo.image = Utils.pathJoin(@path, info.image.path)
 			
 		# If there is a mask on this layer group, take its frame
 		if info.maskFrame
@@ -109,7 +113,7 @@ class exports.Importer
 			layerInfo.superLayer = superLayer
 
 		# We can create the layer here
-		layer = new LayerClass layerInfo
+		layer = new LayerClass(layerInfo)
 		layer.name = layerInfo.name
 
 		# Record the imported path for layers (for the inferencer)
@@ -127,29 +131,53 @@ class exports.Importer
 		if not layer.image and not info.children.length and not info.maskFrame
 			layer.frame = Utils.frameZero()
 
-		_.clone(info.children).reverse().map (info) => @_createLayer info, layer
+		_.clone(info.children).reverse().map (info) =>
+			@_createLayer(info, layer)
 
-		# TODODODODOD
+		# Not really sure what this was for, but I don't want to touch it now
 		if not layer.image and not info.maskFrame
 			layer.frame = layer.contentFrame()
 
 		layer._info = info
 
-		@_createdLayers.push layer
+		@_createdLayers.push(layer)
 		@_createdLayersByName[layer.name] = layer
+
+	_correctArtboards: (layers) ->
+
+		points = []
+
+		for layer in layers
+			if layer._info.kind is "artboard"
+				# We don't have to scale this, because the artboard positions are always in pixels.
+				layer.frame = layer._info.layerFrame
+				layer.visible = true
+				points.push(layer.point)
+
+		# Calculate the artboard positions to always be 0,0.
+		pointOffset =
+			x: Math.min.apply(@, points.map (p) -> p.x)
+			y: Math.min.apply(@, points.map (p) -> p.y)
+
+		# Correct the layers
+		for layer in layers
+			if layer._info.kind is "artboard"
+				layer.x -= pointOffset.x
+				layer.y -= pointOffset.y
+
 
 	_correctLayer: (layer) ->
 
 		traverse = (layer) ->
 
 			if layer.superLayer
-				layer.frame = Utils.convertPoint layer.frame, null, layer.superLayer
+				layer.frame = Utils.convertPoint(layer.frame, null, layer.superLayer)
 
 			for subLayer in layer.subLayers
-				traverse subLayer
+				traverse(subLayer)
 
 		if not layer.superLayer
-			traverse layer
+			traverse(layer)
 
 exports.Importer.load = (path, scale=1) ->
 	importer = new exports.Importer(path, scale)
