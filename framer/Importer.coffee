@@ -54,14 +54,17 @@ class exports.Importer
 		layerInfo.map (layerItemInfo) =>
 			@_createLayer(layerItemInfo)
 
+		# Pass three, correct artboard positions, and reset top left
+		# to the minimum x, y of all artboards
+		# @_correctArtboards(@_createdLayers)
+
 		# Pass two. Adjust position on screen for all layers
 		# based on the hierarchy.
 		for layer in @_createdLayers
 			@_correctLayer(layer)
 
-		# Pass three, correct artboard positions, and reset top left
-		# to the minimum x, y of all artboards
 		@_correctArtboards(@_createdLayers)
+
 
 		# Pass three, insert the layers into the dom
 		# (they were not inserted yet because of the shadow keyword)
@@ -124,6 +127,10 @@ class exports.Importer
 			layerInfo.frame = info.image.frame
 			layerInfo.clip = false
 			
+		if layerInfo.kind is "artboard"
+			layerInfo.frame.x = 0
+			layerInfo.frame.y = 0
+
 		# Figure out what the super layer should be. If this layer has a contentLayer
 		# (like a scroll view) we attach it to that instead.
 		if superLayer?.contentLayer
@@ -157,8 +164,14 @@ class exports.Importer
 		_.clone(info.children).reverse().map (info) =>
 			@_createLayer(info, layer)
 
-		# Not really sure what this was for, but I don't want to touch it now
-		if not layer.image and not info.maskFrame
+		# If this is an artboard we retain the size, but set the coordinates to zero
+		# because all coordinates within artboards are 0, 0 based.
+		if info.kind is "artboard"
+			layer.point = {x:0, y:0}
+
+		# If this is not an artboard, and does not have an image or mask, we clip the
+		# layer to its content size.
+		else if not layer.image and not info.maskFrame
 			layer.frame = layer.contentFrame()
 
 		layer._info = info
@@ -172,8 +185,7 @@ class exports.Importer
 
 		for layer in layers
 			if layer._info.kind is "artboard"
-				# We don't have to scale this, because the artboard positions are always in pixels.
-				layer.frame = layer._info.layerFrame
+				layer.point = layer._info.layerFrame
 				layer.visible = true
 				points.push(layer.point)
 

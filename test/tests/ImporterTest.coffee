@@ -40,6 +40,15 @@ describe "ExternalDocument", ->
 			it "Test", ->
 				compareDocument "Test"
 
+			it "Artboard@1x", ->
+				compareDocument "Artboard@1x"
+
+			it "Artboard@2x", ->
+				compareDocument "Artboard@2x"
+
+			it "ImportFlatten@2x", ->
+				compareDocument "ImportFlatten@2x"
+
 	describe "Shady Hacks", ->
 
 		it "Should work on Chrome", ->
