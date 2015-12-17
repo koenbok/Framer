@@ -79,7 +79,7 @@
 			"Header"
 		]
 	},
-	"TopBar": {
+	"Top Bar": {
 		"frame": {
 			"x": 89,
 			"y": 199,
@@ -88,7 +88,7 @@
 		},
 		"subLayerNames": []
 	},
-	"NavBar": {
+	"Nav Bar": {
 		"frame": {
 			"x": 97,
 			"y": 117,
