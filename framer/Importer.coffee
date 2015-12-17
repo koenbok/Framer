@@ -46,6 +46,9 @@ class exports.Importer
 
 		layersByName = {}
 		layerInfo = @_loadlayerInfo()
+
+		if layerInfo.length is 0
+			throw new Error("Importer: no layers. Do you have at least one layer group?")
 		
 		# Pass one. Create all layers build the hierarchy
 		layerInfo.map (layerItemInfo) =>
