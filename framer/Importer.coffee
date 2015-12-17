@@ -87,6 +87,10 @@ class exports.Importer
 		info.layerFrame = resizeFrame(@scale, info.layerFrame) if info.layerFrame
 		info.maskFrame = resizeFrame(@scale, info.maskFrame) if info.maskFrame
 		info.image.frame = resizeFrame(@scale, info.image.frame) if info.image?.frame?
+
+		# Flattened layers don't get children
+		if not info.children
+			info.children = []
 		
 		LayerClass = Layer
 
@@ -127,13 +131,6 @@ class exports.Importer
 		# Layer names cannot start with a number
 		if startsWithNumber(layerInfo.name)
 			throw new Error("(#{layerInfo.name}) Layer or Artboard names can not start with a number")
-
-		# Sanitize the layer names so mylayer.jpg gets converted to mylayer
-		for suffix in [".jpg", ".pdf"]
-			layerInfo.name = layerInfo.name.replace(suffix, "") if _.endsWith(layerInfo.name, suffix)
-			layerInfo.name = layerInfo.name.replace(suffix.toUpperCase(), "") if _.endsWith(layerInfo.name.toUpperCase(), suffix)
-
-		layerInfo.name = layerInfo.name.replace(/\W/g, "")
 
 		# We can create the layer here
 		layer = new LayerClass(layerInfo)
