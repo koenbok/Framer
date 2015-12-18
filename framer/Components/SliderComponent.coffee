@@ -17,6 +17,14 @@ valueForPoint(<n>)
 animateToValue(value, animationOptions={})
 """
 
+class Knob extends Layer
+
+	constructor: (options) ->
+		super options
+
+	@define "constrained", @simpleProperty("constrained", false)
+
+
 class exports.SliderComponent extends Layer
 
 	constructor: (options={}) ->
@@ -27,7 +35,7 @@ class exports.SliderComponent extends Layer
 		options.height ?= 10
 		options.value ?= 0
 
-		@knob = new Layer
+		@knob = new Knob
 			backgroundColor: "#fff"
 			shadowY: 1, shadowBlur: 3
 			shadowColor: "rgba(0,0,0,0.35)"
@@ -144,7 +152,7 @@ class exports.SliderComponent extends Layer
 			width: @width + @knob.width
 			height: @height + @knob.height
 
-		if @bounded
+		if @knob.constrained
 			@knob.draggable.constraints =
 				x: 0
 				y: 0
@@ -168,8 +176,6 @@ class exports.SliderComponent extends Layer
 
 	_setOverlayRadius: =>
 		@knobOverlay.borderRadius = (@knob.borderRadius * 2) + (@hitArea / 4)
-
-	@define "bounded", @simpleProperty("bounded", false)
 
 	@define "knobSize",
 		get: -> @_knobSize
@@ -223,24 +229,24 @@ class exports.SliderComponent extends Layer
 
 	pointForValue: (value) ->
 		if @width > @height
-			if @bounded
+			if @knob.constrained
 				return Utils.modulate(value, [@min, @max], [0 + (@knob.width / 2), @width - (@knob.width / 2)], true)
 			else
 				return Utils.modulate(value, [@min, @max], [0 , @width], true)
 		else
-			if @bounded
+			if @knob.constrained
 				return Utils.modulate(value, [@min, @max], [0 + (@knob.height / 2), @height - (@knob.height / 2)], true)
 			else
 				return Utils.modulate(value, [@min, @max], [0, @height], true)
 
 	valueForPoint: (value) ->
 		if @width > @height
-			if @bounded
+			if @knob.constrained
 				return Utils.modulate(value, [0 + (@knob.width / 2), @width - (@knob.width / 2)], [@min, @max], true)
 			else
 				return Utils.modulate(value, [0, @width], [@min, @max], true)
 		else
-			if @bounded
+			if @knob.constrained
 				return Utils.modulate(value, [0 + (@knob.height / 2), @height - (@knob.height / 2)], [@min, @max], true)
 			else
 				return Utils.modulate(value, [0, @height], [@min, @max], true)
