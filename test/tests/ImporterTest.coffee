@@ -49,6 +49,12 @@ describe "ExternalDocument", ->
 			it "ImportFlatten@2x", ->
 				compareDocument "ImportFlatten@2x"
 
+			it "masks@1x", ->
+				compareDocument "masks@1x"
+
+			it "innermasks@1x", ->
+				compareDocument "innermasks@1x"
+
 	describe "Shady Hacks", ->
 
 		it "Should work on Chrome", ->
