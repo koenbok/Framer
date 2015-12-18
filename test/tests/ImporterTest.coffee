@@ -55,6 +55,9 @@ describe "ExternalDocument", ->
 			it "innermasks@1x", ->
 				compareDocument "innermasks@1x"
 
+			it "Screens@1x", ->
+				compareDocument "Screens@1x"
+
 	describe "Shady Hacks", ->
 
 		it "Should work on Chrome", ->

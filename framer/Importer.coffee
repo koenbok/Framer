@@ -173,18 +173,20 @@ class exports.Importer
 
 	_correctArtboards: (layers) ->
 
-		points = []
+		leftMostLayer = null
 
 		for layer in layers
 			if layer._info.kind is "artboard"
 				layer.point = layer._info.layerFrame
 				layer.visible = true
-				points.push(layer.point)
+
+				if leftMostLayer is null or layer.x < leftMostLayer.x
+					leftMostLayer = layer
+
+		return unless leftMostLayer
 
 		# Calculate the artboard positions to always be 0,0.
-		pointOffset =
-			x: Math.min.apply(@, points.map (p) -> p.x)
-			y: Math.min.apply(@, points.map (p) -> p.y)
+		pointOffset = leftMostLayer.point
 
 		# Correct the artboard positions to 0,0.
 		for layer in layers
