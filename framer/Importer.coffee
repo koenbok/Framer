@@ -189,17 +189,16 @@ class exports.Importer
 				layer.visible = true
 				points.push(layer.point)
 
-		# # Calculate the artboard positions to always be 0,0.
-		# pointOffset =
-		# 	x: Math.min.apply(@, points.map (p) -> p.x)
-		# 	y: Math.min.apply(@, points.map (p) -> p.y)
+		# Calculate the artboard positions to always be 0,0.
+		pointOffset =
+			x: Math.min.apply(@, points.map (p) -> p.x)
+			y: Math.min.apply(@, points.map (p) -> p.y)
 
-		# # Correct the layers
-		# for layer in layers
-		# 	if layer._info.kind is "artboard"
-		# 		layer.x -= pointOffset.x
-		# 		layer.y -= pointOffset.y
-
+		# Correct the artboard positions to 0,0.
+		for layer in layers
+			if layer._info.kind is "artboard"
+				layer.x -= pointOffset.x
+				layer.y -= pointOffset.y
 
 	_correctLayer: (layer) ->
 
