@@ -898,6 +898,43 @@ class exports.Layer extends BaseClass
 	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
 	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
 
+	onPan: (cb) -> @on(Events.Pan, cb)
+	onPanStart: (cb) -> @on(Events.PanStart, cb)
+	onPanMove: (cb) -> @on(Events.PanMove, cb)
+	onPanEnd: (cb) -> @on(Events.PanEnd, cb)
+	onPanCancel: (cb) -> @on(Events.PanCancel, cb)
+	onPanLeft: (cb) -> @on(Events.PanLeft, cb)
+	onPanRight: (cb) -> @on(Events.PanRight, cb)
+	onPanUp: (cb) -> @on(Events.PanUp, cb)
+	onPanDown: (cb) -> @on(Events.PanDown, cb)
+
+	onPinch: (cb) -> @on(Events.Pinch, cb)
+	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
+	onPinchMove: (cb) -> @on(Events.PinchMove, cb)
+	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
+	onPinchCancel: (cb) -> @on(Events.PinchCancel, cb)
+	onPinchIn: (cb) -> @on(Events.PinchIn, cb)
+	onPinchOut: (cb) -> @on(Events.PinchOut, cb)
+
+	onPress: (cb) -> @on(Events.Press, cb)
+	onPressUp: (cb) -> @on(Events.PressUp, cb)
+
+	onRotate: (cb) -> @on(Events.Rotate, cb)
+	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
+	onRotateMove: (cb) -> @on(Events.RotateMove, cb)
+	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
+	onRotateCancel: (cb) -> @on(Events.RotateCancel, cb)
+
+	onSwipe: (cb) -> @on(Events.Swipe, cb)
+	onSwipeLeft: (cb) -> @on(Events.SwipeLeft, cb)
+	onSwipeRight: (cb) -> @on(Events.SwipeRight, cb)
+	onSwipeUp: (cb) -> @on(Events.SwipeUp, cb)
+	onSwipeDown: (cb) -> @on(Events.SwipeDown, cb)
+
+	onTap: (cb) -> @on(Events.Tap, cb)
+	onSingleTap: (cb) -> @on(Events.SingleTap, cb)
+	onDoubleTap: (cb) -> @on(Events.DoubleTap, cb)
+
 	##############################################################
 	## DESCRIPTOR
 
