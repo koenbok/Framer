@@ -279,19 +279,22 @@ class exports.DeviceComponent extends BaseClass
 		if _.startsWith(name, "http://") or _.startsWith(name, "https://")
 			return name
 
+		# If this device is added by the user we use the name as it is
+		if @_deviceType not in BuiltInDevices
+			return name
+
+		# We want to get these image from our public resources server
+		resourceUrl = "//resources.framerjs.com/static/DeviceResources"
+
 		# If we're running Framer Studio and have local files, we'd like to use those
 		if Utils.isFramerStudio() and window.FramerStudioInfo
-			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
-		
-		# If not, we want to get these image from our public resources server
-		else
-			resourceUrl = "//resources.framerjs.com/static/DeviceResources"
+			resourceUrl = window.FramerStudioInfo.deviceImagesUrl	
 
 		# We'd like to use jp2 if possible, or check if we don't for this specific device
-		if Utils.isJP2Supported() and @_device.deviceImageJP2 isnt false
+		if Utils.isJP2Supported() and @_device.deviceImageJP2 is true
 			return "#{resourceUrl}/#{name.replace(".png", ".jp2")}"
-		else
-			return "#{resourceUrl}/#{name}"
+
+		return "#{resourceUrl}/#{name}"
 
 	###########################################################################
 	# DEVICE ZOOM
@@ -823,5 +826,6 @@ Devices =
 	"applewatchedition-42-gold-sportband-white": _.clone(AppleWatch42Device)
 
 
-
 exports.DeviceComponent.Devices = Devices
+
+BuiltInDevices = _.keys(Devices)

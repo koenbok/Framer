@@ -14,8 +14,8 @@ class exports.VideoLayer extends Layer
 		
 		# Make it work with .on and .off
 		# https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events
-		@player.on = @player.addEventListener
-		@player.off = @player.removeEventListener
+		@player.on = @_context.domEventManager.wrap(@player).addEventListener
+		@player.off = @_context.domEventManager.wrap(@player).removeEventListener
 		
 		@video = options.video
 		
@@ -24,3 +24,5 @@ class exports.VideoLayer extends Layer
 	@define "video",
 		get: -> @player.src
 		set: (video) -> @player.src = video
+
+	# TODO: Maybe add event handler shortcuts here too

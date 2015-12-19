@@ -8,14 +8,29 @@
 
 body {
 	background-color: #fff;
-	font: 28px/1em "Helvetica Neue";
+	font: 28px/1em "Helvetica";
 	color: #FFF;
 	overflow: hidden;
-	cursor: url('images/cursor.png') 39 39, auto;
 }
 
 a {
 	color: gray;
+}
+
+body {
+	cursor: url('images/cursor.png') 32 32, auto;
+	cursor: -webkit-image-set(
+		url('images/cursor.png') 1x,
+		url('images/cursor@2x.png') 2x
+	) 32 32, auto;
+}
+
+body:active {
+	cursor: url('images/cursor-active.png') 32 32, auto;
+	cursor: -webkit-image-set(
+		url('images/cursor-active.png') 1x,
+		url('images/cursor-active@2x.png') 2x
+	) 32 32, auto;
 }
 
 .framerAlertBackground {

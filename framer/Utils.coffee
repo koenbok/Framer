@@ -133,8 +133,7 @@ Utils.memoize = (fn) -> ->
 # HANDY FUNCTIONS
 
 Utils.randomColor = (alpha = 1.0) ->
-	c = -> parseInt(Math.random() * 255)
-	"rgba(#{c()}, #{c()}, #{c()}, #{alpha})"
+	return Color.random(alpha)
 
 Utils.randomChoice = (arr) ->
 	arr[Math.floor(Math.random() * arr.length)]
@@ -368,6 +367,12 @@ Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 
 	[fromLow, fromHigh] = rangeA
 	[toLow, toHigh] = rangeB
+
+	# if rangeB consists of Colors we return a color tween
+	# if Color.isColor(toLow) || _.isString(toLow) && Color.isColorString(toLow)
+	# 	ratio = Utils.modulate(value, rangeA, [0, 1])
+	# 	result = Color.mix(toLow, toHigh, ratio)
+	# 	return result
 
 	result = toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
 
@@ -799,5 +804,6 @@ Utils.textSize = (text, style={}, constraints={}) ->
 	frame =
 		width: rect.right - rect.left
 		height: rect.bottom - rect.top
+
 
 _.extend exports, Utils
