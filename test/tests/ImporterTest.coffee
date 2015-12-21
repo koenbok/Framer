@@ -16,6 +16,7 @@ describe "ExternalDocument", ->
 				frame: layer.frame
 				superLayerName: layer.superLayer?.layerName
 				subLayerNames: layer.subLayers.map (l) -> l.name
+				# clip: layer.clip
 
 		jsonA = JSON.stringify dataA, null, "\t"
 		jsonB = JSON.stringify dataB, null, "\t"
@@ -57,6 +58,9 @@ describe "ExternalDocument", ->
 
 			it "Screens@1x", ->
 				compareDocument "Screens@1x"
+
+			it "sketch-tests@1x", ->
+				compareDocument "sketch-tests@1x"
 
 	describe "Shady Hacks", ->
 
