@@ -182,5 +182,7 @@ class exports.LayerStates extends BaseClass
 				stateProperties[k] = new Color(v)
 			else if _.isNumber(v) or _.isFunction(v) or _.isBoolean(v) or _.isString(v) or Color.isColorObject(v) or v == null
 				stateProperties[k] = v
+			else if k == "superState"
+				stateProperties[k] = v
 
 		return stateProperties
