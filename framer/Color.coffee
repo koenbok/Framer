@@ -12,6 +12,9 @@ ColorType =
 class exports.Color extends BaseClass
 	constructor: (@color, r, g, b) ->
 
+		if @color == ""
+			@color = null
+
 		color = @color
 
 		# If input already is a Color object return input
