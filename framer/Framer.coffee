@@ -8,7 +8,6 @@ Framer.Utils = (require "./Utils")
 Framer.Color = (require "./Color").Color
 Framer.Layer = (require "./Layer").Layer
 Framer.LayerGroup = (require "./LayerGroup").LayerGroup
-Framer.LayerGroupStates = (require "./LayerGroup").LayerGroupStates
 Framer.BackgroundLayer = (require "./BackgroundLayer").BackgroundLayer
 Framer.VideoLayer = (require "./VideoLayer").VideoLayer
 Framer.Events = (require "./Events").Events

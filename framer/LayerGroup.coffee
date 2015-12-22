@@ -69,7 +69,7 @@ class exports.LayerGroup extends BaseClass
 		@_layers = []
 		for layer in layers
 			@addLayer(layer)
-		@states = new LayerGroupStates(@)
+		@_currentState = "default"
 
 	LayerProps.map (prop) =>
 		@property prop,
@@ -81,11 +81,13 @@ class exports.LayerGroup extends BaseClass
 					if layer[prop] != value
 						return false
 				return value
-			set: (newValue) ->
+			set: (value) ->
 				for layer in @_layers
-					layer[prop] = newValue
+					layer[prop] = value
 
-	@property "layers", get: -> @_layers
+	@define "layers", get: -> @_layers
+	@define "currentState", get: -> @_currentState
+	@define "state", get: -> @_currentState
 
 	addLayer: (layers...) ->
 		for layer in layers
@@ -107,6 +109,12 @@ class exports.LayerGroup extends BaseClass
 	animate: (options) ->
 		for layer in @_layers
 			layer.animate(options)
+
+	switchState: (newState, animationOptions, instant = false) ->
+		for layer in @_layers
+			if newState in _.keys layer.states._states
+				layer.states.switch(newState, animationOptions, instant)
+				@_currentState = newState
 
 	##############################################################
 	## EVENTS
@@ -168,53 +176,3 @@ class exports.LayerGroup extends BaseClass
 	toInspect: ->
 
 		return "<Layer#{@constructor.name}>"
-
-##############################################################
-## LAYER GROUP STATES
-
-class exports.LayerGroupStates extends BaseClass
-
-	constructor: (layerGroup) ->
-		@_states = []
-		@_layerGroup = layerGroup
-		@add("default")
-		@_currentState = "default"
-		super
-	
-	@property "state", get: -> @_currentState
-	@property "current", get: -> @_currentState
-	
-	add: (newStates...) ->
-		for state in newStates
-			if _.isString(state)
-				@_states.push state unless state in @_states
-			else if _.isArray(state)
-				for item in state
-					@add(item)
-
-	next: ->
-		currentIndex = @_states.indexOf(@_currentState)
-		if currentIndex == @_states.length - 1 || currentIndex < 0
-			@_currentState = @_states[0]
-		else
-			@_currentState = @_states[currentIndex+1]
-		@_switchToState(@_currentState)
-	
-	switch: (state, animationOptions, instant = false) ->
-		@_switchToState(state, instant, animationOptions)
-
-	switchInstant: (state) ->
-		@_switchToState(state, true)
-
-	printContents: ->
-		print @_states
-	
-	_switchToState: (newState, instant, animationOptions) ->
-		if newState in @_states
-			@_currentState = newState
-		for layer in @_layerGroup.layers
-			if newState in _.keys layer.states._states
-				if instant
-					layer.states.switchInstant(newState)
-				else
-					layer.states.switch(newState)
