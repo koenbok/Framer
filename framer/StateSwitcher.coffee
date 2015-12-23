@@ -2,7 +2,7 @@
 
 {BaseClass} = require "./BaseClass"
 
-class exports.LayerStateCollection extends BaseClass
+class exports.StateSwitcher extends BaseClass
 
 	constructor: (layers...) ->
 		super
@@ -14,6 +14,7 @@ class exports.LayerStateCollection extends BaseClass
 	@define "layers", get: -> @_layers
 	@define "currentState", get: -> @_currentState
 	@define "state", get: -> @_currentState
+	@define "current", get: -> @_currentState
 	
 	addLayer: (layers...) ->
 		for layer in layers
@@ -23,23 +24,24 @@ class exports.LayerStateCollection extends BaseClass
 			else if layer instanceof Layer
 				@_layers.push(layer) unless layer in @_layers
 	
-	removeLayer: (layer) ->
-		if _.isArray(layer)
-			for item in layer
-				@removeLayer(item)
-		else if layer instanceof Layer
-			index = @_layers.indexOf(layer)
-			if index >= 0
-				@_layers.splice(index, 1)
+	removeLayer: (layers...) ->
+		for layer in layers
+			if _.isArray(layer)
+				for item in layer
+					@removeLayer(item)
+			else if layer instanceof Layer
+				index = @_layers.indexOf(layer)
+				if index >= 0
+					@_layers.splice(index, 1)
 	
-	switchState: (newState, animationOptions, instant = false) ->
+	switch: (newState, animationOptions, instant = false) ->
 		for layer in @_layers
 			nextState = newState
 			
 			for key in _.keys(layer.states._states)
 				values = layer.states._states[key]
 
-				if values["superState"] == nextState
+				if values["stateSwitcher"] == nextState
 					nextState = key
 					break
 
@@ -47,3 +49,6 @@ class exports.LayerStateCollection extends BaseClass
 				layer.states.switch(nextState, animationOptions, instant)
 				if nextState == newState
 					@_currentState = newState
+
+	switchInstant: (newState) ->
+		@switch(newState, null, true)
