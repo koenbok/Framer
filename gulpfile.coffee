@@ -7,6 +7,7 @@ gulpWebpack = require("webpack-stream")
 rename = require("gulp-rename")
 template = require("gulp-template")
 gutil = require("gulp-util")
+plumber = require("gulp-plumber")
 {exec} = require("child_process")
 
 command = (cmd, cb) ->
@@ -20,6 +21,7 @@ CONFIG =
 		extensions: ["", ".web.coffee", ".web.js", ".coffee", ".js"]
 	cache: true
 	devtool: "sourcemap"
+	quiet: true
 
 gulp.task "build-release", ["version"], ->
 
@@ -55,6 +57,7 @@ gulp.task "build-debug", ["version"], ->
 		debug: true
 
 	return gulp.src(config.entry)
+		.pipe(plumber())
 		.pipe(gulpWebpack(config))
 		.pipe(gulp.dest("build/"))
 
@@ -65,6 +68,7 @@ gulp.task "build-test", ->
 		output: {filename: "tests.js"}
 
 	return gulp.src(config.entry)
+		.pipe(plumber())
 		.pipe(gulpWebpack(config))
 		.pipe(gulp.dest("test/phantomjs/"))
 
@@ -73,8 +77,9 @@ gulp.task "test", ["build-debug", "build-test"], ->
 		.src("test/phantomjs/index.html")
 		.pipe(phantomjs({reporter:"dot"}))
 
-gulp.task "watch", ["test"], ->
-	gulp.watch(["./*.coffee", "framer/**", "test/tests/**", "!Version.coffee"], ["test"])
+gulp.task "watch", ->
+	gulp.run "test", ->
+		gulp.watch(["./*.coffee", "framer/**", "test/tests/**", "!Version.coffee"], ["test"])
 
 gulp.task "watcher", ["version"], ->
 

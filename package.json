@@ -38,7 +38,8 @@
     "simulate": "^0.0.5",
     "webpack": "^1.7.3",
     "mocha": "^2.3.4",
-    "chai": "^3.4.1"
+    "chai": "^3.4.1",
+    "gulp-plumber": "^1.0.1"
   },
   "keywords": [
     "prototyping"
