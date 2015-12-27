@@ -40,6 +40,18 @@ exports.LayerStyle =
 	opacity: (layer) ->
 		layer._properties.opacity
 
+	webkitTransformStyle: (layer) ->
+		if layer._properties.flat
+			return "flat"
+		else
+			return "preserve-3d"
+
+	webkitBackfaceVisibility: (layer) ->
+		if layer._properties.backfaceVisible
+			return "visible"
+		else
+			return "hidden"
+
 	overflow: (layer) ->
 		if layer._properties.scrollHorizontal is true or layer._properties.scrollVertical is true
 			return "auto"
@@ -78,7 +90,6 @@ exports.LayerStyle =
 
 		return css.join(" ")
 
-
 	webkitTransform: (layer) ->
 
 
@@ -91,15 +102,17 @@ exports.LayerStyle =
 			return exports.LayerStyle.webkitTransformForce2d(layer)
 
 		"
-		translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px) 
+		translate3d(#{layer._properties.x}px,#{layer._properties.y}px,#{layer._properties.z}px)
 		scale(#{layer._properties.scale})
 		scale3d(#{layer._properties.scaleX},#{layer._properties.scaleY},#{layer._properties.scaleZ})
-		skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg) 
-		skewX(#{layer._properties.skewX}deg)  
-		skewY(#{layer._properties.skewY}deg) 
-		rotateX(#{layer._properties.rotationX}deg) 
-		rotateY(#{layer._properties.rotationY}deg) 
-		rotateZ(#{layer._properties.rotationZ}deg) 
+		skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg)
+		skewX(#{layer._properties.skewX}deg)
+		skewY(#{layer._properties.skewY}deg)
+		translateZ(#{layer._properties.originZ}px)
+		rotateX(#{layer._properties.rotationX}deg)
+		rotateY(#{layer._properties.rotationY}deg)
+		rotateZ(#{layer._properties.rotationZ}deg)
+		translateZ(#{-layer._properties.originZ}px)
 		"
 
 	webkitTransformForce2d: (layer) ->
@@ -123,11 +136,11 @@ exports.LayerStyle =
 	webkitTransformOrigin: (layer) ->
 		"#{layer._properties.originX * 100}% #{layer._properties.originY * 100}%"
 
-		# Todo: Origin z is in pixels. I need to read up on this.
-		# "#{layer._properties.originX * 100}% #{layer._properties.originY * 100}% #{layer._properties.originZ * 100}%"
-
 	webkitPerspective: (layer) ->
 		"#{layer._properties.perspective}"
+
+	webkitPerspectiveOrigin: (layer) ->
+		"#{layer._properties.perspectiveOriginX * 100}% #{layer._properties.perspectiveOriginY * 100}%"
 
 	pointerEvents: (layer) ->
 		if layer._properties.ignoreEvents

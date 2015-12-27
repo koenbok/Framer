@@ -83,7 +83,7 @@ describe "Layer", ->
 			layer.y.should.equal 50
 			
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
-			layer.style.webkitTransform.should.equal "translate3d(100px, 50px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
+			layer.style.webkitTransform.should.equal "translate3d(100px, 50px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 			
 		it "should set scale", ->
 			
@@ -94,27 +94,40 @@ describe "Layer", ->
 			layer.scaleZ = 100
 
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 50)"
-			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(100, 100, 100) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(100, 100, 100) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 
 		it "should set origin", ->
-			
+
 			layer = new Layer
+				originZ: 80
+
+			layer.style.webkitTransformOrigin.should.equal "50% 50%"
 
 			layer.originX = 0.1
 			layer.originY = 0.2
 
-			if Utils.isChrome()
-				layer.style.webkitTransformOrigin.should.equal "10% 20% 0px"
-			else
-				layer.style.webkitTransformOrigin.should.equal "10% 20%"
+			layer.style.webkitTransformOrigin.should.equal "10% 20%"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(80px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(-80px)"
 
 			layer.originX = 0.5
 			layer.originY = 0.5
 
-			if Utils.isChrome()
-				layer.style.webkitTransformOrigin.should.equal "50% 50% 0px"
-			else
-				layer.style.webkitTransformOrigin.should.equal "50% 50%"
+			layer.style.webkitTransformOrigin.should.equal "50% 50%"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(80px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(-80px)"
+
+		it "should preserve 3D by default", ->
+
+			layer = new Layer
+
+			layer._element.style.webkitTransformStyle.should.equal "preserve-3d"
+
+		it "should flatten layer", ->
+
+			layer = new Layer
+				flat: true
+
+			layer._element.style.webkitTransformStyle.should.equal "flat"
+
 
 		it "should set local image", ->
 	
@@ -304,6 +317,17 @@ describe "Layer", ->
 			layer.perspective = 500
 
 			layer.style["-webkit-perspective"].should.equal("500")
+
+		it "should have its backface visible by default", ->
+
+			layer = new Layer
+			layer.style["webkitBackfaceVisibility"].should.equal "visible"
+
+		it "should allow backface to be hidden", ->
+
+			layer = new Layer
+			layer.backfaceVisible = false
+			layer.style["webkitBackfaceVisibility"].should.equal "hidden"
 
 		it "should set rotation", ->
 
@@ -921,7 +945,7 @@ describe "Layer", ->
 
 			layer = new Layer
 
-			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 
 			layer.force2d = true
 

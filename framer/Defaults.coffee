@@ -15,6 +15,12 @@ Originals =
 		# curve: "spring(400,40,0)" # Or, the Cemre-Curve
 		curve: "ease"
 		time: 1
+	Context:
+		perspective: 1200
+		perspectiveOriginX: 0.5
+		perspectiveOriginY: 0.5
+		parent: null
+		name: null
 	DeviceComponent:
 		fullScreen: false
 		padding: 50

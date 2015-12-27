@@ -42,7 +42,8 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 				layerValueTypeError(name, value)
 
 			@_properties[name] = value
-			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
+			if cssProperty != null
+				@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
 			set?(@, value)
 			@emit("change:#{name}", value)
@@ -145,9 +146,11 @@ class exports.Layer extends BaseClass
 
 	@define "originX", layerProperty(@, "originX", "webkitTransformOrigin", 0.5, _.isNumber)
 	@define "originY", layerProperty(@, "originY", "webkitTransformOrigin", 0.5, _.isNumber)
-	# @define "originZ", layerProperty(@, "originZ", "WebkitTransformOrigin", 0.5
+	@define "originZ", layerProperty(@, "originZ", null, 0, _.isNumber)
 
 	@define "perspective", layerProperty(@, "perspective", "webkitPerspective", 0, _.isNumber)
+	@define "perspectiveOriginX", layerProperty(@, "perspectiveOriginX", "webkitPerspectiveOrigin", 0.5, _.isNumber)
+	@define "perspectiveOriginY", layerProperty(@, "perspectiveOriginY", "webkitPerspectiveOrigin", 0.5, _.isNumber)
 
 	@define "rotationX", layerProperty(@, "rotationX", "webkitTransform", 0, _.isNumber)
 	@define "rotationY", layerProperty(@, "rotationY", "webkitTransform", 0, _.isNumber)
@@ -185,6 +188,8 @@ class exports.Layer extends BaseClass
 	@define "borderWidth", layerProperty(@, "borderWidth", "border", 0, _.isNumber)
 
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
+	@define "flat", layerProperty(@, "flat", "webkitTransformStyle", false, _.isBoolean)
+	@define "backfaceVisible", layerProperty(@, "backfaceVisible", "webkitBackfaceVisibility", true, _.isBoolean)
 
 	##############################################################
 	# Identity
