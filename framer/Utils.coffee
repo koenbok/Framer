@@ -504,14 +504,14 @@ Utils.domLoadScriptSync = (path) ->
 	eval scriptData
 	scriptData
 
-Utils.insertCSS = (css) ->
-
-	styleElement = document.createElement("style")
-	styleElement.type = "text/css"
-	styleElement.innerHTML = css
-
+Utils.insertCSS = (path) ->
+	styleElement      = document.createElement('link')
+	styleElement.rel  = 'stylesheet'
+	styleElement.type = 'text/css'
+	styleElement.href = path
+	
 	Utils.domComplete ->
-		document.body.appendChild(styleElement)
+		document.body.appendChild(styleElement) unless typeof styleElement is 'undefined'
 
 Utils.loadImage = (url, callback, context) ->
 
