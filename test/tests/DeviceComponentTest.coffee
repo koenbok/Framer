@@ -87,3 +87,15 @@ describe "DeviceComponent", ->
 
 		# reset stubs
 		Utils.isFramerStudio = _originalIsFramerStudio
+
+	it "should influence screen", ->
+
+		device = new DeviceComponent()
+		device.context.run ->
+			Screen.size.should.eql {width:640, height:1136}
+			Utils.inspect(Screen).should.equal "<Screen 640x1136>"
+
+		device.deviceType = "nexus-5-black"
+		device.context.run ->
+			Screen.size.should.eql {width:1080, height:1920}
+			Utils.inspect(Screen).should.equal "<Screen 1080x1920>"

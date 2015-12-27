@@ -8,6 +8,16 @@ class ScreenClass extends BaseClass
 	@define "frame", get: -> {x:0, y:0, width:@width, height:@height}
 
 	# Todo: maybe resize based on parent layer
+
+	toInspect: ->
+
+		round = (value) ->
+			if parseInt(value) == value
+				return parseInt(value)
+			return Utils.round(value, 1)
+
+		return "<Screen #{round(@width)}x#{round(@height)}>"
+
 	
 # We use this as a singleton
 exports.Screen = new ScreenClass
