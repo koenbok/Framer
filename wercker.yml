@@ -1,25 +1,27 @@
-box: nolimitid/node-phantom-npm3
+box: nolimitid/node-phantom
 
 build:
     steps:
+        - install-packages:
+            packages: zip
         - script:
             name: load git revisions
             code: |
                 git remote set-url origin https://github.com/$WERCKER_GIT_OWNER/$WERCKER_GIT_REPOSITORY.git
                 cd $WERCKER_SOURCE_DIR
-                git fetch --unshallow
+                git fetch --unshallow || true
+        - npm-install
         - npm-test
+        - script:
+            name: release build
+            code: |
+                make dist
 
 deploy:
     steps:
         - script:
-            name: load git revisions
-            code: |
-                git remote set-url origin https://github.com/$WERCKER_GIT_OWNER/$WERCKER_GIT_REPOSITORY.git
-                cd $WERCKER_SOURCE_DIR
-                git fetch --unshallow
-        - install-packages:
-            packages: zip
-        - script:
             name: builds.framerjs.com
-            code: make deploy
+            code: |
+                npm rebuild
+                make site%build
+                make site%upload

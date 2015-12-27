@@ -110,6 +110,8 @@ class exports.BaseClass extends EventEmitter
 	toInspect: =>
 		"<#{@constructor.name} id:#{@id or null}>"
 
+	onChange: (name, cb) -> @on("change:#{name}", cb)
+
 
 	#################################################################
 	# Base constructor method

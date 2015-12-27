@@ -54,3 +54,8 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# Docker
+_cache
+_steps
+_builds
+_projects

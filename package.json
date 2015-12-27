@@ -14,8 +14,6 @@
     "type": "git",
     "url": "https://github.com/koenbok/Framer.git"
   },
-  "dependencies": {
-  },
   "devDependencies": {
     "eventemitter3": "^1.1.1",
     "gulp-util": "^3.0.7",
@@ -36,11 +34,12 @@
     "mime": "^1.3.4",
     "mocha-phantomjs": "^4.0.1",
     "mustache": "^2.0.0",
-    "should": "^7.1.1",
+    "should": "^8.0.2",
     "simulate": "^0.0.5",
     "webpack": "^1.7.3",
     "mocha": "^2.3.4",
-    "chai": "^3.4.1"
+    "chai": "^3.4.1",
+    "gulp-plumber": "^1.0.1"
   },
   "keywords": [
     "prototyping"

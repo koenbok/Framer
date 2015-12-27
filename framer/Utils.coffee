@@ -805,4 +805,5 @@ Utils.textSize = (text, style={}, constraints={}) ->
 		width: rect.right - rect.left
 		height: rect.bottom - rect.top
 
+
 _.extend exports, Utils

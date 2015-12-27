@@ -19,5 +19,6 @@ require "./tests/ContextTest"
 require "./tests/ScrollComponentTest"
 require "./tests/VersionTest"
 require "./tests/ColorTest"
+require "./tests/DeviceComponentTest"
 
 mocha.run()
