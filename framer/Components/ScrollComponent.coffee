@@ -409,10 +409,27 @@ wrapComponent = (instance, layer, options = {correct:true}) ->
 			layer.x = layer.y = 0
 			layer = wrapper
 
-			console.log "Corrected the scroll component without sub layers"
-
-	for propKey in ["frame", "image", "name"]
-		scroll[propKey] = layer[propKey]
+			# console.info "Corrected the scroll component without sub layers"
+	
+	scroll.frame = layer.frame
+	scroll.superLayer = layer.superLayer
+	scroll.index = layer.index
+	
+	# Copy over the name, if we don't have it try to use the variable
+	# name from Framer Studio if it was given.
+	if layer.name and layer.name isnt ""
+		scroll.name = layer.name
+	else if layer.__framerInstanceInfo?.name
+		scroll.name = layer.__framerInstanceInfo.name
+		
+	# If we have an image set, it makes way more sense to add it to the
+	# background of the wrapper then the content.
+	if layer.image
+		scroll.image = layer.image
+		layer.image = null
+	
+	# Set the original layer as the content layer for the scroll
+	scroll.setContentLayer(layer)
 
 	# https://github.com/motif/Company/issues/208
 
@@ -433,23 +450,11 @@ wrapComponent = (instance, layer, options = {correct:true}) ->
 		if screenFrame.x < Screen.width
 			if screenFrame.x + screenFrame.width > Screen.width
 				scroll.width = Screen.width - screenFrame.x
-				console.log "Corrected the scroll width to #{scroll.width}"
+				# console.info "Corrected the scroll width to #{scroll.width}"
 
 		if screenFrame.y < Screen.height
 			if screenFrame.y + screenFrame.height > Screen.height
 				scroll.height = Screen.height - screenFrame.y
-				console.log "Corrected the scroll height to #{scroll.height}"
+				# console.info "Corrected the scroll height to #{scroll.height}"
 
-
-	# Now copy over all the content to the new scroll component
-	for subLayer in layer.subLayers
-		subLayerIndex = subLayer.index
-		subLayer.superLayer = scroll.content
-		subLayer.index = subLayerIndex
-
-	scroll.superLayer = layer.superLayer
-	scroll.index = layer.index
-	
-	layer.destroy()
-	
 	return scroll
