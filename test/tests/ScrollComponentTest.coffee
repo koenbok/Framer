@@ -69,3 +69,11 @@ describe "ScrollComponent", ->
 			scroll = ScrollComponent.wrap(layerA)
 			scroll.width.should.equal Screen.width
 			scroll.height.should.equal Screen.height
+
+		it "should work with null backgroundColor", ->
+
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA
+			
+			delete layerA._properties.backgroundColor
+			scroll = ScrollComponent.wrap(layerA)
