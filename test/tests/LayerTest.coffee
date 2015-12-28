@@ -546,6 +546,28 @@ describe "Layer", ->
 
 			simulate.mouseover(layer._element)
 
+		it "should not emit click event if a parent draggable was moved", ->
+
+			clicked = false
+
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA
+
+			layerA.draggable.enabled = true
+			layerA.draggable._correctedLayerStartPoint = {x:10, y:10}
+			layerA.draggable.offset.should.eql {x:-10, y:-10}
+
+			layerB.on Events.Click, ->
+				clicked = true
+
+			layerB.emit(Events.Click)
+			clicked.should.equal false
+
+			layerA.draggable.enabled = false
+
+			layerB.emit(Events.Click)
+			clicked.should.equal true
+
 	describe "Hierarchy", ->
 		
 		it "should insert in dom", ->

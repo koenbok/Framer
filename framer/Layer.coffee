@@ -68,6 +68,10 @@ class exports.Layer extends BaseClass
 		@_prefer2d = false
 		@_alwaysUseImageCache = false
 
+		# Private setting for canceling of click event if wrapped in moved draggable
+		@_cancelClickEventInDragSession = true
+		@_cancelClickEventInDragSessionTolerance = 4
+
 		# We have to create the element before we set the defaults
 		@_createElement()
 
@@ -827,8 +831,23 @@ class exports.Layer extends BaseClass
 	@define "_domEventManager",
 		get: -> @_context.domEventManager.wrap(@_element)
 
-	emit: (args...) ->
-		super(args..., @)
+	emit: (eventName, args...) ->
+
+		# If this layer has a parent draggable view and its position moved
+		# while dragging we automatically cancel click events. This is what
+		# you expect when you add a button to a scroll content layer.
+
+		if @_cancelClickEventInDragSession
+			if eventName is Events.Click
+				parentDraggableLayer = @_parentDraggableLayer()
+				if parentDraggableLayer
+					offset = parentDraggableLayer.draggable.offset
+					return if Math.abs(0 - offset.x) > @_cancelClickEventInDragSessionTolerance
+					return if Math.abs(0 - offset.y) > @_cancelClickEventInDragSessionTolerance
+
+		# Always scope the event this to the layer and pass the layer as
+		# last argument for every event.
+		super(eventName, args..., @)
 
 	once: (eventName, listener) =>
 		super(eventName, listener)
@@ -860,6 +879,11 @@ class exports.Layer extends BaseClass
 		# We are assuming we're the only ones adding dom events to the manager.
 		if not @listeners(eventName).length
 			@_domEventManager.removeAllListeners(eventName)
+
+	_parentDraggableLayer: ->
+		for layer in @superLayers()
+			return layer if layer._draggable?.enabled
+		return null 
 
 	on: @::addListener
 	off: @::removeListener
