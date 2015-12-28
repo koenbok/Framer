@@ -568,6 +568,27 @@ describe "Layer", ->
 			layerB.emit(Events.Click)
 			clicked.should.equal true
 
+		it "should not emit click event if a parent draggable was moved on draggable", ->
+
+			clicked = false
+
+			layerA = new Layer
+
+			layerA.draggable.enabled = true
+			layerA.draggable._correctedLayerStartPoint = {x:10, y:10}
+			layerA.draggable.offset.should.eql {x:-10, y:-10}
+
+			layerA.on Events.Click, ->
+				clicked = true
+
+			layerA.emit(Events.Click)
+			clicked.should.equal false
+
+			layerA.draggable.enabled = false
+
+			layerA.emit(Events.Click)
+			clicked.should.equal true
+
 	describe "Hierarchy", ->
 		
 		it "should insert in dom", ->
