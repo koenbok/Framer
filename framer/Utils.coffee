@@ -521,7 +521,7 @@ Utils.insertStyleSheet = (path) ->
 	styleElement.href = path
 	
 	Utils.domComplete ->
-		document.body.appendChild(styleElement) unless typeof styleElement is "undefined"
+		document.body.appendChild(styleElement)
 
 Utils.loadImage = (url, callback, context) ->
 
