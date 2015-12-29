@@ -17,21 +17,8 @@ for rowIndex in [0..rows-1]
 		y: rowIndex * (height + gutter)
 		backgroundColor: Utils.randomColor(.5)
 		superLayer: scroll.content
+		
+	cellLayer.onClick ->
+		@backgroundColor = Color.random()
 
 	Utils.labelLayer cellLayer, rowIndex
-	
-	
-eventKeys = [
-	"Move", 
-	"ScrollStart", 
-	"ScrollMove", 
-	"ScrollEnd", 
-	"ScrollAnimationDidStart", 
-	"ScrollAnimationDidEnd", 
-]
-
-_.map eventKeys, (eventKey) ->
-	print eventKey
-	scroll.on Events[eventKey], ->
-		print eventKey, Events[eventKey]
-	
