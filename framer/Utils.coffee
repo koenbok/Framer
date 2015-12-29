@@ -513,13 +513,13 @@ Utils.insertCSS = (css) ->
 	Utils.domComplete ->
 		document.body.appendChild(styleElement)
 
-Utils.insertStyleSheet = (path) ->
+Utils.insertStyleSheet = (url) ->
 
 	styleElement = document.createElement("link")
 	styleElement.rel = "stylesheet"
 	styleElement.type = "text/css"
-	styleElement.href = path
-	
+	styleElement.href = url
+
 	Utils.domComplete ->
 		document.body.appendChild(styleElement)
 
