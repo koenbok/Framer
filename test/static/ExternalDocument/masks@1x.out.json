@@ -1,0 +1,86 @@
+{
+	"mask": {
+		"frame": {
+			"x": 150,
+			"y": 150,
+			"width": 300,
+			"height": 300
+		},
+		"subLayerNames": []
+	},
+	"parentF": {
+		"frame": {
+			"x": 772,
+			"y": 612,
+			"width": 300,
+			"height": 300
+		},
+		"subLayerNames": [
+			"mask"
+		]
+	},
+	"parentE": {
+		"frame": {
+			"x": 412,
+			"y": 612,
+			"width": 300,
+			"height": 300
+		},
+		"subLayerNames": [
+			"mask"
+		]
+	},
+	"parentD": {
+		"frame": {
+			"x": 50,
+			"y": 612,
+			"width": 300,
+			"height": 301
+		},
+		"subLayerNames": [
+			"mask"
+		]
+	},
+	"parentC": {
+		"frame": {
+			"x": 770,
+			"y": 132,
+			"width": 300,
+			"height": 300
+		},
+		"subLayerNames": [
+			"mask"
+		]
+	},
+	"parentB": {
+		"frame": {
+			"x": 410,
+			"y": 132,
+			"width": 300,
+			"height": 300
+		},
+		"subLayerNames": [
+			"mask"
+		]
+	},
+	"parentA": {
+		"frame": {
+			"x": 50,
+			"y": 132,
+			"width": 300,
+			"height": 300
+		},
+		"subLayerNames": [
+			"mask"
+		]
+	},
+	"labels": {
+		"frame": {
+			"x": 70,
+			"y": 60,
+			"width": 1010,
+			"height": 530
+		},
+		"subLayerNames": []
+	}
+}

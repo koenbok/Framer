@@ -1,0 +1,64 @@
+{
+	"bg": {
+		"frame": {
+			"x": 0,
+			"y": 0,
+			"width": 750,
+			"height": 1334
+		},
+		"subLayerNames": []
+	},
+	"flat": {
+		"frame": {
+			"x": 40,
+			"y": 260,
+			"width": 180,
+			"height": 180
+		},
+		"subLayerNames": []
+	},
+	"block": {
+		"frame": {
+			"x": 260,
+			"y": 40,
+			"width": 180,
+			"height": 180
+		},
+		"subLayerNames": []
+	},
+	"some23layer": {
+		"frame": {
+			"x": 260,
+			"y": 260,
+			"width": 180,
+			"height": 180
+		},
+		"subLayerNames": []
+	},
+	"ScreenA": {
+		"frame": {
+			"x": 0,
+			"y": 0,
+			"width": 750,
+			"height": 1334
+		},
+		"subLayerNames": [
+			"bg",
+			"flat",
+			"block",
+			"block",
+			"some23layer"
+		]
+	},
+	"ScreenB": {
+		"frame": {
+			"x": 950,
+			"y": 0,
+			"width": 750,
+			"height": 1334
+		},
+		"subLayerNames": [
+			"bg"
+		]
+	}
+}

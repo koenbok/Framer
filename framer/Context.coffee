@@ -1,8 +1,11 @@
 {_} = require "./Underscore"
 
 Utils = require "./Utils"
-{BaseClass} = require "./BaseClass"
+
 {Config} = require "./Config"
+{Defaults} = require "./Defaults"
+
+{BaseClass} = require "./BaseClass"
 {DOMEventManager} = require "./DOMEventManager"
 
 ###
@@ -37,12 +40,10 @@ class exports.Context extends BaseClass
 		get: -> @_element
 
 	constructor: (options={}) ->
-		
-		super
 
-		options = _.defaults options,
-			parent: null
-			name: null
+		options = Defaults.getDefaults("Context", options)
+
+		super
 
 		if not options.name
 			throw Error("Contexts need a name")
@@ -50,6 +51,10 @@ class exports.Context extends BaseClass
 		@_parent = options.parent
 		@_name = options.name
 		
+		@perspective = options.perspective
+		@perspectiveOriginX = options.perspectiveOriginX
+		@perspectiveOriginY = options.perspectiveOriginY
+
 		@reset()
 
 	reset: ->
@@ -211,6 +216,7 @@ class exports.Context extends BaseClass
 		@_element = document.createElement("div")
 		@_element.id = "FramerContextRoot-#{@_name}"
 		@_element.classList.add("framerContext")
+		@_element.style["webkitPerspective"] = @perspective
 
 		@__pendingElementAppend = =>
 			parentElement = @_parent?._element
@@ -253,4 +259,40 @@ class exports.Context extends BaseClass
 	@define "frame", get: -> {x:0, y:0, width:@width, height:@height}
 	@define "size",  get: -> _.pluck(@frame, ["x", "y"])
 	@define "point", get: -> _.pluck(@frame, ["width", "height"])
+
+	@define "backgroundColor",
+		get: ->
+			return @_element?.style["backgroundColor"]
+		set: (value) ->
+			if Color.isColor(value)
+				@_element?.style["backgroundColor"] = new Color value.toString()
+
+	@define "perspective",
+		get: ->
+			return @_perspective
+		set: (value) ->
+			if _.isNumber(value)
+				@_perspective = value
+				@_element?.style["webkitPerspective"] = @_perspective
+
+	_updatePerspective: ->
+		@_element?.style["webkitPerspectiveOrigin"] = "#{@perspectiveOriginX * 100}% #{@perspectiveOriginY * 100}%"
+
+	@define "perspectiveOriginX",
+		get: ->
+			return @_perspectiveOriginX if _.isNumber(@_perspectiveOriginX)
+			return 0.5
+		set: (value) ->
+			if _.isNumber(value)
+				@_perspectiveOriginX = value
+				@_updatePerspective()
+
+	@define "perspectiveOriginY",
+		get: ->
+				return @_perspectiveOriginY if _.isNumber(@_perspectiveOriginY)
+				return .5
+		set: (value) ->
+			if _.isNumber(value)
+				@_perspectiveOriginY = value
+				@_updatePerspective()
 

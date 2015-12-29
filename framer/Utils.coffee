@@ -406,24 +406,25 @@ Utils.parseFunction = (str) ->
 ######################################################
 # DOM FUNCTIONS
 
+__domCompleteState = "interactive"
 __domComplete = []
 __domReady = false
 
 if document?
-	document.onreadystatechange = (event) =>
-		if document.readyState is "complete"
+	document.onreadystatechange = (event) ->
+		if document.readyState is __domCompleteState
 			__domReady = true
 			while __domComplete.length
 				f = __domComplete.shift()()
 
 Utils.domComplete = (f) ->
-	if document.readyState is "complete"
+	if __domReady
 		f()
 	else
 		__domComplete.push(f)
 
 Utils.domCompleteCancel = (f) ->
-	__domComplete = _.without __domComplete, f
+	__domComplete = _.without(__domComplete, f)
 
 Utils.domValidEvent = (element, eventName) ->
 	return if not eventName
@@ -804,5 +805,6 @@ Utils.textSize = (text, style={}, constraints={}) ->
 	frame =
 		width: rect.right - rect.left
 		height: rect.bottom - rect.top
+
 
 _.extend exports, Utils
