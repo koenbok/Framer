@@ -11,6 +11,7 @@ Utils = require "./Utils"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
+{LayerLayout} = require "./LayerLayout"
 
 NoCacheDateKey = Date.now()
 
@@ -777,11 +778,15 @@ class exports.Layer extends BaseClass
 		set: (value) ->
 			@draggable.enabled = value if _.isBoolean(value)
 
-	# anchor: ->
-	# 	if not @_anchor
-	# 		@_anchor = new LayerAnchor(@, arguments...)
-	# 	else
-	# 		@_anchor.updateRules(arguments...)
+
+	#############################################################################
+	## Layout
+
+	layout: ->
+		if not @_layout
+			@_layout = new LayerLayout(@, arguments...)
+		else
+			@_layout.updateRules(arguments...)
 
 	##############################################################
 	## SCROLLING
