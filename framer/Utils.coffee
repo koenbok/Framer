@@ -513,15 +513,21 @@ Utils.insertCSS = (css) ->
 	Utils.domComplete ->
 		document.body.appendChild(styleElement)
 
-Utils.insertStyleSheet = (url) ->
+Utils.insertStylesheet = (url, callback) ->
 
-	styleElement = document.createElement("link")
-	styleElement.rel = "stylesheet"
-	styleElement.type = "text/css"
-	styleElement.href = url
+    styleElement = document.createElement("link")
+    styleElement.rel = "stylesheet"
+    styleElement.type = "text/css"
+    styleElement.href = url
 
-	Utils.domComplete ->
-		document.body.appendChild(styleElement)
+    styleElement.addEventListener "load", ->
+        callback() if callback?
+
+    Utils.domComplete ->
+        document.body.appendChild(styleElement)
+
+Utils.insertStylesheet.inserted = ->
+    true
 
 Utils.loadImage = (url, callback, context) ->
 
