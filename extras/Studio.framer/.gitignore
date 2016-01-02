@@ -29,7 +29,6 @@ framer/backup.coffee
 framer/backups
 framer/backups/*
 framer/.*.hash
-framer/framer.debug.js
 framer/framer.generated.js
 framer/framer.modules.js
 framer/images/*

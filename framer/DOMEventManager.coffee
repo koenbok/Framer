@@ -9,9 +9,9 @@ class DOMEventManagerElement extends EventEmitter
 
 	constructor: (@element) ->
 
-	addListener: (eventName, listener) ->	
+	addListener: (eventName, listener, capture=false) ->	
 		super(eventName, listener)
-		@element.addEventListener(eventName, listener)
+		@element.addEventListener(eventName, listener, capture)
 
 	removeListener: (eventName, listener) ->
 		super(eventName, listener)

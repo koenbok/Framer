@@ -50,13 +50,13 @@ Utils.domComplete(Framer.Loop.start)
 
 window.Framer = Framer if window
 
+# Set the defaults
+Defaults = (require "./Defaults").Defaults
+Defaults.setup()
+Framer.resetDefaults = Defaults.reset
+
 Framer.DefaultContext = new Framer.Context(name:"Default")
 Framer.CurrentContext = Framer.DefaultContext
 
 # Fix for mobile scrolling
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
-
-# Set the defaults
-Defaults = (require "./Defaults").Defaults
-Defaults.setup()
-Framer.resetDefaults = Defaults.reset
