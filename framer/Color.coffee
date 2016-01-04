@@ -333,6 +333,13 @@ inputData = (color, g, b, alpha) ->
 		if typeof color == "string"
 			color = stringToObject(color)
 
+			if !color
+				color =
+					r:0
+					g:0
+					b:0
+					a:0
+
 			if color.hasOwnProperty("type")
 				type = color.type
 
