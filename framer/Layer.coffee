@@ -209,6 +209,87 @@ class exports.Layer extends BaseClass
 			@_element.setAttribute "name", value
 
 	##############################################################
+	# Matrices
+
+	WebKitCSSMatrix::skew = (skew) ->
+		if !skew || skew == 0
+			return @
+		rad = skew * Math.PI / 180
+		value = Math.tan(rad)
+		m = new WebKitCSSMatrix()
+		m.m12 = value
+		m.m21 = value
+		return @multiply(m)
+
+	WebKitCSSMatrix::point = (point = {}) ->
+		x = point.x || 0
+		y = point.y || 0
+		z = point.z || 0
+		w = @m14 * x + @m24 * y + @m34 * z + @m44
+		w = w || 1
+		return point =
+			x: (@m11 * x + @m21 * y + @m31 * z + @m41) / w
+			y: (@m12 * x + @m22 * y + @m32 * z + @m42) / w
+			z: (@m13 * x + @m23 * y + @m33 * z + @m43) / w
+
+	@define "matrix",
+		get: ->
+			if @force2d
+				return @_matrix2d
+			new WebKitCSSMatrix()
+				.translate(@x, @y, @z)
+				.scale(@scale)
+				.scale(@scaleX, @scaleY, @scaleZ)
+				.skew(@skew)
+				.skewX(@skewX)
+				.skewY(@skewY)
+				.translate(0, 0, @originZ)
+				.rotate(@rotationX, 0, 0)
+				.rotate(0, @rotationY, 0)
+				.rotate(0, 0, @rotationZ)
+				.translate(0, 0, -@originZ)
+
+	@define "_matrix2d",
+		get: ->
+			new WebKitCSSMatrix()
+				.translate(@x, @y)
+				.scale(@scale)
+				.skewX(@skew)
+				.skewY(@skew)
+				.rotate(0, 0, @rotationZ)
+
+	@define "transformMatrix",
+		get: ->
+			new WebKitCSSMatrix()
+				.translate(@originX * @width, @originY * @height)
+				.multiply(@matrix)
+				.translate(-@originX * @width, -@originY * @height)
+
+	_perspectiveProjectionMatrix: (element) =>
+		p = element.perspective
+		m = new WebKitCSSMatrix()
+		m.m34 = -1/p if p? and p isnt 0
+		m
+
+	_perspectiveMatrix: (element) =>
+		if !element
+			element = Screen
+		ox = element.perspectiveOriginX * element.width
+		oy = element.perspectiveOriginY * element.height
+		ppm = @_perspectiveProjectionMatrix(element)
+		new WebKitCSSMatrix()
+			.translate(ox, oy)
+			.multiply(ppm)
+			.translate(-ox, -oy)
+
+	@define "matrix3d",
+		get: ->
+			ppm = @_perspectiveMatrix(@superLayer)
+			new WebKitCSSMatrix()
+				.multiply(ppm)
+				.multiply(@transformMatrix)
+
+	##############################################################
 	# Border radius compatibility
 
 	@define "borderRadius",
