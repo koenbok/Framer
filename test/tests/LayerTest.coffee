@@ -994,6 +994,68 @@ describe "Layer", ->
 
 			layer.style.webkitTransform.should.equal "translate(0px, 0px) scale(1) skew(0deg, 0deg) rotate(0deg)"
 
+	describe "Matrices", ->
+
+		it "should have the correct matrix", ->
+
+			layer = new Layer
+				scale: 2
+				rotation: 45
+				x: 200
+				y: 120
+				skew: 21
+
+			layer.matrix.toString().should.eql "matrix(1.957079, 1.957079, -0.871348, 0.871348, 200.000000, 120.000000)"
+
+		it "should have the correct matrix when 2d is forced", ->
+
+			layer = new Layer
+				scale: 2
+				rotation: 45
+				x: 200
+				y: 120
+				skew: 21
+				force2d: true
+
+			layer.matrix.toString().should.eql "matrix(2.165466, 1.957079, -1.079734, 0.871348, 200.000000, 120.000000)"
+
+		it "should have the correct transform matrix", ->
+
+			layer = new Layer
+				scale: 20
+				rotation: 5
+				rotationY: 20
+				x: 200
+				y: 120
+				skew: 21
+
+			layer.transformMatrix.toString().should.eql "matrix3d(19.391455, 8.929946, -0.340719, 0.000000, 6.010074, 19.295128, 0.029809, 0.000000, 6.840403, 2.625785, 0.939693, 0.000000, -1020.076470, -1241.253701, 15.545482, 1.000000)"
+
+		it "should have the correct screen point", ->
+
+			layer = new Layer
+				rotation: 5
+				x: 200
+				y: 120
+				skew: 21
+
+			roundX = Math.round(layer.screenPoint().x)
+			roundX.should.eql 184
+
+		it "should have the correct bounding box", ->
+
+			layer = new Layer
+				rotation: 5
+				x: 200
+				y: 120
+				skew: 21
+			boundingBox = layer.boundingBox()
+
+			boundingBox.x.should.eql 184
+			boundingBox.y.should.eql 98
+			boundingBox.width.should.eql 132
+			boundingBox.height.should.eql 143
+
 	describe "Copy", ->
 
 		it "copied Layer should hold set props", ->
