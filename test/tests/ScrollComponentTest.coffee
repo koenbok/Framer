@@ -77,3 +77,7 @@ describe "ScrollComponent", ->
 			
 			delete layerA._properties.backgroundColor
 			scroll = ScrollComponent.wrap(layerA)
+
+		it "should throw a warning on no layer", ->
+			f = -> ScrollComponent.wrap()
+			f.should.throw()

@@ -391,6 +391,9 @@ class exports.ScrollComponent extends Layer
 
 wrapComponent = (instance, layer, options = {correct:true}) ->
 
+	if not (layer instanceof Layer)
+		throw new Error("ScrollComponent.wrap expects a layer, not #{layer}. Are you sure the layer exists?")
+
 	# This function wraps the given layer into a scroll or page component. This is
 	# great for importing from Sketch or Photoshop.
 
