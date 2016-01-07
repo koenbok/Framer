@@ -12,6 +12,7 @@ Utils = require "./Utils"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
+{Matrix} = require "./Matrix"
 
 NoCacheDateKey = Date.now()
 
@@ -211,32 +212,11 @@ class exports.Layer extends BaseClass
 	##############################################################
 	# Matrices
 
-	WebKitCSSMatrix::skew = (skew) ->
-		if !skew || skew == 0
-			return @
-		rad = skew * Math.PI / 180
-		value = Math.tan(rad)
-		m = new WebKitCSSMatrix()
-		m.m12 = value
-		m.m21 = value
-		return @multiply(m)
-
-	WebKitCSSMatrix::point = (point = {}) ->
-		x = point.x || 0
-		y = point.y || 0
-		z = point.z || 0
-		w = @m14 * x + @m24 * y + @m34 * z + @m44
-		w = w || 1
-		return point =
-			x: (@m11 * x + @m21 * y + @m31 * z + @m41) / w
-			y: (@m12 * x + @m22 * y + @m32 * z + @m42) / w
-			z: (@m13 * x + @m23 * y + @m33 * z + @m43) / w
-
 	@define "matrix",
 		get: ->
 			if @force2d
 				return @_matrix2d
-			new WebKitCSSMatrix()
+			new Matrix()
 				.translate(@x, @y, @z)
 				.scale(@scale)
 				.scale(@scaleX, @scaleY, @scaleZ)
@@ -251,7 +231,7 @@ class exports.Layer extends BaseClass
 
 	@define "_matrix2d",
 		get: ->
-			new WebKitCSSMatrix()
+			new Matrix()
 				.translate(@x, @y)
 				.scale(@scale)
 				.skewX(@skew)
@@ -260,14 +240,14 @@ class exports.Layer extends BaseClass
 
 	@define "transformMatrix",
 		get: ->
-			new WebKitCSSMatrix()
+			new Matrix()
 				.translate(@originX * @width, @originY * @height)
 				.multiply(@matrix)
 				.translate(-@originX * @width, -@originY * @height)
 
 	_perspectiveProjectionMatrix: (element) =>
 		p = element.perspective
-		m = new WebKitCSSMatrix()
+		m = new Matrix()
 		m.m34 = -1/p if p? and p isnt 0
 		m
 
@@ -277,7 +257,7 @@ class exports.Layer extends BaseClass
 		ox = element.perspectiveOriginX * element.width
 		oy = element.perspectiveOriginY * element.height
 		ppm = @_perspectiveProjectionMatrix(element)
-		new WebKitCSSMatrix()
+		new Matrix()
 			.translate(ox, oy)
 			.multiply(ppm)
 			.translate(-ox, -oy)
@@ -285,9 +265,37 @@ class exports.Layer extends BaseClass
 	@define "matrix3d",
 		get: ->
 			ppm = @_perspectiveMatrix(@superLayer)
-			new WebKitCSSMatrix()
+			new Matrix()
 				.multiply(ppm)
 				.multiply(@transformMatrix)
+
+	screenPoint: (point = {}) =>
+		point =
+			x: point.x || 0
+			y: point.y || 0
+			z: point.z || 0
+		point = @matrix3d.point(point)
+		superLayers = @superLayers()
+		for layer in superLayers
+			if layer.superlayer && layer.superlayer.flat
+				point.z = 0
+			point = layer.matrix3d.point(point)
+		return point
+
+	boundingBox: =>
+		c1 = @screenPoint(x:0, y:0)
+		c2 = @screenPoint(x:0, y:@height)
+		c3 = @screenPoint(x:@width, y:0)
+		c4 = @screenPoint(x:@width, y:@height)
+		minX = Math.min(c1.x, c2.x, c3.x, c4.x)
+		maxX = Math.max(c1.x, c2.x, c3.x, c4.x)
+		minY = Math.min(c1.y, c2.y, c3.y, c4.y)
+		maxY = Math.max(c1.y, c2.y, c3.y, c4.y)
+		return frame =
+			x: Math.round(minX)
+			y: Math.round(minY)
+			width: Math.round(maxX - minX)
+			height: Math.round(maxY - minY)
 
 	##############################################################
 	# Border radius compatibility
