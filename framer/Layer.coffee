@@ -275,12 +275,10 @@ class exports.Layer extends BaseClass
 			y: point.y || 0
 			z: point.z || 0
 		point = @matrix3d.point(point)
-		superLayers = @superLayers()
-		for layer in superLayers
-			if layer.flat
-				point.z = 0
+		for layer in @superLayers()
+			point.z = 0 if layer.flat
 			point = layer.matrix3d.point(point)
-		return point
+		point
 
 	@define "boundingBox",
 		get: ->
