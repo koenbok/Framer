@@ -1049,7 +1049,7 @@ describe "Layer", ->
 				x: 200
 				y: 120
 				skew: 21
-			boundingBox = layer.boundingBox()
+			boundingBox = layer.boundingBox
 
 			boundingBox.x.should.eql 184
 			boundingBox.y.should.eql 98

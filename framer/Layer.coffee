@@ -282,20 +282,21 @@ class exports.Layer extends BaseClass
 			point = layer.matrix3d.point(point)
 		return point
 
-	boundingBox: =>
-		c1 = @screenPoint(x:0, y:0)
-		c2 = @screenPoint(x:0, y:@height)
-		c3 = @screenPoint(x:@width, y:0)
-		c4 = @screenPoint(x:@width, y:@height)
-		minX = Math.min(c1.x, c2.x, c3.x, c4.x)
-		maxX = Math.max(c1.x, c2.x, c3.x, c4.x)
-		minY = Math.min(c1.y, c2.y, c3.y, c4.y)
-		maxY = Math.max(c1.y, c2.y, c3.y, c4.y)
-		return frame =
-			x: Math.round(minX)
-			y: Math.round(minY)
-			width: Math.round(maxX - minX)
-			height: Math.round(maxY - minY)
+	@define "boundingBox",
+		get: ->
+			c1 = @screenPoint(x:0, y:0)
+			c2 = @screenPoint(x:0, y:@height)
+			c3 = @screenPoint(x:@width, y:0)
+			c4 = @screenPoint(x:@width, y:@height)
+			minX = Math.min(c1.x, c2.x, c3.x, c4.x)
+			maxX = Math.max(c1.x, c2.x, c3.x, c4.x)
+			minY = Math.min(c1.y, c2.y, c3.y, c4.y)
+			maxY = Math.max(c1.y, c2.y, c3.y, c4.y)
+			return frame =
+				x: Math.round(minX)
+				y: Math.round(minY)
+				width: Math.round(maxX - minX)
+				height: Math.round(maxY - minY)
 
 	##############################################################
 	# Border radius compatibility
