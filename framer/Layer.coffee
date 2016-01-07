@@ -277,7 +277,7 @@ class exports.Layer extends BaseClass
 		point = @matrix3d.point(point)
 		superLayers = @superLayers()
 		for layer in superLayers
-			if layer.superlayer && layer.superlayer.flat
+			if layer.flat
 				point.z = 0
 			point = layer.matrix3d.point(point)
 		return point
