@@ -1039,17 +1039,17 @@ describe "Layer", ->
 				y: 120
 				skew: 21
 
-			roundX = Math.round(layer.screenPoint().x)
+			roundX = Math.round(layer.convertPointToScreen().x)
 			roundX.should.eql 184
 
-		it "should have the correct bounding box", ->
+		it "should have the correct screen frame", ->
 
 			layer = new Layer
 				rotation: 5
 				x: 200
 				y: 120
 				skew: 21
-			boundingBox = layer.boundingBox
+			boundingBox = layer.screenFrame
 
 			boundingBox.x.should.eql 184
 			boundingBox.y.should.eql 98

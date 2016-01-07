@@ -269,32 +269,31 @@ class exports.Layer extends BaseClass
 				.multiply(ppm)
 				.multiply(@transformMatrix)
 
-	screenPoint: (point = {}) =>
+	_screenPoint: (point = {}, context = false) =>
 		point =
 			x: point.x || 0
 			y: point.y || 0
 			z: point.z || 0
 		point = @matrix3d.point(point)
-		for layer in @superLayers()
+		for layer in @superLayers(context)
 			point.z = 0 if layer.flat
 			point = layer.matrix3d.point(point)
 		point
 
-	@define "boundingBox",
-		get: ->
-			c1 = @screenPoint(x:0, y:0)
-			c2 = @screenPoint(x:0, y:@height)
-			c3 = @screenPoint(x:@width, y:0)
-			c4 = @screenPoint(x:@width, y:@height)
-			minX = Math.min(c1.x, c2.x, c3.x, c4.x)
-			maxX = Math.max(c1.x, c2.x, c3.x, c4.x)
-			minY = Math.min(c1.y, c2.y, c3.y, c4.y)
-			maxY = Math.max(c1.y, c2.y, c3.y, c4.y)
-			return frame =
-				x: Math.round(minX)
-				y: Math.round(minY)
-				width: Math.round(maxX - minX)
-				height: Math.round(maxY - minY)
+	_boundingBox: (context = true) =>
+		c1 = @_screenPoint({x:0, y:0}, context)
+		c2 = @_screenPoint({x:0, y:@height}, context)
+		c3 = @_screenPoint({x:@width, y:0}, context)
+		c4 = @_screenPoint({x:@width, y:@height}, context)
+		minX = Math.min(c1.x, c2.x, c3.x, c4.x)
+		maxX = Math.max(c1.x, c2.x, c3.x, c4.x)
+		minY = Math.min(c1.y, c2.y, c3.y, c4.y)
+		maxY = Math.max(c1.y, c2.y, c3.y, c4.y)
+		return frame =
+			x: Math.round(minX)
+			y: Math.round(minY)
+			width: Math.round(maxX - minX)
+			height: Math.round(maxY - minY)
 
 	##############################################################
 	# Border radius compatibility
@@ -389,11 +388,17 @@ class exports.Layer extends BaseClass
 		# TODO: needs tests
 		Utils.convertPoint point, null, @
 
+	convertPointToScreen: (point) ->
+		@_screenPoint(point)
+
+	convertPointToCanvas: (point) ->
+		@_screenPoint(point, true)
+
 	@define "canvasFrame",
 		importable: true
 		exportable: false
 		get: ->
-			Utils.convertPoint(@frame, @, null, context=true)
+			@_boundingBox()
 		set: (frame) ->
 			if not @superLayer
 				@frame = frame
@@ -404,7 +409,7 @@ class exports.Layer extends BaseClass
 		importable: true
 		exportable: false
 		get: ->
-			Utils.convertPoint(@frame, @, null, context=false)
+			@_boundingBox(false)
 		set: (frame) ->
 			if not @superLayer
 				@frame = frame
