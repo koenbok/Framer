@@ -1,5 +1,4 @@
 assert = require "assert"
-
 simulate = require "simulate"
 
 describe "Layer", ->
@@ -408,108 +407,6 @@ describe "Layer", ->
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = null
 			layer.style.boxShadow.should.equal "rgba(0, 0, 0, 0) 10px 10px 10px 10px"
-
-	describe "Events", ->
-
-		it "should set pointer events", ->
-
-			layer = new Layer()
-
-			layer.ignoreEvents = false
-			layer.style["pointerEvents"].should.equal "auto"
-
-			layer.ignoreEvents = true
-			layer.style["pointerEvents"].should.equal "none"
-
-		it "should not listen to events by default", ->
-			
-			layer = new Layer()
-			layer.ignoreEvents.should.equal true
-			layer.style["pointerEvents"].should.equal "none"
-
-
-		it "should not listen to events until a listener is added", ->
-			
-			layer = new Layer()
-			layer.ignoreEvents.should.equal true
-
-			layer.on Events.Click, ->
-				console.log "hello"
-
-			layer.ignoreEvents.should.equal false
-
-		it "should modify the event scope", (callback) ->
-
-			myLayer = new Layer()
-
-			myLayer.on "click", (event, layer) ->
-				@id.should.equal myLayer.id
-				layer.id.should.equal myLayer.id
-				callback()
-
-			simulate.click myLayer._element
-
-
-		it "should modify the event scope for once", (callback) ->
-
-			myLayer = new Layer()
-
-			myLayer.once "click", (event, layer) ->
-				@id.should.equal myLayer.id
-				layer.id.should.equal myLayer.id
-				callback()
-
-			simulate.click myLayer._element
-
-		it "should remove events", ->
-
-			layer = new Layer
-			
-			clickCount = 0
-
-			handler = ->
-				clickCount++
-
-			layer.on "test", handler
-
-			layer.emit "test"
-			clickCount.should.equal 1
-
-			layer.off "test", handler
-
-			layer.emit "test"
-			clickCount.should.equal 1
-
-
-		it "should only run an event once", ->
-			
-			layerA = new Layer
-			count = 0
-
-			layerA.once "hello", (layer) ->
-				count++
-				layerA.should.equal layer
-
-			for i in [0..10]
-				layerA.emit("hello")
-
-			count.should.equal 1
-
-		it "should modify scope for draggable events", (callback) ->
-			
-			layerA = new Layer
-			layerA.draggable.enabled = true
-			layerA.on "test", (args...) ->
-				@id.should.equal(layerA.id)
-				callback()
-
-			layerA.draggable.emit("test", {})
-
-		it "should list all events", ->
-			layerA = new Layer
-			handler = -> console.log "hello"
-			layerA.on("test", handler)
-			layerA.listeners("test").length.should.equal 1
 
 		it "should remove all events", ->
 			layerA = new Layer
