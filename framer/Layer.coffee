@@ -275,9 +275,28 @@ class exports.Layer extends BaseClass
 			y: point.y || 0
 			z: point.z || 0
 		point = @matrix3d.point(point)
+
 		for layer in @superLayers(context)
 			point.z = 0 if layer.flat
 			point = layer.matrix3d.point(point)
+			if !layer.superLayer
+				point.z = 0
+
+		point
+
+	_fromScreenPoint: (point = {}, context = false) =>
+		point =
+			x: point.x || 0
+			y: point.y || 0
+			z: point.z || 0
+		superLayers = @superLayers(context)
+		if superLayers.length
+			point = superLayers.pop().matrix3d.inverse().point(point)
+		superLayers.reverse()
+		superLayers.push(@)
+		for layer in superLayers
+			point = layer.matrix3d.inverse().point(point)
+
 		point
 
 	_boundingBox: (context = true) =>
@@ -387,6 +406,12 @@ class exports.Layer extends BaseClass
 		# Convert a point on screen to this views coordinate system
 		# TODO: needs tests
 		Utils.convertPoint point, null, @
+
+	convertPointFromScreen: (point) ->
+		@_fromScreenPoint(point)
+
+	convertPointFromCanvas: (point) ->
+		@_fromScreenPoint(point, true)
 
 	convertPointToScreen: (point) ->
 		@_screenPoint(point)
