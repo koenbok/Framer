@@ -57,7 +57,7 @@ class exports.SliderComponent extends Layer
 		super options
 
 		@knobSize = options.knobSize or 30
-		@knob.superLayer = @fill.superLayer = @knobOverlay.superLayer = @sliderOverlay.superLayer = @
+		@knob.parent = @fill.parent = @knobOverlay.parent = @sliderOverlay.parent = @
 
 		# Set fill initially
 		if @width > @height

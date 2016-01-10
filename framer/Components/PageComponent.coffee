@@ -34,7 +34,7 @@ class exports.PageComponent extends ScrollComponent
 		@on(Events.ScrollEnd, @_scrollEnd)
 
 		@content.on("change:frame", _.debounce(@_scrollMove, 16))
-		@content.on("change:subLayers", @_resetHistory)
+		@content.on("change:children", @_resetHistory)
 
 		@_resetHistory()
 
@@ -52,10 +52,10 @@ class exports.PageComponent extends ScrollComponent
 		if !withoutCurrentPage
 			point = {x:@scrollX + (@originX * @width), y:@scrollY + (@originY * @height)}
 
-		layers = @content.subLayersAbove(point, @originX, @originY) if direction in ["up", "top", "north"]
-		layers = @content.subLayersBelow(point, @originX, @originY) if direction in ["down", "bottom", "south"]
-		layers = @content.subLayersLeft(point, @originX, @originY) if direction in ["left", "west"]
-		layers = @content.subLayersRight(point, @originX, @originY) if direction in ["right", "east"]
+		layers = @content.childrenAbove(point, @originX, @originY) if direction in ["up", "top", "north"]
+		layers = @content.childrenBelow(point, @originX, @originY) if direction in ["down", "bottom", "south"]
+		layers = @content.childrenLeft(point, @originX, @originY) if direction in ["left", "west"]
+		layers = @content.childrenRight(point, @originX, @originY) if direction in ["right", "east"]
 
 		# See if there is one close by that we should go to
 		if withoutCurrentPage
@@ -99,18 +99,18 @@ class exports.PageComponent extends ScrollComponent
 			throw new Error("#{direction} should be in #{directions}")
 
 		# For allowing pages added with 'addPage' to behave consistently with pages added 
-		# to the PageComponent using 'superLayer', keep the original page point
+		# to the PageComponent using 'parent', keep the original page point
 		# so one of the two coordinates is left untouched after the page is added
 		point = page.point
 
-		if @content.subLayers.length
+		if @content.children.length
 			point.x = Utils.frameGetMaxX(@content.contentFrame()) if direction in ["right", "east"]
 			point.y = Utils.frameGetMaxY(@content.contentFrame()) if direction in ["down", "bottom", "south"]
 
 		page.point = point
 		
-		if page.superLayer isnt @content
-			page.superLayer = @content
+		if page.parent isnt @content
+			page.parent = @content
 		else
 			@updateContent()
 
@@ -124,10 +124,10 @@ class exports.PageComponent extends ScrollComponent
 		@content.on(Events.AnimationStop, @_onAminationEnd)
 
 	horizontalPageIndex: (page) ->
-		(_.sortBy(@content.subLayers, (l) -> l.x)).indexOf(page)
+		(_.sortBy(@content.children, (l) -> l.x)).indexOf(page)
 
 	verticalPageIndex: (page) ->
-		(_.sortBy(@content.subLayers, (l) -> l.y)).indexOf(page)
+		(_.sortBy(@content.children, (l) -> l.y)).indexOf(page)
 
 	_scrollStart: =>
 		@_currentPage = @currentPage

@@ -500,7 +500,7 @@ describe "Layer", ->
 			f = -> layer = new Layer superLayer:1
 			f.should.throw()
 
-		it "should add sublayer", ->
+		it "should add Child", ->
 			
 			layerA = new Layer
 			layerB = new Layer superLayer:layerA
@@ -508,7 +508,7 @@ describe "Layer", ->
 			assert.equal layerB._element.parentNode, layerA._element
 			assert.equal layerB.superLayer, layerA
 
-		it "should remove sublayer", ->
+		it "should remove Child", ->
 
 			layerA = new Layer
 			layerB = new Layer superLayer:layerA
@@ -518,20 +518,20 @@ describe "Layer", ->
 			assert.equal layerB._element.parentNode.id, "FramerContextRoot-Default"
 			assert.equal layerB.superLayer, null
 
-		it "should list sublayers", ->
+		it "should list children", ->
 
 			layerA = new Layer
 			layerB = new Layer superLayer:layerA
 			layerC = new Layer superLayer:layerA
 
-			assert.deepEqual layerA.subLayers, [layerB, layerC]
+			assert.deepEqual layerA.children, [layerB, layerC]
 
 			layerB.superLayer = null
-			assert.equal layerA.subLayers.length, 1
-			assert.deepEqual layerA.subLayers, [layerC]
+			assert.equal layerA.children.length, 1
+			assert.deepEqual layerA.children, [layerC]
 
 			layerC.superLayer = null
-			assert.deepEqual layerA.subLayers, []
+			assert.deepEqual layerA.children, []
 
 		it "should list sibling root layers", ->
 
@@ -635,15 +635,15 @@ describe "Layer", ->
 			assert.equal layerC.index, 1
 			assert.equal layerD.index, 4
 
-		it "should get a sublayers by name", ->
+		it "should get a children by name", ->
 
 			layerA = new Layer
 			layerB = new Layer name:"B", superLayer:layerA
 			layerC = new Layer name:"C", superLayer:layerA
 			layerD = new Layer name:"C", superLayer:layerA
 
-			layerA.subLayersByName("B").should.eql [layerB]
-			layerA.subLayersByName("C").should.eql [layerC, layerD]
+			layerA.childrenByName("B").should.eql [layerB]
+			layerA.childrenByName("C").should.eql [layerC, layerD]
 
 		it "should get a siblinglayer by name", ->
 
@@ -841,13 +841,13 @@ describe "Layer", ->
 			layer._elementHTML.innerHTML.should.equal "Hello"
 			layer.ignoreEvents.should.equal true
 
-		it "should not effect subLayers", ->
+		it "should not effect children", ->
 
 			layer = new Layer
 			layer.html = "Hello"
-			subLayer = new Layer superLayer: layer
+			Child = new Layer superLayer: layer
 
-			subLayer._element.offsetTop.should.equal 0
+			Child._element.offsetTop.should.equal 0
 
 		it "should set interactive html and allow pointer events", ->
 

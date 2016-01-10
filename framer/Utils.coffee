@@ -719,16 +719,16 @@ Utils.convertPoint = (input, layerA, layerB, context=false) ->
 
 	point = _.defaults(input, {x:0, y:0})
 
-	superLayersA = layerA?.superLayers(context) or []
-	superLayersB = layerB?.superLayers(context) or []
+	parentsA = layerA?.parents(context) or []
+	parentsB = layerB?.parents(context) or []
 
-	superLayersB.push(layerB) if layerB
+	parentsB.push(layerB) if layerB
 
-	for layer in superLayersA
+	for layer in parentsA
 		point.x += layer.x #- layer.scrollFrame.x
 		point.y += layer.y #- layer.scrollFrame.y
 
-	for layer in superLayersB
+	for layer in parentsB
 		point.x -= layer.x #+ layer.scrollFrame.x
 		point.y -= layer.y #+ layer.scrollFrame.y
 

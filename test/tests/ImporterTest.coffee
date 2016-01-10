@@ -15,7 +15,7 @@ describe "ExternalDocument", ->
 			dataB[layerName] =
 				frame: layer.frame
 				superLayerName: layer.superLayer?.layerName
-				subLayerNames: layer.subLayers.map (l) -> l.name
+				subLayerNames: layer.children.map (l) -> l.name
 				# clip: layer.clip
 
 		jsonA = JSON.stringify dataA, null, "\t"
