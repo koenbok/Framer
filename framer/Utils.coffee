@@ -673,6 +673,10 @@ Utils.framePointForOrigin = (frame, originX, originY) ->
 		height: frame.height
 
 Utils.frameInset = (frame, inset) ->
+
+	if _.isNumber(inset)
+		inset = {top:inset, right:inset, bottom:inset, left:inset}
+
 	frame =
 		x: frame.x + inset.left
 		y: frame.y + inset.top
