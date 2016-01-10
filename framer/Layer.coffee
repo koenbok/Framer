@@ -529,8 +529,8 @@ class exports.Layer extends BaseClass
 
 		layer = @copySingle()
 
-		for Child in @children
-			copiedChild = Child.copy()
+		for child in @children
+			copiedChild = child.copy()
 			copiedChild.parent = layer
 
 		layer

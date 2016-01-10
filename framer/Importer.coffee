@@ -201,8 +201,8 @@ class exports.Importer
 			if layer.parent
 				layer.frame = Utils.convertPoint(layer.frame, null, layer.parent)
 
-			for Child in layer.children
-				traverse(Child)
+			for child in layer.children
+				traverse(child)
 
 		if not layer.parent
 			traverse(layer)

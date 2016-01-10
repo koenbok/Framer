@@ -500,7 +500,7 @@ describe "Layer", ->
 			f = -> layer = new Layer superLayer:1
 			f.should.throw()
 
-		it "should add Child", ->
+		it "should add child", ->
 			
 			layerA = new Layer
 			layerB = new Layer superLayer:layerA
@@ -508,7 +508,7 @@ describe "Layer", ->
 			assert.equal layerB._element.parentNode, layerA._element
 			assert.equal layerB.superLayer, layerA
 
-		it "should remove Child", ->
+		it "should remove child", ->
 
 			layerA = new Layer
 			layerB = new Layer superLayer:layerA
