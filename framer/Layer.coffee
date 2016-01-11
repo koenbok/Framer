@@ -294,12 +294,14 @@ class exports.Layer extends BaseClass
 			point = layer.matrix3d.inverse().point(point)
 		point
 
-	_boundingBox: (context = true) =>
+	_boundingFrame: (context = true) =>
 
 		frame = {x:0, y:0, width:@width, height:@height}
-		cornerPoints = Utils.pointsFromFrame(frame).map (point) =>
+		cornerPoints = Utils.pointsFromFrame(frame)
+		screenCornerPoints = cornerPoints.map (point) =>
 			@_screenPoint(point, context)
-		Utils.frameFromPoints(cornerPoints)
+		boundingFrame = Utils.frameFromPoints(screenCornerPoints)
+		Utils.pixelAlignedFrame(boundingFrame)
 
 	##############################################################
 	# Border radius compatibility
@@ -410,7 +412,7 @@ class exports.Layer extends BaseClass
 		importable: true
 		exportable: false
 		get: ->
-			@_boundingBox()
+			@_boundingFrame()
 		set: (frame) ->
 			if not @superLayer
 				@frame = frame
@@ -421,7 +423,7 @@ class exports.Layer extends BaseClass
 		importable: true
 		exportable: false
 		get: ->
-			@_boundingBox(false)
+			@_boundingFrame(false)
 		set: (frame) ->
 			if not @superLayer
 				@frame = frame

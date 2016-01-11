@@ -1053,8 +1053,8 @@ describe "Layer", ->
 
 			boundingBox.x.should.eql 184
 			boundingBox.y.should.eql 98
-			boundingBox.width.should.eql 132
-			boundingBox.height.should.eql 143
+			boundingBox.width.should.eql 133
+			boundingBox.height.should.eql 144
 
 	describe "Copy", ->
 
