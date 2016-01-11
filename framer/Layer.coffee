@@ -335,8 +335,8 @@ class exports.Layer extends BaseClass
 		# Get the centered frame for its parent
 		if @parent
 			frame = @frame
-			Utils.frameSetMidX(frame, parseInt(@parent.width  / 2.0))
-			Utils.frameSetMidY(frame, parseInt(@parent.height / 2.0))
+			Utils.frameSetMidX(frame, parseInt((@parent.width  / 2.0) - @superLayer.borderWidth))
+			Utils.frameSetMidY(frame, parseInt((@parent.height / 2.0) - @superLayer.borderWidth))
 			return frame
 		else
 			frame = @frame

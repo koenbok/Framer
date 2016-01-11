@@ -826,6 +826,24 @@ describe "Layer", ->
 			assert.equal layerB.x, 44
 			assert.equal layerB.y, 44
 
+		it "should center with border", ->
+			
+			layer = new Layer
+				width: 200
+				height: 200
+
+			layer.borderColor = "green"
+			layer.borderWidth = 30
+
+			layer.center()
+
+			layerB = new Layer
+				superLayer: layer
+				backgroundColor: "red"
+			layerB.center()
+
+			layerB.frame.should.eql {x:20, y:20, width:100, height:100}
+
 
 	describe "CSS", ->
 
