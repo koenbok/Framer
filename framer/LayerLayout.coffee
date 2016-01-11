@@ -48,11 +48,11 @@ class LayerLayout
 				layerTree.style[property] = value
 
 		if not @layer.superLayer
-			# Add the Canvas as root layer
+			# Add the Screen as root node
 			layerTree =
 				style:
-					width: Canvas.width
-					height: Canvas.height
+					width: Screen.width
+					height: Screen.height
 				children: [layerTree]
 		else if not @layer._layout
 			# Add the layer as root
@@ -67,7 +67,7 @@ class LayerLayout
 	_updateLayersAndTree: =>
 		# Add a basic layout config for all the sublayers
 		# NOTE: This is a hack. In order to avoid ALL layers having an _layout variable, 
-		# we just add the _layout when a layer is added to a "layedout" tree branch, i.e.
+		# we just add the _layout when a layer is added to a "layed out" tree branch, i.e.
 		# a branch that has at least a layout with layout
 		if @layer.subLayers
 			for subLayer in @layer.subLayers
