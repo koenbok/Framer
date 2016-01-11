@@ -150,8 +150,8 @@ class exports.LayerDraggable extends BaseClass
 			x: touchEvent.clientX - @_correctedLayerStartPoint.x
 			y: touchEvent.clientY - @_correctedLayerStartPoint.y
 
-		document.addEventListener(Events.TouchMove, @_touchMove)
-		document.addEventListener(Events.TouchEnd, @_touchEnd)
+		@layer._context.domEventManager.wrap(document).addEventListener(Events.TouchMove, @_touchMove)
+		@layer._context.domEventManager.wrap(document).addEventListener(Events.TouchEnd, @_touchEnd)
 
 		@emit(Events.DragStart, event)
 
@@ -218,8 +218,8 @@ class exports.LayerDraggable extends BaseClass
 
 		event.stopPropagation() unless @propagateEvents
 
-		document.removeEventListener(Events.TouchMove, @_touchMove)
-		document.removeEventListener(Events.TouchEnd, @_touchEnd)
+		@layer._context.domEventManager.wrap(document).removeEventListener(Events.TouchMove, @_touchMove)
+		@layer._context.domEventManager.wrap(document).removeEventListener(Events.TouchEnd, @_touchEnd)
 
 		# Start the simulation prior to emitting the DragEnd event.
 		# This way, if the user calls layer.animate on DragEnd, the simulation will 
@@ -515,4 +515,17 @@ class exports.LayerDraggable extends BaseClass
 	animateStop: ->
 		@_stopSimulation()
 
+	##############################################################
+	## EVENT HELPERS
+	
+	onMove: (cb) -> @on(Events.Move, cb)
+	onDragStart: (cb) -> @on(Events.DragStart, cb)
+	onDragWillMove: (cb) -> @on(Events.DragWillMove, cb)
+	onDragMove: (cb) -> @on(Events.DragMove, cb)
+	onDragDidMove: (cb) -> @on(Events.DragDidMove, cb)
+	onDrag: (cb) -> @on(Events.Drag, cb)
+	onDragEnd: (cb) -> @on(Events.DragEnd, cb)
+	onDragAnimationDidStart: (cb) -> @on(Events.DragAnimationDidStart, cb)
+	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
+	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
 

@@ -343,7 +343,9 @@ ContextListener = (function() {
   }
 
   ContextListener.prototype._update = function() {
-    return bridge.send("ui:layers", _.map(this._context._layerList, getLayerProperties));
+    var layers;
+    layers = this._context._layers || this._context._layerList;
+    return bridge.send("ui:layers", _.map(layers, getLayerProperties));
   };
 
   ContextListener.prototype.send = function(eventName, info) {
@@ -371,7 +373,7 @@ ContextListener = (function() {
     results = [];
     for (i = 0, len = ContextListenerPropertyUpdateKeys.length; i < len; i++) {
       key = ContextListenerPropertyUpdateKeys[i];
-      results.push(layer.on("change:" + key, this.update));
+      results.push(layer.off("change:" + key, this.update));
     }
     return results;
   };
@@ -640,17 +642,6 @@ Runtime = (function(superClass) {
         });
       });
     }
-    Framer.Importer.load = function(path) {
-      var importer, layer, layers, name;
-      importer = new Framer.Importer(path);
-      layers = importer.load();
-      for (name in layers) {
-        layer = layers[name];
-        layer.__framerImportedFromPath = path;
-        layer;
-      }
-      return layers;
-    };
     bridge.send("runtime.init");
     return this._errorHandlerSetup();
   };
@@ -713,10 +704,10 @@ if (window.require == null) {
 }
 
 getLayerById = function(id) {
-  var i, layer, len, ref;
-  ref = Framer.CurrentContext._layerList;
-  for (i = 0, len = ref.length; i < len; i++) {
-    layer = ref[i];
+  var i, layer, layers, len;
+  layers = Framer.CurrentContext._layers || Framer.CurrentContext._layerList;
+  for (i = 0, len = layers.length; i < len; i++) {
+    layer = layers[i];
     if (layer.id === id) {
       return layer;
     }

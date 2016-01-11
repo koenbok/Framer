@@ -41,18 +41,21 @@ Framer.Importer = (require "./Importer").Importer
 Framer.Debug = (require "./Debug").Debug
 Framer.Extras = require "./Extras/Extras"
 
+# Add version info
+Framer.Version = require "../build/Version"
+
 Framer.Loop = new Framer.AnimationLoop()
 Utils.domComplete(Framer.Loop.start)
 
 window.Framer = Framer if window
+
+# Set the defaults
+Defaults = (require "./Defaults").Defaults
+Defaults.setup()
+Framer.resetDefaults = Defaults.reset
 
 Framer.DefaultContext = new Framer.Context(name:"Default")
 Framer.CurrentContext = Framer.DefaultContext
 
 # Fix for mobile scrolling
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
-
-# Set the defaults
-Defaults = (require "./Defaults").Defaults
-Defaults.setup()
-Framer.resetDefaults = Defaults.reset

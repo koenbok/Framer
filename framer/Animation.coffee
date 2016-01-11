@@ -146,8 +146,7 @@ class exports.Animation extends EventEmitter
 
 	stop: (emit=true)->
 		
-		@options.layer._context._animationList = _.without(
-			@options.layer._context._animationList, @)
+		@options.layer.context.removeAnimation(@)
 
 		@emit("stop") if emit
 		Framer.Loop.off("update", @_update)
@@ -175,7 +174,7 @@ class exports.Animation extends EventEmitter
 		_.keys(@_stateA)
 
 	_start: =>
-		@options.layer._context._animationList.push(@)
+		@options.layer.context.addAnimation(@)
 		@emit("start")
 		Framer.Loop.on("update", @_update)
 
@@ -270,3 +269,13 @@ class exports.Animation extends EventEmitter
 			
 
 		return animatableProperties
+
+	##############################################################
+	## EVENT HELPERS
+	
+	onAnimationStart: (cb) -> @on(Events.AnimationStart, cb)
+	onAnimationStop: (cb) -> @on(Events.AnimationStop, cb)
+	onAnimationEnd: (cb) -> @on(Events.AnimationEnd, cb)
+	onAnimationDidStart: (cb) -> @on(Events.AnimationDidStart, cb)
+	onAnimationDidStop: (cb) -> @on(Events.AnimationDidStop, cb)
+	onAnimationDidEnd: (cb) -> @on(Events.AnimationDidEnd, cb)

@@ -1,35 +1,83 @@
-expect = chai.expect
 
 describe "ScrollComponent", ->
 
-  it "should apply constructor options", ->
+	it "should apply constructor options", ->
 
-    instance = new ScrollComponent (scrollHorizontal: false)
-    instance.scrollHorizontal.should.be.false
+		instance = new ScrollComponent (scrollHorizontal: false)
+		instance.scrollHorizontal.should.be.false
 
-  it "should keep scrollHorizontal value on copy", ->
+	it "should keep scrollHorizontal value on copy", ->
 
-    instance = new ScrollComponent (scrollHorizontal: false)
-    instance.scrollHorizontal.should.be.false
+		instance = new ScrollComponent (scrollHorizontal: false)
+		instance.scrollHorizontal.should.be.false
 
-    copy = instance.copy()
-    copy.scrollHorizontal.should.be.false
+		copy = instance.copy()
+		copy.scrollHorizontal.should.be.false
 
-  describe "wrap", ->
+	describe "wrap", ->
 
-    it "should forward constructor options", ->
-      options =
-        scrollVertical: false
-        mouseWheelEnabled: true
-        name: "is a name"
-        backgroundColor: new Color r:0, g:0, b:0, a:0
-        color: new Color r:255, g:255, b:255, a:1
-        shadowColor: new Color r:0, g:0, b:0, a:1
+		it "should use the wrapped layer as content layer when there are sublayers", ->
 
-      # 'wrap' ports the 'name' of the layer onto the ScrollComponent
-      layer = new Layer name: options.name
-      layer.name.should.equal(options.name)
+			layerA = new Layer frame:Screen.frame
+			layerB = new Layer superLayer:layerA
 
-      scroller = ScrollComponent.wrap layer, options
-      for key in _.keys options
-        expect(scroller[key]).to.equal(options[key])
+			scroll = ScrollComponent.wrap(layerA)
+			scroll.content.should.equal layerA
+
+		it "should use the wrapped layer as content if there are no sublayers", ->
+
+			layerA = new Layer frame:Screen.frame
+
+			scroll = ScrollComponent.wrap(layerA)
+			scroll.content.subLayers[0].should.equal layerA
+
+		it "should copy the name and image", ->
+
+			layerA = new Layer frame:Screen.frame, name:"Koen", image:"../static/test.png"
+			layerB = new Layer superLayer:layerA
+
+			scroll = ScrollComponent.wrap(layerA)
+
+			scroll.name.should.equal "Koen"
+			scroll.image.should.equal "../static/test.png"
+
+			scroll.content.should.equal layerA
+			scroll.content.name.should.equal "content"
+			scroll.content.image.should.equal ""
+
+		it "should correct the scroll frame", ->
+
+			frame = Screen.frame
+			frame.width += 100
+			frame.height += 100
+
+			layerA = new Layer frame:frame
+
+			scroll = ScrollComponent.wrap(layerA)
+			scroll.width.should.equal Screen.width
+			scroll.height.should.equal Screen.height
+
+		it "should correct the scroll frame with sublayers", ->
+
+			frame = Screen.frame
+			frame.width += 100
+			frame.height += 100
+
+			layerA = new Layer frame:frame
+			layerB = new Layer superLayer:layerA
+
+			scroll = ScrollComponent.wrap(layerA)
+			scroll.width.should.equal Screen.width
+			scroll.height.should.equal Screen.height
+
+		it "should work with null backgroundColor", ->
+
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA
+			
+			delete layerA._properties.backgroundColor
+			scroll = ScrollComponent.wrap(layerA)
+
+		it "should throw a warning on no layer", ->
+			f = -> ScrollComponent.wrap()
+			f.should.throw()

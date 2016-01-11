@@ -84,12 +84,12 @@ else
 
 Utils.delay = (time, f) ->
 	timer = setTimeout(f, time * 1000)
-	Framer.CurrentContext._delayTimers.push(timer)
+	Framer.CurrentContext.addTimer(timer)
 	return timer
 
 Utils.interval = (time, f) ->
 	timer = setInterval(f, time * 1000)
-	Framer.CurrentContext._delayIntervals.push(timer)
+	Framer.CurrentContext.addInterval(timer)
 	return timer
 
 Utils.debounce = (threshold=0.1, fn, immediate) ->
@@ -406,24 +406,25 @@ Utils.parseFunction = (str) ->
 ######################################################
 # DOM FUNCTIONS
 
+__domCompleteState = "interactive"
 __domComplete = []
 __domReady = false
 
 if document?
-	document.onreadystatechange = (event) =>
-		if document.readyState is "complete"
+	document.onreadystatechange = (event) ->
+		if document.readyState is __domCompleteState
 			__domReady = true
 			while __domComplete.length
 				f = __domComplete.shift()()
 
 Utils.domComplete = (f) ->
-	if document.readyState is "complete"
+	if __domReady
 		f()
 	else
-		__domComplete.push f
+		__domComplete.push(f)
 
 Utils.domCompleteCancel = (f) ->
-	__domComplete = _.without __domComplete, f
+	__domComplete = _.without(__domComplete, f)
 
 Utils.domValidEvent = (element, eventName) ->
 	return if not eventName
@@ -520,10 +521,10 @@ Utils.loadImage = (url, callback, context) ->
 	element = new Image
 	context ?= Framer.CurrentContext
 
-	context.eventManager.wrap(element).addEventListener "load", (event) ->
+	context.domEventManager.wrap(element).addEventListener "load", (event) ->
 		callback()
 
-	context.eventManager.wrap(element).addEventListener "error", (event) ->
+	context.domEventManager.wrap(element).addEventListener "error", (event) ->
 		callback(true)
 
 	element.src = url
@@ -672,6 +673,10 @@ Utils.framePointForOrigin = (frame, originX, originY) ->
 		height: frame.height
 
 Utils.frameInset = (frame, inset) ->
+
+	if _.isNumber(inset)
+		inset = {top:inset, right:inset, bottom:inset, left:inset}
+
 	frame =
 		x: frame.x + inset.left
 		y: frame.y + inset.top
@@ -804,5 +809,6 @@ Utils.textSize = (text, style={}, constraints={}) ->
 	frame =
 		width: rect.right - rect.left
 		height: rect.bottom - rect.top
+
 
 _.extend exports, Utils

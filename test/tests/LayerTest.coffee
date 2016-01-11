@@ -1,5 +1,4 @@
 assert = require "assert"
-
 simulate = require "simulate"
 
 describe "Layer", ->
@@ -83,7 +82,7 @@ describe "Layer", ->
 			layer.y.should.equal 50
 			
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
-			layer.style.webkitTransform.should.equal "translate3d(100px, 50px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
+			layer.style.webkitTransform.should.equal "translate3d(100px, 50px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 			
 		it "should set scale", ->
 			
@@ -94,27 +93,40 @@ describe "Layer", ->
 			layer.scaleZ = 100
 
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 50)"
-			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(100, 100, 100) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(100, 100, 100) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 
 		it "should set origin", ->
-			
+
 			layer = new Layer
+				originZ: 80
+
+			layer.style.webkitTransformOrigin.should.equal "50% 50%"
 
 			layer.originX = 0.1
 			layer.originY = 0.2
 
-			if Utils.isChrome()
-				layer.style.webkitTransformOrigin.should.equal "10% 20% 0px"
-			else
-				layer.style.webkitTransformOrigin.should.equal "10% 20%"
+			layer.style.webkitTransformOrigin.should.equal "10% 20%"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(80px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(-80px)"
 
 			layer.originX = 0.5
 			layer.originY = 0.5
 
-			if Utils.isChrome()
-				layer.style.webkitTransformOrigin.should.equal "50% 50% 0px"
-			else
-				layer.style.webkitTransformOrigin.should.equal "50% 50%"
+			layer.style.webkitTransformOrigin.should.equal "50% 50%"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(80px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(-80px)"
+
+		it "should preserve 3D by default", ->
+
+			layer = new Layer
+
+			layer._element.style.webkitTransformStyle.should.equal "preserve-3d"
+
+		it "should flatten layer", ->
+
+			layer = new Layer
+				flat: true
+
+			layer._element.style.webkitTransformStyle.should.equal "flat"
+
 
 		it "should set local image", ->
 	
@@ -305,6 +317,17 @@ describe "Layer", ->
 
 			layer.style["-webkit-perspective"].should.equal("500")
 
+		it "should have its backface visible by default", ->
+
+			layer = new Layer
+			layer.style["webkitBackfaceVisibility"].should.equal "visible"
+
+		it "should allow backface to be hidden", ->
+
+			layer = new Layer
+			layer.backfaceVisible = false
+			layer.style["webkitBackfaceVisibility"].should.equal "hidden"
+
 		it "should set rotation", ->
 
 			layer = new Layer
@@ -385,115 +408,83 @@ describe "Layer", ->
 			layer.shadowColor = null
 			layer.style.boxShadow.should.equal "rgba(0, 0, 0, 0) 10px 10px 10px 10px"
 
-	describe "Events", ->
+		it "should remove all events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
+			layerA.on("test", handler)
+			layerA.removeAllListeners("test")
+			layerA.listeners("test").length.should.equal 0
 
-		it "should set pointer events", ->
+		it "should add and clean up dom events", ->
+			layerA = new Layer
+			handler = -> console.log "hello"
 
-			layer = new Layer()
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
+			layerA.on(Events.Click, handler)
 
-			layer.ignoreEvents = false
-			layer.style["pointerEvents"].should.equal "auto"
+			# But never more then one
+			layerA._domEventManager.listeners(Events.Click).length.should.equal(1)
 
-			layer.ignoreEvents = true
-			layer.style["pointerEvents"].should.equal "none"
+			layerA.removeAllListeners(Events.Click)
 
-		it "should not listen to events by default", ->
-			
-			layer = new Layer()
-			layer.ignoreEvents.should.equal true
-			layer.style["pointerEvents"].should.equal "none"
+			# And on removal, we should get rid of the dom event
+			layerA._domEventManager.listeners(Events.Click).length.should.equal(0)
 
-		it "should listen to multiple events", ->
-
-			layer = new Layer()
-
-			count = 0
-			handler = -> count++
-
-			layer.on "click", "tap", handler
-
-			layer.emit "click"
-			layer.emit "tap"
-
-			count.should.equal 2
-
-		it "should not listen to events until a listener is added", ->
-			
-			layer = new Layer()
-			layer.ignoreEvents.should.equal true
-
-			layer.on Events.Click, ->
-				console.log "hello"
-
-			layer.ignoreEvents.should.equal false
-
-		it "should modify the event scope", (callback) ->
-
-			myLayer = new Layer()
-
-			myLayer.on "click", (event, layer) ->
-				@id.should.equal myLayer.id
-				layer.id.should.equal myLayer.id
-				callback()
-
-			simulate.click myLayer._element
-
-
-		it "should modify the event scope for once", (callback) ->
-
-			myLayer = new Layer()
-
-			myLayer.once "click", (event, layer) ->
-				@id.should.equal myLayer.id
-				layer.id.should.equal myLayer.id
-				callback()
-
-			simulate.click myLayer._element
-
-		it "should remove events", ->
+		it "should work with event helpers", (done) ->
 
 			layer = new Layer
-			
-			clickCount = 0
 
-			handler = ->
-				clickCount++
+			layer.onMouseOver (event, aLayer) ->
+				aLayer.should.equal(layer)
+				@should.equal(layer)
+				done()
 
-			layer.on "test", handler
+			simulate.mouseover(layer._element)
 
-			layer.emit "test"
-			clickCount.should.equal 1
+		it "should not emit click event if a parent draggable was moved", ->
 
-			layer.off "test", handler
+			clicked = false
 
-			layer.emit "test"
-			clickCount.should.equal 1
-
-
-		it "should only run an event once", ->
-			
 			layerA = new Layer
-			count = 0
+			layerB = new Layer superLayer:layerA
 
-			layerA.once "hello", (layer) ->
-				count++
-				layerA.should.equal layer
-
-			for i in [0..10]
-				layerA.emit("hello")
-
-			count.should.equal 1
-
-		it "should modify scope for draggable events", (callback) ->
-			
-			layerA = new Layer
 			layerA.draggable.enabled = true
-			layerA.on "test", (args...) ->
-				@id.should.equal(layerA.id)
-				callback()
+			layerA.draggable._correctedLayerStartPoint = {x:10, y:10}
+			layerA.draggable.offset.should.eql {x:-10, y:-10}
 
-			layerA.draggable.emit("test", {})
+			layerB.on Events.Click, ->
+				clicked = true
 
+			layerB.emit(Events.Click)
+			clicked.should.equal false
+
+			layerA.draggable.enabled = false
+
+			layerB.emit(Events.Click)
+			clicked.should.equal true
+
+		it "should not emit click event if a parent draggable was moved on draggable", ->
+
+			clicked = false
+
+			layerA = new Layer
+
+			layerA.draggable.enabled = true
+			layerA.draggable._correctedLayerStartPoint = {x:10, y:10}
+			layerA.draggable.offset.should.eql {x:-10, y:-10}
+
+			layerA.on Events.Click, ->
+				clicked = true
+
+			layerA.emit(Events.Click)
+			clicked.should.equal false
+
+			layerA.draggable.enabled = false
+
+			layerA.emit(Events.Click)
+			clicked.should.equal true
 
 	describe "Hierarchy", ->
 		
@@ -820,6 +811,24 @@ describe "Layer", ->
 			assert.equal layerB.x, 44
 			assert.equal layerB.y, 44
 
+		it "should center with border", ->
+			
+			layer = new Layer
+				width: 200
+				height: 200
+
+			layer.borderColor = "green"
+			layer.borderWidth = 30
+
+			layer.center()
+
+			layerB = new Layer
+				superLayer: layer
+				backgroundColor: "red"
+			layerB.center()
+
+			layerB.frame.should.eql {x:20, y:20, width:100, height:100}
+
 
 	describe "CSS", ->
 
@@ -894,7 +903,7 @@ describe "Layer", ->
 
 			layer = new Layer
 
-			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 
 			layer.force2d = true
 

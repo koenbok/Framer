@@ -46,11 +46,11 @@ exports.print = (args...) ->
 
 			update()
 
-			printContext.eventManager.wrap(window).addEventListener("resize", update)
+			printContext.domEventManager.wrap(window).addEventListener("resize", update)
 		
 		printPrefix = "» "
 		printNode = document.createElement("div")
-		printNode.innerHTML = _.escape(printPrefix + args.map(Utils.inspect).join(", ")) + "<br>"
+		printNode.innerHTML = _.escape(printPrefix + args.map((obj) -> Utils.inspect(obj)).join(", ")) + "<br>"
 		printNode.style["-webkit-user-select"] = "text"
 		printNode.style["cursor"] = "auto"
 		

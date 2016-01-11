@@ -3,6 +3,7 @@
 Utils = require "./Utils"
 
 {Config} = require "./Config"
+{Events} = require "./Events"
 {Defaults} = require "./Defaults"
 {BaseClass} = require "./BaseClass"
 {EventEmitter} = require "./EventEmitter"
@@ -22,24 +23,28 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 	result = 
 		default: fallback
 		get: -> 
+			
 			# console.log "Layer.#{name}.get #{@_properties[name]}", @_properties.hasOwnProperty(name)
+			
 			return @_properties[name] if @_properties.hasOwnProperty(name)
 			return fallback
 
 		set: (value) ->
 
-			# console.log "Layer.#{name}.set #{value}"
+			# console.log "Layer.#{name}.set #{value} current:#{@[name]}"
 
-			if value and transformer
+			if transformer
 				value = transformer(value)
-			else if value == null and transformer
-				value = transformer(value)
+
+			# Return unless we get a new value
+			return if value is @_properties[name]
 
 			if value and validator and not validator(value)
 				layerValueTypeError(name, value)
 
 			@_properties[name] = value
-			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
+			if cssProperty != null
+				@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
 			set?(@, value)
 			@emit("change:#{name}", value)
@@ -54,13 +59,19 @@ class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
 
+		# Set needed private variables
 		@_properties = {}
 		@_style = {}
+		@_subLayers = []
 
 		# Special power setting for 2d rendering path. Only enable this
 		# if you know what you are doing. See LayerStyle for more info.
 		@_prefer2d = false
 		@_alwaysUseImageCache = false
+
+		# Private setting for canceling of click event if wrapped in moved draggable
+		@_cancelClickEventInDragSession = true
+		@_cancelClickEventInDragSessionTolerance = 4
 
 		# We have to create the element before we set the defaults
 		@_createElement()
@@ -75,7 +86,7 @@ class exports.Layer extends BaseClass
 		# Add this layer to the current context
 		@_context.addLayer(@)
 
-		@_id = @_context.nextLayerId()
+		@_id = @_context.layerCounter
 
 		# Insert the layer into the dom or the superLayer element
 		if not options.superLayer
@@ -87,13 +98,13 @@ class exports.Layer extends BaseClass
 		if options.hasOwnProperty("index")
 			@index = options.index
 
-		# Set needed private variables
-		@_subLayers = []
-
 		@_context.emit("layer:create", @)
 
 	##############################################################
 	# Properties
+
+	# Readonly context property
+	@define "context", get: -> @_context
 
 	# A placeholder for layer bound properties defined by the user:
 	@define "custom", @simpleProperty("custom", undefined)
@@ -140,9 +151,11 @@ class exports.Layer extends BaseClass
 
 	@define "originX", layerProperty(@, "originX", "webkitTransformOrigin", 0.5, _.isNumber)
 	@define "originY", layerProperty(@, "originY", "webkitTransformOrigin", 0.5, _.isNumber)
-	# @define "originZ", layerProperty(@, "originZ", "WebkitTransformOrigin", 0.5
+	@define "originZ", layerProperty(@, "originZ", null, 0, _.isNumber)
 
 	@define "perspective", layerProperty(@, "perspective", "webkitPerspective", 0, _.isNumber)
+	@define "perspectiveOriginX", layerProperty(@, "perspectiveOriginX", "webkitPerspectiveOrigin", 0.5, _.isNumber)
+	@define "perspectiveOriginY", layerProperty(@, "perspectiveOriginY", "webkitPerspectiveOrigin", 0.5, _.isNumber)
 
 	@define "rotationX", layerProperty(@, "rotationX", "webkitTransform", 0, _.isNumber)
 	@define "rotationY", layerProperty(@, "rotationY", "webkitTransform", 0, _.isNumber)
@@ -180,6 +193,8 @@ class exports.Layer extends BaseClass
 	@define "borderWidth", layerProperty(@, "borderWidth", "border", 0, _.isNumber)
 
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
+	@define "flat", layerProperty(@, "flat", "webkitTransformStyle", false, _.isBoolean)
+	@define "backfaceVisible", layerProperty(@, "backfaceVisible", "webkitBackfaceVisibility", true, _.isBoolean)
 
 	##############################################################
 	# Identity
@@ -317,8 +332,8 @@ class exports.Layer extends BaseClass
 		# Get the centered frame for its superLayer
 		if @superLayer
 			frame = @frame
-			Utils.frameSetMidX(frame, parseInt(@superLayer.width  / 2.0))
-			Utils.frameSetMidY(frame, parseInt(@superLayer.height / 2.0))
+			Utils.frameSetMidX(frame, parseInt((@superLayer.width  / 2.0) - @superLayer.borderWidth))
+			Utils.frameSetMidY(frame, parseInt((@superLayer.height / 2.0) - @superLayer.borderWidth))
 			return frame
 		else
 			frame = @frame
@@ -456,7 +471,7 @@ class exports.Layer extends BaseClass
 
 	_insertElement: ->
 		@bringToFront()
-		@_context.getRootElement().appendChild(@_element)
+		@_context.element.appendChild(@_element)
 
 	@define "html",
 		get: ->
@@ -681,8 +696,8 @@ class exports.Layer extends BaseClass
 	_superOrParentLayer: ->
 		if @superLayer
 			return @superLayer
-		if @_context._parentLayer
-			return @_context._parentLayer
+		if @_context._parent
+			return @_context._parent
 
 	subLayersAbove: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
 		Utils.framePointForOrigin(layer.frame, originX, originY).y < point.y
@@ -709,7 +724,7 @@ class exports.Layer extends BaseClass
 
 	animations: ->
 		# Current running animations on this layer
-		_.filter @_context._animationList, (animation) =>
+		_.filter @_context.animations, (animation) =>
 			animation.options.layer == @
 
 	animatingProperties: ->
@@ -818,77 +833,141 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## EVENTS
 
-	addListener: (eventNames..., originalListener) =>
+	@define "_domEventManager",
+		get: -> @_context.domEventManager.wrap(@_element)
 
-		# To avoid an error in Framer Studio we return if no originalListener was given
-		if not originalListener
-			return
+	emit: (eventName, args...) ->
 
-		# # Modify the scope to be the calling object, just like jquery
-		# # also add the object as the last argument
-		listener = (args...) =>
-			originalListener.call(@, args..., @)
+		# If this layer has a parent draggable view and its position moved
+		# while dragging we automatically cancel click events. This is what
+		# you expect when you add a button to a scroll content layer.
 
-		# Because we modify the listener we need to keep track of it
-		# so we can find it back when we want to unlisten again
-		originalListener.modifiedListener = listener
+		if @_cancelClickEventInDragSession
+			if eventName is Events.Click
+				parentDraggableLayer = @_parentDraggableLayer()
+				if parentDraggableLayer
+					offset = parentDraggableLayer.draggable.offset
+					return if Math.abs(0 - offset.x) > @_cancelClickEventInDragSessionTolerance
+					return if Math.abs(0 - offset.y) > @_cancelClickEventInDragSessionTolerance
 
-		eventNames = [eventNames] if typeof eventNames == 'string'
+		# Always scope the event this to the layer and pass the layer as
+		# last argument for every event.
+		super(eventName, args..., @)
 
-		# Listen to dom events on the element
-		for eventName in eventNames
-			do (eventName) =>
-				super eventName, listener
-				@_context.eventManager.wrap(@_element).addEventListener(eventName, listener)
+	once: (eventName, listener) =>
+		super(eventName, listener)
+		@_addListener(eventName, listener)
 
-				@_eventListeners ?= {}
-				@_eventListeners[eventName] ?= []
-				@_eventListeners[eventName].push(listener)
+	addListener: (eventName, listener) =>
+		super(eventName, listener)
+		@_addListener(eventName, listener)
 
-				# We want to make sure we listen to these events, but we can safely
-				# ignore it for change events
-				if not _.startsWith eventName, "change:"
-					@ignoreEvents = false
+	removeListener: (eventName, listener) ->
+		super(eventName, listener)
+		@_removeListener(eventName, listener)
 
-	removeListener: (eventNames..., listener) ->
+	_addListener: (eventName, listener) ->
 
-		# If the original listener was modified, remove that
-		# one instead
-		if listener.modifiedListener
-			listener = listener.modifiedListener
+		# If this is a dom event, we want the actual dom node to let us know
+		# when it gets triggered, so we can emit the event through the system.
+		if not @_domEventManager.listeners(eventName).length
+			@_domEventManager.addEventListener eventName, (event) =>
+				@emit(eventName, event)
 
-		eventNames = [eventNames] if typeof eventNames == 'string'
-			
-		for eventName in eventNames
-			do (eventName) =>
-				super eventName, listener
-				
-				@_context.eventManager.wrap(@_element).removeEventListener(eventName, listener)
+		# Make sure we stop ignoring events once we add a user event listener
+		if not _.startsWith eventName, "change:"
+			@ignoreEvents = false
 
-				if @_eventListeners
-					@_eventListeners[eventName] = _.without @_eventListeners[eventName], listener
+	_removeListener: (eventName, listener) ->
 
-	once: (eventName, listener) ->
+		# Do cleanup for dom events if this is the last one of it's type.
+		# We are assuming we're the only ones adding dom events to the manager.
+		if not @listeners(eventName).length
+			@_domEventManager.removeAllListeners(eventName)
 
-		originalListener = listener
-
-		listener = (args...) =>
-			originalListener.call(@, args..., @)
-			@removeListener(eventName, listener)
-
-		@addListener(eventName, listener)
-
-
-	removeAllListeners: ->
-
-		return if not @_eventListeners
-
-		for eventName, listeners of @_eventListeners
-			for listener in listeners
-				@removeListener eventName, listener
+	_parentDraggableLayer: ->
+		for layer in @superLayers().concat(@)
+			return layer if layer._draggable?.enabled
+		return null 
 
 	on: @::addListener
 	off: @::removeListener
+
+	##############################################################
+	## EVENT HELPERS
+
+	onClick: (cb) -> @on(Events.Click, cb)
+	onDoubleClick: (cb) -> @on(Events.DoubleClick, cb)
+	onScroll: (cb) -> @on(Events.Scroll, cb)
+	
+	onTouchStart: (cb) -> @on(Events.TouchStart, cb)
+	onTouchEnd: (cb) -> @on(Events.TouchEnd, cb)
+	onTouchMove: (cb) -> @on(Events.TouchMove, cb)
+
+	onMouseUp: (cb) -> @on(Events.MouseUp, cb)
+	onMouseDown: (cb) -> @on(Events.MouseDown, cb)
+	onMouseOver: (cb) -> @on(Events.MouseOver, cb)
+	onMouseOut: (cb) -> @on(Events.MouseOut, cb)
+	onMouseMove: (cb) -> @on(Events.MouseMove, cb)
+	onMouseWheel: (cb) -> @on(Events.MouseWheel, cb)
+
+	onAnimationStart: (cb) -> @on(Events.AnimationStart, cb)
+	onAnimationStop: (cb) -> @on(Events.AnimationStop, cb)
+	onAnimationEnd: (cb) -> @on(Events.AnimationEnd, cb)
+	onAnimationDidStart: (cb) -> @on(Events.AnimationDidStart, cb)
+	onAnimationDidStop: (cb) -> @on(Events.AnimationDidStop, cb)
+	onAnimationDidEnd: (cb) -> @on(Events.AnimationDidEnd, cb)
+
+	onImageLoaded: (cb) -> @on(Events.ImageLoaded, cb)
+	onImageLoadError: (cb) -> @on(Events.ImageLoadError, cb)
+	
+	onMove: (cb) -> @on(Events.Move, cb)
+	onDragStart: (cb) -> @on(Events.DragStart, cb)
+	onDragWillMove: (cb) -> @on(Events.DragWillMove, cb)
+	onDragMove: (cb) -> @on(Events.DragMove, cb)
+	onDragDidMove: (cb) -> @on(Events.DragDidMove, cb)
+	onDrag: (cb) -> @on(Events.Drag, cb)
+	onDragEnd: (cb) -> @on(Events.DragEnd, cb)
+	onDragAnimationDidStart: (cb) -> @on(Events.DragAnimationDidStart, cb)
+	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
+	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
+
+	onPan: (cb) -> @on(Events.Pan, cb)
+	onPanStart: (cb) -> @on(Events.PanStart, cb)
+	onPanMove: (cb) -> @on(Events.PanMove, cb)
+	onPanEnd: (cb) -> @on(Events.PanEnd, cb)
+	onPanCancel: (cb) -> @on(Events.PanCancel, cb)
+	onPanLeft: (cb) -> @on(Events.PanLeft, cb)
+	onPanRight: (cb) -> @on(Events.PanRight, cb)
+	onPanUp: (cb) -> @on(Events.PanUp, cb)
+	onPanDown: (cb) -> @on(Events.PanDown, cb)
+
+	onPinch: (cb) -> @on(Events.Pinch, cb)
+	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
+	onPinchMove: (cb) -> @on(Events.PinchMove, cb)
+	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
+	onPinchCancel: (cb) -> @on(Events.PinchCancel, cb)
+	onPinchIn: (cb) -> @on(Events.PinchIn, cb)
+	onPinchOut: (cb) -> @on(Events.PinchOut, cb)
+
+	onPress: (cb) -> @on(Events.Press, cb)
+	onPressUp: (cb) -> @on(Events.PressUp, cb)
+
+	onRotate: (cb) -> @on(Events.Rotate, cb)
+	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
+	onRotateMove: (cb) -> @on(Events.RotateMove, cb)
+	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
+	onRotateCancel: (cb) -> @on(Events.RotateCancel, cb)
+
+	onSwipe: (cb) -> @on(Events.Swipe, cb)
+	onSwipeLeft: (cb) -> @on(Events.SwipeLeft, cb)
+	onSwipeRight: (cb) -> @on(Events.SwipeRight, cb)
+	onSwipeUp: (cb) -> @on(Events.SwipeUp, cb)
+	onSwipeDown: (cb) -> @on(Events.SwipeDown, cb)
+
+	onTap: (cb) -> @on(Events.Tap, cb)
+	onSingleTap: (cb) -> @on(Events.SingleTap, cb)
+	onDoubleTap: (cb) -> @on(Events.DoubleTap, cb)
 
 	##############################################################
 	## DESCRIPTOR

@@ -1,0 +1,181 @@
+{
+	"layerA": {
+		"frame": {
+			"x": 50,
+			"y": 50,
+			"width": 100,
+			"height": 100
+		},
+		"subLayerNames": []
+	},
+	"label": {
+		"frame": {
+			"x": 66,
+			"y": 160,
+			"width": 68,
+			"height": 27
+		},
+		"subLayerNames": []
+	},
+	"artboardA": {
+		"frame": {
+			"x": 0,
+			"y": 0,
+			"width": 200,
+			"height": 200
+		},
+		"subLayerNames": [
+			"layerA",
+			"label"
+		]
+	},
+	"layerB": {
+		"frame": {
+			"x": 50,
+			"y": 50,
+			"width": 100,
+			"height": 100
+		},
+		"subLayerNames": []
+	},
+	"artboardB": {
+		"frame": {
+			"x": 215,
+			"y": 0,
+			"width": 200,
+			"height": 200
+		},
+		"subLayerNames": [
+			"layerB",
+			"label"
+		]
+	},
+	"layerC": {
+		"frame": {
+			"x": -10,
+			"y": -10,
+			"width": 100,
+			"height": 100
+		},
+		"subLayerNames": []
+	},
+	"layerD": {
+		"frame": {
+			"x": 60,
+			"y": 60,
+			"width": 80,
+			"height": 80
+		},
+		"subLayerNames": [
+			"layerC"
+		]
+	},
+	"artboardC": {
+		"frame": {
+			"x": 430,
+			"y": 0,
+			"width": 200,
+			"height": 200
+		},
+		"subLayerNames": [
+			"layerD",
+			"label"
+		]
+	},
+	"layerF": {
+		"frame": {
+			"x": 10,
+			"y": 10,
+			"width": 80,
+			"height": 80
+		},
+		"subLayerNames": []
+	},
+	"layerE": {
+		"frame": {
+			"x": 50,
+			"y": 50,
+			"width": 100,
+			"height": 100
+		},
+		"subLayerNames": [
+			"layerF"
+		]
+	},
+	"artboardD": {
+		"frame": {
+			"x": 0,
+			"y": 215,
+			"width": 200,
+			"height": 200
+		},
+		"subLayerNames": [
+			"layerE",
+			"label"
+		]
+	},
+	"layerG": {
+		"frame": {
+			"x": 60,
+			"y": 60,
+			"width": 80,
+			"height": 80
+		},
+		"subLayerNames": []
+	},
+	"artboardE": {
+		"frame": {
+			"x": 215,
+			"y": 215,
+			"width": 200,
+			"height": 200
+		},
+		"subLayerNames": [
+			"layerG",
+			"label"
+		]
+	},
+	"layerJ": {
+		"frame": {
+			"x": 30,
+			"y": 30,
+			"width": 50,
+			"height": 50
+		},
+		"subLayerNames": []
+	},
+	"layerI": {
+		"frame": {
+			"x": 0,
+			"y": 0,
+			"width": 60,
+			"height": 60
+		},
+		"subLayerNames": [
+			"layerJ"
+		]
+	},
+	"layerH": {
+		"frame": {
+			"x": 60,
+			"y": 60,
+			"width": 80,
+			"height": 80
+		},
+		"subLayerNames": [
+			"layerI"
+		]
+	},
+	"artboardF": {
+		"frame": {
+			"x": 430,
+			"y": 215,
+			"width": 200,
+			"height": 200
+		},
+		"subLayerNames": [
+			"layerH",
+			"label"
+		]
+	}
+}

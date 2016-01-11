@@ -12,6 +12,9 @@ ColorType =
 class exports.Color extends BaseClass
 	constructor: (@color, r, g, b) ->
 
+		if @color == ""
+			@color = null
+
 		color = @color
 
 		# If input already is a Color object return input
@@ -330,6 +333,13 @@ inputData = (color, g, b, alpha) ->
 		if typeof color == "string"
 			color = stringToObject(color)
 
+			if !color
+				color =
+					r:0
+					g:0
+					b:0
+					a:0
+
 			if color.hasOwnProperty("type")
 				type = color.type
 
@@ -456,7 +466,8 @@ convertToPercentage = (n) ->
 # If there isn't, it will be set to 1 by default.
 correctAlpha = (a) ->
 	a = parseFloat(a)
-	if isNaN(a) or a < 0 or a > 1 then a = 1
+	if a < 0 then a = 0
+	if isNaN(a) or a > 1 then a = 1
 	return a
 
 # Take input from [0, n] and return it as [0, 1]
