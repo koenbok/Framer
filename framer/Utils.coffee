@@ -650,6 +650,33 @@ Utils.framePoint = (frame) ->
 		x: frame.x
 		y: frame.y
 
+Utils.pointsFromFrame = (frame) ->
+	minX = Utils.frameGetMinX(frame)
+	maxX = Utils.frameGetMaxX(frame)
+	minY = Utils.frameGetMinY(frame)
+	maxY = Utils.frameGetMaxY(frame)
+	corner1 = {x:minX, y:minY}
+	corner2 = {x:minX, y:maxY}
+	corner3 = {x:maxX, y:maxY}
+	corner4 = {x:maxX, y:minY}
+	return [corner1, corner2, corner3, corner4]
+
+Utils.frameFromPoints = (points) ->
+
+	xValues = _.pluck(points, "x")
+	yValues = _.pluck(points, "y")
+
+	minX = _.min(xValues)
+	maxX = _.max(xValues)
+	minY = _.min(yValues)
+	maxY = _.max(yValues)
+
+	frame =
+		x: minX
+		y: minY
+		width: maxX - minX
+		height: maxY - minY
+
 Utils.frameMerge = ->
 
 	# Return a frame that fits all the input frames

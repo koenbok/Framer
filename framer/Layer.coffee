@@ -212,6 +212,7 @@ class exports.Layer extends BaseClass
 	##############################################################
 	# Matrices
 
+	# matrix of layer transforms
 	@define "matrix",
 		get: ->
 			if @force2d
@@ -229,6 +230,7 @@ class exports.Layer extends BaseClass
 				.rotate(0, 0, @rotationZ)
 				.translate(0, 0, -@originZ)
 
+	# matrix of layer transforms when 2d is forced
 	@define "_matrix2d",
 		get: ->
 			new Matrix()
@@ -238,6 +240,7 @@ class exports.Layer extends BaseClass
 				.skewY(@skew)
 				.rotate(0, 0, @rotationZ)
 
+	# matrix of layer transforms with transform origin applied
 	@define "transformMatrix",
 		get: ->
 			new Matrix()
@@ -251,6 +254,7 @@ class exports.Layer extends BaseClass
 		m.m34 = -1/p if p? and p isnt 0
 		m
 
+	# matrix of perspective projection with perspective origin applied
 	_perspectiveMatrix: (element) =>
 		ox = element.perspectiveOriginX * element.width
 		oy = element.perspectiveOriginY * element.height
@@ -260,6 +264,7 @@ class exports.Layer extends BaseClass
 			.multiply(ppm)
 			.translate(-ox, -oy)
 
+	# matrix of layer transforms 
 	@define "matrix3d",
 		get: ->
 			parent = @superLayer or @context
@@ -275,40 +280,26 @@ class exports.Layer extends BaseClass
 		for layer in @superLayers(context)
 			point.z = 0 if layer.flat
 			point = layer.matrix3d.point(point)
-			if !layer.superLayer
-				point.z = 0
+			point.z = 0 unless layer.superLayer
 
 		point
 
 	_fromScreenPoint: (point = {}, context = false) =>
-		point =
-			x: point.x || 0
-			y: point.y || 0
-			z: point.z || 0
+		point = _.defaults(point, {x:0, y:0, z:0})
 		superLayers = @superLayers(context)
-		if superLayers.length
-			point = superLayers.pop().matrix3d.inverse().point(point)
+		point = superLayers.pop().matrix3d.inverse().point(point) if superLayers.length
 		superLayers.reverse()
 		superLayers.push(@)
 		for layer in superLayers
 			point = layer.matrix3d.inverse().point(point)
-
 		point
 
 	_boundingBox: (context = true) =>
-		c1 = @_screenPoint({x:0, y:0}, context)
-		c2 = @_screenPoint({x:0, y:@height}, context)
-		c3 = @_screenPoint({x:@width, y:0}, context)
-		c4 = @_screenPoint({x:@width, y:@height}, context)
-		minX = Math.min(c1.x, c2.x, c3.x, c4.x)
-		maxX = Math.max(c1.x, c2.x, c3.x, c4.x)
-		minY = Math.min(c1.y, c2.y, c3.y, c4.y)
-		maxY = Math.max(c1.y, c2.y, c3.y, c4.y)
-		return frame =
-			x: Math.round(minX)
-			y: Math.round(minY)
-			width: Math.round(maxX - minX)
-			height: Math.round(maxY - minY)
+
+		frame = {x:0, y:0, width:@width, height:@height}
+		cornerPoints = Utils.pointsFromFrame(frame).map (point) =>
+			@_screenPoint(point, context)
+		Utils.frameFromPoints(cornerPoints)
 
 	##############################################################
 	# Border radius compatibility
