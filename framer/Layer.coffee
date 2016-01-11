@@ -664,6 +664,21 @@ class exports.Layer extends BaseClass
 
 			return _.without @parent.children, @
 
+	@define "descendants",
+		enumerable: false
+		exportable: false
+		importable: false
+		get: ->
+			result = []
+			
+			f = (layer) ->
+				result.push(layer)
+				layer.children.map(f)
+			
+			@children.map(f)
+				
+			return result
+
 	addChild: (layer) ->
 		layer.parent = @
 

@@ -559,6 +559,21 @@ describe "Layer", ->
 
 			assert.deepEqual layerC.superLayers(), [layerB, layerA]
 
+		it "should list descendants deeply", ->
+
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA
+			layerC = new Layer superLayer:layerB
+
+			layerA.descendants.should.eql [layerB, layerC]
+
+		it "should list descendants", ->
+
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA
+			layerC = new Layer superLayer:layerA
+
+			layerA.descendants.should.eql [layerB, layerC]
 
 			
 
