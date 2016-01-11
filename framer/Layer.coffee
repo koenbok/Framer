@@ -252,8 +252,6 @@ class exports.Layer extends BaseClass
 		m
 
 	_perspectiveMatrix: (element) =>
-		if !element
-			element = Screen
 		ox = element.perspectiveOriginX * element.width
 		oy = element.perspectiveOriginY * element.height
 		ppm = @_perspectiveProjectionMatrix(element)
@@ -264,16 +262,14 @@ class exports.Layer extends BaseClass
 
 	@define "matrix3d",
 		get: ->
-			ppm = @_perspectiveMatrix(@superLayer)
+			parent = @superLayer or @context
+			ppm = @_perspectiveMatrix(parent)
 			new Matrix()
 				.multiply(ppm)
 				.multiply(@transformMatrix)
 
 	_screenPoint: (point = {}, context = false) =>
-		point =
-			x: point.x || 0
-			y: point.y || 0
-			z: point.z || 0
+		point = _.defaults(point, {x:0, y:0, z:0})
 		point = @matrix3d.point(point)
 
 		for layer in @superLayers(context)
