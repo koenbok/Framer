@@ -17,16 +17,16 @@ class CompatLayer extends Layer
 	constructor: (options={}) ->
 
 		if options.hasOwnProperty "superView"
-			options.superLayer = options.superView
+			options.parent = options.superView
 
 		super options
 
-	@define "superView", compatProperty "superLayer", "superView"
-	@define "subViews", compatProperty "subLayers", "subViews"
+	@define "superView", compatProperty "parent", "superView"
+	@define "subViews", compatProperty "children", "subViews"
 	@define "siblingViews", compatProperty "siblingLayers", "siblingViews"
 
-	addSubView = (layer) -> @addSubLayer layer
-	removeSubView = (layer) -> @removeSubLayer layer
+	addSubView = (layer) -> @addChild layer
+	removeSubView = (layer) -> @removeChild layer
 
 class CompatView extends CompatLayer
 
