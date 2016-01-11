@@ -779,6 +779,13 @@ Utils.convertPoint = (input, layerA, layerB, context=false) ->
 	return point unless layerB
 	return Utils.convertPointFromContext(point, layerB, context)
 
+Utils.boundingFrame = (layer, context=true) ->
+	frame = {x:0, y:0, width:layer.width, height:layer.height}
+	cornerPoints = Utils.pointsFromFrame(frame)
+	screenCornerPoints = cornerPoints.map (point) ->
+		return Utils.convertPointToContext(point, layer, context)
+	boundingFrame = Utils.frameFromPoints(screenCornerPoints)
+	return Utils.pixelAlignedFrame(boundingFrame)
 
 ###################################################################
 # Beta additions, use with care

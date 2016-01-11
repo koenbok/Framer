@@ -273,39 +273,6 @@ class exports.Layer extends BaseClass
 				.multiply(ppm)
 				.multiply(@transformMatrix)
 
-	# convert point to top level or current context
-	_screenPoint: (point = {}, context = false) =>
-		point = _.defaults(point, {x:0, y:0, z:0})
-		point = @matrix3d.point(point)
-
-		for layer in @superLayers(context)
-			point.z = 0 if layer.flat
-			point = layer.matrix3d.point(point)
-			point.z = 0 unless layer.superLayer
-
-		point
-
-	# convert point from top level or current canvas
-	_fromScreenPoint: (point = {}, context = false) =>
-		point = _.defaults(point, {x:0, y:0, z:0})
-		superLayers = @superLayers(context)
-		point = superLayers.pop().matrix3d.inverse().point(point) if superLayers.length
-		superLayers.reverse()
-		superLayers.push(@)
-		for layer in superLayers
-			point = layer.matrix3d.inverse().point(point)
-		point
-
-	# get bounding frame
-	_boundingFrame: (context = true) =>
-
-		frame = {x:0, y:0, width:@width, height:@height}
-		cornerPoints = Utils.pointsFromFrame(frame)
-		screenCornerPoints = cornerPoints.map (point) =>
-			@_screenPoint(point, context)
-		boundingFrame = Utils.frameFromPoints(screenCornerPoints)
-		Utils.pixelAlignedFrame(boundingFrame)
-
 	##############################################################
 	# Border radius compatibility
 
@@ -401,22 +368,22 @@ class exports.Layer extends BaseClass
 		@convertPointFromScreen(point)
 
 	convertPointFromScreen: (point) ->
-		@_fromScreenPoint(point)
+		Utils.convertPointFromContext(point, @, false)
 
 	convertPointFromCanvas: (point) ->
-		@_fromScreenPoint(point, true)
+		Utils.convertPointFromContext(point, @, true)
 
 	convertPointToScreen: (point) ->
-		@_screenPoint(point)
+		Utils.convertPointToContext(point, @, false)
 
 	convertPointToCanvas: (point) ->
-		@_screenPoint(point, true)
+		return Utils.convertPointToContext(point, @, true)
 
 	@define "canvasFrame",
 		importable: true
 		exportable: false
 		get: ->
-			@_boundingFrame()
+			Utils.boundingFrame(@)
 		set: (frame) ->
 			if not @superLayer
 				@frame = frame
@@ -427,7 +394,7 @@ class exports.Layer extends BaseClass
 		importable: true
 		exportable: false
 		get: ->
-			@_boundingFrame(false)
+			Utils.boundingFrame(@, false)
 		set: (frame) ->
 			if not @superLayer
 				@frame = frame
