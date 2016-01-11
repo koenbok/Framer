@@ -760,12 +760,12 @@ Utils.convertPointToContext = (point = {}, layer, limit=false) ->
 	return point
 
 # convert a point from the context level to a layer
-Utils.convertPointFromContext = (point = {}, layer, limit=false) ->
+Utils.convertPointFromContext = (point = {}, layer, limit=false, includeLayer = true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
 	parents = layer.superLayers(limit)
 	point = parents.pop().matrix3d.inverse().point(point) if parents.length
 	parents.reverse()
-	parents.push(layer)
+	parents.push(layer) if includeLayer
 	for parent in parents
 		point = parent.matrix3d.inverse().point(point)
 	return point
@@ -786,6 +786,14 @@ Utils.boundingFrame = (layer, context=true) ->
 		return Utils.convertPointToContext(point, layer, context)
 	boundingFrame = Utils.frameFromPoints(screenCornerPoints)
 	return Utils.pixelAlignedFrame(boundingFrame)
+
+Utils.convertFrameFromContext = (frame, layer, limit=false) ->
+	frame = _.defaults(frame, {x:0, y:0, width:100, height:100})
+	corners = Utils.pointsFromFrame(frame)
+	convertedCorners = corners.map (point) =>
+		return Utils.convertPointFromContext(point, layer, limit, false)
+	return Utils.frameFromPoints(convertedCorners)
+
 
 ###################################################################
 # Beta additions, use with care

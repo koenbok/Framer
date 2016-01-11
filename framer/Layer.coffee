@@ -217,7 +217,7 @@ class exports.Layer extends BaseClass
 		get: ->
 			if @force2d
 				return @_matrix2d
-			new Matrix()
+			return new Matrix()
 				.translate(@x, @y, @z)
 				.scale(@scale)
 				.scale(@scaleX, @scaleY, @scaleZ)
@@ -233,7 +233,7 @@ class exports.Layer extends BaseClass
 	# matrix of layer transforms when 2d is forced
 	@define "_matrix2d",
 		get: ->
-			new Matrix()
+			return new Matrix()
 				.translate(@x, @y)
 				.scale(@scale)
 				.skewX(@skew)
@@ -243,7 +243,7 @@ class exports.Layer extends BaseClass
 	# matrix of layer transforms with transform origin applied
 	@define "transformMatrix",
 		get: ->
-			new Matrix()
+			return new Matrix()
 				.translate(@originX * @width, @originY * @height)
 				.multiply(@matrix)
 				.translate(-@originX * @width, -@originY * @height)
@@ -252,24 +252,24 @@ class exports.Layer extends BaseClass
 		p = element.perspective
 		m = new Matrix()
 		m.m34 = -1/p if p? and p isnt 0
-		m
+		return m
 
 	# matrix of perspective projection with perspective origin applied
 	_perspectiveMatrix: (element) =>
 		ox = element.perspectiveOriginX * element.width
 		oy = element.perspectiveOriginY * element.height
 		ppm = @_perspectiveProjectionMatrix(element)
-		new Matrix()
+		return new Matrix()
 			.translate(ox, oy)
 			.multiply(ppm)
 			.translate(-ox, -oy)
 
-	# matrix of layer transforms 
+	# matrix of layer transforms with perspective applied
 	@define "matrix3d",
 		get: ->
 			parent = @superLayer or @context
 			ppm = @_perspectiveMatrix(parent)
-			new Matrix()
+			return new Matrix()
 				.multiply(ppm)
 				.multiply(@transformMatrix)
 
@@ -361,20 +361,14 @@ class exports.Layer extends BaseClass
 		get: -> Utils.frameGetMaxY @
 		set: (value) -> Utils.frameSetMaxY @, value
 
-	convertPoint: (point) ->
-		# Convert a point on screen to this views coordinate system
-		# TODO: needs tests
-		Utils.convertPoint point, null, @
-		@convertPointFromScreen(point)
-
 	convertPointFromScreen: (point) ->
-		Utils.convertPointFromContext(point, @, false)
+		return Utils.convertPointFromContext(point, @, false)
 
 	convertPointFromCanvas: (point) ->
-		Utils.convertPointFromContext(point, @, true)
+		return Utils.convertPointFromContext(point, @, true)
 
 	convertPointToScreen: (point) ->
-		Utils.convertPointToContext(point, @, false)
+		return Utils.convertPointToContext(point, @, false)
 
 	convertPointToCanvas: (point) ->
 		return Utils.convertPointToContext(point, @, true)
@@ -383,23 +377,17 @@ class exports.Layer extends BaseClass
 		importable: true
 		exportable: false
 		get: ->
-			Utils.boundingFrame(@)
+			return Utils.boundingFrame(@)
 		set: (frame) ->
-			if not @superLayer
-				@frame = frame
-			else
-				@frame = Utils.convertPoint(frame, null, @superLayer, context=true)
+			@frame = Utils.convertFrameFromContext(frame, @, true)
 
 	@define "screenFrame",
 		importable: true
 		exportable: false
 		get: ->
-			Utils.boundingFrame(@, false)
+			return Utils.boundingFrame(@, false)
 		set: (frame) ->
-			if not @superLayer
-				@frame = frame
-			else
-				@frame = Utils.convertPoint(frame, null, @superLayer, context=false)
+			@frame = Utils.convertFrameFromContext(frame, @, false)
 
 	contentFrame: ->
 		return {x:0, y:0, width:0, height:0} unless @subLayers.length
