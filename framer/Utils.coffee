@@ -747,26 +747,38 @@ Utils.pointAngle = (p1, p2) ->
 
 # Coordinate system
 
+# convert a point from a layer to the context level
+Utils.convertPointToContext = (point = {}, layer, limit=false) ->
+	point = _.defaults(point, {x:0, y:0, z:0})
+	point = layer.matrix3d.point(point)
+
+	for parent in layer.superLayers(limit)
+		point.z = 0 if parent.flat
+		point = parent.matrix3d.point(point)
+		point.z = 0 unless parent.superLayer
+
+	return point
+
+# convert a point from the context level to a layer
+Utils.convertPointFromContext = (point = {}, layer, limit=false) ->
+	point = _.defaults(point, {x:0, y:0, z:0})
+	parents = layer.superLayers(limit)
+	point = parents.pop().matrix3d.inverse().point(point) if parents.length
+	parents.reverse()
+	parents.push(layer)
+	for parent in parents
+		point = parent.matrix3d.inverse().point(point)
+	return point
+
+# convert a point from layerA to layerB via the context
 Utils.convertPoint = (input, layerA, layerB, context=false) ->
 
 	# Convert a point between two layer coordinate systems
+	point = _.defaults(input, {x:0, y:0, z:0})
+	point = Utils.convertPointToContext(point, layerA, context) if layerA
+	return point unless layerB
+	return Utils.convertPointFromContext(point, layerB, context)
 
-	point = _.defaults(input, {x:0, y:0})
-
-	superLayersA = layerA?.superLayers(context) or []
-	superLayersB = layerB?.superLayers(context) or []
-
-	superLayersB.push(layerB) if layerB
-
-	for layer in superLayersA
-		point.x += layer.x #- layer.scrollFrame.x
-		point.y += layer.y #- layer.scrollFrame.y
-
-	for layer in superLayersB
-		point.x -= layer.x #+ layer.scrollFrame.x
-		point.y -= layer.y #+ layer.scrollFrame.y
-
-	return point
 
 ###################################################################
 # Beta additions, use with care

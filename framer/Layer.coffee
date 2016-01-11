@@ -273,6 +273,7 @@ class exports.Layer extends BaseClass
 				.multiply(ppm)
 				.multiply(@transformMatrix)
 
+	# convert point to top level or current context
 	_screenPoint: (point = {}, context = false) =>
 		point = _.defaults(point, {x:0, y:0, z:0})
 		point = @matrix3d.point(point)
@@ -284,6 +285,7 @@ class exports.Layer extends BaseClass
 
 		point
 
+	# convert point from top level or current canvas
 	_fromScreenPoint: (point = {}, context = false) =>
 		point = _.defaults(point, {x:0, y:0, z:0})
 		superLayers = @superLayers(context)
@@ -294,6 +296,7 @@ class exports.Layer extends BaseClass
 			point = layer.matrix3d.inverse().point(point)
 		point
 
+	# get bounding frame
 	_boundingFrame: (context = true) =>
 
 		frame = {x:0, y:0, width:@width, height:@height}
@@ -395,6 +398,7 @@ class exports.Layer extends BaseClass
 		# Convert a point on screen to this views coordinate system
 		# TODO: needs tests
 		Utils.convertPoint point, null, @
+		@convertPointFromScreen(point)
 
 	convertPointFromScreen: (point) ->
 		@_fromScreenPoint(point)
