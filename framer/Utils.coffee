@@ -719,8 +719,8 @@ Utils.convertPoint = (input, layerA, layerB, context=false) ->
 
 	point = _.defaults(input, {x:0, y:0})
 
-	parentsA = layerA?.parents(context) or []
-	parentsB = layerB?.parents(context) or []
+	parentsA = layerA?.ancestors(context) or []
+	parentsB = layerB?.ancestors(context) or []
 
 	parentsB.push(layerB) if layerB
 

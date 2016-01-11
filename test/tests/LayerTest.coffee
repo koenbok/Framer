@@ -642,8 +642,8 @@ describe "Layer", ->
 			layerC = new Layer name:"C", superLayer:layerA
 			layerD = new Layer name:"C", superLayer:layerA
 
-			layerA.childrenByName("B").should.eql [layerB]
-			layerA.childrenByName("C").should.eql [layerC, layerD]
+			layerA.childrenWithName("B").should.eql [layerB]
+			layerA.childrenWithName("C").should.eql [layerC, layerD]
 
 		it "should get a siblinglayer by name", ->
 

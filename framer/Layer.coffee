@@ -378,25 +378,25 @@ class exports.Layer extends BaseClass
 
 	canvasScaleX: ->
 		scale = @scale * @scaleX
-		for parent in @parents(context=true)
+		for parent in @ancestors(context=true)
 			scale = scale * parent.scale * parent.scaleX
 		return scale
 
 	canvasScaleY: ->
 		scale = @scale * @scaleY
-		for parent in @parents(context=true)
+		for parent in @ancestors(context=true)
 			scale = scale * parent.scale * parent.scaleY
 		return scale
 
 	screenScaleX: ->
 		scale = @scale * @scaleX
-		for parent in @parents(context=false)
+		for parent in @ancestors(context=false)
 			scale = scale * parent.scale * parent.scaleX
 		return scale
 
 	screenScaleY: ->
 		scale = @scale * @scaleY
-		for parent in @parents(context=false)
+		for parent in @ancestors(context=false)
 			scale = scale * parent.scale * parent.scaleY
 		return scale
 
@@ -411,7 +411,7 @@ class exports.Layer extends BaseClass
 			width:  @width  * @screenScaleX()
 			height: @height * @screenScaleY()
 		
-		layers = @parents(context=true)
+		layers = @ancestors(context=true)
 		layers.push(@)
 		layers.reverse()
 		
@@ -625,12 +625,14 @@ class exports.Layer extends BaseClass
 				@_parent._children = _.without @_parent._children, @
 				@_parent._element.removeChild @_element
 				@_parent.emit "change:children", {added:[], removed:[@]}
+				@_parent.emit "change:subLayers", {added:[], removed:[@]}
 
 			# Either insert the element to the new parent element or into dom
 			if layer
 				layer._element.appendChild @_element
 				layer._children.push @
 				layer.emit "change:children", {added:[@], removed:[]}
+				layer.emit "change:subLayers", {added:[@], removed:[]}
 			else
 				@_insertElement()
 
@@ -672,13 +674,13 @@ class exports.Layer extends BaseClass
 
 		layer.parent = null
 
-	childrenByName: (name) ->
+	childrenWithName: (name) ->
 		_.filter @children, (layer) -> layer.name == name
 
-	siblingsByName: (name) ->
+	siblingsWithName: (name) ->
 		_.filter @siblingLayers, (layer) -> layer.name == name
 
-	parents: (context=false) ->
+	ancestors: (context=false) ->
 
 		parents = []
 		currentLayer = @
@@ -713,14 +715,14 @@ class exports.Layer extends BaseClass
 	# Backwards superLayer and children compatibility
 
 	@define("superLayer", @proxyProperty("parent", importable:false))
-	@define("superLayers", @proxyProperty("parents", importable:false))
 	@define("subLayers", @proxyProperty("children", importable:false))
 	@define("siblingLayers", @proxyProperty("siblings", importable:false))
 
+	superLayers: (context=false) -> @ancestors(context)
 	addSubLayer: (layer) -> @addChild(layer)
 	removeSubLayer: (layer) -> @removeChild(layer)
-	subLayersByName: (name) -> @childrenByName(name)
-	siblingLayersByName: (name) -> @siblingsByName(name)
+	subLayersByName: (name) -> @childrenWithName(name)
+	siblingLayersByName: (name) -> @siblingsWithName(name)
 	subLayersAbove: (point, originX=0, originY=0) -> @childrenAbove(point, originX, originY)
 	subLayersBelow: (point, originX=0, originY=0) -> @childrenBelow(point, originX, originY)
 	subLayersLeft: (point, originX=0, originY=0) -> @childrenLeft(point, originX, originY)
@@ -901,7 +903,7 @@ class exports.Layer extends BaseClass
 			@_domEventManager.removeAllListeners(eventName)
 
 	_parentDraggableLayer: ->
-		for layer in @parents().concat(@)
+		for layer in @ancestors().concat(@)
 			return layer if layer._draggable?.enabled
 		return null 
 
