@@ -12,6 +12,7 @@ Utils = require "./Utils"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
+{Matrix} = require "./Matrix"
 
 NoCacheDateKey = Date.now()
 
@@ -213,6 +214,70 @@ class exports.Layer extends BaseClass
 			@_element.setAttribute "name", value
 
 	##############################################################
+	# Matrices
+
+	# matrix of layer transforms
+	@define "matrix",
+		get: ->
+			if @force2d
+				return @_matrix2d
+			return new Matrix()
+				.translate(@x, @y, @z)
+				.scale(@scale)
+				.scale(@scaleX, @scaleY, @scaleZ)
+				.skew(@skew)
+				.skewX(@skewX)
+				.skewY(@skewY)
+				.translate(0, 0, @originZ)
+				.rotate(@rotationX, 0, 0)
+				.rotate(0, @rotationY, 0)
+				.rotate(0, 0, @rotationZ)
+				.translate(0, 0, -@originZ)
+
+	# matrix of layer transforms when 2d is forced
+	@define "_matrix2d",
+		get: ->
+			return new Matrix()
+				.translate(@x, @y)
+				.scale(@scale)
+				.skewX(@skew)
+				.skewY(@skew)
+				.rotate(0, 0, @rotationZ)
+
+	# matrix of layer transforms with transform origin applied
+	@define "transformMatrix",
+		get: ->
+			return new Matrix()
+				.translate(@originX * @width, @originY * @height)
+				.multiply(@matrix)
+				.translate(-@originX * @width, -@originY * @height)
+
+	_perspectiveProjectionMatrix: (element) =>
+		p = element.perspective
+		m = new Matrix()
+		m.m34 = -1/p if p? and p isnt 0
+		return m
+
+	# matrix of perspective projection with perspective origin applied
+	_perspectiveMatrix: (element) =>
+		ox = element.perspectiveOriginX * element.width
+		oy = element.perspectiveOriginY * element.height
+		ppm = @_perspectiveProjectionMatrix(element)
+		return new Matrix()
+			.translate(ox, oy)
+			.multiply(ppm)
+			.translate(-ox, -oy)
+
+	# matrix of layer transforms with perspective applied
+	@define "matrix3d",
+		get: ->
+			parent = @superLayer or @context
+			ppm = @_perspectiveMatrix(parent)
+			return new Matrix()
+				.multiply(ppm)
+				.multiply(@transformMatrix)
+
+	##############################################################
 	# Border radius compatibility
 
 	@define "borderRadius",
@@ -300,32 +365,33 @@ class exports.Layer extends BaseClass
 		get: -> Utils.frameGetMaxY @
 		set: (value) -> Utils.frameSetMaxY @, value
 
-	convertPoint: (point) ->
-		# Convert a point on screen to this views coordinate system
-		# TODO: needs tests
-		Utils.convertPoint point, null, @
+	convertPointFromScreen: (point) ->
+		return Utils.convertPointFromContext(point, @, false)
+
+	convertPointFromCanvas: (point) ->
+		return Utils.convertPointFromContext(point, @, true)
+
+	convertPointToScreen: (point) ->
+		return Utils.convertPointToContext(point, @, false)
+
+	convertPointToCanvas: (point) ->
+		return Utils.convertPointToContext(point, @, true)
 
 	@define "canvasFrame",
 		importable: true
 		exportable: false
 		get: ->
-			Utils.convertPoint(@frame, @, null, context=true)
+			return Utils.boundingFrame(@)
 		set: (frame) ->
-			if not @parent
-				@frame = frame
-			else
-				@frame = Utils.convertPoint(frame, null, @parent, context=true)
+			@frame = Utils.convertFrameFromContext(frame, @, true, false)
 
 	@define "screenFrame",
 		importable: true
 		exportable: false
 		get: ->
-			Utils.convertPoint(@frame, @, null, context=false)
+			return Utils.boundingFrame(@, false)
 		set: (frame) ->
-			if not @parent
-				@frame = frame
-			else
-				@frame = Utils.convertPoint(frame, null, @parent, context=false)
+			@frame = Utils.convertFrameFromContext(frame, @, false, false)
 
 	contentFrame: ->
 		return {x:0, y:0, width:0, height:0} unless @children.length
