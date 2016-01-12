@@ -750,10 +750,10 @@ Utils.pointAngle = (p1, p2) ->
 # convert a point from a layer to the context level, with limit you can make it continue to the root context
 Utils.convertPointToContext = (point = {}, layer, limit=false) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
-	point = layer.matrix3d.point(point)
-	point.z = 0 unless layer.superLayer
+	parents = layer.superLayers(limit)
+	parents.unshift(layer)
 
-	for parent in layer.superLayers(limit)
+	for parent in parents
 		point.z = 0 if parent.flat
 		point = parent.matrix3d.point(point)
 		point.z = 0 unless parent.superLayer
