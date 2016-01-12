@@ -752,10 +752,10 @@ Utils.pointAngle = (p1, p2) ->
 # Coordinate system
 
 # convert a point from a layer to the context level, with limit you can make it continue to the root context
-Utils.convertPointToContext = (point = {}, layer, limit=false) ->
+Utils.convertPointToContext = (point = {}, layer, limit=false, includeLayer = true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
 	ancestors = layer.ancestors(limit)
-	ancestors.unshift(layer)
+	ancestors.unshift(layer) if includeLayer
 
 	for ancestor in ancestors
 		point.z = 0 if ancestor.flat
