@@ -1000,6 +1000,20 @@ describe "Layer", ->
 			boundingBox.width.should.eql 133
 			boundingBox.height.should.eql 144
 
+		it "should have the correct canvas frame", ->
+
+			layer = new Layer
+				rotation: 5
+				x: 200
+				y: 120
+				skew: 21
+			boundingBox = layer.canvasFrame
+
+			boundingBox.x.should.eql 184
+			boundingBox.y.should.eql 98
+			boundingBox.width.should.eql 133
+			boundingBox.height.should.eql 144
+
 	describe "Copy", ->
 
 		it "copied Layer should hold set props", ->
