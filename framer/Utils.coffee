@@ -754,25 +754,25 @@ Utils.pointAngle = (p1, p2) ->
 # convert a point from a layer to the context level, with limit you can make it continue to the root context
 Utils.convertPointToContext = (point = {}, layer, limit=false) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
-	parents = layer.ancestors(limit)
-	parents.unshift(layer)
+	ancestors = layer.ancestors(limit)
+	ancestors.unshift(layer)
 
-	for parent in parents
-		point.z = 0 if parent.flat
-		point = parent.matrix3d.point(point)
-		point.z = 0 unless parent.parent
+	for ancestor in ancestors
+		point.z = 0 if ancestor.flat
+		point = ancestor.matrix3d.point(point)
+		point.z = 0 unless ancestor.parent
 
 	return point
 
 # convert a point from the context level to a layer, with limit you can make it start from the root context
 Utils.convertPointFromContext = (point = {}, layer, limit=false, includeLayer = true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
-	parents = layer.ancestors(limit)
-	point = parents.pop().matrix3d.inverse().point(point) if parents.length
-	parents.reverse()
-	parents.push(layer) if includeLayer
-	for parent in parents
-		point = parent.matrix3d.inverse().point(point)
+	ancestors = layer.ancestors(limit)
+	point = ancestors.pop().matrix3d.inverse().point(point) if ancestors.length
+	ancestors.reverse()
+	ancestors.push(layer) if includeLayer
+	for ancestor in ancestors
+		point = ancestor.matrix3d.inverse().point(point)
 	return point
 
 # convert a frame from the context level to a layer, with limit you can make it start from the root context
