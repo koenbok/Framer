@@ -729,9 +729,24 @@ class exports.Layer extends BaseClass
 	##############################################################
 	# Backwards superLayer and children compatibility
 
-	@define("superLayer", @proxyProperty("parent", importable:false))
-	@define("subLayers", @proxyProperty("children", importable:false))
-	@define("siblingLayers", @proxyProperty("siblings", importable:false))
+	@define "superLayer",
+		enumerable: false
+		exportable: false
+		importable: false
+		get: -> @parent
+		set: (value) -> @parent = value
+
+	@define "subLayers",
+		enumerable: false
+		exportable: false
+		importable: false
+		get: -> @children
+
+	@define "siblingLayers",
+		enumerable: false
+		exportable: false
+		importable: false
+		get: -> @siblings
 
 	superLayers: (context=false) -> @ancestors(context)
 	addSubLayer: (layer) -> @addChild(layer)

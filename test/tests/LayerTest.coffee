@@ -34,6 +34,7 @@ describe "Layer", ->
 			
 			# if the default background color is not set the content layer of scrollcomponent is not hidden when layers are added
 			layer = new Layer()
+
 			Color.equal(layer.backgroundColor, Framer.Defaults.Layer.backgroundColor).should.be.true
 
 			Framer.Defaults =
@@ -272,7 +273,7 @@ describe "Layer", ->
 		it "should set style properties on create", ->
 
 			layer = new Layer backgroundColor: "red"
-			layer.backgroundColor.should.eql new Color("red")
+			layer.backgroundColor.isEqual(new Color("red")).should.equal true
 			layer.style["backgroundColor"].should.equal new Color("red").toString()
 
 		it "should check value type", ->
@@ -575,6 +576,19 @@ describe "Layer", ->
 
 			layerA.descendants.should.eql [layerB, layerC]
 
+		it "should set super/parent with property", ->
+			layerA = new Layer
+			layerB = new Layer
+			layerB.superLayer = layerA
+			layerA.children.should.eql [layerB]
+			layerA.subLayers.should.eql [layerB]
+
+		it "should set super/parent with with constructor", ->
+			layerA = new Layer
+			layerB = new Layer
+				superLayer: layerA
+			layerA.children.should.eql [layerB]
+			layerA.subLayers.should.eql [layerB]
 			
 
 	describe "Layering", ->
