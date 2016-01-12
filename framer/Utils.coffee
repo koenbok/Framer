@@ -747,7 +747,7 @@ Utils.pointAngle = (p1, p2) ->
 
 # Coordinate system
 
-# convert a point from a layer to the context level
+# convert a point from a layer to the context level, with limit you can make it continue to the root context
 Utils.convertPointToContext = (point = {}, layer, limit=false) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
 	point = layer.matrix3d.point(point)
@@ -759,7 +759,7 @@ Utils.convertPointToContext = (point = {}, layer, limit=false) ->
 
 	return point
 
-# convert a point from the context level to a layer
+# convert a point from the context level to a layer, with limit you can make it start from the root context
 Utils.convertPointFromContext = (point = {}, layer, limit=false, includeLayer = true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
 	parents = layer.superLayers(limit)
@@ -770,29 +770,31 @@ Utils.convertPointFromContext = (point = {}, layer, limit=false, includeLayer = 
 		point = parent.matrix3d.inverse().point(point)
 	return point
 
-# convert a point from layerA to layerB via the context
-Utils.convertPoint = (input, layerA, layerB, context=false) ->
-
-	# Convert a point between two layer coordinate systems
-	point = _.defaults(input, {x:0, y:0, z:0})
-	point = Utils.convertPointToContext(point, layerA, context) if layerA
-	return point unless layerB
-	return Utils.convertPointFromContext(point, layerB, context)
-
-Utils.boundingFrame = (layer, context=true) ->
-	frame = {x:0, y:0, width:layer.width, height:layer.height}
-	cornerPoints = Utils.pointsFromFrame(frame)
-	screenCornerPoints = cornerPoints.map (point) ->
-		return Utils.convertPointToContext(point, layer, context)
-	boundingFrame = Utils.frameFromPoints(screenCornerPoints)
-	return Utils.pixelAlignedFrame(boundingFrame)
-
-Utils.convertFrameFromContext = (frame, layer, limit=false) ->
+# convert a frame from the context level to a layer, with limit you can make it start from the root context
+Utils.convertFrameFromContext = (frame, layer, limit=false, includeLayer = true) ->
 	frame = _.defaults(frame, {x:0, y:0, width:100, height:100})
 	corners = Utils.pointsFromFrame(frame)
 	convertedCorners = corners.map (point) =>
-		return Utils.convertPointFromContext(point, layer, limit, false)
+		return Utils.convertPointFromContext(point, layer, limit, includeLayer)
 	return Utils.frameFromPoints(convertedCorners)
+
+# convert a point from layerA to layerB via the context
+Utils.convertPoint = (input, layerA, layerB, rootContext=false) ->
+
+	# Convert a point between two layer coordinate systems
+	point = _.defaults(input, {x:0, y:0, z:0})
+	point = Utils.convertPointToContext(point, layerA, rootContext) if layerA
+	return point unless layerB
+	return Utils.convertPointFromContext(point, layerB, rootContext)
+
+# get the bounding frame of a layer, either at the canvas (rootcontext) or screen level
+Utils.boundingFrame = (layer, rootContext=true) ->
+	frame = {x:0, y:0, width:layer.width, height:layer.height}
+	cornerPoints = Utils.pointsFromFrame(frame)
+	contextCornerPoints = cornerPoints.map (point) ->
+		return Utils.convertPointToContext(point, layer, rootContext)
+	boundingFrame = Utils.frameFromPoints(contextCornerPoints)
+	return Utils.pixelAlignedFrame(boundingFrame)
 
 
 ###################################################################

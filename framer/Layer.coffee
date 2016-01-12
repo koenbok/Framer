@@ -379,7 +379,7 @@ class exports.Layer extends BaseClass
 		get: ->
 			return Utils.boundingFrame(@)
 		set: (frame) ->
-			@frame = Utils.convertFrameFromContext(frame, @, true)
+			@frame = Utils.convertFrameFromContext(frame, @, true, false)
 
 	@define "screenFrame",
 		importable: true
@@ -387,7 +387,7 @@ class exports.Layer extends BaseClass
 		get: ->
 			return Utils.boundingFrame(@, false)
 		set: (frame) ->
-			@frame = Utils.convertFrameFromContext(frame, @, false)
+			@frame = Utils.convertFrameFromContext(frame, @, false, false)
 
 	contentFrame: ->
 		return {x:0, y:0, width:0, height:0} unless @subLayers.length
