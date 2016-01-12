@@ -751,6 +751,7 @@ Utils.pointAngle = (p1, p2) ->
 Utils.convertPointToContext = (point = {}, layer, limit=false) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
 	point = layer.matrix3d.point(point)
+	point.z = 0 unless layer.superLayer
 
 	for parent in layer.superLayers(limit)
 		point.z = 0 if parent.flat
