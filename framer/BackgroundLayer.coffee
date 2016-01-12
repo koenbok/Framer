@@ -17,7 +17,7 @@ class exports.BackgroundLayer extends Layer
 		@_context.domEventManager.wrap(window).addEventListener("resize", @layout)
 	
 	layout: =>
-		if @superLayer
-			@frame = @superLayer.frame
+		if @parent
+			@frame = @parent.frame
 		else
 			@frame = @_context.frame

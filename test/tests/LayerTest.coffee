@@ -1,5 +1,4 @@
 assert = require "assert"
-
 simulate = require "simulate"
 
 describe "Layer", ->
@@ -35,6 +34,7 @@ describe "Layer", ->
 			
 			# if the default background color is not set the content layer of scrollcomponent is not hidden when layers are added
 			layer = new Layer()
+
 			Color.equal(layer.backgroundColor, Framer.Defaults.Layer.backgroundColor).should.be.true
 
 			Framer.Defaults =
@@ -273,7 +273,7 @@ describe "Layer", ->
 		it "should set style properties on create", ->
 
 			layer = new Layer backgroundColor: "red"
-			layer.backgroundColor.should.eql new Color("red")
+			layer.backgroundColor.isEqual(new Color("red")).should.equal true
 			layer.style["backgroundColor"].should.equal new Color("red").toString()
 
 		it "should check value type", ->
@@ -409,108 +409,6 @@ describe "Layer", ->
 			layer.shadowColor = null
 			layer.style.boxShadow.should.equal "rgba(0, 0, 0, 0) 10px 10px 10px 10px"
 
-	describe "Events", ->
-
-		it "should set pointer events", ->
-
-			layer = new Layer()
-
-			layer.ignoreEvents = false
-			layer.style["pointerEvents"].should.equal "auto"
-
-			layer.ignoreEvents = true
-			layer.style["pointerEvents"].should.equal "none"
-
-		it "should not listen to events by default", ->
-			
-			layer = new Layer()
-			layer.ignoreEvents.should.equal true
-			layer.style["pointerEvents"].should.equal "none"
-
-
-		it "should not listen to events until a listener is added", ->
-			
-			layer = new Layer()
-			layer.ignoreEvents.should.equal true
-
-			layer.on Events.Click, ->
-				console.log "hello"
-
-			layer.ignoreEvents.should.equal false
-
-		it "should modify the event scope", (callback) ->
-
-			myLayer = new Layer()
-
-			myLayer.on "click", (event, layer) ->
-				@id.should.equal myLayer.id
-				layer.id.should.equal myLayer.id
-				callback()
-
-			simulate.click myLayer._element
-
-
-		it "should modify the event scope for once", (callback) ->
-
-			myLayer = new Layer()
-
-			myLayer.once "click", (event, layer) ->
-				@id.should.equal myLayer.id
-				layer.id.should.equal myLayer.id
-				callback()
-
-			simulate.click myLayer._element
-
-		it "should remove events", ->
-
-			layer = new Layer
-			
-			clickCount = 0
-
-			handler = ->
-				clickCount++
-
-			layer.on "test", handler
-
-			layer.emit "test"
-			clickCount.should.equal 1
-
-			layer.off "test", handler
-
-			layer.emit "test"
-			clickCount.should.equal 1
-
-
-		it "should only run an event once", ->
-			
-			layerA = new Layer
-			count = 0
-
-			layerA.once "hello", (layer) ->
-				count++
-				layerA.should.equal layer
-
-			for i in [0..10]
-				layerA.emit("hello")
-
-			count.should.equal 1
-
-		it "should modify scope for draggable events", (callback) ->
-			
-			layerA = new Layer
-			layerA.draggable.enabled = true
-			layerA.on "test", (args...) ->
-				@id.should.equal(layerA.id)
-				callback()
-
-			layerA.draggable.emit("test", {})
-
-		it "should list all events", ->
-			layerA = new Layer
-			handler = -> console.log "hello"
-			layerA.on("test", handler)
-			layerA.listeners("test").length.should.equal 1
-
 		it "should remove all events", ->
 			layerA = new Layer
 			handler = -> console.log "hello"
@@ -603,7 +501,7 @@ describe "Layer", ->
 			f = -> layer = new Layer superLayer:1
 			f.should.throw()
 
-		it "should add sublayer", ->
+		it "should add child", ->
 			
 			layerA = new Layer
 			layerB = new Layer superLayer:layerA
@@ -611,7 +509,7 @@ describe "Layer", ->
 			assert.equal layerB._element.parentNode, layerA._element
 			assert.equal layerB.superLayer, layerA
 
-		it "should remove sublayer", ->
+		it "should remove child", ->
 
 			layerA = new Layer
 			layerB = new Layer superLayer:layerA
@@ -621,20 +519,20 @@ describe "Layer", ->
 			assert.equal layerB._element.parentNode.id, "FramerContextRoot-Default"
 			assert.equal layerB.superLayer, null
 
-		it "should list sublayers", ->
+		it "should list children", ->
 
 			layerA = new Layer
 			layerB = new Layer superLayer:layerA
 			layerC = new Layer superLayer:layerA
 
-			assert.deepEqual layerA.subLayers, [layerB, layerC]
+			assert.deepEqual layerA.children, [layerB, layerC]
 
 			layerB.superLayer = null
-			assert.equal layerA.subLayers.length, 1
-			assert.deepEqual layerA.subLayers, [layerC]
+			assert.equal layerA.children.length, 1
+			assert.deepEqual layerA.children, [layerC]
 
 			layerC.superLayer = null
-			assert.deepEqual layerA.subLayers, []
+			assert.deepEqual layerA.children, []
 
 		it "should list sibling root layers", ->
 
@@ -662,7 +560,35 @@ describe "Layer", ->
 
 			assert.deepEqual layerC.superLayers(), [layerB, layerA]
 
+		it "should list descendants deeply", ->
 
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA
+			layerC = new Layer superLayer:layerB
+
+			layerA.descendants.should.eql [layerB, layerC]
+
+		it "should list descendants", ->
+
+			layerA = new Layer
+			layerB = new Layer superLayer:layerA
+			layerC = new Layer superLayer:layerA
+
+			layerA.descendants.should.eql [layerB, layerC]
+
+		it "should set super/parent with property", ->
+			layerA = new Layer
+			layerB = new Layer
+			layerB.superLayer = layerA
+			layerA.children.should.eql [layerB]
+			layerA.subLayers.should.eql [layerB]
+
+		it "should set super/parent with with constructor", ->
+			layerA = new Layer
+			layerB = new Layer
+				superLayer: layerA
+			layerA.children.should.eql [layerB]
+			layerA.subLayers.should.eql [layerB]
 			
 
 	describe "Layering", ->
@@ -738,15 +664,15 @@ describe "Layer", ->
 			assert.equal layerC.index, 1
 			assert.equal layerD.index, 4
 
-		it "should get a sublayers by name", ->
+		it "should get a children by name", ->
 
 			layerA = new Layer
 			layerB = new Layer name:"B", superLayer:layerA
 			layerC = new Layer name:"C", superLayer:layerA
 			layerD = new Layer name:"C", superLayer:layerA
 
-			layerA.subLayersByName("B").should.eql [layerB]
-			layerA.subLayersByName("C").should.eql [layerC, layerD]
+			layerA.childrenWithName("B").should.eql [layerB]
+			layerA.childrenWithName("C").should.eql [layerC, layerD]
 
 		it "should get a siblinglayer by name", ->
 
@@ -914,6 +840,24 @@ describe "Layer", ->
 			assert.equal layerB.x, 44
 			assert.equal layerB.y, 44
 
+		it "should center with border", ->
+			
+			layer = new Layer
+				width: 200
+				height: 200
+
+			layer.borderColor = "green"
+			layer.borderWidth = 30
+
+			layer.center()
+
+			layerB = new Layer
+				superLayer: layer
+				backgroundColor: "red"
+			layerB.center()
+
+			layerB.frame.should.eql {x:20, y:20, width:100, height:100}
+
 
 	describe "CSS", ->
 
@@ -944,13 +888,13 @@ describe "Layer", ->
 			layer._elementHTML.innerHTML.should.equal "Hello"
 			layer.ignoreEvents.should.equal true
 
-		it "should not effect subLayers", ->
+		it "should not effect children", ->
 
 			layer = new Layer
 			layer.html = "Hello"
-			subLayer = new Layer superLayer: layer
+			Child = new Layer superLayer: layer
 
-			subLayer._element.offsetTop.should.equal 0
+			Child._element.offsetTop.should.equal 0
 
 		it "should set interactive html and allow pointer events", ->
 

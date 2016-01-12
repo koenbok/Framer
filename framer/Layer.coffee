@@ -62,7 +62,7 @@ class exports.Layer extends BaseClass
 		# Set needed private variables
 		@_properties = {}
 		@_style = {}
-		@_subLayers = []
+		@_children = []
 
 		# Special power setting for 2d rendering path. Only enable this
 		# if you know what you are doing. See LayerStyle for more info.
@@ -88,11 +88,15 @@ class exports.Layer extends BaseClass
 
 		@_id = @_context.layerCounter
 
-		# Insert the layer into the dom or the superLayer element
-		if not options.superLayer
+		# Backwards compatibility for superLayer
+		if not options.parent and options.hasOwnProperty("superLayer")
+			options.parent = options.superLayer
+
+		# Insert the layer into the dom or the parent element
+		if not options.parent
 			@_insertElement() if not options.shadow
 		else
-			@superLayer = options.superLayer
+			@parent = options.parent
 
 		# If an index was set, we would like to use that one
 		if options.hasOwnProperty("index")
@@ -390,15 +394,15 @@ class exports.Layer extends BaseClass
 			@frame = Utils.convertFrameFromContext(frame, @, false, false)
 
 	contentFrame: ->
-		return {x:0, y:0, width:0, height:0} unless @subLayers.length
-		Utils.frameMerge(_.pluck(@subLayers, "frame"))
+		return {x:0, y:0, width:0, height:0} unless @children.length
+		Utils.frameMerge(_.pluck(@children, "frame"))
 
 	centerFrame: ->
-		# Get the centered frame for its superLayer
-		if @superLayer
+		# Get the centered frame for its parent
+		if @parent
 			frame = @frame
-			Utils.frameSetMidX(frame, parseInt(@superLayer.width  / 2.0))
-			Utils.frameSetMidY(frame, parseInt(@superLayer.height / 2.0))
+			Utils.frameSetMidX(frame, parseInt((@parent.width  / 2.0) - @superLayer.borderWidth))
+			Utils.frameSetMidY(frame, parseInt((@parent.height / 2.0) - @superLayer.borderWidth))
 			return frame
 		else
 			frame = @frame
@@ -407,15 +411,15 @@ class exports.Layer extends BaseClass
 			return frame
 
 	center: ->
-		@frame = @centerFrame() # Center  in superLayer
+		@frame = @centerFrame() # Center  in parent
 		@
 	
 	centerX: (offset=0) ->
-		@x = @centerFrame().x + offset # Center x in superLayer
+		@x = @centerFrame().x + offset # Center x in parent
 		@
 	
 	centerY: (offset=0) ->
-		@y = @centerFrame().y + offset # Center y in superLayer
+		@y = @centerFrame().y + offset # Center y in parent
 		@
 
 	pixelAlign: ->
@@ -429,37 +433,37 @@ class exports.Layer extends BaseClass
 	# TODO: Rotation/Skew
 
 	# screenOriginX = ->
-	# 	if @_superOrParentLayer()
-	# 		return @_superOrParentLayer().screenOriginX()
+	# 	if @_parentOrContext()
+	# 		return @_parentOrContext().screenOriginX()
 	# 	return @originX
 	
 	# screenOriginY = ->
-	# 	if @_superOrParentLayer()
-	# 		return @_superOrParentLayer().screenOriginY()
+	# 	if @_parentOrContext()
+	# 		return @_parentOrContext().screenOriginY()
 	# 	return @originY
 
 	canvasScaleX: ->
 		scale = @scale * @scaleX
-		for superLayer in @superLayers(context=true)
-			scale = scale * superLayer.scale * superLayer.scaleX
+		for parent in @ancestors(context=true)
+			scale = scale * parent.scale * parent.scaleX
 		return scale
 
 	canvasScaleY: ->
 		scale = @scale * @scaleY
-		for superLayer in @superLayers(context=true)
-			scale = scale * superLayer.scale * superLayer.scaleY
+		for parent in @ancestors(context=true)
+			scale = scale * parent.scale * parent.scaleY
 		return scale
 
 	screenScaleX: ->
 		scale = @scale * @scaleX
-		for superLayer in @superLayers(context=false)
-			scale = scale * superLayer.scale * superLayer.scaleX
+		for parent in @ancestors(context=false)
+			scale = scale * parent.scale * parent.scaleX
 		return scale
 
 	screenScaleY: ->
 		scale = @scale * @scaleY
-		for superLayer in @superLayers(context=false)
-			scale = scale * superLayer.scale * superLayer.scaleY
+		for parent in @ancestors(context=false)
+			scale = scale * parent.scale * parent.scaleY
 		return scale
 
 
@@ -473,14 +477,14 @@ class exports.Layer extends BaseClass
 			width:  @width  * @screenScaleX()
 			height: @height * @screenScaleY()
 		
-		layers = @superLayers(context=true)
+		layers = @ancestors(context=true)
 		layers.push(@)
 		layers.reverse()
 		
-		for superLayer in layers
-			factorX = if superLayer._superOrParentLayer() then superLayer._superOrParentLayer().screenScaleX() else 1
-			factorY = if superLayer._superOrParentLayer() then superLayer._superOrParentLayer().screenScaleY() else 1
-			layerScaledFrame = superLayer.scaledFrame()
+		for parent in layers
+			factorX = if parent._parentOrContext() then parent._parentOrContext().screenScaleX() else 1
+			factorY = if parent._parentOrContext() then parent._parentOrContext().screenScaleY() else 1
+			layerScaledFrame = parent.scaledFrame()
 			frame.x += layerScaledFrame.x * factorX
 			frame.y += layerScaledFrame.y * factorY
 
@@ -571,8 +575,8 @@ class exports.Layer extends BaseClass
 		
 		# Todo: check this
 
-		if @superLayer
-			@superLayer._subLayers = _.without @superLayer._subLayers, @
+		if @parent
+			@parent._children = _.without @parent._children, @
 
 		@_element.parentNode?.removeChild @_element
 		@removeAllListeners()
@@ -591,9 +595,9 @@ class exports.Layer extends BaseClass
 
 		layer = @copySingle()
 
-		for subLayer in @subLayers
-			copiedSublayer = subLayer.copy()
-			copiedSublayer.superLayer = layer
+		for child in @children
+			copiedChild = child.copy()
+			copiedChild.parent = layer
 
 		layer
 
@@ -665,113 +669,161 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## HIERARCHY
 
-	@define "superLayer",
+	@define "parent",
 		enumerable: false
 		exportable: false
 		importable: true
 		get: ->
-			@_superLayer or null
+			@_parent or null
 		set: (layer) ->
 
-			return if layer is @_superLayer
+			return if layer is @_parent
 
 			# Check the type
 			if not layer instanceof Layer
-				throw Error "Layer.superLayer needs to be a Layer object"
+				throw Error "Layer.parent needs to be a Layer object"
 
 			# Cancel previous pending insertions
 			Utils.domCompleteCancel @__insertElement
 
-			# Remove from previous superlayer sublayers
-			if @_superLayer
-				@_superLayer._subLayers = _.without @_superLayer._subLayers, @
-				@_superLayer._element.removeChild @_element
-				@_superLayer.emit "change:subLayers", {added:[], removed:[@]}
+			# Remove from previous parent children
+			if @_parent
+				@_parent._children = _.without @_parent._children, @
+				@_parent._element.removeChild @_element
+				@_parent.emit "change:children", {added:[], removed:[@]}
+				@_parent.emit "change:subLayers", {added:[], removed:[@]}
 
-			# Either insert the element to the new superlayer element or into dom
+			# Either insert the element to the new parent element or into dom
 			if layer
 				layer._element.appendChild @_element
-				layer._subLayers.push @
+				layer._children.push @
+				layer.emit "change:children", {added:[@], removed:[]}
 				layer.emit "change:subLayers", {added:[@], removed:[]}
 			else
 				@_insertElement()
 
-			# Set the superlayer
-			@_superLayer = layer
+			# Set the parent
+			@_parent = layer
 
 			# Place this layer on top of its siblings
 			@bringToFront()
 
+			@emit "change:parent"
 			@emit "change:superLayer"
 
-	# Todo: should we have a recursive subLayers function?
-	# Let's make it when we need it.
+	@define "children",
+		enumerable: false
+		exportable: false
+		importable: false
+		get: -> _.clone @_children
+
+	@define "siblings",
+		enumerable: false
+		exportable: false
+		importable: false
+		get: ->
+
+			# If there is no parent we need to walk through the root
+			if @parent is null
+				return _.filter @_context.getLayers(), (layer) =>
+					layer isnt @ and layer.parent is null
+
+			return _.without @parent.children, @
+
+	@define "descendants",
+		enumerable: false
+		exportable: false
+		importable: false
+		get: ->
+			result = []
+			
+			f = (layer) ->
+				result.push(layer)
+				layer.children.map(f)
+			
+			@children.map(f)
+				
+			return result
+
+	addChild: (layer) ->
+		layer.parent = @
+
+	removeChild: (layer) ->
+
+		if layer not in @children
+			return
+
+		layer.parent = null
+
+	childrenWithName: (name) ->
+		_.filter @children, (layer) -> layer.name == name
+
+	siblingsWithName: (name) ->
+		_.filter @siblingLayers, (layer) -> layer.name == name
+
+	ancestors: (context=false) ->
+
+		parents = []
+		currentLayer = @
+
+		if context is false
+			while currentLayer.parent
+				parents.push(currentLayer.parent)
+				currentLayer = currentLayer.parent
+		else
+			while currentLayer._parentOrContext()
+				parents.push(currentLayer._parentOrContext())
+				currentLayer = currentLayer._parentOrContext()
+
+		return parents
+
+	childrenAbove: (point, originX=0, originY=0) -> _.filter @children, (layer) -> 
+		Utils.framePointForOrigin(layer.frame, originX, originY).y < point.y
+	childrenBelow: (point, originX=0, originY=0) -> _.filter @children, (layer) -> 
+		Utils.framePointForOrigin(layer.frame, originX, originY).y > point.y
+	childrenLeft: (point, originX=0, originY=0) -> _.filter @children, (layer) -> 
+		Utils.framePointForOrigin(layer.frame, originX, originY).x < point.x
+	childrenRight: (point, originX=0, originY=0) -> _.filter @children, (layer) -> 
+		Utils.framePointForOrigin(layer.frame, originX, originY).x > point.x
+
+	_parentOrContext: ->
+		if @parent
+			return @parent
+		if @_context._parent
+			return @_context._parent
+
+	##############################################################
+	# Backwards superLayer and children compatibility
+
+	@define "superLayer",
+		enumerable: false
+		exportable: false
+		importable: false
+		get: -> @parent
+		set: (value) -> @parent = value
 
 	@define "subLayers",
 		enumerable: false
 		exportable: false
 		importable: false
-		get: -> _.clone @_subLayers
+		get: -> @children
 
 	@define "siblingLayers",
 		enumerable: false
 		exportable: false
 		importable: false
-		get: ->
+		get: -> @siblings
 
-			# If there is no superLayer we need to walk through the root
-			if @superLayer is null
-				return _.filter @_context.getLayers(), (layer) =>
-					layer isnt @ and layer.superLayer is null
-
-			return _.without @superLayer.subLayers, @
-
-	addSubLayer: (layer) ->
-		layer.superLayer = @
-
-	removeSubLayer: (layer) ->
-
-		if layer not in @subLayers
-			return
-
-		layer.superLayer = null
-
-	subLayersByName: (name) ->
-		_.filter @subLayers, (layer) -> layer.name == name
-
-	siblingLayersByName: (name) ->
-		_.filter @siblingLayers, (layer) -> layer.name == name
-
-	superLayers: (context=false) ->
-
-		superLayers = []
-		currentLayer = @
-
-		if context is false
-			while currentLayer.superLayer
-				superLayers.push(currentLayer.superLayer)
-				currentLayer = currentLayer.superLayer
-		else
-			while currentLayer._superOrParentLayer()
-				superLayers.push(currentLayer._superOrParentLayer())
-				currentLayer = currentLayer._superOrParentLayer()
-
-		return superLayers
-
-	_superOrParentLayer: ->
-		if @superLayer
-			return @superLayer
-		if @_context._parent
-			return @_context._parent
-
-	subLayersAbove: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
-		Utils.framePointForOrigin(layer.frame, originX, originY).y < point.y
-	subLayersBelow: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
-		Utils.framePointForOrigin(layer.frame, originX, originY).y > point.y
-	subLayersLeft: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
-		Utils.framePointForOrigin(layer.frame, originX, originY).x < point.x
-	subLayersRight: (point, originX=0, originY=0) -> _.filter @subLayers, (layer) -> 
-		Utils.framePointForOrigin(layer.frame, originX, originY).x > point.x
+	superLayers: (context=false) -> @ancestors(context)
+	addSubLayer: (layer) -> @addChild(layer)
+	removeSubLayer: (layer) -> @removeChild(layer)
+	subLayersByName: (name) -> @childrenWithName(name)
+	siblingLayersByName: (name) -> @siblingsWithName(name)
+	subLayersAbove: (point, originX=0, originY=0) -> @childrenAbove(point, originX, originY)
+	subLayersBelow: (point, originX=0, originY=0) -> @childrenBelow(point, originX, originY)
+	subLayersLeft: (point, originX=0, originY=0) -> @childrenLeft(point, originX, originY)
+	subLayersRight: (point, originX=0, originY=0) -> @childrenRight(point, originX, originY)
+	_superOrParentLayer: -> @_parentOrContext()
 
 	##############################################################
 	## ANIMATION
@@ -947,7 +999,7 @@ class exports.Layer extends BaseClass
 			@_domEventManager.removeAllListeners(eventName)
 
 	_parentDraggableLayer: ->
-		for layer in @superLayers().concat(@)
+		for layer in @ancestors().concat(@)
 			return layer if layer._draggable?.enabled
 		return null 
 
@@ -992,6 +1044,43 @@ class exports.Layer extends BaseClass
 	onDragAnimationDidStart: (cb) -> @on(Events.DragAnimationDidStart, cb)
 	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
 	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
+
+	onPan: (cb) -> @on(Events.Pan, cb)
+	onPanStart: (cb) -> @on(Events.PanStart, cb)
+	onPanMove: (cb) -> @on(Events.PanMove, cb)
+	onPanEnd: (cb) -> @on(Events.PanEnd, cb)
+	onPanCancel: (cb) -> @on(Events.PanCancel, cb)
+	onPanLeft: (cb) -> @on(Events.PanLeft, cb)
+	onPanRight: (cb) -> @on(Events.PanRight, cb)
+	onPanUp: (cb) -> @on(Events.PanUp, cb)
+	onPanDown: (cb) -> @on(Events.PanDown, cb)
+
+	onPinch: (cb) -> @on(Events.Pinch, cb)
+	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
+	onPinchMove: (cb) -> @on(Events.PinchMove, cb)
+	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
+	onPinchCancel: (cb) -> @on(Events.PinchCancel, cb)
+	onPinchIn: (cb) -> @on(Events.PinchIn, cb)
+	onPinchOut: (cb) -> @on(Events.PinchOut, cb)
+
+	onPress: (cb) -> @on(Events.Press, cb)
+	onPressUp: (cb) -> @on(Events.PressUp, cb)
+
+	onRotate: (cb) -> @on(Events.Rotate, cb)
+	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
+	onRotateMove: (cb) -> @on(Events.RotateMove, cb)
+	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
+	onRotateCancel: (cb) -> @on(Events.RotateCancel, cb)
+
+	onSwipe: (cb) -> @on(Events.Swipe, cb)
+	onSwipeLeft: (cb) -> @on(Events.SwipeLeft, cb)
+	onSwipeRight: (cb) -> @on(Events.SwipeRight, cb)
+	onSwipeUp: (cb) -> @on(Events.SwipeUp, cb)
+	onSwipeDown: (cb) -> @on(Events.SwipeDown, cb)
+
+	onTap: (cb) -> @on(Events.Tap, cb)
+	onSingleTap: (cb) -> @on(Events.SingleTap, cb)
+	onDoubleTap: (cb) -> @on(Events.DoubleTap, cb)
 
 	##############################################################
 	## DESCRIPTOR

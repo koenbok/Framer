@@ -707,6 +707,10 @@ Utils.framePointForOrigin = (frame, originX, originY) ->
 		height: frame.height
 
 Utils.frameInset = (frame, inset) ->
+
+	if _.isNumber(inset)
+		inset = {top:inset, right:inset, bottom:inset, left:inset}
+
 	frame =
 		x: frame.x + inset.left
 		y: frame.y + inset.top
@@ -750,20 +754,20 @@ Utils.pointAngle = (p1, p2) ->
 # convert a point from a layer to the context level, with limit you can make it continue to the root context
 Utils.convertPointToContext = (point = {}, layer, limit=false) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
-	parents = layer.superLayers(limit)
+	parents = layer.ancestors(limit)
 	parents.unshift(layer)
 
 	for parent in parents
 		point.z = 0 if parent.flat
 		point = parent.matrix3d.point(point)
-		point.z = 0 unless parent.superLayer
+		point.z = 0 unless parent.parent
 
 	return point
 
 # convert a point from the context level to a layer, with limit you can make it start from the root context
 Utils.convertPointFromContext = (point = {}, layer, limit=false, includeLayer = true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
-	parents = layer.superLayers(limit)
+	parents = layer.ancestors(limit)
 	point = parents.pop().matrix3d.inverse().point(point) if parents.length
 	parents.reverse()
 	parents.push(layer) if includeLayer
