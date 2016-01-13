@@ -764,6 +764,13 @@ Utils.convertPointToContext = (point = {}, layer, limit=false, includeLayer = tr
 
 	return point
 
+Utils.convertFrameToContext = (frame = {}, layer, limit=false, includeLayer = true) ->
+	frame = _.defaults(frame, {x:0, y:0, width:100, height:100})
+	corners = Utils.pointsFromFrame(frame)
+	convertedCorners = corners.map (point) =>
+		return Utils.convertPointToContext(point, layer, limit, includeLayer)
+	return Utils.frameFromPoints(convertedCorners)
+
 # convert a point from the context level to a layer, with limit you can make it start from the root context
 Utils.convertPointFromContext = (point = {}, layer, limit=false, includeLayer = true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
@@ -776,7 +783,7 @@ Utils.convertPointFromContext = (point = {}, layer, limit=false, includeLayer = 
 	return point
 
 # convert a frame from the context level to a layer, with limit you can make it start from the root context
-Utils.convertFrameFromContext = (frame, layer, limit=false, includeLayer = true) ->
+Utils.convertFrameFromContext = (frame = {}, layer, limit=false, includeLayer = true) ->
 	frame = _.defaults(frame, {x:0, y:0, width:100, height:100})
 	corners = Utils.pointsFromFrame(frame)
 	convertedCorners = corners.map (point) =>
