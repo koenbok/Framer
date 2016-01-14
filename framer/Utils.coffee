@@ -187,11 +187,15 @@ Utils.inspectObjectType = (item) ->
 		return match[1] if match
 		return null
 
-	className = extract(item.toString())
-	return className if className
-	className = extract(item.constructor?.toString())
-	return className.replace("Constructor", "") if className
-	return item
+	if item.toString
+		className = extract(item.toString())
+		return className if className
+
+	if item.constructor?.toString
+		className = extract(item.constructor?.toString())
+		return className.replace("Constructor", "") if className
+
+	return "Object"
 
 Utils.inspect = (item, max=5, l=0) ->
 
