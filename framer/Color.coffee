@@ -270,16 +270,23 @@ class exports.Color extends BaseClass
 		return false
 
 	@equal: (colorA, colorB) ->
+
 		if !@validColorValue(colorA)
 			if !Color.isColorString(colorA)
 				return false
+		
 		if !@validColorValue(colorB)
 			if !Color.isColorString(colorB)
 				return false
+		
 		colorA = new Color(colorA)
 		colorB = new Color(colorB)
 
-		return colorA.r == colorB.r && colorA.g == colorB.g && colorA.b == colorB.b && colorA.a == colorB.a
+		return false if colorA.r isnt colorB.r
+		return false if colorA.g isnt colorB.g
+		return false if colorA.b isnt colorB.b
+		return false if colorA.a isnt colorB.a
+		return true
 
 	@rgbToHsl: (a, b, c) ->
 		return rgbToHsl(a, b, c)
@@ -332,6 +339,13 @@ inputData = (color, g, b, alpha) ->
 
 		if typeof color == "string"
 			color = stringToObject(color)
+
+			if !color
+				color =
+					r:0
+					g:0
+					b:0
+					a:0
 
 			if color.hasOwnProperty("type")
 				type = color.type

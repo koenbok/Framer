@@ -96,7 +96,29 @@ describe "Utils", ->
 				{width:1000, height:1000},
 				{width:100, height:100},
 			]).should.eql {width:100, height:100}
-		
+
+
+	describe "points", ->
+
+		it "should get points from frame", ->
+
+			frame = {x:200, y:-60, width:200, height:200}
+			points = Utils.pointsFromFrame(frame)
+
+			points.length.should.eql 4
+			points[0].x.should.eql 200
+			points[1].y.should.eql 140
+			points[3].y.should.eql -60
+
+		it "should get frame from points", ->
+
+			points = [{x:200, y:-60}, {x:200, y:140}, {x:400, y:140}, {x:400, y:-60}]
+			frame = Utils.frameFromPoints(points)
+
+			frame.x.should.eql 200
+			frame.y.should.eql -60
+			frame.width.should.eql 200
+			frame.height.should.eql 200
 
 	describe "frameMerge", ->
 

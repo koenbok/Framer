@@ -69,8 +69,8 @@ class exports.Importer
 		# Pass three, insert the layers into the dom
 		# (they were not inserted yet because of the shadow keyword)
 		for layer in @_createdLayers
-			if not layer.superLayer
-				layer.superLayer = null
+			if not layer.parent
+				layer.parent = null
 
 		return @_createdLayersByName
 
@@ -87,7 +87,7 @@ class exports.Importer
 
 		return Framer.Utils.domLoadJSONSync @paths.layerInfo
 
-	_createLayer: (info, superLayer) ->
+	_createLayer: (info, parent) ->
 
 		# Resize the layer frames
 		info.layerFrame = resizeFrame(@scale, info.layerFrame) if info.layerFrame
@@ -125,10 +125,10 @@ class exports.Importer
 
 		# Figure out what the super layer should be. If this layer has a contentLayer
 		# (like a scroll view) we attach it to that instead.
-		if superLayer?.contentLayer
-			layerInfo.superLayer = superLayer.contentLayer
-		else if superLayer
-			layerInfo.superLayer = superLayer
+		if parent?.contentLayer
+			layerInfo.parent = parent.contentLayer
+		else if parent
+			layerInfo.parent = parent
 
 		# Layer names cannot start with a number
 		if startsWithNumber(layerInfo.name)
@@ -149,7 +149,7 @@ class exports.Importer
 		if layerInfo.name.toLowerCase().indexOf("draggable") != -1
 			layer.draggable.enabled = true
 
-		# A layer without an image, mask or sublayers should be zero
+		# A layer without an image, mask or children should be zero
 		if not layer.image and not info.children.length and not info.maskFrame
 			layer.frame = Utils.frameZero()
 
@@ -198,13 +198,13 @@ class exports.Importer
 
 		traverse = (layer) ->
 
-			if layer.superLayer
-				layer.frame = Utils.convertPoint(layer.frame, null, layer.superLayer)
+			if layer.parent
+				layer.frame = Utils.convertPoint(layer.frame, null, layer.parent)
 
-			for subLayer in layer.subLayers
-				traverse(subLayer)
+			for child in layer.children
+				traverse(child)
 
-		if not layer.superLayer
+		if not layer.parent
 			traverse(layer)
 
 exports.Importer.load = (path, scale) ->

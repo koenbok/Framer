@@ -75,7 +75,10 @@ gulp.task "build-test", ->
 gulp.task "test", ["build-debug", "build-test"], ->
 	return gulp
 		.src("test/phantomjs/index.html")
-		.pipe(phantomjs({reporter:"dot"}))
+		.pipe(phantomjs({reporter:"dot", viewportSize: {
+			width: 1024,
+			height: 768
+		}}))
 
 gulp.task "watch", ->
 	gulp.run "test", ->

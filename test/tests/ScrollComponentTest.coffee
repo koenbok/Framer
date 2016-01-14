@@ -16,7 +16,7 @@ describe "ScrollComponent", ->
 
 	describe "wrap", ->
 
-		it "should use the wrapped layer as content layer when there are sublayers", ->
+		it "should use the wrapped layer as content layer when there are children", ->
 
 			layerA = new Layer frame:Screen.frame
 			layerB = new Layer superLayer:layerA
@@ -24,12 +24,12 @@ describe "ScrollComponent", ->
 			scroll = ScrollComponent.wrap(layerA)
 			scroll.content.should.equal layerA
 
-		it "should use the wrapped layer as content if there are no sublayers", ->
+		it "should use the wrapped layer as content if there are no children", ->
 
 			layerA = new Layer frame:Screen.frame
 
 			scroll = ScrollComponent.wrap(layerA)
-			scroll.content.subLayers[0].should.equal layerA
+			scroll.content.children[0].should.equal layerA
 
 		it "should copy the name and image", ->
 
@@ -57,7 +57,7 @@ describe "ScrollComponent", ->
 			scroll.width.should.equal Screen.width
 			scroll.height.should.equal Screen.height
 
-		it "should correct the scroll frame with sublayers", ->
+		it "should correct the scroll frame with children", ->
 
 			frame = Screen.frame
 			frame.width += 100
@@ -77,3 +77,7 @@ describe "ScrollComponent", ->
 			
 			delete layerA._properties.backgroundColor
 			scroll = ScrollComponent.wrap(layerA)
+
+		it "should throw a warning on no layer", ->
+			f = -> ScrollComponent.wrap()
+			f.should.throw()
