@@ -139,6 +139,12 @@ describe "LayerEvents", ->
 
 			simulate.mouseover(layer._element)
 
+		it "should trigger ImageLoaded events", (done) ->
+			layerA = new Layer
+			layerA.on Events.ImageLoaded, ->
+				done()
+			layerA.image = "../static/test.png"
+
 	describe "Gesture events", ->
 
 		it "should not be listened to until a listener is added", ->
