@@ -35,61 +35,12 @@ Events.AnimationDidStart = "start"
 Events.AnimationDidStop = "stop"
 Events.AnimationDidEnd = "end"
 
-# Gesture events
-_gestures = []
-
-# Pan
-_gestures.push Events.Pan = "pan" # This event includes all the other Pan events
-_gestures.push Events.PanStart = "panstart"
-_gestures.push Events.PanMove = "panmove"
-_gestures.push Events.PanEnd = "panend"
-_gestures.push Events.PanCancel = "pancancel"
-_gestures.push Events.PanLeft = "panleft"
-_gestures.push Events.PanRight = "panright"
-_gestures.push Events.PanUp = "panup"
-_gestures.push Events.PanDown = "pandown"
-
-# Pinch
-_gestures.push Events.Pinch = "pinch" # This event includes all the other Pinch events
-_gestures.push Events.PinchStart = "pinchstart"
-_gestures.push Events.PinchMove = "pinchmove"
-_gestures.push Events.PinchEnd = "pinchend"
-_gestures.push Events.PinchCancel = "pinchcancel"
-_gestures.push Events.PinchIn = "pinchin"
-_gestures.push Events.PinchOut = "pinchout"
-
-# Press
-_gestures.push Events.Press = "press"
-_gestures.push Events.PressUp = "pressup"
-
-# Rotate
-_gestures.push Events.Rotate = "rotate" # This event includes all the other Rotate events
-_gestures.push Events.RotateStart = "rotatestart"
-_gestures.push Events.RotateMove = "rotatemove"
-_gestures.push Events.RotateEnd = "rotateend"
-_gestures.push Events.RotateCancel = "rotatecancel"
-
-# Swipe
-_gestures.push Events.Swipe = "swipe"
-_gestures.push Events.SwipeLeft = "swipeleft"
-_gestures.push Events.SwipeRight = "swiperight"
-_gestures.push Events.SwipeUp = "swipeup"
-_gestures.push Events.SwipeDown = "swipedown"
-
-# Tap
-_gestures.push Events.Tap = "tap"
-_gestures.push Events.SingleTap = "singletap"
-_gestures.push Events.DoubleTap = "doubletap"
-
 # Scroll events
 Events.Scroll = "scroll"
 
 # Image events
 Events.ImageLoaded = "load"
 Events.ImageLoadError = "error"
-
-Events.isGestureEvent = (eventName) ->
-	return eventName in _gestures
 
 # Extract touch events for any event
 Events.touchEvent = (event) ->
