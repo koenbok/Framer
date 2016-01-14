@@ -751,7 +751,7 @@ Utils.pointAngle = (p1, p2) ->
 
 # Coordinate system
 
-# convert a point from a layer to the context level, with rootContext you can make it continue to the root context
+# convert a point from a layer to the context level, with rootContext enabled you can make it cross to the top context
 Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLayer = true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
 	ancestors = layer.ancestors(rootContext)
@@ -771,7 +771,7 @@ Utils.convertFrameToContext = (frame = {}, layer, rootContext=false, includeLaye
 		return Utils.convertPointToContext(point, layer, rootContext, includeLayer)
 	return Utils.frameFromPoints(convertedCorners)
 
-# convert a point from the context level to a layer, with rootContext you can make it start from the root context
+# convert a point from the context level to a layer, with rootContext enabled you can make it cross from the top context
 Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLayer = true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
 	ancestors = layer.ancestors(rootContext)
@@ -782,7 +782,7 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 		point = ancestor.matrix3d.inverse().point(point)
 	return point
 
-# convert a frame from the context level to a layer, with rootContext you can make it start from the root context
+# convert a frame from the context level to a layer, with rootContext enabled you can make it start from the top context
 Utils.convertFrameFromContext = (frame = {}, layer, rootContext=false, includeLayer = true) ->
 	frame = _.defaults(frame, {x:0, y:0, width:100, height:100})
 	corners = Utils.pointsFromFrame(frame)
