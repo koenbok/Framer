@@ -983,9 +983,10 @@ class exports.Layer extends BaseClass
 
 		# If this is a dom event, we want the actual dom node to let us know
 		# when it gets triggered, so we can emit the event through the system.
-		if not @_domEventManager.listeners(eventName).length
-			@_domEventManager.addEventListener eventName, (event) =>
-				@emit(eventName, event)
+		if Utils.domValidEvent(@_element, eventName)
+			if not @_domEventManager.listeners(eventName).length
+				@_domEventManager.addEventListener eventName, (event) =>
+					@emit(eventName, event)
 
 		# Make sure we stop ignoring events once we add a user event listener
 		if not _.startsWith eventName, "change:"

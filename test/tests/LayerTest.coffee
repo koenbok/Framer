@@ -487,6 +487,14 @@ describe "Layer", ->
 			layerA.emit(Events.Click)
 			clicked.should.equal true
 
+		it "should only pass dom events to the event manager", ->
+
+			layer = new Layer
+			layer.on Events.Click, ->
+			layer.on Events.Move, ->
+
+			layer._domEventManager.listenerEvents().should.eql([Events.Click])
+
 	describe "Hierarchy", ->
 		
 		it "should insert in dom", ->

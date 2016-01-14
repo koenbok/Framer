@@ -5,7 +5,7 @@ window.console.warn = (v) ->
 
 chai.should()
 chai.config.truncateThreshold = 2
-chai.config.showDiff = false
+chai.config.showDiff = true
 
 mocha.setup({ui:"bdd", bail:true, reporter:"dot"})
 mocha.globals(["__import__"])
