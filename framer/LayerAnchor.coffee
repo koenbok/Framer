@@ -18,7 +18,7 @@ calculateFrame = (layer, rules) ->
 		rules["centerX"] = val("center")
 		rules["centerY"] = val("center")
 	
-	parentSize = layer.superLayer
+	parentSize = layer.parent
 	parentSize ?= Screen
 	
 	frame = layer.frame
@@ -59,7 +59,7 @@ class LayerAnchor extends EventEmitter
 
 	updateRules: (rules) ->
 		@rules = @_parseRules(rules)
-		@layer.on("change:superLayer", @_setupListener)
+		@layer.on("change:parent", @_setupListener)
 		@_setNeedsUpdate()
 		# @_needsUpdate = false
 		@_removeListeners()
@@ -69,8 +69,8 @@ class LayerAnchor extends EventEmitter
 		
 		@_removeListeners()
 		
-		if @layer.superLayer
-			@_addListener(@layer.superLayer, "change:frame", @_setNeedsUpdate)
+		if @layer.parent
+			@_addListener(@layer.parent, "change:frame", @_setNeedsUpdate)
 		else
 			@_addListener(Canvas, "resize", @_setNeedsUpdate)
 			
