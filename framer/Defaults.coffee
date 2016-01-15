@@ -16,7 +16,7 @@ Originals =
 		curve: "ease"
 		time: 1
 	Context:
-		perspective: 1200
+		perspective: 0
 		perspectiveOriginX: 0.5
 		perspectiveOriginY: 0.5
 		parent: null

@@ -113,6 +113,7 @@ class exports.DeviceComponent extends BaseClass
 			layer.on "touchmove", (event) -> event.preventDefault()
 
 		@_context = new Framer.Context(parent:@content, name:"Device")
+		@_context.perspective = 1200
 
 	_update: =>
 
