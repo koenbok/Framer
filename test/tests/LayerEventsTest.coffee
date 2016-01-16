@@ -145,6 +145,14 @@ describe "LayerEvents", ->
 				done()
 			layerA.image = "../static/test.png"
 
+		it "should trigger ImageLoadError events", (done) ->
+			layerA = new Layer
+			layerA.on Events.ImageLoadError, ->
+				done()
+			# Apparently there's no way of preventing this 404 error being logged to the console (try/catch or window.onerror don't work)
+			# http://stackoverflow.com/questions/9893886/prevent-image-load-errors-going-to-the-javascript-console
+			layerA.image = "../static/thisimagedoesnotexist.png"
+
 	describe "Gesture events", ->
 
 		it "should not be listened to until a listener is added", ->
