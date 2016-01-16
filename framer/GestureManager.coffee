@@ -75,6 +75,9 @@ class exports.GestureManager extends EventEmitter
 
 	_getRecognizer: (eventFamily) ->
 
+		if @_manager?.get(eventFamily)
+			return @_manager.get(eventFamily)
+
 		switch eventFamily
 			
 			when Gestures.Pan
