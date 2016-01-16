@@ -83,7 +83,7 @@ describe "Layer", ->
 			layer.y.should.equal 50
 			
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
-			layer.style.webkitTransform.should.equal "translate3d(100px, 50px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+			layer.style.webkitTransform.should.equal "translate3d(100px, 50px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 			
 		it "should set scale", ->
 			
@@ -94,7 +94,7 @@ describe "Layer", ->
 			layer.scaleZ = 100
 
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 50)"
-			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(100, 100, 100) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale3d(100, 100, 100) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 
 		it "should set origin", ->
 
@@ -107,13 +107,13 @@ describe "Layer", ->
 			layer.originY = 0.2
 
 			layer.style.webkitTransformOrigin.should.equal "10% 20%"
-			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(80px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(-80px)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(80px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(-80px)"
 
 			layer.originX = 0.5
 			layer.originY = 0.5
 
 			layer.style.webkitTransformOrigin.should.equal "50% 50%"
-			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(80px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(-80px)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(80px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(-80px)"
 
 		it "should preserve 3D by default", ->
 
@@ -129,7 +129,7 @@ describe "Layer", ->
 			layer._element.style.webkitTransformStyle.should.equal "flat"
 
 
-		it "should set local image", ->
+		it "should set local image", (done) ->
 	
 			prefix = "../"
 			imagePath = "static/test.png"
@@ -139,15 +139,17 @@ describe "Layer", ->
 			layer.image = fullPath
 			layer.image.should.equal fullPath
 
-			layer.style["background-image"].indexOf(imagePath).should.not.equal(-1)
-			layer.style["background-image"].indexOf("file://").should.not.equal(-1)
-			layer.style["background-image"].indexOf("?nocache=").should.not.equal(-1)
-
-			#layer.computedStyle()["background-size"].should.equal "cover"
-			#layer.computedStyle()["background-repeat"].should.equal "no-repeat"
-
 			image = layer.props.image
 			layer.props.image.should.equal fullPath
+
+			layer.on Events.ImageLoaded, ->
+				layer.style["background-image"].indexOf(imagePath).should.not.equal(-1)
+				layer.style["background-image"].indexOf("file://").should.not.equal(-1)
+				layer.style["background-image"].indexOf("?nocache=").should.not.equal(-1)
+				done()
+			
+			#layer.computedStyle()["background-size"].should.equal "cover"
+			#layer.computedStyle()["background-repeat"].should.equal "no-repeat"
 
 		it "should set image", ->
 			imagePath = "../static/test.png"
@@ -932,7 +934,7 @@ describe "Layer", ->
 
 			layer = new Layer
 
-			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale(1) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 
 			layer.force2d = true
 
