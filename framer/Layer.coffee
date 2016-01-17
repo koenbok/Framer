@@ -13,6 +13,7 @@ Utils = require "./Utils"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
 {Matrix} = require "./Matrix"
+{GestureManager} = require "./GestureManager"
 
 NoCacheDateKey = Date.now()
 
@@ -576,13 +577,13 @@ class exports.Layer extends BaseClass
 		# Todo: check this
 
 		if @parent
-			@parent._children = _.without @parent._children, @
+			@parent._children = _.without(@parent._children, @)
 
 		@_element.parentNode?.removeChild @_element
 		@removeAllListeners()
+		@gestures.removeAllListeners()
 		
 		@_context.removeLayer(@)
-
 		@_context.emit("layer:destroy", @)
 
 
@@ -984,9 +985,10 @@ class exports.Layer extends BaseClass
 
 		# If this is a dom event, we want the actual dom node to let us know
 		# when it gets triggered, so we can emit the event through the system.
-		if not @_domEventManager.listeners(eventName).length
-			@_domEventManager.addEventListener eventName, (event) =>
-				@emit(eventName, event)
+		if Utils.domValidEvent(@_element, eventName)
+			if not @_domEventManager.listeners(eventName).length
+				@_domEventManager.addEventListener eventName, (event) =>
+					@emit(eventName, event)
 
 		# Make sure we stop ignoring events once we add a user event listener
 		if not _.startsWith eventName, "change:"
@@ -1006,6 +1008,14 @@ class exports.Layer extends BaseClass
 
 	on: @::addListener
 	off: @::removeListener
+
+	##############################################################
+	## EVENTS
+
+	@define "gestures",
+		get: ->
+			@_gestures ?= new GestureManager(@)
+			return @_gestures
 
 	##############################################################
 	## EVENT HELPERS
@@ -1045,43 +1055,6 @@ class exports.Layer extends BaseClass
 	onDragAnimationDidStart: (cb) -> @on(Events.DragAnimationDidStart, cb)
 	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
 	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
-
-	onPan: (cb) -> @on(Events.Pan, cb)
-	onPanStart: (cb) -> @on(Events.PanStart, cb)
-	onPanMove: (cb) -> @on(Events.PanMove, cb)
-	onPanEnd: (cb) -> @on(Events.PanEnd, cb)
-	onPanCancel: (cb) -> @on(Events.PanCancel, cb)
-	onPanLeft: (cb) -> @on(Events.PanLeft, cb)
-	onPanRight: (cb) -> @on(Events.PanRight, cb)
-	onPanUp: (cb) -> @on(Events.PanUp, cb)
-	onPanDown: (cb) -> @on(Events.PanDown, cb)
-
-	onPinch: (cb) -> @on(Events.Pinch, cb)
-	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
-	onPinchMove: (cb) -> @on(Events.PinchMove, cb)
-	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
-	onPinchCancel: (cb) -> @on(Events.PinchCancel, cb)
-	onPinchIn: (cb) -> @on(Events.PinchIn, cb)
-	onPinchOut: (cb) -> @on(Events.PinchOut, cb)
-
-	onPress: (cb) -> @on(Events.Press, cb)
-	onPressUp: (cb) -> @on(Events.PressUp, cb)
-
-	onRotate: (cb) -> @on(Events.Rotate, cb)
-	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
-	onRotateMove: (cb) -> @on(Events.RotateMove, cb)
-	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
-	onRotateCancel: (cb) -> @on(Events.RotateCancel, cb)
-
-	onSwipe: (cb) -> @on(Events.Swipe, cb)
-	onSwipeLeft: (cb) -> @on(Events.SwipeLeft, cb)
-	onSwipeRight: (cb) -> @on(Events.SwipeRight, cb)
-	onSwipeUp: (cb) -> @on(Events.SwipeUp, cb)
-	onSwipeDown: (cb) -> @on(Events.SwipeDown, cb)
-
-	onTap: (cb) -> @on(Events.Tap, cb)
-	onSingleTap: (cb) -> @on(Events.SingleTap, cb)
-	onDoubleTap: (cb) -> @on(Events.DoubleTap, cb)
 
 	##############################################################
 	## DESCRIPTOR

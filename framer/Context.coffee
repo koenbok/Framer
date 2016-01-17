@@ -89,6 +89,7 @@ class exports.Context extends BaseClass
 		@_layers = _.without(@_layers, layer)
 	
 	resetLayers: ->
+		@resetGestures()
 		@_layers = []
 		@_layerCounter = 0
 
@@ -141,6 +142,14 @@ class exports.Context extends BaseClass
 		@_intervals.map(window.clearInterval) if @_intervals
 		@_intervals = []
 
+	# Gestures
+	resetGestures: ->
+		return unless @_layers
+		for layer in @_layers
+			if layer._gestures
+				layer._gestures.destroy()
+
+		return
 
 	##############################################################
 	# Run
