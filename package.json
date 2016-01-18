@@ -19,7 +19,7 @@
     "eventemitter3": "^1.1.1",
     "gulp-util": "^3.0.7",
     "husl": "^6.0.1",
-    "lodash": "^3.5.0",
+    "lodash": "^4.0.0",
     "async": "^1.5.0",
     "bower": "^1.3.12",
     "coffee-coverage": "^0.7.0",
