@@ -17,6 +17,7 @@
   "devDependencies": {
     "hammerjs": "^2.0.4",
     "eventemitter3": "^1.1.1",
+    "css-layout": "^1.1.1",
     "gulp-util": "^3.0.7",
     "husl": "^6.0.1",
     "lodash": "^3.5.0",
