@@ -253,27 +253,11 @@ class exports.Layer extends BaseClass
 				.multiply(@matrix)
 				.translate(-@originX * @width, -@originY * @height)
 
-	_perspectiveProjectionMatrix: (element) =>
-		p = element.perspective
-		m = new Matrix()
-		m.m34 = -1/p if p? and p isnt 0
-		return m
-
-	# matrix of perspective projection with perspective origin applied
-	_perspectiveMatrix: (element) =>
-		ox = element.perspectiveOriginX * element.width
-		oy = element.perspectiveOriginY * element.height
-		ppm = @_perspectiveProjectionMatrix(element)
-		return new Matrix()
-			.translate(ox, oy)
-			.multiply(ppm)
-			.translate(-ox, -oy)
-
 	# matrix of layer transforms with perspective applied
 	@define "matrix3d",
 		get: ->
 			parent = @superLayer or @context
-			ppm = @_perspectiveMatrix(parent)
+			ppm = Utils.perspectiveMatrix(parent)
 			return new Matrix()
 				.multiply(ppm)
 				.multiply(@transformMatrix)

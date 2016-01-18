@@ -1,5 +1,6 @@
 {_} = require "./Underscore"
 {Screen} = require "./Screen"
+{Matrix} = require "./Matrix"
 
 Utils = {}
 
@@ -811,6 +812,21 @@ Utils.boundingFrame = (layer, rootContext=true) ->
 	boundingFrame = Utils.frameFromPoints(contextCornerPoints)
 	return Utils.pixelAlignedFrame(boundingFrame)
 
+Utils.perspectiveProjectionMatrix = (element) ->
+	p = element.perspective
+	m = new Matrix()
+	m.m34 = -1/p if p? and p isnt 0
+	return m
+
+# matrix of perspective projection with perspective origin applied
+Utils.perspectiveMatrix = (element) ->
+	ox = element.perspectiveOriginX * element.width
+	oy = element.perspectiveOriginY * element.height
+	ppm = Utils.perspectiveProjectionMatrix(element)
+	return new Matrix()
+		.translate(ox, oy)
+		.multiply(ppm)
+		.translate(-ox, -oy)
 
 ###################################################################
 # Beta additions, use with care
