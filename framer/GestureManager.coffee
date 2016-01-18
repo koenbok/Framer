@@ -38,8 +38,8 @@ class exports.GestureManager extends EventEmitter
 
 		# Add other recognizers if they existed already
 		existingRecognizers = @_getDependentRecognizersForEventFamily(eventFamily)
-		
-		if existingRecognizers.length > 0
+
+		if existingRecognizers.length
 			@_manager.add(recognizer).recognizeWith(existingRecognizers)
 		else
 			@_manager.add(recognizer)
@@ -87,8 +87,11 @@ class exports.GestureManager extends EventEmitter
 
 	_getRecognizer: (eventFamily) ->
 
-		if @_manager?.get(eventFamily)
-			return @_manager.get(eventFamily)
+		existingRecognizer = @_manager.get(eventFamily)
+
+		if existingRecognizer
+			if eventFamily in [Gestures.Swipe, Gestures.Pan]
+			return existingRecognizer
 
 		switch eventFamily
 			
