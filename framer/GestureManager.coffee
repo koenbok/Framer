@@ -10,9 +10,22 @@ class exports.GestureManager extends EventEmitter
 	constructor: (@layer) ->
 		@_manager = Hammer(@layer._element)
 
-	addListener: (eventName, listener) ->
 
+	once: (eventName, listener) =>
 		super(eventName, listener)
+		@_addListener eventName, (e) =>
+			@removeListener(eventName, listener)
+			listener.apply(@layer, [e, @layer])
+
+	addListener: (eventName, listener) =>
+		super(eventName, listener)
+		@_addListener(eventName, listener)
+
+	removeListener: (eventName, listener) ->
+		super(eventName, listener)
+		@_removeListener(eventName, listener)
+
+	_addListener: (eventName, listener) ->
 
 		# Make sure we have a hammer instance and layer listeners enabled
 		@layer.ignoreEvents = false
@@ -37,8 +50,7 @@ class exports.GestureManager extends EventEmitter
 
 		@_manager.on(eventName, listener._actual)
 
-	removeListener: (eventName, listener) ->
-		super(eventName, listener)
+	_removeListener: (eventName, listener) ->
 		@_manager.off(eventName, listener._actual)
 
 	destroy: ->
