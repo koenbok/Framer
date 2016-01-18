@@ -10,7 +10,6 @@ class exports.GestureManager extends EventEmitter
 	constructor: (@layer) ->
 		@_manager = Hammer(@layer._element)
 
-
 	once: (eventName, listener) =>
 		super(eventName, listener)
 		@_addListener eventName, (e) =>
@@ -39,10 +38,10 @@ class exports.GestureManager extends EventEmitter
 		# Add other recognizers if they existed already
 		existingRecognizers = @_getDependentRecognizersForEventFamily(eventFamily)
 
-		if existingRecognizers.length
-			@_manager.add(recognizer).recognizeWith(existingRecognizers)
-		else
-			@_manager.add(recognizer)
+		if existingRecognizers.length > 0
+			recognizer.recognizeWith(existingRecognizers)
+
+		@_manager.add(recognizer)
 
 		# Wrap this layer so we control the scope
 		listener._actual = (event) =>
@@ -87,12 +86,6 @@ class exports.GestureManager extends EventEmitter
 
 	_getRecognizer: (eventFamily) ->
 
-		existingRecognizer = @_manager.get(eventFamily)
-
-		if existingRecognizer
-			if eventFamily in [Gestures.Swipe, Gestures.Pan]
-			return existingRecognizer
-
 		switch eventFamily
 			
 			when Gestures.Pan
@@ -115,8 +108,6 @@ class exports.GestureManager extends EventEmitter
 			
 			when Gestures.DoubleTap
 				return new Hammer.Tap({event:Gestures.DoubleTap, taps:2})
-			
-
 
 	_getDependentRecognizersForEventFamily: (eventFamily) ->
 
@@ -151,7 +142,7 @@ class exports.GestureManager extends EventEmitter
 			when Gestures.Pinch # Pinch depends on Pan and Rotate
 				if pan = @_manager.get(Gestures.Pan)
 					existingRecognizers.push(pan)
-				if rotate = @_manager.get(Gestures.Pinch)
+				if rotate = @_manager.get(Gestures.Rotate)
 					existingRecognizers.push(rotate)
 
 			when Gestures.DoubleTap # DoubleTap depends on Tap
