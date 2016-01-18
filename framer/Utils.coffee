@@ -779,7 +779,6 @@ Utils.convertFrameToContext = (frame = {}, layer, rootContext=false, includeLaye
 Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLayer = true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
 	ancestors = layer.ancestors(rootContext)
-	point = ancestors.pop().matrix3d.inverse().point(point) if ancestors.length
 	ancestors.reverse()
 	ancestors.push(layer) if includeLayer
 	for ancestor in ancestors
