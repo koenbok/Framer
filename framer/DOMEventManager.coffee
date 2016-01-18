@@ -9,21 +9,14 @@ EventManagerIdCounter = 0
 class DOMEventManagerElement extends EventEmitter
 
 	constructor: (@element) ->
-		@_elementGestureManager = new GestureManagerElement(@element)
 
 	addListener: (eventName, listener, capture=false) ->	
 		super(eventName, listener)
-		if Events.isGestureEvent eventName
-			@_elementGestureManager.addEventListener(eventName, listener, capture)
-		else
-			@element.addEventListener(eventName, listener)
+		@element.addEventListener(eventName, listener, false)
 
 	removeListener: (eventName, listener) ->
 		super(eventName, listener)
-		if Events.isGestureEvent eventName
-			@_elementGestureManager.removeEventListener(eventName, listener)
-		else
-			@element.removeEventListener(eventName, listener)
+		@element.removeEventListener(eventName, listener, false)
 
 	# Keep the DOM API working
 	addEventListener: @::addListener

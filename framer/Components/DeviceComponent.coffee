@@ -80,11 +80,11 @@ class exports.DeviceComponent extends BaseClass
 		@background.backgroundColor = "transparent"
 		@background.classList.add("DeviceBackground")
 
-		# @phone = new Layer superLayer:@background
+		# @phone = new Layer parent:@background
 		@phone = new Layer
-		@screen   = new Layer superLayer:@phone
-		@viewport = new Layer superLayer:@screen
-		@content  = new Layer superLayer:@viewport
+		@screen   = new Layer parent:@phone
+		@viewport = new Layer parent:@screen
+		@content  = new Layer parent:@viewport
 
 		@phone.backgroundColor = "transparent"
 		@phone.classList.add("DevicePhone")
@@ -101,7 +101,7 @@ class exports.DeviceComponent extends BaseClass
 		@content.originX = 0
 		@content.originY = 0
 
-		@keyboardLayer = new Layer superLayer:@viewport
+		@keyboardLayer = new Layer parent:@viewport
 		@keyboardLayer.on "click", => @toggleKeyboard()
 		@keyboardLayer.classList.add("DeviceKeyboard")
 		@keyboardLayer.backgroundColor = "transparent"
@@ -113,6 +113,7 @@ class exports.DeviceComponent extends BaseClass
 			layer.on "touchmove", (event) -> event.preventDefault()
 
 		@_context = new Framer.Context(parent:@content, name:"Device")
+		@_context.perspective = 1200
 
 	_update: =>
 

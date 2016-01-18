@@ -114,12 +114,12 @@ class exports.ScrollComponent extends Layer
 		@_content.destroy() if @content
 
 		@_content = layer
-		@_content.superLayer = @
+		@_content.parent = @
 		@_content.name = "content"
 		@_content.clip = false
 		@_content.draggable.enabled = true
 		@_content.draggable.momentum = true
-		@_content.on("change:subLayers", @updateContent)
+		@_content.on("change:children", @updateContent)
 
 		# Update the content view size on resizing the ScrollComponent
 		@on("change:width", @updateContent)
@@ -158,10 +158,10 @@ class exports.ScrollComponent extends Layer
 
 		@content.draggable.constraints = constraintsFrame
 
-		# Change the default background color if we added subLayers. We keep the default 
+		# Change the default background color if we added children. We keep the default 
 		# color around until you set a content layer so you can see the ScrollComponent 
 		# on your screen after creation.
-		if @content.subLayers.length
+		if @content.children.length
 			if @content.backgroundColor?.isEqual(Framer.Defaults.Layer.backgroundColor)
 				@content.backgroundColor = null
 
@@ -267,10 +267,10 @@ class exports.ScrollComponent extends Layer
 
 	scrollToLayer: (contentLayer, originX=0, originY=0, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
 
-		if contentLayer and contentLayer.superLayer isnt @content
+		if contentLayer and contentLayer.parent isnt @content
 			throw Error("This layer is not in the scroll component content")
 
-		if not contentLayer or @content.subLayers.length == 0
+		if not contentLayer or @content.children.length == 0
 			scrollPoint = {x:0, y:0}
 		else
 			scrollPoint = @_scrollPointForLayer(contentLayer, originX, originY)
@@ -301,7 +301,7 @@ class exports.ScrollComponent extends Layer
 		return Utils.framePointForOrigin(layer, originX, originY)
 
 	_contentLayersSortedByDistanceForScrollPoint: (scrollPoint, originX=0, originY=0) ->
-		return Utils.frameSortByAbsoluteDistance(scrollPoint, @content.subLayers, originX, originY)
+		return Utils.frameSortByAbsoluteDistance(scrollPoint, @content.children, originX, originY)
 
 	_pointInConstraints: (point) ->
 
@@ -376,7 +376,7 @@ class exports.ScrollComponent extends Layer
 
 	copy: ->
 		copy = super
-		contentLayer = _.first(_.without(copy.subLayers, copy.content))
+		contentLayer = _.first(_.without(copy.children, copy.content))
 		copy.setContentLayer(contentLayer)
 		copy.props = @props
 		return copy
@@ -404,18 +404,18 @@ wrapComponent = (instance, layer, options = {correct:true}) ->
 	# correct that here.
 
 	if options.correct is true
-		if layer.subLayers.length is 0
+		if layer.children.length is 0
 			wrapper = new Layer
 			wrapper.name = "ScrollComponent"
 			wrapper.frame = layer.frame
-			layer.superLayer = wrapper
+			layer.parent = wrapper
 			layer.x = layer.y = 0
 			layer = wrapper
 
 			# console.info "Corrected the scroll component without sub layers"
 	
 	scroll.frame = layer.frame
-	scroll.superLayer = layer.superLayer
+	scroll.parent = layer.parent
 	scroll.index = layer.index
 	
 	# Copy over the name, if we don't have it try to use the variable
