@@ -48,7 +48,6 @@ class LayerLayout
 		return cssLayoutProperty
 
 	updateProperty: (property, value) ->
-		console.log("updateProperty", property, value)
 		if property
 			# TODO Check if value exists
 			# TODO How can we handle property removal?
@@ -69,14 +68,15 @@ class LayerLayout
 		while rootLayer.superLayer
 			rootLayer = rootLayer.superLayer
 		# Hack to add Screen size
+		# TODO Maybe add this root node to the Canvas class?
 		rootLayoutNode =
 			style:
 				width: Screen.width
 				height: Screen.height
 			children: [rootLayer.layout()._layoutNode]
-		computedTree = _.cloneDeep(rootLayoutNode)
-		computeLayout(computedTree)
-		@_updateLayer(computedTree.children[0])
+		newTree = _.cloneDeep(rootLayoutNode)
+		computeLayout(newTree)
+		rootLayer.layout()._updateLayer(newTree.children[0])
 
 	_updateLayer: (computedTree) ->
 		if computedTree.shouldUpdate

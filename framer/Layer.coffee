@@ -213,7 +213,6 @@ class exports.Layer extends BaseClass
 				get: -> 
 					@_getPropertyValue layoutProp
 				set: (value) ->
-					console.log("value", value)
 					@_setPropertyValue layoutProp, value
 					# Set the layout attribute on LayerLayout
 					@layout().updateProperty(layoutProp, value)
