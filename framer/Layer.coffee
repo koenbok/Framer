@@ -81,9 +81,6 @@ class exports.Layer extends BaseClass
 		if options.hasOwnProperty "frame"
 			options = _.extend(options, options.frame)
 
-		if options.hasOwnProperty "layout"
-			options = _.extend(options, options.layout)
-
 		options = Defaults.getDefaults "Layer", options
 
 		super options

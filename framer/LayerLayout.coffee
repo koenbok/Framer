@@ -33,9 +33,9 @@ class LayerLayout
 			style: {}
 			children: []
 
-		for property, value of @layer
-			if (property in LayerLayout.layoutProps) and value
-				@_layoutNode.style[@_getLayoutProperty(property)] = value
+		for property of LayerLayout.layoutProps
+			if @layer[property]
+				@_layoutNode.style[@_getLayoutProperty(property)] = @layer[property]
 
 	# This is a temporary hack to maintain original 'width' and 'height'
 	# We should add support for position 'relative' and 'absolute'
