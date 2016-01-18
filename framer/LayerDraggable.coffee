@@ -43,9 +43,6 @@ class exports.LayerDraggable extends BaseClass
 	@define "horizontal", @simpleProperty("horizontal", true)
 	@define "vertical", @simpleProperty("vertical", true)
 
-	@define "pinchable", @simpleProperty("pinchable", false)
-	@define "rotatable", @simpleProperty("rotatable", false)
-
 	@define "momentumVelocityMultiplier", @simpleProperty("momentumVelocityMultiplier", 800)
 	@define "directionLock", @simpleProperty("directionLock", true)
 	@define "directionLockThreshold", @simpleProperty("directionLockThreshold", {x:10, y:10})
@@ -159,15 +156,6 @@ class exports.LayerDraggable extends BaseClass
 		@layer._context.domEventManager.wrap(document).addEventListener(Events.TouchMove, @_touchMove)
 		@layer._context.domEventManager.wrap(document).addEventListener(Events.TouchEnd, @_touchEnd)
 
-		if @pinchable
-			@_scaleStart = null
-			@layer.gestures.on(Gestures.Pinch, @_pinch)
-
-		if @rotatable
-			@_rotationStart = null
-			@_rotationOffset = null
-			@layer.gestures.on(Gestures.Rotate, @_rotate)
-
 		@emit(Events.DragStart, event)
 
 	_touchMove: (event) =>
@@ -248,19 +236,6 @@ class exports.LayerDraggable extends BaseClass
 		# # (which would return a stale value before the simulation had finished one tick)
 		# # and because @_start currently calls calculateVelocity().
 		@_isDragging = false
-
-	_pinch: (event) =>
-		return unless @pinchable
-		@_scaleStart ?= @layer.scale
-		@layer.scale = event.scale * @_scaleStart
-		@emit(Events.Pinch, event)
-		
-	_rotate: (event) =>
-		return unless @rotatable
-		@_rotationStart ?= @layer.rotation
-		@_rotationOffset ?= event.rotation
-		@layer.rotation = event.rotation - @_rotationOffset + @_rotationStart
-		@emit(Events.Rotate, event)
 
 
 	##############################################################
@@ -556,6 +531,4 @@ class exports.LayerDraggable extends BaseClass
 	onDragAnimationDidStart: (cb) -> @on(Events.DragAnimationDidStart, cb)
 	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
 	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
-	onPinch: -> @on(Events.Pinch, cb)
-	onRotate: -> @on(Events.Rotate, cb)
 

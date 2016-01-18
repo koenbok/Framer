@@ -26,6 +26,9 @@ class exports.GestureManager extends EventEmitter
 
 	_addListener: (eventName, listener) ->
 
+		throw new Error("No event name defined") unless eventName
+		throw new Error("No listener defined") unless listener
+
 		# Make sure we have a hammer instance and layer listeners enabled
 		@layer.ignoreEvents = false
 

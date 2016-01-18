@@ -8,11 +8,13 @@ Utils = require "./Utils"
 {BaseClass} = require "./BaseClass"
 {EventEmitter} = require "./EventEmitter"
 {Color} = require "./Color"
+{Matrix} = require "./Matrix"
 {Animation} = require "./Animation"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
-{Matrix} = require "./Matrix"
+{LayerRotatable} = require "./LayerRotatable"
+{LayerPinchable} = require "./LayerPinchable"
 {GestureManager} = require "./GestureManager"
 
 NoCacheDateKey = Date.now()
@@ -886,21 +888,25 @@ class exports.Layer extends BaseClass
 		get: -> @_states ?= new LayerStates @
 
 	#############################################################################
-	## Draggable
+	## Draggable, Rotatable, Pinchable
 
 	@define "draggable",
 		importable: false
 		exportable: false
-		get: ->
-			@_draggable ?= new LayerDraggable(@)
-		set: (value) ->
-			@draggable.enabled = value if _.isBoolean(value)
+		get: -> @_draggable ?= new LayerDraggable(@)
+		set: (value) -> @draggable.enabled = value if _.isBoolean(value)
 
-	# anchor: ->
-	# 	if not @_anchor
-	# 		@_anchor = new LayerAnchor(@, arguments...)
-	# 	else
-	# 		@_anchor.updateRules(arguments...)
+	@define "rotatable",
+		importable: false
+		exportable: false
+		get: -> @_rotatable ?= new LayerRotatable(@)
+		set: (value) -> @rotatable.enabled = value if _.isBoolean(value)
+
+	@define "pinchable",
+		importable: false
+		exportable: false
+		get: -> @_pinchable ?= new LayerPinchable(@)
+		set: (value) -> @pinchable.enabled = value if _.isBoolean(value)
 
 	##############################################################
 	## SCROLLING
