@@ -2,18 +2,58 @@ computeLayout = require 'css-layout'
 
 class LayerLayout
 
-	constructor: (@layer, rules, isRoot = true) ->
-		@layer.on("change:subLayers", @_updateLayersAndTree)
+	@layoutProps = [
+		"fixedWidth", "fixedHeight", 
+		"minWidth", "minHeight", 
+		"maxWidth", "maxHeight", 
+		"left", "right", "top", "bottom", 
+		"margin", "marginLeft", "marginRight", "marginTop", "marginBottom",
+		"padding", "paddingLeft", "paddingRight", "paddingTop", "paddingBottom",
+		# "borderWidth", 
+		"borderLeftWidth", "borderRightWidth", "borderTopWidth", "borderBottomWidth",
+		"flexDirection",
+		"justifyContent",
+		"alignItems", "alignSelf",
+		"flex",
+		"flexWrap",
+		"position"
+	]
+
+
+	constructor: (@layer) ->
+		@layer.on("change:subLayers", @_updateTree)
+		@layer.on("change:superLayer", @_setNeedsUpdate)
 		# When the change:subLayers event is triggered, the 'superLayer' property has not been set yet, so we need a way to know
 		# if we are dealing with a root layer (i.e. doesn't have any superLayer) or not
-		if isRoot
-			@_setupListener()
-		@updateRules(rules)
+		# if isRoot
+		# 	@_setupResizeListener()
+
+		# This property contains everything needed in 'computeLayout' to make the calculations
+		@_layoutNode =
+			style: {}
+			children: []
+
+		for property, value of @layer
+			if (property in LayerLayout.layoutProps) and value
+				@_layoutNode.style[@_getLayoutProperty(property)] = value
+
+	# This is a temporary hack to maintain original 'width' and 'height'
+	# We should add support for position 'relative' and 'absolute'
+	_getLayoutProperty: (property) ->
+		cssLayoutProperty = property
+		# We rename 'width' and 'height' css-layout props to 'fixedWidth' and 'fixedHeight'
+		# so we don't overwrite Framer original 'width' and 'height' Layer props 
+		if cssLayoutProperty is "fixedWidth" then cssLayoutProperty = "width"
+		if cssLayoutProperty is "fixedHeight" then cssLayoutProperty = "height"
+		return cssLayoutProperty
+
+	updateProperty: (property, value) ->
+		if property
+			# TODO Check if value exists
+			# TODO How can we handle property removal?
+			# TODO Check value changes from previous value
+			@_layoutNode.style[@_getLayoutProperty(property)] = value
 		
-	updateRules: (rules) ->
-		if rules
-			@rules = rules
-		@_updateLayersAndTree()
 		@_setNeedsUpdate()
 
 	_createLayersTree: () =>
@@ -27,25 +67,6 @@ class LayerLayout
 					layerTree.children.push(subLayer._layout._createLayersTree())
 				else
 					console.log("Sublayer has no layout. Name: ", subLayer.name)
-		layoutProps = [
-			"width", "height", 
-			"minWidth", "minHeight", 
-			"maxWidth", "maxHeight", 
-			"left", "right", "top", "bottom", 
-			"margin", "marginLeft", "marginRight", "marginTop", "marginBottom",
-			"padding", "paddingLeft", "paddingRight", "paddingTop", "paddingBottom",
-			"borderWidth", "borderLeftWidth", "borderRightWidth", "borderTopWidth", "borderBottomWidth",
-			"flexDirection",
-			"justifyContent",
-			"alignItems", "alignSelf",
-			"flex",
-			"flexWrap",
-			"position"
-		]
-
-		for property, value of @rules
-			if property in layoutProps
-				layerTree.style[property] = value
 
 		if not @layer.superLayer
 			# Add the Screen as root node
@@ -64,68 +85,41 @@ class LayerLayout
 
 		return layerTree
 
-	_updateLayersAndTree: =>
-		# Add a basic layout config for all the sublayers
-		# NOTE: This is a hack. In order to avoid ALL layers having an _layout variable, 
-		# we just add the _layout when a layer is added to a "layed out" tree branch, i.e.
-		# a branch that has at least a layout with layout
-		if @layer.subLayers
-			for subLayer in @layer.subLayers
-				if not subLayer._layout
-					subLayer._layout = new LayerLayout(subLayer, {width: subLayer.width, height: subLayer.height}, false)
-
-		# To improve performance, we update and store the layer tree on the root layer
-		# every time the sublayers are updated
-		rootLayer = @layer
-		while rootLayer.superLayer
-			rootLayer = rootLayer.superLayer
-		if rootLayer._layout
-			rootLayer._layout._layerTree = rootLayer._layout._createLayersTree()
-
-	_setupListener: =>
+	_updateTree: (layersChanged) =>
+		console.log("updating tree of layer " + @layer.name)
+		for layerAdded in layersChanged.added
+			console.log("Adding layout, ", layerAdded.layout(), " to ", @layer.layout())
+			@_layoutNode.children.push(layerAdded.layout()._layoutNode)
+		for layerRemoved in layersChanged.removed
+			console.log("Removing layout, ", layerRemoved.layout(), " to ", @layer.layout())
+			@_layoutNode.children.splice(_layoutNode.indexOf(layerRemoved.layout()._layoutNode), 1)
 		
-		@_removeListeners()
-
-		# if @layer
-		# 	@_addListener(@layer, "change:frame", @_setNeedsUpdate)
-
-		if not @layer.superLayer
-			@_addListener(Canvas, "resize", @_afterResize)
-	
-	_afterResize: =>
-		@_updateLayersAndTree()
-		@_setNeedsUpdate()
-
-	_addListener: (obj, eventName, listener) =>
-		obj.on(eventName, listener)
-		@_currentListeners[eventName] ?= []
-		@_currentListeners[eventName].push(obj)
-	
-	_removeListeners: ->
-		for eventName, objects of @_currentListeners
-			for obj in objects
-				obj.off(eventName, @_setNeedsUpdate)
-		@_currentListeners = {}
-			
 	_setNeedsUpdate: =>
 		rootLayer = @layer
+		if not rootLayer.superLayer
+			console.log("es el superLayer", @layer.name)
 		while rootLayer.superLayer
 			rootLayer = rootLayer.superLayer
-		if rootLayer._layout and rootLayer._layout._layerTree
-			layerTree = rootLayer._layout._layerTree
-			computeLayout(layerTree)
-			if layerTree.shouldUpdate and layerTree.children[0]
-				rootLayer._layout._applyNewLayout(layerTree.children[0])
+		# Hack to add Screen size
+		rootLayoutNode =
+			style:
+				width: Screen.width
+				height: Screen.height
+			children: [rootLayer.layout()._layoutNode]
+		console.log("tree", rootLayoutNode.style, rootLayoutNode.children)
+		computeLayout(rootLayoutNode)
+		@_updateLayer()
 
-	_applyNewLayout: (layoutTree) ->
-		frame = {}
-		frame.x = layoutTree.layout.left
-		frame.y = layoutTree.layout.top
-		frame.width = layoutTree.layout.width
-		frame.height = layoutTree.layout.height
-		@layer.frame = frame
-		for subLayer, index in @layer.subLayers
-			if layoutTree.children[index] and subLayer._layout
-				subLayer._layout._applyNewLayout(layoutTree.children[index])
+	_updateLayer: ->
+		if @layer.layout()._layoutNode.shouldUpdate
+			frame = 
+				x: @layer.layout()._layoutNode.layout.left
+				y: @layer.layout()._layoutNode.layout.top
+				width: @layer.layout()._layoutNode.layout.width
+				height: @layer.layout()._layoutNode.layout.height
+			@layer.frame = frame
+			console.log("setting frame to ", frame) 
+		for subLayer in @layer.subLayers
+			subLayer.layout()._updateLayer()
 
 exports.LayerLayout = LayerLayout

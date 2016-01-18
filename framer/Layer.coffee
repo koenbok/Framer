@@ -79,6 +79,9 @@ class exports.Layer extends BaseClass
 		if options.hasOwnProperty "frame"
 			options = _.extend(options, options.frame)
 
+		if options.hasOwnProperty "layout"
+			options = _.extend(options, options.layout)
+
 		options = Defaults.getDefaults "Layer", options
 
 		super options
@@ -195,6 +198,19 @@ class exports.Layer extends BaseClass
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
 	@define "flat", layerProperty(@, "flat", "webkitTransformStyle", false, _.isBoolean)
 	@define "backfaceVisible", layerProperty(@, "backfaceVisible", "webkitBackfaceVisibility", true, _.isBoolean)
+
+	# Layout properties
+	for layoutProp in LayerLayout.layoutProps
+		do (layoutProp) =>
+			@define layoutProp, 
+				default: undefined
+				get: -> 
+					@_getPropertyValue layoutProp
+				set: (value) ->
+					console.log ("Layer " + @name + ": seetggin pro " + layoutProp + " to valu " + value)
+					@_setPropertyValue layoutProp, value
+					# Set the layout attribute on LayerLayout
+					@layout().updateProperty(layoutProp, value)
 
 	##############################################################
 	# Identity
@@ -799,9 +815,9 @@ class exports.Layer extends BaseClass
 
 	layout: ->
 		if not @_layout
-			@_layout = new LayerLayout(@, arguments...)
+			@_layout = new LayerLayout(@)
 		else
-			@_layout.updateRules(arguments...)
+			@_layout
 
 	##############################################################
 	## SCROLLING
