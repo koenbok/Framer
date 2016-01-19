@@ -13,10 +13,10 @@ class exports.BackgroundLayer extends Layer
 		super options
 		
 		@sendToBack()
-		@layout()
-		@_context.domEventManager.wrap(window).addEventListener("resize", @layout)
+		@backgroundLayout()
+		@_context.domEventManager.wrap(window).addEventListener("resize", @backgroundLayout)
 	
-	layout: =>
+	backgroundLayout: =>
 		if @parent
 			@frame = @parent.frame
 		else
