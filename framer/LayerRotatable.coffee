@@ -9,7 +9,7 @@ Events.Rotate = Gestures.Rotate
 class exports.LayerRotatable extends BaseClass
 
 	@define "enabled", @simpleProperty("enabled", true)
-	@define "threshold", @simpleProperty("threshold", 64)
+	@define "threshold", @simpleProperty("threshold", 0)
 
 	constructor: (@layer) ->
 		super
@@ -24,16 +24,16 @@ class exports.LayerRotatable extends BaseClass
 		
 	_rotate: (event) =>
 
-		# return unless event.pointers.length is 2
+		return unless event.pointers.length is 2
 		
-		# pointA =
-		# 	x: event.pointers[0].pageX
-		# 	y: event.pointers[0].pageY
-		# pointB =
-		# 	x: event.pointers[1].pageX
-		# 	y: event.pointers[1].pageY
+		pointA =
+			x: event.pointers[0].pageX
+			y: event.pointers[0].pageY
+		pointB =
+			x: event.pointers[1].pageX
+			y: event.pointers[1].pageY
 
-		# return unless Utils.pointTotal(Utils.pointAbs(Utils.pointSubtract(pointA, pointB))) > @threshold
+		return unless Utils.pointTotal(Utils.pointAbs(Utils.pointSubtract(pointA, pointB))) > @threshold
 
 		@_rotationStart ?= @layer.rotation
 		@_rotationOffset ?= event.rotation
