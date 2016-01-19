@@ -433,6 +433,7 @@ Utils.domCompleteCancel = (f) ->
 
 Utils.domValidEvent = (element, eventName) ->
 	return if not eventName
+	return true if eventName in ["touchstart", "touchmove", "touchend"]
 	return typeof(element["on#{eventName.toLowerCase()}"]) isnt "undefined"
 
 Utils.domLoadScript = (url, callback) ->
