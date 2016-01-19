@@ -27,6 +27,7 @@ class exports.LayerLayout extends EventEmitter
 
 	constructor: (@layer) ->
 		@layer.on("change:subLayers", @_updateTree)
+		@layer._context.domEventManager.wrap(window).addEventListener("resize", @_didResize)
 		# When the change:subLayers event is triggered, the 'superLayer' property has not been set yet, so we need a way to know
 		# if we are dealing with a root layer (i.e. doesn't have any superLayer) or not
 		# if isRoot
@@ -40,6 +41,10 @@ class exports.LayerLayout extends EventEmitter
 		for property of LayerLayout.layoutProps
 			if @layer[property]
 				@_layoutNode.style[@_getLayoutProperty(property)] = @layer[property]
+
+	_didResize: =>
+		if not @layer.superLayer
+			@_setNeedsUpdate()
 
 	# This is a temporary hack to maintain original 'width' and 'height'
 	# We should add support for position 'relative' and 'absolute'
