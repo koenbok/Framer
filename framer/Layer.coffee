@@ -212,7 +212,7 @@ class exports.Layer extends BaseClass
 				set: (value) ->
 					@_setPropertyValue layoutProp, value
 					# Set the layout attribute on LayerLayout
-					@layout().updateProperty(layoutProp, value)
+					@layout.updateProperty(layoutProp, value)
 
 	##############################################################
 	# Identity
@@ -929,11 +929,10 @@ class exports.Layer extends BaseClass
 	#############################################################################
 	## Layout
 
-	layout: ->
-		if not @_layout
-			@_layout = new LayerLayout(@)
-		else
-			@_layout
+	@define "layout",
+		get: ->
+			@_layout ?= new LayerLayout(@)
+			return @_layout
 
 	##############################################################
 	## SCROLLING

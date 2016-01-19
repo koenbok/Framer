@@ -1,7 +1,8 @@
 computeLayout = require 'css-layout'
+{EventEmitter} = require "./EventEmitter"
 {_} = require "./Underscore"
 
-class LayerLayout
+class exports.LayerLayout extends EventEmitter
 
 	@layoutProps = [
 		"fixedWidth", "fixedHeight", 
@@ -20,6 +21,9 @@ class LayerLayout
 		"position"
 	]
 
+	# A string to specify an animation for each new layout
+	# It might be interesting to have a different value in a Layer basis
+	curve: undefined
 
 	constructor: (@layer) ->
 		@layer.on("change:subLayers", @_updateTree)
@@ -58,9 +62,9 @@ class LayerLayout
 
 	_updateTree: (layersChanged) =>
 		for layerAdded in layersChanged.added
-			@_layoutNode.children.push(layerAdded.layout()._layoutNode)
+			@_layoutNode.children.push(layerAdded.layout._layoutNode)
 		for layerRemoved in layersChanged.removed
-			@_layoutNode.children.splice(_layoutNode.indexOf(layerRemoved.layout()._layoutNode), 1)
+			@_layoutNode.children.splice(_layoutNode.indexOf(layerRemoved.layout._layoutNode), 1)
 		@_setNeedsUpdate()
 
 	_setNeedsUpdate: =>
@@ -73,21 +77,28 @@ class LayerLayout
 			style:
 				width: Screen.width
 				height: Screen.height
-			children: [rootLayer.layout()._layoutNode]
+			children: [rootLayer.layout._layoutNode]
 		newTree = _.cloneDeep(rootLayoutNode)
 		computeLayout(newTree)
-		rootLayer.layout()._updateLayer(newTree.children[0])
+		rootLayer.layout._updateLayer(newTree.children[0])
 
 	_updateLayer: (computedTree) ->
 		if computedTree.shouldUpdate
-			frame = 
-				x: computedTree.layout.left
-				y: computedTree.layout.top
-				width: computedTree.layout.width
-				height: computedTree.layout.height
-			@layer.frame = frame
+			if not @curve
+				frame = 
+					x: computedTree.layout.left
+					y: computedTree.layout.top
+					width: computedTree.layout.width
+					height: computedTree.layout.height
+				@layer.frame = frame
+			else
+				@layer.animate
+					properties:
+						x: computedTree.layout.left
+						y: computedTree.layout.top
+						width: computedTree.layout.width
+						height: computedTree.layout.height
+					curve: @curve
 		for subLayer, i in @layer.subLayers
 			if computedTree.children and computedTree.children.length > i
-				subLayer.layout()._updateLayer(computedTree.children[i])
-
-exports.LayerLayout = LayerLayout
+				subLayer.layout._updateLayer(computedTree.children[i])
