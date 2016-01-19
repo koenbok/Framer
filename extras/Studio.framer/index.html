@@ -15,6 +15,7 @@
  		var iOS = /iPad|iPhone|iPod/.test(navigator.platform)
  		if (iOS) { viewport += ", shrink-to-fit=no" }
  		document.write("<meta name=\"viewport\" content=\"" + viewport + "\">")
+ 		if (window.ontouchstart == undefined) { window.ontouchstart = null }
 		})()
 		</script>
 
