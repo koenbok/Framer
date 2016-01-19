@@ -540,6 +540,21 @@ Utils.loadImage = (url, callback, context) ->
 
 # Point
 
+Utils.pointDivide = (pointA, pointB, fraction) ->
+	return point =
+		x: (pointA.x + pointB.x) / fraction
+		y: (pointA.y + pointB.y) / fraction
+
+Utils.pointAdd = (pointA, pointB) ->
+	return point =
+		x: pointA.x + pointB.x
+		y: pointA.y + pointB.y
+
+Utils.pointSubtract = (pointA, pointB) ->
+	return point =
+		x: pointA.x - pointB.x
+		y: pointA.y - pointB.y
+
 Utils.pointZero = (args={}) ->
 	return _.defaults(args, {x:0, y:0})
 
@@ -577,6 +592,11 @@ Utils.pointInFrame = (point, frame) ->
 	return false if point.x < Utils.frameGetMinX(frame) or point.x > Utils.frameGetMaxX(frame)
 	return false if point.y < Utils.frameGetMinY(frame) or point.y > Utils.frameGetMaxY(frame)
 	return true
+
+Utils.pointCenter = (pointA, pointB) ->
+	return Utils.pointDivide(pointA, pointB, 2)
+
+
 
 # Size
 
