@@ -1043,6 +1043,16 @@ class exports.Layer extends BaseClass
 	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
 	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
 
+	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
+	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
+	onPinch: (cb) -> @on(Events.Pinch, cb)
+	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
+	onRotate: (cb) -> @on(Events.Rotate, cb)
+	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
+	onScaleStart: (cb) -> @on(Events.ScaleStart, cb)
+	onScale: (cb) -> @on(Events.Scale, cb)
+	onScaleEnd: (cb) -> @on(Events.ScaleEnd, cb)
+
 	##############################################################
 	## DESCRIPTOR
 

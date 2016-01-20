@@ -161,43 +161,6 @@ class exports.GestureManager extends EventEmitter
 		
 		return existingRecognizers			
 
-	# onPan: (cb) -> @on(Gestures.Pan, cb)
-	# onPanStart: (cb) -> @on(Gestures.PanStart, cb)
-	# onPanMove: (cb) -> @on(Gestures.PanMove, cb)
-	# onPanEnd: (cb) -> @on(Gestures.PanEnd, cb)
-	# onPanCancel: (cb) -> @on(Gestures.PanCancel, cb)
-	# onPanLeft: (cb) -> @on(Gestures.PanLeft, cb)
-	# onPanRight: (cb) -> @on(Gestures.PanRight, cb)
-	# onPanUp: (cb) -> @on(Gestures.PanUp, cb)
-	# onPanDown: (cb) -> @on(Gestures.PanDown, cb)
-
-	# onPinch: (cb) -> @on(Gestures.Pinch, cb)
-	# onPinchStart: (cb) -> @on(Gestures.PinchStart, cb)
-	# onPinchMove: (cb) -> @on(Gestures.PinchMove, cb)
-	# onPinchEnd: (cb) -> @on(Gestures.PinchEnd, cb)
-	# onPinchCancel: (cb) -> @on(Gestures.PinchCancel, cb)
-	# onPinchIn: (cb) -> @on(Gestures.PinchIn, cb)
-	# onPinchOut: (cb) -> @on(Gestures.PinchOut, cb)
-
-	# onPress: (cb) -> @on(Gestures.Press, cb)
-	# onPressUp: (cb) -> @on(Gestures.PressUp, cb)
-
-	# onRotate: (cb) -> @on(Gestures.Rotate, cb)
-	# onRotateStart: (cb) -> @on(Gestures.RotateStart, cb)
-	# onRotateMove: (cb) -> @on(Gestures.RotateMove, cb)
-	# onRotateEnd: (cb) -> @on(Gestures.RotateEnd, cb)
-	# onRotateCancel: (cb) -> @on(Gestures.RotateCancel, cb)
-
-	# onSwipe: (cb) -> @on(Gestures.Swipe, cb)
-	# onSwipeLeft: (cb) -> @on(Gestures.SwipeLeft, cb)
-	# onSwipeRight: (cb) -> @on(Gestures.SwipeRight, cb)
-	# onSwipeUp: (cb) -> @on(Gestures.SwipeUp, cb)
-	# onSwipeDown: (cb) -> @on(Gestures.SwipeDown, cb)
-
-	# onTap: (cb) -> @on(Gestures.Tap, cb)
-	# onSingleTap: (cb) -> @on(Gestures.SingleTap, cb)
-	# onDoubleTap: (cb) -> @on(Gestures.DoubleTap, cb)
-
 
 ##############################################################
 # PATCH HAMMER
