@@ -96,15 +96,16 @@ class exports.LayerPinchable extends BaseClass
 		@emit(Events.ScaleEnd, event) if @scale
 		@emit(Events.RotateEnd, event) if @rotate
 
-
-	##############################################################
-	# Event Handling
-
 	emit: (eventName, event) ->
-
-		# TODO: Add new event properties like position corrected for device
-
-		# Pass this to the layer above
 		@layer.emit(eventName, event, @)
-
 		super eventName, event, @
+
+	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
+	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
+	onPinch: (cb) -> @on(Events.Pinch, cb)
+	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
+	onRotate: (cb) -> @on(Events.Rotate, cb)
+	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
+	onScaleStart: (cb) -> @on(Events.ScaleStart, cb)
+	onScale: (cb) -> @on(Events.Scale, cb)
+	onScaleEnd: (cb) -> @on(Events.ScaleEnd, cb)

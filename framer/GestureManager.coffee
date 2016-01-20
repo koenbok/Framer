@@ -159,7 +159,7 @@ class exports.GestureManager extends EventEmitter
 				if tap = @_manager.get(Gestures.Tap)
 					existingRecognizers.push(tap)
 		
-		return existingRecognizers			
+		return existingRecognizers
 
 
 ##############################################################
