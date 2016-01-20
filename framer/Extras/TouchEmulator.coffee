@@ -202,4 +202,5 @@ class TouchEmulator extends BaseClass
 touchEmulator = null
 
 exports.enable = ->
+	return if Utils.isTouch()
 	touchEmulator ?= new TouchEmulator()

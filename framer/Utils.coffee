@@ -290,7 +290,11 @@ Utils.isSafari = ->
 	(/safari/).test(navigator.userAgent.toLowerCase())
 
 Utils.isTouch = ->
-	window.ontouchstart is null
+	# This needs to be a little more extensive because we
+	# patch ontouchstart to fake Hammer
+	window.ontouchstart is null and 
+	window.ontouchmove is null and 
+	window.ontouchend is null 
 
 Utils.isDesktop = ->
 	Utils.deviceType() is "desktop"
