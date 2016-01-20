@@ -42,12 +42,12 @@ class TouchEmulator extends BaseClass
 		if not @isHammerTouchSupported()
 			throw new Error "Touch emulation for hammer is not supported"
 		
-		@mouseCursorImage = "framer/images/cursor@2x.png"
-		@mouseCursorImageActive = "framer/images/cursor-active@2x.png"
-		@mouseCursorImageSize = 64
-		@mouseCursorInitialOffset = {x:0, y:0}
+		@touchPointerImage = "framer/images/cursor@2x.png"
+		@touchPointerImageActive = "framer/images/cursor-active@2x.png"
+		@touchPointerImageSize = 64
+		@touchPointerInitialOffset = {x:0, y:0}
 		
-		@keyPinchCode = 16 # Shift
+		@keyPinchCode = 18 # Alt
 		@keyPanCode = 91 # Command
 		
 		@context = new Framer.Context name:"TouchEmulator"
@@ -62,32 +62,32 @@ class TouchEmulator extends BaseClass
 		@isPinchKeyDown = false
 		@isPanKeyDown = false
 		
-		mouseCursorInitialOffset = @mouseCursorInitialOffset
+		touchPointerInitialOffset = @touchPointerInitialOffset
 
 		@context.run =>
-			@imageLayer = new Layer
-				width: @mouseCursorImageSize
-				height: @mouseCursorImageSize
-				image: @mouseCursorImage
+			@touchPointLayer = new Layer
+				width: @touchPointerImageSize
+				height: @touchPointerImageSize
+				image: @touchPointerImage
 				opacity: 0
 	
 	showTouchCursor: ->
-		@imageLayer.animateStop()
-		@imageLayer.midX = @point.x
-		@imageLayer.midY = @point.y
-		@imageLayer.scale = 1.8
-		@imageLayer.animate
+		@touchPointLayer.animateStop()
+		@touchPointLayer.midX = @point.x
+		@touchPointLayer.midY = @point.y
+		@touchPointLayer.scale = 1.8
+		@touchPointLayer.animate
 			properties:
 				opacity: 1
 				scale: 1
-				# midX: @point.x + @mouseCursorInitialOffset.x
-				# midY: @point.y + @mouseCursorInitialOffset.y
+				# midX: @point.x + @touchPointerInitialOffset.x
+				# midY: @point.y + @touchPointerInitialOffset.y
 			time: 0.1
 			curve: "ease-out"
 
 	hideTouchCursor: ->
-		@imageLayer.animateStop()
-		@imageLayer.animate
+		@touchPointLayer.animateStop()
+		@touchPointLayer.animate
 			properties:
 				opacity: 0
 				scale: 1.2
@@ -97,13 +97,13 @@ class TouchEmulator extends BaseClass
 		window.ontouchstart is null 
 	
 	keydown: (event) =>
-		
+
 		if event.keyCode is @keyPinchCode	
 			@isPinchKeyDown = true
 			@startPoint = @centerPoint = null
 			@showTouchCursor()
-			@imageLayer.midX = @point.x
-			@imageLayer.midY = @point.y
+			@touchPointLayer.midX = @point.x
+			@touchPointLayer.midY = @point.y
 			@wrap(document).addEventListener("keyup", @keyup, true)
 			@wrap(document).addEventListener("mousemove", @mousemove, true)
 			
@@ -141,7 +141,7 @@ class TouchEmulator extends BaseClass
 		else
 			dispatchTouchEvent("touchstart", @target, event)
 		
-		@imageLayer.image = @mouseCursorImageActive
+		@touchPointLayer.image = @touchPointerImageActive
 
 	mousemovePosition: (event) =>
 		@point =
@@ -159,16 +159,16 @@ class TouchEmulator extends BaseClass
 		@centerPoint ?= @startPoint
 		
 		if @isPinchKeyDown and not @isPanKeyDown
-			@touchPoint = Utils.pointAdd(@mouseCursorInitialOffset, @pinchPoint(@point, @centerPoint))
+			@touchPoint = Utils.pointAdd(@touchPointerInitialOffset, @pinchPoint(@point, @centerPoint))
 			@touchPointDelta = Utils.pointSubtract(@point, @touchPoint)
 			
 		if @isPinchKeyDown and @isPanKeyDown
 			@touchPoint = @panPoint(@point, @touchPointDelta)
 
 		if @isPinchKeyDown or @isPanKeyDown
-			@imageLayer.visible = true
-			@imageLayer.midX = @touchPoint.x
-			@imageLayer.midY = @touchPoint.y
+			@touchPointLayer.visible = true
+			@touchPointLayer.midX = @touchPoint.x
+			@touchPointLayer.midY = @touchPoint.y
 	
 		if @isPinchKeyDown or @isPanKeyDown
 			dispatchTouchEvent("touchmove", @target, event, @touchPointDelta)
@@ -189,7 +189,7 @@ class TouchEmulator extends BaseClass
 		else
 			dispatchTouchEvent("touchend", @target, event)
 	
-		@imageLayer.image = @mouseCursorImage
+		@touchPointLayer.image = @touchPointerImage
 		@hideTouchCursor()
 	
 	pinchPoint: (point, centerPoint) ->
