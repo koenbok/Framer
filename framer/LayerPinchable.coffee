@@ -28,8 +28,8 @@ class exports.LayerPinchable extends BaseClass
 
 	@define "rotate", @simpleProperty("rotate", true)
 	@define "rotateIncrements", @simpleProperty("rotateIncrements", 0)
-	@define "rotateMin", @simpleProperty("rotateMin", Number.MIN_VALUE)
-	@define "rotateMax", @simpleProperty("rotateMax", Number.MAX_VALUE)
+	@define "rotateMin", @simpleProperty("rotateMin", 0)
+	@define "rotateMax", @simpleProperty("rotateMax", 0)
 	@define "rotateFactor", @simpleProperty("rotateFactor", 1)
 
 	constructor: (@layer) ->
@@ -71,8 +71,8 @@ class exports.LayerPinchable extends BaseClass
 			@_scaleStart ?= @layer.scale
 			scale = event.scale * @_scaleStart
 			scale = scale * @scaleFactor
-			scale = Utils.clamp(scale, @scaleMin, @scaleMax)
-			scale = Utils.nearestIncrement(scale, @scaleIncrements)
+			scale = Utils.clamp(scale, @scaleMin, @scaleMax) if (@scaleMin and @scaleMax)
+			scale = Utils.nearestIncrement(scale, @scaleIncrements) if @scaleIncrements
 			@layer.scale = scale
 			@emit(Events.Scale, event)
 
@@ -81,8 +81,8 @@ class exports.LayerPinchable extends BaseClass
 			@_rotationOffset ?= event.rotation
 			rotation = event.rotation - @_rotationOffset + @_rotationStart
 			rotation = rotation * @rotateFactor
-			rotation = Utils.clamp(rotation, @rotateMin, @rotateMax)
-			rotation = Utils.nearestIncrement(rotation, @rotateIncrements)
+			rotation = Utils.clamp(rotation, @rotateMin, @rotateMax) if (@rotateMin and @rotateMax)
+			rotation = Utils.nearestIncrement(rotation, @rotateIncrements) if @rotateIncrements
 			@layer.rotation = rotation
 			@emit(Events.Rotate, event)
 
