@@ -199,5 +199,7 @@ class TouchEmulator extends BaseClass
 	panPoint: (point, offsetPoint) ->
 		return Utils.pointSubtract(point, offsetPoint)
 
+touchEmulator = null
+
 exports.enable = ->
-	emulator = new TouchEmulator()
+	touchEmulator ?= new TouchEmulator()
