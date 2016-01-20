@@ -12,8 +12,10 @@ createTouch = (event, identifier, offset={x:0, y:0}) ->
 		screenX: event.screenX + offset.x
 		screenY: event.screenY + offset.y
 
-dispatchTouchEvent = (type, event, offset) ->
+dispatchTouchEvent = (type, target, event, offset) ->
 	
+	target ?= event.target
+
 	touchEvent = document.createEvent("MouseEvent")
 	touchEvent.initMouseEvent(type, true, true, window, 
 		event.detail, event.screenX, event.screenY, 
@@ -26,16 +28,12 @@ dispatchTouchEvent = (type, event, offset) ->
 	touches.push(createTouch(event, 2, offset)) if offset
 			
 	touchEvent.touches = touchEvent.changedTouches = touchEvent.targetTouches = touches
-	
-	print "Touch", type
 
-	event.target.dispatchEvent(touchEvent)
-
+	target.dispatchEvent(touchEvent)
 
 cancelEvent = (event) ->
 	event.preventDefault()
 	event.stopPropagation()
-
 
 class TouchEmulator extends BaseClass
 
@@ -47,9 +45,10 @@ class TouchEmulator extends BaseClass
 		@mouseCursorImage = "framer/images/cursor@2x.png"
 		@mouseCursorImageActive = "framer/images/cursor-active@2x.png"
 		@mouseCursorImageSize = 64
+		@mouseCursorInitialOffset = {x:0, y:0}
+		
 		@keyPinchCode = 16 # Shift
 		@keyPanCode = 91 # Command
-		@minimalOffset = 40
 		
 		@context = new Framer.Context name:"TouchEmulator"
 		@context._element.style.zIndex = 10000
@@ -63,18 +62,37 @@ class TouchEmulator extends BaseClass
 		@isPinchKeyDown = false
 		@isPanKeyDown = false
 		
+		mouseCursorInitialOffset = @mouseCursorInitialOffset
+
 		@context.run =>
 			@imageLayer = new Layer
 				width: @mouseCursorImageSize
 				height: @mouseCursorImageSize
 				image: @mouseCursorImage
 				opacity: 0
-			@imageLayer.states.add
-				show: {opacity:1, scale:1}
-				hide: {opacity:0, scale:1.2}
-			@imageLayer.states.animationOptions =
-				time: 0.08
 	
+	showTouchCursor: ->
+		@imageLayer.animateStop()
+		@imageLayer.midX = @point.x
+		@imageLayer.midY = @point.y
+		@imageLayer.scale = 1.8
+		@imageLayer.animate
+			properties:
+				opacity: 1
+				scale: 1
+				# midX: @point.x + @mouseCursorInitialOffset.x
+				# midY: @point.y + @mouseCursorInitialOffset.y
+			time: 0.1
+			curve: "ease-out"
+
+	hideTouchCursor: ->
+		@imageLayer.animateStop()
+		@imageLayer.animate
+			properties:
+				opacity: 0
+				scale: 1.2
+			time: 0.08
+
 	isHammerTouchSupported: ->
 		window.ontouchstart is null 
 	
@@ -83,7 +101,7 @@ class TouchEmulator extends BaseClass
 		if event.keyCode is @keyPinchCode	
 			@isPinchKeyDown = true
 			@startPoint = @centerPoint = null
-			@imageLayer.states.switch("show")
+			@showTouchCursor()
 			@imageLayer.midX = @point.x
 			@imageLayer.midY = @point.y
 			@wrap(document).addEventListener("keyup", @keyup, true)
@@ -98,7 +116,7 @@ class TouchEmulator extends BaseClass
 		if event.keyCode is @keyPinchCode
 			cancelEvent(event)	
 			@isPinchKeyDown = false
-			@imageLayer.states.switch("hide")
+			@hideTouchCursor()
 			
 			@wrap(document).removeEventListener("mousemove", @mousemove, true)
 		
@@ -113,14 +131,15 @@ class TouchEmulator extends BaseClass
 		cancelEvent(event)
 		
 		@isMouseDown = true
+		@target = event.target
 			
 		@wrap(document).addEventListener("mousemove", @mousemove, true)
 		@wrap(document).addEventListener("mouseup", @mouseup, true)
 
 		if @isPinchKeyDown
-			dispatchTouchEvent("touchstart", event, @touchPointDelta)
+			dispatchTouchEvent("touchstart", @target, event, @touchPointDelta)
 		else
-			dispatchTouchEvent("touchstart", event)
+			dispatchTouchEvent("touchstart", @target, event)
 		
 		@imageLayer.image = @mouseCursorImageActive
 
@@ -140,7 +159,7 @@ class TouchEmulator extends BaseClass
 		@centerPoint ?= @startPoint
 		
 		if @isPinchKeyDown and not @isPanKeyDown
-			@touchPoint = @pinchPoint(@point, @centerPoint)
+			@touchPoint = Utils.pointAdd(@mouseCursorInitialOffset, @pinchPoint(@point, @centerPoint))
 			@touchPointDelta = Utils.pointSubtract(@point, @touchPoint)
 			
 		if @isPinchKeyDown and @isPanKeyDown
@@ -152,9 +171,9 @@ class TouchEmulator extends BaseClass
 			@imageLayer.midY = @touchPoint.y
 	
 		if @isPinchKeyDown or @isPanKeyDown
-			dispatchTouchEvent("touchmove", event, @touchPointDelta)
+			dispatchTouchEvent("touchmove", @target, event, @touchPointDelta)
 		else
-			dispatchTouchEvent("touchmove", event)
+			dispatchTouchEvent("touchmove", @target, event)
 
 	mouseup: (event) =>
 		
@@ -166,12 +185,12 @@ class TouchEmulator extends BaseClass
 		@wrap(document).removeEventListener("mouseup", @mouseup, true)
 
 		if @isPinchKeyDown or @isPanKeyDown
-			dispatchTouchEvent("touchend", event, @touchPointDelta)
+			dispatchTouchEvent("touchend", @target, event, @touchPointDelta)
 		else
-			dispatchTouchEvent("touchend", event)
+			dispatchTouchEvent("touchend", @target, event)
 	
 		@imageLayer.image = @mouseCursorImage
-		@imageLayer.states.switch("hide")
+		@hideTouchCursor()
 	
 	pinchPoint: (point, centerPoint) ->
 		return Utils.pointSubtract(centerPoint, 
