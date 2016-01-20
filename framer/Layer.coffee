@@ -13,7 +13,6 @@ Utils = require "./Utils"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
-{LayerRotatable} = require "./LayerRotatable"
 {LayerPinchable} = require "./LayerPinchable"
 {GestureManager} = require "./GestureManager"
 
@@ -888,19 +887,13 @@ class exports.Layer extends BaseClass
 		get: -> @_states ?= new LayerStates @
 
 	#############################################################################
-	## Draggable, Rotatable, Pinchable
+	## Draggable, Pinchable
 
 	@define "draggable",
 		importable: false
 		exportable: false
 		get: -> @_draggable ?= new LayerDraggable(@)
 		set: (value) -> @draggable.enabled = value if _.isBoolean(value)
-
-	@define "rotatable",
-		importable: false
-		exportable: false
-		get: -> @_rotatable ?= new LayerRotatable(@)
-		set: (value) -> @rotatable.enabled = value if _.isBoolean(value)
 
 	@define "pinchable",
 		importable: false

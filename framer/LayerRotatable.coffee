@@ -9,7 +9,7 @@ Events.Rotate = Gestures.Rotate
 class exports.LayerRotatable extends BaseClass
 
 	@define "enabled", @simpleProperty("enabled", true)
-	@define "threshold", @simpleProperty("threshold", 0)
+	@define "threshold", @simpleProperty("threshold", 10)
 
 	constructor: (@layer) ->
 		super

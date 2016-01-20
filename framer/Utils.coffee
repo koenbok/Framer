@@ -64,6 +64,10 @@ Utils.median = (x) ->
 	else
 		(sorted[(sorted.length / 2) - 1] + sorted[sorted.length / 2]) / 2
 
+Utils.nearestIncrement = (x, increment) ->
+	return x unless increment
+	return Math.round(x * (1 / increment)) / (1 / increment)
+
 ######################################################
 # ANIMATION
 
