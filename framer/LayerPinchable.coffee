@@ -34,9 +34,13 @@ class exports.LayerPinchable extends BaseClass
 
 	constructor: (@layer) ->
 		super
-		@layer.gestures.on(Gestures.PinchStart, @_pinch)
-		@layer.gestures.on(Gestures.Pinch, @_pinch)
-		@layer.gestures.on(Gestures.PinchEnd, @_pinchEnd)
+
+		@_attach()
+
+	_attach: ->
+		@layer.on(Gestures.PinchStart, @_pinch)
+		@layer.on(Gestures.Pinch, @_pinch)
+		@layer.on(Gestures.PinchEnd, @_pinchEnd)
 
 	_reset: ->
 		@_scaleStart = null

@@ -14,6 +14,7 @@ Utils = require "./Utils"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
 {LayerPinchable} = require "./LayerPinchable"
+{Gestures} = require "./Gestures"
 {GestureManager} = require "./GestureManager"
 
 NoCacheDateKey = Date.now()
@@ -566,7 +567,6 @@ class exports.Layer extends BaseClass
 
 		@_element.parentNode?.removeChild @_element
 		@removeAllListeners()
-		@gestures.removeAllListeners()
 		
 		@_context.removeLayer(@)
 		@_context.emit("layer:destroy", @)
@@ -966,6 +966,16 @@ class exports.Layer extends BaseClass
 
 	_addListener: (eventName, listener) ->
 
+		# Make sure we stop ignoring events once we add a user event listener
+		if not _.startsWith(eventName, "change:")
+			@ignoreEvents = false
+
+		# If this is a gesture event, pass it on to the gesture manager
+		if _.startsWith(eventName, Gestures._prefix)
+			@_gestureManager ?= new GestureManager(@)
+			@_gestureManager.on(eventName, listener)
+			return
+
 		# If this is a dom event, we want the actual dom node to let us know
 		# when it gets triggered, so we can emit the event through the system.
 		if Utils.domValidEvent(@_element, eventName)
@@ -973,11 +983,13 @@ class exports.Layer extends BaseClass
 				@_domEventManager.addEventListener eventName, (event) =>
 					@emit(eventName, event)
 
-		# Make sure we stop ignoring events once we add a user event listener
-		if not _.startsWith eventName, "change:"
-			@ignoreEvents = false
-
 	_removeListener: (eventName, listener) ->
+
+		# If this is a gesture event, pass it on to the gesture manager
+		if _.startsWith(eventName, Gestures._prefix)
+			@_gestureManager ?= new GestureManager(@)
+			@_gestureManager.off(eventName, listener)
+			return
 
 		# Do cleanup for dom events if this is the last one of it's type.
 		# We are assuming we're the only ones adding dom events to the manager.
@@ -991,14 +1003,6 @@ class exports.Layer extends BaseClass
 
 	on: @::addListener
 	off: @::removeListener
-
-	##############################################################
-	## EVENTS
-
-	@define "gestures",
-		get: ->
-			@_gestures ?= new GestureManager(@)
-			return @_gestures
 
 	##############################################################
 	## EVENT HELPERS

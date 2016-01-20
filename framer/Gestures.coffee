@@ -1,5 +1,6 @@
 # Gesture events
 Gestures = {}
+Gestures._prefix = "gesture:"
 
 # Pan
 Gestures.Pan = "pan" # This event includes all the other Pan events
@@ -43,5 +44,10 @@ Gestures.SwipeDown = "swipedown"
 Gestures.Tap = "tap"
 Gestures.SingleTap = "singletap"
 Gestures.DoubleTap = "doubletap"
+
+# To determine gesture events, we prefix the value with rotate
+for k, v of Gestures
+	continue if k is "_prefix"
+	Gestures[k] = "#{Gestures._prefix}#{v}"
 
 exports.Gestures = Gestures
