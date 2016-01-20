@@ -8,7 +8,6 @@ Utils = require "./Utils"
 class exports.GestureManager extends EventEmitter
 
 	constructor: (@layer) ->
-		@_manager = Hammer(@layer._element)
 
 	once: (eventName, listener) =>
 		super(eventName, listener)
@@ -28,6 +27,8 @@ class exports.GestureManager extends EventEmitter
 
 		throw new Error("No event name defined") unless eventName
 		throw new Error("No listener defined") unless listener
+
+		@_manager = Hammer(@layer._element)
 
 		# Make sure we have a hammer instance and layer listeners enabled
 		@layer.ignoreEvents = false
@@ -53,7 +54,13 @@ class exports.GestureManager extends EventEmitter
 		@_manager.on(eventName, listener._actual)
 
 	_removeListener: (eventName, listener) ->
-		@_manager.off(eventName, listener._actual)
+
+		# If this is the last listener we detroy the hammer element
+		if @listenerEvents().length is 1 and @listenerEvents()[0] is eventName
+			@_manager.destroy()
+		else
+			listener = listener._actual if listener._actual
+			@_manager.off(eventName, listener)
 
 	destroy: ->
 		@_manager.destroy()
@@ -154,49 +161,49 @@ class exports.GestureManager extends EventEmitter
 		
 		return existingRecognizers			
 
-	onPan: (cb) -> @on(Gestures.Pan, cb)
-	onPanStart: (cb) -> @on(Gestures.PanStart, cb)
-	onPanMove: (cb) -> @on(Gestures.PanMove, cb)
-	onPanEnd: (cb) -> @on(Gestures.PanEnd, cb)
-	onPanCancel: (cb) -> @on(Gestures.PanCancel, cb)
-	onPanLeft: (cb) -> @on(Gestures.PanLeft, cb)
-	onPanRight: (cb) -> @on(Gestures.PanRight, cb)
-	onPanUp: (cb) -> @on(Gestures.PanUp, cb)
-	onPanDown: (cb) -> @on(Gestures.PanDown, cb)
+	# onPan: (cb) -> @on(Gestures.Pan, cb)
+	# onPanStart: (cb) -> @on(Gestures.PanStart, cb)
+	# onPanMove: (cb) -> @on(Gestures.PanMove, cb)
+	# onPanEnd: (cb) -> @on(Gestures.PanEnd, cb)
+	# onPanCancel: (cb) -> @on(Gestures.PanCancel, cb)
+	# onPanLeft: (cb) -> @on(Gestures.PanLeft, cb)
+	# onPanRight: (cb) -> @on(Gestures.PanRight, cb)
+	# onPanUp: (cb) -> @on(Gestures.PanUp, cb)
+	# onPanDown: (cb) -> @on(Gestures.PanDown, cb)
 
-	onPinch: (cb) -> @on(Gestures.Pinch, cb)
-	onPinchStart: (cb) -> @on(Gestures.PinchStart, cb)
-	onPinchMove: (cb) -> @on(Gestures.PinchMove, cb)
-	onPinchEnd: (cb) -> @on(Gestures.PinchEnd, cb)
-	onPinchCancel: (cb) -> @on(Gestures.PinchCancel, cb)
-	onPinchIn: (cb) -> @on(Gestures.PinchIn, cb)
-	onPinchOut: (cb) -> @on(Gestures.PinchOut, cb)
+	# onPinch: (cb) -> @on(Gestures.Pinch, cb)
+	# onPinchStart: (cb) -> @on(Gestures.PinchStart, cb)
+	# onPinchMove: (cb) -> @on(Gestures.PinchMove, cb)
+	# onPinchEnd: (cb) -> @on(Gestures.PinchEnd, cb)
+	# onPinchCancel: (cb) -> @on(Gestures.PinchCancel, cb)
+	# onPinchIn: (cb) -> @on(Gestures.PinchIn, cb)
+	# onPinchOut: (cb) -> @on(Gestures.PinchOut, cb)
 
-	onPress: (cb) -> @on(Gestures.Press, cb)
-	onPressUp: (cb) -> @on(Gestures.PressUp, cb)
+	# onPress: (cb) -> @on(Gestures.Press, cb)
+	# onPressUp: (cb) -> @on(Gestures.PressUp, cb)
 
-	onRotate: (cb) -> @on(Gestures.Rotate, cb)
-	onRotateStart: (cb) -> @on(Gestures.RotateStart, cb)
-	onRotateMove: (cb) -> @on(Gestures.RotateMove, cb)
-	onRotateEnd: (cb) -> @on(Gestures.RotateEnd, cb)
-	onRotateCancel: (cb) -> @on(Gestures.RotateCancel, cb)
+	# onRotate: (cb) -> @on(Gestures.Rotate, cb)
+	# onRotateStart: (cb) -> @on(Gestures.RotateStart, cb)
+	# onRotateMove: (cb) -> @on(Gestures.RotateMove, cb)
+	# onRotateEnd: (cb) -> @on(Gestures.RotateEnd, cb)
+	# onRotateCancel: (cb) -> @on(Gestures.RotateCancel, cb)
 
-	onSwipe: (cb) -> @on(Gestures.Swipe, cb)
-	onSwipeLeft: (cb) -> @on(Gestures.SwipeLeft, cb)
-	onSwipeRight: (cb) -> @on(Gestures.SwipeRight, cb)
-	onSwipeUp: (cb) -> @on(Gestures.SwipeUp, cb)
-	onSwipeDown: (cb) -> @on(Gestures.SwipeDown, cb)
+	# onSwipe: (cb) -> @on(Gestures.Swipe, cb)
+	# onSwipeLeft: (cb) -> @on(Gestures.SwipeLeft, cb)
+	# onSwipeRight: (cb) -> @on(Gestures.SwipeRight, cb)
+	# onSwipeUp: (cb) -> @on(Gestures.SwipeUp, cb)
+	# onSwipeDown: (cb) -> @on(Gestures.SwipeDown, cb)
 
-	onTap: (cb) -> @on(Gestures.Tap, cb)
-	onSingleTap: (cb) -> @on(Gestures.SingleTap, cb)
-	onDoubleTap: (cb) -> @on(Gestures.DoubleTap, cb)
+	# onTap: (cb) -> @on(Gestures.Tap, cb)
+	# onSingleTap: (cb) -> @on(Gestures.SingleTap, cb)
+	# onDoubleTap: (cb) -> @on(Gestures.DoubleTap, cb)
 
 
 ##############################################################
 # PATCH HAMMER
 
 # This is a nasty monkey patch to get Hammer to use the DOMEventManager
-# We're not going to use this for now, but we can if things become slow.
+# TODO: it would be better if it would use the layer context then current
 
 getWindowForElement = (element) ->
 	doc = element.ownerDocument or element
@@ -207,11 +214,13 @@ splitStr = (str) ->
 
 addEventListeners = (target, types, handler) ->
 	splitStr(types).map (type) ->
+		#console.log("hammer.addEventListener", type)
 		Framer.CurrentContext.domEventManager.wrap(target)
 			.addEventListener(type, handler, false)
 
 removeEventListeners = (target, types, handler) ->
 	splitStr(types).map (type) ->
+		#console.log("hammer.removeEventListener", type)
 		Framer.CurrentContext.domEventManager.wrap(target)
 			.removeEventListener(type, handler, false)
 

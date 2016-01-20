@@ -45,7 +45,6 @@ describe "LayerGestures", ->
 			layer.emit Events.Pinch
 			pinchCount.should.equal 1
 
-
 		it "should only run once when using 'once'", ->
 			
 			layerA = new Layer
@@ -72,3 +71,17 @@ describe "LayerGestures", ->
 			layerA.on(Events.Pinch, handler)
 			layerA.removeAllListeners(Events.Pinch)
 			layerA.listeners(Events.Pinch).length.should.equal 0
+
+		it "should route a gesture event to the gesture event manager", ->
+
+			context = new Framer.Context name:"test123"
+
+			context.run ->
+				layerA = new Layer
+				
+				layerA.on Gestures.Pinch, ->
+				layerA._domEventManager.listenerEvents().should.eql [
+					"touchstart", "touchmove", "touchend", "touchcancel", "mousedown"]
+
+				layerA.off Gestures.Pinch, ->
+				layerA._domEventManager.listenerEvents().should.eql []
