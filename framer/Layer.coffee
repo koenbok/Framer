@@ -13,8 +13,8 @@ Utils = require "./Utils"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
-{LayerRotatable} = require "./LayerRotatable"
 {LayerPinchable} = require "./LayerPinchable"
+{Gestures} = require "./Gestures"
 {GestureManager} = require "./GestureManager"
 
 NoCacheDateKey = Date.now()
@@ -567,7 +567,6 @@ class exports.Layer extends BaseClass
 
 		@_element.parentNode?.removeChild @_element
 		@removeAllListeners()
-		@gestures.removeAllListeners()
 		
 		@_context.removeLayer(@)
 		@_context.emit("layer:destroy", @)
@@ -888,19 +887,13 @@ class exports.Layer extends BaseClass
 		get: -> @_states ?= new LayerStates @
 
 	#############################################################################
-	## Draggable, Rotatable, Pinchable
+	## Draggable, Pinchable
 
 	@define "draggable",
 		importable: false
 		exportable: false
 		get: -> @_draggable ?= new LayerDraggable(@)
 		set: (value) -> @draggable.enabled = value if _.isBoolean(value)
-
-	@define "rotatable",
-		importable: false
-		exportable: false
-		get: -> @_rotatable ?= new LayerRotatable(@)
-		set: (value) -> @rotatable.enabled = value if _.isBoolean(value)
 
 	@define "pinchable",
 		importable: false
@@ -973,6 +966,16 @@ class exports.Layer extends BaseClass
 
 	_addListener: (eventName, listener) ->
 
+		# Make sure we stop ignoring events once we add a user event listener
+		if not _.startsWith(eventName, "change:")
+			@ignoreEvents = false
+
+		# If this is a gesture event, pass it on to the gesture manager
+		if _.startsWith(eventName, Gestures._prefix)
+			@_gestureManager ?= new GestureManager(@)
+			@_gestureManager.on(eventName, listener)
+			return
+
 		# If this is a dom event, we want the actual dom node to let us know
 		# when it gets triggered, so we can emit the event through the system.
 		if Utils.domValidEvent(@_element, eventName)
@@ -980,11 +983,13 @@ class exports.Layer extends BaseClass
 				@_domEventManager.addEventListener eventName, (event) =>
 					@emit(eventName, event)
 
-		# Make sure we stop ignoring events once we add a user event listener
-		if not _.startsWith eventName, "change:"
-			@ignoreEvents = false
-
 	_removeListener: (eventName, listener) ->
+
+		# If this is a gesture event, pass it on to the gesture manager
+		if _.startsWith(eventName, Gestures._prefix)
+			@_gestureManager ?= new GestureManager(@)
+			@_gestureManager.off(eventName, listener)
+			return
 
 		# Do cleanup for dom events if this is the last one of it's type.
 		# We are assuming we're the only ones adding dom events to the manager.
@@ -998,14 +1003,6 @@ class exports.Layer extends BaseClass
 
 	on: @::addListener
 	off: @::removeListener
-
-	##############################################################
-	## EVENTS
-
-	@define "gestures",
-		get: ->
-			@_gestures ?= new GestureManager(@)
-			return @_gestures
 
 	##############################################################
 	## EVENT HELPERS
@@ -1045,6 +1042,16 @@ class exports.Layer extends BaseClass
 	onDragAnimationDidStart: (cb) -> @on(Events.DragAnimationDidStart, cb)
 	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
 	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
+
+	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
+	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
+	onPinch: (cb) -> @on(Events.Pinch, cb)
+	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
+	onRotate: (cb) -> @on(Events.Rotate, cb)
+	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
+	onScaleStart: (cb) -> @on(Events.ScaleStart, cb)
+	onScale: (cb) -> @on(Events.Scale, cb)
+	onScaleEnd: (cb) -> @on(Events.ScaleEnd, cb)
 
 	##############################################################
 	## DESCRIPTOR

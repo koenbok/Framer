@@ -1,5 +1,9 @@
 {_} = require "./Underscore"
 
+# Before we do anything else, we need to patch touch events
+if window.ontouchstart is undefined
+	window.ontouchstart = null
+
 Framer = {}
 
 # Root level modules
@@ -60,3 +64,4 @@ Framer.CurrentContext = Framer.DefaultContext
 
 # Fix for mobile scrolling
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
+Framer.Extras.TouchEmulator.enable()

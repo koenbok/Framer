@@ -64,6 +64,10 @@ Utils.median = (x) ->
 	else
 		(sorted[(sorted.length / 2) - 1] + sorted[sorted.length / 2]) / 2
 
+Utils.nearestIncrement = (x, increment) ->
+	return x unless increment
+	return Math.round(x * (1 / increment)) / (1 / increment)
+
 ######################################################
 # ANIMATION
 
@@ -286,7 +290,11 @@ Utils.isSafari = ->
 	(/safari/).test(navigator.userAgent.toLowerCase())
 
 Utils.isTouch = ->
-	window.ontouchstart is null
+	# This needs to be a little more extensive because we
+	# patch ontouchstart to fake Hammer
+	window.ontouchstart is null and 
+	window.ontouchmove is null and 
+	window.ontouchend is null 
 
 Utils.isDesktop = ->
 	Utils.deviceType() is "desktop"
@@ -540,6 +548,21 @@ Utils.loadImage = (url, callback, context) ->
 
 # Point
 
+Utils.pointDivide = (pointA, pointB, fraction) ->
+	return point =
+		x: (pointA.x + pointB.x) / fraction
+		y: (pointA.y + pointB.y) / fraction
+
+Utils.pointAdd = (pointA, pointB) ->
+	return point =
+		x: pointA.x + pointB.x
+		y: pointA.y + pointB.y
+
+Utils.pointSubtract = (pointA, pointB) ->
+	return point =
+		x: pointA.x - pointB.x
+		y: pointA.y - pointB.y
+
 Utils.pointZero = (args={}) ->
 	return _.defaults(args, {x:0, y:0})
 
@@ -577,6 +600,11 @@ Utils.pointInFrame = (point, frame) ->
 	return false if point.x < Utils.frameGetMinX(frame) or point.x > Utils.frameGetMaxX(frame)
 	return false if point.y < Utils.frameGetMinY(frame) or point.y > Utils.frameGetMaxY(frame)
 	return true
+
+Utils.pointCenter = (pointA, pointB) ->
+	return Utils.pointDivide(pointA, pointB, 2)
+
+
 
 # Size
 
