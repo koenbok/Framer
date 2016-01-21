@@ -122,8 +122,9 @@ class TouchEmulator extends BaseClass
 		
 		if event.keyCode is @keyPanCode
 			cancelEvent(event)
-			@centerPoint = Utils.pointCenter(@touchPoint, @point)
-			@isPanKeyDown = false
+			if @touchPoint and @point
+				@centerPoint = Utils.pointCenter(@touchPoint, @point)
+				@isPanKeyDown = false
 			
 
 	mousedown: (event) =>
@@ -151,26 +152,30 @@ class TouchEmulator extends BaseClass
 	mousemove: (event) =>
 		
 		cancelEvent(event)
-		
-		@startPoint ?=
+
+		@point =
 			x: event.pageX
 			y: event.pageY
-		
-		@centerPoint ?= @startPoint
+
+		@startPoint ?= @point 
+		@centerPoint ?= @point
 		
 		if @isPinchKeyDown and not @isPanKeyDown
-			@touchPoint = Utils.pointAdd(@touchPointerInitialOffset, @pinchPoint(@point, @centerPoint))
-			@touchPointDelta = Utils.pointSubtract(@point, @touchPoint)
+			if @touchPointerInitialOffset and @centerPoint
+				@touchPoint = Utils.pointAdd(@touchPointerInitialOffset, @pinchPoint(@point, @centerPoint))
+				@touchPointDelta = Utils.pointSubtract(@point, @touchPoint)
 			
 		if @isPinchKeyDown and @isPanKeyDown
-			@touchPoint = @panPoint(@point, @touchPointDelta)
+			if @touchPoint and @touchPointDelta
+				@touchPoint = @panPoint(@point, @touchPointDelta)
 
 		if @isPinchKeyDown or @isPanKeyDown
-			@touchPointLayer.visible = true
-			@touchPointLayer.midX = @touchPoint.x
-			@touchPointLayer.midY = @touchPoint.y
+			if @touchPoint
+				@touchPointLayer.visible = true
+				@touchPointLayer.midX = @touchPoint.x
+				@touchPointLayer.midY = @touchPoint.y
 	
-		if @isPinchKeyDown or @isPanKeyDown
+		if (@isPinchKeyDown or @isPanKeyDown) and @touchPointDelta
 			dispatchTouchEvent("touchmove", @target, event, @touchPointDelta)
 		else
 			dispatchTouchEvent("touchmove", @target, event)
