@@ -90,6 +90,8 @@ class exports.LayerPinchable extends BaseClass
 			@layer.rotation = rotation
 			@emit(Events.Rotate, event)
 
+		@emit(Events.Pinch, event)
+
 	_pinchEnd: (event) =>
 		@_reset()
 		@emit(Events.PinchEnd, event)
