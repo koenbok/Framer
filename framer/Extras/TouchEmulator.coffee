@@ -5,12 +5,12 @@ createTouch = (event, identifier, offset={x:0, y:0}) ->
 	return touch =
 		identifier: identifier
 		target: event.target
-		pageX: event.pageX + offset.x
-		pageY: event.pageY + offset.y
-		clientX: event.clientX + offset.x
-		clientY: event.clientY + offset.y
-		screenX: event.screenX + offset.x
-		screenY: event.screenY + offset.y
+		pageX: event.pageX - offset.x
+		pageY: event.pageY - offset.y
+		clientX: event.clientX - offset.x
+		clientY: event.clientY - offset.y
+		screenX: event.screenX - offset.x
+		screenY: event.screenY - offset.y
 
 dispatchTouchEvent = (type, target, event, offset) ->
 	
