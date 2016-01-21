@@ -34,7 +34,6 @@ class exports.LayerPinchable extends BaseClass
 
 	constructor: (@layer) ->
 		super
-
 		@_attach()
 
 	_attach: ->
@@ -53,6 +52,18 @@ class exports.LayerPinchable extends BaseClass
 		@emit(Events.ScaleStart, event) if @scale
 		@emit(Events.RotateStart, event) if @rotate
 
+		if @setOrigin
+
+			topInSuperBefore = Utils.convertPoint({}, @layer, @layer.superLayer)
+			pinchLocation = Utils.convertPointFromContext(event.center, @layer, true, true)
+			@layer.originX = pinchLocation.x / @layer.width
+			@layer.originY = pinchLocation.y / @layer.height
+			topInSuperAfter = Utils.convertPoint({}, @layer, @layer.superLayer)
+			xDiff = topInSuperAfter.x - topInSuperBefore.x
+			yDiff = topInSuperAfter.y - topInSuperBefore.y
+			@layer.x -= xDiff
+			@layer.y -= yDiff
+
 	_pinchMove: (event) =>
 
 		return unless event.pointers.length is 2
@@ -67,9 +78,6 @@ class exports.LayerPinchable extends BaseClass
 			y: event.pointers[1].pageY
 
 		return unless Utils.pointTotal(Utils.pointAbs(Utils.pointSubtract(pointA, pointB))) > @threshold
-
-		# TODO
-		# if @setOrigin
 
 		if @scale
 			@_scaleStart ?= @layer.scale
