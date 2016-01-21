@@ -5,8 +5,8 @@ Utils = require "./Utils"
 {Gestures} = require "./Gestures"
 
 Events.PinchStart = "pinchstart"
-Events.PinchEnd = "pinchend"
 Events.Pinch = "pinch"
+Events.PinchEnd = "pinchend"
 Events.RotateStart = "rotatestart"
 Events.Rotate = "rotate"
 Events.RotateEnd = "rotateend"
@@ -38,7 +38,7 @@ class exports.LayerPinchable extends BaseClass
 		@_attach()
 
 	_attach: ->
-		@layer.on(Gestures.PinchStart, @_pinch)
+		@layer.on(Gestures.PinchStart, @_pinchStart)
 		@layer.on(Gestures.Pinch, @_pinch)
 		@layer.on(Gestures.PinchEnd, @_pinchEnd)
 
@@ -101,8 +101,8 @@ class exports.LayerPinchable extends BaseClass
 		super eventName, event, @
 
 	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
-	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
 	onPinch: (cb) -> @on(Events.Pinch, cb)
+	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
 	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
 	onRotate: (cb) -> @on(Events.Rotate, cb)
 	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
