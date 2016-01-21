@@ -39,7 +39,7 @@ class exports.LayerPinchable extends BaseClass
 
 	_attach: ->
 		@layer.on(Gestures.PinchStart, @_pinchStart)
-		@layer.on(Gestures.Pinch, @_pinch)
+		@layer.on(Gestures.PinchMove, @_pinchMove)
 		@layer.on(Gestures.PinchEnd, @_pinchEnd)
 
 	_reset: ->
@@ -53,7 +53,7 @@ class exports.LayerPinchable extends BaseClass
 		@emit(Events.ScaleStart, event) if @scale
 		@emit(Events.RotateStart, event) if @rotate
 
-	_pinch: (event) =>
+	_pinchMove: (event) =>
 
 		return unless event.pointers.length is 2
 		return unless @enabled
