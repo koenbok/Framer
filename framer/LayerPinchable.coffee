@@ -17,7 +17,7 @@ Events.ScaleEnd = "scaleend"
 class exports.LayerPinchable extends BaseClass
 
 	@define "enabled", @simpleProperty("enabled", true)
-	@define "threshold", @simpleProperty("threshold", 64)
+	@define "threshold", @simpleProperty("threshold", 0)
 	@define "setOrigin", @simpleProperty("setOrigin", true)
 
 	@define "scale", @simpleProperty("scale", true)
