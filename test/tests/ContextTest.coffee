@@ -222,10 +222,10 @@ describe "Context", ->
 			colorString = color.toString()
 			context._element.style["backgroundColor"].should.equal colorString
 
-		it "should have a default perspective of 1200", ->
+		it "should have a default perspective of 0", ->
 
 			context = new Framer.Context(name:"Test")
-			context._element.style["webkitPerspective"].should.equal "1200"
+			context._element.style["webkitPerspective"].should.equal "0"
 
 		it "should allow the perspective to be changed", ->
 

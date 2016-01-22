@@ -1,143 +1,200 @@
+{_} = require "./Underscore"
 Hammer = require "hammerjs"
 
-class exports.GestureManagerElement
+Utils = require "./Utils"
+{EventEmitter} = require "./EventEmitter"
+{Gestures} = require "./Gestures"
 
-	constructor: (@element) ->
-		
-		@_events = {}
+class exports.GestureManager extends EventEmitter
+
+	constructor: (@layer) ->
+
+	once: (eventName, listener) =>
+		super(eventName, listener)
+		@_addListener eventName, (e) =>
+			@removeListener(eventName, listener)
+			listener.apply(@layer, [e, @layer])
+
+	addListener: (eventName, listener) =>
+		super(eventName, listener)
+		@_addListener(eventName, listener)
+
+	removeListener: (eventName, listener) ->
+		super(eventName, listener)
+		@_removeListener(eventName, listener)
+
+	_addListener: (eventName, listener) ->
+
+		throw new Error("No event name defined") unless eventName
+		throw new Error("No listener defined") unless listener
+
+		@_manager = Hammer(@layer._element)
+
+		# Make sure we have a hammer instance and layer listeners enabled
+		@layer.ignoreEvents = false
+
+		eventFamily = @_getEventFamily(eventName)
+		throw new Error("Cannot find gesture family for #{eventName}") unless eventName
+
+		recognizer = @_getRecognizer(eventFamily)
+		throw new Error("Cannot find gesture recognizer for #{eventFamily}") unless eventFamily
+
+		# Add other recognizers if they existed already
+		existingRecognizers = @_getDependentRecognizersForEventFamily(eventFamily)
+
+		if existingRecognizers.length > 0
+			recognizer.recognizeWith(existingRecognizers)
+
+		@_manager.add(recognizer)
+
+		# Wrap this layer so we control the scope
+		listener._actual = (event) =>
+			listener.apply(@layer, [event, @layer])
+
+		@_manager.on(eventName, listener._actual)
+
+	_removeListener: (eventName, listener) ->
+
+		# If this is the last listener we detroy the hammer element
+		if @listenerEvents().length is 1 and @listenerEvents()[0] is eventName
+			@_manager.destroy()
+		else
+			listener = listener._actual if listener._actual
+			@_manager.off(eventName, listener)
+
+	destroy: ->
+		@_manager.destroy()
 		@_manager = null
-	
+
+	on: @::addListener
+	off: @::removeListener
+
 	_getEventFamily: (eventName) ->
-		
-		eventFamily = undefined
 		
 		switch eventName
 			
-			when Events.Pan, Events.PanStart, Events.PanMove, Events.PanEnd, Events.PanCancel, Events.PanLeft, Events.PanRight,	Events.PanUp, Events.PanDown
-				eventFamily = Events.Pan
+			when Gestures.Pan, Gestures.PanStart, Gestures.PanMove, Gestures.PanEnd, Gestures.PanCancel, Gestures.PanLeft, Gestures.PanRight,	Gestures.PanUp, Gestures.PanDown
+				return Gestures.Pan
 			
-			when Events.Pinch, Events.PinchStart, Events.PinchMove, Events.PinchEnd, Events.PinchCancel, Events.PinchIn, Events.PinchOut
-				eventFamily = Events.Pinch
+			when Gestures.Pinch, Gestures.PinchStart, Gestures.PinchMove, Gestures.PinchEnd, Gestures.PinchCancel, Gestures.PinchIn, Gestures.PinchOut
+				return Gestures.Pinch
 			
-			when Events.Press, Events.PressUp
-				eventFamily = Events.Press
+			when Gestures.Press, Gestures.PressUp
+				return Gestures.Press
 			
-			when Events.Rotate, Events.RotateStart, Events.RotateMove, Events.RotateEnd, Events.RotateCancel
-				eventFamily = Events.Rotate
+			when Gestures.Rotate, Gestures.RotateStart, Gestures.RotateMove, Gestures.RotateEnd, Gestures.RotateCancel
+				return Gestures.Rotate
 			
-			when Events.Swipe, Events.SwipeLeft, Events.SwipeRight, Events.SwipeUp, Events.SwipeDown
-				eventFamily = Events.Swipe
+			when Gestures.Swipe, Gestures.SwipeLeft, Gestures.SwipeRight, Gestures.SwipeUp, Gestures.SwipeDown
+				return Gestures.Swipe
 			
-			when Events.Tap, Events.SingleTap
-				eventFamily = Events.Tap
+			when Gestures.Tap, Gestures.SingleTap
+				return Gestures.Tap
 			
-			when Events.DoubleTap # Tap and DoubleTap need different type of recognizers
-				eventFamily = Events.DoubleTap
-			
-			else
-		
-		return eventFamily
+			when Gestures.DoubleTap # Tap and DoubleTap need different type of recognizers
+				return Gestures.DoubleTap
 
+	_getRecognizer: (eventFamily) ->
+
+		switch eventFamily
+			
+			when Gestures.Pan
+				return new Hammer.Pan({event:Gestures.Pan})
+			
+			when Gestures.Pinch
+				return new Hammer.Pinch({event:Gestures.Pinch})
+			
+			when Gestures.Press
+				return new Hammer.Press({event:Gestures.Press})
+			
+			when Gestures.Rotate
+				return new Hammer.Rotate({event:Gestures.Rotate})
+			
+			when Gestures.Swipe
+				return new Hammer.Swipe({event:Gestures.Swipe})
+			
+			when Gestures.Tap
+				return new Hammer.Tap({event:Gestures.Tap})
+			
+			when Gestures.DoubleTap
+				return new Hammer.Tap({event:Gestures.DoubleTap, taps:2})
 
 	_getDependentRecognizersForEventFamily: (eventFamily) ->
 
 		# We need to add simultaneous recognition for certain gestures to be detected together
 		# See http://hammerjs.github.io/recognize-with/
-		# All these dependencies come from https://cdn.rawgit.com/hammerjs/hammer.js/master/tests/manual/visual.html
+		
+		# All these dependencies come from 
+		# https://cdn.rawgit.com/hammerjs/hammer.js/master/tests/manual/visual.html
+		
 		existingRecognizers = []
 		
 		switch eventFamily
 			
-			when Events.Pan # Pan depends on Swipe, Rotate and Pinch
-				if swipe = @_manager.get(Events.Swipe)
+			when Gestures.Pan # Pan depends on Swipe, Rotate and Pinch
+				if swipe = @_manager.get(Gestures.Swipe)
 					existingRecognizers.push(swipe)
-				if rotate = @_manager.get(Events.Rotate)
+				if rotate = @_manager.get(Gestures.Rotate)
 					existingRecognizers.push(rotate)
-				if pinch = @_manager.get(Events.Pinch)
+				if pinch = @_manager.get(Gestures.Pinch)
 					existingRecognizers.push(pinch)
 			
-			when Events.Swipe # Swipe depends on Pan
-				if pan = @_manager.get(Events.Pan)
+			when Gestures.Swipe # Swipe depends on Pan
+				if pan = @_manager.get(Gestures.Pan)
 					existingRecognizers.push(pan)
 			
-			when Events.Rotate # Rotate depends on Pan and Pinch
-				if pan = @_manager.get(Events.Pan)
+			when Gestures.Rotate # Rotate depends on Pan and Pinch
+				if pan = @_manager.get(Gestures.Pan)
 					existingRecognizers.push(pan)
-				if pinch = @_manager.get(Events.Pinch)
+				if pinch = @_manager.get(Gestures.Pinch)
 					existingRecognizers.push(pinch)
 			
-			when Events.Pinch # Pinch depends on Pan and Rotate
-				if pan = @_manager.get(Events.Pan)
+			when Gestures.Pinch # Pinch depends on Pan and Rotate
+				if pan = @_manager.get(Gestures.Pan)
 					existingRecognizers.push(pan)
-				if rotate = @_manager.get(Events.Pinch)
+				if rotate = @_manager.get(Gestures.Rotate)
 					existingRecognizers.push(rotate)
 
-			when Events.DoubleTap # DoubleTap depends on Tap
-				if tap = @_manager.get(Events.Tap)
+			when Gestures.DoubleTap # DoubleTap depends on Tap
+				if tap = @_manager.get(Gestures.Tap)
 					existingRecognizers.push(tap)
-			
-			else
 		
-		return existingRecognizers			
+		return existingRecognizers
 
 
-	addEventListener: (eventName, listener) ->
-		#Lazy creation
-		@_manager ?= new Hammer.Manager(@element)
-		
-		validEvent = true
-		recognizer = undefined
+##############################################################
+# PATCH HAMMER
 
-		# Get event family to add different recognizers
-		eventFamily = @_getEventFamily(eventName)
+# This is a nasty monkey patch to get Hammer to use the DOMEventManager
+# TODO: it would be better if it would use the layer context then current
 
-		# Add recognizer if needed
-		switch eventFamily
-			
-			when Events.Pan
-				if not @_manager.get(Events.Pan)
-					recognizer = new Hammer.Pan({ event: Events.Pan})
-			
-			when Events.Pinch
-				if not @_manager.get(Events.Pinch)
-					recognizer = new Hammer.Pinch({ event: Events.Pinch})
-			
-			when Events.Press
-				if not @_manager.get(Events.Press)
-					recognizer = new Hammer.Press({ event: Events.Press})
-			
-			when Events.Rotate
-				if not @_manager.get(Events.Rotate)
-					recognizer = new Hammer.Rotate({ event: Events.Rotate})
-			
-			when Events.Swipe
-				if not @_manager.get(Events.Swipe)
-					recognizer = new Hammer.Swipe({ event: Events.Swipe})
-			
-			when Events.Tap
-				if not @_manager.get(Events.Tap)
-					recognizer = new Hammer.Tap({ event: Events.Tap})
-			
-			when Events.DoubleTap
-				if not @_manager.get(Events.DoubleTap)
-					recognizer = new Hammer.Tap({ event: Events.DoubleTap, taps: 2})
-			
-			else
-				validEvent = false
+getWindowForElement = (element) ->
+	doc = element.ownerDocument or element
+	return doc.defaultView or doc.parentWindow or window
 
-		if recognizer
-			# Add other recognizers if they existed already
-			existingRecognizers = @_getDependentRecognizersForEventFamily(eventFamily)
-			if existingRecognizers.length > 0
-				@_manager.add(recognizer).recognizeWith(existingRecognizers)
-			else
-				@_manager.add recognizer
+splitStr = (str) ->
+	return str.trim().split(/\s+/g)
 
-		if validEvent
-			@_manager.on eventName, listener
+addEventListeners = (target, types, handler) ->
+	splitStr(types).map (type) ->
+		#console.log("hammer.addEventListener", type)
+		Framer.CurrentContext.domEventManager.wrap(target)
+			.addEventListener(type, handler, false)
 
-	removeEventListener: (eventName, listener) ->
-		# The EventManager already checks that the listener has been registered
-		# so we can remove it safely
-		# -- Should we remove the recognizers as well?? --
-		@_manager.off eventName, listener
+removeEventListeners = (target, types, handler) ->
+	splitStr(types).map (type) ->
+		#console.log("hammer.removeEventListener", type)
+		Framer.CurrentContext.domEventManager.wrap(target)
+			.removeEventListener(type, handler, false)
+
+Hammer.Input::init = ->
+	@evEl and addEventListeners(@element, @evEl, @domHandler)
+	@evTarget and addEventListeners(@target, @evTarget, @domHandler)
+	@evWin and addEventListeners(getWindowForElement(@element), @evWin, @domHandler)
+	return
+
+Hammer.Input::destroy = ->
+	@evEl and removeEventListeners(@element, @evEl, @domHandler)
+	@evTarget and removeEventListeners(@target, @evTarget, @domHandler)
+	@evWin and removeEventListeners(getWindowForElement(@element), @evWin, @domHandler)
+	return

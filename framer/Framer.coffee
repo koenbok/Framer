@@ -1,5 +1,9 @@
 {_} = require "./Underscore"
 
+# Before we do anything else, we need to patch touch events
+if window.ontouchstart is undefined
+	window.ontouchstart = null
+
 Framer = {}
 
 # Root level modules
@@ -10,6 +14,7 @@ Framer.Layer = (require "./Layer").Layer
 Framer.BackgroundLayer = (require "./BackgroundLayer").BackgroundLayer
 Framer.VideoLayer = (require "./VideoLayer").VideoLayer
 Framer.Events = (require "./Events").Events
+Framer.Gestures = (require "./Gestures").Gestures
 Framer.Animation = (require "./Animation").Animation
 Framer.AnimationGroup = (require "./AnimationGroup").AnimationGroup
 Framer.Screen = (require "./Screen").Screen
@@ -60,3 +65,4 @@ Framer.CurrentContext = Framer.DefaultContext
 
 # Fix for mobile scrolling
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
+Framer.Extras.TouchEmulator.enable()

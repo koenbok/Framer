@@ -8,11 +8,14 @@ Utils = require "./Utils"
 {BaseClass} = require "./BaseClass"
 {EventEmitter} = require "./EventEmitter"
 {Color} = require "./Color"
+{Matrix} = require "./Matrix"
 {Animation} = require "./Animation"
 {LayerStyle} = require "./LayerStyle"
 {LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
-{Matrix} = require "./Matrix"
+{LayerPinchable} = require "./LayerPinchable"
+{Gestures} = require "./Gestures"
+{GestureManager} = require "./GestureManager"
 
 NoCacheDateKey = Date.now()
 
@@ -252,27 +255,11 @@ class exports.Layer extends BaseClass
 				.multiply(@matrix)
 				.translate(-@originX * @width, -@originY * @height)
 
-	_perspectiveProjectionMatrix: (element) =>
-		p = element.perspective
-		m = new Matrix()
-		m.m34 = -1/p if p? and p isnt 0
-		return m
-
-	# matrix of perspective projection with perspective origin applied
-	_perspectiveMatrix: (element) =>
-		ox = element.perspectiveOriginX * element.width
-		oy = element.perspectiveOriginY * element.height
-		ppm = @_perspectiveProjectionMatrix(element)
-		return new Matrix()
-			.translate(ox, oy)
-			.multiply(ppm)
-			.translate(-ox, -oy)
-
 	# matrix of layer transforms with perspective applied
 	@define "matrix3d",
 		get: ->
 			parent = @superLayer or @context
-			ppm = @_perspectiveMatrix(parent)
+			ppm = Utils.perspectiveMatrix(parent)
 			return new Matrix()
 				.multiply(ppm)
 				.multiply(@transformMatrix)
@@ -576,13 +563,12 @@ class exports.Layer extends BaseClass
 		# Todo: check this
 
 		if @parent
-			@parent._children = _.without @parent._children, @
+			@parent._children = _.without(@parent._children, @)
 
 		@_element.parentNode?.removeChild @_element
 		@removeAllListeners()
 
 		@_context.removeLayer(@)
-
 		@_context.emit("layer:destroy", @)
 
 
@@ -650,7 +636,8 @@ class exports.Layer extends BaseClass
 
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
-			if @_eventListeners?.hasOwnProperty "load" or @_eventListeners?.hasOwnProperty "error"
+			
+			if @_domEventManager.listeners(Events.ImageLoaded) or @_domEventManager.listeners(Events.ImageLoadError)
 
 				loader = new Image()
 				loader.name = imageUrl
@@ -658,10 +645,10 @@ class exports.Layer extends BaseClass
 
 				loader.onload = =>
 					@style["background-image"] = "url('#{imageUrl}')"
-					@emit "load", loader
+					@emit Events.ImageLoaded, loader
 
 				loader.onerror = =>
-					@emit "error", loader
+					@emit Events.ImageLoadError, loader
 
 			else
 				@style["background-image"] = "url('#{imageUrl}')"
@@ -900,21 +887,19 @@ class exports.Layer extends BaseClass
 		get: -> @_states ?= new LayerStates @
 
 	#############################################################################
-	## Draggable
+	## Draggable, Pinchable
 
 	@define "draggable",
 		importable: false
 		exportable: false
-		get: ->
-			@_draggable ?= new LayerDraggable(@)
-		set: (value) ->
-			@draggable.enabled = value if _.isBoolean(value)
+		get: -> @_draggable ?= new LayerDraggable(@)
+		set: (value) -> @draggable.enabled = value if _.isBoolean(value)
 
-	# anchor: ->
-	# 	if not @_anchor
-	# 		@_anchor = new LayerAnchor(@, arguments...)
-	# 	else
-	# 		@_anchor.updateRules(arguments...)
+	@define "pinchable",
+		importable: false
+		exportable: false
+		get: -> @_pinchable ?= new LayerPinchable(@)
+		set: (value) -> @pinchable.enabled = value if _.isBoolean(value)
 
 	##############################################################
 	## SCROLLING
@@ -981,17 +966,30 @@ class exports.Layer extends BaseClass
 
 	_addListener: (eventName, listener) ->
 
-		# If this is a dom event, we want the actual dom node to let us know
-		# when it gets triggered, so we can emit the event through the system.
-		if not @_domEventManager.listeners(eventName).length
-			@_domEventManager.addEventListener eventName, (event) =>
-				@emit(eventName, event)
-
 		# Make sure we stop ignoring events once we add a user event listener
-		if not _.startsWith eventName, "change:"
+		if not _.startsWith(eventName, "change:")
 			@ignoreEvents = false
 
+		# If this is a gesture event, pass it on to the gesture manager
+		if _.startsWith(eventName, Gestures._prefix)
+			@_gestureManager ?= new GestureManager(@)
+			@_gestureManager.on(eventName, listener)
+			return
+
+		# If this is a dom event, we want the actual dom node to let us know
+		# when it gets triggered, so we can emit the event through the system.
+		if Utils.domValidEvent(@_element, eventName)
+			if not @_domEventManager.listeners(eventName).length
+				@_domEventManager.addEventListener eventName, (event) =>
+					@emit(eventName, event)
+
 	_removeListener: (eventName, listener) ->
+
+		# If this is a gesture event, pass it on to the gesture manager
+		if _.startsWith(eventName, Gestures._prefix)
+			@_gestureManager ?= new GestureManager(@)
+			@_gestureManager.off(eventName, listener)
+			return
 
 		# Do cleanup for dom events if this is the last one of it's type.
 		# We are assuming we're the only ones adding dom events to the manager.
@@ -1045,42 +1043,15 @@ class exports.Layer extends BaseClass
 	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
 	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
 
-	onPan: (cb) -> @on(Events.Pan, cb)
-	onPanStart: (cb) -> @on(Events.PanStart, cb)
-	onPanMove: (cb) -> @on(Events.PanMove, cb)
-	onPanEnd: (cb) -> @on(Events.PanEnd, cb)
-	onPanCancel: (cb) -> @on(Events.PanCancel, cb)
-	onPanLeft: (cb) -> @on(Events.PanLeft, cb)
-	onPanRight: (cb) -> @on(Events.PanRight, cb)
-	onPanUp: (cb) -> @on(Events.PanUp, cb)
-	onPanDown: (cb) -> @on(Events.PanDown, cb)
-
-	onPinch: (cb) -> @on(Events.Pinch, cb)
 	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
-	onPinchMove: (cb) -> @on(Events.PinchMove, cb)
 	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
-	onPinchCancel: (cb) -> @on(Events.PinchCancel, cb)
-	onPinchIn: (cb) -> @on(Events.PinchIn, cb)
-	onPinchOut: (cb) -> @on(Events.PinchOut, cb)
-
-	onPress: (cb) -> @on(Events.Press, cb)
-	onPressUp: (cb) -> @on(Events.PressUp, cb)
-
-	onRotate: (cb) -> @on(Events.Rotate, cb)
+	onPinch: (cb) -> @on(Events.Pinch, cb)
 	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
-	onRotateMove: (cb) -> @on(Events.RotateMove, cb)
+	onRotate: (cb) -> @on(Events.Rotate, cb)
 	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
-	onRotateCancel: (cb) -> @on(Events.RotateCancel, cb)
-
-	onSwipe: (cb) -> @on(Events.Swipe, cb)
-	onSwipeLeft: (cb) -> @on(Events.SwipeLeft, cb)
-	onSwipeRight: (cb) -> @on(Events.SwipeRight, cb)
-	onSwipeUp: (cb) -> @on(Events.SwipeUp, cb)
-	onSwipeDown: (cb) -> @on(Events.SwipeDown, cb)
-
-	onTap: (cb) -> @on(Events.Tap, cb)
-	onSingleTap: (cb) -> @on(Events.SingleTap, cb)
-	onDoubleTap: (cb) -> @on(Events.DoubleTap, cb)
+	onScaleStart: (cb) -> @on(Events.ScaleStart, cb)
+	onScale: (cb) -> @on(Events.Scale, cb)
+	onScaleEnd: (cb) -> @on(Events.ScaleEnd, cb)
 
 	##############################################################
 	## DESCRIPTOR

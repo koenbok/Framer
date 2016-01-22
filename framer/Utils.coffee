@@ -1,5 +1,6 @@
 {_} = require "./Underscore"
 {Screen} = require "./Screen"
+{Matrix} = require "./Matrix"
 
 Utils = {}
 
@@ -62,6 +63,10 @@ Utils.median = (x) ->
 		sorted[(sorted.length - 1) / 2]
 	else
 		(sorted[(sorted.length / 2) - 1] + sorted[sorted.length / 2]) / 2
+
+Utils.nearestIncrement = (x, increment) ->
+	return x unless increment
+	return Math.round(x * (1 / increment)) / (1 / increment)
 
 ######################################################
 # ANIMATION
@@ -187,11 +192,15 @@ Utils.inspectObjectType = (item) ->
 		return match[1] if match
 		return null
 
-	className = extract(item.toString())
-	return className if className
-	className = extract(item.constructor?.toString())
-	return className.replace("Constructor", "") if className
-	return item
+	if item.toString
+		className = extract(item.toString())
+		return className if className
+
+	if item.constructor?.toString
+		className = extract(item.constructor?.toString())
+		return className.replace("Constructor", "") if className
+
+	return "Object"
 
 Utils.inspect = (item, max=5, l=0) ->
 
@@ -281,7 +290,11 @@ Utils.isSafari = ->
 	(/safari/).test(navigator.userAgent.toLowerCase())
 
 Utils.isTouch = ->
-	window.ontouchstart is null
+	# This needs to be a little more extensive because we
+	# patch ontouchstart to fake Hammer
+	window.ontouchstart is null and 
+	window.ontouchmove is null and 
+	window.ontouchend is null 
 
 Utils.isDesktop = ->
 	Utils.deviceType() is "desktop"
@@ -428,6 +441,7 @@ Utils.domCompleteCancel = (f) ->
 
 Utils.domValidEvent = (element, eventName) ->
 	return if not eventName
+	return true if eventName in ["touchstart", "touchmove", "touchend"]
 	return typeof(element["on#{eventName.toLowerCase()}"]) isnt "undefined"
 
 Utils.domLoadScript = (url, callback) ->
@@ -534,6 +548,21 @@ Utils.loadImage = (url, callback, context) ->
 
 # Point
 
+Utils.pointDivide = (pointA, pointB, fraction) ->
+	return point =
+		x: (pointA.x + pointB.x) / fraction
+		y: (pointA.y + pointB.y) / fraction
+
+Utils.pointAdd = (pointA, pointB) ->
+	return point =
+		x: pointA.x + pointB.x
+		y: pointA.y + pointB.y
+
+Utils.pointSubtract = (pointA, pointB) ->
+	return point =
+		x: pointA.x - pointB.x
+		y: pointA.y - pointB.y
+
 Utils.pointZero = (args={}) ->
 	return _.defaults(args, {x:0, y:0})
 
@@ -571,6 +600,11 @@ Utils.pointInFrame = (point, frame) ->
 	return false if point.x < Utils.frameGetMinX(frame) or point.x > Utils.frameGetMaxX(frame)
 	return false if point.y < Utils.frameGetMinY(frame) or point.y > Utils.frameGetMaxY(frame)
 	return true
+
+Utils.pointCenter = (pointA, pointB) ->
+	return Utils.pointDivide(pointA, pointB, 2)
+
+
 
 # Size
 
@@ -781,7 +815,6 @@ Utils.convertFrameToContext = (frame = {}, layer, rootContext=false, includeLaye
 Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLayer = true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
 	ancestors = layer.ancestors(rootContext)
-	point = ancestors.pop().matrix3d.inverse().point(point) if ancestors.length
 	ancestors.reverse()
 	ancestors.push(layer) if includeLayer
 	for ancestor in ancestors
@@ -814,6 +847,21 @@ Utils.boundingFrame = (layer, rootContext=true) ->
 	boundingFrame = Utils.frameFromPoints(contextCornerPoints)
 	return Utils.pixelAlignedFrame(boundingFrame)
 
+Utils.perspectiveProjectionMatrix = (element) ->
+	p = element.perspective
+	m = new Matrix()
+	m.m34 = -1/p if p? and p isnt 0
+	return m
+
+# matrix of perspective projection with perspective origin applied
+Utils.perspectiveMatrix = (element) ->
+	ox = element.perspectiveOriginX * element.width
+	oy = element.perspectiveOriginY * element.height
+	ppm = Utils.perspectiveProjectionMatrix(element)
+	return new Matrix()
+		.translate(ox, oy)
+		.multiply(ppm)
+		.translate(-ox, -oy)
 
 ###################################################################
 # Beta additions, use with care

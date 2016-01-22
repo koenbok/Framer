@@ -6,6 +6,7 @@ Utils        = require "./Utils"
 {Simulation} = require "./Simulation"
 {Defaults}   = require "./Defaults"
 {EventBuffer} = require "./EventBuffer"
+{Gestures}    = require "./Gestures"
 
 Events.Move                  = "move"
 Events.DragStart             = "dragstart"
@@ -17,6 +18,8 @@ Events.DragEnd               = "dragend"
 Events.DragAnimationDidStart = "draganimationdidstart"
 Events.DragAnimationDidEnd   = "draganimationdidend"
 Events.DirectionLockDidStart = "directionlockdidstart"
+Events.Pinch                 = Gestures.Pinch
+Events.Rotate                = Gestures.Rotate
 
 """
              

@@ -131,6 +131,7 @@ class exports.LayerStates extends BaseClass
 
 	@define "state", get: -> @_currentState
 	@define "current", get: -> @_currentState
+	@define "all", get: -> _.clone(@_orderedStates)
 
 	states: ->
 		# Return a list of all the possible states
