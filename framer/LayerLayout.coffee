@@ -27,6 +27,7 @@ class exports.LayerLayout extends EventEmitter
 
 	constructor: (@layer) ->
 		@layer.on("change:subLayers", @_updateTree)
+		Framer.Loop.on("update", @_drawIfNeeded)
 		@layer._context.domEventManager.wrap(window).addEventListener("resize", @_didResize)
 		# When the change:subLayers event is triggered, the 'superLayer' property has not been set yet, so we need a way to know
 		# if we are dealing with a root layer (i.e. doesn't have any superLayer) or not
@@ -76,16 +77,21 @@ class exports.LayerLayout extends EventEmitter
 		rootLayer = @layer
 		while rootLayer.superLayer
 			rootLayer = rootLayer.superLayer
-		# Hack to add Screen size
-		# TODO Maybe add this root node to the Canvas class?
-		rootLayoutNode =
-			style:
-				width: Screen.width
-				height: Screen.height
-			children: [rootLayer.layout._layoutNode]
-		newTree = _.cloneDeep(rootLayoutNode)
-		computeLayout(newTree)
-		rootLayer.layout._updateLayer(newTree.children[0])
+		rootLayer.layout.needsUpdate = true
+
+	_drawIfNeeded: =>
+		if not @layer.superLayer and @needsUpdate
+			@needsUpdate = false
+			# Hack to add Screen size
+			# TODO Maybe add this root node to the Canvas class?
+			rootLayoutNode =
+				style:
+					width: Screen.width
+					height: Screen.height
+				children: [@_layoutNode]
+			newTree = _.cloneDeep(rootLayoutNode)
+			computeLayout(newTree)
+			@_updateLayer(newTree.children[0])
 
 	_updateLayer: (computedTree) ->
 		if computedTree.shouldUpdate
