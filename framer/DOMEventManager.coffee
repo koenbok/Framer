@@ -1,6 +1,5 @@
 {_} = require "./Underscore"
 {EventEmitter} = require "./EventEmitter"
-{GestureManagerElement} = require "./GestureManager"
 
 Utils = require "./Utils"
 

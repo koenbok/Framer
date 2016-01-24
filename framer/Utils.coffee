@@ -588,10 +588,15 @@ Utils.pointMax = ->
 		x: _.max points.map (size) -> size.x
 		y: _.max points.map (size) -> size.y
 
+Utils.pointDelta = (pointA, pointB) ->
+	delta =
+		x: pointB.x - pointA.x
+		y: pointB.y - pointA.y
+
 Utils.pointDistance = (pointA, pointB) ->
-	distance =
-		x: Math.abs(pointB.x - pointA.x)
-		y: Math.abs(pointB.y - pointA.y)
+	a = pointA.x - pointB.x
+	b = pointA.y - pointB.y
+	return Math.sqrt((a * a) + (b * b))
 
 Utils.pointInvert = (point) ->
 	point =
@@ -614,6 +619,8 @@ Utils.pointInFrame = (point, frame) ->
 Utils.pointCenter = (pointA, pointB) ->
 	return Utils.pointDivide(pointA, pointB, 2)
 
+Utils.pointAngle = (pointA, pointB) ->
+	return Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x) * 180 / Math.PI
 
 
 # Size
@@ -763,7 +770,7 @@ Utils.frameInset = (frame, inset) ->
 
 Utils.frameSortByAbsoluteDistance = (point, frames, originX=0, originY=0) ->
 	distance = (frame) ->
-		result = Utils.pointDistance(point, Utils.framePointForOrigin(frame, originX, originY))
+		result = Utils.pointDelta(point, Utils.framePointForOrigin(frame, originX, originY))
 		result = Utils.pointAbs(result)
 		result = Utils.pointTotal(result)
 		result

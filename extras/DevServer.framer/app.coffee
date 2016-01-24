@@ -1,40 +1,35 @@
+# logEventListeners = ->
+# 	
+# 	return if window.__logEventListeners
+# 	window.__logEventListeners = true
+# 	
+# 	addEventListener = Element::addEventListener
+# 	removeEventListener = Element::removeEventListener
+# 	
+# 	Element::addEventListener = () ->
+# 		print "addEventListener", arguments[0], @
+# 		addEventListener.apply(@, arguments)
+# 		
+# 	
+# 	Element::removeEventListener = () ->
+# 		print "removeEventListener", arguments, @
+# 		removeEventListener.apply(@, arguments)
+# 
+# logEventListeners()
+
 layer =  new Layer
 	width: Screen.width / 2
 	height: Screen.height / 2
 
 layer.center()
 
-layer.draggable.enabled = true
+
 layer.pinchable.enabled = true
-layer.pinchable.rotate = false
+#layer.draggable.enabled = true
 
 
-Utils.labelLayer(layer, "ALT to emulate touch, CMD to pan")
+p = new Layer width: 10, height: 10
 
-# layer.on Gestures.PinchStart, (e) -> print e.type
-# layer.on Gestures.Pinch, (e) -> print e.type
-# layer.on Gestures.PinchEnd, (e) -> print e.type
-# 
-# layer.on Gestures.RotateStart, (e) -> print e.type
-# layer.on Gestures.Rotate, (e) -> print e.type
-# layer.on Gestures.RotateEnd, (e) -> print e.type
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+layer.on Gestures.Pinch, (e) ->
+	print "pinch", p.point = event.center
 
