@@ -268,6 +268,10 @@ class exports.Context extends BaseClass
 	@define "frame", get: -> {x:0, y:0, width:@width, height:@height}
 	@define "size",  get: -> _.pluck(@frame, ["x", "y"])
 	@define "point", get: -> _.pluck(@frame, ["width", "height"])
+	@define "canvasFrame",
+		get: ->
+			return @frame if not parent
+			return @parent.canvasFrame
 
 	@define "backgroundColor",
 		get: ->

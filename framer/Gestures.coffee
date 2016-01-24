@@ -1,19 +1,21 @@
 # Gesture events
 Gestures = {}
 
-# Pinch
-Gestures.Pinch = "pinch" # This event includes all the other Pinch events
-Gestures.PinchStart = "pinchstart"
-Gestures.PinchEnd = "pinchend"
+# Tap
+Gestures.Tap = "tap"
+Gestures.TapStart = "tapstart"
+Gestures.TapEnd = "tapend"
+Gestures.DoubleTap = "doubletap"
+
+# Force Tap
+Gestures.ForceTap = "forcetap"
+Gestures.ForceTapStart = "forcetapstart"
+Gestures.ForceTapEnd = "forcetapend"
 
 # Press
-# Gestures.Press = "press"
-# Gestures.PressUp = "pressup"
-
-# Rotate
-Gestures.Rotate = "rotate" # This event includes all the other Rotate events
-Gestures.RotateStart = "rotatestart"
-Gestures.RotateEnd = "rotateend"
+Gestures.LongPress = "longpress"
+Gestures.LongPressStart = "longpressstart"
+Gestures.LongPressEnd = "longpressend"
 
 # Swipe
 Gestures.Swipe = "swipe"
@@ -22,9 +24,35 @@ Gestures.SwipeRight = "swiperight"
 Gestures.SwipeUp = "swipeup"
 Gestures.SwipeDown = "swipedown"
 
-# Tap
-# Gestures.Tap = "tap"
-# Gestures.SingleTap = "singletap"
-# Gestures.DoubleTap = "doubletap"
+# Edge Swipe
+Gestures.EdgeSwipe = "edgeswipe"
+Gestures.EdgeSwipeLeft = "edgeswipeleft"
+Gestures.EdgeSwipeRight = "edgeswiperight"
+Gestures.EdgeSwipeTop = "edgeswipetop"
+Gestures.EdgeSwipeBottom = "edgeswipebottom"
+
+# Pan
+Gestures.Pan = "pan"
+Gestures.PanStart = "panstart"
+Gestures.PanEnd = "panend"
+Gestures.PanLeft = "panleft"
+Gestures.PanRight = "panright"
+Gestures.PanUp = "panup"
+Gestures.PanDown = "pandown"
+
+# Pinch
+Gestures.Pinch = "pinch"
+Gestures.PinchStart = "pinchstart"
+Gestures.PinchEnd = "pinchend"
+
+# Scale
+Gestures.Scale = "scale"
+Gestures.ScaleStart = "scalestart"
+Gestures.ScaleEnd = "scaleend"
+
+# Rotate
+Gestures.Rotate = "rotate"
+Gestures.RotateStart = "rotatestart"
+Gestures.RotateEnd = "rotateend"
 
 exports.Gestures = Gestures
