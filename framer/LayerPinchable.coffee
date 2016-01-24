@@ -38,7 +38,7 @@ class exports.LayerPinchable extends BaseClass
 
 	_attach: ->
 		@layer.on(Gestures.PinchStart, @_pinchStart)
-		@layer.on(Gestures.PinchMove, @_pinchMove)
+		@layer.on(Gestures.Pinch, @_pinch)
 		@layer.on(Gestures.PinchEnd, @_pinchEnd)
 
 	_reset: ->
@@ -47,6 +47,7 @@ class exports.LayerPinchable extends BaseClass
 		@_rotationOffset = null
 
 	_pinchStart: (event) =>
+
 		@_reset()
 		@emit(Events.PinchStart, event)
 		@emit(Events.ScaleStart, event) if @scale
@@ -64,18 +65,18 @@ class exports.LayerPinchable extends BaseClass
 			@layer.x -= xDiff
 			@layer.y -= yDiff
 
-	_pinchMove: (event) =>
+	_pinch: (event) =>
 
-		return unless event.pointers.length is 2
+		return unless event.touches.length is 2
 		return unless @enabled
 
 		pointA =
-			x: event.pointers[0].pageX
-			y: event.pointers[0].pageY
+			x: event.touches[0].pageX
+			y: event.touches[0].pageY
 
 		pointB =
-			x: event.pointers[1].pageX
-			y: event.pointers[1].pageY
+			x: event.touches[1].pageX
+			y: event.touches[1].pageY
 
 		return unless Utils.pointTotal(Utils.pointAbs(Utils.pointSubtract(pointA, pointB))) > @threshold
 
@@ -107,6 +108,7 @@ class exports.LayerPinchable extends BaseClass
 		@emit(Events.RotateEnd, event) if @rotate
 
 	emit: (eventName, event) ->
+		return 
 		@layer.emit(eventName, event, @)
 		super eventName, event, @
 

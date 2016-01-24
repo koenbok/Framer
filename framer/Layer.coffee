@@ -15,7 +15,6 @@ Utils = require "./Utils"
 {LayerDraggable} = require "./LayerDraggable"
 {LayerPinchable} = require "./LayerPinchable"
 {Gestures} = require "./Gestures"
-{GestureManager} = require "./GestureManager"
 
 NoCacheDateKey = Date.now()
 
@@ -970,26 +969,14 @@ class exports.Layer extends BaseClass
 		if not _.startsWith(eventName, "change:")
 			@ignoreEvents = false
 
-		# If this is a gesture event, pass it on to the gesture manager
-		if _.startsWith(eventName, Gestures._prefix)
-			@_gestureManager ?= new GestureManager(@)
-			@_gestureManager.on(eventName, listener)
-			return
-
 		# If this is a dom event, we want the actual dom node to let us know
 		# when it gets triggered, so we can emit the event through the system.
-		if Utils.domValidEvent(@_element, eventName)
+		if Utils.domValidEvent(@_element, eventName) or eventName in _.values(Gestures)
 			if not @_domEventManager.listeners(eventName).length
 				@_domEventManager.addEventListener eventName, (event) =>
 					@emit(eventName, event)
 
 	_removeListener: (eventName, listener) ->
-
-		# If this is a gesture event, pass it on to the gesture manager
-		if _.startsWith(eventName, Gestures._prefix)
-			@_gestureManager ?= new GestureManager(@)
-			@_gestureManager.off(eventName, listener)
-			return
 
 		# Do cleanup for dom events if this is the last one of it's type.
 		# We are assuming we're the only ones adding dom events to the manager.

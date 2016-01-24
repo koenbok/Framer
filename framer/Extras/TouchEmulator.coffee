@@ -39,9 +39,6 @@ class TouchEmulator extends BaseClass
 
 	constructor: ->
 		
-		if not @isHammerTouchSupported()
-			throw new Error "Touch emulation for hammer is not supported"
-		
 		@touchPointerImage = "framer/images/cursor@2x.png"
 		@touchPointerImageActive = "framer/images/cursor-active@2x.png"
 		@touchPointerImageSize = 64
@@ -92,9 +89,6 @@ class TouchEmulator extends BaseClass
 				opacity: 0
 				scale: 1.2
 			time: 0.08
-
-	isHammerTouchSupported: ->
-		window.ontouchstart is null 
 	
 	keydown: (event) =>
 
