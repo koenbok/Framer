@@ -4,8 +4,9 @@ class ScreenClass extends BaseClass
 	
 	@define "width",  get: -> Framer.CurrentContext.width
 	@define "height", get: -> Framer.CurrentContext.height
-	@define "size", get: -> {width:@width, height:@height}
-	@define "frame", get: -> {x:0, y:0, width:@width, height:@height}
+	@define "size", get: -> Framer.CurrentContext.size
+	@define "frame", get: -> Framer.CurrentContext.frame
+	@define "canvasFrame", get: -> Framer.CurrentContext.canvasFrame
 
 	@define "backgroundColor",
 		importable: false
