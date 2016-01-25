@@ -16,6 +16,7 @@ class exports.GestureInputRecognizer
 		@session = null
 	
 	touchstart: (event) =>
+		# Only fire if we are not already in a session
 		return if @session
 		@em.wrap(window).addEventListener("touchmove", @touchmove)
 		@em.wrap(window).addEventListener("touchend", @touchend)
@@ -42,7 +43,8 @@ class exports.GestureInputRecognizer
 		@_process(@_getGestureEvent(event))
 		
 	touchend: (event) =>
-		return if event.touches.length != 0
+		# Only fire if there are no fingers left on the screen
+		return unless (event.touches.length == 0) or (event.touches.length == event.changedTouches.length)
 		@em.wrap(window).removeEventListener("touchmove", @touchmove)
 		@em.wrap(window).removeEventListener("touchend", @touchend)
 		event = @_getGestureEvent(event)
