@@ -16,12 +16,13 @@ class exports.GestureInputRecognizer
 		@session = null
 	
 	touchstart: (event) =>
-
+		return if event.touches.length > 1
 		@em.wrap(window).addEventListener("touchmove", @touchmove)
 		@em.wrap(window).addEventListener("touchend", @touchend)
 		
 		@session =
 			startEvent: @_getGestureEvent(event)
+			startMultiEvent: null
 			startTime: Date.now()
 			pressTimer: window.setTimeout(@longpressstart, 250)
 			started: {}
@@ -41,6 +42,7 @@ class exports.GestureInputRecognizer
 		@_process(@_getGestureEvent(event))
 		
 	touchend: (event) =>
+		return if event.touches.length != 0
 		@em.wrap(window).removeEventListener("touchmove", @touchmove)
 		@em.wrap(window).removeEventListener("touchend", @touchend)
 		event = @_getGestureEvent(event)
@@ -189,12 +191,16 @@ class exports.GestureInputRecognizer
 		
 		return unless @session 
 
+		# if event.fingers > 1 and not not @session.startMultiEvent
+		# 	@session.startMultiEvent = event
+		# if event.fingers == 1
+		# 	@session.startMultiEvent = null
+
 		# Detect pan events
-		if event.fingers == 1
-			if not @session.started.pan and (Math.abs(event.offset.x) > 0 or Math.abs(event.offset.y) > 0)
-				@panstart(event)
-			else if @session.started.pan
-				@pan(event)
+		if not @session.started.pan and (Math.abs(event.offset.x) > 0 or Math.abs(event.offset.y) > 0)
+			@panstart(event)
+		else if @session.started.pan
+			@pan(event)
 
 		# Detect pinch, rotate and scale events
 		if @session.started.pinch and event.fingers == 1
@@ -249,7 +255,13 @@ class exports.GestureInputRecognizer
 		if @session?.lastEvent
 			event.deltaTime = event.time - @session.lastEvent.time
 			event.previous = @session.lastEvent.point
-			event.delta = Utils.pointSubtract(event.point, event.previous)
+
+			if @session.lastEvent.fingers != event.fingers
+				event.delta = {x:0, y:0}
+			else if @session.lastEvent.fingers == event.fingers == 2
+				event.delta = Utils.pointSubtract(event.touchCenter, @session.lastEvent.touchCenter)
+			else
+				event.delta = Utils.pointSubtract(event.point, event.previous)
 
 		if event.touches.length > 0
 			
