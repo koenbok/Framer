@@ -22,8 +22,10 @@ class exports.GestureInputRecognizer
 		@session = null
 	
 	touchstart: (event) =>
+
 		# Only fire if we are not already in a session
 		return if @session
+
 		@em.wrap(window).addEventListener("touchmove", @touchmove)
 		@em.wrap(window).addEventListener("touchend", @touchend)
 		
@@ -66,10 +68,10 @@ class exports.GestureInputRecognizer
 
 	# Tap
 
-	tap: => @_dispatchEvent("tap", event)
-	tapstart: => @_dispatchEvent("tapstart", event)
-	tapend: => @_dispatchEvent("tapend", event)
-	doubletap: => @_dispatchEvent("doubletap", event)
+	tap: (event) => @_dispatchEvent("tap", event)
+	tapstart: (event) => @_dispatchEvent("tapstart", event)
+	tapend: (event) => @_dispatchEvent("tapend", event)
+	doubletap: (event) => @_dispatchEvent("doubletap", event)
 
 	# Press
 
@@ -83,6 +85,19 @@ class exports.GestureInputRecognizer
 
 	longpressend: (event) =>
 		@_dispatchEvent("longpressend", event)
+
+	# ForceTap
+
+	forcetapstart: (event) =>
+		print "forcetapstart"
+		return unless @session
+		return if @session.started.forcetap
+		@session.started.forcetap = event
+		@_dispatchEvent("forcetapstart", event)
+		@_dispatchEvent("forcetap", event)
+
+	forcetapend: =>
+		@_dispatchEvent("forcetapend", event)
 
 	# Pan
 
