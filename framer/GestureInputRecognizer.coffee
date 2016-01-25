@@ -27,6 +27,7 @@ class exports.GestureInputRecognizer
 			startTime: Date.now()
 			pressTimer: window.setTimeout(@longpressstart, 250)
 			started: {}
+			events: []
 
 		event = @_getGestureEvent(event)
 
@@ -196,6 +197,8 @@ class exports.GestureInputRecognizer
 		
 		return unless @session 
 
+		@session.events.push(event)
+
 		# Detect pan events
 
 		# See if there was any movement
@@ -275,6 +278,10 @@ class exports.GestureInputRecognizer
 			else
 				event.delta = Utils.pointSubtract(event.touchCenter, @session.lastEvent.touchCenter)
 
+		if @session?.events
+			events = _.filter @session.events, (e) -> e.time > (event.time - 100)
+			event.velocity = @_getVelocity(events)
+
 		if event.touches.length > 0
 			
 			event.angle = 0
@@ -347,3 +354,20 @@ class exports.GestureInputRecognizer
 		touchEvent = @_createEvent(type, event)
 		target ?= event.target
 		target.dispatchEvent(touchEvent)
+
+	_getVelocity: (events) ->
+
+		return {x:0, y:0} if events.length < 2
+
+		current = events[events.length - 1]
+		first   = events[0]
+		time    = current.time - first.time
+
+		velocity =
+			x: (current.point.x - first.point.x) / time
+			y: (current.point.y - first.point.y) / time
+
+		velocity.x = 0 if velocity.x is Infinity
+		velocity.y = 0 if velocity.y is Infinity
+
+		return velocity
