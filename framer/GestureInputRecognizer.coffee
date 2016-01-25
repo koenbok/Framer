@@ -139,6 +139,7 @@ class exports.GestureInputRecognizer
 	swipeend: (event) =>
 		@_dispatchEvent("swipeend", event)
 
+	# Direction swipe
 
 	swipedirectionstart: (event) =>
 		return unless event.direction
@@ -163,11 +164,18 @@ class exports.GestureInputRecognizer
 	swipedirection: (event) =>
 		direction = @session.started.swipedirection.direction
 		@_dispatchEvent("swipe#{direction}", event)
+		@edgeswipedirection(event) if @session.started.edgeswipedirection
 
 	swipedirectionend: (event) =>
 		direction = @session.started.swipedirection.direction
 		@_dispatchEvent("swipe#{direction}end", event)
 
+	# Edge swipe
+
+	edgeswipedirection: (event) =>
+		swipeEdge = @_edgeForSwipeDirection(@session.started.edgeswipedirection.direction)
+		Screen.emit("edgeswipe", @_createEvent("edgeswipe", event))
+		Screen.emit("edgeswipe#{swipeEdge}", @_createEvent("edgeswipe#{swipeEdge}", event))
 
 	edgeswipedirectionstart: (event) =>
 		return if @session.started.edgeswipedirection
@@ -175,11 +183,6 @@ class exports.GestureInputRecognizer
 		swipeEdge = @_edgeForSwipeDirection(@session.started.edgeswipedirection.direction)
 		Screen.emit("edgeswipestart", @_createEvent("edgeswipestart", event))
 		Screen.emit("edgeswipe#{swipeEdge}start", @_createEvent("edgeswipe#{swipeEdge}start", event))
-
-	edgeswipedirection: (event) =>
-		swipeEdge = @_edgeForSwipeDirection(@session.started.edgeswipedirection.direction)
-		Screen.emit("edgeswipe", @_createEvent("edgeswipe", event))
-		Screen.emit("edgeswipe#{swipeEdge}", @_createEvent("edgeswipe#{swipeEdge}", event))
 
 	edgeswipedirectionend: (event) =>
 		swipeEdge = @_edgeForSwipeDirection(@session.started.edgeswipedirection.direction)
