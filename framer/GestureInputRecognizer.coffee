@@ -16,7 +16,7 @@ class exports.GestureInputRecognizer
 		@session = null
 	
 	touchstart: (event) =>
-		return if event.touches.length > 1
+		return if @session
 		@em.wrap(window).addEventListener("touchmove", @touchmove)
 		@em.wrap(window).addEventListener("touchend", @touchend)
 		
@@ -49,7 +49,7 @@ class exports.GestureInputRecognizer
 		@_process(event)
 
 		for eventName, value of @session.started
-			@["#{eventName}end"](event)
+			@["#{eventName}end"](event) if value
 
 		@tap(event)
 		@tapend(event)
@@ -191,29 +191,34 @@ class exports.GestureInputRecognizer
 		
 		return unless @session 
 
-		# if event.fingers > 1 and not not @session.startMultiEvent
-		# 	@session.startMultiEvent = event
-		# if event.fingers == 1
-		# 	@session.startMultiEvent = null
-
 		# Detect pan events
-		if not @session.started.pan and (Math.abs(event.offset.x) > 0 or Math.abs(event.offset.y) > 0)
-			@panstart(event)
-		else if @session.started.pan
-			@pan(event)
+
+		# See if there was any movement
+		if Math.abs(event.delta.x) > 0 or Math.abs(event.delta.y) > 0
+			if not @session.started.pan
+				@panstart(event)
+			else
+				@pan(event)
+
 
 		# Detect pinch, rotate and scale events
+
+		# Stop panning if we go from 2 to 1 finger
 		if @session.started.pinch and event.fingers == 1
 			@pinchend(event)
+		# If we did not start yet and get two fingers, start
 		else if not @session.started.pinch and event.fingers == 2 
-			@pinchstart(event)	
+			@pinchstart(event)
+		# If we did start send pinch events
 		else if @session.started.pinch
 			@pinch(event)
 			
 		# Detect swipe events
-		if not @session.started.swipe and  event.fingers == 1
-			if Math.abs(event.offset.x) > 30 or Math.abs(event.offset.y) > 30
+
+		# If we did not start but moved more then the swipe threshold, start
+		if not @session.started.swipe and (Math.abs(event.offset.x) > 30 or Math.abs(event.offset.y) > 30)
 				@swipestart(event)
+		# If we did start send swipe events
 		else if @session.started.swipe
 			@swipe(event)
 		
@@ -256,12 +261,14 @@ class exports.GestureInputRecognizer
 			event.deltaTime = event.time - @session.lastEvent.time
 			event.previous = @session.lastEvent.point
 
+			# If the amount of fingers changed we don't send any delta
 			if @session.lastEvent.fingers != event.fingers
 				event.delta = {x:0, y:0}
-			else if @session.lastEvent.fingers == event.fingers == 2
-				event.delta = Utils.pointSubtract(event.touchCenter, @session.lastEvent.touchCenter)
+			# If there are exactly two fingers we use their center point as delta,
+			# this works because we use the single finger point as center when there
+			# is only one finger in this touch.
 			else
-				event.delta = Utils.pointSubtract(event.point, event.previous)
+				event.delta = Utils.pointSubtract(event.touchCenter, @session.lastEvent.touchCenter)
 
 		if event.touches.length > 0
 			
