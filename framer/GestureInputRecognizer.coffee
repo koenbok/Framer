@@ -16,15 +16,25 @@ class exports.GestureInputRecognizer
 		@session = null
 	
 	touchstart: (event) =>
+
 		@em.wrap(window).addEventListener("touchmove", @touchmove)
 		@em.wrap(window).addEventListener("touchend", @touchend)
+		
 		@session =
 			startEvent: @_getGestureEvent(event)
 			startTime: Date.now()
 			pressTimer: window.setTimeout(@longpressstart, 250)
 			started: {}
+
 		event = @_getGestureEvent(event)
+
 		@tapstart(event)
+
+		if Date.now() - @doubleTapTime < 250
+			@doubletap(event)
+		else
+			@doubleTapTime = Date.now()
+
 		@_process(event)
 
 	touchmove: (event) =>
@@ -48,6 +58,7 @@ class exports.GestureInputRecognizer
 	tap: => @_dispatchEvent("tap", event)
 	tapstart: => @_dispatchEvent("tapstart", event)
 	tapend: => @_dispatchEvent("tapend", event)
+	doubletap: => @_dispatchEvent("doubletap", event)
 
 	# Press
 
