@@ -18,7 +18,7 @@ class exports.LayerPinchable extends BaseClass
 
 	@define "enabled", @simpleProperty("enabled", true)
 	@define "threshold", @simpleProperty("threshold", 0)
-	@define "setOrigin", @simpleProperty("setOrigin", true)
+	@define "centerOrigin", @simpleProperty("centerOrigin", true)
 
 	@define "scale", @simpleProperty("scale", true)
 	@define "scaleIncrements", @simpleProperty("scaleIncrements", 0)
@@ -53,8 +53,7 @@ class exports.LayerPinchable extends BaseClass
 		@emit(Events.ScaleStart, event) if @scale
 		@emit(Events.RotateStart, event) if @rotate
 
-		if @setOrigin
-
+		if @centerOrigin
 			topInSuperBefore = Utils.convertPoint({}, @layer, @layer.superLayer)
 			pinchLocation = Utils.convertPointFromContext(event.center, @layer, true, true)
 			@layer.originX = pinchLocation.x / @layer.width
