@@ -22,6 +22,7 @@ class exports.GestureInputRecognizer
 			startEvent: @_getGestureEvent(event)
 			startTime: Date.now()
 			pressTimer: window.setTimeout(@longpress, 250)
+			started: {}
 		event = @_getGestureEvent(event)
 		@tapstart(event)
 		@_process(event)
@@ -34,8 +35,10 @@ class exports.GestureInputRecognizer
 		@em.wrap(window).removeEventListener("touchend", @touchend)
 		event = @_getGestureEvent(event)
 		@_process(event)
-		@panend(event) if @session.panStartEvent
-		@pinchend(event) if @session.pinchStartEvent
+
+		for eventName, value of @session.started
+			@["#{eventName}end"](event)
+
 		@tap(event)
 		@tapend(event)
 		@cancel()
@@ -58,41 +61,41 @@ class exports.GestureInputRecognizer
 	# Pan
 
 	panstart: (event) =>
-		@session.panStartEvent = event
-		@_dispatchEvent("panstart", event, @session.panStartEvent.target)
+		@session.started.pan = event
+		@_dispatchEvent("panstart", event, @session.started.pan.target)
 
 	pan: (event) =>
-		@_dispatchEvent("pan", event, @session.panStartEvent.target)
+		@_dispatchEvent("pan", event, @session.started.pan.target)
 		direction = @_getDirection(event.delta)
 		@["pan#{direction}"](event) if direction
 		
 	panend: (event) =>
-		@_dispatchEvent("panend", event, @session.panStartEvent.target)
-		@session.panStartEvent = null
+		@_dispatchEvent("panend", event, @session.started.pan.target)
+		@session.started.pan = null
 
-	panup: (event) => @_dispatchEvent("panup", event, @session.panStartEvent.target)
-	pandown: (event) => @_dispatchEvent("pandown", event, @session.panStartEvent.target)
-	panleft: (event) => @_dispatchEvent("panleft", event, @session.panStartEvent.target)
-	panright: (event) => @_dispatchEvent("panright", event, @session.panStartEvent.target)
+	panup: (event) => @_dispatchEvent("panup", event, @session.started.pan.target)
+	pandown: (event) => @_dispatchEvent("pandown", event, @session.started.pan.target)
+	panleft: (event) => @_dispatchEvent("panleft", event, @session.started.pan.target)
+	panright: (event) => @_dispatchEvent("panright", event, @session.started.pan.target)
 
 	# Pinch
 
 	pinchstart: (event) =>
-		@session.pinchStartEvent = event
-		@scalestart(event, @session.pinchStartEvent.target)
-		@rotatestart(event, @session.pinchStartEvent.target)
+		@session.started.pinch = event
+		@scalestart(event, @session.started.pinch.target)
+		@rotatestart(event, @session.started.pinch.target)
 		@_dispatchEvent("pinchstart", event)
 
 	pinch: (event) =>
 		@_dispatchEvent("pinch", event)
-		@scale(event, @session.pinchStartEvent.target)
-		@rotate(event, @session.pinchStartEvent.target)
+		@scale(event, @session.started.pinch.target)
+		@rotate(event, @session.started.pinch.target)
 		
 	pinchend: (event) =>
 		@_dispatchEvent("pinchend", event)
-		@scaleend(event, @session.pinchStartEvent.target)
-		@rotateend(event, @session.pinchStartEvent.target)
-		@session.pinchStartEvent = null
+		@scaleend(event, @session.started.pinch.target)
+		@rotateend(event, @session.started.pinch.target)
+		@session.started.pinch = null
 
 
 	scalestart: (event) => @_dispatchEvent("scalestart", event)
@@ -105,39 +108,113 @@ class exports.GestureInputRecognizer
 
 	# Swipe
 	
+	swipestart: (event) =>
+		@_dispatchEvent("swipestart", event)
+		@session.started.swipe = event
+		@swipedirectionstart(event)
+
 	swipe: (event) =>
 		@_dispatchEvent("swipe", event)
-		@session.swipeStartEvent = event
-	
-	swipeup: (event) ->
-		@_dispatchEvent("swipeup", event)
-		maxY = Utils.frameGetMaxY(Screen.canvasFrame)
-		if maxY - 30 < event.start.y < maxY
-			event = @_createEvent("edgeswipebottom", event)
-			Screen.emit("edgeswipe", event)
-			Screen.emit("edgeswipebottom", event)
-		
-	swipedown: (event) ->
-		@_dispatchEvent("swipedown", event)
-		if 0 < event.start.y - Screen.canvasFrame.y < 30
-			event = @_createEvent("edgeswipetop", event)
-			Screen.emit("edgeswipe", event)
-			Screen.emit("edgeswipetop", event)
-	
-	swipeleft: (event) ->
-		@_dispatchEvent("swipeleft", event)
+		@swipedirection(event)
+
+	swipeend: (event) =>
+		@_dispatchEvent("swipeend", event)
+
+
+	swipedirectionstart: (event) =>
+		return unless event.direction
+		return if @session.started.swipedirection 
+		@session.started.swipedirection = event
+		direction = @session.started.swipedirection.direction
+		@_dispatchEvent("swipe#{direction}start", event)
+
+		swipeEdge = @_edgeForSwipeDirection(direction)
 		maxX = Utils.frameGetMaxX(Screen.canvasFrame)
-		if maxX - 30 < event.start.x < maxX
-			event = @_createEvent("edgeswiperight", event)
-			Screen.emit("edgeswipe", event)
-			Screen.emit("edgeswiperight", event)
+		maxY = Utils.frameGetMaxY(Screen.canvasFrame)
+
+		if swipeEdge is "top" and 0 < event.start.y - Screen.canvasFrame.y < 30
+			@edgeswipedirectionstart(event)
+		if swipeEdge is "right" and maxX - 30 < event.start.x < maxX
+			@edgeswipedirectionstart(event)
+		if swipeEdge is "bottom" and maxY - 30 < event.start.y < maxY
+			@edgeswipedirectionstart(event)
+		if swipeEdge is "left" and 0 < event.start.x - Screen.canvasFrame.x < 30
+			@edgeswipedirectionstart(event)
+
+	swipedirection: (event) =>
+		direction = @session.started.swipedirection.direction
+		@_dispatchEvent("swipe#{direction}", event)
+
+	swipedirectionend: (event) =>
+		direction = @session.started.swipedirection.direction
+		@_dispatchEvent("swipe#{direction}end", event)
+
+
+
+
+	edgeswipedirectionstart: (event) =>
+		return if @session.started.edgeswipedirection
+		@session.started.edgeswipedirection = event
+		swipeEdge = @_edgeForSwipeDirection(@session.started.edgeswipedirection.direction)
+		Screen.emit("edgeswipestart", @_createEvent("edgeswipestart", event))
+		Screen.emit("edgeswipe#{swipeEdge}start", @_createEvent("edgeswipe#{swipeEdge}start", event))
+
+	edgeswipedirection: (event) =>
+		swipeEdge = @_edgeForSwipeDirection(@session.started.edgeswipedirection.direction)
+		Screen.emit("edgeswipe", @_createEvent("edgeswipe", event))
+		Screen.emit("edgeswipe#{swipeEdge}", @_createEvent("edgeswipe#{swipeEdge}", event))
+
+	edgeswipedirectionend: (event) =>
+		swipeEdge = @_edgeForSwipeDirection(@session.started.edgeswipedirection.direction)
+		Screen.emit("edgeswipeend", @_createEvent("edgeswipeend", event))
+		Screen.emit("edgeswipe#{swipeEdge}end", @_createEvent("edgeswipe#{swipeEdge}end", event))
+
+	_edgeForSwipeDirection: (direction) ->
+		return "top" if direction is "down"
+		return "right" if direction is "left"
+		return "bottom" if direction is "up"
+		return "left" if direction is "right"
+		
+
+	# swipeend: -> @_dispatchEvent("swipeend", event)
+
+	# swipeup: (event) ->
+
+	# 	if not @session.started.swipeup
+	# 		@session.started.swipeup = event
+	# 		@_dispatchEvent("swipeup", event)
+
+	# 	@_dispatchEvent("swipeup", event)
+	# 	maxY = Utils.frameGetMaxY(Screen.canvasFrame)
+	# 	if maxY - 30 < event.start.y < maxY
+	# 		event = @_createEvent("edgeswipebottom", event)
+	# 		Screen.emit("edgeswipe", event)
+	# 		Screen.emit("edgeswipebottom", event)
+
+	# swipeupend: -> @_dispatchEvent("swipeupend", event)
+
+
+	# swipedown: (event) ->
+	# 	@_dispatchEvent("swipedown", event)
+	# 	if 0 < event.start.y - Screen.canvasFrame.y < 30
+	# 		event = @_createEvent("edgeswipetop", event)
+	# 		Screen.emit("edgeswipe", event)
+	# 		Screen.emit("edgeswipetop", event)
 	
-	swiperight: (event) ->
-		@_dispatchEvent("swiperight", event)
-		if 0 < event.start.x - Screen.canvasFrame.x < 30
-			event = @_createEvent("edgeswipeleft", event)
-			Screen.emit("edgeswipe", event)
-			Screen.emit("edgeswipeleft", event)
+	# swipeleft: (event) ->
+	# 	@_dispatchEvent("swipeleft", event)
+	# 	maxX = Utils.frameGetMaxX(Screen.canvasFrame)
+	# 	if maxX - 30 < event.start.x < maxX
+	# 		event = @_createEvent("edgeswiperight", event)
+	# 		Screen.emit("edgeswipe", event)
+	# 		Screen.emit("edgeswiperight", event)
+	
+	# swiperight: (event) ->
+	# 	@_dispatchEvent("swiperight", event)
+	# 	if 0 < event.start.x - Screen.canvasFrame.x < 30
+	# 		event = @_createEvent("edgeswipeleft", event)
+	# 		Screen.emit("edgeswipe", event)
+	# 		Screen.emit("edgeswipeleft", event)
 
 	_process: (event) =>
 		
@@ -145,25 +222,26 @@ class exports.GestureInputRecognizer
 
 		# Detect pan events
 		if event.fingers == 1
-			if not @session.panStartEvent and (Math.abs(event.offset.x) > 0 or Math.abs(event.offset.y) > 0)
+			if not @session.started.pan and (Math.abs(event.offset.x) > 0 or Math.abs(event.offset.y) > 0)
 				@panstart(event)
-			else if @session.panStartEvent
+			else if @session.started.pan
 				@pan(event)
 
 		
 		# Detect pinch, rotate and scale events
-		if @session.pinchStartEvent and event.fingers == 1
+		if @session.started.pinch and event.fingers == 1
 			@pinchend(event)
-		else if not @session.pinchStartEvent and event.fingers == 2 
+		else if not @session.started.pinch and event.fingers == 2 
 			@pinchstart(event)	
-		else if @session.pinchStartEvent
+		else if @session.started.pinch
 			@pinch(event)
 			
 		# Detect swipe events
-		if not @session.swipeStartEvent and  event.fingers == 1
+		if not @session.started.swipe and  event.fingers == 1
 			if Math.abs(event.offset.x) > 30 or Math.abs(event.offset.y) > 30
-				@swipe(event)
-				@["swipe#{event.direction}"](event)
+				@swipestart(event)
+		else if @session.started.swipe
+			@swipe(event)
 		
 		@session.lastEvent = event
 
@@ -225,7 +303,7 @@ class exports.GestureInputRecognizer
 			event.scale = 1
 		
 		if @session?.pinchStartEvent
-			event.scale = event.distance / @session.pinchStartEvent.distance
+			event.scale = event.distance / @session.started.pinch.distance
 
 		# Convert point style event properties to dom style:
 		# event.delta -> event.deltaX, event.deltaY

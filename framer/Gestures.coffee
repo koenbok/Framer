@@ -19,17 +19,46 @@ Gestures.LongPressEnd = "longpressend"
 
 # Swipe
 Gestures.Swipe = "swipe"
-Gestures.SwipeLeft = "swipeleft"
-Gestures.SwipeRight = "swiperight"
+Gestures.SwipeStart = "swipestart"
+Gestures.SwipeEnd = "swipeend"
+
 Gestures.SwipeUp = "swipeup"
+Gestures.SwipeUpStart = "swipeupstart"
+Gestures.SwipeUpEnd = "swipeupend"
+
 Gestures.SwipeDown = "swipedown"
+Gestures.SwipeDownStart = "swipedownstart"
+Gestures.SwipeDownEnd = "swipedownend"
+
+Gestures.SwipeLeft = "swipeleft"
+Gestures.SwipeLeftStart = "swipeleftstart"
+Gestures.SwipeLeftEnd = "swipeleftend"
+
+Gestures.SwipeRight = "swiperight"
+Gestures.SwipeRightStart = "swiperightstart"
+Gestures.SwipeRightEnd = "swiperightend"
 
 # Edge Swipe
+
 Gestures.EdgeSwipe = "edgeswipe"
-Gestures.EdgeSwipeLeft = "edgeswipeleft"
-Gestures.EdgeSwipeRight = "edgeswiperight"
+Gestures.EdgeSwipeStart = "edgeswipestart"
+Gestures.EdgeSwipeEnd = "edgeswipeend"
+
 Gestures.EdgeSwipeTop = "edgeswipetop"
+Gestures.EdgeSwipeTopStart = "edgeswipetopstart"
+Gestures.EdgeSwipeTopEnd = "edgeswipetopend"
+
+Gestures.EdgeSwipeRight = "edgeswiperight"
+Gestures.EdgeSwipeRightStart = "edgeswiperightstart"
+Gestures.EdgeSwipeRightEnd = "edgeswiperightend"
+
 Gestures.EdgeSwipeBottom = "edgeswipebottom"
+Gestures.EdgeSwipeBottomStart = "edgeswipebottomstart"
+Gestures.EdgeSwipeBottomEnd = "edgeswipebottomend"
+
+Gestures.EdgeSwipeLeft = "edgeswipeleft"
+Gestures.EdgeSwipeLeftStart = "edgeswipeleftstart"
+Gestures.EdgeSwipeLeftEnd = "edgeswipeleftend"
 
 # Pan
 Gestures.Pan = "pan"
@@ -56,3 +85,6 @@ Gestures.RotateStart = "rotatestart"
 Gestures.RotateEnd = "rotateend"
 
 exports.Gestures = Gestures
+
+
+
