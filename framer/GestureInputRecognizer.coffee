@@ -270,7 +270,7 @@ class exports.GestureInputRecognizer
 			event.distance = Utils.pointDistance(pointA, pointB)
 			event.scale = 1
 		
-		if @session?.pinchStartEvent
+		if @session?.started.pinch
 			event.scale = event.distance / @session.started.pinch.distance
 
 		# Convert point style event properties to dom style:
