@@ -1,5 +1,11 @@
 Utils = require "./Utils"
 
+GestureInputLongPressTime = 0.25
+GestureInputDoubleTapTime = 0.25
+GestureInputSwipeThreshold = 30
+GestureInputEdgeSwipeDistance = 30
+GestureInputVelocityTime = 0.1
+
 {DOMEventManager} = require "./DOMEventManager"
 
 class exports.GestureInputRecognizer
@@ -25,7 +31,7 @@ class exports.GestureInputRecognizer
 			startEvent: @_getGestureEvent(event)
 			startMultiEvent: null
 			startTime: Date.now()
-			pressTimer: window.setTimeout(@longpressstart, 250)
+			pressTimer: window.setTimeout(@longpressstart, GestureInputLongPressTime * 1000)
 			started: {}
 			events: []
 
@@ -33,7 +39,7 @@ class exports.GestureInputRecognizer
 
 		@tapstart(event)
 
-		if Date.now() - @doubleTapTime < 250
+		if Date.now() - @doubleTapTime < (GestureInputDoubleTapTime * 1000)
 			@doubletap(event)
 		else
 			@doubleTapTime = Date.now()
@@ -153,13 +159,13 @@ class exports.GestureInputRecognizer
 		maxX = Utils.frameGetMaxX(Screen.canvasFrame)
 		maxY = Utils.frameGetMaxY(Screen.canvasFrame)
 
-		if swipeEdge is "top" and 0 < event.start.y - Screen.canvasFrame.y < 30
+		if swipeEdge is "top" and 0 < event.start.y - Screen.canvasFrame.y < GestureInputEdgeSwipeDistance
 			@edgeswipedirectionstart(event)
-		if swipeEdge is "right" and maxX - 30 < event.start.x < maxX
+		if swipeEdge is "right" and maxX - GestureInputEdgeSwipeDistance < event.start.x < maxX
 			@edgeswipedirectionstart(event)
-		if swipeEdge is "bottom" and maxY - 30 < event.start.y < maxY
+		if swipeEdge is "bottom" and maxY - GestureInputEdgeSwipeDistance < event.start.y < maxY
 			@edgeswipedirectionstart(event)
-		if swipeEdge is "left" and 0 < event.start.x - Screen.canvasFrame.x < 30
+		if swipeEdge is "left" and 0 < event.start.x - Screen.canvasFrame.x < GestureInputEdgeSwipeDistance
 			@edgeswipedirectionstart(event)
 
 	swipedirection: (event) =>
@@ -224,7 +230,9 @@ class exports.GestureInputRecognizer
 		# Detect swipe events
 
 		# If we did not start but moved more then the swipe threshold, start
-		if not @session.started.swipe and (Math.abs(event.offset.x) > 30 or Math.abs(event.offset.y) > 30)
+		if not @session.started.swipe and (
+			Math.abs(event.offset.x) > GestureInputSwipeThreshold or 
+			Math.abs(event.offset.y) > GestureInputSwipeThreshold)
 				@swipestart(event)
 		# If we did start send swipe events
 		else if @session.started.swipe
@@ -279,7 +287,7 @@ class exports.GestureInputRecognizer
 				event.delta = Utils.pointSubtract(event.touchCenter, @session.lastEvent.touchCenter)
 
 		if @session?.events
-			events = _.filter @session.events, (e) -> e.time > (event.time - 100)
+			events = _.filter @session.events, (e) -> e.time > (event.time - GestureInputVelocityTime)
 			event.velocity = @_getVelocity(events)
 
 		if event.touches.length > 0
