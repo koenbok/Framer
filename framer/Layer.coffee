@@ -956,7 +956,7 @@ class exports.Layer extends BaseClass
 		@_addListener(eventName, listener)
 
 	addListener: (eventName, listener) =>
-		throw Error("Layer.on needs an event name") unless eventName
+		throw Error("Layer.on needs a valid event name") unless eventName
 		throw Error("Layer.on needs an event listener") unless listener
 		super(eventName, listener)
 		@_addListener(eventName, listener)
