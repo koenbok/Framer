@@ -336,20 +336,6 @@ class exports.GestureInputRecognizer
 			event.previous = @session.lastEvent.point
 			event.deltaTime = event.time - @session.lastEvent.time
 
-			# If the amount of fingers changed we don't send any delta
-			if @session.lastEvent.fingers != event.fingers
-				event.delta = {x:0, y:0}
-
-			# If there are exactly two fingers we use their center point as delta,
-			# this works because we use the single finger point as center when there
-			# is only one finger in this touch.
-			else
-				event.delta = Utils.pointSubtract(event.touchCenter, @session.lastEvent.touchCenter)
-				event.deltaAngle = Utils.pointAngle(@session.lastEvent.touchCenter, event.touchCenter)
-
-			event.deltaDirection = @_getDirection(event.delta)
-
-
 		if @session?.events
 			events = _.filter @session.events, (e) -> e.time > (event.time - GestureInputVelocityTime)
 			event.velocity = @_getVelocity(events)
@@ -369,10 +355,24 @@ class exports.GestureInputRecognizer
 		if event.fingers > 1
 			pointA = @_getTouchPoint(event, 0)
 			pointB = @_getTouchPoint(event, 1)
-			event.center = Utils.pointCenter(pointB, pointA)
+			event.touchCenter = Utils.pointCenter(pointB, pointA)
 			event.touchDistance = Utils.pointDistance(pointA, pointB)
 			event.rotation = Utils.pointAngle(pointA, pointB)
-		
+
+		if @session?.lastEvent
+			# If the amount of fingers changed we don't send any delta
+			if @session.lastEvent.fingers != event.fingers
+				event.delta = {x:0, y:0}
+
+			# If there are exactly two fingers we use their center point as delta,
+			# this works because we use the single finger point as center when there
+			# is only one finger in this touch.
+			else
+				event.delta = Utils.pointSubtract(event.touchCenter, @session.lastEvent.touchCenter)
+				event.deltaAngle = Utils.pointAngle(@session.lastEvent.touchCenter, event.touchCenter)
+
+			event.deltaDirection = @_getDirection(event.delta)
+
 		if @session?.started.pinch
 			event.scale = event.touchDistance / @session.started.pinch.touchDistance
 
