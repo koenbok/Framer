@@ -962,7 +962,7 @@ class exports.Layer extends BaseClass
 		@_addListener(eventName, listener)
 
 	removeListener: (eventName, listener) ->
-		throw Error("Layer.off needs an event name") unless eventName
+		throw Error("Layer.off needs a valid event name") unless eventName
 		super(eventName, listener)
 		@_removeListener(eventName, listener)
 
