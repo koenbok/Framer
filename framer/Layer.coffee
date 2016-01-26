@@ -1033,15 +1033,91 @@ class exports.Layer extends BaseClass
 	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
 	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
 
-	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
-	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
-	onPinch: (cb) -> @on(Events.Pinch, cb)
-	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
-	onRotate: (cb) -> @on(Events.Rotate, cb)
-	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
-	onScaleStart: (cb) -> @on(Events.ScaleStart, cb)
-	onScale: (cb) -> @on(Events.Scale, cb)
-	onScaleEnd: (cb) -> @on(Events.ScaleEnd, cb)
+	# Gestures
+
+	# Tap
+	onTap:(cb) -> @on(Events.Tap, cb)
+	onTapStart:(cb) -> @on(Events.TapStart, cb)
+	onTapEnd:(cb) -> @on(Events.TapEnd, cb)
+	onDoubleTap:(cb) -> @on(Events.DoubleTap, cb)
+
+	# Force Tap
+	onForceTap:(cb) -> @on(Events.ForceTap, cb)
+	onForceTapChange:(cb) -> @on(Events.ForceTapChange, cb)
+	onForceTapStart:(cb) -> @on(Events.ForceTapStart, cb)
+	onForceTapEnd:(cb) -> @on(Events.ForceTapEnd, cb)
+
+	# Press
+	onLongPress:(cb) -> @on(Events.LongPress, cb)
+	onLongPressStart:(cb) -> @on(Events.LongPressStart, cb)
+	onLongPressEnd:(cb) -> @on(Events.LongPressEnd, cb)
+
+	# Swipe
+	onSwipe:(cb) -> @on(Events.Swipe, cb)
+	onSwipeStart:(cb) -> @on(Events.SwipeStart, cb)
+	onSwipeEnd:(cb) -> @on(Events.SwipeEnd, cb)
+
+	onSwipeUp:(cb) -> @on(Events.SwipeUp, cb)
+	onSwipeUpStart:(cb) -> @on(Events.SwipeUpStart, cb)
+	onSwipeUpEnd:(cb) -> @on(Events.SwipeUpEnd, cb)
+
+	onSwipeDown:(cb) -> @on(Events.SwipeDown, cb)
+	onSwipeDownStart:(cb) -> @on(Events.SwipeDownStart, cb)
+	onSwipeDownEnd:(cb) -> @on(Events.SwipeDownEnd, cb)
+
+	onSwipeLeft:(cb) -> @on(Events.SwipeLeft, cb)
+	onSwipeLeftStart:(cb) -> @on(Events.SwipeLeftStart, cb)
+	onSwipeLeftEnd:(cb) -> @on(Events.SwipeLeftEnd, cb)
+
+	onSwipeRight:(cb) -> @on(Events.SwipeRight, cb)
+	onSwipeRightStart:(cb) -> @on(Events.SwipeRightStart, cb)
+	onSwipeRightEnd:(cb) -> @on(Events.SwipeRightEnd, cb)
+
+	# Edge Swipe
+
+	onEdgeSwipe:(cb) -> @on(Events.EdgeSwipe, cb)
+	onEdgeSwipeStart:(cb) -> @on(Events.EdgeSwipeStart, cb)
+	onEdgeSwipeEnd:(cb) -> @on(Events.EdgeSwipeEnd, cb)
+
+	onEdgeSwipeTop:(cb) -> @on(Events.EdgeSwipeTop, cb)
+	onEdgeSwipeTopStart:(cb) -> @on(Events.EdgeSwipeTopStart, cb)
+	onEdgeSwipeTopEnd:(cb) -> @on(Events.EdgeSwipeTopEnd, cb)
+
+	onEdgeSwipeRight:(cb) -> @on(Events.EdgeSwipeRight, cb)
+	onEdgeSwipeRightStart:(cb) -> @on(Events.EdgeSwipeRightStart, cb)
+	onEdgeSwipeRightEnd:(cb) -> @on(Events.EdgeSwipeRightEnd, cb)
+
+	onEdgeSwipeBottom:(cb) -> @on(Events.EdgeSwipeBottom, cb)
+	onEdgeSwipeBottomStart:(cb) -> @on(Events.EdgeSwipeBottomStart, cb)
+	onEdgeSwipeBottomEnd:(cb) -> @on(Events.EdgeSwipeBottomEnd, cb)
+
+	onEdgeSwipeLeft:(cb) -> @on(Events.EdgeSwipeLeft, cb)
+	onEdgeSwipeLeftStart:(cb) -> @on(Events.EdgeSwipeLeftStart, cb)
+	onEdgeSwipeLeftEnd:(cb) -> @on(Events.EdgeSwipeLeftEnd, cb)
+
+	# Pan
+	onPan:(cb) -> @on(Events.Pan, cb)
+	onPanStart:(cb) -> @on(Events.PanStart, cb)
+	onPanEnd:(cb) -> @on(Events.PanEnd, cb)
+	onPanLeft:(cb) -> @on(Events.PanLeft, cb)
+	onPanRight:(cb) -> @on(Events.PanRight, cb)
+	onPanUp:(cb) -> @on(Events.PanUp, cb)
+	onPanDown:(cb) -> @on(Events.PanDown, cb)
+
+	# Pinch
+	onPinch:(cb) -> @on(Events.Pinch, cb)
+	onPinchStart:(cb) -> @on(Events.PinchStart, cb)
+	onPinchEnd:(cb) -> @on(Events.PinchEnd, cb)
+
+	# Scale
+	onScale:(cb) -> @on(Events.Scale, cb)
+	onScaleStart:(cb) -> @on(Events.ScaleStart, cb)
+	onScaleEnd:(cb) -> @on(Events.ScaleEnd, cb)
+
+	# Rotate
+	onRotate:(cb) -> @on(Events.Rotate, cb)
+	onRotateStart:(cb) -> @on(Events.RotateStart, cb)
+	onRotateEnd:(cb) -> @on(Events.RotateEnd, cb)
 
 	##############################################################
 	## DESCRIPTOR
