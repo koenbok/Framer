@@ -5,6 +5,9 @@ GestureInputDoubleTapTime = 0.25
 GestureInputSwipeThreshold = 30
 GestureInputEdgeSwipeDistance = 30
 GestureInputVelocityTime = 0.1
+GestureInputForceTapDesktop = MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN
+GestureInputForceTapMobile = 0.7
+GestureInputForceTapMobilePollTime = 1/30
 
 {DOMEventManager} = require "./DOMEventManager"
 
@@ -48,18 +51,22 @@ class exports.GestureInputRecognizer
 			@doubleTapTime = Date.now()
 
 		@_process(event)
-		@_updateTouchForce()
+		@_updateTouchForce() if Utils.isTouch()
 
 	touchmove: (event) =>
 		@_process(@_getGestureEvent(event))
 		
 	touchend: (event) =>
+
 		# Only fire if there are no fingers left on the screen
 		return unless (event.touches.length == 0) or (event.touches.length == event.changedTouches.length)
+		
 		@em.wrap(window).removeEventListener("touchmove", @touchmove)
 		@em.wrap(window).removeEventListener("touchend", @touchend)
 		@em.wrap(window).removeEventListener("webkitmouseforcechanged", @_updateMacForce)
+		
 		event = @_getGestureEvent(event)
+		
 		@_process(event)
 
 		for eventName, value of @session.started
@@ -94,26 +101,41 @@ class exports.GestureInputRecognizer
 	_updateTouchForce: =>
 		return unless @session?.lastEvent?.touches.length
 		@session.force = @session.lastEvent.touches[0].force or 0
-		@forcetapchange(@_getGestureEvent(@session.lastEvent))
-		setTimeout(@_updateTouchForce, 1/30)
+		event = @_getGestureEvent(@session.lastEvent)
+		@forcetapchange(event)
+
+		if @session.force >= GestureInputForceTapMobile
+			@forcetapstart(event)
+		else
+			@forcetapend(event)
+
+		setTimeout(@_updateTouchForce, GestureInputForceTapMobilePollTime)
 
 	_updateMacForce: (event) =>
 		return unless @session
 		@session.force = Utils.modulate(event.webkitForce, [0, 3], [0, 1])
 		@forcetapchange(@_getGestureEvent(event))
 
+		# Trigger a force touch if we reach the desktop threshold
+		if event.webkitForce >= GestureInputForceTapDesktop
+			@forcetapstart(event)
+		else
+			@forcetapend(event)
+
 	forcetapchange: (event) =>
 		@_dispatchEvent("forcetapchange", event)
 
 	forcetapstart: (event) =>
-		print "forcetapstart"
 		return unless @session
 		return if @session.started.forcetap
 		@session.started.forcetap = event
 		@_dispatchEvent("forcetapstart", event)
 		@_dispatchEvent("forcetap", event)
 
-	forcetapend: =>
+	forcetapend: (event) =>
+		return unless @session
+		return unless @session.started.forcetap
+		@session.started.forcetap = null
 		@_dispatchEvent("forcetapend", event)
 
 	# Pan
