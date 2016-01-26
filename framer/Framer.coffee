@@ -44,7 +44,6 @@ Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4An
 Framer.LayerDraggable = (require "./LayerDraggable").LayerDraggable
 
 Framer.Importer = (require "./Importer").Importer
-Framer.Debug = (require "./Debug").Debug
 Framer.Extras = require "./Extras/Extras"
 
 Framer.GestureInputRecognizer = new (require "./GestureInputRecognizer").GestureInputRecognizer
