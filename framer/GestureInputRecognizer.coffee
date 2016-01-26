@@ -28,6 +28,7 @@ class exports.GestureInputRecognizer
 
 		@em.wrap(window).addEventListener("touchmove", @touchmove)
 		@em.wrap(window).addEventListener("touchend", @touchend)
+		@em.wrap(window).addEventListener("webkitmouseforcechanged", @_updateMacForce)
 		
 		@session =
 			startEvent: @_getGestureEvent(event)
@@ -47,6 +48,7 @@ class exports.GestureInputRecognizer
 			@doubleTapTime = Date.now()
 
 		@_process(event)
+		@_updateTouchForce()
 
 	touchmove: (event) =>
 		@_process(@_getGestureEvent(event))
@@ -56,6 +58,7 @@ class exports.GestureInputRecognizer
 		return unless (event.touches.length == 0) or (event.touches.length == event.changedTouches.length)
 		@em.wrap(window).removeEventListener("touchmove", @touchmove)
 		@em.wrap(window).removeEventListener("touchend", @touchend)
+		@em.wrap(window).removeEventListener("webkitmouseforcechanged", @_updateMacForce)
 		event = @_getGestureEvent(event)
 		@_process(event)
 
@@ -87,6 +90,20 @@ class exports.GestureInputRecognizer
 		@_dispatchEvent("longpressend", event)
 
 	# ForceTap
+
+	_updateTouchForce: =>
+		return unless @session?.lastEvent?.touches.length
+		@session.force = @session.lastEvent.touches[0].force or 0
+		@forcetapchange(@_getGestureEvent(@session.lastEvent))
+		setTimeout(@_updateTouchForce, 1/30)
+
+	_updateMacForce: (event) =>
+		return unless @session
+		@session.force = Utils.modulate(event.webkitForce, [0, 3], [0, 1])
+		@forcetapchange(@_getGestureEvent(event))
+
+	forcetapchange: (event) =>
+		@_dispatchEvent("forcetapchange", event)
 
 	forcetapstart: (event) =>
 		print "forcetapstart"
@@ -276,9 +293,10 @@ class exports.GestureInputRecognizer
 			deltaAngle: 0 # Angle from last event √
 			deltaDirection: null # Direction from last event √
 
+			force: 0, # 3d touch or force touch, iOS/Mac only √
 			velocity: {x:0, y:0} # Velocity average over the last few events √
 			
-			fingers: event.touches.length # Number of fingers used √
+			fingers: event.touches?.length or 0 # Number of fingers used √
 			touchCenter: {x:event.pageX, y:event.pageY} # Center between two fingers √
 			touchDistance: 0 # Distance between two fingers √
 			touchOffset: {x:0, y:0} # Offset between two fingers √
@@ -314,7 +332,7 @@ class exports.GestureInputRecognizer
 			events = _.filter @session.events, (e) -> e.time > (event.time - GestureInputVelocityTime)
 			event.velocity = @_getVelocity(events)
 
-		if event.touches.length > 0
+		if event.fingers > 0
 			
 			event.angle = 0
 			
@@ -326,7 +344,7 @@ class exports.GestureInputRecognizer
 			
 			event.offsetDirection = @_getDirection(event.offset)
 		
-		if event.touches.length > 1
+		if event.fingers > 1
 			pointA = @_getTouchPoint(event, 0)
 			pointB = @_getTouchPoint(event, 1)
 			event.center = Utils.pointCenter(pointB, pointA)
@@ -335,6 +353,9 @@ class exports.GestureInputRecognizer
 		
 		if @session?.started.pinch
 			event.scale = event.touchDistance / @session.started.pinch.touchDistance
+
+		if @session?.force
+			event.force = @session.force
 
 		# Convert point style event properties to dom style:
 		# event.delta -> event.deltaX, event.deltaY
