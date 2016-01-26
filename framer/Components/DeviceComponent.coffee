@@ -289,7 +289,7 @@ class exports.DeviceComponent extends BaseClass
 
 		# If we're running Framer Studio and have local files, we'd like to use those
 		if Utils.isFramerStudio() and window.FramerStudioInfo
-			resourceUrl = window.FramerStudioInfo.deviceImagesUrl	
+			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
 
 		# We'd like to use jp2 if possible, or check if we don't for this specific device
 		if Utils.isJP2Supported() and @_device.deviceImageJP2 is true
@@ -564,11 +564,116 @@ class exports.DeviceComponent extends BaseClass
 	_keyboardShowY: -> @viewport.height - @keyboardLayer.height
 	_keyboardHideY: -> @viewport.height
 
-
 ###########################################################################
-# DEVICE CONFIGURATIONS
+# NEW DEVICE CONFIGURATIONS
 
 iPhone6BaseDevice =
+	deviceImageWidth: 874
+	deviceImageHeight: 1792
+	deviceImageJP2: false
+	screenWidth: 750
+	screenHeight: 1334
+	deviceType: "phone"
+
+iPhone6PlusBaseDevice =
+	deviceImageWidth: 1452
+	deviceImageHeight: 2968
+	deviceImageJP2: false
+	screenWidth: 1242
+	screenHeight: 2208
+	deviceType: "phone"
+
+iPhone5BaseDevice =
+	deviceImageWidth: 768
+	deviceImageHeight: 1612
+	deviceImageJP2: false
+	screenWidth: 640
+	screenHeight: 1136
+	deviceType: "phone"
+
+iPhone5CBaseDevice =
+	deviceImageWidth: 776
+	deviceImageHeight: 1620
+	deviceImageJP2: false
+	screenWidth: 640
+	screenHeight: 1136
+	deviceType: "phone"
+
+Nexus4BaseDevice =
+	deviceImageWidth: 860
+	deviceImageHeight: 1668
+	deviceImageJP2: false
+	screenWidth: 768
+	screenHeight: 1280
+	deviceType: "phone"
+
+Nexus5BaseDevice =
+	deviceImageWidth: 1204
+	deviceImageHeight: 2432
+	deviceImageJP2: false
+	screenWidth: 1080
+	screenHeight: 1920
+	deviceType: "phone"
+
+Nexus6BaseDevice =
+	deviceImageWidth: 1576
+	deviceImageHeight: 3220
+	deviceImageJP2: false
+	screenWidth: 1440
+	screenHeight: 2560
+	deviceType: "phone"
+
+HTCa9BaseDevice =
+	deviceImageWidth: 1252
+	deviceImageHeight: 2592
+	deviceImageJP2: false
+	screenWidth: 1080
+	screenHeight: 1920
+	deviceType: "phone"
+
+HTCm8BaseDevice =
+	deviceImageWidth: 1232
+	deviceImageHeight: 2572
+	deviceImageJP2: false
+	screenWidth: 1080
+	screenHeight: 1920
+	deviceType: "phone"
+
+MSFTLumia950BaseDevice =
+	deviceImageWidth: 1660
+	deviceImageHeight: 3292
+	deviceImageJP2: false
+	screenWidth: 1440
+	screenHeight: 2560
+	deviceType: "phone"
+
+SamsungGalaxyNote5BaseDevice =
+	deviceImageWidth: 1572
+	deviceImageHeight: 3140
+	deviceImageJP2: false
+	screenWidth: 1440
+	screenHeight: 2560
+	deviceType: "phone"
+
+AppleWatch42Device =
+	deviceImageWidth: 512
+	deviceImageHeight: 990
+	deviceImageJP2: false
+	screenWidth: 312
+	screenHeight: 390
+
+AppleWatch38Device =
+	deviceImageWidth: 472
+	deviceImageHeight: 796
+	deviceImageJP2: false
+	screenWidth: 272
+	screenHeight: 340
+
+
+###########################################################################
+# OLD DEVICE CONFIGURATIONS
+
+old_iPhone6BaseDevice =
 	deviceImageWidth: 870
 	deviceImageHeight: 1738
 	deviceImageJP2: true
@@ -576,13 +681,13 @@ iPhone6BaseDevice =
 	screenHeight: 1334
 	deviceType: "phone"
 
-iPhone6BaseDeviceHand = _.extend {}, iPhone6BaseDevice,
+old_iPhone6BaseDeviceHand = _.extend {}, old_iPhone6BaseDevice,
 	deviceImageWidth: 1988
 	deviceImageHeight: 2368
 	deviceImageJP2: true
 	paddingOffset: -150
 
-iPhone6PlusBaseDevice =
+old_iPhone6PlusBaseDevice =
 	deviceImageWidth: 1460
 	deviceImageHeight: 2900
 	deviceImageJP2: true
@@ -590,14 +695,14 @@ iPhone6PlusBaseDevice =
 	screenHeight: 2208
 	deviceType: "phone"
 
-iPhone6PlusBaseDeviceHand = _.extend {}, iPhone6PlusBaseDevice,
+old_iPhone6PlusBaseDeviceHand = _.extend {}, old_iPhone6PlusBaseDevice,
 	deviceImageWidth: 3128
 	deviceImageHeight: 3487
 	deviceImageJP2: true
 	paddingOffset: -150
 
 
-iPhone5BaseDevice =
+old_iPhone5BaseDevice =
 	deviceImageWidth: 780
 	deviceImageHeight: 1608
 	deviceImageJP2: true
@@ -614,14 +719,14 @@ iPhone5BaseDevice =
 	# 		width: 1136
 	# 		height: 322
 
-iPhone5BaseDeviceHand = _.extend {}, iPhone5BaseDevice,
+old_iPhone5BaseDeviceHand = _.extend {}, old_iPhone5BaseDevice,
 	deviceImageWidth: 1884
 	deviceImageHeight: 2234
 	deviceImageJP2: true
 	paddingOffset: -200
 
 
-iPhone5CBaseDevice =
+old_iPhone5CBaseDevice =
 	deviceImageWidth: 776
 	deviceImageHeight: 1612
 	deviceImageJP2: true
@@ -638,14 +743,14 @@ iPhone5CBaseDevice =
 	# 		width: 1136
 	# 		height: 322
 
-iPhone5CBaseDeviceHand = _.extend {}, iPhone5CBaseDevice,
+old_iPhone5CBaseDeviceHand = _.extend {}, old_iPhone5CBaseDevice,
 	deviceImageWidth: 1894
 	deviceImageHeight: 2244
 	deviceImageJP2: true
 	paddingOffset: -200
 
 
-iPadMiniBaseDevice =
+old_iPadMiniBaseDevice =
 	deviceImageWidth: 872
 	deviceImageHeight: 1292
 	deviceImageJP2: true
@@ -653,14 +758,14 @@ iPadMiniBaseDevice =
 	screenHeight: 1024
 	deviceType: "tablet"
 
-iPadMiniBaseDeviceHand = _.extend {}, iPadMiniBaseDevice,
+old_iPadMiniBaseDeviceHand = _.extend {}, old_iPadMiniBaseDevice,
 	deviceImageWidth: 1380
 	deviceImageHeight: 2072
 	deviceImageJP2: true
 	paddingOffset: -120
 
 
-iPadAirBaseDevice =
+old_iPadAirBaseDevice =
 	deviceImageWidth: 1769
 	deviceImageHeight: 2509
 	deviceImageJP2: true
@@ -668,14 +773,14 @@ iPadAirBaseDevice =
 	screenHeight: 2048
 	deviceType: "tablet"
 
-iPadAirBaseDeviceHand = _.extend {}, iPadAirBaseDevice,
+old_iPadAirBaseDeviceHand = _.extend {}, old_iPadAirBaseDevice,
 	deviceImageWidth: 4744
 	deviceImageHeight: 4101
 	deviceImageJP2: true
 	paddingOffset: -120
 
 
-Nexus5BaseDevice =
+old_Nexus5BaseDevice =
 	deviceImageWidth: 1208
 	deviceImageHeight: 2440
 	deviceImageJP2: true
@@ -683,13 +788,13 @@ Nexus5BaseDevice =
 	screenHeight: 1920
 	deviceType: "phone"
 
-Nexus5BaseDeviceHand = _.extend {}, Nexus5BaseDevice, # 2692 × 2996
+old_Nexus5BaseDeviceHand = _.extend {}, old_Nexus5BaseDevice, # 2692 × 2996
 	deviceImageWidth: 2692
 	deviceImageHeight: 2996
 	deviceImageJP2: true
 	paddingOffset: -120
 
-Nexus9BaseDevice =
+old_Nexus9BaseDevice =
 	deviceImageWidth: 1733
 	deviceImageHeight: 2575
 	deviceImageJP2: true
@@ -697,14 +802,14 @@ Nexus9BaseDevice =
 	screenHeight: 2048
 	deviceType: "tablet"
 
-AppleWatch42Device =
+old_AppleWatch42Device =
 	deviceImageWidth: 552
 	deviceImageHeight: 938
 	deviceImageJP2: true
 	screenWidth: 312
 	screenHeight: 390
 
-AppleWatch38Device =
+old_AppleWatch38Device =
 	deviceImageWidth: 508
 	deviceImageHeight: 900
 	deviceImageJP2: true
@@ -716,6 +821,92 @@ Devices =
 	"fullscreen":
 		name: "Fullscreen"
 		deviceType: "desktop"
+
+	# iPhone 6
+	"apple-iphone-6s-gold": _.clone(iPhone6BaseDevice)
+	"apple-iphone-6s-rose-gold": _.clone(iPhone6BaseDevice)
+	"apple-iphone-6s-silver" : _.clone(iPhone6BaseDevice)
+	"apple-iphone-6s-space-gray": _.clone(iPhone6BaseDevice)
+
+	# iPhone 6+
+	"apple-iphone-6s-plus-gold": _.clone(iPhone6PlusBaseDevice)
+	"apple-iphone-6s-plus-rose-gold": _.clone(iPhone6PlusBaseDevice)
+	"apple-iphone-6s-plus-silver": _.clone(iPhone6PlusBaseDevice)
+	"apple-iphone-6s-plus-space-gray": _.clone(iPhone6PlusBaseDevice)
+
+	# iPhone 5S
+	"apple-iphone-5s-gold": _.clone(iPhone5BaseDevice)
+	"apple-iphone-5s-silver": _.clone(iPhone5BaseDevice)
+	"apple-iphone-5s-space-gray": _.clone(iPhone5BaseDevice)
+
+	# iPhone 5C
+	"apple-iphone-5c-blue": _.clone(iPhone5CBaseDevice)
+	"apple-iphone-5c-green": _.clone(iPhone5CBaseDevice)
+	"apple-iphone-5c-red": _.clone(iPhone5CBaseDevice)
+	"apple-iphone-5c-white": _.clone(iPhone5CBaseDevice)
+	"apple-iphone-5c-yellow": _.clone(iPhone5CBaseDevice)
+
+	# Apple Watch 38mm
+	"apple-watch-38mm-black-steel-+-black-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-gold-+-black-leather-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-gold-+-midnight-blue-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-rose-gold-+-black-leather-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-rose-gold-+-lavender-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-+-blue-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-+-fog-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-+-green-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-+-red-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-+-walnut-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-+-white-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-gold-+-antique-white-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-rose-gold-+-stone-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-space-gray-+-black-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-stainless-steel-+-black-leather-closed": _.clone(AppleWatch38Device)
+
+	# Apple Watch 42mm
+	"apple-watch-42mm-black-steel-+-black-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-gold-+-black-leather-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-gold-+-midnight-blue-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-rose-gold-+-black-leather-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-rose-gold-+-lavender-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-+-blue-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-+-fog-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-+-green-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-+-red-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-+-walnut-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-+-white-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-gold-+-antique-white-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-rose-gold-+-stone-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-space-gray-+-black-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-stainless-steel-+-black-leather-closed": _.clone(AppleWatch42Device)
+
+	# Nexus
+	"google-nexus-4": _.clone(Nexus4BaseDevice)
+	"google-nexus-5x": _.clone(Nexus5BaseDevice)
+	"google-nexus-6p": _.clone(Nexus6BaseDevice)
+
+	# HTC A9
+	"htc-one-a9-black": _.clone(HTCa9BaseDevice)
+	"htc-one-a9-white": _.clone(HTCa9BaseDevice)
+
+	# HTC M8
+	"htc-one-m8-black": _.clone(HTCm8BaseDevice)
+	"htc-one-m8-gold": _.clone(HTCm8BaseDevice)
+	"htc-one-m8-silver": _.clone(HTCm8BaseDevice)
+
+	# MICROSOFT LUMIA 950
+	"microsoft-lumia-950-black": _.clone(MSFTLumia950BaseDevice)
+	"microsoft-lumia-950-white": _.clone(MSFTLumia950BaseDevice)
+
+	# SAMSUNG NOTE 5
+	"samsung-galaxy-note-5-black": _.clone(SamsungGalaxyNote5BaseDevice)
+	"samsung-galaxy-note-5-gold": _.clone(SamsungGalaxyNote5BaseDevice)
+	"samsung-galaxy-note-5-pink": _.clone(SamsungGalaxyNote5BaseDevice)
+	"samsung-galaxy-note-5-silver-titanium": _.clone(SamsungGalaxyNote5BaseDevice)
+	"samsung-galaxy-note-5-white": _.clone(SamsungGalaxyNote5BaseDevice)
+
+
+	# OLD DEVICES
 
 	# Desktop Browser
 	"desktop-safari-1024-600":
@@ -744,87 +935,87 @@ Devices =
 		deviceImageJP2: true
 
 	# iPhone 6
-	"iphone-6-spacegray": _.clone(iPhone6BaseDevice)
-	"iphone-6-spacegray-hand": _.clone(iPhone6BaseDeviceHand)
-	"iphone-6-silver": _.clone(iPhone6BaseDevice)
-	"iphone-6-silver-hand": _.clone(iPhone6BaseDeviceHand)
-	"iphone-6-gold": _.clone(iPhone6BaseDevice)
-	"iphone-6-gold-hand": _.clone(iPhone6BaseDeviceHand)
+	"iphone-6-spacegray": _.clone(old_iPhone6BaseDevice)
+	"iphone-6-spacegray-hand": _.clone(old_iPhone6BaseDeviceHand)
+	"iphone-6-silver": _.clone(old_iPhone6BaseDevice)
+	"iphone-6-silver-hand": _.clone(old_iPhone6BaseDeviceHand)
+	"iphone-6-gold": _.clone(old_iPhone6BaseDevice)
+	"iphone-6-gold-hand": _.clone(old_iPhone6BaseDeviceHand)
 
 	# iPhone 6+
-	"iphone-6plus-spacegray": _.clone(iPhone6PlusBaseDevice)
-	"iphone-6plus-spacegray-hand": _.clone(iPhone6PlusBaseDeviceHand)
-	"iphone-6plus-silver": _.clone(iPhone6PlusBaseDevice)
-	"iphone-6plus-silver-hand": _.clone(iPhone6PlusBaseDeviceHand)
-	"iphone-6plus-gold": _.clone(iPhone6PlusBaseDevice)
-	"iphone-6plus-gold-hand": _.clone(iPhone6PlusBaseDeviceHand)
+	"iphone-6plus-spacegray": _.clone(old_iPhone6PlusBaseDevice)
+	"iphone-6plus-spacegray-hand": _.clone(old_iPhone6PlusBaseDeviceHand)
+	"iphone-6plus-silver": _.clone(old_iPhone6PlusBaseDevice)
+	"iphone-6plus-silver-hand": _.clone(old_iPhone6PlusBaseDeviceHand)
+	"iphone-6plus-gold": _.clone(old_iPhone6PlusBaseDevice)
+	"iphone-6plus-gold-hand": _.clone(old_iPhone6PlusBaseDeviceHand)
 
 	# iPhone 5S
-	"iphone-5s-spacegray": _.clone(iPhone5BaseDevice)
-	"iphone-5s-spacegray-hand":_.clone(iPhone5BaseDeviceHand)
-	"iphone-5s-silver": _.clone(iPhone5BaseDevice)
-	"iphone-5s-silver-hand": _.clone(iPhone5BaseDeviceHand)
-	"iphone-5s-gold": _.clone(iPhone5BaseDevice)
-	"iphone-5s-gold-hand": _.clone(iPhone5BaseDeviceHand)
+	"iphone-5s-spacegray": _.clone(old_iPhone5BaseDevice)
+	"iphone-5s-spacegray-hand":_.clone(old_iPhone5BaseDeviceHand)
+	"iphone-5s-silver": _.clone(old_iPhone5BaseDevice)
+	"iphone-5s-silver-hand": _.clone(old_iPhone5BaseDeviceHand)
+	"iphone-5s-gold": _.clone(old_iPhone5BaseDevice)
+	"iphone-5s-gold-hand": _.clone(old_iPhone5BaseDeviceHand)
 
 	# iPhone 5C
-	"iphone-5c-green": _.clone(iPhone5CBaseDevice)
-	"iphone-5c-green-hand": _.clone(iPhone5CBaseDeviceHand)
-	"iphone-5c-blue": _.clone(iPhone5CBaseDevice)
-	"iphone-5c-blue-hand": _.clone(iPhone5CBaseDeviceHand)
-	"iphone-5c-pink": _.clone(iPhone5CBaseDevice)
-	"iphone-5c-pink-hand": _.clone(iPhone5CBaseDeviceHand)
-	"iphone-5c-white": _.clone(iPhone5CBaseDevice)
-	"iphone-5c-white-hand": _.clone(iPhone5CBaseDeviceHand)
-	"iphone-5c-yellow": _.clone(iPhone5CBaseDevice)
-	"iphone-5c-yellow-hand": _.clone(iPhone5CBaseDeviceHand)
+	"iphone-5c-green": _.clone(old_iPhone5CBaseDevice)
+	"iphone-5c-green-hand": _.clone(old_iPhone5CBaseDeviceHand)
+	"iphone-5c-blue": _.clone(old_iPhone5CBaseDevice)
+	"iphone-5c-blue-hand": _.clone(old_iPhone5CBaseDeviceHand)
+	"iphone-5c-pink": _.clone(old_iPhone5CBaseDevice)
+	"iphone-5c-pink-hand": _.clone(old_iPhone5CBaseDeviceHand)
+	"iphone-5c-white": _.clone(old_iPhone5CBaseDevice)
+	"iphone-5c-white-hand": _.clone(old_iPhone5CBaseDeviceHand)
+	"iphone-5c-yellow": _.clone(old_iPhone5CBaseDevice)
+	"iphone-5c-yellow-hand": _.clone(old_iPhone5CBaseDeviceHand)
 
 	# iPad Mini
-	"ipad-mini-spacegray": _.clone(iPadMiniBaseDevice)
-	"ipad-mini-spacegray-hand": _.clone(iPadMiniBaseDeviceHand)
-	"ipad-mini-silver": _.clone(iPadMiniBaseDevice)
-	"ipad-mini-silver-hand": _.clone(iPadMiniBaseDeviceHand)
+	"ipad-mini-spacegray": _.clone(old_iPadMiniBaseDevice)
+	"ipad-mini-spacegray-hand": _.clone(old_iPadMiniBaseDeviceHand)
+	"ipad-mini-silver": _.clone(old_iPadMiniBaseDevice)
+	"ipad-mini-silver-hand": _.clone(old_iPadMiniBaseDeviceHand)
 
 	# iPad Air
-	"ipad-air-spacegray": _.clone(iPadAirBaseDevice)
-	"ipad-air-spacegray-hand": _.clone(iPadAirBaseDeviceHand)
-	"ipad-air-silver": _.clone(iPadAirBaseDevice)
-	"ipad-air-silver-hand": _.clone(iPadAirBaseDeviceHand)
+	"ipad-air-spacegray": _.clone(old_iPadAirBaseDevice)
+	"ipad-air-spacegray-hand": _.clone(old_iPadAirBaseDeviceHand)
+	"ipad-air-silver": _.clone(old_iPadAirBaseDevice)
+	"ipad-air-silver-hand": _.clone(old_iPadAirBaseDeviceHand)
 
 	# Nexus 5
-	"nexus-5-black": _.clone(Nexus5BaseDevice)
-	"nexus-5-black-hand": _.clone(Nexus5BaseDeviceHand)
+	"nexus-5-black": _.clone(old_Nexus5BaseDevice)
+	"nexus-5-black-hand": _.clone(old_Nexus5BaseDeviceHand)
 
 	# Nexus 9
-	"nexus-9": _.clone(Nexus9BaseDevice)
+	"nexus-9": _.clone(old_Nexus9BaseDevice)
 
 	# Apple Watch 38mm
-	"applewatchsport-38-aluminum-sportband-black": _.clone(AppleWatch38Device)
-	"applewatchsport-38-aluminum-sportband-blue": _.clone(AppleWatch38Device)
-	"applewatchsport-38-aluminum-sportband-green": _.clone(AppleWatch38Device)
-	"applewatchsport-38-aluminum-sportband-pink": _.clone(AppleWatch38Device)
-	"applewatchsport-38-aluminum-sportband-white": _.clone(AppleWatch38Device)
-	"applewatch-38-black-bracelet": _.clone(AppleWatch38Device)
-	"applewatch-38-steel-bracelet": _.clone(AppleWatch38Device)
-	"applewatchedition-38-gold-buckle-blue": _.clone(AppleWatch38Device)
-	"applewatchedition-38-gold-buckle-gray": _.clone(AppleWatch38Device)
-	"applewatchedition-38-gold-buckle-red": _.clone(AppleWatch38Device)
-	"applewatchedition-38-gold-sportband-black": _.clone(AppleWatch38Device)
-	"applewatchedition-38-gold-sportband-white": _.clone(AppleWatch38Device)
+	"applewatchsport-38-aluminum-sportband-black": _.clone(old_AppleWatch38Device)
+	"applewatchsport-38-aluminum-sportband-blue": _.clone(old_AppleWatch38Device)
+	"applewatchsport-38-aluminum-sportband-green": _.clone(old_AppleWatch38Device)
+	"applewatchsport-38-aluminum-sportband-pink": _.clone(old_AppleWatch38Device)
+	"applewatchsport-38-aluminum-sportband-white": _.clone(old_AppleWatch38Device)
+	"applewatch-38-black-bracelet": _.clone(old_AppleWatch38Device)
+	"applewatch-38-steel-bracelet": _.clone(old_AppleWatch38Device)
+	"applewatchedition-38-gold-buckle-blue": _.clone(old_AppleWatch38Device)
+	"applewatchedition-38-gold-buckle-gray": _.clone(old_AppleWatch38Device)
+	"applewatchedition-38-gold-buckle-red": _.clone(old_AppleWatch38Device)
+	"applewatchedition-38-gold-sportband-black": _.clone(old_AppleWatch38Device)
+	"applewatchedition-38-gold-sportband-white": _.clone(old_AppleWatch38Device)
 
 	# Apple Watch 42mm
-	"applewatchsport-42-aluminum-sportband-black": _.clone(AppleWatch42Device)
-	"applewatchsport-42-aluminum-sportband-blue": _.clone(AppleWatch42Device)
-	"applewatchsport-42-aluminum-sportband-green": _.clone(AppleWatch42Device)
-	"applewatchsport-42-aluminum-sportband-pink": _.clone(AppleWatch42Device)
-	"applewatchsport-42-aluminum-sportband-white": _.clone(AppleWatch42Device)
-	"applewatch-42-black-bracelet": _.clone(AppleWatch42Device)
-	"applewatch-42-steel-bracelet": _.clone(AppleWatch42Device)
-	"applewatchedition-42-gold-buckle-blue": _.clone(AppleWatch42Device)
-	"applewatchedition-42-gold-buckle-gray": _.clone(AppleWatch42Device)
-	"applewatchedition-42-gold-buckle-red": _.clone(AppleWatch42Device)
-	"applewatchedition-42-gold-sportband-black": _.clone(AppleWatch42Device)
-	"applewatchedition-42-gold-sportband-white": _.clone(AppleWatch42Device)
+	"applewatchsport-42-aluminum-sportband-black": _.clone(old_AppleWatch42Device)
+	"applewatchsport-42-aluminum-sportband-blue": _.clone(old_AppleWatch42Device)
+	"applewatchsport-42-aluminum-sportband-green": _.clone(old_AppleWatch42Device)
+	"applewatchsport-42-aluminum-sportband-pink": _.clone(old_AppleWatch42Device)
+	"applewatchsport-42-aluminum-sportband-white": _.clone(old_AppleWatch42Device)
+	"applewatch-42-black-bracelet": _.clone(old_AppleWatch42Device)
+	"applewatch-42-steel-bracelet": _.clone(old_AppleWatch42Device)
+	"applewatchedition-42-gold-buckle-blue": _.clone(old_AppleWatch42Device)
+	"applewatchedition-42-gold-buckle-gray": _.clone(old_AppleWatch42Device)
+	"applewatchedition-42-gold-buckle-red": _.clone(old_AppleWatch42Device)
+	"applewatchedition-42-gold-sportband-black": _.clone(old_AppleWatch42Device)
+	"applewatchedition-42-gold-sportband-white": _.clone(old_AppleWatch42Device)
 
 
 exports.DeviceComponent.Devices = Devices
