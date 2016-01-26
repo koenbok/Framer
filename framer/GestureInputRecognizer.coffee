@@ -184,11 +184,13 @@ class exports.GestureInputRecognizer
 			@edgeswipedirectionstart(event)
 
 	swipedirection: (event) =>
+		return unless @session.started.swipedirection
 		direction = @session.started.swipedirection.direction
 		@_dispatchEvent("swipe#{direction}", event)
 		@edgeswipedirection(event) if @session.started.edgeswipedirection
 
 	swipedirectionend: (event) =>
+		return unless @session.started.swipedirection
 		direction = @session.started.swipedirection.direction
 		@_dispatchEvent("swipe#{direction}end", event)
 
@@ -258,48 +260,55 @@ class exports.GestureInputRecognizer
 	_getGestureEvent: (event) ->
 		
 		_.extend event,
-			time: Date.now() # Current time
+			time: Date.now() # Current time √
 			
-			point: {x:event.pageX, y:event.pageY} # Current point
-			start: {x:event.pageX, y:event.pageY} # Start point
-			previous: {x:event.pageX, y:event.pageY} # Previous point
+			point: {x:event.pageX, y:event.pageY} # Current point √
+			start: {x:event.pageX, y:event.pageY} # Start point √
+			previous: {x:event.pageX, y:event.pageY} # Previous point √
 			
-			offset: {x:0, y:0} # Offset since start
-			offsetTime: 0 # Time since start
-			offsetAngle: 0 # Angle from start
-			offsetDirection: null # Direction from start (up, down, left, right)
+			offset: {x:0, y:0} # Offset since start √
+			offsetTime: 0 # Time since start √
+			offsetAngle: 0 # Angle from start √
+			offsetDirection: null # Direction from start (up, down, left, right) √
 
-			delta: {x:0, y:0} # Offset since last event
-			deltaTime: 0 # Time since last event
-			deltaAngle: 0 # Angle from last event
-			deltaDirection: null # Direction from last event
+			delta: {x:0, y:0} # Offset since last event √
+			deltaTime: 0 # Time since last event √
+			deltaAngle: 0 # Angle from last event √
+			deltaDirection: null # Direction from last event √
 
-			velocity: {x:0, y:0} # Velocity average over the last few events
+			velocity: {x:0, y:0} # Velocity average over the last few events √
 			
-			fingers: event.touches.length # Number of fingers used
-			touchCenter: {x:event.pageX, y:event.pageY} # Center between two fingers
-			touchDistance: 0 # Distance between two fingers
-			touchOffset: {x:0, y:0} # Offset between two fingers
-			scale: 1 # Scale value from two fingers
-			rotation: 0 # Rotation value from two fingers
+			fingers: event.touches.length # Number of fingers used √
+			touchCenter: {x:event.pageX, y:event.pageY} # Center between two fingers √
+			touchDistance: 0 # Distance between two fingers √
+			touchOffset: {x:0, y:0} # Offset between two fingers √
+			scale: 1 # Scale value from two fingers √
+			rotation: 0 # Rotation value from two fingers √
 
 		if @session?.startEvent
 			event.start = @session.startEvent.point
 			event.offsetTime = event.time - @session.startEvent.time
 			event.offset = Utils.pointSubtract(event.point, event.start)
+			event.offsetAngle = Utils.pointAngle(event.start, event.point)
+			event.offsetDirection = @_getDirection(event.offset)
 
 		if @session?.lastEvent
-			event.deltaTime = event.time - @session.lastEvent.time
 			event.previous = @session.lastEvent.point
+			event.deltaTime = event.time - @session.lastEvent.time
 
 			# If the amount of fingers changed we don't send any delta
 			if @session.lastEvent.fingers != event.fingers
 				event.delta = {x:0, y:0}
+
 			# If there are exactly two fingers we use their center point as delta,
 			# this works because we use the single finger point as center when there
 			# is only one finger in this touch.
 			else
 				event.delta = Utils.pointSubtract(event.touchCenter, @session.lastEvent.touchCenter)
+				event.deltaAngle = Utils.pointAngle(@session.lastEvent.touchCenter, event.touchCenter)
+
+			event.deltaDirection = @_getDirection(event.delta)
+
 
 		if @session?.events
 			events = _.filter @session.events, (e) -> e.time > (event.time - GestureInputVelocityTime)
@@ -313,19 +322,19 @@ class exports.GestureInputRecognizer
 				pointA = @_getTouchPoint(@session.startEvent, 0)
 				pointB = @_getTouchPoint(event, 0)
 				event.angle = Utils.pointAngle(pointA, pointB)
+				event.touchOffset = Utils.pointSubtract(pointA, pointB)
 			
-			event.direction = @_getDirection(event.offset)
+			event.offsetDirection = @_getDirection(event.offset)
 		
 		if event.touches.length > 1
 			pointA = @_getTouchPoint(event, 0)
 			pointB = @_getTouchPoint(event, 1)
 			event.center = Utils.pointCenter(pointB, pointA)
+			event.touchDistance = Utils.pointDistance(pointA, pointB)
 			event.rotation = Utils.pointAngle(pointA, pointB)
-			event.distance = Utils.pointDistance(pointA, pointB)
-			event.scale = 1
 		
 		if @session?.started.pinch
-			event.scale = event.distance / @session.started.pinch.distance
+			event.scale = event.touchDistance / @session.started.pinch.touchDistance
 
 		# Convert point style event properties to dom style:
 		# event.delta -> event.deltaX, event.deltaY
