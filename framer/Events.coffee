@@ -1,6 +1,7 @@
-{_} = require "./Underscore"
-
 Utils = require "./Utils"
+
+{_} = require "./Underscore"
+{Gestures} = require "./Gestures"
 
 Events = {}
 
@@ -42,6 +43,9 @@ Events.Scroll = "scroll"
 Events.ImageLoaded = "load"
 Events.ImageLoadError = "error"
 
+# Add all gesture events
+_.extend(Events, Gestures)
+
 # Extract touch events for any event
 Events.touchEvent = (event) ->
 	touchEvent =  event.touches?[0]
@@ -51,5 +55,8 @@ Events.touchEvent = (event) ->
 
 Events.wrap = (element) ->
 	Framer.CurrentContext.domEventManager.wrap(element)
+
+Events.isGesture = (eventName) ->
+	return eventName in Gestures
 
 exports.Events = Events
