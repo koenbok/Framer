@@ -1,6 +1,6 @@
 Utils = require "./Utils"
 
-GestureInputLongPressTime = 0.25
+GestureInputLongPressTime = 0.5
 GestureInputDoubleTapTime = 0.25
 GestureInputSwipeThreshold = 30
 GestureInputEdgeSwipeDistance = 30
