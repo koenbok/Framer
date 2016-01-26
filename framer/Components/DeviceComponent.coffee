@@ -570,7 +570,7 @@ class exports.DeviceComponent extends BaseClass
 iPhone6BaseDevice =
 	deviceImageWidth: 874
 	deviceImageHeight: 1792
-	deviceImageJP2: false
+	deviceImageJP2: true
 	screenWidth: 750
 	screenHeight: 1334
 	deviceType: "phone"
@@ -578,7 +578,7 @@ iPhone6BaseDevice =
 iPhone6PlusBaseDevice =
 	deviceImageWidth: 1452
 	deviceImageHeight: 2968
-	deviceImageJP2: false
+	deviceImageJP2: true
 	screenWidth: 1242
 	screenHeight: 2208
 	deviceType: "phone"
@@ -586,7 +586,7 @@ iPhone6PlusBaseDevice =
 iPhone5BaseDevice =
 	deviceImageWidth: 768
 	deviceImageHeight: 1612
-	deviceImageJP2: false
+	deviceImageJP2: true
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
@@ -594,7 +594,7 @@ iPhone5BaseDevice =
 iPhone5CBaseDevice =
 	deviceImageWidth: 776
 	deviceImageHeight: 1620
-	deviceImageJP2: false
+	deviceImageJP2: true
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
@@ -602,7 +602,7 @@ iPhone5CBaseDevice =
 Nexus4BaseDevice =
 	deviceImageWidth: 860
 	deviceImageHeight: 1668
-	deviceImageJP2: false
+	deviceImageJP2: true
 	screenWidth: 768
 	screenHeight: 1280
 	deviceType: "phone"
@@ -610,7 +610,7 @@ Nexus4BaseDevice =
 Nexus5BaseDevice =
 	deviceImageWidth: 1204
 	deviceImageHeight: 2432
-	deviceImageJP2: false
+	deviceImageJP2: true
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
@@ -618,7 +618,7 @@ Nexus5BaseDevice =
 Nexus6BaseDevice =
 	deviceImageWidth: 1576
 	deviceImageHeight: 3220
-	deviceImageJP2: false
+	deviceImageJP2: true
 	screenWidth: 1440
 	screenHeight: 2560
 	deviceType: "phone"
@@ -626,7 +626,7 @@ Nexus6BaseDevice =
 HTCa9BaseDevice =
 	deviceImageWidth: 1252
 	deviceImageHeight: 2592
-	deviceImageJP2: false
+	deviceImageJP2: true
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
@@ -634,7 +634,7 @@ HTCa9BaseDevice =
 HTCm8BaseDevice =
 	deviceImageWidth: 1232
 	deviceImageHeight: 2572
-	deviceImageJP2: false
+	deviceImageJP2: true
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
@@ -642,7 +642,7 @@ HTCm8BaseDevice =
 MSFTLumia950BaseDevice =
 	deviceImageWidth: 1660
 	deviceImageHeight: 3292
-	deviceImageJP2: false
+	deviceImageJP2: true
 	screenWidth: 1440
 	screenHeight: 2560
 	deviceType: "phone"
@@ -650,7 +650,7 @@ MSFTLumia950BaseDevice =
 SamsungGalaxyNote5BaseDevice =
 	deviceImageWidth: 1572
 	deviceImageHeight: 3140
-	deviceImageJP2: false
+	deviceImageJP2: true
 	screenWidth: 1440
 	screenHeight: 2560
 	deviceType: "phone"
@@ -658,14 +658,14 @@ SamsungGalaxyNote5BaseDevice =
 AppleWatch42Device =
 	deviceImageWidth: 512
 	deviceImageHeight: 990
-	deviceImageJP2: false
+	deviceImageJP2: true
 	screenWidth: 312
 	screenHeight: 390
 
 AppleWatch38Device =
 	deviceImageWidth: 472
 	deviceImageHeight: 796
-	deviceImageJP2: false
+	deviceImageJP2: true
 	screenWidth: 272
 	screenHeight: 340
 
@@ -885,11 +885,11 @@ Devices =
 	"google-nexus-5x": _.clone(Nexus5BaseDevice)
 	"google-nexus-6p": _.clone(Nexus6BaseDevice)
 
-	# HTC A9
+	# HTC ONE A9
 	"htc-one-a9-black": _.clone(HTCa9BaseDevice)
 	"htc-one-a9-white": _.clone(HTCa9BaseDevice)
 
-	# HTC M8
+	# HTC ONE M8
 	"htc-one-m8-black": _.clone(HTCm8BaseDevice)
 	"htc-one-m8-gold": _.clone(HTCm8BaseDevice)
 	"htc-one-m8-silver": _.clone(HTCm8BaseDevice)
