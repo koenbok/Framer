@@ -99,9 +99,14 @@ class exports.LayerDraggable extends BaseClass
 		@attach()
 
 	attach: -> 
-		@layer.on Events.TouchStart, @_touchStart
+		@layer.on(Gestures.TapStart, @touchStart)
+		@layer.on(Gestures.Pan, @_touchMove)
+		@layer.on(Gestures.TapEnd, @_touchEnd)
 
-	remove: -> @layer.off(Events.TouchStart, @_touchStart)
+	remove: ->
+		@layer.off(Gestures.PanStart, @touchStart)
+		@layer.off(Gestures.Pan, @_touchMove)
+		@layer.off(Gestures.PanEnd, @_touchEnd)
 
 	updatePosition: (point) ->
 		# Override this to add your own behaviour to the update position
@@ -153,9 +158,6 @@ class exports.LayerDraggable extends BaseClass
 			x: touchEvent.clientX - @_correctedLayerStartPoint.x
 			y: touchEvent.clientY - @_correctedLayerStartPoint.y
 
-		@layer._context.domEventManager.wrap(document).addEventListener(Events.TouchMove, @_touchMove)
-		@layer._context.domEventManager.wrap(document).addEventListener(Events.TouchEnd, @_touchEnd)
-
 		@emit(Events.DragStart, event)
 
 	_touchMove: (event) =>
@@ -172,18 +174,10 @@ class exports.LayerDraggable extends BaseClass
 			y: touchEvent.clientY
 			t: Date.now() # We don't use timeStamp because it's different on Chrome/Safari
 
-		offset =
-			x: touchEvent.clientX - @_correctedLayerStartPoint.x - @_layerCursorOffset.x
-			y: touchEvent.clientY - @_correctedLayerStartPoint.y - @_layerCursorOffset.y
-
-		# Scale the offset with the screen scale for the current layer
-		offset.x = offset.x * @speedX * (1 / @layer.canvasScaleX()) * @layer.scaleX * @layer.scale
-		offset.y = offset.y * @speedY * (1 / @layer.canvasScaleY()) * @layer.scaleY * @layer.scale
-
 		# See if horizontal/vertical was set and set the offset
 		point = @layer.point
-		point.x = @_correctedLayerStartPoint.x + offset.x if @horizontal
-		point.y = @_correctedLayerStartPoint.y + offset.y if @vertical
+		point.x += event.delta.x if @horizontal
+		point.y += event.delta.y if @vertical
 
 		# Constraints and overdrag
 		point = @_constrainPosition(point, @_constraints, @overdragScale) if @_constraints
@@ -220,9 +214,6 @@ class exports.LayerDraggable extends BaseClass
 	_touchEnd: (event) =>
 
 		event.stopPropagation() unless @propagateEvents
-
-		@layer._context.domEventManager.wrap(document).removeEventListener(Events.TouchMove, @_touchMove)
-		@layer._context.domEventManager.wrap(document).removeEventListener(Events.TouchEnd, @_touchEnd)
 
 		# Start the simulation prior to emitting the DragEnd event.
 		# This way, if the user calls layer.animate on DragEnd, the simulation will 

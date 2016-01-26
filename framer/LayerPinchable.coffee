@@ -54,10 +54,12 @@ class exports.LayerPinchable extends BaseClass
 		@emit(Events.RotateStart, event) if @rotate
 
 		if @centerOrigin
+
 			topInSuperBefore = Utils.convertPoint({}, @layer, @layer.superLayer)
-			pinchLocation = Utils.convertPointFromContext(event.center, @layer, true, true)
+			pinchLocation = Utils.convertPointFromContext(event.touchCenter, @layer, true, true)
 			@layer.originX = pinchLocation.x / @layer.width
 			@layer.originY = pinchLocation.y / @layer.height
+
 			topInSuperAfter = Utils.convertPoint({}, @layer, @layer.superLayer)
 			xDiff = topInSuperAfter.x - topInSuperBefore.x
 			yDiff = topInSuperAfter.y - topInSuperBefore.y
