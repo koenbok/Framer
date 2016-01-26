@@ -176,8 +176,8 @@ class exports.LayerDraggable extends BaseClass
 
 		# See if horizontal/vertical was set and set the offset
 		point = @layer.point
-		point.x += event.delta.x if @horizontal
-		point.y += event.delta.y if @vertical
+		point.x += event.delta.x * (1 / @layer.canvasScaleX() * @layer.scale * @layer.scaleX) if @horizontal
+		point.y += event.delta.y * (1 / @layer.canvasScaleY() * @layer.scale * @layer.scaleY) if @vertical
 
 		# Constraints and overdrag
 		point = @_constrainPosition(point, @_constraints, @overdragScale) if @_constraints
