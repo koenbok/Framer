@@ -32,3 +32,5 @@ framer/.*.hash
 framer/framer.generated.js
 framer/framer.modules.js
 framer/images/*
+app.coffee
+app.js

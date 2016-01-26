@@ -266,8 +266,12 @@ class exports.Context extends BaseClass
 			return window.innerHeight
 
 	@define "frame", get: -> {x:0, y:0, width:@width, height:@height}
-	@define "size",  get: -> _.pluck(@frame, ["x", "y"])
-	@define "point", get: -> _.pluck(@frame, ["width", "height"])
+	@define "size",  get: -> _.pick(@frame, ["width", "height"])
+	@define "point", get: -> _.pick(@frame, ["x", "y"])
+	@define "canvasFrame",
+		get: ->
+			return @frame if not parent
+			return @parent.canvasFrame
 
 	@define "backgroundColor",
 		get: ->

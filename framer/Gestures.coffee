@@ -1,53 +1,91 @@
 # Gesture events
 Gestures = {}
-Gestures._prefix = "gesture:"
+
+# Tap
+Gestures.Tap = "tap"
+Gestures.TapStart = "tapstart"
+Gestures.TapEnd = "tapend"
+Gestures.DoubleTap = "doubletap"
+
+# Force Tap
+Gestures.ForceTap = "forcetap"
+Gestures.ForceTapChange = "forcetapchange"
+Gestures.ForceTapStart = "forcetapstart"
+Gestures.ForceTapEnd = "forcetapend"
+
+# Press
+Gestures.LongPress = "longpress"
+Gestures.LongPressStart = "longpressstart"
+Gestures.LongPressEnd = "longpressend"
+
+# Swipe
+Gestures.Swipe = "swipe"
+Gestures.SwipeStart = "swipestart"
+Gestures.SwipeEnd = "swipeend"
+
+Gestures.SwipeUp = "swipeup"
+Gestures.SwipeUpStart = "swipeupstart"
+Gestures.SwipeUpEnd = "swipeupend"
+
+Gestures.SwipeDown = "swipedown"
+Gestures.SwipeDownStart = "swipedownstart"
+Gestures.SwipeDownEnd = "swipedownend"
+
+Gestures.SwipeLeft = "swipeleft"
+Gestures.SwipeLeftStart = "swipeleftstart"
+Gestures.SwipeLeftEnd = "swipeleftend"
+
+Gestures.SwipeRight = "swiperight"
+Gestures.SwipeRightStart = "swiperightstart"
+Gestures.SwipeRightEnd = "swiperightend"
+
+# Edge Swipe
+
+Gestures.EdgeSwipe = "edgeswipe"
+Gestures.EdgeSwipeStart = "edgeswipestart"
+Gestures.EdgeSwipeEnd = "edgeswipeend"
+
+Gestures.EdgeSwipeTop = "edgeswipetop"
+Gestures.EdgeSwipeTopStart = "edgeswipetopstart"
+Gestures.EdgeSwipeTopEnd = "edgeswipetopend"
+
+Gestures.EdgeSwipeRight = "edgeswiperight"
+Gestures.EdgeSwipeRightStart = "edgeswiperightstart"
+Gestures.EdgeSwipeRightEnd = "edgeswiperightend"
+
+Gestures.EdgeSwipeBottom = "edgeswipebottom"
+Gestures.EdgeSwipeBottomStart = "edgeswipebottomstart"
+Gestures.EdgeSwipeBottomEnd = "edgeswipebottomend"
+
+Gestures.EdgeSwipeLeft = "edgeswipeleft"
+Gestures.EdgeSwipeLeftStart = "edgeswipeleftstart"
+Gestures.EdgeSwipeLeftEnd = "edgeswipeleftend"
 
 # Pan
-Gestures.Pan = "pan" # This event includes all the other Pan events
+Gestures.Pan = "pan"
 Gestures.PanStart = "panstart"
-Gestures.PanMove = "panmove"
 Gestures.PanEnd = "panend"
-Gestures.PanCancel = "pancancel"
 Gestures.PanLeft = "panleft"
 Gestures.PanRight = "panright"
 Gestures.PanUp = "panup"
 Gestures.PanDown = "pandown"
 
 # Pinch
-Gestures.Pinch = "pinch" # This event includes all the other Pinch events
+Gestures.Pinch = "pinch"
 Gestures.PinchStart = "pinchstart"
-Gestures.PinchMove = "pinchmove"
 Gestures.PinchEnd = "pinchend"
-Gestures.PinchCancel = "pinchcancel"
-Gestures.PinchIn = "pinchin"
-Gestures.PinchOut = "pinchout"
 
-# Press
-Gestures.Press = "press"
-Gestures.PressUp = "pressup"
+# Scale
+Gestures.Scale = "scale"
+Gestures.ScaleStart = "scalestart"
+Gestures.ScaleEnd = "scaleend"
 
 # Rotate
-Gestures.Rotate = "rotate" # This event includes all the other Rotate events
+Gestures.Rotate = "rotate"
 Gestures.RotateStart = "rotatestart"
-Gestures.RotateMove = "rotatemove"
 Gestures.RotateEnd = "rotateend"
-Gestures.RotateCancel = "rotatecancel"
-
-# Swipe
-Gestures.Swipe = "swipe"
-Gestures.SwipeLeft = "swipeleft"
-Gestures.SwipeRight = "swiperight"
-Gestures.SwipeUp = "swipeup"
-Gestures.SwipeDown = "swipedown"
-
-# Tap
-Gestures.Tap = "tap"
-Gestures.SingleTap = "singletap"
-Gestures.DoubleTap = "doubletap"
-
-# To determine gesture events, we prefix the value with rotate
-for k, v of Gestures
-	continue if k is "_prefix"
-	Gestures[k] = "#{Gestures._prefix}#{v}"
 
 exports.Gestures = Gestures
+
+
+

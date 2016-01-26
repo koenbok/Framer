@@ -15,7 +15,6 @@ Utils = require "./Utils"
 {LayerDraggable} = require "./LayerDraggable"
 {LayerPinchable} = require "./LayerPinchable"
 {Gestures} = require "./Gestures"
-{GestureManager} = require "./GestureManager"
 
 NoCacheDateKey = Date.now()
 
@@ -957,10 +956,13 @@ class exports.Layer extends BaseClass
 		@_addListener(eventName, listener)
 
 	addListener: (eventName, listener) =>
+		throw Error("Layer.on needs a valid event name") unless eventName
+		throw Error("Layer.on needs an event listener") unless listener
 		super(eventName, listener)
 		@_addListener(eventName, listener)
 
 	removeListener: (eventName, listener) ->
+		throw Error("Layer.off needs a valid event name") unless eventName
 		super(eventName, listener)
 		@_removeListener(eventName, listener)
 
@@ -970,26 +972,14 @@ class exports.Layer extends BaseClass
 		if not _.startsWith(eventName, "change:")
 			@ignoreEvents = false
 
-		# If this is a gesture event, pass it on to the gesture manager
-		if _.startsWith(eventName, Gestures._prefix)
-			@_gestureManager ?= new GestureManager(@)
-			@_gestureManager.on(eventName, listener)
-			return
-
 		# If this is a dom event, we want the actual dom node to let us know
 		# when it gets triggered, so we can emit the event through the system.
-		if Utils.domValidEvent(@_element, eventName)
+		if Utils.domValidEvent(@_element, eventName) or eventName in _.values(Gestures)
 			if not @_domEventManager.listeners(eventName).length
 				@_domEventManager.addEventListener eventName, (event) =>
 					@emit(eventName, event)
 
 	_removeListener: (eventName, listener) ->
-
-		# If this is a gesture event, pass it on to the gesture manager
-		if _.startsWith(eventName, Gestures._prefix)
-			@_gestureManager ?= new GestureManager(@)
-			@_gestureManager.off(eventName, listener)
-			return
 
 		# Do cleanup for dom events if this is the last one of it's type.
 		# We are assuming we're the only ones adding dom events to the manager.
@@ -1043,15 +1033,91 @@ class exports.Layer extends BaseClass
 	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
 	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
 
-	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
-	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
-	onPinch: (cb) -> @on(Events.Pinch, cb)
-	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
-	onRotate: (cb) -> @on(Events.Rotate, cb)
-	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
-	onScaleStart: (cb) -> @on(Events.ScaleStart, cb)
-	onScale: (cb) -> @on(Events.Scale, cb)
-	onScaleEnd: (cb) -> @on(Events.ScaleEnd, cb)
+	# Gestures
+
+	# Tap
+	onTap:(cb) -> @on(Events.Tap, cb)
+	onTapStart:(cb) -> @on(Events.TapStart, cb)
+	onTapEnd:(cb) -> @on(Events.TapEnd, cb)
+	onDoubleTap:(cb) -> @on(Events.DoubleTap, cb)
+
+	# Force Tap
+	onForceTap:(cb) -> @on(Events.ForceTap, cb)
+	onForceTapChange:(cb) -> @on(Events.ForceTapChange, cb)
+	onForceTapStart:(cb) -> @on(Events.ForceTapStart, cb)
+	onForceTapEnd:(cb) -> @on(Events.ForceTapEnd, cb)
+
+	# Press
+	onLongPress:(cb) -> @on(Events.LongPress, cb)
+	onLongPressStart:(cb) -> @on(Events.LongPressStart, cb)
+	onLongPressEnd:(cb) -> @on(Events.LongPressEnd, cb)
+
+	# Swipe
+	onSwipe:(cb) -> @on(Events.Swipe, cb)
+	onSwipeStart:(cb) -> @on(Events.SwipeStart, cb)
+	onSwipeEnd:(cb) -> @on(Events.SwipeEnd, cb)
+
+	onSwipeUp:(cb) -> @on(Events.SwipeUp, cb)
+	onSwipeUpStart:(cb) -> @on(Events.SwipeUpStart, cb)
+	onSwipeUpEnd:(cb) -> @on(Events.SwipeUpEnd, cb)
+
+	onSwipeDown:(cb) -> @on(Events.SwipeDown, cb)
+	onSwipeDownStart:(cb) -> @on(Events.SwipeDownStart, cb)
+	onSwipeDownEnd:(cb) -> @on(Events.SwipeDownEnd, cb)
+
+	onSwipeLeft:(cb) -> @on(Events.SwipeLeft, cb)
+	onSwipeLeftStart:(cb) -> @on(Events.SwipeLeftStart, cb)
+	onSwipeLeftEnd:(cb) -> @on(Events.SwipeLeftEnd, cb)
+
+	onSwipeRight:(cb) -> @on(Events.SwipeRight, cb)
+	onSwipeRightStart:(cb) -> @on(Events.SwipeRightStart, cb)
+	onSwipeRightEnd:(cb) -> @on(Events.SwipeRightEnd, cb)
+
+	# Edge Swipe
+
+	onEdgeSwipe:(cb) -> @on(Events.EdgeSwipe, cb)
+	onEdgeSwipeStart:(cb) -> @on(Events.EdgeSwipeStart, cb)
+	onEdgeSwipeEnd:(cb) -> @on(Events.EdgeSwipeEnd, cb)
+
+	onEdgeSwipeTop:(cb) -> @on(Events.EdgeSwipeTop, cb)
+	onEdgeSwipeTopStart:(cb) -> @on(Events.EdgeSwipeTopStart, cb)
+	onEdgeSwipeTopEnd:(cb) -> @on(Events.EdgeSwipeTopEnd, cb)
+
+	onEdgeSwipeRight:(cb) -> @on(Events.EdgeSwipeRight, cb)
+	onEdgeSwipeRightStart:(cb) -> @on(Events.EdgeSwipeRightStart, cb)
+	onEdgeSwipeRightEnd:(cb) -> @on(Events.EdgeSwipeRightEnd, cb)
+
+	onEdgeSwipeBottom:(cb) -> @on(Events.EdgeSwipeBottom, cb)
+	onEdgeSwipeBottomStart:(cb) -> @on(Events.EdgeSwipeBottomStart, cb)
+	onEdgeSwipeBottomEnd:(cb) -> @on(Events.EdgeSwipeBottomEnd, cb)
+
+	onEdgeSwipeLeft:(cb) -> @on(Events.EdgeSwipeLeft, cb)
+	onEdgeSwipeLeftStart:(cb) -> @on(Events.EdgeSwipeLeftStart, cb)
+	onEdgeSwipeLeftEnd:(cb) -> @on(Events.EdgeSwipeLeftEnd, cb)
+
+	# Pan
+	onPan:(cb) -> @on(Events.Pan, cb)
+	onPanStart:(cb) -> @on(Events.PanStart, cb)
+	onPanEnd:(cb) -> @on(Events.PanEnd, cb)
+	onPanLeft:(cb) -> @on(Events.PanLeft, cb)
+	onPanRight:(cb) -> @on(Events.PanRight, cb)
+	onPanUp:(cb) -> @on(Events.PanUp, cb)
+	onPanDown:(cb) -> @on(Events.PanDown, cb)
+
+	# Pinch
+	onPinch:(cb) -> @on(Events.Pinch, cb)
+	onPinchStart:(cb) -> @on(Events.PinchStart, cb)
+	onPinchEnd:(cb) -> @on(Events.PinchEnd, cb)
+
+	# Scale
+	onScale:(cb) -> @on(Events.Scale, cb)
+	onScaleStart:(cb) -> @on(Events.ScaleStart, cb)
+	onScaleEnd:(cb) -> @on(Events.ScaleEnd, cb)
+
+	# Rotate
+	onRotate:(cb) -> @on(Events.Rotate, cb)
+	onRotateStart:(cb) -> @on(Events.RotateStart, cb)
+	onRotateEnd:(cb) -> @on(Events.RotateEnd, cb)
 
 	##############################################################
 	## DESCRIPTOR
