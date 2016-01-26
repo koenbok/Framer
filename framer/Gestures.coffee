@@ -9,6 +9,7 @@ Gestures.DoubleTap = "doubletap"
 
 # Force Tap
 Gestures.ForceTap = "forcetap"
+Gestures.ForceTapChange = "forcetapchange"
 Gestures.ForceTapStart = "forcetapstart"
 Gestures.ForceTapEnd = "forcetapend"
 
