@@ -337,7 +337,8 @@ class exports.GestureInputRecognizer
 			event.deltaTime = event.time - @session.lastEvent.time
 
 		if @session?.events
-			events = _.filter @session.events, (e) -> e.time > (event.time - (GestureInputVelocityTime * 1000))
+			events = _.filter @session.events, (e) -> 
+				return e.time > (event.time - (GestureInputVelocityTime * 1000))
 			event.velocity = @_getVelocity(events)
 
 		if event.fingers > 0
