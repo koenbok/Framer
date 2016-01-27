@@ -344,7 +344,7 @@ class exports.GestureInputRecognizer
 			touchOffset: {x:0, y:0} # Offset between two fingers √
 			touchDistance: 0 # Distance between two fingers √
 			scale: 1 # Scale value from two fingers √
-			scaleDirection: null # Direction for scale: up or down
+			scaleDirection: null # Direction for scale: up or down √
 			rotation: 0 # Rotation value from two fingers √
 
 		# Properties relative to a start event
@@ -382,65 +382,16 @@ class exports.GestureInputRecognizer
 				return e.time > (event.time - (GestureInputVelocityTime * 1000))
 			event.velocity = @_getVelocity(events)
 
-		if @session?.lastEvent
-			if @session.lastEvent.fingers == 1 and event.fingers == 2
-				print "1 -> 2"
-			if @session.lastEvent.fingers == 2 and event.fingers == 1
-				print "2 -> 1"
-
-
-
-
-
-		# if event.fingers > 0			
-		# 	if @session?.startEvent
-		# 		pointA = @_getTouchPoint(@session.startEvent, 0)
-		# 		pointB = @_getTouchPoint(event, 0)
-		# 		event.angle = Utils.pointAngle(pointA, pointB)
-		# 		event.touchOffset = Utils.pointSubtract(pointA, pointB)
-		
-		# if event.fingers > 1
-		# 	pointA = @_getTouchPoint(event, 0)
-		# 	pointB = @_getTouchPoint(event, 1)
-		# 	event.touchCenter = Utils.pointCenter(pointB, pointA)
-		# 	event.touchDistance = Utils.pointDistance(pointA, pointB)
-		# 	event.rotation = Utils.pointAngle(pointA, pointB)
-
-		# 	# if @session?.lastEvent
-		# 	# 	if Math.abs(event.rotation - @session.lastEvent.rotation) >= 180
-		# 	# 		print "Oh no"
-
+		# Scale can only be set after we started a pinch session
+		if @session?.started.pinch
+			event.scale = event.touchDistance / @session.started.pinch.touchDistance
+			event.scaleDirection = @_getScaleDirection(event.scale - @session.lastEvent.scale)
 
 		# if @session?.lastEvent
-		# 	# If the amount of fingers changed we don't send any delta
-		# 	if @session.lastEvent.fingers != event.fingers
-		# 		event.delta = {x:0, y:0}
-
-		# 	# If there are exactly two fingers we use their center point as delta,
-		# 	# this works because we use the single finger point as center when there
-		# 	# is only one finger in this touch.
-		# 	else
-		# 		event.delta = Utils.pointSubtract(event.touchCenter, @session.lastEvent.touchCenter)
-		# 		event.deltaAngle = Utils.pointAngle(@session.lastEvent.touchCenter, event.touchCenter)
-
-		# 	event.deltaDirection = @_getDirection(event.delta)
-
-		# if @session?.started.pinch
-		# 	event.scale = event.touchDistance / @session.started.pinch.touchDistance
-
-		# 	if @session?.lastEvent
-		# 		event.scaleDirection = @_getScaleDirection(event.scale - @session.lastEvent.scale)
-
-		# if @session?.force
-		# 	event.force = @session.force
-
-		# event.offset = Utils.pointSubtract(event.point, event.start)
-		# event.offsetAngle = Utils.pointAngle(event.start, event.point)
-		# event.offsetDirection = @_getDirection(event.offset)
-
-		# # if @session.lastEvent?
-		# # 	if @session.lastEvent.fingers == 1 and event.fingers == 2
-		# # 		event.offset = Utils.pointSubtract(event.offset, event.touchOff)
+		# 	if @session.lastEvent.fingers == 1 and event.fingers == 2
+		# 		print "1 -> 2"
+		# 	if @session.lastEvent.fingers == 2 and event.fingers == 1
+		# 		print "2 -> 1"
 
 		# Convert point style event properties to dom style:
 		# event.delta -> event.deltaX, event.deltaY
