@@ -796,8 +796,10 @@ Utils.pointInPolygon = (point, vs) ->
 		j = i++
 	inside
 
-Utils.pointAngle = (p1, p2) ->
-	Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+Utils.frameCenterPoint = (frame) ->
+	return point =
+		x: Utils.frameGetMidX(frame)
+		y: Utils.frameGetMidY(frame)
 
 
 # Coordinate system
