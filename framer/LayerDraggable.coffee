@@ -175,9 +175,11 @@ class exports.LayerDraggable extends BaseClass
 			t: Date.now() # We don't use timeStamp because it's different on Chrome/Safari
 
 		# See if horizontal/vertical was set and set the offset
+
 		point = @layer.point
-		point.x += event.delta.x * (1 / @layer.canvasScaleX() * @layer.scale * @layer.scaleX) if @horizontal
-		point.y += event.delta.y * (1 / @layer.canvasScaleY() * @layer.scale * @layer.scaleY) if @vertical
+		point.x = @_layerStartPoint.x + (event.offset.x * (1 / @layer.canvasScaleX() * @layer.scale * @layer.scaleX))
+		point.y = @_layerStartPoint.y + (event.offset.y * (1 / @layer.canvasScaleY() * @layer.scale * @layer.scaleY))
+
 
 		# Constraints and overdrag
 		point = @_constrainPosition(point, @_constraints, @overdragScale) if @_constraints
