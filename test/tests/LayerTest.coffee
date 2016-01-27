@@ -817,6 +817,16 @@ describe "Layer", ->
 			layerB.screenScaledFrame().should.eql {"x":255,"y":280,"width":240,"height":240}
 			layerC.screenScaledFrame().should.eql {"x":223,"y":228,"width":384,"height":336}
 
+		it "should accept point shortcut", ->
+			layer = new Layer point:10
+			layer.x.should.equal 10
+			layer.y.should.equal 10
+
+		it "should accept size shortcut", ->
+			layer = new Layer size:10
+			layer.width.should.equal 10
+			layer.height.should.equal 10
+
 	describe "Center", ->
 
 		it "should center", ->
