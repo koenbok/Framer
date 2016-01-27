@@ -41,28 +41,40 @@ class exports.LayerPinchable extends BaseClass
 		@layer.on(Gestures.PinchStart, @_pinchStart)
 		@layer.on(Gestures.Pinch, @_pinch)
 		@layer.on(Gestures.PinchEnd, @_pinchEnd)
+		@layer.on(Gestures.TapStart, @_tapStart)
 
 	_reset: ->
 		@_scaleStart = null
 		@_rotationStart = null
 		@_rotationOffset = null
 
+	_tapStart: (event) ->
+		#@_centerOrigin(event) if @centerOrigin
+
+	_centerOrigin: (event) =>
+
+		topInSuperBefore = Utils.convertPoint({}, @layer, @layer.superLayer)
+		pinchLocation = Utils.convertPointFromContext(event.touchCenter, @layer, true, true)
+		@layer.originX = pinchLocation.x / @layer.width
+		@layer.originY = pinchLocation.y / @layer.height
+
+		topInSuperAfter = Utils.convertPoint({}, @layer, @layer.superLayer)
+		xDiff = topInSuperAfter.x - topInSuperBefore.x
+		yDiff = topInSuperAfter.y - topInSuperBefore.y
+		@layer.x -= xDiff
+		@layer.y -= yDiff
+
+		# This is not a great fix, we should add this in the draggable. Basically
+		# we need to account in the draggable for a change of origin relative to 
+		# the dragging start offset.
+		
+		if @layer._draggable
+			@layer.draggable._layerStartPoint.x -= xDiff
+			@layer.draggable._layerStartPoint.y -= yDiff
+
 	_pinchStart: (event) =>
-
 		@_reset()
-
-		if @centerOrigin
-
-			topInSuperBefore = Utils.convertPoint({}, @layer, @layer.superLayer)
-			pinchLocation = Utils.convertPointFromContext(event.touchCenter, @layer, true, true)
-			@layer.originX = pinchLocation.x / @layer.width
-			@layer.originY = pinchLocation.y / @layer.height
-
-			topInSuperAfter = Utils.convertPoint({}, @layer, @layer.superLayer)
-			xDiff = topInSuperAfter.x - topInSuperBefore.x
-			yDiff = topInSuperAfter.y - topInSuperBefore.y
-			@layer.x -= xDiff
-			@layer.y -= yDiff
+		@_centerOrigin(event) if @centerOrigin
 
 	_pinch: (event) =>
 
