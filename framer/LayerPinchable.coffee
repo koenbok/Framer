@@ -14,6 +14,7 @@ Events.ScaleStart = "scalestart"
 Events.Scale = "scale"
 Events.ScaleEnd = "scaleend"
 
+
 class exports.LayerPinchable extends BaseClass
 
 	@define "enabled", @simpleProperty("enabled", true)
@@ -49,9 +50,6 @@ class exports.LayerPinchable extends BaseClass
 	_pinchStart: (event) =>
 
 		@_reset()
-		@emit(Events.PinchStart, event)
-		@emit(Events.ScaleStart, event) if @scale
-		@emit(Events.RotateStart, event) if @rotate
 
 		if @centerOrigin
 
@@ -98,27 +96,6 @@ class exports.LayerPinchable extends BaseClass
 			rotation = Utils.clamp(rotation, @rotateMin, @rotateMax) if (@rotateMin and @rotateMax)
 			rotation = Utils.nearestIncrement(rotation, @rotateIncrements) if @rotateIncrements
 			@layer.rotation = rotation
-			@emit(Events.Rotate, event)
-
-		@emit(Events.Pinch, event)
 
 	_pinchEnd: (event) =>
 		@_reset()
-		@emit(Events.PinchEnd, event)
-		@emit(Events.ScaleEnd, event) if @scale
-		@emit(Events.RotateEnd, event) if @rotate
-
-	emit: (eventName, event) ->
-		return 
-		@layer.emit(eventName, event, @)
-		super eventName, event, @
-
-	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
-	onPinch: (cb) -> @on(Events.Pinch, cb)
-	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
-	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
-	onRotate: (cb) -> @on(Events.Rotate, cb)
-	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
-	onScaleStart: (cb) -> @on(Events.ScaleStart, cb)
-	onScale: (cb) -> @on(Events.Scale, cb)
-	onScaleEnd: (cb) -> @on(Events.ScaleEnd, cb)
