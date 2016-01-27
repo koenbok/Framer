@@ -177,9 +177,8 @@ class exports.LayerDraggable extends BaseClass
 		# See if horizontal/vertical was set and set the offset
 
 		point = @layer.point
-		point.x = @_layerStartPoint.x + (event.offset.x * (1 / @layer.canvasScaleX() * @layer.scale * @layer.scaleX))
-		point.y = @_layerStartPoint.y + (event.offset.y * (1 / @layer.canvasScaleY() * @layer.scale * @layer.scaleY))
-
+		point.x = @_layerStartPoint.x + (event.offset.x * (1 / @layer.canvasScaleX() * @layer.scale * @layer.scaleX)) if @horizontal
+		point.y = @_layerStartPoint.y + (event.offset.y * (1 / @layer.canvasScaleY() * @layer.scale * @layer.scaleY)) if @vertical
 
 		# Constraints and overdrag
 		point = @_constrainPosition(point, @_constraints, @overdragScale) if @_constraints
@@ -195,8 +194,8 @@ class exports.LayerDraggable extends BaseClass
 
 		# Pixel align all moves
 		if @pixelAlign
-			point.x = parseInt(point.x)
-			point.y = parseInt(point.y)
+			point.x = parseInt(point.x) if @horizontal
+			point.y = parseInt(point.y) if @vertical
 
 		# Update the dragging status
 		if point.x isnt @_layerStartPoint.x or point.y isnt @_layerStartPoint.y
@@ -447,6 +446,8 @@ class exports.LayerDraggable extends BaseClass
 
 	_onSimulationStop: (axis, state) =>
 
+		return if axis is "x" and @horizontal is false
+		return if axis is "y" and @vertical is false
 		return unless @_simulation
 
 		# Round the end position to whole pixels
