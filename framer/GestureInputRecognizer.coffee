@@ -373,7 +373,6 @@ class exports.GestureInputRecognizer
 			event.touchDistance = Utils.pointDistance(touchPointA, touchPointB)
 			event.rotation = Utils.pointAngle(touchPointA, touchPointB)
 
-
 		# Special cases
 
 		# Velocity
@@ -387,11 +386,12 @@ class exports.GestureInputRecognizer
 			event.scale = event.touchDistance / @session.started.pinch.touchDistance
 			event.scaleDirection = @_getScaleDirection(event.scale - @session.lastEvent.scale)
 
+		# Sanitize the rotation
 		# if @session?.lastEvent
-		# 	if @session.lastEvent.fingers == 1 and event.fingers == 2
-		# 		print "1 -> 2"
-		# 	if @session.lastEvent.fingers == 2 and event.fingers == 1
-		# 		print "2 -> 1"
+		# 	if event.rotation - @session.lastEvent.rotation > 180
+		# 		event.rotation -= 360
+		# 	if event.rotation - @session.lastEvent.rotation < 180
+		# 		event.rotation += 360		
 
 		# Convert point style event properties to dom style:
 		# event.delta -> event.deltaX, event.deltaY
