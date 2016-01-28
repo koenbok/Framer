@@ -74,10 +74,6 @@ class exports.LayerDraggable extends BaseClass
 				x: @layer.x - @_correctedLayerStartPoint.x
 				y: @layer.y - @_correctedLayerStartPoint.y
 
-	# TODO: what to do with this?
-	# Should there be a tap event?
-	# @define "multipleDraggables", @simpleProperty("multipleDraggables", false)
-
 	constructor: (@layer) ->
 
 		options = Defaults.getDefaults("LayerDraggable", {})
@@ -188,7 +184,7 @@ class exports.LayerDraggable extends BaseClass
 			y: touchEvent.clientY
 			t: Date.now() # We don't use timeStamp because it's different on Chrome/Safari
 
-		point = {}
+		point = _.clone(@_point)
 
 		scaleX = (1 / @layer.canvasScaleX() * @layer.scale * @layer.scaleX)
 		scaleY = (1 / @layer.canvasScaleY() * @layer.scale * @layer.scaleY)
