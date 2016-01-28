@@ -118,6 +118,7 @@ class exports.DeviceComponent extends BaseClass
 
 		@_context = new Framer.Context(parent:@content, name:"Device")
 		@_context.perspective = 1200
+		@_context.backgroundColor = "white"
 
 	_update: =>
 

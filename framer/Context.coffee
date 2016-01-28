@@ -226,6 +226,7 @@ class exports.Context extends BaseClass
 		@_element.id = "FramerContextRoot-#{@_name}"
 		@_element.classList.add("framerContext")
 		@_element.style["webkitPerspective"] = @perspective
+		@_element.style["backgroundColor"] = @backgroundColor
 
 		@__pendingElementAppend = =>
 			parentElement = @_parent?._element
@@ -271,9 +272,11 @@ class exports.Context extends BaseClass
 
 	@define "backgroundColor",
 		get: ->
-			return @_element?.style["backgroundColor"]
+			return @_backgroundColor if Color.isColor(@_backgroundColor)
+			return "transparent"
 		set: (value) ->
 			if Color.isColor(value)
+				@_backgroundColor = value
 				@_element?.style["backgroundColor"] = new Color value.toString()
 
 	@define "perspective",
