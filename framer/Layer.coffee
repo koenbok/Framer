@@ -73,7 +73,6 @@ class exports.Layer extends BaseClass
 
 		# Private setting for canceling of click event if wrapped in moved draggable
 		@_cancelClickEventInDragSession = true
-		@_cancelClickEventInDragSessionTolerance = 4
 
 		# We have to create the element before we set the defaults
 		@_createElement()
@@ -943,11 +942,7 @@ class exports.Layer extends BaseClass
 
 		if @_cancelClickEventInDragSession
 			if eventName is Events.Click
-				parentDraggableLayer = @_parentDraggableLayer()
-				if parentDraggableLayer
-					offset = parentDraggableLayer.draggable.offset
-					return if Math.abs(0 - offset.x) > @_cancelClickEventInDragSessionTolerance
-					return if Math.abs(0 - offset.y) > @_cancelClickEventInDragSessionTolerance
+				return if @_parentDraggableLayer()?.draggable.isMoving
 
 		# Always scope the event this to the layer and pass the layer as
 		# last argument for every event.
