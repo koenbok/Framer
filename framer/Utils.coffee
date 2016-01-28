@@ -558,10 +558,10 @@ Utils.loadImage = (url, callback, context) ->
 
 # Point
 
-Utils.pointDivide = (pointA, pointB, fraction) ->
+Utils.pointDivide = (point, fraction) ->
 	return point =
-		x: (pointA.x + pointB.x) / fraction
-		y: (pointA.y + pointB.y) / fraction
+		x: point.x / fraction
+		y: point.y / fraction
 
 Utils.pointAdd = (pointA, pointB) ->
 	return point =
@@ -617,7 +617,9 @@ Utils.pointInFrame = (point, frame) ->
 	return true
 
 Utils.pointCenter = (pointA, pointB) ->
-	return Utils.pointDivide(pointA, pointB, 2)
+	return point =
+		x: (pointA.x + pointB.x) / 2
+		y: (pointA.y + pointB.y) / 2
 
 Utils.pointAngle = (pointA, pointB) ->
 	return Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x) * 180 / Math.PI
