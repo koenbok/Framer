@@ -163,7 +163,7 @@ class exports.LayerDraggable extends BaseClass
 			x: touchEvent.clientX - @_correctedLayerStartPoint.x
 			y: touchEvent.clientY - @_correctedLayerStartPoint.y
 
-		@_point = @layer.point
+		@_point = @_correctedLayerStartPoint
 		@_ignoreUpdateLayerPosition = false
 
 		@emit(Events.DragStart, event)
