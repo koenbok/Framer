@@ -30,7 +30,7 @@ Originals =
 		orientation: "portrait"
 		keyboard: false
 		animationOptions:
-			curve: "spring(400,40,0)"
+			curve: "spring(400,40,0,0.06)"
 	LayerDraggable:
 		momentum: true
 		momentumOptions:

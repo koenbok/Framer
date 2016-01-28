@@ -159,7 +159,7 @@ class exports.DeviceComponent extends BaseClass
 			@viewport.height = @content.height = height
 			@screen.center()
 
-			@setHand(@selectedHand) if @selectedHand
+			@setHand(@selectedHand) if @selectedHand && @_orientation == 0
 
 			@_context.backgroundColor = "white"
 			@_context.backgroundColor = @_device.backgroundColor if @_device.backgroundColor
@@ -461,6 +461,7 @@ class exports.DeviceComponent extends BaseClass
 				properties: phoneProperties
 			@viewport.animate _.extend @animationOptions,
 				properties: contentProperties
+				
 
 			animation.on Events.AnimationEnd, =>
 				@_update()
@@ -476,6 +477,8 @@ class exports.DeviceComponent extends BaseClass
 
 			if _hadKeyboard
 				@showKeyboard(true)
+
+		@handsImageLayer.image = "" if @_orientation != 0
 
 		@_renderKeyboard()
 
