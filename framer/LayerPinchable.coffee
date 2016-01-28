@@ -23,8 +23,8 @@ class exports.LayerPinchable extends BaseClass
 
 	@define "scale", @simpleProperty("scale", true)
 	@define "scaleIncrements", @simpleProperty("scaleIncrements", 0)
-	@define "scaleMin", @simpleProperty("scaleMin", 0)
-	@define "scaleMax", @simpleProperty("scaleMax", Number.MAX_VALUE)
+	@define "minScale", @simpleProperty("minScale", 0)
+	@define "maxScale", @simpleProperty("maxScale", Number.MAX_VALUE)
 	@define "scaleFactor", @simpleProperty("scaleFactor", 1)
 
 	@define "rotate", @simpleProperty("rotate", true)
@@ -65,9 +65,9 @@ class exports.LayerPinchable extends BaseClass
 		@layer.y -= yDiff
 
 		# This is not a great fix, we should add this in the draggable. Basically
-		# we need to account in the draggable for a change of origin relative to 
+		# we need to account in the draggable for a change of origin relative to
 		# the dragging start offset.
-		
+
 		if @layer._draggable
 			@layer.draggable._layerStartPoint.x -= xDiff
 			@layer.draggable._layerStartPoint.y -= yDiff
@@ -94,7 +94,7 @@ class exports.LayerPinchable extends BaseClass
 		if @scale
 			@_scaleStart ?= @layer.scale
 			scale = (((event.scale - 1) * @scaleFactor) + 1) * @_scaleStart
-			scale = Utils.clamp(scale, @scaleMin, @scaleMax) if (@scaleMin and @scaleMax)
+			scale = Utils.clamp(scale, @minScale, @maxScale) if (@minScale and @maxScale)
 			scale = Utils.nearestIncrement(scale, @scaleIncrements) if @scaleIncrements
 			@layer.scale = scale
 			@emit(Events.Scale, event)
