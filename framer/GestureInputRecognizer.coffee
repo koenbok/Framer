@@ -334,9 +334,6 @@ class exports.GestureInputRecognizer
 			
 			fingers: event.touches?.length or 0 # Number of fingers used √
 			touchCenter: @_getEventPoint(event) # Center between two fingers √
-			touchCenterStart: @_getEventPoint(event) # 
-			touchCenterDelta: null
-			touchCenterOffset: @_getEventPoint(event) # 
 			touchOffset: {x:0, y:0} # Offset between two fingers √
 			touchDistance: 0 # Distance between two fingers √
 			scale: 1 # Scale value from two fingers √
@@ -365,7 +362,7 @@ class exports.GestureInputRecognizer
 			touchPointA = @_getTouchPoint(event, 0)
 			touchPointB = @_getTouchPoint(event, 1)
 			event.touchCenter = Utils.pointCenter(touchPointB, touchPointA)
-			event.touchCenterOffset = Utils.pointSubtract(event.touchCenter, event.touchCenterStart)
+			event.touchOffset = Utils.pointSubtract(touchPointB, touchPointA)
 			event.touchDistance = Utils.pointDistance(touchPointA, touchPointB)		
 			event.rotation = Utils.pointAngle(touchPointA, touchPointB)
 
@@ -387,9 +384,11 @@ class exports.GestureInputRecognizer
 				event.scaleDirection = @session.lastEvent.scaleDirection
 
 		# For delta we switch to center-compare if there are two fingers
-		if @session?.lastEvent 
+		if @session?.lastEvent
+			# If we just switched fingers, we skip the delta event entirely
 			if event.fingers != @session.lastEvent.fingers == 2
 				event.delta = {x:0, y:0}
+			# If we are having two finger events, we use the touchCenter as base for delta
 			if event.fingers == 2 and @session.lastEvent.fingers == 2
 				event.delta = Utils.pointSubtract(event.touchCenter, @session.lastEvent.touchCenter)
 
