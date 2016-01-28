@@ -118,7 +118,6 @@ class exports.DeviceComponent extends BaseClass
 
 		@_context = new Framer.Context(parent:@content, name:"Device")
 		@_context.perspective = 1200
-		@_context.backgroundColor = "white"
 
 	_update: =>
 
@@ -161,6 +160,9 @@ class exports.DeviceComponent extends BaseClass
 			@screen.center()
 
 			@setHand(@selectedHand) if @selectedHand
+
+			@_context.backgroundColor = "white"
+			@_context.backgroundColor = @_device.backgroundColor if @_device.backgroundColor
 
 	_shouldRenderFullScreen: ->
 
@@ -848,14 +850,23 @@ AppleWatch42Device =
 	deviceImageJP2: true
 	screenWidth: 312
 	screenHeight: 390
+	backgroundColor: "black"
 
 AppleWatch38Device =
+	deviceImageWidth: 472
+	deviceImageHeight: 772
+	deviceImageJP2: true
+	screenWidth: 272
+	screenHeight: 340
+	backgroundColor: "black"
+
+AppleWatch38BlackLeatherDevice =
 	deviceImageWidth: 472
 	deviceImageHeight: 796
 	deviceImageJP2: true
 	screenWidth: 272
 	screenHeight: 340
-
+	backgroundColor: "black"
 
 ###########################################################################
 # OLD DEVICE CONFIGURATIONS
@@ -1048,10 +1059,13 @@ Devices =
 	"apple-iphone-5c-yellow": _.clone(iPhone5CBaseDevice)
 
 	# Apple Watch 38mm
+
+	"apple-watch-38mm-gold-+-black-leather-closed": _.clone(AppleWatch38BlackLeatherDevice)
+	"apple-watch-38mm-rose-gold-+-black-leather-closed": _.clone(AppleWatch38BlackLeatherDevice)
+	"apple-watch-38mm-stainless-steel-+-black-leather-closed": _.clone(AppleWatch38BlackLeatherDevice)
+
 	"apple-watch-38mm-black-steel-+-black-closed": _.clone(AppleWatch38Device)
-	"apple-watch-38mm-gold-+-black-leather-closed": _.clone(AppleWatch38Device)
 	"apple-watch-38mm-gold-+-midnight-blue-closed": _.clone(AppleWatch38Device)
-	"apple-watch-38mm-rose-gold-+-black-leather-closed": _.clone(AppleWatch38Device)
 	"apple-watch-38mm-rose-gold-+-lavender-closed": _.clone(AppleWatch38Device)
 	"apple-watch-38mm-sport-aluminum-+-blue-closed": _.clone(AppleWatch38Device)
 	"apple-watch-38mm-sport-aluminum-+-fog-closed": _.clone(AppleWatch38Device)
@@ -1062,7 +1076,6 @@ Devices =
 	"apple-watch-38mm-sport-aluminum-gold-+-antique-white-closed": _.clone(AppleWatch38Device)
 	"apple-watch-38mm-sport-aluminum-rose-gold-+-stone-closed": _.clone(AppleWatch38Device)
 	"apple-watch-38mm-sport-space-gray-+-black-closed": _.clone(AppleWatch38Device)
-	"apple-watch-38mm-stainless-steel-+-black-leather-closed": _.clone(AppleWatch38Device)
 
 	# Apple Watch 42mm
 	"apple-watch-42mm-black-steel-+-black-closed": _.clone(AppleWatch42Device)
