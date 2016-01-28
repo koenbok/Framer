@@ -578,26 +578,25 @@ class exports.DeviceComponent extends BaseClass
 	###########################################################################
 	# HANDS
 
-	supportsHandSwitching: ->
+	handSwitchingSupported: ->
 		return @_device.hands != undefined
 
 	nextHand: ->
-		if @supportsHandSwitching()
+		if @handSwitchingSupported()
 			hands = _.keys(@_device.hands)
 			if hands.length > 0
-				index = hands.indexOf(@selectedHand)
+				nextHandIndex = hands.indexOf(@selectedHand) + 1
 				nextHand = ""
-				nextHand = hands[index + 1] if index < (hands.length - 1)
+				nextHand = hands[nextHandIndex] if nextHandIndex < hands.length
 				return @setHand(nextHand)
 		return false
 
 	setHand: (hand) ->
 		@selectedHand = hand
-		return @handsImageLayer.image = "" if !hand or !@supportsHandSwitching()
+		return @handsImageLayer.image = "" if !hand or !@handSwitchingSupported()
 
 		handData = @_device.hands[hand]
 		if handData
-			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
 			@hands.width = handData.width
 			@hands.height = handData.height
 			@hands.center()
@@ -605,8 +604,23 @@ class exports.DeviceComponent extends BaseClass
 			@handsImageLayer.size = @hands.size
 			@handsImageLayer.y = 0
 			@handsImageLayer.y = handData.offset if handData.offset
-			@handsImageLayer.image = "#{resourceUrl}/#{hand}.png"
+			@handsImageLayer.image = @handImageUrl(hand)
 			return hand
+
+	handImageUrl: (hand) ->
+
+		# We want to get these image from our public resources server
+		resourceUrl = "//resources.framerjs.com/static/DeviceResources"
+
+		# If we're running Framer Studio and have local files, we'd like to use those
+		if Utils.isFramerStudio() and window.FramerStudioInfo
+			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
+
+		# We'd like to use jp2 if possible, or check if we don't for this specific device
+		if Utils.isJP2Supported() and @_device.deviceImageJP2 is true
+			return "#{resourceUrl}/#{hand}.jp2"
+
+		return "#{resourceUrl}/#{hand}.png"
 
 
 ###########################################################################
