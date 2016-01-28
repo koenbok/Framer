@@ -158,11 +158,15 @@ class exports.LayerDraggable extends BaseClass
 			x: touchEvent.clientX - @_correctedLayerStartPoint.x
 			y: touchEvent.clientY - @_correctedLayerStartPoint.y
 
+		@_point = @layer.point
+
 		@emit(Events.DragStart, event)
 
 	_touchMove: (event) =>
 
 		return unless @enabled
+
+		@_lastEvent = event
 
 		event.preventDefault()
 		event.stopPropagation() unless @propagateEvents
@@ -174,11 +178,13 @@ class exports.LayerDraggable extends BaseClass
 			y: touchEvent.clientY
 			t: Date.now() # We don't use timeStamp because it's different on Chrome/Safari
 
-		# See if horizontal/vertical was set and set the offset
+		point = {}
 
-		point = @layer.point
-		point.x = @_layerStartPoint.x + (event.offset.x * (1 / @layer.canvasScaleX() * @layer.scale * @layer.scaleX)) if @horizontal
-		point.y = @_layerStartPoint.y + (event.offset.y * (1 / @layer.canvasScaleY() * @layer.scale * @layer.scaleY)) if @vertical
+		scaleX = (1 / @layer.canvasScaleX() * @layer.scale * @layer.scaleX)
+		scaleY = (1 / @layer.canvasScaleY() * @layer.scale * @layer.scaleY)
+
+		point.x = @_point.x + (event.delta.x * scaleX) if @horizontal
+		point.y = @_point.y + (event.delta.y * scaleY) if @vertical
 
 		# Constraints and overdrag
 		point = @_constrainPosition(point, @_constraints, @overdragScale) if @_constraints
@@ -192,11 +198,6 @@ class exports.LayerDraggable extends BaseClass
 				point.x = @_layerStartPoint.x if @_directionLockEnabledX
 				point.y = @_layerStartPoint.y if @_directionLockEnabledY
 
-		# Pixel align all moves
-		if @pixelAlign
-			point.x = parseInt(point.x) if @horizontal
-			point.y = parseInt(point.y) if @vertical
-
 		# Update the dragging status
 		if point.x isnt @_layerStartPoint.x or point.y isnt @_layerStartPoint.y
 			@_isDragging = true
@@ -205,6 +206,12 @@ class exports.LayerDraggable extends BaseClass
 		# Move literally means move. If there is no movement, we do not emit.
 		if @isDragging
 			@emit(Events.DragWillMove, event)
+
+		@_point = _.clone(point)
+
+		if @pixelAlign
+			point.x = parseInt(point.x) if @horizontal
+			point.y = parseInt(point.y) if @vertical
 
 		@layer.point = @updatePosition(point)
  

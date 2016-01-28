@@ -64,13 +64,17 @@ class exports.LayerPinchable extends BaseClass
 		@layer.x -= xDiff
 		@layer.y -= yDiff
 
-		# This is not a great fix, we should add this in the draggable. Basically
-		# we need to account in the draggable for a change of origin relative to
-		# the dragging start offset.
+		# # This is not a great fix, we should add this in the draggable. Basically
+		# # we need to account in the draggable for a change of origin relative to
+		# # the dragging start offset.
 
-		if @layer._draggable
-			@layer.draggable._layerStartPoint.x -= xDiff
-			@layer.draggable._layerStartPoint.y -= yDiff
+		# if @layer._draggable
+		# 	@layer.draggable._originDiff ?= {x:0, y:0}
+		# 	@layer.draggable._originDiff.x += xDiff
+		# 	@layer.draggable._originDiff.y += yDiff
+
+
+		# print "_centerOrigin"
 
 	_pinchStart: (event) =>
 		@_reset()

@@ -67,17 +67,18 @@ class exports.GestureInputRecognizer
 		@_process(@_getGestureEvent(event))
 		
 	touchend: (event) =>
-
 		# Only fire if there are no fingers left on the screen
-		return unless (event.touches.length == 0) or (event.touches.length == event.changedTouches.length)
-		
+
+		if Utils.isTouch()
+			return unless (event.touches.length == 0)
+		else
+			return unless (event.touches.length == event.changedTouches.length)
+
 		@em.wrap(window).removeEventListener("touchmove", @touchmove)
 		@em.wrap(window).removeEventListener("touchend", @touchend)
 		@em.wrap(window).removeEventListener("webkitmouseforcechanged", @_updateMacForce)
 		
 		event = @_getGestureEvent(event)
-		
-		@_process(event)
 
 		for eventName, value of @session.started
 			@["#{eventName}end"](event) if value
@@ -280,7 +281,6 @@ class exports.GestureInputRecognizer
 			else
 				@pan(event)
 
-
 		# Detect pinch, rotate and scale events
 
 		# Stop panning if we go from 2 to 1 finger
@@ -306,16 +306,9 @@ class exports.GestureInputRecognizer
 		
 		@session.lastEvent = event
 
-	_getEventPoint: (event) ->
-		if event.touches?.length > 1
-			return Utils.pointCenter(
-				@_getTouchPoint(event, 0), 
-				@_getTouchPoint(event, 1))
-		if event.touches?.length == 1
-			return @_getTouchPoint(event, 0)
-		return point =
-			x: event.pageX
-			y: event.pageY
+	_getEventPoint: (event) ->		
+		return @_getTouchPoint(event, 0) if event.touches.length
+		return {x:event.pageX ,y:event.pageY}
 
 	_getGestureEvent: (event) ->
 		
@@ -341,6 +334,9 @@ class exports.GestureInputRecognizer
 			
 			fingers: event.touches?.length or 0 # Number of fingers used √
 			touchCenter: @_getEventPoint(event) # Center between two fingers √
+			touchCenterStart: @_getEventPoint(event) # 
+			touchCenterDelta: null
+			touchCenterOffset: @_getEventPoint(event) # 
 			touchOffset: {x:0, y:0} # Offset between two fingers √
 			touchDistance: 0 # Distance between two fingers √
 			scale: 1 # Scale value from two fingers √
@@ -352,10 +348,9 @@ class exports.GestureInputRecognizer
 			event.start = @session.startEvent.point
 			event.offset = Utils.pointSubtract(event.point, event.start)
 			event.offsetTime = event.time - @session.startEvent.time
-			event.offsetAngle = Utils.pointAngle(
-				@_getTouchPoint(@session.startEvent, 0), 
-				@_getTouchPoint(event, 0))
+			event.offsetAngle = Utils.pointAngle(@session.startEvent.point, event.point)
 			event.offsetDirection = @_getDirection(event.offset)
+			event.touchCenterStart = @session.startEvent.touchCenter
 	
 		# Properties relative to the previous event
 		if @session?.lastEvent
@@ -370,7 +365,8 @@ class exports.GestureInputRecognizer
 			touchPointA = @_getTouchPoint(event, 0)
 			touchPointB = @_getTouchPoint(event, 1)
 			event.touchCenter = Utils.pointCenter(touchPointB, touchPointA)
-			event.touchDistance = Utils.pointDistance(touchPointA, touchPointB)
+			event.touchCenterOffset = Utils.pointSubtract(event.touchCenter, event.touchCenterStart)
+			event.touchDistance = Utils.pointDistance(touchPointA, touchPointB)		
 			event.rotation = Utils.pointAngle(touchPointA, touchPointB)
 
 		# Special cases
@@ -386,12 +382,16 @@ class exports.GestureInputRecognizer
 			event.scale = event.touchDistance / @session.started.pinch.touchDistance
 			event.scaleDirection = @_getScaleDirection(event.scale - @session.lastEvent.scale)
 
-		# Sanitize the rotation
-		# if @session?.lastEvent
-		# 	if event.rotation - @session.lastEvent.rotation > 180
-		# 		event.rotation -= 360
-		# 	if event.rotation - @session.lastEvent.rotation < 180
-		# 		event.rotation += 360		
+			# If this is a pinch end event, there was no movement so we use the last one
+			if not event.scaleDirection and @session?.lastEvent
+				event.scaleDirection = @session.lastEvent.scaleDirection
+
+		# For delta we switch to center-compare if there are two fingers
+		if @session?.lastEvent 
+			if event.fingers != @session.lastEvent.fingers == 2
+				event.delta = {x:0, y:0}
+			if event.fingers == 2 and @session.lastEvent.fingers == 2
+				event.delta = Utils.pointSubtract(event.touchCenter, @session.lastEvent.touchCenter)
 
 		# Convert point style event properties to dom style:
 		# event.delta -> event.deltaX, event.deltaY
