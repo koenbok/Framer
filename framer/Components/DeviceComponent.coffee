@@ -80,11 +80,15 @@ class exports.DeviceComponent extends BaseClass
 		@background.backgroundColor = "transparent"
 		@background.classList.add("DeviceBackground")
 
-		# @phone = new Layer parent:@background
-		@phone = new Layer
+		@hands    = new Layer
+		@handsImageLayer = new Layer parent:@hands
+		@phone    = new Layer parent:@hands
 		@screen   = new Layer parent:@phone
 		@viewport = new Layer parent:@screen
 		@content  = new Layer parent:@viewport
+
+		@hands.backgroundColor = "transparent"
+		@handsImageLayer.backgroundColor = "transparent"
 
 		@phone.backgroundColor = "transparent"
 		@phone.classList.add("DevicePhone")
@@ -123,7 +127,7 @@ class exports.DeviceComponent extends BaseClass
 		contentScaleFactor = 1 if contentScaleFactor > 1
 
 		if @_shouldRenderFullScreen()
-			for layer in [@background, @phone, @viewport, @content, @screen]
+			for layer in [@background, @hands, @phone, @viewport, @content, @screen]
 				layer.x = layer.y = 0
 				layer.width = window.innerWidth / contentScaleFactor
 				layer.height = window.innerHeight / contentScaleFactor
@@ -140,7 +144,8 @@ class exports.DeviceComponent extends BaseClass
 			@background.width  = window.innerWidth  + (2 * backgroundOverlap)
 			@background.height = window.innerHeight + (2 * backgroundOverlap)
 
-			@phone.scale = @_calculatePhoneScale()
+			@hands.scale = @_calculatePhoneScale()
+			@hands.center()
 			@phone.center()
 
 			[width, height] = @_getOrientationDimensions(
@@ -153,6 +158,8 @@ class exports.DeviceComponent extends BaseClass
 			@viewport.width  = @content.width  = width
 			@viewport.height = @content.height = height
 			@screen.center()
+
+			@setHand(@selectedHand) if @selectedHand
 
 	_shouldRenderFullScreen: ->
 
@@ -205,6 +212,7 @@ class exports.DeviceComponent extends BaseClass
 
 		if fullScreen is true
 			@phone.image = ""
+			@hands.image = ""
 		else
 			@_updateDeviceImage()
 
@@ -259,6 +267,7 @@ class exports.DeviceComponent extends BaseClass
 
 		if @_shouldRenderFullScreen()
 			@phone.image  = ""
+			@hands.image  = ""
 		else if not @_deviceImageUrl(@_deviceImageName())
 			@phone.image  = ""
 		else
@@ -266,6 +275,8 @@ class exports.DeviceComponent extends BaseClass
 			@phone.image  = @_deviceImageUrl(@_deviceImageName())
 			@phone.width  = @_device.deviceImageWidth
 			@phone.height = @_device.deviceImageHeight
+			@hands.width  = @phone.width
+			@hands.height = @phone.height
 
 	_deviceImageName: ->
 		if @_device.hasOwnProperty("deviceImage")
@@ -327,14 +338,14 @@ class exports.DeviceComponent extends BaseClass
 		else
 			phoneScale = deviceScale
 
-		@phone.animateStop()
+		@hands.animateStop()
 
 		if animate
-			@phone.animate _.extend @animationOptions,
+			@hands.animate _.extend @animationOptions,
 				properties: {scale:phoneScale}
 		else
-			@phone.scale = phoneScale
-			@phone.center()
+			@hands.scale = phoneScale
+			@hands.center()
 
 		@emit("change:deviceScale")
 
@@ -435,7 +446,7 @@ class exports.DeviceComponent extends BaseClass
 		if _hadKeyboard
 			@hideKeyboard(false)
 
-		@phone.animateStop()
+		@hands.animateStop()
 		@viewport.animateStop()
 
 		# FIXME: After a rotation we call _update() again to set all the right
@@ -443,7 +454,7 @@ class exports.DeviceComponent extends BaseClass
 		# the animation.
 
 		if animate
-			animation = @phone.animate _.extend @animationOptions,
+			animation = @hands.animate _.extend @animationOptions,
 				properties: phoneProperties
 			@viewport.animate _.extend @animationOptions,
 				properties: contentProperties
@@ -456,7 +467,7 @@ class exports.DeviceComponent extends BaseClass
 					@showKeyboard(true)
 
 		else
-			@phone.props = phoneProperties
+			@hands.props = phoneProperties
 			@viewport.props = contentProperties
 			@_update()
 
@@ -564,8 +575,66 @@ class exports.DeviceComponent extends BaseClass
 	_keyboardShowY: -> @viewport.height - @keyboardLayer.height
 	_keyboardHideY: -> @viewport.height
 
+	###########################################################################
+	# HANDS
+
+	supportsHandSwitching: ->
+		return @_device.hands != undefined
+
+	nextHand: ->
+		if @supportsHandSwitching()
+			hands = _.keys(@_device.hands)
+			if hands.length > 0
+				index = hands.indexOf(@selectedHand)
+				nextHand = ""
+				nextHand = hands[index + 1] if index < (hands.length - 1)
+				return @setHand(nextHand)
+		return false
+
+	setHand: (hand) ->
+		@selectedHand = hand
+		return @handsImageLayer.image = "" if !hand or !@supportsHandSwitching()
+
+		handData = @_device.hands[hand]
+		if handData
+			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
+			@hands.width = handData.width
+			@hands.height = handData.height
+			@hands.center()
+			@phone.center()
+			@handsImageLayer.size = @hands.size
+			@handsImageLayer.y = 0
+			@handsImageLayer.y = handData.offset if handData.offset
+			@handsImageLayer.image = "#{resourceUrl}/#{hand}.png"
+			return hand
+
+
 ###########################################################################
 # NEW DEVICE CONFIGURATIONS
+
+iPadAir2BaseDevice =
+	deviceImageWidth: 1856
+	deviceImageHeight: 2608
+	deviceImageJP2: true
+	screenWidth: 1536
+	screenHeight: 2048
+	deviceType: "phone"
+
+iPadMini4BaseDevice =
+	deviceImageWidth: 1936
+	deviceImageHeight: 2688
+	deviceImageJP2: true
+	screenWidth: 1536
+	screenHeight: 2048
+	deviceType: "phone"
+
+iPadProBaseDevice =
+	deviceImageWidth: 2448
+	deviceImageHeight: 3432
+	deviceImageJP2: true
+	screenWidth: 2048
+	screenHeight: 2732
+	deviceType: "phone"
 
 iPhone6BaseDevice =
 	deviceImageWidth: 874
@@ -574,6 +643,13 @@ iPhone6BaseDevice =
 	screenWidth: 750
 	screenHeight: 1334
 	deviceType: "phone"
+	hands:
+		"iphone-hands-2":
+			width:  2400
+			height: 3740
+		"iphone-hands-1":
+			width:  2400
+			height: 3740
 
 iPhone6PlusBaseDevice =
 	deviceImageWidth: 1452
@@ -582,6 +658,13 @@ iPhone6PlusBaseDevice =
 	screenWidth: 1242
 	screenHeight: 2208
 	deviceType: "phone"
+	hands:
+		"iphone-hands-2":
+			width:  3987
+			height: 6212
+		"iphone-hands-1":
+			width:  3987
+			height: 6212
 
 iPhone5BaseDevice =
 	deviceImageWidth: 768
@@ -590,6 +673,15 @@ iPhone5BaseDevice =
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
+	hands:
+		"iphone-hands-2":
+			width:  2098
+			height: 3269
+			offset: 19
+		"iphone-hands-1":
+			width:  2098
+			height: 3269
+			offset: 19
 
 iPhone5CBaseDevice =
 	deviceImageWidth: 776
@@ -598,6 +690,15 @@ iPhone5CBaseDevice =
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
+	hands:
+		"iphone-hands-2":
+			width:  2098
+			height: 3269
+			offset: 28
+		"iphone-hands-1":
+			width:  2098
+			height: 3269
+			offset: 28
 
 Nexus4BaseDevice =
 	deviceImageWidth: 860
@@ -606,6 +707,15 @@ Nexus4BaseDevice =
 	screenWidth: 768
 	screenHeight: 1280
 	deviceType: "phone"
+	hands:
+		"iphone-hands-2":
+			width:  2362
+			height: 3681
+			offset: -52
+		"iphone-hands-1":
+			width:  2362
+			height: 3681
+			offset: -52
 
 Nexus5BaseDevice =
 	deviceImageWidth: 1204
@@ -614,6 +724,15 @@ Nexus5BaseDevice =
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
+	hands:
+		"iphone-hands-2":
+			width:  3292
+			height: 5130
+			offset: 8
+		"iphone-hands-1":
+			width:  3292
+			height: 5130
+			offset: 8
 
 Nexus6BaseDevice =
 	deviceImageWidth: 1576
@@ -621,6 +740,23 @@ Nexus6BaseDevice =
 	deviceImageJP2: true
 	screenWidth: 1440
 	screenHeight: 2560
+	deviceType: "phone"
+	hands:
+		"iphone-hands-2":
+			width:  4304
+			height: 6707
+			offset: 8
+		"iphone-hands-1":
+			width:  4304
+			height: 6707
+			offset: 8
+
+Nexus9BaseDevice =
+	deviceImageWidth: 1896
+	deviceImageHeight: 2648
+	deviceImageJP2: true
+	screenWidth: 1536
+	screenHeight: 2048
 	deviceType: "phone"
 
 HTCa9BaseDevice =
@@ -630,6 +766,15 @@ HTCa9BaseDevice =
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
+	hands:
+		"iphone-hands-2":
+			width:  3436
+			height: 5354
+			offset: 36
+		"iphone-hands-1":
+			width:  3436
+			height: 5354
+			offset: 36
 
 HTCm8BaseDevice =
 	deviceImageWidth: 1232
@@ -638,6 +783,15 @@ HTCm8BaseDevice =
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
+	hands:
+		"iphone-hands-2":
+			width:  3436
+			height: 5354
+			offset: 12
+		"iphone-hands-1":
+			width:  3436
+			height: 5354
+			offset: 12
 
 MSFTLumia950BaseDevice =
 	deviceImageWidth: 1660
@@ -646,6 +800,15 @@ MSFTLumia950BaseDevice =
 	screenWidth: 1440
 	screenHeight: 2560
 	deviceType: "phone"
+	hands:
+		"iphone-hands-2":
+			width:  4494
+			height: 7003
+			offset: -84
+		"iphone-hands-1":
+			width:  4494
+			height: 7003
+			offset: -84
 
 SamsungGalaxyNote5BaseDevice =
 	deviceImageWidth: 1572
@@ -654,6 +817,15 @@ SamsungGalaxyNote5BaseDevice =
 	screenWidth: 1440
 	screenHeight: 2560
 	deviceType: "phone"
+	hands:
+		"iphone-hands-2":
+			width:  4279
+			height: 6668
+			offset: -24
+		"iphone-hands-1":
+			width:  4279
+			height: 6668
+			offset: -84
 
 AppleWatch42Device =
 	deviceImageWidth: 512
@@ -724,7 +896,6 @@ old_iPhone5BaseDeviceHand = _.extend {}, old_iPhone5BaseDevice,
 	deviceImageHeight: 2234
 	deviceImageJP2: true
 	paddingOffset: -200
-
 
 old_iPhone5CBaseDevice =
 	deviceImageWidth: 776
@@ -822,6 +993,21 @@ Devices =
 		name: "Fullscreen"
 		deviceType: "desktop"
 
+	# iPad Air
+	"apple-ipad-air-2-silver": _.clone(iPadAir2BaseDevice)
+	"apple-ipad-air-2-gold": _.clone(iPadAir2BaseDevice)
+	"apple-ipad-air-2-space-gray": _.clone(iPadAir2BaseDevice)
+
+	# iPad Mini
+	"apple-ipad-mini-4-silver": _.clone(iPadMini4BaseDevice)
+	"apple-ipad-mini-4-gold": _.clone(iPadMini4BaseDevice)
+	"apple-ipad-mini-4-space-gray": _.clone(iPadMini4BaseDevice)
+
+	# iPad Pro
+	"apple-ipad-pro-silver": _.clone(iPadProBaseDevice)
+	"apple-ipad-pro-gold": _.clone(iPadProBaseDevice)
+	"apple-ipad-pro-space-gray": _.clone(iPadProBaseDevice)
+
 	# iPhone 6
 	"apple-iphone-6s-gold": _.clone(iPhone6BaseDevice)
 	"apple-iphone-6s-rose-gold": _.clone(iPhone6BaseDevice)
@@ -880,10 +1066,11 @@ Devices =
 	"apple-watch-42mm-sport-space-gray-+-black-closed": _.clone(AppleWatch42Device)
 	"apple-watch-42mm-stainless-steel-+-black-leather-closed": _.clone(AppleWatch42Device)
 
-	# Nexus
+	# NEXUS
 	"google-nexus-4": _.clone(Nexus4BaseDevice)
 	"google-nexus-5x": _.clone(Nexus5BaseDevice)
 	"google-nexus-6p": _.clone(Nexus6BaseDevice)
+	"google-nexus-9": _.clone(Nexus9BaseDevice)
 
 	# HTC ONE A9
 	"htc-one-a9-black": _.clone(HTCa9BaseDevice)
