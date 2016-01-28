@@ -186,6 +186,8 @@ class exports.LayerDraggable extends BaseClass
 		point.x = @_point.x + (event.delta.x * scaleX) if @horizontal
 		point.y = @_point.y + (event.delta.y * scaleY) if @vertical
 
+		@_point = _.clone(point)
+
 		# Constraints and overdrag
 		point = @_constrainPosition(point, @_constraints, @overdragScale) if @_constraints
 
@@ -207,8 +209,7 @@ class exports.LayerDraggable extends BaseClass
 		if @isDragging
 			@emit(Events.DragWillMove, event)
 
-		@_point = _.clone(point)
-
+		# Align every drag to pixels
 		if @pixelAlign
 			point.x = parseInt(point.x) if @horizontal
 			point.y = parseInt(point.y) if @vertical
