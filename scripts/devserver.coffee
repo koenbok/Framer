@@ -21,6 +21,10 @@ config =
 			loader: "coffee-loader"
 		}
 	]
+	devServer:
+		headers:
+			"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS"
+			"Access-Control-Allow-Origin": "*"
 
 # First we fire up Webpack an pass in the configuration we
 # created
