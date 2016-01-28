@@ -94,7 +94,7 @@ class exports.LayerDraggable extends BaseClass
 		
 		@_eventBuffer = new EventBuffer
 		@_constraints = null
-		# @_propagateEvents = false
+		@_ignoreUpdateLayerPosition = true
 
 		@attach()
 
@@ -102,6 +102,8 @@ class exports.LayerDraggable extends BaseClass
 		@layer.on(Gestures.TapStart, @touchStart)
 		@layer.on(Gestures.Pan, @_touchMove)
 		@layer.on(Gestures.TapEnd, @_touchEnd)
+		@layer.on("change:x", @_updateLayerPosition)
+		@layer.on("change:y", @_updateLayerPosition)
 
 	remove: ->
 		@layer.off(Gestures.PanStart, @touchStart)
@@ -116,6 +118,12 @@ class exports.LayerDraggable extends BaseClass
 		# We expose this publicly so you can start the dragging from an external event
 		# this is for example needed with the slider.
 		@_touchStart(event)
+
+	_updateLayerPosition: =>
+		# This updates the layer position if it's extrenally changed while
+		# a drag is going on at the same time.
+		return if @_ignoreUpdateLayerPosition is true
+		@_point = @layer.point
 
 	_touchStart: (event) =>
 
@@ -133,6 +141,7 @@ class exports.LayerDraggable extends BaseClass
 		# Extract the event (mobile may have multiple)
 		touchEvent = Events.touchEvent(event)
 
+		# TODO: we should use the event velocity
 		@_eventBuffer.push
 			x: touchEvent.clientX
 			y: touchEvent.clientY
@@ -159,6 +168,7 @@ class exports.LayerDraggable extends BaseClass
 			y: touchEvent.clientY - @_correctedLayerStartPoint.y
 
 		@_point = @layer.point
+		@_ignoreUpdateLayerPosition = false
 
 		@emit(Events.DragStart, event)
 
@@ -186,6 +196,7 @@ class exports.LayerDraggable extends BaseClass
 		point.x = @_point.x + (event.delta.x * scaleX) if @horizontal
 		point.y = @_point.y + (event.delta.y * scaleY) if @vertical
 
+		# Save the point for the next update so we have the unrounded, unconstrained value
 		@_point = _.clone(point)
 
 		# Constraints and overdrag
@@ -214,7 +225,11 @@ class exports.LayerDraggable extends BaseClass
 			point.x = parseInt(point.x) if @horizontal
 			point.y = parseInt(point.y) if @vertical
 
+		# While we update the layer position ourselves, we don't want
+		# to trigger the updater for external changes.
+		@_ignoreUpdateLayerPosition = true
 		@layer.point = @updatePosition(point)
+		@_ignoreUpdateLayerPosition = false
  
 		if @isDragging
 			@emit(Events.Move, @layer.point)
@@ -231,11 +246,13 @@ class exports.LayerDraggable extends BaseClass
 
 		@emit(Events.DragEnd, event)
 
-		# # Set _isDragging after DragEnd is fired, so that calls to calculateVelocity() 
-		# # still returns dragging velocity - both in case the user calls calculateVelocity(),
-		# # (which would return a stale value before the simulation had finished one tick)
-		# # and because @_start currently calls calculateVelocity().
+		# Set _isDragging after DragEnd is fired, so that calls to calculateVelocity() 
+		# still returns dragging velocity - both in case the user calls calculateVelocity(),
+		# (which would return a stale value before the simulation had finished one tick)
+		# and because @_start currently calls calculateVelocity().
 		@_isDragging = false
+
+		@_ignoreUpdateLayerPosition = true
 
 
 	##############################################################
