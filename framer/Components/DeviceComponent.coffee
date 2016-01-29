@@ -303,7 +303,12 @@ class exports.DeviceComponent extends BaseClass
 
 		# If we're running Framer Studio and have local files, we'd like to use those
 		if Utils.isFramerStudio() and window.FramerStudioInfo
-			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
+
+			if @_device.minStudioVersion and Utils.framerStudioVersion() >= @_device.minStudioVersion or !@_device.minStudioVersion
+
+				if @_device.maxStudioVersion and Utils.framerStudioVersion() <= @_device.maxStudioVersion or !@_device.maxStudioVersion
+
+					resourceUrl = window.FramerStudioInfo.deviceImagesUrl
 
 		# We'd like to use jp2 if possible, or check if we don't for this specific device
 		if Utils.isJP2Supported() and @_device.deviceImageJP2 is true
@@ -619,7 +624,7 @@ class exports.DeviceComponent extends BaseClass
 		resourceUrl = "//resources.framerjs.com/static/DeviceResources"
 
 		# If we're running Framer Studio and have local files, we'd like to use those
-		if Utils.isFramerStudio() and window.FramerStudioInfo
+		if Utils.isFramerStudio() and window.FramerStudioInfo and Utils.framerStudioVersion() >= newDeviceMinVersion
 			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
 
 		# We'd like to use jp2 if possible, or check if we don't for this specific device
@@ -630,7 +635,10 @@ class exports.DeviceComponent extends BaseClass
 
 
 ###########################################################################
-# NEW DEVICE CONFIGURATIONS
+# DEVICE CONFIGURATIONS
+
+newDeviceMinVersion = 51
+oldDeviceMaxVersion = 50
 
 iPadAir2BaseDevice =
 	deviceImageWidth: 1856
@@ -639,6 +647,7 @@ iPadAir2BaseDevice =
 	screenWidth: 1536
 	screenHeight: 2048
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 
 iPadMini4BaseDevice =
 	deviceImageWidth: 1936
@@ -647,6 +656,7 @@ iPadMini4BaseDevice =
 	screenWidth: 1536
 	screenHeight: 2048
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 
 iPadProBaseDevice =
 	deviceImageWidth: 2448
@@ -655,6 +665,7 @@ iPadProBaseDevice =
 	screenWidth: 2048
 	screenHeight: 2732
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 
 iPhone6BaseDevice =
 	deviceImageWidth: 874
@@ -663,6 +674,7 @@ iPhone6BaseDevice =
 	screenWidth: 750
 	screenHeight: 1334
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
 			width:  2400
@@ -678,6 +690,7 @@ iPhone6PlusBaseDevice =
 	screenWidth: 1242
 	screenHeight: 2208
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
 			width:  3987
@@ -693,6 +706,7 @@ iPhone5BaseDevice =
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
 			width:  2098
@@ -710,6 +724,7 @@ iPhone5CBaseDevice =
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
 			width:  2098
@@ -727,6 +742,7 @@ Nexus4BaseDevice =
 	screenWidth: 768
 	screenHeight: 1280
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
 			width:  2362
@@ -744,6 +760,7 @@ Nexus5BaseDevice =
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
 			width:  3292
@@ -761,6 +778,7 @@ Nexus6BaseDevice =
 	screenWidth: 1440
 	screenHeight: 2560
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
 			width:  4304
@@ -778,6 +796,7 @@ Nexus9BaseDevice =
 	screenWidth: 1536
 	screenHeight: 2048
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 
 HTCa9BaseDevice =
 	deviceImageWidth: 1252
@@ -786,6 +805,7 @@ HTCa9BaseDevice =
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
 			width:  3436
@@ -803,6 +823,7 @@ HTCm8BaseDevice =
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
 			width:  3436
@@ -820,6 +841,7 @@ MSFTLumia950BaseDevice =
 	screenWidth: 1440
 	screenHeight: 2560
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
 			width:  4494
@@ -837,6 +859,7 @@ SamsungGalaxyNote5BaseDevice =
 	screenWidth: 1440
 	screenHeight: 2560
 	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
 			width:  4279
@@ -854,6 +877,7 @@ AppleWatch42Device =
 	screenWidth: 312
 	screenHeight: 390
 	backgroundColor: "black"
+	minStudioVersion: newDeviceMinVersion
 
 AppleWatch38Device =
 	deviceImageWidth: 472
@@ -862,6 +886,7 @@ AppleWatch38Device =
 	screenWidth: 272
 	screenHeight: 340
 	backgroundColor: "black"
+	minStudioVersion: newDeviceMinVersion
 
 AppleWatch38BlackLeatherDevice =
 	deviceImageWidth: 472
@@ -870,6 +895,7 @@ AppleWatch38BlackLeatherDevice =
 	screenWidth: 272
 	screenHeight: 340
 	backgroundColor: "black"
+	minStudioVersion: newDeviceMinVersion
 
 ###########################################################################
 # OLD DEVICE CONFIGURATIONS
@@ -881,12 +907,14 @@ old_iPhone6BaseDevice =
 	screenWidth: 750
 	screenHeight: 1334
 	deviceType: "phone"
+	maxStudioVersion: oldDeviceMaxVersion
 
 old_iPhone6BaseDeviceHand = _.extend {}, old_iPhone6BaseDevice,
 	deviceImageWidth: 1988
 	deviceImageHeight: 2368
 	deviceImageJP2: true
 	paddingOffset: -150
+	maxStudioVersion: oldDeviceMaxVersion
 
 old_iPhone6PlusBaseDevice =
 	deviceImageWidth: 1460
@@ -895,13 +923,14 @@ old_iPhone6PlusBaseDevice =
 	screenWidth: 1242
 	screenHeight: 2208
 	deviceType: "phone"
+	maxStudioVersion: oldDeviceMaxVersion
 
 old_iPhone6PlusBaseDeviceHand = _.extend {}, old_iPhone6PlusBaseDevice,
 	deviceImageWidth: 3128
 	deviceImageHeight: 3487
 	deviceImageJP2: true
 	paddingOffset: -150
-
+	maxStudioVersion: oldDeviceMaxVersion
 
 old_iPhone5BaseDevice =
 	deviceImageWidth: 780
@@ -910,6 +939,7 @@ old_iPhone5BaseDevice =
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
+	maxStudioVersion: oldDeviceMaxVersion
 	# keyboards:
 	# 	portrait:
 	# 		image:  "ios-keyboard.png"
@@ -925,6 +955,7 @@ old_iPhone5BaseDeviceHand = _.extend {}, old_iPhone5BaseDevice,
 	deviceImageHeight: 2234
 	deviceImageJP2: true
 	paddingOffset: -200
+	maxStudioVersion: oldDeviceMaxVersion
 
 old_iPhone5CBaseDevice =
 	deviceImageWidth: 776
@@ -933,6 +964,7 @@ old_iPhone5CBaseDevice =
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
+	maxStudioVersion: oldDeviceMaxVersion
 	# keyboards:
 	# 	portrait:
 	# 		image:  "ios-keyboard.png"
@@ -948,7 +980,7 @@ old_iPhone5CBaseDeviceHand = _.extend {}, old_iPhone5CBaseDevice,
 	deviceImageHeight: 2244
 	deviceImageJP2: true
 	paddingOffset: -200
-
+	maxStudioVersion: oldDeviceMaxVersion
 
 old_iPadMiniBaseDevice =
 	deviceImageWidth: 872
@@ -957,13 +989,14 @@ old_iPadMiniBaseDevice =
 	screenWidth: 768
 	screenHeight: 1024
 	deviceType: "tablet"
+	maxStudioVersion: oldDeviceMaxVersion
 
 old_iPadMiniBaseDeviceHand = _.extend {}, old_iPadMiniBaseDevice,
 	deviceImageWidth: 1380
 	deviceImageHeight: 2072
 	deviceImageJP2: true
 	paddingOffset: -120
-
+	maxStudioVersion: oldDeviceMaxVersion
 
 old_iPadAirBaseDevice =
 	deviceImageWidth: 1769
@@ -972,13 +1005,14 @@ old_iPadAirBaseDevice =
 	screenWidth: 1536
 	screenHeight: 2048
 	deviceType: "tablet"
+	maxStudioVersion: oldDeviceMaxVersion
 
 old_iPadAirBaseDeviceHand = _.extend {}, old_iPadAirBaseDevice,
 	deviceImageWidth: 4744
 	deviceImageHeight: 4101
 	deviceImageJP2: true
 	paddingOffset: -120
-
+	maxStudioVersion: oldDeviceMaxVersion
 
 old_Nexus5BaseDevice =
 	deviceImageWidth: 1208
@@ -987,12 +1021,14 @@ old_Nexus5BaseDevice =
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
+	maxStudioVersion: oldDeviceMaxVersion
 
 old_Nexus5BaseDeviceHand = _.extend {}, old_Nexus5BaseDevice, # 2692 × 2996
 	deviceImageWidth: 2692
 	deviceImageHeight: 2996
 	deviceImageJP2: true
 	paddingOffset: -120
+	maxStudioVersion: oldDeviceMaxVersion
 
 old_Nexus9BaseDevice =
 	deviceImageWidth: 1733
@@ -1001,6 +1037,7 @@ old_Nexus9BaseDevice =
 	screenWidth: 1536
 	screenHeight: 2048
 	deviceType: "tablet"
+	maxStudioVersion: oldDeviceMaxVersion
 
 old_AppleWatch42Device =
 	deviceImageWidth: 552
@@ -1008,6 +1045,7 @@ old_AppleWatch42Device =
 	deviceImageJP2: true
 	screenWidth: 312
 	screenHeight: 390
+	maxStudioVersion: oldDeviceMaxVersion
 
 old_AppleWatch38Device =
 	deviceImageWidth: 508
@@ -1015,6 +1053,7 @@ old_AppleWatch38Device =
 	deviceImageJP2: true
 	screenWidth: 272
 	screenHeight: 340
+	maxStudioVersion: oldDeviceMaxVersion
 
 Devices =
 
@@ -1135,6 +1174,7 @@ Devices =
 		deviceImageWidth: 1136
 		deviceImageHeight: 760
 		deviceImageJP2: true
+		maxStudioVersion: oldDeviceMaxVersion
 	"desktop-safari-1280-800":
 		deviceType: "browser"
 		name: "Desktop Safari 1280 x 800"
@@ -1143,6 +1183,7 @@ Devices =
 		deviceImageWidth: 1392
 		deviceImageHeight: 960
 		deviceImageJP2: true
+		maxStudioVersion: oldDeviceMaxVersion
 	"desktop-safari-1440-900":
 		deviceType: "browser"
 		name: "Desktop Safari 1440 x 900"
@@ -1151,6 +1192,7 @@ Devices =
 		deviceImageWidth: 1552
 		deviceImageHeight: 1060
 		deviceImageJP2: true
+		maxStudioVersion: oldDeviceMaxVersion
 
 	# iPhone 6
 	"iphone-6-spacegray": _.clone(old_iPhone6BaseDevice)
