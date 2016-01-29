@@ -331,6 +331,15 @@ Utils.isLocalAssetUrl = (url, baseUrl) ->
 Utils.isFramerStudio = ->
 	navigator.userAgent.indexOf("FramerStudio") != -1
 
+Utils.framerStudioVersion = ->
+
+	if Utils.isFramerStudio()
+		matches = navigator.userAgent.match(/\d+$/)
+		version = parseInt(matches[0]) if matches and matches.length > 0
+		return version if _.isNumber(version)
+
+	return false
+
 Utils.devicePixelRatio = ->
 	window.devicePixelRatio
 
