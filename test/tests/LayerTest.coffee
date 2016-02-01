@@ -446,27 +446,6 @@ describe "Layer", ->
 
 			simulate.mouseover(layer._element)
 
-
-		it "should not emit click event if a parent draggable was moved on draggable", ->
-
-			clicked = false
-
-			layerA = new Layer
-
-			layerA.draggable.enabled = true
-			layerA.draggable._isMoving = true
-
-			layerA.on Events.Click, ->
-				clicked = true
-
-			layerA.emit(Events.Click)
-			clicked.should.equal false
-
-			layerA.draggable.enabled = false
-
-			layerA.emit(Events.Click)
-			clicked.should.equal true
-
 		it "should only pass dom events to the event manager", ->
 
 			layer = new Layer
