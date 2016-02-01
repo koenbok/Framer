@@ -69,6 +69,10 @@ class TouchEmulator extends BaseClass
 				image: @touchPointerImage
 				opacity: 0
 	
+	destroy: ->
+		@context.reset()
+		@context = null
+
 	# Event handlers
 
 	keydown: (event) =>
@@ -218,3 +222,7 @@ touchEmulator = null
 exports.enable = ->
 	return if Utils.isTouch()
 	touchEmulator ?= new TouchEmulator()
+
+exports.disable = ->
+	return unless touchEmulator
+	touchEmulator.destroy()
