@@ -986,7 +986,7 @@ class exports.Layer extends BaseClass
 			@_domEventManager.removeAllListeners(eventName)
 
 	_parentDraggableLayer: ->
-		for layer in @ancestors().concat(@)
+		for layer in @ancestors()
 			return layer if layer._draggable?.enabled
 		return null 
 
