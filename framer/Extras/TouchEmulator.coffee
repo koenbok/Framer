@@ -54,6 +54,7 @@ class TouchEmulator extends BaseClass
 		@wrap(document).addEventListener("mousedown", @mousedown, true)
 		@wrap(document).addEventListener("mousemove", @mousemovePosition, true)
 		@wrap(document).addEventListener("keydown", @keydown, true)
+		@wrap(document).addEventListener("mouseout", @mouseout, true)
 		
 		@isMouseDown = false
 		@isPinchKeyDown = false
@@ -68,28 +69,8 @@ class TouchEmulator extends BaseClass
 				image: @touchPointerImage
 				opacity: 0
 	
-	showTouchCursor: ->
-		@touchPointLayer.animateStop()
-		@touchPointLayer.midX = @point.x
-		@touchPointLayer.midY = @point.y
-		@touchPointLayer.scale = 1.8
-		@touchPointLayer.animate
-			properties:
-				opacity: 1
-				scale: 1
-				# midX: @point.x + @touchPointerInitialOffset.x
-				# midY: @point.y + @touchPointerInitialOffset.y
-			time: 0.1
-			curve: "ease-out"
+	# Event handlers
 
-	hideTouchCursor: ->
-		@touchPointLayer.animateStop()
-		@touchPointLayer.animate
-			properties:
-				opacity: 0
-				scale: 1.2
-			time: 0.08
-	
 	keydown: (event) =>
 
 		if event.keyCode is @keyPinchCode	
@@ -137,11 +118,6 @@ class TouchEmulator extends BaseClass
 			dispatchTouchEvent("touchstart", @target, event)
 		
 		@touchPointLayer.image = @touchPointerImageActive
-
-	mousemovePosition: (event) =>
-		@point =
-			x: event.pageX
-			y: event.pageY
 	
 	mousemove: (event) =>
 		
@@ -175,19 +151,58 @@ class TouchEmulator extends BaseClass
 			dispatchTouchEvent("touchmove", @target, event)
 
 	mouseup: (event) =>
-		
-		@isMouseDown = false
-		
+			
 		cancelEvent(event)
-		
-		@wrap(document).removeEventListener("mousemove", @mousemove, true)
-		@wrap(document).removeEventListener("mouseup", @mouseup, true)
 
 		if @isPinchKeyDown or @isPanKeyDown
 			dispatchTouchEvent("touchend", @target, event, @touchPointDelta)
 		else
 			dispatchTouchEvent("touchend", @target, event)
+
+		@endMultiTouch()
 	
+	mouseout: (event) =>
+
+		fromElement = event.relatedTarget or event.toElement
+
+		if not fromElement or fromElement.nodeName is "HTML"
+			@endMultiTouch()
+
+	# Utilities
+
+	showTouchCursor: ->
+		@touchPointLayer.animateStop()
+		@touchPointLayer.midX = @point.x
+		@touchPointLayer.midY = @point.y
+		@touchPointLayer.scale = 1.8
+		@touchPointLayer.animate
+			properties:
+				opacity: 1
+				scale: 1
+				# midX: @point.x + @touchPointerInitialOffset.x
+				# midY: @point.y + @touchPointerInitialOffset.y
+			time: 0.1
+			curve: "ease-out"
+
+	hideTouchCursor: ->
+		@touchPointLayer.animateStop()
+		@touchPointLayer.animate
+			properties:
+				opacity: 0
+				scale: 1.2
+			time: 0.08
+
+	mousemovePosition: (event) =>
+		@point =
+			x: event.pageX
+			y: event.pageY
+
+	endMultiTouch: ->
+
+		@wrap(document).removeEventListener("mousemove", @mousemove, true)
+		@wrap(document).removeEventListener("mouseup", @mouseup, true)
+		
+		@isMouseDown = false
 		@touchPointLayer.image = @touchPointerImage
 		@hideTouchCursor()
 	
