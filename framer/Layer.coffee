@@ -941,7 +941,9 @@ class exports.Layer extends BaseClass
 		# you expect when you add a button to a scroll content layer.
 
 		if @_cancelClickEventInDragSession
-			if eventName is Events.Click
+			if eventName in [Events.Click, 
+				Events.Tap, Events.TapStart, Events.TapEnd, 
+				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
 				return if @_parentDraggableLayer()?.draggable.isMoving
 
 		# Always scope the event this to the layer and pass the layer as
