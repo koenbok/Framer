@@ -15,11 +15,9 @@ Events.DragMove              = "dragmove"
 Events.DragDidMove           = "dragmove"
 Events.Drag                  = "dragmove"
 Events.DragEnd               = "dragend"
-Events.DragAnimationDidStart = "draganimationdidstart"
-Events.DragAnimationDidEnd   = "draganimationdidend"
-Events.DirectionLockDidStart = "directionlockdidstart"
-Events.Pinch                 = Gestures.Pinch
-Events.Rotate                = Gestures.Rotate
+Events.DragAnimationStart 	 = "draganimationstart"
+Events.DragAnimationEnd   	 = "draganimationend"
+Events.DirectionLockStart = "directionlockstart"
 
 """
              
@@ -391,7 +389,7 @@ class exports.LayerDraggable extends BaseClass
 		# @_directionLockEnabledX = @_directionLockEnabledY = true if (xSlightlyPreferred and ySlightlyPreferred)
 
 		if @_directionLockEnabledX or @_directionLockEnabledY
-			@emit Events.DirectionLockDidStart, 
+			@emit Events.DirectionLockStart, 
 				x: @_directionLockEnabledX
 				y: @_directionLockEnabledY
 
@@ -519,7 +517,7 @@ class exports.LayerDraggable extends BaseClass
 			v: velocityY
 		@_simulation.y.start() if startSimulationY
 
-		@emit(Events.DragAnimationDidStart)
+		@emit(Events.DragAnimationStart)
 
 	_stopSimulation: =>
 		@_isAnimating = false
@@ -528,7 +526,7 @@ class exports.LayerDraggable extends BaseClass
 		@_simulation?.y.stop()
 		@_simulation = null
 		@emit(Events.Move, @layer.point)
-		@emit(Events.DragAnimationDidEnd)
+		@emit(Events.DragAnimationEnd)
 
 	animateStop: ->
 		@_stopSimulation()
@@ -543,7 +541,7 @@ class exports.LayerDraggable extends BaseClass
 	onDragDidMove: (cb) -> @on(Events.DragDidMove, cb)
 	onDrag: (cb) -> @on(Events.Drag, cb)
 	onDragEnd: (cb) -> @on(Events.DragEnd, cb)
-	onDragAnimationDidStart: (cb) -> @on(Events.DragAnimationDidStart, cb)
-	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
-	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
+	onDragAnimationStart: (cb) -> @on(Events.DragAnimationStart, cb)
+	onDragAnimationEnd: (cb) -> @on(Events.DragAnimationEnd, cb)
+	onDirectionLockStart: (cb) -> @on(Events.DirectionLockStart, cb)
 

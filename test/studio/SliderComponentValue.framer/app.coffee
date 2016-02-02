@@ -58,5 +58,5 @@ sliderA.on "change:value", ->
 	valueLayer.states.switch "nofade" if this.value >= 75
 
 # Return after DragEnd
-sliderA.knob.on Events.DragAnimationDidEnd, ->
+sliderA.knob.on Events.DragAnimationEnd, ->
 	valueLayer.states.switch "scaleDown"

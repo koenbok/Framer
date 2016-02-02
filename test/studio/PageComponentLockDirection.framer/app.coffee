@@ -20,8 +20,8 @@ for index in [0..2]
 	pageContent.scrollHorizontal = false
 	pageContent.directionLock = true
 	
-	page.on Events.DirectionLockDidStart, (direction) ->
-		print "pageContent.DirectionLockDidStart", direction
+	page.on Events.DirectionLockStart, (direction) ->
+		print "pageContent.DirectionLockStart", direction
 	
 	rows = 10
 	gutter = 2
@@ -43,5 +43,5 @@ for index in [0..2]
 			"line-height": "#{cellLayer.height}px"
 
 
-page.on Events.DirectionLockDidStart, (direction) ->
-	print "page.DirectionLockDidStart", direction
+page.on Events.DirectionLockStart, (direction) ->
+	print "page.DirectionLockStart", direction
