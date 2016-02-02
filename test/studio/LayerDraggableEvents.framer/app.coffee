@@ -3,8 +3,8 @@ eventKeys = [
 	"DragStart", 
 	"DragMove", 
 	"DragEnd", 
-	"DragAnimationDidStart", 
-	"DragAnimationDidEnd", 
+	"DragAnimationStart", 
+	"DragAnimationEnd", 
 ]
 
 layer = new Layer

@@ -1028,9 +1028,9 @@ class exports.Layer extends BaseClass
 	onDragDidMove: (cb) -> @on(Events.DragDidMove, cb)
 	onDrag: (cb) -> @on(Events.Drag, cb)
 	onDragEnd: (cb) -> @on(Events.DragEnd, cb)
-	onDragAnimationDidStart: (cb) -> @on(Events.DragAnimationDidStart, cb)
-	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
-	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
+	onDragAnimationStart: (cb) -> @on(Events.DragAnimationStart, cb)
+	onDragAnimationEnd: (cb) -> @on(Events.DragAnimationEnd, cb)
+	onDirectionLockStart: (cb) -> @on(Events.DirectionLockStart, cb)
 
 	# Gestures
 
