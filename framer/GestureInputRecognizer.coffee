@@ -392,6 +392,11 @@ class exports.GestureInputRecognizer
 			if event.fingers == 2 and @session.lastEvent.fingers == 2
 				event.delta = Utils.pointSubtract(event.touchCenter, @session.lastEvent.touchCenter)
 
+		# Force touch
+		if @session?.lastEvent
+			if @session.force
+				event.force = @session.force
+
 		# Convert point style event properties to dom style:
 		# event.delta -> event.deltaX, event.deltaY
 		for pointKey in ["point", "start", "previous", "offset", "delta", "velocity", "touchCenter", "touchOffset"]
