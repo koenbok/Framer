@@ -79,7 +79,6 @@ class exports.SliderComponent extends Layer
 		@knob.draggable.momentum = true
 		@knob.draggable.momentumOptions = {friction: 5, tolerance: 0.25}
 		@knob.draggable.bounce = false
-		@knob.draggable.propagateEvents = false
 		@knob.borderRadius = @knobSize / 2
 		@knobOverlay.borderRadius = (@knob.borderRadius * 2) + (@hitArea / 4)
 
@@ -111,12 +110,14 @@ class exports.SliderComponent extends Layer
 			@_updateValue()
 
 		# On click/touch of the slider, update the value
-		@on(Events.TouchStart, @_touchDown)
-		@sliderOverlay.on(Events.TouchStart, @_touchDown)
+		# @on(Events.TouchStart, @_touchDown)
 
-	_touchDown: (event) =>
+		@on(Events.TapStart, @_touchStart)
+		@on(Events.Pan, @_touchMove)
+		@on(Events.TapEnd, @_touchEnd)
+
+	_touchStart: (event) =>
 		event.preventDefault()
-		event.stopPropagation()
 
 		offsetX = (@min / @canvasScaleX()) - @min
 		offsetY = (@min / @canvasScaleY()) - @min
@@ -128,6 +129,14 @@ class exports.SliderComponent extends Layer
 
 		@knob.draggable._touchStart(event)
 		@_updateValue()
+
+	_touchMove: (event) =>
+		if event.target is @_element
+			@knob.draggable._touchMove(event)
+
+	_touchEnd: (event) =>
+		if event.target is @_element
+			@knob.draggable._touchEnd(event)
 
 	_updateFill: =>
 		if @width > @height

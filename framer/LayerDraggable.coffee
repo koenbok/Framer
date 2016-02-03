@@ -130,7 +130,7 @@ class exports.LayerDraggable extends BaseClass
 		@_resetdirectionLock()
 
 		event.preventDefault()
-		event.stopPropagation() unless @propagateEvents
+		event.stopPropagation() if @propagateEvents is false
 
 		# Extract the event (mobile may have multiple)
 		touchEvent = Events.touchEvent(event)
@@ -167,13 +167,13 @@ class exports.LayerDraggable extends BaseClass
 		@emit(Events.DragStart, event)
 
 	_touchMove: (event) =>
-
+		
 		return unless @enabled
 
 		@_lastEvent = event
 
 		event.preventDefault()
-		event.stopPropagation() unless @propagateEvents
+		event.stopPropagation() if @propagateEvents is false
 
 		touchEvent = Events.touchEvent(event)
 
@@ -231,7 +231,7 @@ class exports.LayerDraggable extends BaseClass
 
 	_touchEnd: (event) =>
 
-		event.stopPropagation() unless @propagateEvents
+		event.stopPropagation() if @propagateEvents is false
 
 		# Start the simulation prior to emitting the DragEnd event.
 		# This way, if the user calls layer.animate on DragEnd, the simulation will 
