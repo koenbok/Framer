@@ -167,6 +167,8 @@ class TouchEmulator extends BaseClass
 	
 	mouseout: (event) =>
 
+		return if @isMouseDown
+
 		fromElement = event.relatedTarget or event.toElement
 
 		if not fromElement or fromElement.nodeName is "HTML"
