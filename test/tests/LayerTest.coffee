@@ -227,19 +227,18 @@ describe "Layer", ->
 			
 			layer = new Layer
 
-			layer.clip.should.equal true
-			layer.style["overflow"].should.equal "hidden"
-
-			layer.clip = false
-			layer.scroll.should.equal false
+			layer.clip.should.equal false
 			layer.style["overflow"].should.equal "visible"
+
+			layer.clip = true
+			layer.style["overflow"].should.equal "hidden"
 
 		it "should set scroll", ->
 			
 			layer = new Layer
 
 			layer.scroll.should.equal false
-			layer.style["overflow"].should.equal "hidden"
+			layer.style["overflow"].should.equal "visible"
 
 			layer.scroll = true
 			layer.scroll.should.equal true
@@ -249,7 +248,7 @@ describe "Layer", ->
 
 			layer.scroll = false
 			layer.scroll.should.equal false
-			layer.style["overflow"].should.equal "hidden"
+			layer.style["overflow"].should.equal "visible"
 
 		it "should set scroll from properties", ->
 
@@ -264,7 +263,7 @@ describe "Layer", ->
 			layer = new Layer
 
 			layer.scroll.should.equal false
-			layer.style["overflow"].should.equal "hidden"
+			layer.style["overflow"].should.equal "visible"
 			layer.ignoreEvents.should.equal true
 
 			layer.scroll = true
