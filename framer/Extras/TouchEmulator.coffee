@@ -52,8 +52,10 @@ class TouchEmulator extends BaseClass
 		@wrap = @context.domEventManager.wrap
 		
 		@wrap(document).addEventListener("mousedown", @mousedown, true)
-		@wrap(document).addEventListener("mousemove", @mousemovePosition, true)
+		@wrap(document).addEventListener("mousemove", @mousemove, true)
+		@wrap(document).addEventListener("mouseup", @mouseup, true)
 		@wrap(document).addEventListener("keydown", @keydown, true)
+		@wrap(document).addEventListener("keyup", @keyup, true)
 		@wrap(document).addEventListener("mouseout", @mouseout, true)
 		
 		@isMouseDown = false
@@ -83,8 +85,6 @@ class TouchEmulator extends BaseClass
 			@showTouchCursor()
 			@touchPointLayer.midX = @point.x
 			@touchPointLayer.midY = @point.y
-			@wrap(document).addEventListener("keyup", @keyup, true)
-			@wrap(document).addEventListener("mousemove", @mousemove, true)
 			
 		if event.keyCode is @keyPanCode
 			@isPanKeyDown = true
@@ -96,8 +96,6 @@ class TouchEmulator extends BaseClass
 			cancelEvent(event)	
 			@isPinchKeyDown = false
 			@hideTouchCursor()
-			
-			@wrap(document).removeEventListener("mousemove", @mousemove, true)
 		
 		if event.keyCode is @keyPanCode
 			cancelEvent(event)
@@ -107,15 +105,12 @@ class TouchEmulator extends BaseClass
 			
 
 	mousedown: (event) =>
-	
+
 		cancelEvent(event)
 		
 		@isMouseDown = true
 		@target = event.target
 			
-		@wrap(document).addEventListener("mousemove", @mousemove, true)
-		@wrap(document).addEventListener("mouseup", @mouseup, true)
-
 		if @isPinchKeyDown
 			dispatchTouchEvent("touchstart", @target, event, @touchPointDelta)
 		else
@@ -124,12 +119,12 @@ class TouchEmulator extends BaseClass
 		@touchPointLayer.image = @touchPointerImageActive
 	
 	mousemove: (event) =>
-		
-		cancelEvent(event)
 
 		@point =
 			x: event.pageX
 			y: event.pageY
+
+		cancelEvent(event)
 
 		@startPoint ?= @point 
 		@centerPoint ?= @point
@@ -149,10 +144,11 @@ class TouchEmulator extends BaseClass
 				@touchPointLayer.midX = @touchPoint.x
 				@touchPointLayer.midY = @touchPoint.y
 	
-		if (@isPinchKeyDown or @isPanKeyDown) and @touchPointDelta
-			dispatchTouchEvent("touchmove", @target, event, @touchPointDelta)
-		else
-			dispatchTouchEvent("touchmove", @target, event)
+		if @isMouseDown
+			if (@isPinchKeyDown or @isPanKeyDown) and @touchPointDelta
+				dispatchTouchEvent("touchmove", @target, event, @touchPointDelta)
+			else
+				dispatchTouchEvent("touchmove", @target, event)
 
 	mouseup: (event) =>
 			
@@ -204,10 +200,6 @@ class TouchEmulator extends BaseClass
 			y: event.pageY
 
 	endMultiTouch: ->
-
-		@wrap(document).removeEventListener("mousemove", @mousemove, true)
-		@wrap(document).removeEventListener("mouseup", @mouseup, true)
-		
 		@isMouseDown = false
 		@touchPointLayer.image = @touchPointerImage
 		@hideTouchCursor()
