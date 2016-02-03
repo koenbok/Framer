@@ -8,6 +8,7 @@ GestureInputVelocityTime = 0.1
 GestureInputForceTapDesktop = MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN
 GestureInputForceTapMobile = 0.7
 GestureInputForceTapMobilePollTime = 1/30
+GestureInputMinimumFingerDistance = 30
 
 {DOMEventManager} = require "./DOMEventManager"
 
@@ -287,7 +288,7 @@ class exports.GestureInputRecognizer
 		if @session.started.pinch and event.fingers == 1
 			@pinchend(event)
 		# If we did not start yet and get two fingers, start
-		else if not @session.started.pinch and event.fingers == 2 
+		else if not @session.started.pinch and event.fingers == 2
 			@pinchstart(event)
 		# If we did start send pinch events
 		else if @session.started.pinch
@@ -363,7 +364,7 @@ class exports.GestureInputRecognizer
 			touchPointB = @_getTouchPoint(event, 1)
 			event.touchCenter = Utils.pointCenter(touchPointB, touchPointA)
 			event.touchOffset = Utils.pointSubtract(touchPointB, touchPointA)
-			event.touchDistance = Utils.pointDistance(touchPointA, touchPointB)		
+			event.touchDistance = _.max([GestureInputMinimumFingerDistance, Utils.pointDistance(touchPointA, touchPointB)])
 			event.rotation = Utils.pointAngle(touchPointA, touchPointB)
 
 		# Special cases
