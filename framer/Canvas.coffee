@@ -8,6 +8,18 @@ class CanvasClass extends BaseClass
 	@define "size", get: -> {width:@width, height:@height}
 	@define "frame", get: -> {x:0, y:0, width:@width, height:@height}
 
+	@define "backgroundColor",
+		importable: false
+		exportable: false
+		get: -> Framer.Device.background.backgroundColor
+		set: (value) -> Framer.Device.background.backgroundColor = value
+
+	@define "image",
+		importable: false
+		exportable: false
+		get: -> Framer.Device.background.image
+		set: (value) -> Framer.Device.background.image = value
+
 	addListener: (eventName, listener) =>
 		if eventName is "resize"
 			Events.wrap(window).addEventListener "resize", =>
