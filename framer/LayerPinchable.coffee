@@ -88,7 +88,14 @@ class exports.LayerPinchable extends BaseClass
 		if @scale
 			@_scaleStart ?= @layer.scale
 			scale = (((event.scale - 1) * @scaleFactor) + 1) * @_scaleStart
-			scale = Utils.clamp(scale, @minScale, @maxScale) if (@minScale and @maxScale)
+
+			if @minScale and @maxScale
+				scale = Utils.clamp(scale, @minScale, @maxScale) 
+			else if @minScale
+				scale = Utils.clamp(scale, @minScale, 1000000)
+			else if @maxScale
+				scale = Utils.clamp(scale, 0.00001, @maxScale)
+				
 			scale = Utils.nearestIncrement(scale, @scaleIncrements) if @scaleIncrements
 			@layer.scale = scale
 			@emit(Events.Scale, event)
