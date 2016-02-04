@@ -69,6 +69,7 @@ class exports.LayerPinchable extends BaseClass
 	_pinchStart: (event) =>
 		@_reset()
 		@_centerOrigin(event) if @centerOrigin
+		@normalizeRotation = Utils.rotationNormalizer()
 
 	_pinch: (event) =>
 
@@ -105,6 +106,7 @@ class exports.LayerPinchable extends BaseClass
 			@_rotationOffset ?= event.rotation
 			rotation = event.rotation - @_rotationOffset + @_rotationStart
 			rotation = rotation * @rotateFactor
+			rotation = @normalizeRotation(rotation)
 			rotation = Utils.clamp(rotation, @rotateMin, @rotateMax) if (@rotateMin and @rotateMax)
 			rotation = Utils.nearestIncrement(rotation, @rotateIncrements) if @rotateIncrements
 			@layer.rotation = rotation
