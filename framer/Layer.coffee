@@ -1072,28 +1072,6 @@ class exports.Layer extends BaseClass
 	onSwipeRightStart:(cb) -> @on(Events.SwipeRightStart, cb)
 	onSwipeRightEnd:(cb) -> @on(Events.SwipeRightEnd, cb)
 
-	# Edge Swipe
-
-	onEdgeSwipe:(cb) -> @on(Events.EdgeSwipe, cb)
-	onEdgeSwipeStart:(cb) -> @on(Events.EdgeSwipeStart, cb)
-	onEdgeSwipeEnd:(cb) -> @on(Events.EdgeSwipeEnd, cb)
-
-	onEdgeSwipeTop:(cb) -> @on(Events.EdgeSwipeTop, cb)
-	onEdgeSwipeTopStart:(cb) -> @on(Events.EdgeSwipeTopStart, cb)
-	onEdgeSwipeTopEnd:(cb) -> @on(Events.EdgeSwipeTopEnd, cb)
-
-	onEdgeSwipeRight:(cb) -> @on(Events.EdgeSwipeRight, cb)
-	onEdgeSwipeRightStart:(cb) -> @on(Events.EdgeSwipeRightStart, cb)
-	onEdgeSwipeRightEnd:(cb) -> @on(Events.EdgeSwipeRightEnd, cb)
-
-	onEdgeSwipeBottom:(cb) -> @on(Events.EdgeSwipeBottom, cb)
-	onEdgeSwipeBottomStart:(cb) -> @on(Events.EdgeSwipeBottomStart, cb)
-	onEdgeSwipeBottomEnd:(cb) -> @on(Events.EdgeSwipeBottomEnd, cb)
-
-	onEdgeSwipeLeft:(cb) -> @on(Events.EdgeSwipeLeft, cb)
-	onEdgeSwipeLeftStart:(cb) -> @on(Events.EdgeSwipeLeftStart, cb)
-	onEdgeSwipeLeftEnd:(cb) -> @on(Events.EdgeSwipeLeftEnd, cb)
-
 	# Pan
 	onPan:(cb) -> @on(Events.Pan, cb)
 	onPanStart:(cb) -> @on(Events.PanStart, cb)
