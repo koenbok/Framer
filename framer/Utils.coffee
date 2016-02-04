@@ -803,6 +803,25 @@ Utils.frameCenterPoint = (frame) ->
 		x: Utils.frameGetMidX(frame)
 		y: Utils.frameGetMidY(frame)
 
+# Rotation
+
+Utils.rotationNormalizer = ->
+
+	lastValue = null
+
+	return (value) =>
+		lastValue = value if not lastValue?
+
+		diff = lastValue - value
+		maxDiff = Math.abs(diff) + 180
+		nTimes = Math.floor(maxDiff / 360)
+		
+		value -= (nTimes * 360) if diff < 180
+		value += (nTimes * 360) if diff > 180
+		
+		lastValue = value
+		return value
+
 
 # Coordinate system
 
