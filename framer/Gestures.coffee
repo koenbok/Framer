@@ -86,6 +86,3 @@ Gestures.RotateStart = "rotatestart"
 Gestures.RotateEnd = "rotateend"
 
 exports.Gestures = Gestures
-
-
-

@@ -208,6 +208,11 @@ class exports.LayerDraggable extends BaseClass
 		# Direction lock
 		if @directionLock
 			if not @_directionLockEnabledX and not @_directionLockEnabledY
+
+				offset = event.offset
+				offset.x = offset.x * @speedX * (1 / @layer.canvasScaleX()) * @layer.scaleX * @layer.scale
+				offset.y = offset.y * @speedY * (1 / @layer.canvasScaleY()) * @layer.scaleY * @layer.scale
+
 				@_updatedirectionLock(offset) 
 				return
 			else
