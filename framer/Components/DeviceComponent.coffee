@@ -628,8 +628,8 @@ class exports.DeviceComponent extends BaseClass
 			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
 
 		# We'd like to use jp2 if possible, or check if we don't for this specific device
-		if Utils.isJP2Supported() and @_device.deviceImageJP2 is true
-			return "#{resourceUrl}/#{hand}.jp2"
+		# if Utils.isJP2Supported() and @_device.deviceImageJP2 is true
+		# 	return "#{resourceUrl}/#{hand}.jp2"
 
 		return "#{resourceUrl}/#{hand}.png"
 
