@@ -53,7 +53,7 @@ class exports.BaseClass extends EventEmitter
 		Object.defineProperty(@prototype, propertyName, descriptor)
 
 	@simpleProperty = (name, fallback, options={}) ->
-		return _.extend options, 
+		return _.extend options,
 			default: fallback
 			get: -> @_getPropertyValue(name)
 			set: (value) -> @_setPropertyValue(name, value)
@@ -66,7 +66,7 @@ class exports.BaseClass extends EventEmitter
 			get: ->
 				return unless _.isObject(@[objectKey])
 				Utils.getValueForKeyPath(@, keyPath)
-			set: (value) -> 
+			set: (value) ->
 				return unless _.isObject(@[objectKey])
 				Utils.setValueForKeyPath(@, keyPath, value)
 

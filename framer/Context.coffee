@@ -15,7 +15,7 @@ is always at least one context on the screen, but often many more. For example, 
 a special context and replaces the default one (so it renders in the screen), and the print
 function uses on to draw the console.
 
-The default context lives under Framer.DefaultContext and the current one in 
+The default context lives under Framer.DefaultContext and the current one in
 Framer.CurrentContext. You can create layers in any context by using the run function.
 
 A context keeps track of everyting around those layers, so it can clean it up again. We use
@@ -50,7 +50,7 @@ class exports.Context extends BaseClass
 
 		@_parent = options.parent
 		@_name = options.name
-		
+
 		@perspective = options.perspective
 		@perspectiveOriginX = options.perspectiveOriginX
 		@perspectiveOriginY = options.perspectiveOriginY
@@ -79,15 +79,15 @@ class exports.Context extends BaseClass
 	# Layers
 	@define "layers", get: -> _.clone(@_layers)
 	@define "layerCounter", get: -> @_layerCounter
-	
+
 	addLayer: (layer) ->
 		return if layer in @_layers
 		@_layerCounter++
 		@_layers.push(layer)
-		
+
 	removeLayer: (layer) ->
 		@_layers = _.without(@_layers, layer)
-	
+
 	resetLayers: ->
 		@resetGestures()
 		@_layers = []
@@ -96,14 +96,14 @@ class exports.Context extends BaseClass
 
 	# Animations
 	@define "animations", get: -> _.clone(@_animations)
-	
+
 	addAnimation: (animation) ->
 		return if animation in @_animations
 		@_animations.push(animation)
-		
+
 	removeAnimation: (animation) ->
 		@_animations = _.without(@_animations, animation)
-	
+
 	resetAnimations: ->
 		@stopAnimations()
 		@_animations = []
@@ -115,14 +115,14 @@ class exports.Context extends BaseClass
 
 	# Timers
 	@define "timers", get: -> _.clone(@_timers)
-	
+
 	addTimer: (timer) ->
 		return if timer in @_timers
 		@_timers.push(timer)
-		
+
 	removeTimer: (timer) ->
 		@_timers = _.without(@_timers, timer)
-	
+
 	resetTimers: ->
 		@_timers.map(window.clearTimeout) if @_timers
 		@_timers = []
@@ -130,14 +130,14 @@ class exports.Context extends BaseClass
 
 	# Intervals
 	@define "intervals", get: -> _.clone(@_intervals)
-	
+
 	addInterval: (interval) ->
 		return if interval in @_intervals
 		@_intervals.push(interval)
-		
+
 	removeInterval: (interval) ->
 		@_intervals = _.without(@_intervals, interval)
-	
+
 	resetIntervals: ->
 		@_intervals.map(window.clearInterval) if @_intervals
 		@_intervals = []
@@ -177,12 +177,12 @@ class exports.Context extends BaseClass
 
 			for eventName in layer.listenerEvents()
 				layerListeners[eventName] = layer.listeners(eventName)
-			
+
 			layer.removeAllListeners()
 			layerId = @_layers.indexOf(layer)
-			
+
 			@_frozenEvents[layerId] = layerListeners
-			
+
 		@stopAnimations()
 
 		# TODO: It would be nice to continue at least intervals after a resume
@@ -210,7 +210,7 @@ class exports.Context extends BaseClass
 
 		# This manages all dom events for any node in this context centrally,
 		# so we can clean them up on a reset, avoiding memory leaks and whatnot.
-		
+
 		@domEventManager?.reset()
 		@domEventManager = new DOMEventManager
 
@@ -255,13 +255,13 @@ class exports.Context extends BaseClass
 	# Remember the context doesn't really have height. These are just a reference
 	# to it's parent or document.
 
-	@define "width", 
-		get: -> 
+	@define "width",
+		get: ->
 			return @parent.width if @parent
 			return window.innerWidth
 
 	@define "height",
-		get: -> 
+		get: ->
 			return @parent.height if @parent
 			return window.innerHeight
 
@@ -308,4 +308,3 @@ class exports.Context extends BaseClass
 			if _.isNumber(value)
 				@_perspectiveOriginY = value
 				@_updatePerspective()
-

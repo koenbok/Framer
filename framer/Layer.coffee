@@ -22,12 +22,12 @@ layerValueTypeError = (name, value) ->
 	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
 
 layerProperty = (obj, name, cssProperty, fallback, validator, transformer, options={}, set) ->
-	result = 
+	result =
 		default: fallback
-		get: -> 
-			
+		get: ->
+
 			# console.log "Layer.#{name}.get #{@_properties[name]}", @_properties.hasOwnProperty(name)
-			
+
 			return @_properties[name] if @_properties.hasOwnProperty(name)
 			return fallback
 
@@ -122,10 +122,10 @@ class exports.Layer extends BaseClass
 	@define "opacity", layerProperty(@, "opacity", "opacity", 1, _.isNumber)
 	@define "index", layerProperty(@, "index", "zIndex", 0, _.isNumber, null, {importable:false, exportable:false})
 	@define "clip", layerProperty(@, "clip", "overflow", false, _.isBoolean)
-	
+
 	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBoolean, null, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
-	
+
 	@define "scrollVertical", layerProperty @, "scrollVertical", "overflowY", false, _.isBoolean, null, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
 
@@ -206,7 +206,7 @@ class exports.Layer extends BaseClass
 
 	@define "name",
 		default: ""
-		get: -> 
+		get: ->
 			@_getPropertyValue "name"
 		set: (value) ->
 			@_setPropertyValue "name", value
@@ -269,7 +269,7 @@ class exports.Layer extends BaseClass
 		importable: true
 		exportable: true
 		default: 0
-		get: -> 
+		get: ->
 			@_properties["borderRadius"]
 
 		set: (value) ->
@@ -300,7 +300,7 @@ class exports.Layer extends BaseClass
 			point = {x: point, y: point} if _.isNumber(point)
 			for k in ["x", "y"]
 				@[k] = point[k] if point.hasOwnProperty(k)
-				
+
 	@define "size",
 		get: -> _.pick(@, ["width", "height"])
 		set: (size) ->
@@ -400,11 +400,11 @@ class exports.Layer extends BaseClass
 	center: ->
 		@frame = @centerFrame() # Center  in parent
 		@
-	
+
 	centerX: (offset=0) ->
 		@x = @centerFrame().x + offset # Center x in parent
 		@
-	
+
 	centerY: (offset=0) ->
 		@y = @centerFrame().y + offset # Center y in parent
 		@
@@ -423,7 +423,7 @@ class exports.Layer extends BaseClass
 	# 	if @_parentOrContext()
 	# 		return @_parentOrContext().screenOriginX()
 	# 	return @originX
-	
+
 	# screenOriginY = ->
 	# 	if @_parentOrContext()
 	# 		return @_parentOrContext().screenOriginY()
@@ -463,11 +463,11 @@ class exports.Layer extends BaseClass
 			y: 0
 			width:  @width  * @screenScaleX()
 			height: @height * @screenScaleY()
-		
+
 		layers = @ancestors(context=true)
 		layers.push(@)
 		layers.reverse()
-		
+
 		for parent in layers
 			factorX = if parent._parentOrContext() then parent._parentOrContext().screenScaleX() else 1
 			factorY = if parent._parentOrContext() then parent._parentOrContext().screenScaleY() else 1
@@ -479,7 +479,7 @@ class exports.Layer extends BaseClass
 
 	scaledFrame: ->
 
-		# Get the scaled frame for a layer, taking into account 
+		# Get the scaled frame for a layer, taking into account
 		# the transform origins.
 
 		frame = @frame
@@ -490,7 +490,7 @@ class exports.Layer extends BaseClass
 		frame.height *= scaleY
 		frame.x += (1 - scaleX) * @originX * @width
 		frame.y += (1 - scaleY) * @originY * @height
-		
+
 		return frame
 
 	##############################################################
@@ -509,7 +509,7 @@ class exports.Layer extends BaseClass
 
 		getComputedStyle  = document.defaultView.getComputedStyle
 		getComputedStyle ?= window.getComputedStyle
-		
+
 		return getComputedStyle(@_element)
 
 	@define "classList",
@@ -559,7 +559,7 @@ class exports.Layer extends BaseClass
 	querySelectorAll: (query) -> @_element.querySelectorAll(query)
 
 	destroy: ->
-		
+
 		# Todo: check this
 
 		if @parent
@@ -567,7 +567,7 @@ class exports.Layer extends BaseClass
 
 		@_element.parentNode?.removeChild @_element
 		@removeAllListeners()
-		
+
 		@_context.removeLayer(@)
 		@_context.emit("layer:destroy", @)
 
@@ -636,7 +636,7 @@ class exports.Layer extends BaseClass
 
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
-			
+
 			if @_domEventManager.listeners(Events.ImageLoaded) or @_domEventManager.listeners(Events.ImageLoadError)
 
 				loader = new Image()
@@ -723,13 +723,13 @@ class exports.Layer extends BaseClass
 		importable: false
 		get: ->
 			result = []
-			
+
 			f = (layer) ->
 				result.push(layer)
 				layer.children.map(f)
-			
+
 			@children.map(f)
-				
+
 			return result
 
 	addChild: (layer) ->
@@ -764,13 +764,13 @@ class exports.Layer extends BaseClass
 
 		return parents
 
-	childrenAbove: (point, originX=0, originY=0) -> _.filter @children, (layer) -> 
+	childrenAbove: (point, originX=0, originY=0) -> _.filter @children, (layer) ->
 		Utils.framePointForOrigin(layer.frame, originX, originY).y < point.y
-	childrenBelow: (point, originX=0, originY=0) -> _.filter @children, (layer) -> 
+	childrenBelow: (point, originX=0, originY=0) -> _.filter @children, (layer) ->
 		Utils.framePointForOrigin(layer.frame, originX, originY).y > point.y
-	childrenLeft: (point, originX=0, originY=0) -> _.filter @children, (layer) -> 
+	childrenLeft: (point, originX=0, originY=0) -> _.filter @children, (layer) ->
 		Utils.framePointForOrigin(layer.frame, originX, originY).x < point.x
-	childrenRight: (point, originX=0, originY=0) -> _.filter @children, (layer) -> 
+	childrenRight: (point, originX=0, originY=0) -> _.filter @children, (layer) ->
 		Utils.framePointForOrigin(layer.frame, originX, originY).x > point.x
 
 	_parentOrContext: ->
@@ -907,7 +907,7 @@ class exports.Layer extends BaseClass
 	@define "scrollFrame",
 		importable: false
 		get: ->
-			frame = 
+			frame =
 				x: @scrollX
 				y: @scrollY
 				width: @width
@@ -924,7 +924,7 @@ class exports.Layer extends BaseClass
 
 	@define "scrollY",
 		get: -> @_element.scrollTop
-		set: (value) -> 
+		set: (value) ->
 			layerValueTypeError("scrollY", value) if not _.isNumber(value)
 			@_element.scrollTop = value
 
@@ -941,8 +941,8 @@ class exports.Layer extends BaseClass
 		# you expect when you add a button to a scroll content layer.
 
 		if @_cancelClickEventInDragSession
-			if eventName in [Events.Click, 
-				Events.Tap, Events.TapStart, Events.TapEnd, 
+			if eventName in [Events.Click,
+				Events.Tap, Events.TapStart, Events.TapEnd,
 				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
 				return if @_parentDraggableLayer()?.draggable.isMoving
 
@@ -988,7 +988,7 @@ class exports.Layer extends BaseClass
 	_parentDraggableLayer: ->
 		for layer in @ancestors()
 			return layer if layer._draggable?.enabled
-		return null 
+		return null
 
 	on: @::addListener
 	off: @::removeListener
@@ -999,7 +999,7 @@ class exports.Layer extends BaseClass
 	onClick: (cb) -> @on(Events.Click, cb)
 	onDoubleClick: (cb) -> @on(Events.DoubleClick, cb)
 	onScroll: (cb) -> @on(Events.Scroll, cb)
-	
+
 	onTouchStart: (cb) -> @on(Events.TouchStart, cb)
 	onTouchEnd: (cb) -> @on(Events.TouchEnd, cb)
 	onTouchMove: (cb) -> @on(Events.TouchMove, cb)
@@ -1020,7 +1020,7 @@ class exports.Layer extends BaseClass
 
 	onImageLoaded: (cb) -> @on(Events.ImageLoaded, cb)
 	onImageLoadError: (cb) -> @on(Events.ImageLoadError, cb)
-	
+
 	onMove: (cb) -> @on(Events.Move, cb)
 	onDragStart: (cb) -> @on(Events.DragStart, cb)
 	onDragWillMove: (cb) -> @on(Events.DragWillMove, cb)

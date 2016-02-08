@@ -126,7 +126,7 @@ describe "Color", ->
 		color.a.should.equal 0.5
 
 	it "should be transparent when constructor option is null", ->
-					
+
 		color = new Color null
 		color.a.should.equal 0
 
@@ -167,7 +167,7 @@ describe "Color", ->
 		b.should.equal 127
 
 	it "should mix colors with RGB", ->
-		
+
 		red = new Color "red"
 		yellow = new Color "yellow"
 		orange = red.mix(yellow, .5, true, "rgb")

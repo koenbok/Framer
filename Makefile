@@ -15,22 +15,22 @@ unbootstrap:
 clean:
 	rm -rf build
 
-build: bootstrap clean 
+build: bootstrap clean
 	mkdir -p build
 	$(gulp) build-release
 
-debug: bootstrap clean 
+debug: bootstrap clean
 	mkdir -p build
 	$(gulp) build-debug
 
-watch: bootstrap 
+watch: bootstrap
 	$(gulp) watch
 
-dev: bootstrap 
+dev: bootstrap
 	open -a "Framer Studio Beta" "extras/DevServer.framer"
 	$(bin)/coffee scripts/devserver.coffee
 
-test: bootstrap 
+test: bootstrap
 	$(gulp) test
 
 coverage: bootstrap
@@ -77,7 +77,7 @@ deploy:
 
 resources%optimize:
 	python scripts/optimize.py
-	
+
 resources%upload:
 	cd extras/resources.framerjs.com; cactus deploy
 

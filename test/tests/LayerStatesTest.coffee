@@ -1,5 +1,5 @@
 describe "LayerStates", ->
-	
+
 	describe "Events", ->
 
 		beforeEach ->
@@ -8,7 +8,7 @@ describe "LayerStates", ->
 			@layer.states.add("b", {x:200, y:200})
 
 		it "should emit willSwitch when switching", (done) ->
-			
+
 			test = (previous, current, states) =>
 				previous.should.equal 'default'
 				current.should.equal 'a'
@@ -19,7 +19,7 @@ describe "LayerStates", ->
 			@layer.states.switchInstant 'a'
 
 		it "should emit didSwitch when switching", (done) ->
-			
+
 			test = (previous, current, states) =>
 				previous.should.equal 'default'
 				current.should.equal 'a'
@@ -31,7 +31,7 @@ describe "LayerStates", ->
 
 
 	describe "Defaults", ->
-		
+
 		it "should set defaults", ->
 
 			layer = new Layer
@@ -82,7 +82,7 @@ describe "LayerStates", ->
 			layer.states.animationOptions =
 				curve: "linear"
 				time: 0.05
-			
+
 			layer.x.should.equal 0
 
 			ready = (animation, layer) ->
@@ -102,7 +102,7 @@ describe "LayerStates", ->
 
 			layer.on "end", ready
 			layer.states.next()
-			
+
 		it "should set scroll property", ->
 
 			layer = new Layer
@@ -164,4 +164,3 @@ describe "LayerStates", ->
 
 			layer.states.switchInstant "default"
 			layer.x.should.equal 0
-

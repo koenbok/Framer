@@ -26,21 +26,21 @@ describe "BaseClass", ->
 		@define "height", testProperty "height", 0
 
 	it "should set defaults", ->
-		
+
 		testClass = new TestClass()
 
 		testClass.width.should.equal 0
 		testClass.height.should.equal 0
 
 	it "should set defaults on construction", ->
-		
+
 		testClass = new TestClass width:100, height:100
 
 		testClass.width.should.equal 100
 		testClass.height.should.equal 100
 
 	it "should set a property value", ->
-		
+
 		testClass = new TestClass()
 		testClass.width = 500
 
@@ -205,4 +205,3 @@ describe "BaseClass", ->
 
 		instance.props.testPropA.should.equal "a"
 		instance.props.testPropB.should.equal "value"
-

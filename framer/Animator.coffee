@@ -9,7 +9,7 @@ class exports.Animator
 		- Takes a set of input values at setup({input values})
 		- Emits an output value for progress (0 -> 1) in value(progress)
 	"""
-	
+
 	constructor: (options={}) ->
 		@setup options
 
@@ -22,6 +22,6 @@ class exports.Animator
 	finished: ->
 		throw Error "Not implemented"
 
-	
+
 	# start: -> Framer.Loop.on("update", )
 	# stop: -> AnimationLoop.remove @

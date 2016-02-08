@@ -273,7 +273,7 @@ class exports.DeviceComponent extends BaseClass
 		return "#{@_deviceType}.png"
 
 	_deviceImageUrl: (name) ->
-		
+
 		return null unless name
 
 		# If the image is externally hosted, we'd like to use that
@@ -289,7 +289,7 @@ class exports.DeviceComponent extends BaseClass
 
 		# If we're running Framer Studio and have local files, we'd like to use those
 		if Utils.isFramerStudio() and window.FramerStudioInfo
-			resourceUrl = window.FramerStudioInfo.deviceImagesUrl	
+			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
 
 		# We'd like to use jp2 if possible, or check if we don't for this specific device
 		if Utils.isJP2Supported() and @_device.deviceImageJP2 is true

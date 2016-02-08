@@ -20,7 +20,7 @@ getTime = -> Utils.getTime() * 1000
 class exports.AnimationLoop extends EventEmitter
 
 	constructor: ->
-		
+
 		# For now we set the delta to a fixed time because using performance.now plus
 		# raf seems to cause weird issues.
 		@delta = 1/60
@@ -37,7 +37,7 @@ class exports.AnimationLoop extends EventEmitter
 		@maximumListeners = Infinity
 
 	start: =>
-		
+
 		animationLoop = @
 		_timestamp = getTime()
 

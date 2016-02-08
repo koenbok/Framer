@@ -15,14 +15,14 @@ describe "LayerEvents", ->
 			layer.style["pointerEvents"].should.equal "none"
 
 		it "should not listen to events by default", ->
-			
+
 			layer = new Layer()
 			layer.ignoreEvents.should.equal true
 			layer.style["pointerEvents"].should.equal "none"
 
 
 		it "should not listen to events until a listener is added", ->
-			
+
 			layer = new Layer()
 			layer.ignoreEvents.should.equal true
 
@@ -57,7 +57,7 @@ describe "LayerEvents", ->
 		it "should remove events", ->
 
 			layer = new Layer
-			
+
 			clickCount = 0
 
 			handler = ->
@@ -75,7 +75,7 @@ describe "LayerEvents", ->
 
 
 		it "should only run an event once", ->
-			
+
 			layerA = new Layer
 			count = 0
 
@@ -89,7 +89,7 @@ describe "LayerEvents", ->
 			count.should.equal 1
 
 		it "should modify scope for draggable events", (callback) ->
-			
+
 			layerA = new Layer
 			layerA.draggable.enabled = true
 			layerA.on "test", (args...) ->
@@ -167,4 +167,3 @@ describe "LayerEvents", ->
 			layerA = new Layer
 			f = -> layerA.off(null)
 			f.should.throw()
-			

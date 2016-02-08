@@ -1,7 +1,7 @@
 describe "EventEmitter", ->
-	
+
 	it "should listen", ->
-		
+
 		tester = new Framer.EventEmitter
 		count = 0
 		handler = -> count++
@@ -12,7 +12,7 @@ describe "EventEmitter", ->
 		count.should.equal 1
 
 	it "should stop listening", ->
-		
+
 		tester = new Framer.EventEmitter
 		count = 0
 		handler = -> count++
@@ -28,7 +28,7 @@ describe "EventEmitter", ->
 		count.should.equal 1
 
 	it "should listen once", ->
-		
+
 		tester = new Framer.EventEmitter
 		count = 0
 		handler = -> count++
@@ -41,7 +41,7 @@ describe "EventEmitter", ->
 		count.should.equal 1
 
 	it "should list listeners", ->
-		
+
 		handler = ->
 		tester = new Framer.EventEmitter
 		tester.on("test", handler)
@@ -57,6 +57,5 @@ describe "EventEmitter", ->
 	# 		tester.on "test", ->
 
 	# 	f = -> tester.on "test", ->
-		
-	# 	f.should.throw()
 
+	# 	f.should.throw()

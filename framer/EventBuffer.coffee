@@ -16,11 +16,11 @@ class exports.EventBuffer extends BaseClass
 			velocityTimeout: 100
 		@_events = []
 
-	push: (event) -> 
+	push: (event) ->
 		@_events.push event
 		@emit Events.EventBufferUpdated, event
 
-	reset: -> 
+	reset: ->
 		@_events.length = 0
 		@emit Events.EventBufferReset
 
@@ -35,7 +35,7 @@ class exports.EventBuffer extends BaseClass
 			return {x:0, y:0} if events.length < 2
 			current = events[events.length - 1]
 			first   = events[0]
-			offset = 
+			offset =
 				x: current.x - first.x
 				y: current.y - first.y
 

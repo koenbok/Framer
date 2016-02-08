@@ -74,7 +74,7 @@ describe "ScrollComponent", ->
 
 			layerA = new Layer
 			layerB = new Layer superLayer:layerA
-			
+
 			delete layerA._properties.backgroundColor
 			scroll = ScrollComponent.wrap(layerA)
 

@@ -7,10 +7,10 @@ Utils = require "./Utils"
 class exports.Simulator extends BaseClass
 
 	"""
-	The simulator class runs a physics simulation based on a set of input values 
+	The simulator class runs a physics simulation based on a set of input values
 	at setup({input values}), and emits an output state {x, v}
 	"""
-	
+
 	@define "state",
 		get: -> _.clone(@_state)
 		set: (state) -> @_state = _.clone(state)
@@ -20,11 +20,11 @@ class exports.Simulator extends BaseClass
 		@options = null
 		@setup(options)
 
-	setup: (options) -> 
+	setup: (options) ->
 		throw Error "Not implemented"
-	
-	next: (delta) -> 
+
+	next: (delta) ->
 		throw Error "Not implemented"
-	
-	finished: -> 
+
+	finished: ->
 		throw Error "Not implemented"

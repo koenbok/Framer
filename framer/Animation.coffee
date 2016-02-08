@@ -111,14 +111,14 @@ class exports.Animation extends EventEmitter
 
 			# We also need to account for derivatives from x, y
 			if property is "x" and (
-				@_stateA.hasOwnProperty("minX") or 
-				@_stateA.hasOwnProperty("midX") or 
+				@_stateA.hasOwnProperty("minX") or
+				@_stateA.hasOwnProperty("midX") or
 				@_stateA.hasOwnProperty("maxX"))
 				animation.stop()
 
 			if property is "y" and (
-				@_stateA.hasOwnProperty("minY") or 
-				@_stateA.hasOwnProperty("midY") or 
+				@_stateA.hasOwnProperty("minY") or
+				@_stateA.hasOwnProperty("midY") or
 				@_stateA.hasOwnProperty("maxY"))
 				animation.stop()
 
@@ -145,7 +145,7 @@ class exports.Animation extends EventEmitter
 		return true
 
 	stop: (emit=true)->
-		
+
 		@options.layer.context.removeAnimation(@)
 
 		@emit("stop") if emit
@@ -266,13 +266,13 @@ class exports.Animation extends EventEmitter
 			else if _.isString(v)
 				if Color.isColorString(v)
 					animatableProperties[k] = new Color(v)
-			
+
 
 		return animatableProperties
 
 	##############################################################
 	## EVENT HELPERS
-	
+
 	onAnimationStart: (cb) -> @on(Events.AnimationStart, cb)
 	onAnimationStop: (cb) -> @on(Events.AnimationStop, cb)
 	onAnimationEnd: (cb) -> @on(Events.AnimationEnd, cb)

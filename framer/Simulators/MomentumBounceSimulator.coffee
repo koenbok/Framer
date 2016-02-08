@@ -53,12 +53,12 @@ class exports.MomentumBounceSimulator extends Simulator
 
 	setState: (state) ->
 
-		@_state = 
+		@_state =
 			x: state.x
 			v: state.v
 
 		@_frictionSimulator.setState(@_state)
-		
+
 		if @_isValidState()
 			@_tryTransitionToSpring()
 		else
@@ -72,7 +72,7 @@ class exports.MomentumBounceSimulator extends Simulator
 
 		belowMinWithVelocity = @_state.x < @options.min && @_state.v <= 0
 		aboveMaxWithVelocity = @_state.x > @options.max && @_state.v >= 0
-		
+
 		if (belowMinWithVelocity || aboveMaxWithVelocity)
 			bound = @options.min if belowMinWithVelocity
 			bound = @options.max if aboveMaxWithVelocity
@@ -91,11 +91,11 @@ class exports.MomentumBounceSimulator extends Simulator
 	# work. If not, the state is invalid, so use the spring.
 	_isValidState: ->
 
-		# Note that if velocity is 0, the state is still valid (should use spring, 
+		# Note that if velocity is 0, the state is still valid (should use spring,
 		# not friction), and we don't want to divide by 0 later in the check.
 		belowMinTravelingBack = @_state.x < @options.min && @_state.v > 0
 		aboveMaxTravelingBack = @_state.x > @options.max && @_state.v < 0
-		
+
 		check = false
 
 		if (belowMinTravelingBack)
@@ -114,42 +114,42 @@ class exports.MomentumBounceSimulator extends Simulator
 		return true
 
 	# The math behind _isValidState:
-	# 
+	#
 	# 1. Integrate the friction simulator's acceleration to find velocity
-	# 
+	#
 	#         a = - k * v
 	#     dv/dt = - k * v
 	# Int(dv/v) = - k * Int(dt)
 	#      ln v = - k * t + C
-	# 
+	#
 	# => Solve for C at t = 0
-	# 
+	#
 	# ln v(0) = - k * 0 + C
 	# ln v(0) = C
-	# 
+	#
 	# => Plug C back into v(t)
-	# 
+	#
 	#     ln v = - k * t + ln v(0)
 	# e^(ln v) = e^(- k * t) + e^(ln v(0))
 	#        v = v(0) * e^(- k * t)
-	# 
+	#
 	# 2. Integrate velocity to find position
-	# 
+	#
 	# Int(v) = v(0) * Int(e^(- k * t))
 	#      x = - v(0) * e^(-k * t) / k + C
-	# 
+	#
 	# => Solve for C at t = 0
-	# 
+	#
 	#            x(0) = - v(0) * e^(-k * 0) / k + C
 	#            x(0) = - v(0) / k + C
 	# x(0) + v(0) / k = C
-	# 
+	#
 	# => Plug C back into x(t)
-	# 
+	#
 	# x = - v(0) * e^(-k * t) / k + x(0) + v(0) / k
-	# 
+	#
 	# 3. Check if a (real) solution exists for t for position x
-	# 
+	#
 	#                                x = - v(0) * e^(-k * t) / k + x(0) + v(0) / k
 	#                         x - x(0) = - v(0) * e^(-k * t) / k + v(0) / k
 	#                   k * (x - x(0)) = - v(0) * e^(-k * t) + v(0)
@@ -157,5 +157,5 @@ class exports.MomentumBounceSimulator extends Simulator
 	# (k * (x - x(0)) - v(0)) / - v(0) = e^(-k * t)
 	#       1 - (k * (x - x(0)) / v(0) = e^(-k * t)
 	#   ln(1 - (k * (x - x(0)) / v(0)) = -k * t
-	# 
+	#
 	# Therefore, a real solution exists if 1 - (k * (x - x(0)) / v(0) > 0

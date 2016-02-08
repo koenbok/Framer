@@ -73,7 +73,7 @@ gulp.task "test", ["build-debug", "build-test"], ->
 	return gulp
 		.src("test/phantomjs/index.html")
 		.pipe(phantomjs({
-			reporter:"dot", 
+			reporter:"dot",
 			viewportSize: {width: 1024, height: 768},
 			useColors: true,
 			loadImages: false
@@ -102,9 +102,9 @@ gulp.task "version", (callback) ->
 		(cb) -> command("git rev-parse --abbrev-ref HEAD", cb) # branch
 		(cb) -> command("git describe --always --dirty", cb) # hash
 		(cb) -> command("git rev-list --count HEAD", cb) # build
-	], (err, results) ->			
+	], (err, results) ->
 
-		info = 
+		info =
 			branch: results[0]
 			hash: results[1]
 			build: results[2]
@@ -117,7 +117,7 @@ gulp.task "version", (callback) ->
 			info.hash = info.hash.replace("-dirty", "")
 
 		gutil.log "Building ", gutil.colors.green("#{info.branch}/#{info.hash} @#{info.build}")
-		 
+
 		task = gulp.src("framer/Version.coffee.template")
 			.pipe(template(info))
 			.pipe(rename({

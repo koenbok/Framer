@@ -5,7 +5,7 @@ body {
 	margin: 0;
 }
 
-.framerContext {	
+.framerContext {
 	position: absolute;
 	left: 0;
 	top: 0;

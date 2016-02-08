@@ -5,10 +5,10 @@ compatWarning = (msg) ->
 
 compatProperty = (name, originalName) ->
 	enumerable: false
-	get: -> 
+	get: ->
 		compatWarning "#{originalName} is a deprecated property"
 		@[name]
-	set: (value) -> 
+	set: (value) ->
 		compatWarning "#{originalName} is a deprecated property"
 		@[name] = value
 
@@ -50,6 +50,3 @@ window.ScrollView = CompatScrollView
 
 # Utils were utils in Framer 2
 window.utils = window.Utils
-
-	
-
