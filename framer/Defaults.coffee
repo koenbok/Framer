@@ -24,7 +24,7 @@ Originals =
 	DeviceComponent:
 		fullScreen: false
 		padding: 50
-		deviceType: "iphone-5s-spacegray"
+		deviceType: "apple-iphone-6s-silver"
 		deviceZoom: "fit"
 		contentZoom: 1
 		orientation: "portrait"
