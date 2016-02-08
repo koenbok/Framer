@@ -164,8 +164,6 @@ class exports.LayerDraggable extends BaseClass
 		@_point = @_correctedLayerStartPoint
 		@_ignoreUpdateLayerPosition = false
 
-		@emit(Events.DragStart, event)
-
 	_touchMove: (event) =>
 
 		return unless @enabled
@@ -225,8 +223,10 @@ class exports.LayerDraggable extends BaseClass
 
 		# Update the dragging status
 		if point.x isnt @_layerStartPoint.x or point.y isnt @_layerStartPoint.y
-			@_isDragging = true
-			@_isMoving = true
+			if not @_isDragging
+				@_isDragging = true
+				@_isMoving = true
+				@emit(Events.DragStart, event)
 
 		# Move literally means move. If there is no movement, we do not emit.
 		if @isDragging
