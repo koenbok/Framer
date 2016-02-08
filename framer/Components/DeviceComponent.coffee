@@ -1,8 +1,6 @@
 Utils = require "../Utils"
 {_}   = require "../Underscore"
 
-DeviceComponentDefaultDevice = "iphone-6-silver"
-
 {BaseClass} = require "../BaseClass"
 {Layer} = require "../Layer"
 {Defaults} = require "../Defaults"
