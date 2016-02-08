@@ -285,7 +285,7 @@ class exports.DeviceComponent extends BaseClass
 		return "#{@_deviceType}.png"
 
 	_deviceImageUrl: (name) ->
-		
+
 		return null unless name
 
 		# If the image is externally hosted, we'd like to use that

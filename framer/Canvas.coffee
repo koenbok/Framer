@@ -2,7 +2,7 @@
 {Events} = require "./Events"
 
 class CanvasClass extends BaseClass
-	
+
 	@define "width",  get: -> window.innerWidth
 	@define "height", get: -> window.innerHeight
 	@define "size", get: -> {width:@width, height:@height}
@@ -24,12 +24,12 @@ class CanvasClass extends BaseClass
 		if eventName is "resize"
 			Events.wrap(window).addEventListener "resize", =>
 				@emit("resize")
-		
+
 		super(eventName, listener)
 
 	on: @::addListener
 
 	onResize: (cb) -> @on("resize", cb)
-	
+
 # We use this as a singleton
 exports.Canvas = new CanvasClass

@@ -32,7 +32,7 @@ exports.print = (args...) ->
 				"padding": "8px"
 				"padding-bottom": "30px"
 				"border-top": "1px solid #d9d9d9"
-			
+
 			printLayer.opacity = 0.9
 			printLayer.style.zIndex = 999 # Always stay on top
 			printLayer.visible = true
@@ -47,14 +47,14 @@ exports.print = (args...) ->
 			update()
 
 			printContext.domEventManager.wrap(window).addEventListener("resize", update)
-		
+
 		printPrefix = "» "
 		printNode = document.createElement("div")
 		printNode.innerHTML = _.escape(printPrefix + args.map((obj) -> Utils.inspect(obj)).join(", ")) + "<br>"
 		printNode.style["-webkit-user-select"] = "text"
 		printNode.style["cursor"] = "auto"
-		
+
 		printLayer._element.appendChild(printNode)
-	
+
 	Utils.delay 0, ->
 		printLayer._element.scrollTop = printLayer._element.scrollHeight

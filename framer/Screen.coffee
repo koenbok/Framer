@@ -1,7 +1,7 @@
 {BaseClass} = require "./BaseClass"
 
 class ScreenClass extends BaseClass
-	
+
 	@define "width",  get: -> Framer.CurrentContext.width
 	@define "height", get: -> Framer.CurrentContext.height
 	@define "size", get: -> Framer.CurrentContext.size
@@ -68,6 +68,6 @@ class ScreenClass extends BaseClass
 	onEdgeSwipeLeft:(cb) -> @on(Events.EdgeSwipeLeft, cb)
 	onEdgeSwipeLeftStart:(cb) -> @on(Events.EdgeSwipeLeftStart, cb)
 	onEdgeSwipeLeftEnd:(cb) -> @on(Events.EdgeSwipeLeftEnd, cb)
-	
+
 # We use this as a singleton
 exports.Screen = new ScreenClass

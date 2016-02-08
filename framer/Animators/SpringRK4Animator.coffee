@@ -31,11 +31,11 @@ class exports.SpringRK4Animator extends Animator
 
 		stateBefore = {}
 		stateAfter = {}
-		
+
 		# Calculate previous state
 		stateBefore.x = @_value - 1
 		stateBefore.v = @_velocity
-		
+
 		# Calculate new state
 		stateAfter = @_integrator.integrateState stateBefore, delta
 		@_value = 1 + stateAfter.x
@@ -46,7 +46,7 @@ class exports.SpringRK4Animator extends Animator
 		# See if we reached the end state
 		netValueIsLow = Math.abs(netFloat) < @options.tolerance
 		netVelocityIsLow = Math.abs(net1DVelocity) < @options.tolerance
-				
+
 		@_stopSpring = netValueIsLow and netVelocityIsLow
 		@_velocity = finalVelocity
 

@@ -7,7 +7,7 @@ class AnimationGroup extends EventEmitter
 	constructor: (animations=[]) ->
 		@setAnimations(animations)
 		@_currentAnimation = null
-	
+
 	setAnimations: (animations) ->
 		# Copy all animations so we can use the same one for repeat
 		@_animations = _.map animations, (animation) -> animation.copy()

@@ -292,9 +292,9 @@ Utils.isSafari = ->
 Utils.isTouch = ->
 	# This needs to be a little more extensive because we
 	# patch ontouchstart to fake Hammer
-	window.ontouchstart is null and 
-	window.ontouchmove is null and 
-	window.ontouchend is null 
+	window.ontouchstart is null and
+	window.ontouchmove is null and
+	window.ontouchend is null
 
 Utils.isDesktop = ->
 	Utils.deviceType() is "desktop"
@@ -815,10 +815,10 @@ Utils.rotationNormalizer = ->
 		diff = lastValue - value
 		maxDiff = Math.abs(diff) + 180
 		nTimes = Math.floor(maxDiff / 360)
-		
+
 		value -= (nTimes * 360) if diff < 180
 		value += (nTimes * 360) if diff > 180
-		
+
 		lastValue = value
 		return value
 

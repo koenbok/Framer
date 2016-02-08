@@ -29,7 +29,7 @@ describe "Context", ->
 		it "should remove events", ->
 
 			context = new Framer.Context(name:"Test")
-			
+
 			layer = null
 			handler = ->
 
@@ -45,7 +45,7 @@ describe "Context", ->
 		it "should restore events", ->
 
 			context = new Framer.Context(name:"Test")
-			
+
 			layer = null
 			handler = ->
 
@@ -62,7 +62,7 @@ describe "Context", ->
 		it "should freeze and restore multiple events on multiple layers", ->
 
 			context = new Framer.Context(name:"Test")
-			
+
 			layerA = layerB = null
 			handlerA = ->
 			handlerB = ->
@@ -70,11 +70,11 @@ describe "Context", ->
 			handlerD = ->
 
 			context.run ->
-				
+
 				layerA = new Layer
 				layerA.on(Events.Click, handlerA)
 				layerA.on(Events.Click, handlerB)
-				
+
 				layerB = new Layer
 				layerB.on(Events.Scroll, handlerC)
 				layerB.on(Events.Scroll, handlerD)
@@ -94,7 +94,7 @@ describe "Context", ->
 		it "should freeze and restore multiple events a layer", ->
 
 			context = new Framer.Context(name:"Test")
-			
+
 			layerA = null
 			handlerA = ->
 			handlerB = ->
@@ -102,7 +102,7 @@ describe "Context", ->
 			handlerD = ->
 
 			context.run ->
-				
+
 				layerA = new Layer
 				layerA.on(Events.Click, handlerA)
 				layerA.on(Events.Click, handlerB)
@@ -124,7 +124,7 @@ describe "Context", ->
 		it "should stop animations", ->
 
 			context = new Framer.Context(name:"Test")
-			
+
 			layer = null
 			animation = null
 
@@ -144,7 +144,7 @@ describe "Context", ->
 		it "should stop timers", ->
 
 			context = new Framer.Context(name:"Test")
-			
+
 			layer = null
 			timer = null
 
@@ -215,7 +215,7 @@ describe "Context", ->
 	describe "Styling", ->
 
 		it "should set backgroundColor", ->
-			
+
 			context = new Framer.Context(name:"Test")
 			context.backgroundColor = "red"
 			color = new Color "red"

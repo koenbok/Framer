@@ -17,20 +17,25 @@ Events.Drag                  = "dragmove"
 Events.DragEnd               = "dragend"
 Events.DragAnimationStart 	 = "draganimationstart"
 Events.DragAnimationEnd   	 = "draganimationend"
-Events.DirectionLockStart = "directionlockstart"
+Events.DirectionLockStart    = "directionlockstart"
+
+# Add deprecated aliases
+Events.DragAnimationDidStart = Events.DragAnimationStart
+Events.DragAnimationDidEnd = Events.DragAnimationEnd
+
 
 """
-             
-    ┌──────┐                   │         
-    │      │                             
-    │      │  ───────────────▶ │ ◀────▶  
-    │      │                             
-    └──────┘                   │         
-                                         
-    ════════  ═════════════════ ═══════  
-                                         
-      Drag         Momentum      Bounce  
-                                             
+
+    ┌──────┐                   │
+    │      │
+    │      │  ───────────────▶ │ ◀────▶
+    │      │
+    └──────┘                   │
+
+    ════════  ═════════════════ ═══════
+
+      Drag         Momentum      Bounce
+
 """
 
 class exports.LayerDraggable extends BaseClass
@@ -48,9 +53,11 @@ class exports.LayerDraggable extends BaseClass
 
 	@define "constraints",
 		get: -> @_constraints
-		set: (value) -> 
+		set: (value) ->
 			if value and _.isObject(value)
-				@_constraints = _.defaults(value, {x:0, y:0, width:0, height:0})
+				value = _.pick(value, ["x", "y", "width", "height"])
+				value = _.defaults(value, {x:0, y:0, width:0, height:0})
+				@_constraints = value
 			else
 				@_constraints = {x:0, y:0, width:0, height:0}
 			@_updateSimulationConstraints(@_constraints) if @_constraints
@@ -68,7 +75,7 @@ class exports.LayerDraggable extends BaseClass
 	@define "offset",
 		get: ->
 			return {x:0, y:0} if not @_correctedLayerStartPoint
-			return offset = 
+			return offset =
 				x: @layer.x - @_correctedLayerStartPoint.x
 				y: @layer.y - @_correctedLayerStartPoint.y
 
@@ -82,17 +89,17 @@ class exports.LayerDraggable extends BaseClass
 
 		@enabled = true
 
-		# TODO: will have to change panRecognizer's horizontal/vertical etc 
+		# TODO: will have to change panRecognizer's horizontal/vertical etc
 		# when they are changed on the LayerDraggable
 		# @_panRecognizer = new PanRecognizer @eventBuffer
-		
+
 		@_eventBuffer = new EventBuffer
 		@_constraints = null
 		@_ignoreUpdateLayerPosition = true
 
 		@attach()
 
-	attach: -> 
+	attach: ->
 		@layer.on(Gestures.TapStart, @touchStart)
 		@layer.on(Gestures.Pan, @_touchMove)
 		@layer.on(Gestures.TapEnd, @_touchEnd)
@@ -144,8 +151,8 @@ class exports.LayerDraggable extends BaseClass
 		# Store original layer position
 		@_layerStartPoint = @layer.point
 		@_correctedLayerStartPoint = @layer.point
-		
-		# If we are beyond bounds, we need to correct for the scaled clamping from the last drag, 
+
+		# If we are beyond bounds, we need to correct for the scaled clamping from the last drag,
 		# hence the 1 / overdragScale
 		if @constraints and @bounce
 			@_correctedLayerStartPoint = @_constrainPosition(
@@ -164,11 +171,12 @@ class exports.LayerDraggable extends BaseClass
 		@_point = @_correctedLayerStartPoint
 		@_ignoreUpdateLayerPosition = false
 
-		@emit(Events.DragStart, event)
-
 	_touchMove: (event) =>
-		
+
 		return unless @enabled
+
+		# If we started dragging from another event we need to capture some initial values
+		@touchStart(event) if not @_point
 
 		@_lastEvent = event
 
@@ -186,18 +194,19 @@ class exports.LayerDraggable extends BaseClass
 		if @overdrag is false
 			# TODO: We still need to account for the cursor offset here
 			frame = Utils.convertFrameToContext(@constraints, @layer, true, false)
-			return if event.point.x < Utils.frameGetMinX(frame) 
+			return if event.point.x < Utils.frameGetMinX(frame)
 			return if event.point.x > Utils.frameGetMaxX(frame)
-			return if event.point.y < Utils.frameGetMinY(frame) 
+			return if event.point.y < Utils.frameGetMinY(frame)
 			return if event.point.y > Utils.frameGetMaxY(frame)
-	
+
+
 		point = _.clone(@_point)
 
 		scaleX = (1 / @layer.canvasScaleX() * @layer.scale * @layer.scaleX)
 		scaleY = (1 / @layer.canvasScaleY() * @layer.scale * @layer.scaleY)
 
-		point.x = @_point.x + (event.delta.x * scaleX) if @horizontal
-		point.y = @_point.y + (event.delta.y * scaleY) if @vertical
+		point.x = @_point.x + (event.delta.x * scaleX * @speedX) if @horizontal
+		point.y = @_point.y + (event.delta.y * scaleY * @speedY) if @vertical
 
 		# Save the point for the next update so we have the unrounded, unconstrained value
 		@_point = _.clone(point)
@@ -213,7 +222,7 @@ class exports.LayerDraggable extends BaseClass
 				offset.x = offset.x * @speedX * (1 / @layer.canvasScaleX()) * @layer.scaleX * @layer.scale
 				offset.y = offset.y * @speedY * (1 / @layer.canvasScaleY()) * @layer.scaleY * @layer.scale
 
-				@_updatedirectionLock(offset) 
+				@_updatedirectionLock(offset)
 				return
 			else
 				point.x = @_layerStartPoint.x if @_directionLockEnabledX
@@ -221,8 +230,10 @@ class exports.LayerDraggable extends BaseClass
 
 		# Update the dragging status
 		if point.x isnt @_layerStartPoint.x or point.y isnt @_layerStartPoint.y
-			@_isDragging = true
-			@_isMoving = true
+			if not @_isDragging
+				@_isDragging = true
+				@_isMoving = true
+				@emit(Events.DragStart, event)
 
 		# Move literally means move. If there is no movement, we do not emit.
 		if @isDragging
@@ -238,7 +249,7 @@ class exports.LayerDraggable extends BaseClass
 		@_ignoreUpdateLayerPosition = true
 		@layer.point = @updatePosition(point)
 		@_ignoreUpdateLayerPosition = false
- 
+
 		if @isDragging
 			@emit(Events.Move, @layer.point)
 			@emit(Events.DragDidMove, event)
@@ -248,13 +259,13 @@ class exports.LayerDraggable extends BaseClass
 		event.stopPropagation() if @propagateEvents is false
 
 		# Start the simulation prior to emitting the DragEnd event.
-		# This way, if the user calls layer.animate on DragEnd, the simulation will 
+		# This way, if the user calls layer.animate on DragEnd, the simulation will
 		# be canceled by the user's animation (if the user animates x and/or y).
 		@_startSimulation()
 
 		@emit(Events.DragEnd, event)
 
-		# Set _isDragging after DragEnd is fired, so that calls to calculateVelocity() 
+		# Set _isDragging after DragEnd is fired, so that calls to calculateVelocity()
 		# still returns dragging velocity - both in case the user calls calculateVelocity(),
 		# (which would return a stale value before the simulation had finished one tick)
 		# and because @_start currently calls calculateVelocity().
@@ -271,10 +282,10 @@ class exports.LayerDraggable extends BaseClass
 			return {x:0, y:0} unless @constraints
 			{minX, maxX, minY, maxY} = @_calculateConstraints(@constraints)
 			point = @layer.point
-			constrainedPoint = 
+			constrainedPoint =
 				x: Utils.clamp(point.x, minX, maxX)
 				y: Utils.clamp(point.y, minY, maxY)
-			offset = 
+			offset =
 				x: point.x - constrainedPoint.x
 				y: point.y - constrainedPoint.y
 			return offset
@@ -295,13 +306,19 @@ class exports.LayerDraggable extends BaseClass
 	_calculateConstraints: (bounds) ->
 
 		if not bounds
-			return constraints = 
+			return constraints =
 				minX: Infinity
 				maxX: Infinity
 				minY: Infinity
 				maxY: Infinity
 
-		constraints = 
+		# Correct the constraints if the layer size exceeds the constraints
+		bounds.width = @layer.width if bounds.width < @layer.width
+		bounds.height = @layer.height if bounds.height < @layer.height
+
+		#bounds.width = _.max([bounds.width, @layer.width])
+
+		constraints =
 			minX: Utils.frameGetMinX(bounds)
 			maxX: Utils.frameGetMaxX(bounds)
 			minY: Utils.frameGetMinY(bounds)
@@ -314,15 +331,15 @@ class exports.LayerDraggable extends BaseClass
 		return constraints
 
 	_constrainPosition: (proposedPoint, bounds, scale) ->
-		
+
 		{minX, maxX, minY, maxY} = @_calculateConstraints(@_constraints)
 
 		if @overdrag
-			point = 
+			point =
 				x: @_clampAndScale(proposedPoint.x, minX, maxX, scale)
 				y: @_clampAndScale(proposedPoint.y, minY, maxY, scale)
 		else
-			point = 
+			point =
 				x: Utils.clamp(proposedPoint.x, minX, maxX)
 				y: Utils.clamp(proposedPoint.y, minY, maxY)
 
@@ -337,7 +354,7 @@ class exports.LayerDraggable extends BaseClass
 	@define "velocity",
 		get: ->
 			return @_calculateSimulationVelocity() if @isAnimating
-			return @_eventBuffer.velocity 
+			return @_eventBuffer.velocity
 			return {x:0, y:0}
 
 			# return @_eventBuffer.velocity if @isDragging
@@ -389,21 +406,21 @@ class exports.LayerDraggable extends BaseClass
 	# Lock Direction
 
 	_updatedirectionLock: (correctedDelta) ->
-		
+
 		@_directionLockEnabledX = Math.abs(correctedDelta.y) > @directionLockThreshold.y
 		@_directionLockEnabledY = Math.abs(correctedDelta.x) > @directionLockThreshold.x
-		
+
 		# TODO: This wasn't working as advertised. We shouls have a way to scroll diagonally
 		# if we were sort of moving into both directions equally.
-		
+
 		# xSlightlyPreferred = Math.abs(correctedDelta.y) > @directionLockThreshold.y / 2
 		# ySlightlyPreferred = Math.abs(correctedDelta.x) > @directionLockThreshold.x / 2
-		
+
 		# # Allow locking in both directions at the same time
 		# @_directionLockEnabledX = @_directionLockEnabledY = true if (xSlightlyPreferred and ySlightlyPreferred)
 
 		if @_directionLockEnabledX or @_directionLockEnabledY
-			@emit Events.DirectionLockStart, 
+			@emit Events.DirectionLockStart,
 				x: @_directionLockEnabledX
 				y: @_directionLockEnabledY
 
@@ -417,14 +434,14 @@ class exports.LayerDraggable extends BaseClass
 	_setupSimulation: ->
 		return if @_simulation
 
-		@_simulation = 
+		@_simulation =
 			x: @_setupSimulationForAxis("x")
 			y: @_setupSimulationForAxis("y")
 
 		@_updateSimulationConstraints(@constraints)
 
 	_setupSimulationForAxis: (axis) ->
-		
+
 		properties = {}
 		properties[axis] = true
 
@@ -470,8 +487,8 @@ class exports.LayerDraggable extends BaseClass
 			delta = state.x - @layer[axis]
 
 		updatePoint = @layer.point
-		updatePoint[axis] = updatePoint[axis] + (delta * @speedX) if axis is "x"
-		updatePoint[axis] = updatePoint[axis] + (delta * @speedY) if axis is "y"
+		updatePoint[axis] = updatePoint[axis] + delta if axis is "x"
+		updatePoint[axis] = updatePoint[axis] + delta if axis is "y"
 		@updatePosition(updatePoint)
 
 		@layer[axis] = @updatePosition(updatePoint)[axis]
@@ -520,7 +537,7 @@ class exports.LayerDraggable extends BaseClass
 		@_setupSimulation()
 		@_isAnimating = true
 		@_isMoving = true
-		
+
 		@_simulation.x.simulator.setState
 			x: @layer.x
 			v: velocityX
@@ -547,7 +564,7 @@ class exports.LayerDraggable extends BaseClass
 
 	##############################################################
 	## EVENT HELPERS
-	
+
 	onMove: (cb) -> @on(Events.Move, cb)
 	onDragStart: (cb) -> @on(Events.DragStart, cb)
 	onDragWillMove: (cb) -> @on(Events.DragWillMove, cb)
@@ -558,4 +575,3 @@ class exports.LayerDraggable extends BaseClass
 	onDragAnimationStart: (cb) -> @on(Events.DragAnimationStart, cb)
 	onDragAnimationEnd: (cb) -> @on(Events.DragAnimationEnd, cb)
 	onDirectionLockStart: (cb) -> @on(Events.DirectionLockStart, cb)
-

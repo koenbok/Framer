@@ -20,7 +20,7 @@ describe "Utils", ->
 
 			f("a").should.eql ["a"]
 			f("a", "b").should.eql ["a", "b"]
-			
+
 			f(["a"]).should.eql ["a"]
 			f(["a", "b"]).should.eql ["a", "b"]
 
@@ -197,7 +197,7 @@ describe "Utils", ->
 		it "should have the right results", ->
 			Utils.modulate(0.5, [0, 1], [0, 100]).should.equal 50
 			Utils.modulate(1, [0, 1], [0, 100]).should.equal 100
-			
+
 			Utils.modulate(2, [0, 1], [0, 100], true).should.equal 100
 			Utils.modulate(2, [0, 1], [0, 100], false).should.equal 200
 

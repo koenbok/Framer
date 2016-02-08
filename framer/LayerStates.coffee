@@ -86,7 +86,7 @@ class exports.LayerStates extends BaseClass
 			# Allow dynamic properties as functions
 			value = value.call(@layer, @layer, stateName) if _.isFunction(value)
 
-			# Set the new value 
+			# Set the new value
 			properties[propertyName] = value
 
 		# If we are only transitioning to non-animatable (numeric) properties
@@ -116,8 +116,8 @@ class exports.LayerStates extends BaseClass
 
 			@_animation?.stop()
 			@_animation = @layer.animate animationOptions
-			@_animation.on "stop", => 
-				
+			@_animation.on "stop", =>
+
 				# Set all the values for keys that we couldn't animate
 				for k, v of properties
 					@layer[k] = v unless _.isNumber(v) or Color.isColorObject(v)

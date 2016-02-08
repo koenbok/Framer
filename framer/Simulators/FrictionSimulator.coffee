@@ -21,12 +21,11 @@ class exports.FrictionSimulator extends Simulator
 			return - (@options.friction * state.v)
 
 	next: (delta) ->
-		
+
 		@_state = @_integrator.integrateState(@_state, delta)
 
 		return @_state
 
 	finished: =>
-		
-		Math.abs(@_state.v) < @options.tolerance
 
+		Math.abs(@_state.v) < @options.tolerance

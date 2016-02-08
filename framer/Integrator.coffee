@@ -12,7 +12,7 @@ class exports.Integrator
 	"""
 
 	constructor: (@_accelerationForState) ->
-		
+
 		unless _.isFunction(@_accelerationForState)
 			console.warn "Integrator: an integrator must be constructed with an acceleration function"
 			@_accelerationForState = -> 0

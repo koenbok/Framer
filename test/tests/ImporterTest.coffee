@@ -7,7 +7,7 @@ describe "ExternalDocument", ->
 		path = "../static/ExternalDocument"
 
 		layers = Framer.Importer.load Utils.pathJoin(path, name)
-		
+
 		dataA = Framer.Utils.domLoadJSONSync Utils.pathJoin(path, "#{name}.out.json")
 		dataB = {}
 
@@ -68,7 +68,7 @@ describe "ExternalDocument", ->
 
 			# This is terrible, but better than having people load
 			# Chrome with some command line option.
-			
+
 			window.__imported__ ?= {}
 			window.__imported__["Android/layers.json.js"] = "hello"
 
@@ -76,5 +76,3 @@ describe "ExternalDocument", ->
 
 			data = importer._loadlayerInfo()
 			data.should.equal "hello"
-
-

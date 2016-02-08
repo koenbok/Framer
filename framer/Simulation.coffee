@@ -72,7 +72,7 @@ class exports.Simulation extends BaseClass
 		return unless @_running
 
 		@_running = false
-		
+
 		@options.layer.context.removeAnimation(@)
 
 		@emit(Events.SimulationStop) if emit
@@ -111,4 +111,3 @@ class exports.Simulation extends BaseClass
 		get: -> @_simulator
 
 	finished: -> @_simulator.finished()
-

@@ -7,7 +7,7 @@ open -a Google\ Chrome -–allow-file-access-from-files
 """
 
 resizeFrame = (scale, frame) ->
-	
+
 	return frame if scale == 1
 
 	result = {}
@@ -49,7 +49,7 @@ class exports.Importer
 
 		if layerInfo.length is 0
 			throw new Error("Importer: no layers. Do you have at least one layer group?")
-		
+
 		# Pass one. Create all layers build the hierarchy
 		layerInfo.map (layerItemInfo) =>
 			@_createLayer(layerItemInfo)
@@ -77,7 +77,7 @@ class exports.Importer
 	_loadlayerInfo: ->
 
 		# Chrome is a pain in the ass and won't allow local file access
-		# therefore I add a .js file which adds the data to 
+		# therefore I add a .js file which adds the data to
 		# window.__imported__["<path>"]
 
 		importedKey = "#{@paths.documentName}/layers.json.js"
@@ -97,7 +97,7 @@ class exports.Importer
 		# Flattened layers don't get children
 		if not info.children
 			info.children = []
-		
+
 		LayerClass = Layer
 
 		layerInfo =
@@ -114,11 +114,11 @@ class exports.Importer
 		if info.image
 			layerInfo.frame = info.image.frame
 			layerInfo.image = Utils.pathJoin(@path, info.image.path)
-			
+
 		# If there is a mask on this layer we clip the layer
 		if info.maskFrame
 			layerInfo.clip = true
-			
+
 		if layerInfo.kind is "artboard"
 			layerInfo.frame.x = 0
 			layerInfo.frame.y = 0
