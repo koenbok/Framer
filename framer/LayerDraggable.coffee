@@ -17,7 +17,12 @@ Events.Drag                  = "dragmove"
 Events.DragEnd               = "dragend"
 Events.DragAnimationStart 	 = "draganimationstart"
 Events.DragAnimationEnd   	 = "draganimationend"
-Events.DirectionLockStart = "directionlockstart"
+Events.DirectionLockStart    = "directionlockstart"
+
+# Add deprecated aliases
+Events.DragAnimationDidStart = Events.DragAnimationStart
+Events.DragAnimationDidEnd = Events.DragAnimationEnd
+
 
 """
 
