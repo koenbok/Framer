@@ -337,9 +337,9 @@ Utils.framerStudioVersion = ->
 		matches = navigator.userAgent.match(/\d+$/)
 		version = parseInt(matches[0]) if matches and matches.length > 0
 		return version if _.isNumber(version)
-		return Number.MAX_VALUE if navigator.userAgent.indexOf("FramerStudio/local") != -1
 
-	return false
+	# if we don't know the version we are probably running the beta or a local build
+	return Number.MAX_VALUE
 
 Utils.devicePixelRatio = ->
 	window.devicePixelRatio
