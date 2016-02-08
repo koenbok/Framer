@@ -1,6 +1,5 @@
 WebKitCSSMatrix::skew = (skew) ->
-	if !skew || skew == 0
-		return @
+	return @ if not skew
 	rad = skew * Math.PI / 180
 	value = Math.tan(rad)
 	m = new WebKitCSSMatrix()
@@ -9,11 +8,9 @@ WebKitCSSMatrix::skew = (skew) ->
 	return @multiply(m)
 
 WebKitCSSMatrix::point = (point = {}) ->
-	x = point.x || 0
-	y = point.y || 0
-	z = point.z || 0
+	{x, y, z} = _.defaults(point, {x:0, y:0, z:0})
 	w = @m14 * x + @m24 * y + @m34 * z + @m44
-	w = w || 1
+	w = w or 1
 	return point =
 		x: (@m11 * x + @m21 * y + @m31 * z + @m41) / w
 		y: (@m12 * x + @m22 * y + @m32 * z + @m42) / w
