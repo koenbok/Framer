@@ -21,7 +21,7 @@ Utils.sanitizeRotation = ->
 
 
 class exports.GestureInputRecognizer
-	
+
 	constructor: ->
 		@em = new DOMEventManager()
 		@em.wrap(window).addEventListener("touchstart", @touchstart)
@@ -32,7 +32,7 @@ class exports.GestureInputRecognizer
 	cancel: ->
 		window.clearTimeout(@session.pressTimer)
 		@session = null
-	
+
 	touchstart: (event) =>
 
 		# Only fire if we are not already in a session
@@ -41,7 +41,7 @@ class exports.GestureInputRecognizer
 		@em.wrap(window).addEventListener("touchmove", @touchmove)
 		@em.wrap(window).addEventListener("touchend", @touchend)
 		@em.wrap(window).addEventListener("webkitmouseforcechanged", @_updateMacForce)
-		
+
 		@session =
 			startEvent: @_getGestureEvent(event)
 			lastEvent: null
@@ -51,6 +51,7 @@ class exports.GestureInputRecognizer
 			started: {}
 			events: []
 			sanitizeRotation: Utils.sanitizeRotation()
+			eventCount: 0
 
 		event = @_getGestureEvent(event)
 
@@ -66,7 +67,7 @@ class exports.GestureInputRecognizer
 
 	touchmove: (event) =>
 		@_process(@_getGestureEvent(event))
-		
+
 	touchend: (event) =>
 		# Only fire if there are no fingers left on the screen
 
@@ -78,7 +79,7 @@ class exports.GestureInputRecognizer
 		@em.wrap(window).removeEventListener("touchmove", @touchmove)
 		@em.wrap(window).removeEventListener("touchend", @touchend)
 		@em.wrap(window).removeEventListener("webkitmouseforcechanged", @_updateMacForce)
-		
+
 		event = @_getGestureEvent(event)
 
 		for eventName, value of @session.started
@@ -160,7 +161,7 @@ class exports.GestureInputRecognizer
 		@_dispatchEvent("pan", event, @session.started.pan.target)
 		direction = @_getDirection(event.delta)
 		@["pan#{direction}"](event) if direction
-		
+
 	panend: (event) =>
 		@_dispatchEvent("panend", event, @session.started.pan.target)
 		@session.started.pan = null
@@ -182,7 +183,7 @@ class exports.GestureInputRecognizer
 		@_dispatchEvent("pinch", event)
 		@scale(event, @session.started.pinch.target)
 		@rotate(event, @session.started.pinch.target)
-		
+
 	pinchend: (event) =>
 		@_dispatchEvent("pinchend", event)
 		@scaleend(event, @session.started.pinch.target)
@@ -199,7 +200,7 @@ class exports.GestureInputRecognizer
 	rotateend: (event) => @_dispatchEvent("rotateend", event)
 
 	# Swipe
-	
+
 	swipestart: (event) =>
 		@_dispatchEvent("swipestart", event)
 		@session.started.swipe = event
@@ -216,7 +217,7 @@ class exports.GestureInputRecognizer
 
 	swipedirectionstart: (event) =>
 		return unless event.offsetDirection
-		return if @session.started.swipedirection 
+		return if @session.started.swipedirection
 		@session.started.swipedirection = event
 		direction = @session.started.swipedirection.offsetDirection
 		@_dispatchEvent("swipe#{direction}start", event)
@@ -266,12 +267,13 @@ class exports.GestureInputRecognizer
 
 
 	# Utilities
-		
+
 	_process: (event) =>
-		
-		return unless @session 
+
+		return unless @session
 
 		@session.events.push(event)
+		event.eventCount = @session.eventCount++
 
 		# Detect pan events
 
@@ -293,33 +295,33 @@ class exports.GestureInputRecognizer
 		# If we did start send pinch events
 		else if @session.started.pinch
 			@pinch(event)
-			
+
 		# Detect swipe events
 
 		# If we did not start but moved more then the swipe threshold, start
 		if not @session.started.swipe and (
-			Math.abs(event.offset.x) > GestureInputSwipeThreshold or 
+			Math.abs(event.offset.x) > GestureInputSwipeThreshold or
 			Math.abs(event.offset.y) > GestureInputSwipeThreshold)
 				@swipestart(event)
 		# If we did start send swipe events
 		else if @session.started.swipe
 			@swipe(event)
-		
+
 		@session.lastEvent = event
 
-	_getEventPoint: (event) ->		
+	_getEventPoint: (event) ->
 		return @_getTouchPoint(event, 0) if event.touches?.length
 		return {x:event.pageX ,y:event.pageY}
 
 	_getGestureEvent: (event) ->
-		
+
 		_.extend event,
 			time: Date.now() # Current time √
-			
+
 			point: @_getEventPoint(event) # Current point √
 			start: @_getEventPoint(event) # Start point √
 			previous: @_getEventPoint(event) # Previous point √
-			
+
 			offset: {x:0, y:0} # Offset since start √
 			offsetTime: 0 # Time since start √
 			offsetAngle: 0 # Angle from start √
@@ -332,7 +334,7 @@ class exports.GestureInputRecognizer
 
 			force: 0, # 3d touch or force touch, iOS/Mac only √
 			velocity: {x:0, y:0} # Velocity average over the last few events √
-			
+
 			fingers: event.touches?.length or 0 # Number of fingers used √
 			touchCenter: @_getEventPoint(event) # Center between two fingers √
 			touchOffset: {x:0, y:0} # Offset between two fingers √
@@ -349,7 +351,7 @@ class exports.GestureInputRecognizer
 			event.offsetAngle = Utils.pointAngle(@session.startEvent.point, event.point)
 			event.offsetDirection = @_getDirection(event.offset)
 			event.touchCenterStart = @session.startEvent.touchCenter
-	
+
 		# Properties relative to the previous event
 		if @session?.lastEvent
 			event.previous = @session.lastEvent.point
@@ -371,8 +373,10 @@ class exports.GestureInputRecognizer
 
 		# Velocity
 		if @session?.events
-			events = _.filter @session.events, (e) -> 
+			events = _.filter @session.events, (e) ->
+				return false if e.eventCount is 0
 				return e.time > (event.time - (GestureInputVelocityTime * 1000))
+
 			event.velocity = @_getVelocity(events)
 
 		# Scale can only be set after we started a pinch session
@@ -403,14 +407,14 @@ class exports.GestureInputRecognizer
 		for pointKey in ["point", "start", "previous", "offset", "delta", "velocity", "touchCenter", "touchOffset"]
 			event["#{pointKey}X"] = event[pointKey].x
 			event["#{pointKey}Y"] = event[pointKey].y
-			
+
 		return event
-	
+
 	_getTouchPoint: (event, index) ->
 		return point =
 			x: event.touches[index].pageX
 			y: event.touches[index].pageY
-			
+
 	_getDirection: (offset) ->
 		if Math.abs(offset.x) > Math.abs(offset.y)
 			return "right" if offset.x > 0
@@ -419,7 +423,7 @@ class exports.GestureInputRecognizer
 			return "up"    if offset.y < 0
 			return "down"  if offset.y > 0
 		return null
-	
+
 	_edgeForSwipeDirection: (direction) ->
 		return "top" if direction is "down"
 		return "right" if direction is "left"
@@ -435,16 +439,16 @@ class exports.GestureInputRecognizer
 	_createEvent: (type, event) ->
 
 		touchEvent = document.createEvent("MouseEvent")
-		touchEvent.initMouseEvent(type, true, true, window, 
-			event.detail, event.screenX, event.screenY, 
-			event.clientX, event.clientY, 
-			event.ctrlKey, event.shiftKey, event.altKey, event.metaKey, 
+		touchEvent.initMouseEvent(type, true, true, window,
+			event.detail, event.screenX, event.screenY,
+			event.clientX, event.clientY,
+			event.ctrlKey, event.shiftKey, event.altKey, event.metaKey,
 			event.button, event.relatedTarget)
-			
+
 		touchEvent.touches = event.touches
 		touchEvent.changedTouches = event.touches
 		touchEvent.targetTouches = event.touches
-		
+
 		for k, v of event
 			touchEvent[k] = v
 
@@ -462,6 +466,7 @@ class exports.GestureInputRecognizer
 		current = events[events.length - 1]
 		first   = events[0]
 		time    = current.time - first.time
+
 
 		velocity =
 			x: (current.point.x - first.point.x) / time
