@@ -203,8 +203,8 @@ class exports.LayerDraggable extends BaseClass
 		scaleX = (1 / @layer.canvasScaleX() * @layer.scale * @layer.scaleX)
 		scaleY = (1 / @layer.canvasScaleY() * @layer.scale * @layer.scaleY)
 
-		point.x = @_point.x + (event.delta.x * scaleX) if @horizontal
-		point.y = @_point.y + (event.delta.y * scaleY) if @vertical
+		point.x = @_point.x + (event.delta.x * scaleX * @speedX) if @horizontal
+		point.y = @_point.y + (event.delta.y * scaleY * @speedY) if @vertical
 
 		# Save the point for the next update so we have the unrounded, unconstrained value
 		@_point = _.clone(point)
@@ -479,8 +479,8 @@ class exports.LayerDraggable extends BaseClass
 			delta = state.x - @layer[axis]
 
 		updatePoint = @layer.point
-		updatePoint[axis] = updatePoint[axis] + (delta * @speedX) if axis is "x"
-		updatePoint[axis] = updatePoint[axis] + (delta * @speedY) if axis is "y"
+		updatePoint[axis] = updatePoint[axis] + delta if axis is "x"
+		updatePoint[axis] = updatePoint[axis] + delta if axis is "y"
 		@updatePosition(updatePoint)
 
 		@layer[axis] = @updatePosition(updatePoint)[axis]
