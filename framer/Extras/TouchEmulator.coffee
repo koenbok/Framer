@@ -106,7 +106,7 @@ class TouchEmulator extends BaseClass
 
 	mousedown: (event) =>
 
-		cancelEvent(event)
+		# cancelEvent(event)
 
 		@isMouseDown = true
 		@target = event.target
@@ -124,7 +124,7 @@ class TouchEmulator extends BaseClass
 			x: event.pageX
 			y: event.pageY
 
-		cancelEvent(event)
+		# cancelEvent(event)
 
 		@startPoint ?= @point
 		@centerPoint ?= @point
@@ -152,7 +152,7 @@ class TouchEmulator extends BaseClass
 
 	mouseup: (event) =>
 
-		cancelEvent(event)
+		# cancelEvent(event)
 
 		if @isPinchKeyDown or @isPanKeyDown
 			dispatchTouchEvent("touchend", @target, event, @touchPointDelta)
