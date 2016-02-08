@@ -268,7 +268,7 @@ class exports.ScrollComponent extends Layer
 	scrollToLayer: (contentLayer, originX=0, originY=0, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
 
 		if contentLayer and contentLayer.parent isnt @content
-			throw Error("This layer is not in the scroll component content")
+			throw Error("Can't scroll to this layer because it's not in the ScrollComponent. Add it to the content like layer.parent = scroll.content.")
 
 		if not contentLayer or @content.children.length == 0
 			scrollPoint = {x:0, y:0}
