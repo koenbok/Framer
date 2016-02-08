@@ -55,7 +55,9 @@ class exports.LayerDraggable extends BaseClass
 		get: -> @_constraints
 		set: (value) ->
 			if value and _.isObject(value)
-				@_constraints = _.defaults(value, {x:0, y:0, width:0, height:0})
+				value = _.pick(value, ["x", "y", "width", "height"])
+				value = _.defaults(value, {x:0, y:0, width:0, height:0})
+				@_constraints = value
 			else
 				@_constraints = {x:0, y:0, width:0, height:0}
 			@_updateSimulationConstraints(@_constraints) if @_constraints
@@ -309,6 +311,12 @@ class exports.LayerDraggable extends BaseClass
 				maxX: Infinity
 				minY: Infinity
 				maxY: Infinity
+
+		# Correct the constraints if the layer size exceeds the constraints
+		bounds.width = @layer.width if bounds.width < @layer.width
+		bounds.height = @layer.height if bounds.height < @layer.height
+
+		#bounds.width = _.max([bounds.width, @layer.width])
 
 		constraints =
 			minX: Utils.frameGetMinX(bounds)
