@@ -257,12 +257,12 @@ class exports.Context extends BaseClass
 
 	@define "width",
 		get: ->
-			return @parent.width if @parent
+			return @parent.width if @parent?
 			return window.innerWidth
 
 	@define "height",
 		get: ->
-			return @parent.height if @parent
+			return @parent.height if @parent?
 			return window.innerHeight
 
 	@define "frame", get: -> {x:0, y:0, width:@width, height:@height}
@@ -270,7 +270,7 @@ class exports.Context extends BaseClass
 	@define "point", get: -> _.pick(@frame, ["x", "y"])
 	@define "canvasFrame",
 		get: ->
-			return @frame if not parent
+			return @frame if not @parent?
 			return @parent.canvasFrame
 
 	@define "backgroundColor",
