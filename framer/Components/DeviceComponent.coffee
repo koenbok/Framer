@@ -372,6 +372,9 @@ class exports.DeviceComponent extends BaseClass
 			(window.innerHeight - ((@padding + paddingOffset) * 2)) / height
 		])
 
+		# Never scale the phone beyond 100%
+		phoneScale = 1 if phoneScale > 1
+
 		return phoneScale
 
 	###########################################################################

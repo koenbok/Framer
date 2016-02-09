@@ -64,3 +64,6 @@ _builds
 _projects
 extras/DevServer.framer/app.coffee
 extras/DevServer.framer/framer/config.json
+imported
+cursor-active.png
+cursor-active@2x.png
