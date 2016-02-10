@@ -91,8 +91,9 @@ class exports.DeviceComponent extends BaseClass
 		@phone.backgroundColor = "transparent"
 		@phone.classList.add("DevicePhone")
 
-		@screen.backgroundColor = "transparent"
+		@screen.backgroundColor = "black"
 		@screen.classList.add("DeviceScreen")
+		@screen.clip = true
 
 		@viewport.backgroundColor = "transparent"
 		@viewport.classList.add("DeviceComponentPort")
@@ -116,7 +117,6 @@ class exports.DeviceComponent extends BaseClass
 
 		@_context = new Framer.Context(parent:@content, name:"Device")
 		@_context.perspective = 1200
-		@_context.backgroundColor = "black"
 
 	_update: =>
 
@@ -465,7 +465,6 @@ class exports.DeviceComponent extends BaseClass
 				properties: phoneProperties
 			@viewport.animate _.extend @animationOptions,
 				properties: contentProperties
-				
 
 			animation.on Events.AnimationEnd, =>
 				@_update()
