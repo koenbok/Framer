@@ -86,7 +86,7 @@ class exports.ScrollComponent extends Layer
 		# Because we did not have a content layer before, we want to re-apply
 		# the options again so everything gets configures properly.
 		@_applyOptionsAndDefaults(options)
-		@_enableMouseWheelHandling()
+		@_enableMouseWheelHandling(options.mouseWheelEnabled)
 
 		if options.hasOwnProperty("wrap")
 			wrapComponent(@, options.wrap)
