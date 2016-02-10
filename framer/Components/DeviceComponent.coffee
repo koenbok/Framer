@@ -366,6 +366,8 @@ class exports.DeviceComponent extends BaseClass
 
 		paddingOffset = @_device?.paddingOffset or 0
 
+		paddingOffset = 36 if @selectedHand && @_orientation == 0
+
 		phoneScale = _.min([
 			(window.innerWidth  - ((@padding + paddingOffset) * 2)) / width,
 			(window.innerHeight - ((@padding + paddingOffset) * 2)) / height
@@ -598,7 +600,9 @@ class exports.DeviceComponent extends BaseClass
 				nextHandIndex = hands.indexOf(@selectedHand) + 1
 				nextHand = ""
 				nextHand = hands[nextHandIndex] if nextHandIndex < hands.length
-				return @setHand(nextHand)
+				hand = @setHand(nextHand)
+				@_update()
+				return hand
 		return false
 
 	setHand: (hand) ->
