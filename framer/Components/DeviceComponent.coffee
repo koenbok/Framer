@@ -86,6 +86,7 @@ class exports.DeviceComponent extends BaseClass
 		@content  = new Layer parent:@viewport
 
 		@hands.backgroundColor = "transparent"
+		@hands._alwaysUseImageCache = true
 		@handsImageLayer.backgroundColor = "transparent"
 
 		@phone.backgroundColor = "transparent"
