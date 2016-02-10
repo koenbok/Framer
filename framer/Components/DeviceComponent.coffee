@@ -159,8 +159,7 @@ class exports.DeviceComponent extends BaseClass
 
 			@setHand(@selectedHand) if @selectedHand && @_orientation == 0
 
-			@_context.backgroundColor = "white"
-			@_context.backgroundColor = @_device.backgroundColor if @_device.backgroundColor
+			@_context.backgroundColor = "black"
 
 	_shouldRenderFullScreen: ->
 
@@ -877,7 +876,6 @@ AppleWatch42Device =
 	deviceImageJP2: true
 	screenWidth: 312
 	screenHeight: 390
-	backgroundColor: "black"
 	minStudioVersion: newDeviceMinVersion
 
 AppleWatch38Device =
@@ -886,7 +884,6 @@ AppleWatch38Device =
 	deviceImageJP2: true
 	screenWidth: 272
 	screenHeight: 340
-	backgroundColor: "black"
 	minStudioVersion: newDeviceMinVersion
 
 AppleWatch38BlackLeatherDevice =
@@ -895,7 +892,6 @@ AppleWatch38BlackLeatherDevice =
 	deviceImageJP2: true
 	screenWidth: 272
 	screenHeight: 340
-	backgroundColor: "black"
 	minStudioVersion: newDeviceMinVersion
 
 ###########################################################################
