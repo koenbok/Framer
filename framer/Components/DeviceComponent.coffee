@@ -92,7 +92,6 @@ class exports.DeviceComponent extends BaseClass
 		@phone.backgroundColor = "transparent"
 		@phone.classList.add("DevicePhone")
 
-		@screen.backgroundColor = "black"
 		@screen.classList.add("DeviceScreen")
 		@screen.clip = true
 
@@ -136,6 +135,8 @@ class exports.DeviceComponent extends BaseClass
 			@content.scale = contentScaleFactor
 			@_positionKeyboard()
 
+			@screen.backgroundColor = "white"
+
 		else
 			backgroundOverlap = 100
 
@@ -160,6 +161,8 @@ class exports.DeviceComponent extends BaseClass
 			@screen.center()
 
 			@setHand(@selectedHand) if @selectedHand && @_orientation == 0
+
+			@screen.backgroundColor = "black"
 
 	_shouldRenderFullScreen: ->
 
