@@ -638,8 +638,8 @@ class exports.DeviceComponent extends BaseClass
 ###########################################################################
 # DEVICE CONFIGURATIONS
 
-newDeviceMinVersion = 52
-oldDeviceMaxVersion = 51
+newDeviceMinVersion = 53
+oldDeviceMaxVersion = 52
 
 iPadAir2BaseDevice =
 	deviceImageWidth: 1856
