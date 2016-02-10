@@ -422,3 +422,15 @@ describe "Utils", ->
 			Utils.isLocalAssetUrl("Desktop/index.html", "http://apple.com/index.html").should.equal(false)
 			Utils.isLocalAssetUrl("file:///Desktop/index.html", "http://apple.com/index.html").should.equal(true)
 			Utils.isLocalAssetUrl("http://apple.com/index.html", "http://127.0.0.1/index.html").should.equal(false)
+
+	describe "insertStylesheet", ->
+		it "should be inserted", ->
+
+			Utils.insertStylesheet "https://fonts.googleapis.com/icon?family=Material+Icons", ->
+				Utils.insertStylesheet.inserted().should.equal(true)
+
+			Utils.insertStylesheet "foo://bar", ->
+				Utils.insertStylesheet.inserted().should.notEqual(true)
+
+			Utils.insertStylesheet "framer/style.css", ->
+				Utils.insertStylesheet.inserted().should.equal(true)

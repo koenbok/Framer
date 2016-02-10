@@ -527,6 +527,22 @@ Utils.insertCSS = (css) ->
 	Utils.domComplete ->
 		document.body.appendChild(styleElement)
 
+Utils.insertStylesheet = (url, callback) ->
+
+    styleElement = document.createElement("link")
+    styleElement.rel = "stylesheet"
+    styleElement.type = "text/css"
+    styleElement.href = url
+
+    styleElement.addEventListener "load", ->
+        callback() if callback?
+
+    Utils.domComplete ->
+        document.body.appendChild(styleElement)
+
+Utils.insertStylesheet.inserted = ->
+    true
+
 Utils.loadImage = (url, callback, context) ->
 
 	# Loads a single image and calls callback.
