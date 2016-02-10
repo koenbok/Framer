@@ -116,6 +116,7 @@ class exports.DeviceComponent extends BaseClass
 
 		@_context = new Framer.Context(parent:@content, name:"Device")
 		@_context.perspective = 1200
+		@_context.backgroundColor = "black"
 
 	_update: =>
 
@@ -158,8 +159,6 @@ class exports.DeviceComponent extends BaseClass
 			@screen.center()
 
 			@setHand(@selectedHand) if @selectedHand && @_orientation == 0
-
-			@_context.backgroundColor = "black"
 
 	_shouldRenderFullScreen: ->
 
