@@ -240,7 +240,10 @@ class exports.DeviceComponent extends BaseClass
 			device = null
 
 			if _.isString(deviceType)
-				device = Devices[deviceType.toLowerCase()]
+				lDevicetype = deviceType.toLowerCase()
+				for key in _.keys(Devices)
+					lKey = key.toLowerCase()
+					device = Devices[key] if lDevicetype == lKey
 
 			if not device
 				throw Error "No device named #{deviceType}. Options are: #{_.keys Devices}"
