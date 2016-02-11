@@ -369,11 +369,8 @@ class exports.DeviceComponent extends BaseClass
 
 		paddingOffset = @_device?.paddingOffset or 0
 
-		widthOffset = 0
-		widthOffset = 36 if @selectedHand and @_orientation == 0 and @_device.hands[@selectedHand]?
-
 		phoneScale = _.min([
-			(window.innerWidth  - ((@padding + paddingOffset + widthOffset) * 2)) / width,
+			(window.innerWidth  - ((@padding + paddingOffset) * 2)) / width,
 			(window.innerHeight - ((@padding + paddingOffset) * 2)) / height
 		])
 
