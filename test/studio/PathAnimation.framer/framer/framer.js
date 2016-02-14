@@ -62,33 +62,33 @@
 	
 	Framer.Layer = (__webpack_require__(13)).Layer;
 	
-	Framer.BackgroundLayer = (__webpack_require__(37)).BackgroundLayer;
+	Framer.BackgroundLayer = (__webpack_require__(35)).BackgroundLayer;
 	
-	Framer.VideoLayer = (__webpack_require__(38)).VideoLayer;
+	Framer.VideoLayer = (__webpack_require__(36)).VideoLayer;
 	
 	Framer.Events = (__webpack_require__(15)).Events;
 	
-	Framer.Gestures = (__webpack_require__(33)).Gestures;
+	Framer.Gestures = (__webpack_require__(16)).Gestures;
 	
-	Framer.Animation = (__webpack_require__(17)).Animation;
+	Framer.Animation = (__webpack_require__(18)).Animation;
 	
-	Framer.AnimationGroup = (__webpack_require__(39)).AnimationGroup;
+	Framer.AnimationGroup = (__webpack_require__(37)).AnimationGroup;
 	
 	Framer.Screen = (__webpack_require__(5)).Screen;
 	
-	Framer.Path = (__webpack_require__(40)).Path;
+	Framer.Path = (__webpack_require__(38)).Path;
 	
-	Framer.Canvas = (__webpack_require__(41)).Canvas;
+	Framer.Canvas = (__webpack_require__(39)).Canvas;
 	
-	Framer.print = (__webpack_require__(42)).print;
+	Framer.print = (__webpack_require__(40)).print;
 	
-	Framer.ScrollComponent = (__webpack_require__(45)).ScrollComponent;
+	Framer.ScrollComponent = (__webpack_require__(43)).ScrollComponent;
 	
-	Framer.PageComponent = (__webpack_require__(46)).PageComponent;
+	Framer.PageComponent = (__webpack_require__(44)).PageComponent;
 	
-	Framer.SliderComponent = (__webpack_require__(47)).SliderComponent;
+	Framer.SliderComponent = (__webpack_require__(45)).SliderComponent;
 	
-	Framer.DeviceComponent = (__webpack_require__(48)).DeviceComponent;
+	Framer.DeviceComponent = (__webpack_require__(46)).DeviceComponent;
 	
 	Framer.DeviceView = Framer.DeviceComponent;
 	
@@ -96,7 +96,7 @@
 	  _.extend(window, Framer);
 	}
 	
-	Framer.Context = (__webpack_require__(43)).Context;
+	Framer.Context = (__webpack_require__(41)).Context;
 	
 	Framer.Config = (__webpack_require__(14)).Config;
 	
@@ -104,27 +104,27 @@
 	
 	Framer.BaseClass = (__webpack_require__(6)).BaseClass;
 	
-	Framer.LayerStyle = (__webpack_require__(24)).LayerStyle;
+	Framer.LayerStyle = (__webpack_require__(25)).LayerStyle;
 	
-	Framer.AnimationLoop = (__webpack_require__(49)).AnimationLoop;
+	Framer.AnimationLoop = (__webpack_require__(47)).AnimationLoop;
 	
-	Framer.LinearAnimator = (__webpack_require__(18)).LinearAnimator;
+	Framer.LinearAnimator = (__webpack_require__(19)).LinearAnimator;
 	
-	Framer.BezierCurveAnimator = (__webpack_require__(20)).BezierCurveAnimator;
+	Framer.BezierCurveAnimator = (__webpack_require__(21)).BezierCurveAnimator;
 	
-	Framer.SpringDHOAnimator = (__webpack_require__(23)).SpringDHOAnimator;
+	Framer.SpringDHOAnimator = (__webpack_require__(24)).SpringDHOAnimator;
 	
-	Framer.SpringRK4Animator = (__webpack_require__(21)).SpringRK4Animator;
+	Framer.SpringRK4Animator = (__webpack_require__(22)).SpringRK4Animator;
 	
-	Framer.LayerDraggable = (__webpack_require__(26)).LayerDraggable;
+	Framer.LayerDraggable = (__webpack_require__(27)).LayerDraggable;
 	
-	Framer.Importer = (__webpack_require__(50)).Importer;
+	Framer.Importer = (__webpack_require__(48)).Importer;
 	
-	Framer.Debug = (__webpack_require__(51)).Debug;
+	Framer.Extras = __webpack_require__(49);
 	
-	Framer.Extras = __webpack_require__(52);
+	Framer.GestureInputRecognizer = new (__webpack_require__(53)).GestureInputRecognizer;
 	
-	Framer.Version = __webpack_require__(56);
+	Framer.Version = __webpack_require__(54);
 	
 	Framer.Loop = new Framer.AnimationLoop();
 	
@@ -134,7 +134,7 @@
 	  window.Framer = Framer;
 	}
 	
-	Defaults = (__webpack_require__(16)).Defaults;
+	Defaults = (__webpack_require__(17)).Defaults;
 	
 	Defaults.setup();
 	
@@ -150,7 +150,9 @@
 	  Framer.Extras.MobileScrollFix.enable();
 	}
 	
-	Framer.Extras.TouchEmulator.enable();
+	if (!Utils.isTouch()) {
+	  Framer.Extras.TouchEmulator.enable();
+	}
 
 
 /***/ },
@@ -13258,11 +13260,10 @@
 	  return element.src = url;
 	};
 	
-	Utils.pointDivide = function(pointA, pointB, fraction) {
-	  var point;
+	Utils.pointDivide = function(point, fraction) {
 	  return point = {
-	    x: (pointA.x + pointB.x) / fraction,
-	    y: (pointA.y + pointB.y) / fraction
+	    x: point.x / fraction,
+	    y: point.y / fraction
 	  };
 	};
 	
@@ -13318,12 +13319,19 @@
 	  };
 	};
 	
-	Utils.pointDistance = function(pointA, pointB) {
-	  var distance;
-	  return distance = {
-	    x: Math.abs(pointB.x - pointA.x),
-	    y: Math.abs(pointB.y - pointA.y)
+	Utils.pointDelta = function(pointA, pointB) {
+	  var delta;
+	  return delta = {
+	    x: pointB.x - pointA.x,
+	    y: pointB.y - pointA.y
 	  };
+	};
+	
+	Utils.pointDistance = function(pointA, pointB) {
+	  var a, b;
+	  a = pointA.x - pointB.x;
+	  b = pointA.y - pointB.y;
+	  return Math.sqrt((a * a) + (b * b));
 	};
 	
 	Utils.pointInvert = function(point) {
@@ -13355,7 +13363,15 @@
 	};
 	
 	Utils.pointCenter = function(pointA, pointB) {
-	  return Utils.pointDivide(pointA, pointB, 2);
+	  var point;
+	  return point = {
+	    x: (pointA.x + pointB.x) / 2,
+	    y: (pointA.y + pointB.y) / 2
+	  };
+	};
+	
+	Utils.pointAngle = function(pointA, pointB) {
+	  return Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x) * 180 / Math.PI;
 	};
 	
 	Utils.sizeZero = function(args) {
@@ -13648,7 +13664,7 @@
 	  }
 	  distance = function(frame) {
 	    var result;
-	    result = Utils.pointDistance(point, Utils.framePointForOrigin(frame, originX, originY));
+	    result = Utils.pointDelta(point, Utils.framePointForOrigin(frame, originX, originY));
 	    result = Utils.pointAbs(result);
 	    result = Utils.pointTotal(result);
 	    return result;
@@ -13679,8 +13695,36 @@
 	  return inside;
 	};
 	
-	Utils.pointAngle = function(p1, p2) {
-	  return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+	Utils.frameCenterPoint = function(frame) {
+	  var point;
+	  return point = {
+	    x: Utils.frameGetMidX(frame),
+	    y: Utils.frameGetMidY(frame)
+	  };
+	};
+	
+	Utils.rotationNormalizer = function() {
+	  var lastValue;
+	  lastValue = null;
+	  return (function(_this) {
+	    return function(value) {
+	      var diff, maxDiff, nTimes;
+	      if (lastValue == null) {
+	        lastValue = value;
+	      }
+	      diff = lastValue - value;
+	      maxDiff = Math.abs(diff) + 180;
+	      nTimes = Math.floor(maxDiff / 360);
+	      if (diff < 180) {
+	        value -= nTimes * 360;
+	      }
+	      if (diff > 180) {
+	        value += nTimes * 360;
+	      }
+	      lastValue = value;
+	      return value;
+	    };
+	  })(this);
 	};
 	
 	Utils.convertPointToContext = function(point, layer, rootContext, includeLayer) {
@@ -13977,21 +14021,19 @@
 	
 	  ScreenClass.define("size", {
 	    get: function() {
-	      return {
-	        width: this.width,
-	        height: this.height
-	      };
+	      return Framer.CurrentContext.size;
 	    }
 	  });
 	
 	  ScreenClass.define("frame", {
 	    get: function() {
-	      return {
-	        x: 0,
-	        y: 0,
-	        width: this.width,
-	        height: this.height
-	      };
+	      return Framer.CurrentContext.frame;
+	    }
+	  });
+	
+	  ScreenClass.define("canvasFrame", {
+	    get: function() {
+	      return Framer.CurrentContext.canvasFrame;
 	    }
 	  });
 	
@@ -14048,6 +14090,66 @@
 	      return Utils.round(value, 1);
 	    };
 	    return "<Screen " + (round(this.width)) + "x" + (round(this.height)) + ">";
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipe = function(cb) {
+	    return this.on(Events.EdgeSwipe, cb);
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipeStart = function(cb) {
+	    return this.on(Events.EdgeSwipeStart, cb);
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipeEnd = function(cb) {
+	    return this.on(Events.EdgeSwipeEnd, cb);
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipeTop = function(cb) {
+	    return this.on(Events.EdgeSwipeTop, cb);
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipeTopStart = function(cb) {
+	    return this.on(Events.EdgeSwipeTopStart, cb);
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipeTopEnd = function(cb) {
+	    return this.on(Events.EdgeSwipeTopEnd, cb);
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipeRight = function(cb) {
+	    return this.on(Events.EdgeSwipeRight, cb);
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipeRightStart = function(cb) {
+	    return this.on(Events.EdgeSwipeRightStart, cb);
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipeRightEnd = function(cb) {
+	    return this.on(Events.EdgeSwipeRightEnd, cb);
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipeBottom = function(cb) {
+	    return this.on(Events.EdgeSwipeBottom, cb);
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipeBottomStart = function(cb) {
+	    return this.on(Events.EdgeSwipeBottomStart, cb);
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipeBottomEnd = function(cb) {
+	    return this.on(Events.EdgeSwipeBottomEnd, cb);
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipeLeft = function(cb) {
+	    return this.on(Events.EdgeSwipeLeft, cb);
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipeLeftStart = function(cb) {
+	    return this.on(Events.EdgeSwipeLeftStart, cb);
+	  };
+	
+	  ScreenClass.prototype.onEdgeSwipeLeftEnd = function(cb) {
+	    return this.on(Events.EdgeSwipeLeftEnd, cb);
 	  };
 	
 	  return ScreenClass;
@@ -14597,7 +14699,7 @@
 
 	WebKitCSSMatrix.prototype.skew = function(skew) {
 	  var m, rad, value;
-	  if (!skew || skew === 0) {
+	  if (!skew) {
 	    return this;
 	  }
 	  rad = skew * Math.PI / 180;
@@ -14609,13 +14711,15 @@
 	};
 	
 	WebKitCSSMatrix.prototype.point = function(point) {
-	  var w, x, y, z;
+	  var ref, w, x, y, z;
 	  if (point == null) {
 	    point = {};
 	  }
-	  x = point.x || 0;
-	  y = point.y || 0;
-	  z = point.z || 0;
+	  ref = _.defaults(point, {
+	    x: 0,
+	    y: 0,
+	    z: 0
+	  }), x = ref.x, y = ref.y, z = ref.z;
 	  w = this.m14 * x + this.m24 * y + this.m34 * z + this.m44;
 	  w = w || 1;
 	  return point = {
@@ -15966,7 +16070,7 @@
 /* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Animation, BaseClass, Color, Config, Defaults, EventEmitter, Events, GestureManager, Gestures, LayerDraggable, LayerPinchable, LayerStates, LayerStyle, Matrix, NoCacheDateKey, Utils, _, layerProperty, layerValueTypeError,
+	var Animation, BaseClass, Color, Config, Defaults, EventEmitter, Events, Gestures, LayerDraggable, LayerPinchable, LayerStates, LayerStyle, Matrix, NoCacheDateKey, Utils, _, layerProperty, layerValueTypeError,
 	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty,
@@ -15981,7 +16085,7 @@
 	
 	Events = __webpack_require__(15).Events;
 	
-	Defaults = __webpack_require__(16).Defaults;
+	Defaults = __webpack_require__(17).Defaults;
 	
 	BaseClass = __webpack_require__(6).BaseClass;
 	
@@ -15991,19 +16095,17 @@
 	
 	Matrix = __webpack_require__(9).Matrix;
 	
-	Animation = __webpack_require__(17).Animation;
+	Animation = __webpack_require__(18).Animation;
 	
-	LayerStyle = __webpack_require__(24).LayerStyle;
+	LayerStyle = __webpack_require__(25).LayerStyle;
 	
-	LayerStates = __webpack_require__(25).LayerStates;
+	LayerStates = __webpack_require__(26).LayerStates;
 	
-	LayerDraggable = __webpack_require__(26).LayerDraggable;
+	LayerDraggable = __webpack_require__(27).LayerDraggable;
 	
 	LayerPinchable = __webpack_require__(34).LayerPinchable;
 	
-	Gestures = __webpack_require__(33).Gestures;
-	
-	GestureManager = __webpack_require__(35).GestureManager;
+	Gestures = __webpack_require__(16).Gestures;
 	
 	NoCacheDateKey = Date.now();
 	
@@ -16074,7 +16176,6 @@
 	    this._prefer2d = false;
 	    this._alwaysUseImageCache = false;
 	    this._cancelClickEventInDragSession = true;
-	    this._cancelClickEventInDragSessionTolerance = 4;
 	    this._createElement();
 	    if (options.hasOwnProperty("frame")) {
 	      options = _.extend(options, options.frame);
@@ -16120,7 +16221,7 @@
 	    exportable: false
 	  }));
 	
-	  Layer.define("clip", layerProperty(Layer, "clip", "overflow", true, _.isBoolean));
+	  Layer.define("clip", layerProperty(Layer, "clip", "overflow", false, _.isBoolean));
 	
 	  Layer.define("scrollHorizontal", layerProperty(Layer, "scrollHorizontal", "overflowX", false, _.isBoolean, null, {}, function(layer, value) {
 	    if (value === true) {
@@ -16310,6 +16411,12 @@
 	      if (!point) {
 	        return;
 	      }
+	      if (_.isNumber(point)) {
+	        point = {
+	          x: point,
+	          y: point
+	        };
+	      }
 	      ref = ["x", "y"];
 	      results = [];
 	      for (i = 0, len = ref.length; i < len; i++) {
@@ -16332,6 +16439,12 @@
 	      var i, k, len, ref, results;
 	      if (!size) {
 	        return;
+	      }
+	      if (_.isNumber(size)) {
+	        size = {
+	          width: size,
+	          height: size
+	        };
 	      }
 	      ref = ["width", "height"];
 	      results = [];
@@ -17210,19 +17323,12 @@
 	  });
 	
 	  Layer.prototype.emit = function() {
-	    var args, eventName, offset, parentDraggableLayer;
+	    var args, eventName, ref;
 	    eventName = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
 	    if (this._cancelClickEventInDragSession) {
-	      if (eventName === Events.Click) {
-	        parentDraggableLayer = this._parentDraggableLayer();
-	        if (parentDraggableLayer) {
-	          offset = parentDraggableLayer.draggable.offset;
-	          if (Math.abs(0 - offset.x) > this._cancelClickEventInDragSessionTolerance) {
-	            return;
-	          }
-	          if (Math.abs(0 - offset.y) > this._cancelClickEventInDragSessionTolerance) {
-	            return;
-	          }
+	      if (eventName === Events.Click || eventName === Events.Tap || eventName === Events.TapStart || eventName === Events.TapEnd || eventName === Events.LongPress || eventName === Events.LongPressStart || eventName === Events.LongPressEnd) {
+	        if ((ref = this._parentDraggableLayer()) != null ? ref.draggable.isMoving : void 0) {
+	          return;
 	        }
 	      }
 	    }
@@ -17235,11 +17341,20 @@
 	  };
 	
 	  Layer.prototype.addListener = function(eventName, listener) {
+	    if (!eventName) {
+	      throw Error("Layer.on needs a valid event name");
+	    }
+	    if (!listener) {
+	      throw Error("Layer.on needs an event listener");
+	    }
 	    Layer.__super__.addListener.call(this, eventName, listener);
 	    return this._addListener(eventName, listener);
 	  };
 	
 	  Layer.prototype.removeListener = function(eventName, listener) {
+	    if (!eventName) {
+	      throw Error("Layer.off needs a valid event name");
+	    }
 	    Layer.__super__.removeListener.call(this, eventName, listener);
 	    return this._removeListener(eventName, listener);
 	  };
@@ -17248,14 +17363,7 @@
 	    if (!_.startsWith(eventName, "change:")) {
 	      this.ignoreEvents = false;
 	    }
-	    if (_.startsWith(eventName, Gestures._prefix)) {
-	      if (this._gestureManager == null) {
-	        this._gestureManager = new GestureManager(this);
-	      }
-	      this._gestureManager.on(eventName, listener);
-	      return;
-	    }
-	    if (Utils.domValidEvent(this._element, eventName)) {
+	    if (Utils.domValidEvent(this._element, eventName) || indexOf.call(_.values(Gestures), eventName) >= 0) {
 	      if (!this._domEventManager.listeners(eventName).length) {
 	        return this._domEventManager.addEventListener(eventName, (function(_this) {
 	          return function(event) {
@@ -17267,13 +17375,6 @@
 	  };
 	
 	  Layer.prototype._removeListener = function(eventName, listener) {
-	    if (_.startsWith(eventName, Gestures._prefix)) {
-	      if (this._gestureManager == null) {
-	        this._gestureManager = new GestureManager(this);
-	      }
-	      this._gestureManager.off(eventName, listener);
-	      return;
-	    }
 	    if (!this.listeners(eventName).length) {
 	      return this._domEventManager.removeAllListeners(eventName);
 	    }
@@ -17281,7 +17382,7 @@
 	
 	  Layer.prototype._parentDraggableLayer = function() {
 	    var i, layer, len, ref, ref1;
-	    ref = this.ancestors().concat(this);
+	    ref = this.ancestors();
 	    for (i = 0, len = ref.length; i < len; i++) {
 	      layer = ref[i];
 	      if ((ref1 = layer._draggable) != null ? ref1.enabled : void 0) {
@@ -17403,16 +17504,152 @@
 	    return this.on(Events.DragEnd, cb);
 	  };
 	
-	  Layer.prototype.onDragAnimationDidStart = function(cb) {
-	    return this.on(Events.DragAnimationDidStart, cb);
+	  Layer.prototype.onDragAnimationStart = function(cb) {
+	    return this.on(Events.DragAnimationStart, cb);
 	  };
 	
-	  Layer.prototype.onDragAnimationDidEnd = function(cb) {
-	    return this.on(Events.DragAnimationDidEnd, cb);
+	  Layer.prototype.onDragAnimationEnd = function(cb) {
+	    return this.on(Events.DragAnimationEnd, cb);
 	  };
 	
-	  Layer.prototype.onDirectionLockDidStart = function(cb) {
-	    return this.on(Events.DirectionLockDidStart, cb);
+	  Layer.prototype.onDirectionLockStart = function(cb) {
+	    return this.on(Events.DirectionLockStart, cb);
+	  };
+	
+	  Layer.prototype.onTap = function(cb) {
+	    return this.on(Events.Tap, cb);
+	  };
+	
+	  Layer.prototype.onTapStart = function(cb) {
+	    return this.on(Events.TapStart, cb);
+	  };
+	
+	  Layer.prototype.onTapEnd = function(cb) {
+	    return this.on(Events.TapEnd, cb);
+	  };
+	
+	  Layer.prototype.onDoubleTap = function(cb) {
+	    return this.on(Events.DoubleTap, cb);
+	  };
+	
+	  Layer.prototype.onForceTap = function(cb) {
+	    return this.on(Events.ForceTap, cb);
+	  };
+	
+	  Layer.prototype.onForceTapChange = function(cb) {
+	    return this.on(Events.ForceTapChange, cb);
+	  };
+	
+	  Layer.prototype.onForceTapStart = function(cb) {
+	    return this.on(Events.ForceTapStart, cb);
+	  };
+	
+	  Layer.prototype.onForceTapEnd = function(cb) {
+	    return this.on(Events.ForceTapEnd, cb);
+	  };
+	
+	  Layer.prototype.onLongPress = function(cb) {
+	    return this.on(Events.LongPress, cb);
+	  };
+	
+	  Layer.prototype.onLongPressStart = function(cb) {
+	    return this.on(Events.LongPressStart, cb);
+	  };
+	
+	  Layer.prototype.onLongPressEnd = function(cb) {
+	    return this.on(Events.LongPressEnd, cb);
+	  };
+	
+	  Layer.prototype.onSwipe = function(cb) {
+	    return this.on(Events.Swipe, cb);
+	  };
+	
+	  Layer.prototype.onSwipeStart = function(cb) {
+	    return this.on(Events.SwipeStart, cb);
+	  };
+	
+	  Layer.prototype.onSwipeEnd = function(cb) {
+	    return this.on(Events.SwipeEnd, cb);
+	  };
+	
+	  Layer.prototype.onSwipeUp = function(cb) {
+	    return this.on(Events.SwipeUp, cb);
+	  };
+	
+	  Layer.prototype.onSwipeUpStart = function(cb) {
+	    return this.on(Events.SwipeUpStart, cb);
+	  };
+	
+	  Layer.prototype.onSwipeUpEnd = function(cb) {
+	    return this.on(Events.SwipeUpEnd, cb);
+	  };
+	
+	  Layer.prototype.onSwipeDown = function(cb) {
+	    return this.on(Events.SwipeDown, cb);
+	  };
+	
+	  Layer.prototype.onSwipeDownStart = function(cb) {
+	    return this.on(Events.SwipeDownStart, cb);
+	  };
+	
+	  Layer.prototype.onSwipeDownEnd = function(cb) {
+	    return this.on(Events.SwipeDownEnd, cb);
+	  };
+	
+	  Layer.prototype.onSwipeLeft = function(cb) {
+	    return this.on(Events.SwipeLeft, cb);
+	  };
+	
+	  Layer.prototype.onSwipeLeftStart = function(cb) {
+	    return this.on(Events.SwipeLeftStart, cb);
+	  };
+	
+	  Layer.prototype.onSwipeLeftEnd = function(cb) {
+	    return this.on(Events.SwipeLeftEnd, cb);
+	  };
+	
+	  Layer.prototype.onSwipeRight = function(cb) {
+	    return this.on(Events.SwipeRight, cb);
+	  };
+	
+	  Layer.prototype.onSwipeRightStart = function(cb) {
+	    return this.on(Events.SwipeRightStart, cb);
+	  };
+	
+	  Layer.prototype.onSwipeRightEnd = function(cb) {
+	    return this.on(Events.SwipeRightEnd, cb);
+	  };
+	
+	  Layer.prototype.onPan = function(cb) {
+	    return this.on(Events.Pan, cb);
+	  };
+	
+	  Layer.prototype.onPanStart = function(cb) {
+	    return this.on(Events.PanStart, cb);
+	  };
+	
+	  Layer.prototype.onPanEnd = function(cb) {
+	    return this.on(Events.PanEnd, cb);
+	  };
+	
+	  Layer.prototype.onPanLeft = function(cb) {
+	    return this.on(Events.PanLeft, cb);
+	  };
+	
+	  Layer.prototype.onPanRight = function(cb) {
+	    return this.on(Events.PanRight, cb);
+	  };
+	
+	  Layer.prototype.onPanUp = function(cb) {
+	    return this.on(Events.PanUp, cb);
+	  };
+	
+	  Layer.prototype.onPanDown = function(cb) {
+	    return this.on(Events.PanDown, cb);
+	  };
+	
+	  Layer.prototype.onPinch = function(cb) {
+	    return this.on(Events.Pinch, cb);
 	  };
 	
 	  Layer.prototype.onPinchStart = function(cb) {
@@ -17423,32 +17660,28 @@
 	    return this.on(Events.PinchEnd, cb);
 	  };
 	
-	  Layer.prototype.onPinch = function(cb) {
-	    return this.on(Events.Pinch, cb);
-	  };
-	
-	  Layer.prototype.onRotateStart = function(cb) {
-	    return this.on(Events.RotateStart, cb);
-	  };
-	
-	  Layer.prototype.onRotate = function(cb) {
-	    return this.on(Events.Rotate, cb);
-	  };
-	
-	  Layer.prototype.onRotateEnd = function(cb) {
-	    return this.on(Events.RotateEnd, cb);
+	  Layer.prototype.onScale = function(cb) {
+	    return this.on(Events.Scale, cb);
 	  };
 	
 	  Layer.prototype.onScaleStart = function(cb) {
 	    return this.on(Events.ScaleStart, cb);
 	  };
 	
-	  Layer.prototype.onScale = function(cb) {
-	    return this.on(Events.Scale, cb);
-	  };
-	
 	  Layer.prototype.onScaleEnd = function(cb) {
 	    return this.on(Events.ScaleEnd, cb);
+	  };
+	
+	  Layer.prototype.onRotate = function(cb) {
+	    return this.on(Events.Rotate, cb);
+	  };
+	
+	  Layer.prototype.onRotateStart = function(cb) {
+	    return this.on(Events.RotateStart, cb);
+	  };
+	
+	  Layer.prototype.onRotateEnd = function(cb) {
+	    return this.on(Events.RotateEnd, cb);
 	  };
 	
 	  Layer.prototype.toInspect = function() {
@@ -17478,7 +17711,7 @@
 	
 	Utils = __webpack_require__(4);
 	
-	FramerCSS = "body {\n	margin: 0;\n}\n\n.framerContext {	\n	position: absolute;\n	left: 0;\n	top: 0;\n	right: 0;\n	bottom: 0;\n	pointer-events: none;\n	overflow: hidden;\n}\n\n.framerLayer {\n	display: block;\n	position: absolute;\n	left: 0;\n	top: 0;\n	background-repeat: no-repeat;\n	background-size: cover;\n	-webkit-overflow-scrolling: touch;\n	-webkit-box-sizing: border-box;\n	-webkit-user-select: none;\n}\n\n.framerLayer input,\n.framerLayer textarea,\n.framerLayer select,\n.framerLayer option,\n.framerLayer div[contenteditable=true]\n{\n	pointer-events: auto;\n	-webkit-user-select: auto;\n}\n\n.framerDebug {\n	padding: 6px;\n	color: #fff;\n	font: 10px/1em Monaco;\n}\n";
+	FramerCSS = "body {\n	margin: 0;\n}\n\n.framerContext {\n	position: absolute;\n	left: 0;\n	top: 0;\n	right: 0;\n	bottom: 0;\n	pointer-events: none;\n	overflow: hidden;\n}\n\n.framerLayer {\n	display: block;\n	position: absolute;\n	left: 0;\n	top: 0;\n	background-repeat: no-repeat;\n	background-size: cover;\n	-webkit-overflow-scrolling: touch;\n	-webkit-box-sizing: border-box;\n	-webkit-user-select: none;\n}\n\n.framerLayer input,\n.framerLayer textarea,\n.framerLayer select,\n.framerLayer option,\n.framerLayer div[contenteditable=true]\n{\n	pointer-events: auto;\n	-webkit-user-select: auto;\n}\n\n.framerDebug {\n	padding: 6px;\n	color: #fff;\n	font: 10px/1em Monaco;\n}\n";
 	
 	Utils.domComplete(function() {
 	  return Utils.insertCSS(FramerCSS);
@@ -17489,11 +17722,14 @@
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Events, Utils, _;
+	var Events, Gestures, Utils, _,
+	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+	
+	Utils = __webpack_require__(4);
 	
 	_ = __webpack_require__(1)._;
 	
-	Utils = __webpack_require__(4);
+	Gestures = __webpack_require__(16).Gestures;
 	
 	Events = {};
 	
@@ -17545,6 +17781,8 @@
 	
 	Events.ImageLoadError = "error";
 	
+	_.extend(Events, Gestures);
+	
 	Events.touchEvent = function(event) {
 	  var ref, ref1, touchEvent;
 	  touchEvent = (ref = event.touches) != null ? ref[0] : void 0;
@@ -17561,11 +17799,140 @@
 	  return Framer.CurrentContext.domEventManager.wrap(element);
 	};
 	
+	Events.isGesture = function(eventName) {
+	  return indexOf.call(Gestures, eventName) >= 0;
+	};
+	
 	exports.Events = Events;
 
 
 /***/ },
 /* 16 */
+/***/ function(module, exports) {
+
+	var Gestures;
+	
+	Gestures = {};
+	
+	Gestures.Tap = "tap";
+	
+	Gestures.TapStart = "tapstart";
+	
+	Gestures.TapEnd = "tapend";
+	
+	Gestures.DoubleTap = "doubletap";
+	
+	Gestures.ForceTap = "forcetap";
+	
+	Gestures.ForceTapChange = "forcetapchange";
+	
+	Gestures.ForceTapStart = "forcetapstart";
+	
+	Gestures.ForceTapEnd = "forcetapend";
+	
+	Gestures.LongPress = "longpress";
+	
+	Gestures.LongPressStart = "longpressstart";
+	
+	Gestures.LongPressEnd = "longpressend";
+	
+	Gestures.Swipe = "swipe";
+	
+	Gestures.SwipeStart = "swipestart";
+	
+	Gestures.SwipeEnd = "swipeend";
+	
+	Gestures.SwipeUp = "swipeup";
+	
+	Gestures.SwipeUpStart = "swipeupstart";
+	
+	Gestures.SwipeUpEnd = "swipeupend";
+	
+	Gestures.SwipeDown = "swipedown";
+	
+	Gestures.SwipeDownStart = "swipedownstart";
+	
+	Gestures.SwipeDownEnd = "swipedownend";
+	
+	Gestures.SwipeLeft = "swipeleft";
+	
+	Gestures.SwipeLeftStart = "swipeleftstart";
+	
+	Gestures.SwipeLeftEnd = "swipeleftend";
+	
+	Gestures.SwipeRight = "swiperight";
+	
+	Gestures.SwipeRightStart = "swiperightstart";
+	
+	Gestures.SwipeRightEnd = "swiperightend";
+	
+	Gestures.EdgeSwipe = "edgeswipe";
+	
+	Gestures.EdgeSwipeStart = "edgeswipestart";
+	
+	Gestures.EdgeSwipeEnd = "edgeswipeend";
+	
+	Gestures.EdgeSwipeTop = "edgeswipetop";
+	
+	Gestures.EdgeSwipeTopStart = "edgeswipetopstart";
+	
+	Gestures.EdgeSwipeTopEnd = "edgeswipetopend";
+	
+	Gestures.EdgeSwipeRight = "edgeswiperight";
+	
+	Gestures.EdgeSwipeRightStart = "edgeswiperightstart";
+	
+	Gestures.EdgeSwipeRightEnd = "edgeswiperightend";
+	
+	Gestures.EdgeSwipeBottom = "edgeswipebottom";
+	
+	Gestures.EdgeSwipeBottomStart = "edgeswipebottomstart";
+	
+	Gestures.EdgeSwipeBottomEnd = "edgeswipebottomend";
+	
+	Gestures.EdgeSwipeLeft = "edgeswipeleft";
+	
+	Gestures.EdgeSwipeLeftStart = "edgeswipeleftstart";
+	
+	Gestures.EdgeSwipeLeftEnd = "edgeswipeleftend";
+	
+	Gestures.Pan = "pan";
+	
+	Gestures.PanStart = "panstart";
+	
+	Gestures.PanEnd = "panend";
+	
+	Gestures.PanLeft = "panleft";
+	
+	Gestures.PanRight = "panright";
+	
+	Gestures.PanUp = "panup";
+	
+	Gestures.PanDown = "pandown";
+	
+	Gestures.Pinch = "pinch";
+	
+	Gestures.PinchStart = "pinchstart";
+	
+	Gestures.PinchEnd = "pinchend";
+	
+	Gestures.Scale = "scale";
+	
+	Gestures.ScaleStart = "scalestart";
+	
+	Gestures.ScaleEnd = "scaleend";
+	
+	Gestures.Rotate = "rotate";
+	
+	Gestures.RotateStart = "rotatestart";
+	
+	Gestures.RotateEnd = "rotateend";
+	
+	exports.Gestures = Gestures;
+
+
+/***/ },
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Originals, Utils, _;
@@ -17694,7 +18061,7 @@
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var AnimatorClassBezierPresets, AnimatorClasses, BezierCurveAnimator, Config, Defaults, EventEmitter, LinearAnimator, SpringDHOAnimator, SpringRK4Animator, Utils, _, createDebugLayerForPath, evaluateRelativeProperty, isRelativeProperty, numberRE, relativePropertyRE,
@@ -17710,17 +18077,17 @@
 	
 	Config = __webpack_require__(14).Config;
 	
-	Defaults = __webpack_require__(16).Defaults;
+	Defaults = __webpack_require__(17).Defaults;
 	
 	EventEmitter = __webpack_require__(7).EventEmitter;
 	
-	LinearAnimator = __webpack_require__(18).LinearAnimator;
+	LinearAnimator = __webpack_require__(19).LinearAnimator;
 	
-	BezierCurveAnimator = __webpack_require__(20).BezierCurveAnimator;
+	BezierCurveAnimator = __webpack_require__(21).BezierCurveAnimator;
 	
-	SpringRK4Animator = __webpack_require__(21).SpringRK4Animator;
+	SpringRK4Animator = __webpack_require__(22).SpringRK4Animator;
 	
-	SpringDHOAnimator = __webpack_require__(23).SpringDHOAnimator;
+	SpringDHOAnimator = __webpack_require__(24).SpringDHOAnimator;
 	
 	AnimatorClasses = {
 	  "linear": LinearAnimator,
@@ -18133,7 +18500,7 @@
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Animator, Utils,
@@ -18142,7 +18509,7 @@
 	
 	Utils = __webpack_require__(4);
 	
-	Animator = __webpack_require__(19).Animator;
+	Animator = __webpack_require__(20).Animator;
 	
 	exports.LinearAnimator = (function(superClass) {
 	  extend(LinearAnimator, superClass);
@@ -18177,7 +18544,7 @@
 
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Config, Utils;
@@ -18213,7 +18580,7 @@
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Animator, BezierCurveDefaults, UnitBezier, Utils, _,
@@ -18224,7 +18591,7 @@
 	
 	Utils = __webpack_require__(4);
 	
-	Animator = __webpack_require__(19).Animator;
+	Animator = __webpack_require__(20).Animator;
 	
 	BezierCurveDefaults = {
 	  "linear": [0, 0, 1, 1],
@@ -18377,7 +18744,7 @@
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Animator, Integrator, Utils,
@@ -18387,9 +18754,9 @@
 	
 	Utils = __webpack_require__(4);
 	
-	Animator = __webpack_require__(19).Animator;
+	Animator = __webpack_require__(20).Animator;
 	
-	Integrator = __webpack_require__(22).Integrator;
+	Integrator = __webpack_require__(23).Integrator;
 	
 	exports.SpringRK4Animator = (function(superClass) {
 	  extend(SpringRK4Animator, superClass);
@@ -18450,7 +18817,7 @@
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Config, Utils;
@@ -18509,7 +18876,7 @@
 
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Animator, Utils,
@@ -18519,7 +18886,7 @@
 	
 	Utils = __webpack_require__(4);
 	
-	Animator = __webpack_require__(19).Animator;
+	Animator = __webpack_require__(20).Animator;
 	
 	exports.SpringDHOAnimator = (function(superClass) {
 	  extend(SpringDHOAnimator, superClass);
@@ -18569,7 +18936,7 @@
 
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports) {
 
 	var _Force2DProperties, _WebkitProperties, filterFormat;
@@ -18728,7 +19095,7 @@
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var BaseClass, Defaults, Events, LayerStatesIgnoredKeys, _,
@@ -18743,7 +19110,7 @@
 	
 	BaseClass = __webpack_require__(6).BaseClass;
 	
-	Defaults = __webpack_require__(16).Defaults;
+	Defaults = __webpack_require__(17).Defaults;
 	
 	LayerStatesIgnoredKeys = ["ignoreEvents"];
 	
@@ -18946,7 +19313,7 @@
 
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var BaseClass, Defaults, EventBuffer, Events, Gestures, Simulation, Utils, _,
@@ -18962,13 +19329,13 @@
 	
 	Events = __webpack_require__(15).Events;
 	
-	Simulation = __webpack_require__(27).Simulation;
+	Simulation = __webpack_require__(28).Simulation;
 	
-	Defaults = __webpack_require__(16).Defaults;
+	Defaults = __webpack_require__(17).Defaults;
 	
-	EventBuffer = __webpack_require__(32).EventBuffer;
+	EventBuffer = __webpack_require__(33).EventBuffer;
 	
-	Gestures = __webpack_require__(33).Gestures;
+	Gestures = __webpack_require__(16).Gestures;
 	
 	Events.Move = "move";
 	
@@ -18984,17 +19351,17 @@
 	
 	Events.DragEnd = "dragend";
 	
-	Events.DragAnimationDidStart = "draganimationdidstart";
+	Events.DragAnimationStart = "draganimationstart";
 	
-	Events.DragAnimationDidEnd = "draganimationdidend";
+	Events.DragAnimationEnd = "draganimationend";
 	
-	Events.DirectionLockDidStart = "directionlockdidstart";
+	Events.DirectionLockStart = "directionlockstart";
 	
-	Events.Pinch = Gestures.Pinch;
+	Events.DragAnimationDidStart = Events.DragAnimationStart;
 	
-	Events.Rotate = Gestures.Rotate;
+	Events.DragAnimationDidEnd = Events.DragAnimationEnd;
 	
-	"         \n┌──────┐                   │         \n│      │                             \n│      │  ───────────────▶ │ ◀────▶  \n│      │                             \n└──────┘                   │         \n                                     \n════════  ═════════════════ ═══════  \n                                     \n  Drag         Momentum      Bounce  \n                                         ";
+	"\n┌──────┐                   │\n│      │\n│      │  ───────────────▶ │ ◀────▶\n│      │\n└──────┘                   │\n\n════════  ═════════════════ ═══════\n\n  Drag         Momentum      Bounce\n";
 	
 	exports.LayerDraggable = (function(superClass) {
 	  extend(LayerDraggable, superClass);
@@ -19024,12 +19391,14 @@
 	    },
 	    set: function(value) {
 	      if (value && _.isObject(value)) {
-	        this._constraints = _.defaults(value, {
+	        value = _.pick(value, ["x", "y", "width", "height"]);
+	        value = _.defaults(value, {
 	          x: 0,
 	          y: 0,
 	          width: 0,
 	          height: 0
 	        });
+	        this._constraints = value;
 	      } else {
 	        this._constraints = {
 	          x: 0,
@@ -19111,6 +19480,7 @@
 	    this._touchEnd = bind(this._touchEnd, this);
 	    this._touchMove = bind(this._touchMove, this);
 	    this._touchStart = bind(this._touchStart, this);
+	    this._updateLayerPosition = bind(this._updateLayerPosition, this);
 	    this.touchStart = bind(this.touchStart, this);
 	    options = Defaults.getDefaults("LayerDraggable", {});
 	    LayerDraggable.__super__.constructor.call(this, options);
@@ -19118,15 +19488,22 @@
 	    this.enabled = true;
 	    this._eventBuffer = new EventBuffer;
 	    this._constraints = null;
+	    this._ignoreUpdateLayerPosition = true;
 	    this.attach();
 	  }
 	
 	  LayerDraggable.prototype.attach = function() {
-	    return this.layer.on(Events.TouchStart, this._touchStart);
+	    this.layer.on(Gestures.TapStart, this.touchStart);
+	    this.layer.on(Gestures.Pan, this._touchMove);
+	    this.layer.on(Gestures.TapEnd, this._touchEnd);
+	    this.layer.on("change:x", this._updateLayerPosition);
+	    return this.layer.on("change:y", this._updateLayerPosition);
 	  };
 	
 	  LayerDraggable.prototype.remove = function() {
-	    return this.layer.off(Events.TouchStart, this._touchStart);
+	    this.layer.off(Gestures.PanStart, this.touchStart);
+	    this.layer.off(Gestures.Pan, this._touchMove);
+	    return this.layer.off(Gestures.PanEnd, this._touchEnd);
 	  };
 	
 	  LayerDraggable.prototype.updatePosition = function(point) {
@@ -19137,6 +19514,13 @@
 	    return this._touchStart(event);
 	  };
 	
+	  LayerDraggable.prototype._updateLayerPosition = function() {
+	    if (this._ignoreUpdateLayerPosition === true) {
+	      return;
+	    }
+	    return this._point = this.layer.point;
+	  };
+	
 	  LayerDraggable.prototype._touchStart = function(event) {
 	    var touchEvent;
 	    this._isMoving = this.isAnimating;
@@ -19144,7 +19528,7 @@
 	    this._stopSimulation();
 	    this._resetdirectionLock();
 	    event.preventDefault();
-	    if (!this.propagateEvents) {
+	    if (this.propagateEvents === false) {
 	      event.stopPropagation();
 	    }
 	    touchEvent = Events.touchEvent(event);
@@ -19166,18 +19550,21 @@
 	      x: touchEvent.clientX - this._correctedLayerStartPoint.x,
 	      y: touchEvent.clientY - this._correctedLayerStartPoint.y
 	    };
-	    this.layer._context.domEventManager.wrap(document).addEventListener(Events.TouchMove, this._touchMove);
-	    this.layer._context.domEventManager.wrap(document).addEventListener(Events.TouchEnd, this._touchEnd);
-	    return this.emit(Events.DragStart, event);
+	    this._point = this._correctedLayerStartPoint;
+	    return this._ignoreUpdateLayerPosition = false;
 	  };
 	
 	  LayerDraggable.prototype._touchMove = function(event) {
-	    var offset, point, touchEvent;
+	    var frame, offset, point, scaleX, scaleY, touchEvent;
 	    if (!this.enabled) {
 	      return;
 	    }
+	    if (!this._point) {
+	      this.touchStart(event);
+	    }
+	    this._lastEvent = event;
 	    event.preventDefault();
-	    if (!this.propagateEvents) {
+	    if (this.propagateEvents === false) {
 	      event.stopPropagation();
 	    }
 	    touchEvent = Events.touchEvent(event);
@@ -19186,24 +19573,39 @@
 	      y: touchEvent.clientY,
 	      t: Date.now()
 	    });
-	    offset = {
-	      x: touchEvent.clientX - this._correctedLayerStartPoint.x - this._layerCursorOffset.x,
-	      y: touchEvent.clientY - this._correctedLayerStartPoint.y - this._layerCursorOffset.y
-	    };
-	    offset.x = offset.x * this.speedX * (1 / this.layer.canvasScaleX()) * this.layer.scaleX * this.layer.scale;
-	    offset.y = offset.y * this.speedY * (1 / this.layer.canvasScaleY()) * this.layer.scaleY * this.layer.scale;
-	    point = this.layer.point;
+	    if (this.overdrag === false) {
+	      frame = Utils.convertFrameToContext(this.constraints, this.layer, true, false);
+	      if (event.point.x < Utils.frameGetMinX(frame)) {
+	        return;
+	      }
+	      if (event.point.x > Utils.frameGetMaxX(frame)) {
+	        return;
+	      }
+	      if (event.point.y < Utils.frameGetMinY(frame)) {
+	        return;
+	      }
+	      if (event.point.y > Utils.frameGetMaxY(frame)) {
+	        return;
+	      }
+	    }
+	    point = _.clone(this._point);
+	    scaleX = 1 / this.layer.canvasScaleX() * this.layer.scale * this.layer.scaleX;
+	    scaleY = 1 / this.layer.canvasScaleY() * this.layer.scale * this.layer.scaleY;
 	    if (this.horizontal) {
-	      point.x = this._correctedLayerStartPoint.x + offset.x;
+	      point.x = this._point.x + (event.delta.x * scaleX * this.speedX);
 	    }
 	    if (this.vertical) {
-	      point.y = this._correctedLayerStartPoint.y + offset.y;
+	      point.y = this._point.y + (event.delta.y * scaleY * this.speedY);
 	    }
+	    this._point = _.clone(point);
 	    if (this._constraints) {
 	      point = this._constrainPosition(point, this._constraints, this.overdragScale);
 	    }
 	    if (this.directionLock) {
 	      if (!this._directionLockEnabledX && !this._directionLockEnabledY) {
+	        offset = event.offset;
+	        offset.x = offset.x * this.speedX * (1 / this.layer.canvasScaleX()) * this.layer.scaleX * this.layer.scale;
+	        offset.y = offset.y * this.speedY * (1 / this.layer.canvasScaleY()) * this.layer.scaleY * this.layer.scale;
 	        this._updatedirectionLock(offset);
 	        return;
 	      } else {
@@ -19215,18 +19617,27 @@
 	        }
 	      }
 	    }
-	    if (this.pixelAlign) {
-	      point.x = parseInt(point.x);
-	      point.y = parseInt(point.y);
-	    }
 	    if (point.x !== this._layerStartPoint.x || point.y !== this._layerStartPoint.y) {
-	      this._isDragging = true;
-	      this._isMoving = true;
+	      if (!this._isDragging) {
+	        this._isDragging = true;
+	        this._isMoving = true;
+	        this.emit(Events.DragStart, event);
+	      }
 	    }
 	    if (this.isDragging) {
 	      this.emit(Events.DragWillMove, event);
 	    }
+	    if (this.pixelAlign) {
+	      if (this.horizontal) {
+	        point.x = parseInt(point.x);
+	      }
+	      if (this.vertical) {
+	        point.y = parseInt(point.y);
+	      }
+	    }
+	    this._ignoreUpdateLayerPosition = true;
 	    this.layer.point = this.updatePosition(point);
+	    this._ignoreUpdateLayerPosition = false;
 	    if (this.isDragging) {
 	      this.emit(Events.Move, this.layer.point);
 	      return this.emit(Events.DragDidMove, event);
@@ -19234,14 +19645,13 @@
 	  };
 	
 	  LayerDraggable.prototype._touchEnd = function(event) {
-	    if (!this.propagateEvents) {
+	    if (this.propagateEvents === false) {
 	      event.stopPropagation();
 	    }
-	    this.layer._context.domEventManager.wrap(document).removeEventListener(Events.TouchMove, this._touchMove);
-	    this.layer._context.domEventManager.wrap(document).removeEventListener(Events.TouchEnd, this._touchEnd);
 	    this._startSimulation();
 	    this.emit(Events.DragEnd, event);
-	    return this._isDragging = false;
+	    this._isDragging = false;
+	    return this._ignoreUpdateLayerPosition = true;
 	  };
 	
 	  LayerDraggable.define("constraintsOffset", {
@@ -19300,6 +19710,12 @@
 	        minY: Infinity,
 	        maxY: Infinity
 	      };
+	    }
+	    if (bounds.width < this.layer.width) {
+	      bounds.width = this.layer.width;
+	    }
+	    if (bounds.height < this.layer.height) {
+	      bounds.height = this.layer.height;
 	    }
 	    constraints = {
 	      minX: Utils.frameGetMinX(bounds),
@@ -19402,7 +19818,7 @@
 	    this._directionLockEnabledX = Math.abs(correctedDelta.y) > this.directionLockThreshold.y;
 	    this._directionLockEnabledY = Math.abs(correctedDelta.x) > this.directionLockThreshold.x;
 	    if (this._directionLockEnabledX || this._directionLockEnabledY) {
-	      return this.emit(Events.DirectionLockDidStart, {
+	      return this.emit(Events.DirectionLockStart, {
 	        x: this._directionLockEnabledX,
 	        y: this._directionLockEnabledY
 	      });
@@ -19503,10 +19919,10 @@
 	    }
 	    updatePoint = this.layer.point;
 	    if (axis === "x") {
-	      updatePoint[axis] = updatePoint[axis] + (delta * this.speedX);
+	      updatePoint[axis] = updatePoint[axis] + delta;
 	    }
 	    if (axis === "y") {
-	      updatePoint[axis] = updatePoint[axis] + (delta * this.speedY);
+	      updatePoint[axis] = updatePoint[axis] + delta;
 	    }
 	    this.updatePosition(updatePoint);
 	    this.layer[axis] = this.updatePosition(updatePoint)[axis];
@@ -19514,6 +19930,12 @@
 	  };
 	
 	  LayerDraggable.prototype._onSimulationStop = function(axis, state) {
+	    if (axis === "x" && this.horizontal === false) {
+	      return;
+	    }
+	    if (axis === "y" && this.vertical === false) {
+	      return;
+	    }
 	    if (!this._simulation) {
 	      return;
 	    }
@@ -19562,7 +19984,7 @@
 	    if (startSimulationY) {
 	      this._simulation.y.start();
 	    }
-	    return this.emit(Events.DragAnimationDidStart);
+	    return this.emit(Events.DragAnimationStart);
 	  };
 	
 	  LayerDraggable.prototype._stopSimulation = function() {
@@ -19579,7 +20001,7 @@
 	    }
 	    this._simulation = null;
 	    this.emit(Events.Move, this.layer.point);
-	    return this.emit(Events.DragAnimationDidEnd);
+	    return this.emit(Events.DragAnimationEnd);
 	  };
 	
 	  LayerDraggable.prototype.animateStop = function() {
@@ -19614,16 +20036,16 @@
 	    return this.on(Events.DragEnd, cb);
 	  };
 	
-	  LayerDraggable.prototype.onDragAnimationDidStart = function(cb) {
-	    return this.on(Events.DragAnimationDidStart, cb);
+	  LayerDraggable.prototype.onDragAnimationStart = function(cb) {
+	    return this.on(Events.DragAnimationStart, cb);
 	  };
 	
-	  LayerDraggable.prototype.onDragAnimationDidEnd = function(cb) {
-	    return this.on(Events.DragAnimationDidEnd, cb);
+	  LayerDraggable.prototype.onDragAnimationEnd = function(cb) {
+	    return this.on(Events.DragAnimationEnd, cb);
 	  };
 	
-	  LayerDraggable.prototype.onDirectionLockDidStart = function(cb) {
-	    return this.on(Events.DirectionLockDidStart, cb);
+	  LayerDraggable.prototype.onDirectionLockStart = function(cb) {
+	    return this.on(Events.DirectionLockStart, cb);
 	  };
 	
 	  return LayerDraggable;
@@ -19632,7 +20054,7 @@
 
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var BaseClass, Config, Defaults, Events, FrictionSimulator, MomentumBounceSimulator, SimulatorClasses, SpringSimulator, Utils, _,
@@ -19647,17 +20069,17 @@
 	
 	Config = __webpack_require__(14).Config;
 	
-	Defaults = __webpack_require__(16).Defaults;
+	Defaults = __webpack_require__(17).Defaults;
 	
 	BaseClass = __webpack_require__(6).BaseClass;
 	
 	Events = __webpack_require__(15).Events;
 	
-	SpringSimulator = __webpack_require__(28).SpringSimulator;
+	SpringSimulator = __webpack_require__(29).SpringSimulator;
 	
-	FrictionSimulator = __webpack_require__(30).FrictionSimulator;
+	FrictionSimulator = __webpack_require__(31).FrictionSimulator;
 	
-	MomentumBounceSimulator = __webpack_require__(31).MomentumBounceSimulator;
+	MomentumBounceSimulator = __webpack_require__(32).MomentumBounceSimulator;
 	
 	Events.SimulationStart = 'simulationStart';
 	
@@ -19782,7 +20204,7 @@
 
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Defaults, Integrator, Simulator, Utils,
@@ -19792,11 +20214,11 @@
 	
 	Utils = __webpack_require__(4);
 	
-	Defaults = __webpack_require__(16).Defaults;
+	Defaults = __webpack_require__(17).Defaults;
 	
-	Simulator = __webpack_require__(29).Simulator;
+	Simulator = __webpack_require__(30).Simulator;
 	
-	Integrator = __webpack_require__(22).Integrator;
+	Integrator = __webpack_require__(23).Integrator;
 	
 	exports.SpringSimulator = (function(superClass) {
 	  extend(SpringSimulator, superClass);
@@ -19857,7 +20279,7 @@
 
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var BaseClass, Config, Utils, _,
@@ -19873,7 +20295,7 @@
 	BaseClass = __webpack_require__(6).BaseClass;
 	
 	exports.Simulator = (function(superClass) {
-	  "The simulator class runs a physics simulation based on a set of input values \nat setup({input values}), and emits an output state {x, v}";
+	  "The simulator class runs a physics simulation based on a set of input values\nat setup({input values}), and emits an output state {x, v}";
 	  extend(Simulator, superClass);
 	
 	  Simulator.define("state", {
@@ -19915,7 +20337,7 @@
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Defaults, Integrator, Simulator, Utils,
@@ -19925,11 +20347,11 @@
 	
 	Utils = __webpack_require__(4);
 	
-	Defaults = __webpack_require__(16).Defaults;
+	Defaults = __webpack_require__(17).Defaults;
 	
-	Simulator = __webpack_require__(29).Simulator;
+	Simulator = __webpack_require__(30).Simulator;
 	
-	Integrator = __webpack_require__(22).Integrator;
+	Integrator = __webpack_require__(23).Integrator;
 	
 	exports.FrictionSimulator = (function(superClass) {
 	  extend(FrictionSimulator, superClass);
@@ -19971,7 +20393,7 @@
 
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Defaults, FrictionSimulator, Simulator, SpringSimulator, Utils,
@@ -19981,13 +20403,13 @@
 	
 	Utils = __webpack_require__(4);
 	
-	Defaults = __webpack_require__(16).Defaults;
+	Defaults = __webpack_require__(17).Defaults;
 	
-	Simulator = __webpack_require__(29).Simulator;
+	Simulator = __webpack_require__(30).Simulator;
 	
-	SpringSimulator = __webpack_require__(28).SpringSimulator;
+	SpringSimulator = __webpack_require__(29).SpringSimulator;
 	
-	FrictionSimulator = __webpack_require__(30).FrictionSimulator;
+	FrictionSimulator = __webpack_require__(31).FrictionSimulator;
 	
 	exports.MomentumBounceSimulator = (function(superClass) {
 	  extend(MomentumBounceSimulator, superClass);
@@ -20111,7 +20533,7 @@
 
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var BaseClass, Events, Utils, _,
@@ -20241,89 +20663,6 @@
 
 
 /***/ },
-/* 33 */
-/***/ function(module, exports) {
-
-	var Gestures, k, v;
-	
-	Gestures = {};
-	
-	Gestures._prefix = "gesture:";
-	
-	Gestures.Pan = "pan";
-	
-	Gestures.PanStart = "panstart";
-	
-	Gestures.PanMove = "panmove";
-	
-	Gestures.PanEnd = "panend";
-	
-	Gestures.PanCancel = "pancancel";
-	
-	Gestures.PanLeft = "panleft";
-	
-	Gestures.PanRight = "panright";
-	
-	Gestures.PanUp = "panup";
-	
-	Gestures.PanDown = "pandown";
-	
-	Gestures.Pinch = "pinch";
-	
-	Gestures.PinchStart = "pinchstart";
-	
-	Gestures.PinchMove = "pinchmove";
-	
-	Gestures.PinchEnd = "pinchend";
-	
-	Gestures.PinchCancel = "pinchcancel";
-	
-	Gestures.PinchIn = "pinchin";
-	
-	Gestures.PinchOut = "pinchout";
-	
-	Gestures.Press = "press";
-	
-	Gestures.PressUp = "pressup";
-	
-	Gestures.Rotate = "rotate";
-	
-	Gestures.RotateStart = "rotatestart";
-	
-	Gestures.RotateMove = "rotatemove";
-	
-	Gestures.RotateEnd = "rotateend";
-	
-	Gestures.RotateCancel = "rotatecancel";
-	
-	Gestures.Swipe = "swipe";
-	
-	Gestures.SwipeLeft = "swipeleft";
-	
-	Gestures.SwipeRight = "swiperight";
-	
-	Gestures.SwipeUp = "swipeup";
-	
-	Gestures.SwipeDown = "swipedown";
-	
-	Gestures.Tap = "tap";
-	
-	Gestures.SingleTap = "singletap";
-	
-	Gestures.DoubleTap = "doubletap";
-	
-	for (k in Gestures) {
-	  v = Gestures[k];
-	  if (k === "_prefix") {
-	    continue;
-	  }
-	  Gestures[k] = "" + Gestures._prefix + v;
-	}
-	
-	exports.Gestures = Gestures;
-
-
-/***/ },
 /* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -20338,7 +20677,7 @@
 	
 	Events = __webpack_require__(15).Events;
 	
-	Gestures = __webpack_require__(33).Gestures;
+	Gestures = __webpack_require__(16).Gestures;
 	
 	Events.PinchStart = "pinchstart";
 	
@@ -20365,15 +20704,15 @@
 	
 	  LayerPinchable.define("threshold", LayerPinchable.simpleProperty("threshold", 0));
 	
-	  LayerPinchable.define("setOrigin", LayerPinchable.simpleProperty("setOrigin", true));
+	  LayerPinchable.define("centerOrigin", LayerPinchable.simpleProperty("centerOrigin", true));
 	
 	  LayerPinchable.define("scale", LayerPinchable.simpleProperty("scale", true));
 	
 	  LayerPinchable.define("scaleIncrements", LayerPinchable.simpleProperty("scaleIncrements", 0));
 	
-	  LayerPinchable.define("scaleMin", LayerPinchable.simpleProperty("scaleMin", 0));
+	  LayerPinchable.define("minScale", LayerPinchable.simpleProperty("minScale", 0));
 	
-	  LayerPinchable.define("scaleMax", LayerPinchable.simpleProperty("scaleMax", Number.MAX_VALUE));
+	  LayerPinchable.define("maxScale", LayerPinchable.simpleProperty("maxScale", Number.MAX_VALUE));
 	
 	  LayerPinchable.define("scaleFactor", LayerPinchable.simpleProperty("scaleFactor", 1));
 	
@@ -20390,16 +20729,18 @@
 	  function LayerPinchable(layer) {
 	    this.layer = layer;
 	    this._pinchEnd = bind(this._pinchEnd, this);
-	    this._pinchMove = bind(this._pinchMove, this);
+	    this._pinch = bind(this._pinch, this);
 	    this._pinchStart = bind(this._pinchStart, this);
+	    this._centerOrigin = bind(this._centerOrigin, this);
 	    LayerPinchable.__super__.constructor.apply(this, arguments);
 	    this._attach();
 	  }
 	
 	  LayerPinchable.prototype._attach = function() {
 	    this.layer.on(Gestures.PinchStart, this._pinchStart);
-	    this.layer.on(Gestures.PinchMove, this._pinchMove);
-	    return this.layer.on(Gestures.PinchEnd, this._pinchEnd);
+	    this.layer.on(Gestures.Pinch, this._pinch);
+	    this.layer.on(Gestures.PinchEnd, this._pinchEnd);
+	    return this.layer.on(Gestures.TapStart, this._tapStart);
 	  };
 	
 	  LayerPinchable.prototype._reset = function() {
@@ -20408,44 +20749,46 @@
 	    return this._rotationOffset = null;
 	  };
 	
-	  LayerPinchable.prototype._pinchStart = function(event) {
-	    var pinchLocation, topInSuperAfter, topInSuperBefore, xDiff, yDiff;
-	    this._reset();
-	    this.emit(Events.PinchStart, event);
-	    if (this.scale) {
-	      this.emit(Events.ScaleStart, event);
-	    }
-	    if (this.rotate) {
-	      this.emit(Events.RotateStart, event);
-	    }
-	    if (this.setOrigin) {
-	      topInSuperBefore = Utils.convertPoint({}, this.layer, this.layer.superLayer);
-	      pinchLocation = Utils.convertPointFromContext(event.center, this.layer, true, true);
-	      this.layer.originX = pinchLocation.x / this.layer.width;
-	      this.layer.originY = pinchLocation.y / this.layer.height;
-	      topInSuperAfter = Utils.convertPoint({}, this.layer, this.layer.superLayer);
-	      xDiff = topInSuperAfter.x - topInSuperBefore.x;
-	      yDiff = topInSuperAfter.y - topInSuperBefore.y;
-	      this.layer.x -= xDiff;
-	      return this.layer.y -= yDiff;
-	    }
+	  LayerPinchable.prototype._tapStart = function(event) {};
+	
+	  LayerPinchable.prototype._centerOrigin = function(event) {
+	    var originDelta, pinchLocation, topInSuperAfter, topInSuperBefore;
+	    topInSuperBefore = Utils.convertPoint({}, this.layer, this.layer.superLayer);
+	    pinchLocation = Utils.convertPointFromContext(event.touchCenter, this.layer, true, true);
+	    this.layer.originX = pinchLocation.x / this.layer.width;
+	    this.layer.originY = pinchLocation.y / this.layer.height;
+	    topInSuperAfter = Utils.convertPoint({}, this.layer, this.layer.superLayer);
+	    originDelta = {
+	      x: topInSuperAfter.x - topInSuperBefore.x,
+	      y: topInSuperAfter.y - topInSuperBefore.y
+	    };
+	    this.layer.x -= originDelta.x;
+	    return this.layer.y -= originDelta.y;
 	  };
 	
-	  LayerPinchable.prototype._pinchMove = function(event) {
+	  LayerPinchable.prototype._pinchStart = function(event) {
+	    this._reset();
+	    if (this.centerOrigin) {
+	      this._centerOrigin(event);
+	    }
+	    return this.normalizeRotation = Utils.rotationNormalizer();
+	  };
+	
+	  LayerPinchable.prototype._pinch = function(event) {
 	    var pointA, pointB, rotation, scale;
-	    if (event.pointers.length !== 2) {
+	    if (event.touches.length !== 2) {
 	      return;
 	    }
 	    if (!this.enabled) {
 	      return;
 	    }
 	    pointA = {
-	      x: event.pointers[0].pageX,
-	      y: event.pointers[0].pageY
+	      x: event.touches[0].pageX,
+	      y: event.touches[0].pageY
 	    };
 	    pointB = {
-	      x: event.pointers[1].pageX,
-	      y: event.pointers[1].pageY
+	      x: event.touches[1].pageX,
+	      y: event.touches[1].pageY
 	    };
 	    if (!(Utils.pointTotal(Utils.pointAbs(Utils.pointSubtract(pointA, pointB))) > this.threshold)) {
 	      return;
@@ -20454,10 +20797,13 @@
 	      if (this._scaleStart == null) {
 	        this._scaleStart = this.layer.scale;
 	      }
-	      scale = event.scale * this._scaleStart;
-	      scale = scale * this.scaleFactor;
-	      if (this.scaleMin && this.scaleMax) {
-	        scale = Utils.clamp(scale, this.scaleMin, this.scaleMax);
+	      scale = (((event.scale - 1) * this.scaleFactor) + 1) * this._scaleStart;
+	      if (this.minScale && this.maxScale) {
+	        scale = Utils.clamp(scale, this.minScale, this.maxScale);
+	      } else if (this.minScale) {
+	        scale = Utils.clamp(scale, this.minScale, 1000000);
+	      } else if (this.maxScale) {
+	        scale = Utils.clamp(scale, 0.00001, this.maxScale);
 	      }
 	      if (this.scaleIncrements) {
 	        scale = Utils.nearestIncrement(scale, this.scaleIncrements);
@@ -20474,68 +20820,19 @@
 	      }
 	      rotation = event.rotation - this._rotationOffset + this._rotationStart;
 	      rotation = rotation * this.rotateFactor;
+	      rotation = this.normalizeRotation(rotation);
 	      if (this.rotateMin && this.rotateMax) {
 	        rotation = Utils.clamp(rotation, this.rotateMin, this.rotateMax);
 	      }
 	      if (this.rotateIncrements) {
 	        rotation = Utils.nearestIncrement(rotation, this.rotateIncrements);
 	      }
-	      this.layer.rotation = rotation;
-	      this.emit(Events.Rotate, event);
+	      return this.layer.rotation = rotation;
 	    }
-	    return this.emit(Events.Pinch, event);
 	  };
 	
 	  LayerPinchable.prototype._pinchEnd = function(event) {
-	    this._reset();
-	    this.emit(Events.PinchEnd, event);
-	    if (this.scale) {
-	      this.emit(Events.ScaleEnd, event);
-	    }
-	    if (this.rotate) {
-	      return this.emit(Events.RotateEnd, event);
-	    }
-	  };
-	
-	  LayerPinchable.prototype.emit = function(eventName, event) {
-	    this.layer.emit(eventName, event, this);
-	    return LayerPinchable.__super__.emit.call(this, eventName, event, this);
-	  };
-	
-	  LayerPinchable.prototype.onPinchStart = function(cb) {
-	    return this.on(Events.PinchStart, cb);
-	  };
-	
-	  LayerPinchable.prototype.onPinch = function(cb) {
-	    return this.on(Events.Pinch, cb);
-	  };
-	
-	  LayerPinchable.prototype.onPinchEnd = function(cb) {
-	    return this.on(Events.PinchEnd, cb);
-	  };
-	
-	  LayerPinchable.prototype.onRotateStart = function(cb) {
-	    return this.on(Events.RotateStart, cb);
-	  };
-	
-	  LayerPinchable.prototype.onRotate = function(cb) {
-	    return this.on(Events.Rotate, cb);
-	  };
-	
-	  LayerPinchable.prototype.onRotateEnd = function(cb) {
-	    return this.on(Events.RotateEnd, cb);
-	  };
-	
-	  LayerPinchable.prototype.onScaleStart = function(cb) {
-	    return this.on(Events.ScaleStart, cb);
-	  };
-	
-	  LayerPinchable.prototype.onScale = function(cb) {
-	    return this.on(Events.Scale, cb);
-	  };
-	
-	  LayerPinchable.prototype.onScaleEnd = function(cb) {
-	    return this.on(Events.ScaleEnd, cb);
+	    return this._reset();
 	  };
 	
 	  return LayerPinchable;
@@ -20545,2839 +20842,6 @@
 
 /***/ },
 /* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var EventEmitter, Gestures, Hammer, Utils, _, addEventListeners, getWindowForElement, removeEventListeners, splitStr,
-	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-	  hasProp = {}.hasOwnProperty;
-	
-	_ = __webpack_require__(1)._;
-	
-	Hammer = __webpack_require__(36);
-	
-	Utils = __webpack_require__(4);
-	
-	EventEmitter = __webpack_require__(7).EventEmitter;
-	
-	Gestures = __webpack_require__(33).Gestures;
-	
-	exports.GestureManager = (function(superClass) {
-	  extend(GestureManager, superClass);
-	
-	  function GestureManager(layer) {
-	    this.layer = layer;
-	    this.addListener = bind(this.addListener, this);
-	    this.once = bind(this.once, this);
-	  }
-	
-	  GestureManager.prototype.once = function(eventName, listener) {
-	    GestureManager.__super__.once.call(this, eventName, listener);
-	    return this._addListener(eventName, (function(_this) {
-	      return function(e) {
-	        _this.removeListener(eventName, listener);
-	        return listener.apply(_this.layer, [e, _this.layer]);
-	      };
-	    })(this));
-	  };
-	
-	  GestureManager.prototype.addListener = function(eventName, listener) {
-	    GestureManager.__super__.addListener.call(this, eventName, listener);
-	    return this._addListener(eventName, listener);
-	  };
-	
-	  GestureManager.prototype.removeListener = function(eventName, listener) {
-	    GestureManager.__super__.removeListener.call(this, eventName, listener);
-	    return this._removeListener(eventName, listener);
-	  };
-	
-	  GestureManager.prototype._addListener = function(eventName, listener) {
-	    var eventFamily, existingRecognizers, recognizer;
-	    if (!eventName) {
-	      throw new Error("No event name defined");
-	    }
-	    if (!listener) {
-	      throw new Error("No listener defined");
-	    }
-	    this._manager = Hammer(this.layer._element);
-	    this.layer.ignoreEvents = false;
-	    eventFamily = this._getEventFamily(eventName);
-	    if (!eventName) {
-	      throw new Error("Cannot find gesture family for " + eventName);
-	    }
-	    recognizer = this._getRecognizer(eventFamily);
-	    if (!eventFamily) {
-	      throw new Error("Cannot find gesture recognizer for " + eventFamily);
-	    }
-	    existingRecognizers = this._getDependentRecognizersForEventFamily(eventFamily);
-	    if (existingRecognizers.length > 0) {
-	      recognizer.recognizeWith(existingRecognizers);
-	    }
-	    this._manager.add(recognizer);
-	    listener._actual = (function(_this) {
-	      return function(event) {
-	        return listener.apply(_this.layer, [event, _this.layer]);
-	      };
-	    })(this);
-	    return this._manager.on(eventName, listener._actual);
-	  };
-	
-	  GestureManager.prototype._removeListener = function(eventName, listener) {
-	    if (this.listenerEvents().length === 1 && this.listenerEvents()[0] === eventName) {
-	      return this._manager.destroy();
-	    } else {
-	      if (listener._actual) {
-	        listener = listener._actual;
-	      }
-	      return this._manager.off(eventName, listener);
-	    }
-	  };
-	
-	  GestureManager.prototype.destroy = function() {
-	    this._manager.destroy();
-	    return this._manager = null;
-	  };
-	
-	  GestureManager.prototype.on = GestureManager.prototype.addListener;
-	
-	  GestureManager.prototype.off = GestureManager.prototype.removeListener;
-	
-	  GestureManager.prototype._getEventFamily = function(eventName) {
-	    switch (eventName) {
-	      case Gestures.Pan:
-	      case Gestures.PanStart:
-	      case Gestures.PanMove:
-	      case Gestures.PanEnd:
-	      case Gestures.PanCancel:
-	      case Gestures.PanLeft:
-	      case Gestures.PanRight:
-	      case Gestures.PanUp:
-	      case Gestures.PanDown:
-	        return Gestures.Pan;
-	      case Gestures.Pinch:
-	      case Gestures.PinchStart:
-	      case Gestures.PinchMove:
-	      case Gestures.PinchEnd:
-	      case Gestures.PinchCancel:
-	      case Gestures.PinchIn:
-	      case Gestures.PinchOut:
-	        return Gestures.Pinch;
-	      case Gestures.Press:
-	      case Gestures.PressUp:
-	        return Gestures.Press;
-	      case Gestures.Rotate:
-	      case Gestures.RotateStart:
-	      case Gestures.RotateMove:
-	      case Gestures.RotateEnd:
-	      case Gestures.RotateCancel:
-	        return Gestures.Rotate;
-	      case Gestures.Swipe:
-	      case Gestures.SwipeLeft:
-	      case Gestures.SwipeRight:
-	      case Gestures.SwipeUp:
-	      case Gestures.SwipeDown:
-	        return Gestures.Swipe;
-	      case Gestures.Tap:
-	      case Gestures.SingleTap:
-	        return Gestures.Tap;
-	      case Gestures.DoubleTap:
-	        return Gestures.DoubleTap;
-	    }
-	  };
-	
-	  GestureManager.prototype._getRecognizer = function(eventFamily) {
-	    switch (eventFamily) {
-	      case Gestures.Pan:
-	        return new Hammer.Pan({
-	          event: Gestures.Pan
-	        });
-	      case Gestures.Pinch:
-	        return new Hammer.Pinch({
-	          event: Gestures.Pinch
-	        });
-	      case Gestures.Press:
-	        return new Hammer.Press({
-	          event: Gestures.Press
-	        });
-	      case Gestures.Rotate:
-	        return new Hammer.Rotate({
-	          event: Gestures.Rotate
-	        });
-	      case Gestures.Swipe:
-	        return new Hammer.Swipe({
-	          event: Gestures.Swipe
-	        });
-	      case Gestures.Tap:
-	        return new Hammer.Tap({
-	          event: Gestures.Tap
-	        });
-	      case Gestures.DoubleTap:
-	        return new Hammer.Tap({
-	          event: Gestures.DoubleTap,
-	          taps: 2
-	        });
-	    }
-	  };
-	
-	  GestureManager.prototype._getDependentRecognizersForEventFamily = function(eventFamily) {
-	    var existingRecognizers, pan, pinch, rotate, swipe, tap;
-	    existingRecognizers = [];
-	    switch (eventFamily) {
-	      case Gestures.Pan:
-	        if (swipe = this._manager.get(Gestures.Swipe)) {
-	          existingRecognizers.push(swipe);
-	        }
-	        if (rotate = this._manager.get(Gestures.Rotate)) {
-	          existingRecognizers.push(rotate);
-	        }
-	        if (pinch = this._manager.get(Gestures.Pinch)) {
-	          existingRecognizers.push(pinch);
-	        }
-	        break;
-	      case Gestures.Swipe:
-	        if (pan = this._manager.get(Gestures.Pan)) {
-	          existingRecognizers.push(pan);
-	        }
-	        break;
-	      case Gestures.Rotate:
-	        if (pan = this._manager.get(Gestures.Pan)) {
-	          existingRecognizers.push(pan);
-	        }
-	        if (pinch = this._manager.get(Gestures.Pinch)) {
-	          existingRecognizers.push(pinch);
-	        }
-	        break;
-	      case Gestures.Pinch:
-	        if (pan = this._manager.get(Gestures.Pan)) {
-	          existingRecognizers.push(pan);
-	        }
-	        if (rotate = this._manager.get(Gestures.Rotate)) {
-	          existingRecognizers.push(rotate);
-	        }
-	        break;
-	      case Gestures.DoubleTap:
-	        if (tap = this._manager.get(Gestures.Tap)) {
-	          existingRecognizers.push(tap);
-	        }
-	    }
-	    return existingRecognizers;
-	  };
-	
-	  return GestureManager;
-	
-	})(EventEmitter);
-	
-	getWindowForElement = function(element) {
-	  var doc;
-	  doc = element.ownerDocument || element;
-	  return doc.defaultView || doc.parentWindow || window;
-	};
-	
-	splitStr = function(str) {
-	  return str.trim().split(/\s+/g);
-	};
-	
-	addEventListeners = function(target, types, handler) {
-	  return splitStr(types).map(function(type) {
-	    return Framer.CurrentContext.domEventManager.wrap(target).addEventListener(type, handler, false);
-	  });
-	};
-	
-	removeEventListeners = function(target, types, handler) {
-	  return splitStr(types).map(function(type) {
-	    return Framer.CurrentContext.domEventManager.wrap(target).removeEventListener(type, handler, false);
-	  });
-	};
-	
-	Hammer.Input.prototype.init = function() {
-	  this.evEl && addEventListeners(this.element, this.evEl, this.domHandler);
-	  this.evTarget && addEventListeners(this.target, this.evTarget, this.domHandler);
-	  this.evWin && addEventListeners(getWindowForElement(this.element), this.evWin, this.domHandler);
-	};
-	
-	Hammer.Input.prototype.destroy = function() {
-	  this.evEl && removeEventListeners(this.element, this.evEl, this.domHandler);
-	  this.evTarget && removeEventListeners(this.target, this.evTarget, this.domHandler);
-	  this.evWin && removeEventListeners(getWindowForElement(this.element), this.evWin, this.domHandler);
-	};
-
-
-/***/ },
-/* 36 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/*! Hammer.JS - v2.0.6 - 2015-12-23
-	 * http://hammerjs.github.io/
-	 *
-	 * Copyright (c) 2015 Jorik Tangelder;
-	 * Licensed under the  license */
-	(function(window, document, exportName, undefined) {
-	  'use strict';
-	
-	var VENDOR_PREFIXES = ['', 'webkit', 'Moz', 'MS', 'ms', 'o'];
-	var TEST_ELEMENT = document.createElement('div');
-	
-	var TYPE_FUNCTION = 'function';
-	
-	var round = Math.round;
-	var abs = Math.abs;
-	var now = Date.now;
-	
-	/**
-	 * set a timeout with a given scope
-	 * @param {Function} fn
-	 * @param {Number} timeout
-	 * @param {Object} context
-	 * @returns {number}
-	 */
-	function setTimeoutContext(fn, timeout, context) {
-	    return setTimeout(bindFn(fn, context), timeout);
-	}
-	
-	/**
-	 * if the argument is an array, we want to execute the fn on each entry
-	 * if it aint an array we don't want to do a thing.
-	 * this is used by all the methods that accept a single and array argument.
-	 * @param {*|Array} arg
-	 * @param {String} fn
-	 * @param {Object} [context]
-	 * @returns {Boolean}
-	 */
-	function invokeArrayArg(arg, fn, context) {
-	    if (Array.isArray(arg)) {
-	        each(arg, context[fn], context);
-	        return true;
-	    }
-	    return false;
-	}
-	
-	/**
-	 * walk objects and arrays
-	 * @param {Object} obj
-	 * @param {Function} iterator
-	 * @param {Object} context
-	 */
-	function each(obj, iterator, context) {
-	    var i;
-	
-	    if (!obj) {
-	        return;
-	    }
-	
-	    if (obj.forEach) {
-	        obj.forEach(iterator, context);
-	    } else if (obj.length !== undefined) {
-	        i = 0;
-	        while (i < obj.length) {
-	            iterator.call(context, obj[i], i, obj);
-	            i++;
-	        }
-	    } else {
-	        for (i in obj) {
-	            obj.hasOwnProperty(i) && iterator.call(context, obj[i], i, obj);
-	        }
-	    }
-	}
-	
-	/**
-	 * wrap a method with a deprecation warning and stack trace
-	 * @param {Function} method
-	 * @param {String} name
-	 * @param {String} message
-	 * @returns {Function} A new function wrapping the supplied method.
-	 */
-	function deprecate(method, name, message) {
-	    var deprecationMessage = 'DEPRECATED METHOD: ' + name + '\n' + message + ' AT \n';
-	    return function() {
-	        var e = new Error('get-stack-trace');
-	        var stack = e && e.stack ? e.stack.replace(/^[^\(]+?[\n$]/gm, '')
-	            .replace(/^\s+at\s+/gm, '')
-	            .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@') : 'Unknown Stack Trace';
-	
-	        var log = window.console && (window.console.warn || window.console.log);
-	        if (log) {
-	            log.call(window.console, deprecationMessage, stack);
-	        }
-	        return method.apply(this, arguments);
-	    };
-	}
-	
-	/**
-	 * extend object.
-	 * means that properties in dest will be overwritten by the ones in src.
-	 * @param {Object} target
-	 * @param {...Object} objects_to_assign
-	 * @returns {Object} target
-	 */
-	var assign;
-	if (typeof Object.assign !== 'function') {
-	    assign = function assign(target) {
-	        if (target === undefined || target === null) {
-	            throw new TypeError('Cannot convert undefined or null to object');
-	        }
-	
-	        var output = Object(target);
-	        for (var index = 1; index < arguments.length; index++) {
-	            var source = arguments[index];
-	            if (source !== undefined && source !== null) {
-	                for (var nextKey in source) {
-	                    if (source.hasOwnProperty(nextKey)) {
-	                        output[nextKey] = source[nextKey];
-	                    }
-	                }
-	            }
-	        }
-	        return output;
-	    };
-	} else {
-	    assign = Object.assign;
-	}
-	
-	/**
-	 * extend object.
-	 * means that properties in dest will be overwritten by the ones in src.
-	 * @param {Object} dest
-	 * @param {Object} src
-	 * @param {Boolean=false} [merge]
-	 * @returns {Object} dest
-	 */
-	var extend = deprecate(function extend(dest, src, merge) {
-	    var keys = Object.keys(src);
-	    var i = 0;
-	    while (i < keys.length) {
-	        if (!merge || (merge && dest[keys[i]] === undefined)) {
-	            dest[keys[i]] = src[keys[i]];
-	        }
-	        i++;
-	    }
-	    return dest;
-	}, 'extend', 'Use `assign`.');
-	
-	/**
-	 * merge the values from src in the dest.
-	 * means that properties that exist in dest will not be overwritten by src
-	 * @param {Object} dest
-	 * @param {Object} src
-	 * @returns {Object} dest
-	 */
-	var merge = deprecate(function merge(dest, src) {
-	    return extend(dest, src, true);
-	}, 'merge', 'Use `assign`.');
-	
-	/**
-	 * simple class inheritance
-	 * @param {Function} child
-	 * @param {Function} base
-	 * @param {Object} [properties]
-	 */
-	function inherit(child, base, properties) {
-	    var baseP = base.prototype,
-	        childP;
-	
-	    childP = child.prototype = Object.create(baseP);
-	    childP.constructor = child;
-	    childP._super = baseP;
-	
-	    if (properties) {
-	        assign(childP, properties);
-	    }
-	}
-	
-	/**
-	 * simple function bind
-	 * @param {Function} fn
-	 * @param {Object} context
-	 * @returns {Function}
-	 */
-	function bindFn(fn, context) {
-	    return function boundFn() {
-	        return fn.apply(context, arguments);
-	    };
-	}
-	
-	/**
-	 * let a boolean value also be a function that must return a boolean
-	 * this first item in args will be used as the context
-	 * @param {Boolean|Function} val
-	 * @param {Array} [args]
-	 * @returns {Boolean}
-	 */
-	function boolOrFn(val, args) {
-	    if (typeof val == TYPE_FUNCTION) {
-	        return val.apply(args ? args[0] || undefined : undefined, args);
-	    }
-	    return val;
-	}
-	
-	/**
-	 * use the val2 when val1 is undefined
-	 * @param {*} val1
-	 * @param {*} val2
-	 * @returns {*}
-	 */
-	function ifUndefined(val1, val2) {
-	    return (val1 === undefined) ? val2 : val1;
-	}
-	
-	/**
-	 * addEventListener with multiple events at once
-	 * @param {EventTarget} target
-	 * @param {String} types
-	 * @param {Function} handler
-	 */
-	function addEventListeners(target, types, handler) {
-	    each(splitStr(types), function(type) {
-	        target.addEventListener(type, handler, false);
-	    });
-	}
-	
-	/**
-	 * removeEventListener with multiple events at once
-	 * @param {EventTarget} target
-	 * @param {String} types
-	 * @param {Function} handler
-	 */
-	function removeEventListeners(target, types, handler) {
-	    each(splitStr(types), function(type) {
-	        target.removeEventListener(type, handler, false);
-	    });
-	}
-	
-	/**
-	 * find if a node is in the given parent
-	 * @method hasParent
-	 * @param {HTMLElement} node
-	 * @param {HTMLElement} parent
-	 * @return {Boolean} found
-	 */
-	function hasParent(node, parent) {
-	    while (node) {
-	        if (node == parent) {
-	            return true;
-	        }
-	        node = node.parentNode;
-	    }
-	    return false;
-	}
-	
-	/**
-	 * small indexOf wrapper
-	 * @param {String} str
-	 * @param {String} find
-	 * @returns {Boolean} found
-	 */
-	function inStr(str, find) {
-	    return str.indexOf(find) > -1;
-	}
-	
-	/**
-	 * split string on whitespace
-	 * @param {String} str
-	 * @returns {Array} words
-	 */
-	function splitStr(str) {
-	    return str.trim().split(/\s+/g);
-	}
-	
-	/**
-	 * find if a array contains the object using indexOf or a simple polyFill
-	 * @param {Array} src
-	 * @param {String} find
-	 * @param {String} [findByKey]
-	 * @return {Boolean|Number} false when not found, or the index
-	 */
-	function inArray(src, find, findByKey) {
-	    if (src.indexOf && !findByKey) {
-	        return src.indexOf(find);
-	    } else {
-	        var i = 0;
-	        while (i < src.length) {
-	            if ((findByKey && src[i][findByKey] == find) || (!findByKey && src[i] === find)) {
-	                return i;
-	            }
-	            i++;
-	        }
-	        return -1;
-	    }
-	}
-	
-	/**
-	 * convert array-like objects to real arrays
-	 * @param {Object} obj
-	 * @returns {Array}
-	 */
-	function toArray(obj) {
-	    return Array.prototype.slice.call(obj, 0);
-	}
-	
-	/**
-	 * unique array with objects based on a key (like 'id') or just by the array's value
-	 * @param {Array} src [{id:1},{id:2},{id:1}]
-	 * @param {String} [key]
-	 * @param {Boolean} [sort=False]
-	 * @returns {Array} [{id:1},{id:2}]
-	 */
-	function uniqueArray(src, key, sort) {
-	    var results = [];
-	    var values = [];
-	    var i = 0;
-	
-	    while (i < src.length) {
-	        var val = key ? src[i][key] : src[i];
-	        if (inArray(values, val) < 0) {
-	            results.push(src[i]);
-	        }
-	        values[i] = val;
-	        i++;
-	    }
-	
-	    if (sort) {
-	        if (!key) {
-	            results = results.sort();
-	        } else {
-	            results = results.sort(function sortUniqueArray(a, b) {
-	                return a[key] > b[key];
-	            });
-	        }
-	    }
-	
-	    return results;
-	}
-	
-	/**
-	 * get the prefixed property
-	 * @param {Object} obj
-	 * @param {String} property
-	 * @returns {String|Undefined} prefixed
-	 */
-	function prefixed(obj, property) {
-	    var prefix, prop;
-	    var camelProp = property[0].toUpperCase() + property.slice(1);
-	
-	    var i = 0;
-	    while (i < VENDOR_PREFIXES.length) {
-	        prefix = VENDOR_PREFIXES[i];
-	        prop = (prefix) ? prefix + camelProp : property;
-	
-	        if (prop in obj) {
-	            return prop;
-	        }
-	        i++;
-	    }
-	    return undefined;
-	}
-	
-	/**
-	 * get a unique id
-	 * @returns {number} uniqueId
-	 */
-	var _uniqueId = 1;
-	function uniqueId() {
-	    return _uniqueId++;
-	}
-	
-	/**
-	 * get the window object of an element
-	 * @param {HTMLElement} element
-	 * @returns {DocumentView|Window}
-	 */
-	function getWindowForElement(element) {
-	    var doc = element.ownerDocument || element;
-	    return (doc.defaultView || doc.parentWindow || window);
-	}
-	
-	var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i;
-	
-	var SUPPORT_TOUCH = ('ontouchstart' in window);
-	var SUPPORT_POINTER_EVENTS = prefixed(window, 'PointerEvent') !== undefined;
-	var SUPPORT_ONLY_TOUCH = SUPPORT_TOUCH && MOBILE_REGEX.test(navigator.userAgent);
-	
-	var INPUT_TYPE_TOUCH = 'touch';
-	var INPUT_TYPE_PEN = 'pen';
-	var INPUT_TYPE_MOUSE = 'mouse';
-	var INPUT_TYPE_KINECT = 'kinect';
-	
-	var COMPUTE_INTERVAL = 25;
-	
-	var INPUT_START = 1;
-	var INPUT_MOVE = 2;
-	var INPUT_END = 4;
-	var INPUT_CANCEL = 8;
-	
-	var DIRECTION_NONE = 1;
-	var DIRECTION_LEFT = 2;
-	var DIRECTION_RIGHT = 4;
-	var DIRECTION_UP = 8;
-	var DIRECTION_DOWN = 16;
-	
-	var DIRECTION_HORIZONTAL = DIRECTION_LEFT | DIRECTION_RIGHT;
-	var DIRECTION_VERTICAL = DIRECTION_UP | DIRECTION_DOWN;
-	var DIRECTION_ALL = DIRECTION_HORIZONTAL | DIRECTION_VERTICAL;
-	
-	var PROPS_XY = ['x', 'y'];
-	var PROPS_CLIENT_XY = ['clientX', 'clientY'];
-	
-	/**
-	 * create new input type manager
-	 * @param {Manager} manager
-	 * @param {Function} callback
-	 * @returns {Input}
-	 * @constructor
-	 */
-	function Input(manager, callback) {
-	    var self = this;
-	    this.manager = manager;
-	    this.callback = callback;
-	    this.element = manager.element;
-	    this.target = manager.options.inputTarget;
-	
-	    // smaller wrapper around the handler, for the scope and the enabled state of the manager,
-	    // so when disabled the input events are completely bypassed.
-	    this.domHandler = function(ev) {
-	        if (boolOrFn(manager.options.enable, [manager])) {
-	            self.handler(ev);
-	        }
-	    };
-	
-	    this.init();
-	
-	}
-	
-	Input.prototype = {
-	    /**
-	     * should handle the inputEvent data and trigger the callback
-	     * @virtual
-	     */
-	    handler: function() { },
-	
-	    /**
-	     * bind the events
-	     */
-	    init: function() {
-	        this.evEl && addEventListeners(this.element, this.evEl, this.domHandler);
-	        this.evTarget && addEventListeners(this.target, this.evTarget, this.domHandler);
-	        this.evWin && addEventListeners(getWindowForElement(this.element), this.evWin, this.domHandler);
-	    },
-	
-	    /**
-	     * unbind the events
-	     */
-	    destroy: function() {
-	        this.evEl && removeEventListeners(this.element, this.evEl, this.domHandler);
-	        this.evTarget && removeEventListeners(this.target, this.evTarget, this.domHandler);
-	        this.evWin && removeEventListeners(getWindowForElement(this.element), this.evWin, this.domHandler);
-	    }
-	};
-	
-	/**
-	 * create new input type manager
-	 * called by the Manager constructor
-	 * @param {Hammer} manager
-	 * @returns {Input}
-	 */
-	function createInputInstance(manager) {
-	    var Type;
-	    var inputClass = manager.options.inputClass;
-	
-	    if (inputClass) {
-	        Type = inputClass;
-	    } else if (SUPPORT_POINTER_EVENTS) {
-	        Type = PointerEventInput;
-	    } else if (SUPPORT_ONLY_TOUCH) {
-	        Type = TouchInput;
-	    } else if (!SUPPORT_TOUCH) {
-	        Type = MouseInput;
-	    } else {
-	        Type = TouchMouseInput;
-	    }
-	    return new (Type)(manager, inputHandler);
-	}
-	
-	/**
-	 * handle input events
-	 * @param {Manager} manager
-	 * @param {String} eventType
-	 * @param {Object} input
-	 */
-	function inputHandler(manager, eventType, input) {
-	    var pointersLen = input.pointers.length;
-	    var changedPointersLen = input.changedPointers.length;
-	    var isFirst = (eventType & INPUT_START && (pointersLen - changedPointersLen === 0));
-	    var isFinal = (eventType & (INPUT_END | INPUT_CANCEL) && (pointersLen - changedPointersLen === 0));
-	
-	    input.isFirst = !!isFirst;
-	    input.isFinal = !!isFinal;
-	
-	    if (isFirst) {
-	        manager.session = {};
-	    }
-	
-	    // source event is the normalized value of the domEvents
-	    // like 'touchstart, mouseup, pointerdown'
-	    input.eventType = eventType;
-	
-	    // compute scale, rotation etc
-	    computeInputData(manager, input);
-	
-	    // emit secret event
-	    manager.emit('hammer.input', input);
-	
-	    manager.recognize(input);
-	    manager.session.prevInput = input;
-	}
-	
-	/**
-	 * extend the data with some usable properties like scale, rotate, velocity etc
-	 * @param {Object} manager
-	 * @param {Object} input
-	 */
-	function computeInputData(manager, input) {
-	    var session = manager.session;
-	    var pointers = input.pointers;
-	    var pointersLength = pointers.length;
-	
-	    // store the first input to calculate the distance and direction
-	    if (!session.firstInput) {
-	        session.firstInput = simpleCloneInputData(input);
-	    }
-	
-	    // to compute scale and rotation we need to store the multiple touches
-	    if (pointersLength > 1 && !session.firstMultiple) {
-	        session.firstMultiple = simpleCloneInputData(input);
-	    } else if (pointersLength === 1) {
-	        session.firstMultiple = false;
-	    }
-	
-	    var firstInput = session.firstInput;
-	    var firstMultiple = session.firstMultiple;
-	    var offsetCenter = firstMultiple ? firstMultiple.center : firstInput.center;
-	
-	    var center = input.center = getCenter(pointers);
-	    input.timeStamp = now();
-	    input.deltaTime = input.timeStamp - firstInput.timeStamp;
-	
-	    input.angle = getAngle(offsetCenter, center);
-	    input.distance = getDistance(offsetCenter, center);
-	
-	    computeDeltaXY(session, input);
-	    input.offsetDirection = getDirection(input.deltaX, input.deltaY);
-	
-	    var overallVelocity = getVelocity(input.deltaTime, input.deltaX, input.deltaY);
-	    input.overallVelocityX = overallVelocity.x;
-	    input.overallVelocityY = overallVelocity.y;
-	    input.overallVelocity = (abs(overallVelocity.x) > abs(overallVelocity.y)) ? overallVelocity.x : overallVelocity.y;
-	
-	    input.scale = firstMultiple ? getScale(firstMultiple.pointers, pointers) : 1;
-	    input.rotation = firstMultiple ? getRotation(firstMultiple.pointers, pointers) : 0;
-	
-	    input.maxPointers = !session.prevInput ? input.pointers.length : ((input.pointers.length >
-	        session.prevInput.maxPointers) ? input.pointers.length : session.prevInput.maxPointers);
-	
-	    computeIntervalInputData(session, input);
-	
-	    // find the correct target
-	    var target = manager.element;
-	    if (hasParent(input.srcEvent.target, target)) {
-	        target = input.srcEvent.target;
-	    }
-	    input.target = target;
-	}
-	
-	function computeDeltaXY(session, input) {
-	    var center = input.center;
-	    var offset = session.offsetDelta || {};
-	    var prevDelta = session.prevDelta || {};
-	    var prevInput = session.prevInput || {};
-	
-	    if (input.eventType === INPUT_START || prevInput.eventType === INPUT_END) {
-	        prevDelta = session.prevDelta = {
-	            x: prevInput.deltaX || 0,
-	            y: prevInput.deltaY || 0
-	        };
-	
-	        offset = session.offsetDelta = {
-	            x: center.x,
-	            y: center.y
-	        };
-	    }
-	
-	    input.deltaX = prevDelta.x + (center.x - offset.x);
-	    input.deltaY = prevDelta.y + (center.y - offset.y);
-	}
-	
-	/**
-	 * velocity is calculated every x ms
-	 * @param {Object} session
-	 * @param {Object} input
-	 */
-	function computeIntervalInputData(session, input) {
-	    var last = session.lastInterval || input,
-	        deltaTime = input.timeStamp - last.timeStamp,
-	        velocity, velocityX, velocityY, direction;
-	
-	    if (input.eventType != INPUT_CANCEL && (deltaTime > COMPUTE_INTERVAL || last.velocity === undefined)) {
-	        var deltaX = input.deltaX - last.deltaX;
-	        var deltaY = input.deltaY - last.deltaY;
-	
-	        var v = getVelocity(deltaTime, deltaX, deltaY);
-	        velocityX = v.x;
-	        velocityY = v.y;
-	        velocity = (abs(v.x) > abs(v.y)) ? v.x : v.y;
-	        direction = getDirection(deltaX, deltaY);
-	
-	        session.lastInterval = input;
-	    } else {
-	        // use latest velocity info if it doesn't overtake a minimum period
-	        velocity = last.velocity;
-	        velocityX = last.velocityX;
-	        velocityY = last.velocityY;
-	        direction = last.direction;
-	    }
-	
-	    input.velocity = velocity;
-	    input.velocityX = velocityX;
-	    input.velocityY = velocityY;
-	    input.direction = direction;
-	}
-	
-	/**
-	 * create a simple clone from the input used for storage of firstInput and firstMultiple
-	 * @param {Object} input
-	 * @returns {Object} clonedInputData
-	 */
-	function simpleCloneInputData(input) {
-	    // make a simple copy of the pointers because we will get a reference if we don't
-	    // we only need clientXY for the calculations
-	    var pointers = [];
-	    var i = 0;
-	    while (i < input.pointers.length) {
-	        pointers[i] = {
-	            clientX: round(input.pointers[i].clientX),
-	            clientY: round(input.pointers[i].clientY)
-	        };
-	        i++;
-	    }
-	
-	    return {
-	        timeStamp: now(),
-	        pointers: pointers,
-	        center: getCenter(pointers),
-	        deltaX: input.deltaX,
-	        deltaY: input.deltaY
-	    };
-	}
-	
-	/**
-	 * get the center of all the pointers
-	 * @param {Array} pointers
-	 * @return {Object} center contains `x` and `y` properties
-	 */
-	function getCenter(pointers) {
-	    var pointersLength = pointers.length;
-	
-	    // no need to loop when only one touch
-	    if (pointersLength === 1) {
-	        return {
-	            x: round(pointers[0].clientX),
-	            y: round(pointers[0].clientY)
-	        };
-	    }
-	
-	    var x = 0, y = 0, i = 0;
-	    while (i < pointersLength) {
-	        x += pointers[i].clientX;
-	        y += pointers[i].clientY;
-	        i++;
-	    }
-	
-	    return {
-	        x: round(x / pointersLength),
-	        y: round(y / pointersLength)
-	    };
-	}
-	
-	/**
-	 * calculate the velocity between two points. unit is in px per ms.
-	 * @param {Number} deltaTime
-	 * @param {Number} x
-	 * @param {Number} y
-	 * @return {Object} velocity `x` and `y`
-	 */
-	function getVelocity(deltaTime, x, y) {
-	    return {
-	        x: x / deltaTime || 0,
-	        y: y / deltaTime || 0
-	    };
-	}
-	
-	/**
-	 * get the direction between two points
-	 * @param {Number} x
-	 * @param {Number} y
-	 * @return {Number} direction
-	 */
-	function getDirection(x, y) {
-	    if (x === y) {
-	        return DIRECTION_NONE;
-	    }
-	
-	    if (abs(x) >= abs(y)) {
-	        return x < 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
-	    }
-	    return y < 0 ? DIRECTION_UP : DIRECTION_DOWN;
-	}
-	
-	/**
-	 * calculate the absolute distance between two points
-	 * @param {Object} p1 {x, y}
-	 * @param {Object} p2 {x, y}
-	 * @param {Array} [props] containing x and y keys
-	 * @return {Number} distance
-	 */
-	function getDistance(p1, p2, props) {
-	    if (!props) {
-	        props = PROPS_XY;
-	    }
-	    var x = p2[props[0]] - p1[props[0]],
-	        y = p2[props[1]] - p1[props[1]];
-	
-	    return Math.sqrt((x * x) + (y * y));
-	}
-	
-	/**
-	 * calculate the angle between two coordinates
-	 * @param {Object} p1
-	 * @param {Object} p2
-	 * @param {Array} [props] containing x and y keys
-	 * @return {Number} angle
-	 */
-	function getAngle(p1, p2, props) {
-	    if (!props) {
-	        props = PROPS_XY;
-	    }
-	    var x = p2[props[0]] - p1[props[0]],
-	        y = p2[props[1]] - p1[props[1]];
-	    return Math.atan2(y, x) * 180 / Math.PI;
-	}
-	
-	/**
-	 * calculate the rotation degrees between two pointersets
-	 * @param {Array} start array of pointers
-	 * @param {Array} end array of pointers
-	 * @return {Number} rotation
-	 */
-	function getRotation(start, end) {
-	    return getAngle(end[1], end[0], PROPS_CLIENT_XY) + getAngle(start[1], start[0], PROPS_CLIENT_XY);
-	}
-	
-	/**
-	 * calculate the scale factor between two pointersets
-	 * no scale is 1, and goes down to 0 when pinched together, and bigger when pinched out
-	 * @param {Array} start array of pointers
-	 * @param {Array} end array of pointers
-	 * @return {Number} scale
-	 */
-	function getScale(start, end) {
-	    return getDistance(end[0], end[1], PROPS_CLIENT_XY) / getDistance(start[0], start[1], PROPS_CLIENT_XY);
-	}
-	
-	var MOUSE_INPUT_MAP = {
-	    mousedown: INPUT_START,
-	    mousemove: INPUT_MOVE,
-	    mouseup: INPUT_END
-	};
-	
-	var MOUSE_ELEMENT_EVENTS = 'mousedown';
-	var MOUSE_WINDOW_EVENTS = 'mousemove mouseup';
-	
-	/**
-	 * Mouse events input
-	 * @constructor
-	 * @extends Input
-	 */
-	function MouseInput() {
-	    this.evEl = MOUSE_ELEMENT_EVENTS;
-	    this.evWin = MOUSE_WINDOW_EVENTS;
-	
-	    this.allow = true; // used by Input.TouchMouse to disable mouse events
-	    this.pressed = false; // mousedown state
-	
-	    Input.apply(this, arguments);
-	}
-	
-	inherit(MouseInput, Input, {
-	    /**
-	     * handle mouse events
-	     * @param {Object} ev
-	     */
-	    handler: function MEhandler(ev) {
-	        var eventType = MOUSE_INPUT_MAP[ev.type];
-	
-	        // on start we want to have the left mouse button down
-	        if (eventType & INPUT_START && ev.button === 0) {
-	            this.pressed = true;
-	        }
-	
-	        if (eventType & INPUT_MOVE && ev.which !== 1) {
-	            eventType = INPUT_END;
-	        }
-	
-	        // mouse must be down, and mouse events are allowed (see the TouchMouse input)
-	        if (!this.pressed || !this.allow) {
-	            return;
-	        }
-	
-	        if (eventType & INPUT_END) {
-	            this.pressed = false;
-	        }
-	
-	        this.callback(this.manager, eventType, {
-	            pointers: [ev],
-	            changedPointers: [ev],
-	            pointerType: INPUT_TYPE_MOUSE,
-	            srcEvent: ev
-	        });
-	    }
-	});
-	
-	var POINTER_INPUT_MAP = {
-	    pointerdown: INPUT_START,
-	    pointermove: INPUT_MOVE,
-	    pointerup: INPUT_END,
-	    pointercancel: INPUT_CANCEL,
-	    pointerout: INPUT_CANCEL
-	};
-	
-	// in IE10 the pointer types is defined as an enum
-	var IE10_POINTER_TYPE_ENUM = {
-	    2: INPUT_TYPE_TOUCH,
-	    3: INPUT_TYPE_PEN,
-	    4: INPUT_TYPE_MOUSE,
-	    5: INPUT_TYPE_KINECT // see https://twitter.com/jacobrossi/status/480596438489890816
-	};
-	
-	var POINTER_ELEMENT_EVENTS = 'pointerdown';
-	var POINTER_WINDOW_EVENTS = 'pointermove pointerup pointercancel';
-	
-	// IE10 has prefixed support, and case-sensitive
-	if (window.MSPointerEvent && !window.PointerEvent) {
-	    POINTER_ELEMENT_EVENTS = 'MSPointerDown';
-	    POINTER_WINDOW_EVENTS = 'MSPointerMove MSPointerUp MSPointerCancel';
-	}
-	
-	/**
-	 * Pointer events input
-	 * @constructor
-	 * @extends Input
-	 */
-	function PointerEventInput() {
-	    this.evEl = POINTER_ELEMENT_EVENTS;
-	    this.evWin = POINTER_WINDOW_EVENTS;
-	
-	    Input.apply(this, arguments);
-	
-	    this.store = (this.manager.session.pointerEvents = []);
-	}
-	
-	inherit(PointerEventInput, Input, {
-	    /**
-	     * handle mouse events
-	     * @param {Object} ev
-	     */
-	    handler: function PEhandler(ev) {
-	        var store = this.store;
-	        var removePointer = false;
-	
-	        var eventTypeNormalized = ev.type.toLowerCase().replace('ms', '');
-	        var eventType = POINTER_INPUT_MAP[eventTypeNormalized];
-	        var pointerType = IE10_POINTER_TYPE_ENUM[ev.pointerType] || ev.pointerType;
-	
-	        var isTouch = (pointerType == INPUT_TYPE_TOUCH);
-	
-	        // get index of the event in the store
-	        var storeIndex = inArray(store, ev.pointerId, 'pointerId');
-	
-	        // start and mouse must be down
-	        if (eventType & INPUT_START && (ev.button === 0 || isTouch)) {
-	            if (storeIndex < 0) {
-	                store.push(ev);
-	                storeIndex = store.length - 1;
-	            }
-	        } else if (eventType & (INPUT_END | INPUT_CANCEL)) {
-	            removePointer = true;
-	        }
-	
-	        // it not found, so the pointer hasn't been down (so it's probably a hover)
-	        if (storeIndex < 0) {
-	            return;
-	        }
-	
-	        // update the event in the store
-	        store[storeIndex] = ev;
-	
-	        this.callback(this.manager, eventType, {
-	            pointers: store,
-	            changedPointers: [ev],
-	            pointerType: pointerType,
-	            srcEvent: ev
-	        });
-	
-	        if (removePointer) {
-	            // remove from the store
-	            store.splice(storeIndex, 1);
-	        }
-	    }
-	});
-	
-	var SINGLE_TOUCH_INPUT_MAP = {
-	    touchstart: INPUT_START,
-	    touchmove: INPUT_MOVE,
-	    touchend: INPUT_END,
-	    touchcancel: INPUT_CANCEL
-	};
-	
-	var SINGLE_TOUCH_TARGET_EVENTS = 'touchstart';
-	var SINGLE_TOUCH_WINDOW_EVENTS = 'touchstart touchmove touchend touchcancel';
-	
-	/**
-	 * Touch events input
-	 * @constructor
-	 * @extends Input
-	 */
-	function SingleTouchInput() {
-	    this.evTarget = SINGLE_TOUCH_TARGET_EVENTS;
-	    this.evWin = SINGLE_TOUCH_WINDOW_EVENTS;
-	    this.started = false;
-	
-	    Input.apply(this, arguments);
-	}
-	
-	inherit(SingleTouchInput, Input, {
-	    handler: function TEhandler(ev) {
-	        var type = SINGLE_TOUCH_INPUT_MAP[ev.type];
-	
-	        // should we handle the touch events?
-	        if (type === INPUT_START) {
-	            this.started = true;
-	        }
-	
-	        if (!this.started) {
-	            return;
-	        }
-	
-	        var touches = normalizeSingleTouches.call(this, ev, type);
-	
-	        // when done, reset the started state
-	        if (type & (INPUT_END | INPUT_CANCEL) && touches[0].length - touches[1].length === 0) {
-	            this.started = false;
-	        }
-	
-	        this.callback(this.manager, type, {
-	            pointers: touches[0],
-	            changedPointers: touches[1],
-	            pointerType: INPUT_TYPE_TOUCH,
-	            srcEvent: ev
-	        });
-	    }
-	});
-	
-	/**
-	 * @this {TouchInput}
-	 * @param {Object} ev
-	 * @param {Number} type flag
-	 * @returns {undefined|Array} [all, changed]
-	 */
-	function normalizeSingleTouches(ev, type) {
-	    var all = toArray(ev.touches);
-	    var changed = toArray(ev.changedTouches);
-	
-	    if (type & (INPUT_END | INPUT_CANCEL)) {
-	        all = uniqueArray(all.concat(changed), 'identifier', true);
-	    }
-	
-	    return [all, changed];
-	}
-	
-	var TOUCH_INPUT_MAP = {
-	    touchstart: INPUT_START,
-	    touchmove: INPUT_MOVE,
-	    touchend: INPUT_END,
-	    touchcancel: INPUT_CANCEL
-	};
-	
-	var TOUCH_TARGET_EVENTS = 'touchstart touchmove touchend touchcancel';
-	
-	/**
-	 * Multi-user touch events input
-	 * @constructor
-	 * @extends Input
-	 */
-	function TouchInput() {
-	    this.evTarget = TOUCH_TARGET_EVENTS;
-	    this.targetIds = {};
-	
-	    Input.apply(this, arguments);
-	}
-	
-	inherit(TouchInput, Input, {
-	    handler: function MTEhandler(ev) {
-	        var type = TOUCH_INPUT_MAP[ev.type];
-	        var touches = getTouches.call(this, ev, type);
-	        if (!touches) {
-	            return;
-	        }
-	
-	        this.callback(this.manager, type, {
-	            pointers: touches[0],
-	            changedPointers: touches[1],
-	            pointerType: INPUT_TYPE_TOUCH,
-	            srcEvent: ev
-	        });
-	    }
-	});
-	
-	/**
-	 * @this {TouchInput}
-	 * @param {Object} ev
-	 * @param {Number} type flag
-	 * @returns {undefined|Array} [all, changed]
-	 */
-	function getTouches(ev, type) {
-	    var allTouches = toArray(ev.touches);
-	    var targetIds = this.targetIds;
-	
-	    // when there is only one touch, the process can be simplified
-	    if (type & (INPUT_START | INPUT_MOVE) && allTouches.length === 1) {
-	        targetIds[allTouches[0].identifier] = true;
-	        return [allTouches, allTouches];
-	    }
-	
-	    var i,
-	        targetTouches,
-	        changedTouches = toArray(ev.changedTouches),
-	        changedTargetTouches = [],
-	        target = this.target;
-	
-	    // get target touches from touches
-	    targetTouches = allTouches.filter(function(touch) {
-	        return hasParent(touch.target, target);
-	    });
-	
-	    // collect touches
-	    if (type === INPUT_START) {
-	        i = 0;
-	        while (i < targetTouches.length) {
-	            targetIds[targetTouches[i].identifier] = true;
-	            i++;
-	        }
-	    }
-	
-	    // filter changed touches to only contain touches that exist in the collected target ids
-	    i = 0;
-	    while (i < changedTouches.length) {
-	        if (targetIds[changedTouches[i].identifier]) {
-	            changedTargetTouches.push(changedTouches[i]);
-	        }
-	
-	        // cleanup removed touches
-	        if (type & (INPUT_END | INPUT_CANCEL)) {
-	            delete targetIds[changedTouches[i].identifier];
-	        }
-	        i++;
-	    }
-	
-	    if (!changedTargetTouches.length) {
-	        return;
-	    }
-	
-	    return [
-	        // merge targetTouches with changedTargetTouches so it contains ALL touches, including 'end' and 'cancel'
-	        uniqueArray(targetTouches.concat(changedTargetTouches), 'identifier', true),
-	        changedTargetTouches
-	    ];
-	}
-	
-	/**
-	 * Combined touch and mouse input
-	 *
-	 * Touch has a higher priority then mouse, and while touching no mouse events are allowed.
-	 * This because touch devices also emit mouse events while doing a touch.
-	 *
-	 * @constructor
-	 * @extends Input
-	 */
-	function TouchMouseInput() {
-	    Input.apply(this, arguments);
-	
-	    var handler = bindFn(this.handler, this);
-	    this.touch = new TouchInput(this.manager, handler);
-	    this.mouse = new MouseInput(this.manager, handler);
-	}
-	
-	inherit(TouchMouseInput, Input, {
-	    /**
-	     * handle mouse and touch events
-	     * @param {Hammer} manager
-	     * @param {String} inputEvent
-	     * @param {Object} inputData
-	     */
-	    handler: function TMEhandler(manager, inputEvent, inputData) {
-	        var isTouch = (inputData.pointerType == INPUT_TYPE_TOUCH),
-	            isMouse = (inputData.pointerType == INPUT_TYPE_MOUSE);
-	
-	        // when we're in a touch event, so  block all upcoming mouse events
-	        // most mobile browser also emit mouseevents, right after touchstart
-	        if (isTouch) {
-	            this.mouse.allow = false;
-	        } else if (isMouse && !this.mouse.allow) {
-	            return;
-	        }
-	
-	        // reset the allowMouse when we're done
-	        if (inputEvent & (INPUT_END | INPUT_CANCEL)) {
-	            this.mouse.allow = true;
-	        }
-	
-	        this.callback(manager, inputEvent, inputData);
-	    },
-	
-	    /**
-	     * remove the event listeners
-	     */
-	    destroy: function destroy() {
-	        this.touch.destroy();
-	        this.mouse.destroy();
-	    }
-	});
-	
-	var PREFIXED_TOUCH_ACTION = prefixed(TEST_ELEMENT.style, 'touchAction');
-	var NATIVE_TOUCH_ACTION = PREFIXED_TOUCH_ACTION !== undefined;
-	
-	// magical touchAction value
-	var TOUCH_ACTION_COMPUTE = 'compute';
-	var TOUCH_ACTION_AUTO = 'auto';
-	var TOUCH_ACTION_MANIPULATION = 'manipulation'; // not implemented
-	var TOUCH_ACTION_NONE = 'none';
-	var TOUCH_ACTION_PAN_X = 'pan-x';
-	var TOUCH_ACTION_PAN_Y = 'pan-y';
-	
-	/**
-	 * Touch Action
-	 * sets the touchAction property or uses the js alternative
-	 * @param {Manager} manager
-	 * @param {String} value
-	 * @constructor
-	 */
-	function TouchAction(manager, value) {
-	    this.manager = manager;
-	    this.set(value);
-	}
-	
-	TouchAction.prototype = {
-	    /**
-	     * set the touchAction value on the element or enable the polyfill
-	     * @param {String} value
-	     */
-	    set: function(value) {
-	        // find out the touch-action by the event handlers
-	        if (value == TOUCH_ACTION_COMPUTE) {
-	            value = this.compute();
-	        }
-	
-	        if (NATIVE_TOUCH_ACTION && this.manager.element.style) {
-	            this.manager.element.style[PREFIXED_TOUCH_ACTION] = value;
-	        }
-	        this.actions = value.toLowerCase().trim();
-	    },
-	
-	    /**
-	     * just re-set the touchAction value
-	     */
-	    update: function() {
-	        this.set(this.manager.options.touchAction);
-	    },
-	
-	    /**
-	     * compute the value for the touchAction property based on the recognizer's settings
-	     * @returns {String} value
-	     */
-	    compute: function() {
-	        var actions = [];
-	        each(this.manager.recognizers, function(recognizer) {
-	            if (boolOrFn(recognizer.options.enable, [recognizer])) {
-	                actions = actions.concat(recognizer.getTouchAction());
-	            }
-	        });
-	        return cleanTouchActions(actions.join(' '));
-	    },
-	
-	    /**
-	     * this method is called on each input cycle and provides the preventing of the browser behavior
-	     * @param {Object} input
-	     */
-	    preventDefaults: function(input) {
-	        // not needed with native support for the touchAction property
-	        if (NATIVE_TOUCH_ACTION) {
-	            return;
-	        }
-	
-	        var srcEvent = input.srcEvent;
-	        var direction = input.offsetDirection;
-	
-	        // if the touch action did prevented once this session
-	        if (this.manager.session.prevented) {
-	            srcEvent.preventDefault();
-	            return;
-	        }
-	
-	        var actions = this.actions;
-	        var hasNone = inStr(actions, TOUCH_ACTION_NONE);
-	        var hasPanY = inStr(actions, TOUCH_ACTION_PAN_Y);
-	        var hasPanX = inStr(actions, TOUCH_ACTION_PAN_X);
-	
-	        if (hasNone) {
-	            //do not prevent defaults if this is a tap gesture
-	
-	            var isTapPointer = input.pointers.length === 1;
-	            var isTapMovement = input.distance < 2;
-	            var isTapTouchTime = input.deltaTime < 250;
-	
-	            if (isTapPointer && isTapMovement && isTapTouchTime) {
-	                return;
-	            }
-	        }
-	
-	        if (hasPanX && hasPanY) {
-	            // `pan-x pan-y` means browser handles all scrolling/panning, do not prevent
-	            return;
-	        }
-	
-	        if (hasNone ||
-	            (hasPanY && direction & DIRECTION_HORIZONTAL) ||
-	            (hasPanX && direction & DIRECTION_VERTICAL)) {
-	            return this.preventSrc(srcEvent);
-	        }
-	    },
-	
-	    /**
-	     * call preventDefault to prevent the browser's default behavior (scrolling in most cases)
-	     * @param {Object} srcEvent
-	     */
-	    preventSrc: function(srcEvent) {
-	        this.manager.session.prevented = true;
-	        srcEvent.preventDefault();
-	    }
-	};
-	
-	/**
-	 * when the touchActions are collected they are not a valid value, so we need to clean things up. *
-	 * @param {String} actions
-	 * @returns {*}
-	 */
-	function cleanTouchActions(actions) {
-	    // none
-	    if (inStr(actions, TOUCH_ACTION_NONE)) {
-	        return TOUCH_ACTION_NONE;
-	    }
-	
-	    var hasPanX = inStr(actions, TOUCH_ACTION_PAN_X);
-	    var hasPanY = inStr(actions, TOUCH_ACTION_PAN_Y);
-	
-	    // if both pan-x and pan-y are set (different recognizers
-	    // for different directions, e.g. horizontal pan but vertical swipe?)
-	    // we need none (as otherwise with pan-x pan-y combined none of these
-	    // recognizers will work, since the browser would handle all panning
-	    if (hasPanX && hasPanY) {
-	        return TOUCH_ACTION_NONE;
-	    }
-	
-	    // pan-x OR pan-y
-	    if (hasPanX || hasPanY) {
-	        return hasPanX ? TOUCH_ACTION_PAN_X : TOUCH_ACTION_PAN_Y;
-	    }
-	
-	    // manipulation
-	    if (inStr(actions, TOUCH_ACTION_MANIPULATION)) {
-	        return TOUCH_ACTION_MANIPULATION;
-	    }
-	
-	    return TOUCH_ACTION_AUTO;
-	}
-	
-	/**
-	 * Recognizer flow explained; *
-	 * All recognizers have the initial state of POSSIBLE when a input session starts.
-	 * The definition of a input session is from the first input until the last input, with all it's movement in it. *
-	 * Example session for mouse-input: mousedown -> mousemove -> mouseup
-	 *
-	 * On each recognizing cycle (see Manager.recognize) the .recognize() method is executed
-	 * which determines with state it should be.
-	 *
-	 * If the recognizer has the state FAILED, CANCELLED or RECOGNIZED (equals ENDED), it is reset to
-	 * POSSIBLE to give it another change on the next cycle.
-	 *
-	 *               Possible
-	 *                  |
-	 *            +-----+---------------+
-	 *            |                     |
-	 *      +-----+-----+               |
-	 *      |           |               |
-	 *   Failed      Cancelled          |
-	 *                          +-------+------+
-	 *                          |              |
-	 *                      Recognized       Began
-	 *                                         |
-	 *                                      Changed
-	 *                                         |
-	 *                                  Ended/Recognized
-	 */
-	var STATE_POSSIBLE = 1;
-	var STATE_BEGAN = 2;
-	var STATE_CHANGED = 4;
-	var STATE_ENDED = 8;
-	var STATE_RECOGNIZED = STATE_ENDED;
-	var STATE_CANCELLED = 16;
-	var STATE_FAILED = 32;
-	
-	/**
-	 * Recognizer
-	 * Every recognizer needs to extend from this class.
-	 * @constructor
-	 * @param {Object} options
-	 */
-	function Recognizer(options) {
-	    this.options = assign({}, this.defaults, options || {});
-	
-	    this.id = uniqueId();
-	
-	    this.manager = null;
-	
-	    // default is enable true
-	    this.options.enable = ifUndefined(this.options.enable, true);
-	
-	    this.state = STATE_POSSIBLE;
-	
-	    this.simultaneous = {};
-	    this.requireFail = [];
-	}
-	
-	Recognizer.prototype = {
-	    /**
-	     * @virtual
-	     * @type {Object}
-	     */
-	    defaults: {},
-	
-	    /**
-	     * set options
-	     * @param {Object} options
-	     * @return {Recognizer}
-	     */
-	    set: function(options) {
-	        assign(this.options, options);
-	
-	        // also update the touchAction, in case something changed about the directions/enabled state
-	        this.manager && this.manager.touchAction.update();
-	        return this;
-	    },
-	
-	    /**
-	     * recognize simultaneous with an other recognizer.
-	     * @param {Recognizer} otherRecognizer
-	     * @returns {Recognizer} this
-	     */
-	    recognizeWith: function(otherRecognizer) {
-	        if (invokeArrayArg(otherRecognizer, 'recognizeWith', this)) {
-	            return this;
-	        }
-	
-	        var simultaneous = this.simultaneous;
-	        otherRecognizer = getRecognizerByNameIfManager(otherRecognizer, this);
-	        if (!simultaneous[otherRecognizer.id]) {
-	            simultaneous[otherRecognizer.id] = otherRecognizer;
-	            otherRecognizer.recognizeWith(this);
-	        }
-	        return this;
-	    },
-	
-	    /**
-	     * drop the simultaneous link. it doesnt remove the link on the other recognizer.
-	     * @param {Recognizer} otherRecognizer
-	     * @returns {Recognizer} this
-	     */
-	    dropRecognizeWith: function(otherRecognizer) {
-	        if (invokeArrayArg(otherRecognizer, 'dropRecognizeWith', this)) {
-	            return this;
-	        }
-	
-	        otherRecognizer = getRecognizerByNameIfManager(otherRecognizer, this);
-	        delete this.simultaneous[otherRecognizer.id];
-	        return this;
-	    },
-	
-	    /**
-	     * recognizer can only run when an other is failing
-	     * @param {Recognizer} otherRecognizer
-	     * @returns {Recognizer} this
-	     */
-	    requireFailure: function(otherRecognizer) {
-	        if (invokeArrayArg(otherRecognizer, 'requireFailure', this)) {
-	            return this;
-	        }
-	
-	        var requireFail = this.requireFail;
-	        otherRecognizer = getRecognizerByNameIfManager(otherRecognizer, this);
-	        if (inArray(requireFail, otherRecognizer) === -1) {
-	            requireFail.push(otherRecognizer);
-	            otherRecognizer.requireFailure(this);
-	        }
-	        return this;
-	    },
-	
-	    /**
-	     * drop the requireFailure link. it does not remove the link on the other recognizer.
-	     * @param {Recognizer} otherRecognizer
-	     * @returns {Recognizer} this
-	     */
-	    dropRequireFailure: function(otherRecognizer) {
-	        if (invokeArrayArg(otherRecognizer, 'dropRequireFailure', this)) {
-	            return this;
-	        }
-	
-	        otherRecognizer = getRecognizerByNameIfManager(otherRecognizer, this);
-	        var index = inArray(this.requireFail, otherRecognizer);
-	        if (index > -1) {
-	            this.requireFail.splice(index, 1);
-	        }
-	        return this;
-	    },
-	
-	    /**
-	     * has require failures boolean
-	     * @returns {boolean}
-	     */
-	    hasRequireFailures: function() {
-	        return this.requireFail.length > 0;
-	    },
-	
-	    /**
-	     * if the recognizer can recognize simultaneous with an other recognizer
-	     * @param {Recognizer} otherRecognizer
-	     * @returns {Boolean}
-	     */
-	    canRecognizeWith: function(otherRecognizer) {
-	        return !!this.simultaneous[otherRecognizer.id];
-	    },
-	
-	    /**
-	     * You should use `tryEmit` instead of `emit` directly to check
-	     * that all the needed recognizers has failed before emitting.
-	     * @param {Object} input
-	     */
-	    emit: function(input) {
-	        var self = this;
-	        var state = this.state;
-	
-	        function emit(event) {
-	            self.manager.emit(event, input);
-	        }
-	
-	        // 'panstart' and 'panmove'
-	        if (state < STATE_ENDED) {
-	            emit(self.options.event + stateStr(state));
-	        }
-	
-	        emit(self.options.event); // simple 'eventName' events
-	
-	        if (input.additionalEvent) { // additional event(panleft, panright, pinchin, pinchout...)
-	            emit(input.additionalEvent);
-	        }
-	
-	        // panend and pancancel
-	        if (state >= STATE_ENDED) {
-	            emit(self.options.event + stateStr(state));
-	        }
-	    },
-	
-	    /**
-	     * Check that all the require failure recognizers has failed,
-	     * if true, it emits a gesture event,
-	     * otherwise, setup the state to FAILED.
-	     * @param {Object} input
-	     */
-	    tryEmit: function(input) {
-	        if (this.canEmit()) {
-	            return this.emit(input);
-	        }
-	        // it's failing anyway
-	        this.state = STATE_FAILED;
-	    },
-	
-	    /**
-	     * can we emit?
-	     * @returns {boolean}
-	     */
-	    canEmit: function() {
-	        var i = 0;
-	        while (i < this.requireFail.length) {
-	            if (!(this.requireFail[i].state & (STATE_FAILED | STATE_POSSIBLE))) {
-	                return false;
-	            }
-	            i++;
-	        }
-	        return true;
-	    },
-	
-	    /**
-	     * update the recognizer
-	     * @param {Object} inputData
-	     */
-	    recognize: function(inputData) {
-	        // make a new copy of the inputData
-	        // so we can change the inputData without messing up the other recognizers
-	        var inputDataClone = assign({}, inputData);
-	
-	        // is is enabled and allow recognizing?
-	        if (!boolOrFn(this.options.enable, [this, inputDataClone])) {
-	            this.reset();
-	            this.state = STATE_FAILED;
-	            return;
-	        }
-	
-	        // reset when we've reached the end
-	        if (this.state & (STATE_RECOGNIZED | STATE_CANCELLED | STATE_FAILED)) {
-	            this.state = STATE_POSSIBLE;
-	        }
-	
-	        this.state = this.process(inputDataClone);
-	
-	        // the recognizer has recognized a gesture
-	        // so trigger an event
-	        if (this.state & (STATE_BEGAN | STATE_CHANGED | STATE_ENDED | STATE_CANCELLED)) {
-	            this.tryEmit(inputDataClone);
-	        }
-	    },
-	
-	    /**
-	     * return the state of the recognizer
-	     * the actual recognizing happens in this method
-	     * @virtual
-	     * @param {Object} inputData
-	     * @returns {Const} STATE
-	     */
-	    process: function(inputData) { }, // jshint ignore:line
-	
-	    /**
-	     * return the preferred touch-action
-	     * @virtual
-	     * @returns {Array}
-	     */
-	    getTouchAction: function() { },
-	
-	    /**
-	     * called when the gesture isn't allowed to recognize
-	     * like when another is being recognized or it is disabled
-	     * @virtual
-	     */
-	    reset: function() { }
-	};
-	
-	/**
-	 * get a usable string, used as event postfix
-	 * @param {Const} state
-	 * @returns {String} state
-	 */
-	function stateStr(state) {
-	    if (state & STATE_CANCELLED) {
-	        return 'cancel';
-	    } else if (state & STATE_ENDED) {
-	        return 'end';
-	    } else if (state & STATE_CHANGED) {
-	        return 'move';
-	    } else if (state & STATE_BEGAN) {
-	        return 'start';
-	    }
-	    return '';
-	}
-	
-	/**
-	 * direction cons to string
-	 * @param {Const} direction
-	 * @returns {String}
-	 */
-	function directionStr(direction) {
-	    if (direction == DIRECTION_DOWN) {
-	        return 'down';
-	    } else if (direction == DIRECTION_UP) {
-	        return 'up';
-	    } else if (direction == DIRECTION_LEFT) {
-	        return 'left';
-	    } else if (direction == DIRECTION_RIGHT) {
-	        return 'right';
-	    }
-	    return '';
-	}
-	
-	/**
-	 * get a recognizer by name if it is bound to a manager
-	 * @param {Recognizer|String} otherRecognizer
-	 * @param {Recognizer} recognizer
-	 * @returns {Recognizer}
-	 */
-	function getRecognizerByNameIfManager(otherRecognizer, recognizer) {
-	    var manager = recognizer.manager;
-	    if (manager) {
-	        return manager.get(otherRecognizer);
-	    }
-	    return otherRecognizer;
-	}
-	
-	/**
-	 * This recognizer is just used as a base for the simple attribute recognizers.
-	 * @constructor
-	 * @extends Recognizer
-	 */
-	function AttrRecognizer() {
-	    Recognizer.apply(this, arguments);
-	}
-	
-	inherit(AttrRecognizer, Recognizer, {
-	    /**
-	     * @namespace
-	     * @memberof AttrRecognizer
-	     */
-	    defaults: {
-	        /**
-	         * @type {Number}
-	         * @default 1
-	         */
-	        pointers: 1
-	    },
-	
-	    /**
-	     * Used to check if it the recognizer receives valid input, like input.distance > 10.
-	     * @memberof AttrRecognizer
-	     * @param {Object} input
-	     * @returns {Boolean} recognized
-	     */
-	    attrTest: function(input) {
-	        var optionPointers = this.options.pointers;
-	        return optionPointers === 0 || input.pointers.length === optionPointers;
-	    },
-	
-	    /**
-	     * Process the input and return the state for the recognizer
-	     * @memberof AttrRecognizer
-	     * @param {Object} input
-	     * @returns {*} State
-	     */
-	    process: function(input) {
-	        var state = this.state;
-	        var eventType = input.eventType;
-	
-	        var isRecognized = state & (STATE_BEGAN | STATE_CHANGED);
-	        var isValid = this.attrTest(input);
-	
-	        // on cancel input and we've recognized before, return STATE_CANCELLED
-	        if (isRecognized && (eventType & INPUT_CANCEL || !isValid)) {
-	            return state | STATE_CANCELLED;
-	        } else if (isRecognized || isValid) {
-	            if (eventType & INPUT_END) {
-	                return state | STATE_ENDED;
-	            } else if (!(state & STATE_BEGAN)) {
-	                return STATE_BEGAN;
-	            }
-	            return state | STATE_CHANGED;
-	        }
-	        return STATE_FAILED;
-	    }
-	});
-	
-	/**
-	 * Pan
-	 * Recognized when the pointer is down and moved in the allowed direction.
-	 * @constructor
-	 * @extends AttrRecognizer
-	 */
-	function PanRecognizer() {
-	    AttrRecognizer.apply(this, arguments);
-	
-	    this.pX = null;
-	    this.pY = null;
-	}
-	
-	inherit(PanRecognizer, AttrRecognizer, {
-	    /**
-	     * @namespace
-	     * @memberof PanRecognizer
-	     */
-	    defaults: {
-	        event: 'pan',
-	        threshold: 10,
-	        pointers: 1,
-	        direction: DIRECTION_ALL
-	    },
-	
-	    getTouchAction: function() {
-	        var direction = this.options.direction;
-	        var actions = [];
-	        if (direction & DIRECTION_HORIZONTAL) {
-	            actions.push(TOUCH_ACTION_PAN_Y);
-	        }
-	        if (direction & DIRECTION_VERTICAL) {
-	            actions.push(TOUCH_ACTION_PAN_X);
-	        }
-	        return actions;
-	    },
-	
-	    directionTest: function(input) {
-	        var options = this.options;
-	        var hasMoved = true;
-	        var distance = input.distance;
-	        var direction = input.direction;
-	        var x = input.deltaX;
-	        var y = input.deltaY;
-	
-	        // lock to axis?
-	        if (!(direction & options.direction)) {
-	            if (options.direction & DIRECTION_HORIZONTAL) {
-	                direction = (x === 0) ? DIRECTION_NONE : (x < 0) ? DIRECTION_LEFT : DIRECTION_RIGHT;
-	                hasMoved = x != this.pX;
-	                distance = Math.abs(input.deltaX);
-	            } else {
-	                direction = (y === 0) ? DIRECTION_NONE : (y < 0) ? DIRECTION_UP : DIRECTION_DOWN;
-	                hasMoved = y != this.pY;
-	                distance = Math.abs(input.deltaY);
-	            }
-	        }
-	        input.direction = direction;
-	        return hasMoved && distance > options.threshold && direction & options.direction;
-	    },
-	
-	    attrTest: function(input) {
-	        return AttrRecognizer.prototype.attrTest.call(this, input) &&
-	            (this.state & STATE_BEGAN || (!(this.state & STATE_BEGAN) && this.directionTest(input)));
-	    },
-	
-	    emit: function(input) {
-	
-	        this.pX = input.deltaX;
-	        this.pY = input.deltaY;
-	
-	        var direction = directionStr(input.direction);
-	
-	        if (direction) {
-	            input.additionalEvent = this.options.event + direction;
-	        }
-	        this._super.emit.call(this, input);
-	    }
-	});
-	
-	/**
-	 * Pinch
-	 * Recognized when two or more pointers are moving toward (zoom-in) or away from each other (zoom-out).
-	 * @constructor
-	 * @extends AttrRecognizer
-	 */
-	function PinchRecognizer() {
-	    AttrRecognizer.apply(this, arguments);
-	}
-	
-	inherit(PinchRecognizer, AttrRecognizer, {
-	    /**
-	     * @namespace
-	     * @memberof PinchRecognizer
-	     */
-	    defaults: {
-	        event: 'pinch',
-	        threshold: 0,
-	        pointers: 2
-	    },
-	
-	    getTouchAction: function() {
-	        return [TOUCH_ACTION_NONE];
-	    },
-	
-	    attrTest: function(input) {
-	        return this._super.attrTest.call(this, input) &&
-	            (Math.abs(input.scale - 1) > this.options.threshold || this.state & STATE_BEGAN);
-	    },
-	
-	    emit: function(input) {
-	        if (input.scale !== 1) {
-	            var inOut = input.scale < 1 ? 'in' : 'out';
-	            input.additionalEvent = this.options.event + inOut;
-	        }
-	        this._super.emit.call(this, input);
-	    }
-	});
-	
-	/**
-	 * Press
-	 * Recognized when the pointer is down for x ms without any movement.
-	 * @constructor
-	 * @extends Recognizer
-	 */
-	function PressRecognizer() {
-	    Recognizer.apply(this, arguments);
-	
-	    this._timer = null;
-	    this._input = null;
-	}
-	
-	inherit(PressRecognizer, Recognizer, {
-	    /**
-	     * @namespace
-	     * @memberof PressRecognizer
-	     */
-	    defaults: {
-	        event: 'press',
-	        pointers: 1,
-	        time: 251, // minimal time of the pointer to be pressed
-	        threshold: 9 // a minimal movement is ok, but keep it low
-	    },
-	
-	    getTouchAction: function() {
-	        return [TOUCH_ACTION_AUTO];
-	    },
-	
-	    process: function(input) {
-	        var options = this.options;
-	        var validPointers = input.pointers.length === options.pointers;
-	        var validMovement = input.distance < options.threshold;
-	        var validTime = input.deltaTime > options.time;
-	
-	        this._input = input;
-	
-	        // we only allow little movement
-	        // and we've reached an end event, so a tap is possible
-	        if (!validMovement || !validPointers || (input.eventType & (INPUT_END | INPUT_CANCEL) && !validTime)) {
-	            this.reset();
-	        } else if (input.eventType & INPUT_START) {
-	            this.reset();
-	            this._timer = setTimeoutContext(function() {
-	                this.state = STATE_RECOGNIZED;
-	                this.tryEmit();
-	            }, options.time, this);
-	        } else if (input.eventType & INPUT_END) {
-	            return STATE_RECOGNIZED;
-	        }
-	        return STATE_FAILED;
-	    },
-	
-	    reset: function() {
-	        clearTimeout(this._timer);
-	    },
-	
-	    emit: function(input) {
-	        if (this.state !== STATE_RECOGNIZED) {
-	            return;
-	        }
-	
-	        if (input && (input.eventType & INPUT_END)) {
-	            this.manager.emit(this.options.event + 'up', input);
-	        } else {
-	            this._input.timeStamp = now();
-	            this.manager.emit(this.options.event, this._input);
-	        }
-	    }
-	});
-	
-	/**
-	 * Rotate
-	 * Recognized when two or more pointer are moving in a circular motion.
-	 * @constructor
-	 * @extends AttrRecognizer
-	 */
-	function RotateRecognizer() {
-	    AttrRecognizer.apply(this, arguments);
-	}
-	
-	inherit(RotateRecognizer, AttrRecognizer, {
-	    /**
-	     * @namespace
-	     * @memberof RotateRecognizer
-	     */
-	    defaults: {
-	        event: 'rotate',
-	        threshold: 0,
-	        pointers: 2
-	    },
-	
-	    getTouchAction: function() {
-	        return [TOUCH_ACTION_NONE];
-	    },
-	
-	    attrTest: function(input) {
-	        return this._super.attrTest.call(this, input) &&
-	            (Math.abs(input.rotation) > this.options.threshold || this.state & STATE_BEGAN);
-	    }
-	});
-	
-	/**
-	 * Swipe
-	 * Recognized when the pointer is moving fast (velocity), with enough distance in the allowed direction.
-	 * @constructor
-	 * @extends AttrRecognizer
-	 */
-	function SwipeRecognizer() {
-	    AttrRecognizer.apply(this, arguments);
-	}
-	
-	inherit(SwipeRecognizer, AttrRecognizer, {
-	    /**
-	     * @namespace
-	     * @memberof SwipeRecognizer
-	     */
-	    defaults: {
-	        event: 'swipe',
-	        threshold: 10,
-	        velocity: 0.3,
-	        direction: DIRECTION_HORIZONTAL | DIRECTION_VERTICAL,
-	        pointers: 1
-	    },
-	
-	    getTouchAction: function() {
-	        return PanRecognizer.prototype.getTouchAction.call(this);
-	    },
-	
-	    attrTest: function(input) {
-	        var direction = this.options.direction;
-	        var velocity;
-	
-	        if (direction & (DIRECTION_HORIZONTAL | DIRECTION_VERTICAL)) {
-	            velocity = input.overallVelocity;
-	        } else if (direction & DIRECTION_HORIZONTAL) {
-	            velocity = input.overallVelocityX;
-	        } else if (direction & DIRECTION_VERTICAL) {
-	            velocity = input.overallVelocityY;
-	        }
-	
-	        return this._super.attrTest.call(this, input) &&
-	            direction & input.offsetDirection &&
-	            input.distance > this.options.threshold &&
-	            input.maxPointers == this.options.pointers &&
-	            abs(velocity) > this.options.velocity && input.eventType & INPUT_END;
-	    },
-	
-	    emit: function(input) {
-	        var direction = directionStr(input.offsetDirection);
-	        if (direction) {
-	            this.manager.emit(this.options.event + direction, input);
-	        }
-	
-	        this.manager.emit(this.options.event, input);
-	    }
-	});
-	
-	/**
-	 * A tap is ecognized when the pointer is doing a small tap/click. Multiple taps are recognized if they occur
-	 * between the given interval and position. The delay option can be used to recognize multi-taps without firing
-	 * a single tap.
-	 *
-	 * The eventData from the emitted event contains the property `tapCount`, which contains the amount of
-	 * multi-taps being recognized.
-	 * @constructor
-	 * @extends Recognizer
-	 */
-	function TapRecognizer() {
-	    Recognizer.apply(this, arguments);
-	
-	    // previous time and center,
-	    // used for tap counting
-	    this.pTime = false;
-	    this.pCenter = false;
-	
-	    this._timer = null;
-	    this._input = null;
-	    this.count = 0;
-	}
-	
-	inherit(TapRecognizer, Recognizer, {
-	    /**
-	     * @namespace
-	     * @memberof PinchRecognizer
-	     */
-	    defaults: {
-	        event: 'tap',
-	        pointers: 1,
-	        taps: 1,
-	        interval: 300, // max time between the multi-tap taps
-	        time: 250, // max time of the pointer to be down (like finger on the screen)
-	        threshold: 9, // a minimal movement is ok, but keep it low
-	        posThreshold: 10 // a multi-tap can be a bit off the initial position
-	    },
-	
-	    getTouchAction: function() {
-	        return [TOUCH_ACTION_MANIPULATION];
-	    },
-	
-	    process: function(input) {
-	        var options = this.options;
-	
-	        var validPointers = input.pointers.length === options.pointers;
-	        var validMovement = input.distance < options.threshold;
-	        var validTouchTime = input.deltaTime < options.time;
-	
-	        this.reset();
-	
-	        if ((input.eventType & INPUT_START) && (this.count === 0)) {
-	            return this.failTimeout();
-	        }
-	
-	        // we only allow little movement
-	        // and we've reached an end event, so a tap is possible
-	        if (validMovement && validTouchTime && validPointers) {
-	            if (input.eventType != INPUT_END) {
-	                return this.failTimeout();
-	            }
-	
-	            var validInterval = this.pTime ? (input.timeStamp - this.pTime < options.interval) : true;
-	            var validMultiTap = !this.pCenter || getDistance(this.pCenter, input.center) < options.posThreshold;
-	
-	            this.pTime = input.timeStamp;
-	            this.pCenter = input.center;
-	
-	            if (!validMultiTap || !validInterval) {
-	                this.count = 1;
-	            } else {
-	                this.count += 1;
-	            }
-	
-	            this._input = input;
-	
-	            // if tap count matches we have recognized it,
-	            // else it has began recognizing...
-	            var tapCount = this.count % options.taps;
-	            if (tapCount === 0) {
-	                // no failing requirements, immediately trigger the tap event
-	                // or wait as long as the multitap interval to trigger
-	                if (!this.hasRequireFailures()) {
-	                    return STATE_RECOGNIZED;
-	                } else {
-	                    this._timer = setTimeoutContext(function() {
-	                        this.state = STATE_RECOGNIZED;
-	                        this.tryEmit();
-	                    }, options.interval, this);
-	                    return STATE_BEGAN;
-	                }
-	            }
-	        }
-	        return STATE_FAILED;
-	    },
-	
-	    failTimeout: function() {
-	        this._timer = setTimeoutContext(function() {
-	            this.state = STATE_FAILED;
-	        }, this.options.interval, this);
-	        return STATE_FAILED;
-	    },
-	
-	    reset: function() {
-	        clearTimeout(this._timer);
-	    },
-	
-	    emit: function() {
-	        if (this.state == STATE_RECOGNIZED) {
-	            this._input.tapCount = this.count;
-	            this.manager.emit(this.options.event, this._input);
-	        }
-	    }
-	});
-	
-	/**
-	 * Simple way to create a manager with a default set of recognizers.
-	 * @param {HTMLElement} element
-	 * @param {Object} [options]
-	 * @constructor
-	 */
-	function Hammer(element, options) {
-	    options = options || {};
-	    options.recognizers = ifUndefined(options.recognizers, Hammer.defaults.preset);
-	    return new Manager(element, options);
-	}
-	
-	/**
-	 * @const {string}
-	 */
-	Hammer.VERSION = '2.0.6';
-	
-	/**
-	 * default settings
-	 * @namespace
-	 */
-	Hammer.defaults = {
-	    /**
-	     * set if DOM events are being triggered.
-	     * But this is slower and unused by simple implementations, so disabled by default.
-	     * @type {Boolean}
-	     * @default false
-	     */
-	    domEvents: false,
-	
-	    /**
-	     * The value for the touchAction property/fallback.
-	     * When set to `compute` it will magically set the correct value based on the added recognizers.
-	     * @type {String}
-	     * @default compute
-	     */
-	    touchAction: TOUCH_ACTION_COMPUTE,
-	
-	    /**
-	     * @type {Boolean}
-	     * @default true
-	     */
-	    enable: true,
-	
-	    /**
-	     * EXPERIMENTAL FEATURE -- can be removed/changed
-	     * Change the parent input target element.
-	     * If Null, then it is being set the to main element.
-	     * @type {Null|EventTarget}
-	     * @default null
-	     */
-	    inputTarget: null,
-	
-	    /**
-	     * force an input class
-	     * @type {Null|Function}
-	     * @default null
-	     */
-	    inputClass: null,
-	
-	    /**
-	     * Default recognizer setup when calling `Hammer()`
-	     * When creating a new Manager these will be skipped.
-	     * @type {Array}
-	     */
-	    preset: [
-	        // RecognizerClass, options, [recognizeWith, ...], [requireFailure, ...]
-	        [RotateRecognizer, {enable: false}],
-	        [PinchRecognizer, {enable: false}, ['rotate']],
-	        [SwipeRecognizer, {direction: DIRECTION_HORIZONTAL}],
-	        [PanRecognizer, {direction: DIRECTION_HORIZONTAL}, ['swipe']],
-	        [TapRecognizer],
-	        [TapRecognizer, {event: 'doubletap', taps: 2}, ['tap']],
-	        [PressRecognizer]
-	    ],
-	
-	    /**
-	     * Some CSS properties can be used to improve the working of Hammer.
-	     * Add them to this method and they will be set when creating a new Manager.
-	     * @namespace
-	     */
-	    cssProps: {
-	        /**
-	         * Disables text selection to improve the dragging gesture. Mainly for desktop browsers.
-	         * @type {String}
-	         * @default 'none'
-	         */
-	        userSelect: 'none',
-	
-	        /**
-	         * Disable the Windows Phone grippers when pressing an element.
-	         * @type {String}
-	         * @default 'none'
-	         */
-	        touchSelect: 'none',
-	
-	        /**
-	         * Disables the default callout shown when you touch and hold a touch target.
-	         * On iOS, when you touch and hold a touch target such as a link, Safari displays
-	         * a callout containing information about the link. This property allows you to disable that callout.
-	         * @type {String}
-	         * @default 'none'
-	         */
-	        touchCallout: 'none',
-	
-	        /**
-	         * Specifies whether zooming is enabled. Used by IE10>
-	         * @type {String}
-	         * @default 'none'
-	         */
-	        contentZooming: 'none',
-	
-	        /**
-	         * Specifies that an entire element should be draggable instead of its contents. Mainly for desktop browsers.
-	         * @type {String}
-	         * @default 'none'
-	         */
-	        userDrag: 'none',
-	
-	        /**
-	         * Overrides the highlight color shown when the user taps a link or a JavaScript
-	         * clickable element in iOS. This property obeys the alpha value, if specified.
-	         * @type {String}
-	         * @default 'rgba(0,0,0,0)'
-	         */
-	        tapHighlightColor: 'rgba(0,0,0,0)'
-	    }
-	};
-	
-	var STOP = 1;
-	var FORCED_STOP = 2;
-	
-	/**
-	 * Manager
-	 * @param {HTMLElement} element
-	 * @param {Object} [options]
-	 * @constructor
-	 */
-	function Manager(element, options) {
-	    this.options = assign({}, Hammer.defaults, options || {});
-	
-	    this.options.inputTarget = this.options.inputTarget || element;
-	
-	    this.handlers = {};
-	    this.session = {};
-	    this.recognizers = [];
-	
-	    this.element = element;
-	    this.input = createInputInstance(this);
-	    this.touchAction = new TouchAction(this, this.options.touchAction);
-	
-	    toggleCssProps(this, true);
-	
-	    each(this.options.recognizers, function(item) {
-	        var recognizer = this.add(new (item[0])(item[1]));
-	        item[2] && recognizer.recognizeWith(item[2]);
-	        item[3] && recognizer.requireFailure(item[3]);
-	    }, this);
-	}
-	
-	Manager.prototype = {
-	    /**
-	     * set options
-	     * @param {Object} options
-	     * @returns {Manager}
-	     */
-	    set: function(options) {
-	        assign(this.options, options);
-	
-	        // Options that need a little more setup
-	        if (options.touchAction) {
-	            this.touchAction.update();
-	        }
-	        if (options.inputTarget) {
-	            // Clean up existing event listeners and reinitialize
-	            this.input.destroy();
-	            this.input.target = options.inputTarget;
-	            this.input.init();
-	        }
-	        return this;
-	    },
-	
-	    /**
-	     * stop recognizing for this session.
-	     * This session will be discarded, when a new [input]start event is fired.
-	     * When forced, the recognizer cycle is stopped immediately.
-	     * @param {Boolean} [force]
-	     */
-	    stop: function(force) {
-	        this.session.stopped = force ? FORCED_STOP : STOP;
-	    },
-	
-	    /**
-	     * run the recognizers!
-	     * called by the inputHandler function on every movement of the pointers (touches)
-	     * it walks through all the recognizers and tries to detect the gesture that is being made
-	     * @param {Object} inputData
-	     */
-	    recognize: function(inputData) {
-	        var session = this.session;
-	        if (session.stopped) {
-	            return;
-	        }
-	
-	        // run the touch-action polyfill
-	        this.touchAction.preventDefaults(inputData);
-	
-	        var recognizer;
-	        var recognizers = this.recognizers;
-	
-	        // this holds the recognizer that is being recognized.
-	        // so the recognizer's state needs to be BEGAN, CHANGED, ENDED or RECOGNIZED
-	        // if no recognizer is detecting a thing, it is set to `null`
-	        var curRecognizer = session.curRecognizer;
-	
-	        // reset when the last recognizer is recognized
-	        // or when we're in a new session
-	        if (!curRecognizer || (curRecognizer && curRecognizer.state & STATE_RECOGNIZED)) {
-	            curRecognizer = session.curRecognizer = null;
-	        }
-	
-	        var i = 0;
-	        while (i < recognizers.length) {
-	            recognizer = recognizers[i];
-	
-	            // find out if we are allowed try to recognize the input for this one.
-	            // 1.   allow if the session is NOT forced stopped (see the .stop() method)
-	            // 2.   allow if we still haven't recognized a gesture in this session, or the this recognizer is the one
-	            //      that is being recognized.
-	            // 3.   allow if the recognizer is allowed to run simultaneous with the current recognized recognizer.
-	            //      this can be setup with the `recognizeWith()` method on the recognizer.
-	            if (session.stopped !== FORCED_STOP && ( // 1
-	                    !curRecognizer || recognizer == curRecognizer || // 2
-	                    recognizer.canRecognizeWith(curRecognizer))) { // 3
-	                recognizer.recognize(inputData);
-	            } else {
-	                recognizer.reset();
-	            }
-	
-	            // if the recognizer has been recognizing the input as a valid gesture, we want to store this one as the
-	            // current active recognizer. but only if we don't already have an active recognizer
-	            if (!curRecognizer && recognizer.state & (STATE_BEGAN | STATE_CHANGED | STATE_ENDED)) {
-	                curRecognizer = session.curRecognizer = recognizer;
-	            }
-	            i++;
-	        }
-	    },
-	
-	    /**
-	     * get a recognizer by its event name.
-	     * @param {Recognizer|String} recognizer
-	     * @returns {Recognizer|Null}
-	     */
-	    get: function(recognizer) {
-	        if (recognizer instanceof Recognizer) {
-	            return recognizer;
-	        }
-	
-	        var recognizers = this.recognizers;
-	        for (var i = 0; i < recognizers.length; i++) {
-	            if (recognizers[i].options.event == recognizer) {
-	                return recognizers[i];
-	            }
-	        }
-	        return null;
-	    },
-	
-	    /**
-	     * add a recognizer to the manager
-	     * existing recognizers with the same event name will be removed
-	     * @param {Recognizer} recognizer
-	     * @returns {Recognizer|Manager}
-	     */
-	    add: function(recognizer) {
-	        if (invokeArrayArg(recognizer, 'add', this)) {
-	            return this;
-	        }
-	
-	        // remove existing
-	        var existing = this.get(recognizer.options.event);
-	        if (existing) {
-	            this.remove(existing);
-	        }
-	
-	        this.recognizers.push(recognizer);
-	        recognizer.manager = this;
-	
-	        this.touchAction.update();
-	        return recognizer;
-	    },
-	
-	    /**
-	     * remove a recognizer by name or instance
-	     * @param {Recognizer|String} recognizer
-	     * @returns {Manager}
-	     */
-	    remove: function(recognizer) {
-	        if (invokeArrayArg(recognizer, 'remove', this)) {
-	            return this;
-	        }
-	
-	        recognizer = this.get(recognizer);
-	
-	        // let's make sure this recognizer exists
-	        if (recognizer) {
-	            var recognizers = this.recognizers;
-	            var index = inArray(recognizers, recognizer);
-	
-	            if (index !== -1) {
-	                recognizers.splice(index, 1);
-	                this.touchAction.update();
-	            }
-	        }
-	
-	        return this;
-	    },
-	
-	    /**
-	     * bind event
-	     * @param {String} events
-	     * @param {Function} handler
-	     * @returns {EventEmitter} this
-	     */
-	    on: function(events, handler) {
-	        var handlers = this.handlers;
-	        each(splitStr(events), function(event) {
-	            handlers[event] = handlers[event] || [];
-	            handlers[event].push(handler);
-	        });
-	        return this;
-	    },
-	
-	    /**
-	     * unbind event, leave emit blank to remove all handlers
-	     * @param {String} events
-	     * @param {Function} [handler]
-	     * @returns {EventEmitter} this
-	     */
-	    off: function(events, handler) {
-	        var handlers = this.handlers;
-	        each(splitStr(events), function(event) {
-	            if (!handler) {
-	                delete handlers[event];
-	            } else {
-	                handlers[event] && handlers[event].splice(inArray(handlers[event], handler), 1);
-	            }
-	        });
-	        return this;
-	    },
-	
-	    /**
-	     * emit event to the listeners
-	     * @param {String} event
-	     * @param {Object} data
-	     */
-	    emit: function(event, data) {
-	        // we also want to trigger dom events
-	        if (this.options.domEvents) {
-	            triggerDomEvent(event, data);
-	        }
-	
-	        // no handlers, so skip it all
-	        var handlers = this.handlers[event] && this.handlers[event].slice();
-	        if (!handlers || !handlers.length) {
-	            return;
-	        }
-	
-	        data.type = event;
-	        data.preventDefault = function() {
-	            data.srcEvent.preventDefault();
-	        };
-	
-	        var i = 0;
-	        while (i < handlers.length) {
-	            handlers[i](data);
-	            i++;
-	        }
-	    },
-	
-	    /**
-	     * destroy the manager and unbinds all events
-	     * it doesn't unbind dom events, that is the user own responsibility
-	     */
-	    destroy: function() {
-	        this.element && toggleCssProps(this, false);
-	
-	        this.handlers = {};
-	        this.session = {};
-	        this.input.destroy();
-	        this.element = null;
-	    }
-	};
-	
-	/**
-	 * add/remove the css properties as defined in manager.options.cssProps
-	 * @param {Manager} manager
-	 * @param {Boolean} add
-	 */
-	function toggleCssProps(manager, add) {
-	    var element = manager.element;
-	    if (!element.style) {
-	        return;
-	    }
-	    each(manager.options.cssProps, function(value, name) {
-	        element.style[prefixed(element.style, name)] = add ? value : '';
-	    });
-	}
-	
-	/**
-	 * trigger dom event
-	 * @param {String} event
-	 * @param {Object} data
-	 */
-	function triggerDomEvent(event, data) {
-	    var gestureEvent = document.createEvent('Event');
-	    gestureEvent.initEvent(event, true, true);
-	    gestureEvent.gesture = data;
-	    data.target.dispatchEvent(gestureEvent);
-	}
-	
-	assign(Hammer, {
-	    INPUT_START: INPUT_START,
-	    INPUT_MOVE: INPUT_MOVE,
-	    INPUT_END: INPUT_END,
-	    INPUT_CANCEL: INPUT_CANCEL,
-	
-	    STATE_POSSIBLE: STATE_POSSIBLE,
-	    STATE_BEGAN: STATE_BEGAN,
-	    STATE_CHANGED: STATE_CHANGED,
-	    STATE_ENDED: STATE_ENDED,
-	    STATE_RECOGNIZED: STATE_RECOGNIZED,
-	    STATE_CANCELLED: STATE_CANCELLED,
-	    STATE_FAILED: STATE_FAILED,
-	
-	    DIRECTION_NONE: DIRECTION_NONE,
-	    DIRECTION_LEFT: DIRECTION_LEFT,
-	    DIRECTION_RIGHT: DIRECTION_RIGHT,
-	    DIRECTION_UP: DIRECTION_UP,
-	    DIRECTION_DOWN: DIRECTION_DOWN,
-	    DIRECTION_HORIZONTAL: DIRECTION_HORIZONTAL,
-	    DIRECTION_VERTICAL: DIRECTION_VERTICAL,
-	    DIRECTION_ALL: DIRECTION_ALL,
-	
-	    Manager: Manager,
-	    Input: Input,
-	    TouchAction: TouchAction,
-	
-	    TouchInput: TouchInput,
-	    MouseInput: MouseInput,
-	    PointerEventInput: PointerEventInput,
-	    TouchMouseInput: TouchMouseInput,
-	    SingleTouchInput: SingleTouchInput,
-	
-	    Recognizer: Recognizer,
-	    AttrRecognizer: AttrRecognizer,
-	    Tap: TapRecognizer,
-	    Pan: PanRecognizer,
-	    Swipe: SwipeRecognizer,
-	    Pinch: PinchRecognizer,
-	    Rotate: RotateRecognizer,
-	    Press: PressRecognizer,
-	
-	    on: addEventListeners,
-	    off: removeEventListeners,
-	    each: each,
-	    merge: merge,
-	    extend: extend,
-	    assign: assign,
-	    inherit: inherit,
-	    bindFn: bindFn,
-	    prefixed: prefixed
-	});
-	
-	// this prevents errors when Hammer is loaded in the presence of an AMD
-	//  style loader but by script tag, not by the loader.
-	var freeGlobal = (typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : {})); // jshint ignore:line
-	freeGlobal.Hammer = Hammer;
-	
-	if (true) {
-	    !(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
-	        return Hammer;
-	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	} else if (typeof module != 'undefined' && module.exports) {
-	    module.exports = Hammer;
-	} else {
-	    window[exportName] = Hammer;
-	}
-	
-	})(window, document, 'Hammer');
-
-
-/***/ },
-/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Layer,
@@ -23420,7 +20884,7 @@
 
 
 /***/ },
-/* 38 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Layer,
@@ -23462,7 +20926,7 @@
 
 
 /***/ },
-/* 39 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var AnimationGroup, EventEmitter, _,
@@ -23523,7 +20987,7 @@
 
 
 /***/ },
-/* 40 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Layer, Path, Utils, _, catmullRom2Bezier, j, len, method, ref,
@@ -24064,7 +21528,7 @@
 
 
 /***/ },
-/* 41 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var BaseClass, CanvasClass, Events,
@@ -24116,6 +21580,28 @@
 	    }
 	  });
 	
+	  CanvasClass.define("backgroundColor", {
+	    importable: false,
+	    exportable: false,
+	    get: function() {
+	      return Framer.Device.background.backgroundColor;
+	    },
+	    set: function(value) {
+	      return Framer.Device.background.backgroundColor = value;
+	    }
+	  });
+	
+	  CanvasClass.define("image", {
+	    importable: false,
+	    exportable: false,
+	    get: function() {
+	      return Framer.Device.background.image;
+	    },
+	    set: function(value) {
+	      return Framer.Device.background.image = value;
+	    }
+	  });
+	
 	  CanvasClass.prototype.addListener = function(eventName, listener) {
 	    if (eventName === "resize") {
 	      Events.wrap(window).addEventListener("resize", (function(_this) {
@@ -24141,7 +21627,7 @@
 
 
 /***/ },
-/* 42 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Context, Utils, printContext, printLayer,
@@ -24149,7 +21635,7 @@
 	
 	Utils = __webpack_require__(4);
 	
-	Context = __webpack_require__(43).Context;
+	Context = __webpack_require__(41).Context;
 	
 	"\nTodo:\n- Better looks\n- Resizable\n- Live in own space on top of all Framer stuff\n";
 	
@@ -24207,7 +21693,7 @@
 
 
 /***/ },
-/* 43 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var BaseClass, Config, DOMEventManager, Defaults, Utils, _,
@@ -24221,11 +21707,11 @@
 	
 	Config = __webpack_require__(14).Config;
 	
-	Defaults = __webpack_require__(16).Defaults;
+	Defaults = __webpack_require__(17).Defaults;
 	
 	BaseClass = __webpack_require__(6).BaseClass;
 	
-	DOMEventManager = __webpack_require__(44).DOMEventManager;
+	DOMEventManager = __webpack_require__(42).DOMEventManager;
 	
 	
 	/*
@@ -24235,7 +21721,7 @@
 	a special context and replaces the default one (so it renders in the screen), and the print
 	function uses on to draw the console.
 	
-	The default context lives under Framer.DefaultContext and the current one in 
+	The default context lives under Framer.DefaultContext and the current one in
 	Framer.CurrentContext. You can create layers in any context by using the run function.
 	
 	A context keeps track of everyting around those layers, so it can clean it up again. We use
@@ -24508,7 +21994,7 @@
 	
 	  Context.define("width", {
 	    get: function() {
-	      if (this.parent) {
+	      if (this.parent != null) {
 	        return this.parent.width;
 	      }
 	      return window.innerWidth;
@@ -24517,7 +22003,7 @@
 	
 	  Context.define("height", {
 	    get: function() {
-	      if (this.parent) {
+	      if (this.parent != null) {
 	        return this.parent.height;
 	      }
 	      return window.innerHeight;
@@ -24537,13 +22023,22 @@
 	
 	  Context.define("size", {
 	    get: function() {
-	      return _.pluck(this.frame, ["x", "y"]);
+	      return _.pick(this.frame, ["width", "height"]);
 	    }
 	  });
 	
 	  Context.define("point", {
 	    get: function() {
-	      return _.pluck(this.frame, ["width", "height"]);
+	      return _.pick(this.frame, ["x", "y"]);
+	    }
+	  });
+	
+	  Context.define("canvasFrame", {
+	    get: function() {
+	      if (this.parent == null) {
+	        return this.frame;
+	      }
+	      return this.parent.canvasFrame;
 	    }
 	  });
 	
@@ -24614,10 +22109,10 @@
 
 
 /***/ },
-/* 44 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var DOMEventManagerElement, EventEmitter, EventManagerIdCounter, GestureManagerElement, Utils, _,
+	var DOMEventManagerElement, EventEmitter, EventManagerIdCounter, Utils, _,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty,
 	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -24625,8 +22120,6 @@
 	_ = __webpack_require__(1)._;
 	
 	EventEmitter = __webpack_require__(7).EventEmitter;
-	
-	GestureManagerElement = __webpack_require__(35).GestureManagerElement;
 	
 	Utils = __webpack_require__(4);
 	
@@ -24693,7 +22186,7 @@
 
 
 /***/ },
-/* 45 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var EventMappers, Events, Layer, Utils, _, wrapComponent,
@@ -24735,11 +22228,11 @@
 	
 	EventMappers[Events.ScrollEnd] = Events.DragEnd;
 	
-	EventMappers[Events.ScrollAnimationDidStart] = Events.DragAnimationDidStart;
+	EventMappers[Events.ScrollAnimationDidStart] = Events.DragAnimationStart;
 	
-	EventMappers[Events.ScrollAnimationDidEnd] = Events.DragAnimationDidEnd;
+	EventMappers[Events.ScrollAnimationDidEnd] = Events.DragAnimationEnd;
 	
-	EventMappers[Events.DirectionLockDidStart] = Events.DirectionLockDidStart;
+	EventMappers[Events.DirectionLockStart] = Events.DirectionLockStart;
 	
 	exports.ScrollComponent = (function(superClass) {
 	  extend(ScrollComponent, superClass);
@@ -25060,7 +22553,7 @@
 	      };
 	    }
 	    if (contentLayer && contentLayer.parent !== this.content) {
-	      throw Error("This layer is not in the scroll component content");
+	      throw Error("Can't scroll to this layer because it's not in the ScrollComponent. Add it to the content like layer.parent = scroll.content.");
 	    }
 	    if (!contentLayer || this.content.children.length === 0) {
 	      scrollPoint = {
@@ -25307,7 +22800,7 @@
 
 
 /***/ },
-/* 46 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Events, ScrollComponent,
@@ -25318,7 +22811,7 @@
 	
 	Events = __webpack_require__(15).Events;
 	
-	ScrollComponent = __webpack_require__(45).ScrollComponent;
+	ScrollComponent = __webpack_require__(43).ScrollComponent;
 	
 	"PageComponent\n\noriginX <number>\noriginY <number>\n\nvelocityThreshold <number>\nanimationOptions <animationOptions={}>\ncurrentPage <Layer>\nclosestPage(<originX:n, originY:n>) <Layer>\n\nnextPage(direction=\"\", currentPage)\nsnapToNextPage(direction=\"\", animate, animationOptions={})\n";
 	
@@ -25338,9 +22831,9 @@
 	  function PageComponent() {
 	    this._resetHistory = bind(this._resetHistory, this);
 	    this._scrollEnd = bind(this._scrollEnd, this);
-	    this._onAminationEnd = bind(this._onAminationEnd, this);
-	    this._onAminationStep = bind(this._onAminationStep, this);
-	    this._onAminationStart = bind(this._onAminationStart, this);
+	    this._onAnimationStop = bind(this._onAnimationStop, this);
+	    this._onAnimationStep = bind(this._onAnimationStep, this);
+	    this._onAnimationStart = bind(this._onAnimationStart, this);
 	    this._scrollMove = bind(this._scrollMove, this);
 	    this._scrollStart = bind(this._scrollStart, this);
 	    PageComponent.__super__.constructor.apply(this, arguments);
@@ -25490,13 +22983,13 @@
 	
 	  PageComponent.prototype.setContentLayer = function(contentLayer) {
 	    if (this.content) {
-	      this._onAminateStop();
-	      this.content.off(Events.AnimationStart, this._onAminationStart);
-	      this.content.off(Events.AnimationStop, this._onAminationEnd);
+	      this._onAnimationStop();
+	      this.content.off(Events.AnimationStart, this._onAnimationStart);
+	      this.content.off(Events.AnimationStop, this._onAnimationStop);
 	    }
 	    PageComponent.__super__.setContentLayer.call(this, contentLayer);
-	    this.content.on(Events.AnimationStart, this._onAminationStart);
-	    return this.content.on(Events.AnimationStop, this._onAminationEnd);
+	    this.content.on(Events.AnimationStart, this._onAnimationStart);
+	    return this.content.on(Events.AnimationStop, this._onAnimationStop);
 	  };
 	
 	  PageComponent.prototype.horizontalPageIndex = function(page) {
@@ -25527,20 +23020,20 @@
 	    }
 	  };
 	
-	  PageComponent.prototype._onAminationStart = function() {
+	  PageComponent.prototype._onAnimationStart = function() {
 	    this._isMoving = true;
 	    this._isAnimating = true;
-	    return this.content.on("change:frame", this._onAminationStep);
+	    return this.content.on("change:frame", this._onAnimationStep);
 	  };
 	
-	  PageComponent.prototype._onAminationStep = function() {
+	  PageComponent.prototype._onAnimationStep = function() {
 	    return this.emit(Events.Move, this.content.point);
 	  };
 	
-	  PageComponent.prototype._onAminationEnd = function() {
+	  PageComponent.prototype._onAnimationStop = function() {
 	    this._isMoving = false;
 	    this._isAnimating = false;
-	    return this.content.off("change:frame", this._onAminationStep);
+	    return this.content.off("change:frame", this._onAnimationStep);
 	  };
 	
 	  PageComponent.prototype._scrollEnd = function() {
@@ -25584,7 +23077,7 @@
 
 
 /***/ },
-/* 47 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Events, Knob, Layer, Utils,
@@ -25626,7 +23119,9 @@
 	    this._updateFrame = bind(this._updateFrame, this);
 	    this._updateKnob = bind(this._updateKnob, this);
 	    this._updateFill = bind(this._updateFill, this);
-	    this._touchDown = bind(this._touchDown, this);
+	    this._touchEnd = bind(this._touchEnd, this);
+	    this._touchMove = bind(this._touchMove, this);
+	    this._touchStart = bind(this._touchStart, this);
 	    if (options.backgroundColor == null) {
 	      options.backgroundColor = "#ccc";
 	    }
@@ -25690,7 +23185,6 @@
 	      tolerance: 0.25
 	    };
 	    this.knob.draggable.bounce = false;
-	    this.knob.draggable.propagateEvents = false;
 	    this.knob.borderRadius = this.knobSize / 2;
 	    this.knobOverlay.borderRadius = (this.knob.borderRadius * 2) + (this.hitArea / 4);
 	    if (!this.hitArea) {
@@ -25717,14 +23211,14 @@
 	        return _this._updateValue();
 	      };
 	    })(this));
-	    this.on(Events.TouchStart, this._touchDown);
-	    this.sliderOverlay.on(Events.TouchStart, this._touchDown);
+	    this.on(Events.TapStart, this._touchStart);
+	    this.on(Events.Pan, this._touchMove);
+	    this.on(Events.TapEnd, this._touchEnd);
 	  }
 	
-	  SliderComponent.prototype._touchDown = function(event) {
+	  SliderComponent.prototype._touchStart = function(event) {
 	    var offsetX, offsetY;
 	    event.preventDefault();
-	    event.stopPropagation();
 	    offsetX = (this.min / this.canvasScaleX()) - this.min;
 	    offsetY = (this.min / this.canvasScaleY()) - this.min;
 	    if (this.width > this.height) {
@@ -25734,6 +23228,18 @@
 	    }
 	    this.knob.draggable._touchStart(event);
 	    return this._updateValue();
+	  };
+	
+	  SliderComponent.prototype._touchMove = function(event) {
+	    if (event.target === this._element) {
+	      return this.knob.draggable._touchMove(event);
+	    }
+	  };
+	
+	  SliderComponent.prototype._touchEnd = function(event) {
+	    if (event.target === this._element) {
+	      return this.knob.draggable._touchEnd(event);
+	    }
 	  };
 	
 	  SliderComponent.prototype._updateFill = function() {
@@ -25920,7 +23426,7 @@
 
 
 /***/ },
-/* 48 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var AppleWatch38Device, AppleWatch42Device, BaseClass, BuiltInDevices, Defaults, DeviceComponentDefaultDevice, Devices, Events, Layer, Nexus5BaseDevice, Nexus5BaseDeviceHand, Nexus9BaseDevice, Utils, _, iPadAirBaseDevice, iPadAirBaseDeviceHand, iPadMiniBaseDevice, iPadMiniBaseDeviceHand, iPhone5BaseDevice, iPhone5BaseDeviceHand, iPhone5CBaseDevice, iPhone5CBaseDeviceHand, iPhone6BaseDevice, iPhone6BaseDeviceHand, iPhone6PlusBaseDevice, iPhone6PlusBaseDeviceHand,
@@ -25939,7 +23445,7 @@
 	
 	Layer = __webpack_require__(13).Layer;
 	
-	Defaults = __webpack_require__(16).Defaults;
+	Defaults = __webpack_require__(17).Defaults;
 	
 	Events = __webpack_require__(15).Events;
 	
@@ -26283,6 +23789,9 @@
 	    ref = this._getOrientationDimensions(this.phone.width, this.phone.height), width = ref[0], height = ref[1];
 	    paddingOffset = ((ref1 = this._device) != null ? ref1.paddingOffset : void 0) || 0;
 	    phoneScale = _.min([(window.innerWidth - ((this.padding + paddingOffset) * 2)) / width, (window.innerHeight - ((this.padding + paddingOffset) * 2)) / height]);
+	    if (phoneScale > 1) {
+	      phoneScale = 1;
+	    }
 	    return phoneScale;
 	  };
 	
@@ -26810,7 +24319,7 @@
 
 
 /***/ },
-/* 49 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Config, EventEmitter, Utils, _, getTime,
@@ -26881,7 +24390,7 @@
 
 
 /***/ },
-/* 50 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var ChromeAlert, Utils, _, getScaleFromName, resizeFrame, startsWithNumber;
@@ -27116,83 +24625,18 @@
 
 
 /***/ },
-/* 51 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Context, Utils, _errorContext, _errorShown, errorWarning;
+	exports.TouchEmulator = __webpack_require__(50);
 	
-	Utils = __webpack_require__(4);
+	exports.MobileScrollFix = __webpack_require__(51);
 	
-	Context = __webpack_require__(43).Context;
-	
-	_errorContext = null;
-	
-	_errorShown = false;
-	
-	errorWarning = function(event) {
-	  var _errorWarningLayer, layer;
-	  if (!_errorContext) {
-	    _errorContext = new Context({
-	      name: "Error"
-	    });
-	  }
-	  if (_errorShown) {
-	    return;
-	  }
-	  _errorShown = true;
-	  layer = new Layer({
-	    x: 20,
-	    y: -50,
-	    width: 300,
-	    height: 40
-	  });
-	  layer.states.add({
-	    visible: {
-	      x: 20,
-	      y: 20,
-	      width: 300,
-	      height: 40
-	    }
-	  });
-	  layer.html = "Javascript Error, see the console";
-	  layer.style = {
-	    font: "12px/1.35em Menlo",
-	    color: "white",
-	    textAlign: "center",
-	    lineHeight: layer.height + "px",
-	    borderRadius: "5px",
-	    backgroundColor: "rgba(255,0,0,.8)"
-	  };
-	  layer.states.animationOptions = {
-	    curve: "spring",
-	    curveOptions: {
-	      tension: 1000,
-	      friction: 30
-	    }
-	  };
-	  layer.states["switch"]("visible");
-	  layer.on(Events.Click, function() {
-	    return this.states["switch"]("default");
-	  });
-	  return _errorWarningLayer = layer;
-	};
-	
-	window.error = errorWarning;
+	exports.OmitNew = __webpack_require__(52);
 
 
 /***/ },
-/* 52 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports.TouchEmulator = __webpack_require__(53);
-	
-	exports.MobileScrollFix = __webpack_require__(54);
-	
-	exports.OmitNew = __webpack_require__(55);
-
-
-/***/ },
-/* 53 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var BaseClass, TouchEmulator, Utils, cancelEvent, createTouch, dispatchTouchEvent, touchEmulator,
@@ -27249,18 +24693,16 @@
 	  extend(TouchEmulator, superClass);
 	
 	  function TouchEmulator() {
+	    this.mousemovePosition = bind(this.mousemovePosition, this);
+	    this.mouseout = bind(this.mouseout, this);
 	    this.mouseup = bind(this.mouseup, this);
 	    this.mousemove = bind(this.mousemove, this);
-	    this.mousemovePosition = bind(this.mousemovePosition, this);
 	    this.mousedown = bind(this.mousedown, this);
 	    this.keyup = bind(this.keyup, this);
 	    this.keydown = bind(this.keydown, this);
 	    var touchPointerInitialOffset;
-	    if (!this.isHammerTouchSupported()) {
-	      throw new Error("Touch emulation for hammer is not supported");
-	    }
-	    this.touchPointerImage = "framer/images/cursor@2x.png";
-	    this.touchPointerImageActive = "framer/images/cursor-active@2x.png";
+	    this.touchPointerImage = "url('data:image/png;base64,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')";
+	    this.touchPointerImageActive = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAAXNSR0IArs4c6QAAHipJREFUeAHtnXus3VWVx9v76L19UQptoS8sFCqgDsMrpURBOwjKSHhpBBNGZmAkJhAyf/ivMUZj1MjIEB9MIiRQRV5OjBODjjOAg84MSCmFoVAp0BbaAiOUtvRBe9v5fvY53+O6u79z73nd3tN7z0rWWWuvvdfea6+19t6/3+/87rkTJnSg44GOBzoe6Hig44GOBzoe6Hig44GOBzoe6Hig44GOBzoe6Hig44GOBzoe6Hig44GOBzoe6HhgzHpg4pid2eCJtWKeBwZ3OTZKPWNjGoNmURTsItkgpQYLh31SjJRjGvRnQ2r5HGI58nSel2sZMAa5Gk8/sa6WftuiTSMOaQfDo91FfJEMu6O8qIwsD2Qsm89prud65G0NuUPa2lgZF+01X0SLZMzNcs8zLyOPwct5lyON/FD6HrOtaJED2spAGRNtNB9pzudl5hNlsQxfDYoCG2XwRvqoxrsO2nZgx7SdYTIo2mYemvOW5ZQ5IesKOvBA3kdJenAQke8XOvDmHeyhKLquhwfcT6nUBp92RBuYMsgE2xUpfC1IkI0Tb7/99lnLli07/thjj503efLkuX19fbO7urpmTJw4cZJor9pOKiPB2b1///69Bw4c2CO6fc+ePa9v27bttU2bNq2/7bbb1t51113vqg3tSASjg2x5LMMDlpVKbZQIdrANG21qeyKtFnSvbOq7hSnoDzzwwEIF/PSjjz56SW9v7/EEW3UxWPCAA4a+A+VxY9/mJwwMDGzcvn37mtWrV6/81Kc+9Zx49zsQ+nO/DnqkHjdS+FEDT3jUDCgPHO2Ar4YORgq22qXAP/jgg8ctX778Y0ccccQZCvhMyQmIg7Nb/LYyviO6vcy/J7q3jPtEAe8IfeKnCunryDKFZ7w0JjvE1q1bn7jnnnseuvHGG7dI7iTw2EMlAnWAaak0Cp/R8aMwfBrSNkTqBIgBR0Y5BUEB71+xYsVfH3PMMeco6MdIjuPBncI3hZvL+H+iBJogkxQxUA4A1GOapkBLDuWB2WThgjLOF50uTLboqFj37LPP/utZZ531lGS2A+okpH+QsnmxlQRANirAZEcTPL6dHmkMfiXwN91005Ff/vKXL9MWf67OcVYsjt4l3ChcJ3xVuEfooEMdCNo6AA4IY1JvW8RWLhzzJCARGJMdgmRYInyfkOuInr17925YuXLlA+ecc84zKseEc+BNow3wgGmpdIg+46QP0ZCVYRxsBOahBDsGP62yz33uc9O///3vXz1jxoyl5XoCy+r+X+FLQrZ6As/WTqCpd8BNCQDgAJRKpXL0hfloj5OBBIAn6CQC1xgnCz8g5NggEdbdfffdd1533XUkI2M7GRgXG4oSQeJDnwSeKIMfKvCYkcaA2+msthT8l19++YLjjjvuUm31/ZIR2E1CVtl6IQEn+MgddJyeO1qiioPjamO8WKadgbocvRvF3YBE4Eg4TXiKcIrwwObNmx9asmTJv+zYsQN7YiI4AUxjQlazRV20HpjcoQSPlzuVslc+FOf23HfffSdcccUV13Z3d89XmeC+IXxcyMqKK54V5lVW5FRVtwSi3UWJwHUCF43sUicIJ+nOYcuPf/zj2z//+c9vVNkJ6uS0raYOvqlURhYckJEdpdS7x4pOhI+BZ8Wnlb9+/fqLtOovLxu2Q3SVkO2eizy2epCgV1vtqioEnGtbChsMI7S+5xETwccCO8Bi4TLhEcIB3Trefdppp/23eCdBbreTQE0OOqKQjQg044h6DPI4dpppDH4K/CWXXDLtpz/96Q1Tpkw5VQMQ5FeE/yV8W+hVT+BxpJ0G9RgOkFdRkRxZrLeOxEme1+fyvJ5yOq5EmQdHFchu8GHhImHvm2+++fCcOXPuE4/tTl4nAjZ4PrbNVFUjAxg+0uAxoBEdfDuuVxd582644YZ/0FnPqmGl/0H4rJCrfILPeY/jcBSOMziAdpjHpN51bmsa5eab0Wc+AJSdgItFjgTwLOFfCvt0PbBGTyX/6d13322LJIiOkn0tB/efB54yjvKW3/uzn/3sxMsvv/xGyXAcV/f/KeRiz8H31kmQvOJjwBxEVVeCbpnbUcfYuTzKaBPrXYcccNk0lyEH2QlAJ8FJ4tkNpum5wR/f//7336pjjh2ORPZu4B3A1HabqmlrAUNHEuyMSOPKx0G9jz766OnnnXfe34mn3WvCh4Vs+QSfwLPycYIdIza1hSJHz9QyKFCtDjlgPVPLUqU+GtX3PNkNQG4RFwqXC6crCTYsXbr0lqefftp3MCQCyBw9T2wCAdNSqUWfdkKLuhvUDX27f5wBb6dUVn45+Nerjkm/JPytkMe1HAHeJu0QiRLQV+6QKDNvWlarkCJ5lJk3rSiWmSJ5lJn3vEl0rgnYDUiCvxJO37Vr18uzZ8/+Rx0HPtp8vDFfz9lJkM9XTZoHDBwJwAEGePCg4OsZ/hKt/L9VHRN/QfiIkOf1BN9OwRGA+4ECLtvJUWbe1G1No3wk9R08VjbbPfPaKPyNcLu+nTx+48aNfyOeHYIkYWHYT7bLNkNbDgzSarChNtwT8cSYZO93vvOdeZdddtkN4gnwK8LfCVn53hK9AtxPNSqVSjJUazOUfKT16Z+5kAQkNccax9xv4WfOnHnWiy++eJH43jLaT9FmVSVA1lJgsJGAaDy8J5XO/AsvvHDazTfffJOu9injjEeFMfg+C/N+qpWlflASFMlGUz9PgldkIA+1di9evPjiRx555C/E4w/Q/oJGm1VsLbAaWwkYC0BtvLc1T27SqlWrru/v75+rNlzt/4eQr2tZ+T4D2TqtbwdIlPo1jfKitkWyaN9o6GO7z3Ioxx3XBkfpodep8svjL7zwAtc9PjrcVqKRAZzUarBjoQ4ClAToXbt27cemTZu2RDxv1zwm3CrkfCT4rHwmnduV96Umg1aGx0QOtLM+9jFPAk3S86zjDe2GffoC6RrxXiheOJ4b1BB5yxqiuaMa6qSsFA01T/8gk+q+8847jz/ppJMuFk/AnxRuKfM4gy3SelD0TMUmoAxEu827LTTyrkevXfRJchIeP3BNwJPOnXqhZYkeGX9YvJMA242el+egquahVUeAjYJiMNQZ7Iubvvvvv//v9cUOt0IvCZ8S+j7fK1+iSpDgHTz3G+tjHXKDbaEc20Q+r7Mu9FDpx3FYAIDuCmef+Nhjj/2PvgGtdhT4WIj6Je0GPu2UBlQPUsEgI/3CQ0mEHj3w+Ije0TtGPBd7rP48+NaxHhSwHD6vc5soj3w76xNIdj0CzU6wRshR0PuTn/zkEvEsHHYC5m8fMDej2OaBjpsFDDLYOCh9E/zuj370o9M++MEPflw8Z94zQpLA277YNClT9+e+ojyv8zi5POpEPm832vrYBnAc4JunoXrN7cxvfOMbc8Wno1O0KAkkrvgNviGwQxpSLivRh9GGpsBLzgOOPr1WfdXcuXP5MmST8DdCLgDJerZ+n/1iE7AybFfky9UHkbxNLEf+IMWyIG8Ty5EfSX0Cja+mCD8iPEFfGq2fPn36P4snMVgsJIn9hc+wzSi2MWjFDuCRnQSmaev/7Gc/O0PB5x6XgKcMF2UyGA9gg3WgsWyedm4T+bx9Xj5c9PEFweVBEd9+7tad0gnf/e53F4iPx4DnwzwNkbesZtqUskZB34hxYFz9/Rs2bLhs4cKFZ0u+QfiokNXvjBab9HGAbTHvBCmSI4v11qE/87E+l7ejPn7j3GcXWCZc/Pbbb6896qijVohn8fjReEt3AQLWCsChEdPqP+OMMybPnz+frR/j15apty/aM37UU3FQ2fa5LfVRJ/K0AWJ/h5M+tnsXeFH8Xj0mPvnqq68+Ujz+zOfq+aqqcbCDGunBBkQKT59pF9A7fR8uP+7lid9mIVu/EyCO7T6QWZ5TVVWCC+96yy2zPKduF8dCBkRZruey28W2SblF+t6x8A/+ekO4/9vf/vZ5okNdDGKPbRJbH8TJ1adZau2BbQT9GXv0eJOzn9W/ThiDH9vDo2OZ2MqELIttXB9lY0WfubEL4Ct8tldvD/G6OQngJLBPJGoecFyzYINM0/avzJ2r+/6Z6pyr2NeETgDGi+OiB0TqvqLMbZCNVX12AZAkYMfcqQdnU/VcYJF45gxG39g/EjcGZFUjkBsRyxjZ85nPfIYLPy72mAi7AFsbYKNNS9L6P8eyPr6y76bpOcrpKr8kZBGxwKiPPlcxgY8Rl4eljSZA3rGNSWe/Krt18XeSKAaz+sloG+fAUTYvNkGRzHU5LWpbJMv1XC5qWyRz+5wWtS2S5XouF7VFBkAJMs9NFs2aNetEUXyb7wASNQd02Aw48Kb01/XNb37z2J6enmniedz7ppDJAG6XU9fFCVqWty0qu+1Y0Wc+LB4uBnfpKJ38ve99b4H4oiTAHw1DMwlQFAj667nooovIWLawPwmZCAmQZ7yDpapKZsN7Qq53OdbBuz7n3d71Lh9O+t4J8B0+3Hv++eefIOodljnlKFH9gJPqBQ9sPZfpK2XookWLyFa2fSdAbBsDY91IaZvbFXUiH/XMjwV95kISVHw4b968hWW/MH/8HOer4kFlZMNC7uhhFUKDaAC8A9Otx5jzVMZ4Xu1mIl79tAPiuDnvft2fdSwfL/rMF7/hw316V4BvUvMjQKLGAo8iEJ1fktT/6cDQV/cXvvCFI3XrwmtOPL7kVS8mAXgsBzQG2H3QzvXWcd1407ff8OFe3qPQL5EcJR4/RN/hp4bBTq23AwfJwUEfvuviiy8+VpQznz/ohLqt2Eq2WhYpvNETRCfyro96tIly+KgT+djOeqaxLupEPraxnmmsizqRj22sZxrr0AF87cTX5/t0bTVHlDrXW0eiQX6mXBM0cxvI4AZPskvn/9ESsv3zpY8nENtaZzgadSI/nJ7ro07kXT8cjTqRH07P9VEn8q4fjqID4kN8OaAv1fCtgw/FzwDtvGMkQa0f9SaAjXL/LkNTEuinW/jyAsP4IwgbRX01oE2sj+XIj1d95o0vB/SXxTxZrfi6zEffmbff1WRoqDcBhuotGaYLwBlqRNZidIRonHnqzTvYLhfVIXM7eMDtLXe5qA6Z28EDbm+5y0V1yNwOHnB7y10uqkPmdvCA21vusuuQp8U0depU/mrau63roQ2Dt5N6O8DIiPSTDNP7/nyfzQ7AdwCelMeJOqpO4Akn/UxGkfrxrI8PuKAekG95odb+GMon6NQELd8B9Mtd7pOHGBgJBeBJCFMnA3UAZScMPGAZvPVMx4s+c7cP8S3zz+dOm4bAwWpIuaxkYxLVY0sMZAfwBaADRnO3hY+AHHB9TJTxro9P8OeA3q3IHwDZb/iuIWhFAsSBMQgjk8HlChsJJbBAkcxy7wIuF7Utkrn9WNNnXmkxhQRA1hJoJgEIQgxE4stGYhxJEOuRxXKeDNQDblMqlT4ti3Q86ePLCcG3+CH6wnzJW3V8NpMAcZhoAIEB2bqBWFeSlD6ryWObofjxpO9j0EmPX5qdf/JtqxLAgZrIz60rUzGUowCIhiJ3OfKpoT5y2VDlvI4+ctlQ5byunfXx5QH5lhdr7D/sbRpanQAT9gkmTeJvHNIOQOZyfhly4112MFymPTLvIuNZH5+kxSTXpqPAzmgFzR3caJ8EC3CWwvOOO/3HoEY+jh15t7Guy/QZ+agTebcZK/rMIyVAeQeo+BqHNAvRcfX2hSHRmMTr1694AEQQSABDDIZ56szT3rzlUIPritohK5JbF3q46/Pt6sSyb5lPoe+pqBdwTKsgGaV/orC13CFPBO14RATJUIvcbaxnSh+ug68mdxvXmx5u+syjD6PLvvWiQ9Q00HmzMCgbX331VRIAZ6esLfOU84DEMvUOUBE/3vXTYtIPS74jP9nfphI1Ds0mQMxGLvb2P/XUU7wGxpnlHcCBxkoHNw92lFfjx6M+vgP5DqBrzZo1+Db5WdQQY2BZzbTRBIjZB5+eVEH1e7+8BYwMo7nLqBbQjrw23+BDfHlAbwb7Devoc1VVdgX4uqDeBGDgIkCeUFm6R3/Vynts9M2r4dCiYEt80LZPO8DtI2+ZqetMcznlvM5tYl3eJpYjH3UPlT7jpK+A33nnna3PPPOMv2G1v7Evh2oxytulcr0JgFIcIBrirWlg3bp1/PgTffNugMewAyVKAXZimFrudtCiOrdznanlY0mfo3S6cKLOf3xqH0OB6H+XU0WtHzivEfDApjYsfQn0y1/+cqM6pW+/wJDuY1WOwfG4yIBYZ5nltjO2SUplPberVn846nsu+LDnV7/6FT7la2F8bH/b/6aqqg+io2vVtGE4FSS4II//uF2ZoieBU/VPFa8sPxH8o2RcvQIYij4U8PhFcrcptfyz3njRZ97soCfpCeBEvQ30wHvvvce7gbwd5B+MSAtO5TwhJKoNvDJqaz24FQGKaCMGZOg+/R+9V1RPYvhVZrFDrnLX2yaok82JEsuWWc90rOjjO94B7NKvh26UT6sF2zFg/nWDnVWPYj6gy5UEUGcDX/3qV18QZRK8JMru4ICKHRTYGFTb4+BCred240GfOXP1j+96fvjDH7KLxu3fPocaIm/ZsNSOHrZh1sDBwFCQQIOVY0D81Ndff/3jepOVM2yT8A0hSTIcMJFG7aLvsaCPT2cLF+gofVd/FfSQeLZ//tiWOwG+Fay2I6iqdmCgZgBnR/QuQLbuu/fee58XJZN5n73WZwLY5ARwotVDx4K+fdb9i1/84kX5w6vfF4DR5/ANgx1dbwcxIDgcjLsAj4F5Ejh18+bNF+hnTqaKf72MGIx+EZW4Enz4odoMVYcuMFSboepK2qOjjy9ZMPP1n0T4uThWPxd+IKs/vSEs6mRg0TEXo9jagcEaAQ8WqQ3BsLQDiO7V0yt+984ZzV0CiZInkEQpibDHdZaZIqc+trHMbWKdZaZuG9tY5jaxzjJTt41tLHObWGeZqdvGNpa5DXX4apawW/9Ia60ovuRP7R3w6POcV7P6AAMaBXSNGA4SXL4G5lqAXYBHmFO2bNlyvn7+lAuat4T8ZAzJgi4TAIbiqXc7eMNQOm5PG8DlUqn02Y762MRfAc/S2b9HZ/+/ifetn89+kgH/FSWExPUBQWsG7FioEcNADE34xS9+cZVeZmBy3Nf68bDYQasZWxywyMd2yGOdefTMx/bwgOug5qO8HfRZPCwabv0mfetb33palIs9fBivAfCzd1uxhcmNvCZg0GbAAaMP81Bjcvjzzz+//9xzz+068cQTubLlGNgudPJYT6IUHCiALuB6U8tcNkVunci73rRd9bF9vrBf/tqkn9hl++e890MfkoDAG73gJKr4Er4uiE6pS7Hc2PoYDw8lqUDOMoKdjgF+50Y/Gv0x/eARZZ4MclHIZGoF+nfSoJOXh+snb5+XR1MfW1j5c/TAZ4L+x/C/KwnwUbzwy2/9nACmw9lfWB9XTGGDYYQOiI2AOkOhvoDZs1ego+APOgrokmcDXBM4cXDAcKgmCdyOsczXQsvqFZ120ccH3DGlW2X9V5XVCj6Bz7d/HBf9HHlVNQbNHgGMivOBnFrm4HQ999xzAzNmzNi9bNmyearkvGOSJAkQ9a1juctFbYaqOxz02SnnCvueeOKJ9Zdeeula8Vzw+aIPH/mCz0kgUWvADm22txgEMtpIgnFHALL1J9S/SDtVv3p1vMpc4PA7gpxztoXMBih7lVI2X0SpPxz18Q9X/VPfeuutdxcsWPA7/TdRVj9P/ECf/76wJgGcBPgBbAoIVKvABkWKsb4jIJOZ0B798uXz+meJvN1C9s8TkhgAQQSxy1RsAsscaNsONX846RN87ven8eXZpz/96ZUKvh/04Ctf/edBV1XzgacTwI4rlRr/jJkIH41miweZVCUJTj311Cf1kgPvuPHcgFXABaMDKLYC1QJMg9jePDRCO+oTfM786fqqd/9111335MMPP8xFn1e8E8Bbf1xU9rVpnGvdfKsSwAPnhjoR4i6QzjddE+4+5ZRTVioJeH2MJJgr5LqAAGKXAyo2gW01dTsqi/h21a8En2cjX/rSl1auWLGChZB2R9E8+PZh9C1zbgnYma3ozBkZDbXx0JgEabJseR/60Iee1D9Q9k4wR+14BQqISUAwAQfVNMpyvh31CT7PQngYNvFrX/va0/q3MHxLOtxFn32qpgnsa5cbpnZswx0UKDo4pgTCiAP8qJgtPz0u1jOCPv0b+Q/o7oAHIRwXPChiS2zZRNXXaINXfr+2/QNa+asUfK6DuNhzArAw4tnPosEHLCAnQUt9glGthqGSynVMAj5Nhq3wRz/60Vsnn3zygP69HBdGJAkJgjOYPGBdqLFIbpnbRL28zmXT2LaV+syFefVr1xu45pprnrzjjjvY9Rx4KFs/ye9z30E3bWngNU6CkUgAOrYjS6MUlz2hCn3wwQd37Ny5c7seG8/W+4TcOvKAhHocEwMyFK+mlfGHaletrpX67HwcaTzl69ULMjs+8YlPrPz1r3+9VeU8+F75eQIw/4qPxLcUcMJIgfu2o30mQ0k8kNtAAs0KgXIk9OkHESc/9NBDp+hOgfOSFcDWyE+mskoA+sQpOR2ujnog13N5uLqkXKM+uxhffjG3nscff3yDbn//WL7VI/jMySt/uODHJJBa62CkdgBbiGMj5GXqPDlo2u63bdvGXxj9ST86ufvMM8+cqR+cwIk8K8Cp7Aa0BejPfTrBchntYh1l6+RtXXY9ekA9+viUi7wUfF7m1L/PWXPVVVe9rLM/rnoSwFf8zIm5x+0++sXzVZPWgifa2l4H9+Yx7Fw7EwriMALLbgCt7ATw+qeTffrvY4t0LCws//IITvKFU74jqGoQeOwiB1JneeRjB/Xqk6QEP+1uq1at2nLFFVes1T+C9lM9gu7A+8yP5z725EkgUcVO+JaCJ9jSTgs68zhQME8Cyk4AHwvxaJh0wQUXTNOusFj/fp6LKRzFWYkTca4Tod6AYgs6tq8Rfamn3YnrFQLfrce6u77yla+8cNttt/ECjANuiq0OPnPwmc/YhzT4Gq8ycfiRBjsZavQuYJpWjupjEpAI3hkmffKTn5z29a9/fcHpp5/OMwP6wXE4EQdzlkIbBfdXiz42pWsWUezv1t/v77zrrrteufnmm7m3J8i2x0G3DHvjtp8H3oloquYjA0z4UILHgxpxHryTAIpzfTQ4+JH2LF68uP/WW2+drwurOfqrGQKBEwGc6xVGACjXAjjb9kXeutRhg+3AvmTz5s2bt99///0by4FnTDAPuuXYg60RGS+iiqkMHVHwhEd0kKxzjwmNmCdC3A18PMQAIEt47bXXHnH99dfP1r+qnTV58mSSAWc68PA+Z5G5zglDGT7aYp7xYkIiT3bqgm7P73//+zdvueWWLT//+c93SE6AGcer3NRy2zBU4LEFMC2VRvCTCY0GeFw7OqdpZckwKIngZCAgToZInQzdV1555RR9pz7z7LPPnq7byRnaHbiDABxo80mYfdCGMaHY5HKyT/fx21avXv223tV/+wc/+ME7SgISisA6yF7lLrsuX/W2BQoCOS1JR/iTiY0WeOxIk6NlUFplgXq7JdBOBgc9Utc5cbqWLl3av3z58sn64mmKLiD7Z8+e3ae3bfv5TeO+vr5uoW4uuuhjAl/LDgwM7NOPMQ3ordz3XnvttV1r167dpav5nffcc882vd1MII0EN2IMOnK3i8HPA1+UAFI9dGDnH7oRDx7JNjj4OS1KhhjomBRRDl9JhDJP38gAj1Mq/fnTQTGNW3YMqoOPzAE3dTsHnD7cX04ZGdmoAE5oB7AdkTpApk4EyjGwMdDwsUw7t7WeKfN23/CAgwPvwCMzT4DhHeBIo9w6kbpvKJDTkvQQf+KAdgLbE6mDFGlMBgJOnQPtoEfq+qiHzGDeQUHuoCMzT8DNO+CxDE9765iHAi6bT8LR/PDER9OGfOxok3lorRgTgoADDrxp7LfU4s+fMUh5QF02JSHc3tR1lAHLXbYsVY72hx0x2nYUjR9tMw81omO+GqWNg57zlK0HDzhY5qEEFKAuBtdtq1HrFFFkbQE4oN0h2mg+0pzPy8wPmeUuQ4cCAgtEmvMOvtvFessihW8riE5pK8MKjIm2FvHILB+Ounu3cxnqIBbxros08kU6yNoWihzQtsYGw6LdRXyRDPUoLyojc0DhgVg2n9Nq7VIH7fyRO6Sdba1mWz6HWI48+nm5Wp9R7mAjq8bndVG/rflGHNLWE5JxRXMqktU7jxh86xbJXHdYUG6ZOlCbBw77YNc2zU6rjgc6Huh4oOOBjgc6Huh4oOOBjgc6Huh4oOOBjgc6Huh4oOOBMemB/weNeh3RI/q/7QAAAABJRU5ErkJggg==')";
 	    this.touchPointerImageSize = 64;
 	    this.touchPointerInitialOffset = {
 	      x: 0,
@@ -27274,52 +24716,31 @@
 	    this.context._element.style.zIndex = 10000;
 	    this.wrap = this.context.domEventManager.wrap;
 	    this.wrap(document).addEventListener("mousedown", this.mousedown, true);
-	    this.wrap(document).addEventListener("mousemove", this.mousemovePosition, true);
+	    this.wrap(document).addEventListener("mousemove", this.mousemove, true);
+	    this.wrap(document).addEventListener("mouseup", this.mouseup, true);
 	    this.wrap(document).addEventListener("keydown", this.keydown, true);
+	    this.wrap(document).addEventListener("keyup", this.keyup, true);
+	    this.wrap(document).addEventListener("mouseout", this.mouseout, true);
 	    this.isMouseDown = false;
 	    this.isPinchKeyDown = false;
 	    this.isPanKeyDown = false;
 	    touchPointerInitialOffset = this.touchPointerInitialOffset;
 	    this.context.run((function(_this) {
 	      return function() {
-	        return _this.touchPointLayer = new Layer({
+	        _this.touchPointLayer = new Layer({
 	          width: _this.touchPointerImageSize,
 	          height: _this.touchPointerImageSize,
-	          image: _this.touchPointerImage,
+	          backgroundColor: null,
 	          opacity: 0
 	        });
+	        return _this.touchPointLayer.style.backgroundImage = _this.touchPointerImage;
 	      };
 	    })(this));
 	  }
 	
-	  TouchEmulator.prototype.showTouchCursor = function() {
-	    this.touchPointLayer.animateStop();
-	    this.touchPointLayer.midX = this.point.x;
-	    this.touchPointLayer.midY = this.point.y;
-	    this.touchPointLayer.scale = 1.8;
-	    return this.touchPointLayer.animate({
-	      properties: {
-	        opacity: 1,
-	        scale: 1
-	      },
-	      time: 0.1,
-	      curve: "ease-out"
-	    });
-	  };
-	
-	  TouchEmulator.prototype.hideTouchCursor = function() {
-	    this.touchPointLayer.animateStop();
-	    return this.touchPointLayer.animate({
-	      properties: {
-	        opacity: 0,
-	        scale: 1.2
-	      },
-	      time: 0.08
-	    });
-	  };
-	
-	  TouchEmulator.prototype.isHammerTouchSupported = function() {
-	    return window.ontouchstart === null;
+	  TouchEmulator.prototype.destroy = function() {
+	    this.context.reset();
+	    return this.context = null;
 	  };
 	
 	  TouchEmulator.prototype.keydown = function(event) {
@@ -27329,8 +24750,6 @@
 	      this.showTouchCursor();
 	      this.touchPointLayer.midX = this.point.x;
 	      this.touchPointLayer.midY = this.point.y;
-	      this.wrap(document).addEventListener("keyup", this.keyup, true);
-	      this.wrap(document).addEventListener("mousemove", this.mousemove, true);
 	    }
 	    if (event.keyCode === this.keyPanCode) {
 	      this.isPanKeyDown = true;
@@ -27343,7 +24762,6 @@
 	      cancelEvent(event);
 	      this.isPinchKeyDown = false;
 	      this.hideTouchCursor();
-	      this.wrap(document).removeEventListener("mousemove", this.mousemove, true);
 	    }
 	    if (event.keyCode === this.keyPanCode) {
 	      cancelEvent(event);
@@ -27355,28 +24773,17 @@
 	  };
 	
 	  TouchEmulator.prototype.mousedown = function(event) {
-	    cancelEvent(event);
 	    this.isMouseDown = true;
 	    this.target = event.target;
-	    this.wrap(document).addEventListener("mousemove", this.mousemove, true);
-	    this.wrap(document).addEventListener("mouseup", this.mouseup, true);
 	    if (this.isPinchKeyDown) {
 	      dispatchTouchEvent("touchstart", this.target, event, this.touchPointDelta);
 	    } else {
 	      dispatchTouchEvent("touchstart", this.target, event);
 	    }
-	    return this.touchPointLayer.image = this.touchPointerImageActive;
-	  };
-	
-	  TouchEmulator.prototype.mousemovePosition = function(event) {
-	    return this.point = {
-	      x: event.pageX,
-	      y: event.pageY
-	    };
+	    return this.touchPointLayer.style.backgroundImage = this.touchPointerImageActive;
 	  };
 	
 	  TouchEmulator.prototype.mousemove = function(event) {
-	    cancelEvent(event);
 	    this.point = {
 	      x: event.pageX,
 	      y: event.pageY
@@ -27405,24 +24812,71 @@
 	        this.touchPointLayer.midY = this.touchPoint.y;
 	      }
 	    }
-	    if ((this.isPinchKeyDown || this.isPanKeyDown) && this.touchPointDelta) {
-	      return dispatchTouchEvent("touchmove", this.target, event, this.touchPointDelta);
-	    } else {
-	      return dispatchTouchEvent("touchmove", this.target, event);
+	    if (this.isMouseDown) {
+	      if ((this.isPinchKeyDown || this.isPanKeyDown) && this.touchPointDelta) {
+	        return dispatchTouchEvent("touchmove", this.target, event, this.touchPointDelta);
+	      } else {
+	        return dispatchTouchEvent("touchmove", this.target, event);
+	      }
 	    }
 	  };
 	
 	  TouchEmulator.prototype.mouseup = function(event) {
-	    this.isMouseDown = false;
-	    cancelEvent(event);
-	    this.wrap(document).removeEventListener("mousemove", this.mousemove, true);
-	    this.wrap(document).removeEventListener("mouseup", this.mouseup, true);
 	    if (this.isPinchKeyDown || this.isPanKeyDown) {
 	      dispatchTouchEvent("touchend", this.target, event, this.touchPointDelta);
 	    } else {
 	      dispatchTouchEvent("touchend", this.target, event);
 	    }
-	    this.touchPointLayer.image = this.touchPointerImage;
+	    return this.endMultiTouch();
+	  };
+	
+	  TouchEmulator.prototype.mouseout = function(event) {
+	    var fromElement;
+	    if (this.isMouseDown) {
+	      return;
+	    }
+	    fromElement = event.relatedTarget || event.toElement;
+	    if (!fromElement || fromElement.nodeName === "HTML") {
+	      return this.endMultiTouch();
+	    }
+	  };
+	
+	  TouchEmulator.prototype.showTouchCursor = function() {
+	    this.touchPointLayer.animateStop();
+	    this.touchPointLayer.midX = this.point.x;
+	    this.touchPointLayer.midY = this.point.y;
+	    this.touchPointLayer.scale = 1.8;
+	    return this.touchPointLayer.animate({
+	      properties: {
+	        opacity: 1,
+	        scale: 1
+	      },
+	      time: 0.1,
+	      curve: "ease-out"
+	    });
+	  };
+	
+	  TouchEmulator.prototype.hideTouchCursor = function() {
+	    this.touchPointLayer.animateStop();
+	    return this.touchPointLayer.animate({
+	      properties: {
+	        opacity: 0,
+	        scale: 1.2
+	      },
+	      time: 0.08
+	    });
+	  };
+	
+	  TouchEmulator.prototype.mousemovePosition = function(event) {
+	    return this.point = {
+	      x: event.pageX,
+	      y: event.pageY
+	    };
+	  };
+	
+	  TouchEmulator.prototype.endMultiTouch = function() {
+	    this.isMouseDown = false;
+	    this.touchPointLayer.style.backgroundImage = this.touchPointerImage;
 	    return this.hideTouchCursor();
 	  };
 	
@@ -27446,10 +24900,17 @@
 	  }
 	  return touchEmulator != null ? touchEmulator : touchEmulator = new TouchEmulator();
 	};
+	
+	exports.disable = function() {
+	  if (!touchEmulator) {
+	    return;
+	  }
+	  return touchEmulator.destroy();
+	};
 
 
 /***/ },
-/* 54 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Utils,
@@ -27510,7 +24971,7 @@
 
 
 /***/ },
-/* 55 */
+/* 52 */
 /***/ function(module, exports) {
 
 	var slice = [].slice;
@@ -27540,16 +25001,677 @@
 
 
 /***/ },
-/* 56 */
+/* 53 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var DOMEventManager, GestureInputDoubleTapTime, GestureInputEdgeSwipeDistance, GestureInputForceTapDesktop, GestureInputForceTapMobile, GestureInputForceTapMobilePollTime, GestureInputLongPressTime, GestureInputMinimumFingerDistance, GestureInputSwipeThreshold, GestureInputVelocityTime, Utils,
+	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+	
+	Utils = __webpack_require__(4);
+	
+	GestureInputLongPressTime = 0.5;
+	
+	GestureInputDoubleTapTime = 0.25;
+	
+	GestureInputSwipeThreshold = 30;
+	
+	GestureInputEdgeSwipeDistance = 30;
+	
+	GestureInputVelocityTime = 0.1;
+	
+	GestureInputForceTapDesktop = MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
+	
+	GestureInputForceTapMobile = 0.7;
+	
+	GestureInputForceTapMobilePollTime = 1 / 30;
+	
+	GestureInputMinimumFingerDistance = 30;
+	
+	DOMEventManager = __webpack_require__(42).DOMEventManager;
+	
+	Utils.sanitizeRotation = function() {
+	  var previous, sanitize;
+	  previous = null;
+	  return sanitize = function(value) {
+	    if (previous == null) {
+	      previous = value;
+	    }
+	    return value;
+	  };
+	};
+	
+	exports.GestureInputRecognizer = (function() {
+	  function GestureInputRecognizer() {
+	    this._process = bind(this._process, this);
+	    this.edgeswipedirectionend = bind(this.edgeswipedirectionend, this);
+	    this.edgeswipedirectionstart = bind(this.edgeswipedirectionstart, this);
+	    this.edgeswipedirection = bind(this.edgeswipedirection, this);
+	    this.swipedirectionend = bind(this.swipedirectionend, this);
+	    this.swipedirection = bind(this.swipedirection, this);
+	    this.swipedirectionstart = bind(this.swipedirectionstart, this);
+	    this.swipeend = bind(this.swipeend, this);
+	    this.swipe = bind(this.swipe, this);
+	    this.swipestart = bind(this.swipestart, this);
+	    this.rotateend = bind(this.rotateend, this);
+	    this.rotate = bind(this.rotate, this);
+	    this.rotatestart = bind(this.rotatestart, this);
+	    this.scaleend = bind(this.scaleend, this);
+	    this.scale = bind(this.scale, this);
+	    this.scalestart = bind(this.scalestart, this);
+	    this.pinchend = bind(this.pinchend, this);
+	    this.pinch = bind(this.pinch, this);
+	    this.pinchstart = bind(this.pinchstart, this);
+	    this.panright = bind(this.panright, this);
+	    this.panleft = bind(this.panleft, this);
+	    this.pandown = bind(this.pandown, this);
+	    this.panup = bind(this.panup, this);
+	    this.panend = bind(this.panend, this);
+	    this.pan = bind(this.pan, this);
+	    this.panstart = bind(this.panstart, this);
+	    this.forcetapend = bind(this.forcetapend, this);
+	    this.forcetapstart = bind(this.forcetapstart, this);
+	    this.forcetapchange = bind(this.forcetapchange, this);
+	    this._updateMacForce = bind(this._updateMacForce, this);
+	    this._updateTouchForce = bind(this._updateTouchForce, this);
+	    this.longpressend = bind(this.longpressend, this);
+	    this.longpressstart = bind(this.longpressstart, this);
+	    this.doubletap = bind(this.doubletap, this);
+	    this.tapend = bind(this.tapend, this);
+	    this.tapstart = bind(this.tapstart, this);
+	    this.tap = bind(this.tap, this);
+	    this.touchend = bind(this.touchend, this);
+	    this.touchmove = bind(this.touchmove, this);
+	    this.touchstart = bind(this.touchstart, this);
+	    this.em = new DOMEventManager();
+	    this.em.wrap(window).addEventListener("touchstart", this.touchstart);
+	  }
+	
+	  GestureInputRecognizer.prototype.destroy = function() {
+	    return this.em.removeAllListeners();
+	  };
+	
+	  GestureInputRecognizer.prototype.cancel = function() {
+	    window.clearTimeout(this.session.pressTimer);
+	    return this.session = null;
+	  };
+	
+	  GestureInputRecognizer.prototype.touchstart = function(event) {
+	    if (this.session) {
+	      return;
+	    }
+	    this.em.wrap(window).addEventListener("touchmove", this.touchmove);
+	    this.em.wrap(window).addEventListener("touchend", this.touchend);
+	    this.em.wrap(window).addEventListener("webkitmouseforcechanged", this._updateMacForce);
+	    this.session = {
+	      startEvent: this._getGestureEvent(event),
+	      lastEvent: null,
+	      startMultiEvent: null,
+	      startTime: Date.now(),
+	      pressTimer: window.setTimeout(this.longpressstart, GestureInputLongPressTime * 1000),
+	      started: {},
+	      events: [],
+	      sanitizeRotation: Utils.sanitizeRotation(),
+	      eventCount: 0
+	    };
+	    event = this._getGestureEvent(event);
+	    this.tapstart(event);
+	    if (Date.now() - this.doubleTapTime < (GestureInputDoubleTapTime * 1000)) {
+	      this.doubletap(event);
+	    } else {
+	      this.doubleTapTime = Date.now();
+	    }
+	    this._process(event);
+	    if (Utils.isTouch()) {
+	      return this._updateTouchForce();
+	    }
+	  };
+	
+	  GestureInputRecognizer.prototype.touchmove = function(event) {
+	    return this._process(this._getGestureEvent(event));
+	  };
+	
+	  GestureInputRecognizer.prototype.touchend = function(event) {
+	    var eventName, ref, value;
+	    if (Utils.isTouch()) {
+	      if (!(event.touches.length === 0)) {
+	        return;
+	      }
+	    } else {
+	      if (!(event.touches.length === event.changedTouches.length)) {
+	        return;
+	      }
+	    }
+	    this.em.wrap(window).removeEventListener("touchmove", this.touchmove);
+	    this.em.wrap(window).removeEventListener("touchend", this.touchend);
+	    this.em.wrap(window).removeEventListener("webkitmouseforcechanged", this._updateMacForce);
+	    event = this._getGestureEvent(event);
+	    ref = this.session.started;
+	    for (eventName in ref) {
+	      value = ref[eventName];
+	      if (value) {
+	        this[eventName + "end"](event);
+	      }
+	    }
+	    this.tap(event);
+	    this.tapend(event);
+	    return this.cancel();
+	  };
+	
+	  GestureInputRecognizer.prototype.tap = function(event) {
+	    return this._dispatchEvent("tap", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.tapstart = function(event) {
+	    return this._dispatchEvent("tapstart", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.tapend = function(event) {
+	    return this._dispatchEvent("tapend", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.doubletap = function(event) {
+	    return this._dispatchEvent("doubletap", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.longpressstart = function() {
+	    var event;
+	    if (!this.session) {
+	      return;
+	    }
+	    if (this.session.started.longpress) {
+	      return;
+	    }
+	    event = this._getGestureEvent(this.session.startEvent);
+	    this.session.started.longpress = event;
+	    this._dispatchEvent("longpressstart", event);
+	    return this._dispatchEvent("longpress", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.longpressend = function(event) {
+	    return this._dispatchEvent("longpressend", event);
+	  };
+	
+	  GestureInputRecognizer.prototype._updateTouchForce = function() {
+	    var event, ref, ref1;
+	    if (!((ref = this.session) != null ? (ref1 = ref.lastEvent) != null ? ref1.touches.length : void 0 : void 0)) {
+	      return;
+	    }
+	    this.session.force = this.session.lastEvent.touches[0].force || 0;
+	    event = this._getGestureEvent(this.session.lastEvent);
+	    this.forcetapchange(event);
+	    if (this.session.force >= GestureInputForceTapMobile) {
+	      this.forcetapstart(event);
+	    } else {
+	      this.forcetapend(event);
+	    }
+	    return setTimeout(this._updateTouchForce, GestureInputForceTapMobilePollTime);
+	  };
+	
+	  GestureInputRecognizer.prototype._updateMacForce = function(event) {
+	    if (!this.session) {
+	      return;
+	    }
+	    this.session.force = Utils.modulate(event.webkitForce, [0, 3], [0, 1]);
+	    this.forcetapchange(this._getGestureEvent(event));
+	    if (event.webkitForce >= GestureInputForceTapDesktop) {
+	      return this.forcetapstart(event);
+	    } else {
+	      return this.forcetapend(event);
+	    }
+	  };
+	
+	  GestureInputRecognizer.prototype.forcetapchange = function(event) {
+	    return this._dispatchEvent("forcetapchange", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.forcetapstart = function(event) {
+	    if (!this.session) {
+	      return;
+	    }
+	    if (this.session.started.forcetap) {
+	      return;
+	    }
+	    this.session.started.forcetap = event;
+	    this._dispatchEvent("forcetapstart", event);
+	    return this._dispatchEvent("forcetap", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.forcetapend = function(event) {
+	    if (!this.session) {
+	      return;
+	    }
+	    if (!this.session.started.forcetap) {
+	      return;
+	    }
+	    this.session.started.forcetap = null;
+	    return this._dispatchEvent("forcetapend", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.panstart = function(event) {
+	    this.session.started.pan = event;
+	    return this._dispatchEvent("panstart", event, this.session.started.pan.target);
+	  };
+	
+	  GestureInputRecognizer.prototype.pan = function(event) {
+	    var direction;
+	    this._dispatchEvent("pan", event, this.session.started.pan.target);
+	    direction = this._getDirection(event.delta);
+	    if (direction) {
+	      return this["pan" + direction](event);
+	    }
+	  };
+	
+	  GestureInputRecognizer.prototype.panend = function(event) {
+	    this._dispatchEvent("panend", event, this.session.started.pan.target);
+	    return this.session.started.pan = null;
+	  };
+	
+	  GestureInputRecognizer.prototype.panup = function(event) {
+	    return this._dispatchEvent("panup", event, this.session.started.pan.target);
+	  };
+	
+	  GestureInputRecognizer.prototype.pandown = function(event) {
+	    return this._dispatchEvent("pandown", event, this.session.started.pan.target);
+	  };
+	
+	  GestureInputRecognizer.prototype.panleft = function(event) {
+	    return this._dispatchEvent("panleft", event, this.session.started.pan.target);
+	  };
+	
+	  GestureInputRecognizer.prototype.panright = function(event) {
+	    return this._dispatchEvent("panright", event, this.session.started.pan.target);
+	  };
+	
+	  GestureInputRecognizer.prototype.pinchstart = function(event) {
+	    this.session.started.pinch = event;
+	    this.scalestart(event, this.session.started.pinch.target);
+	    this.rotatestart(event, this.session.started.pinch.target);
+	    return this._dispatchEvent("pinchstart", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.pinch = function(event) {
+	    this._dispatchEvent("pinch", event);
+	    this.scale(event, this.session.started.pinch.target);
+	    return this.rotate(event, this.session.started.pinch.target);
+	  };
+	
+	  GestureInputRecognizer.prototype.pinchend = function(event) {
+	    this._dispatchEvent("pinchend", event);
+	    this.scaleend(event, this.session.started.pinch.target);
+	    this.rotateend(event, this.session.started.pinch.target);
+	    return this.session.started.pinch = null;
+	  };
+	
+	  GestureInputRecognizer.prototype.scalestart = function(event) {
+	    return this._dispatchEvent("scalestart", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.scale = function(event) {
+	    return this._dispatchEvent("scale", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.scaleend = function(event) {
+	    return this._dispatchEvent("scaleend", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.rotatestart = function(event) {
+	    return this._dispatchEvent("rotatestart", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.rotate = function(event) {
+	    return this._dispatchEvent("rotate", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.rotateend = function(event) {
+	    return this._dispatchEvent("rotateend", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.swipestart = function(event) {
+	    this._dispatchEvent("swipestart", event);
+	    this.session.started.swipe = event;
+	    return this.swipedirectionstart(event);
+	  };
+	
+	  GestureInputRecognizer.prototype.swipe = function(event) {
+	    this._dispatchEvent("swipe", event);
+	    return this.swipedirection(event);
+	  };
+	
+	  GestureInputRecognizer.prototype.swipeend = function(event) {
+	    return this._dispatchEvent("swipeend", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.swipedirectionstart = function(event) {
+	    var direction, maxX, maxY, ref, ref1, ref2, ref3, swipeEdge;
+	    if (!event.offsetDirection) {
+	      return;
+	    }
+	    if (this.session.started.swipedirection) {
+	      return;
+	    }
+	    this.session.started.swipedirection = event;
+	    direction = this.session.started.swipedirection.offsetDirection;
+	    this._dispatchEvent("swipe" + direction + "start", event);
+	    swipeEdge = this._edgeForSwipeDirection(direction);
+	    maxX = Utils.frameGetMaxX(Screen.canvasFrame);
+	    maxY = Utils.frameGetMaxY(Screen.canvasFrame);
+	    if (swipeEdge === "top" && (0 < (ref = event.start.y - Screen.canvasFrame.y) && ref < GestureInputEdgeSwipeDistance)) {
+	      this.edgeswipedirectionstart(event);
+	    }
+	    if (swipeEdge === "right" && (maxX - GestureInputEdgeSwipeDistance < (ref1 = event.start.x) && ref1 < maxX)) {
+	      this.edgeswipedirectionstart(event);
+	    }
+	    if (swipeEdge === "bottom" && (maxY - GestureInputEdgeSwipeDistance < (ref2 = event.start.y) && ref2 < maxY)) {
+	      this.edgeswipedirectionstart(event);
+	    }
+	    if (swipeEdge === "left" && (0 < (ref3 = event.start.x - Screen.canvasFrame.x) && ref3 < GestureInputEdgeSwipeDistance)) {
+	      return this.edgeswipedirectionstart(event);
+	    }
+	  };
+	
+	  GestureInputRecognizer.prototype.swipedirection = function(event) {
+	    var direction;
+	    if (!this.session.started.swipedirection) {
+	      return;
+	    }
+	    direction = this.session.started.swipedirection.offsetDirection;
+	    this._dispatchEvent("swipe" + direction, event);
+	    if (this.session.started.edgeswipedirection) {
+	      return this.edgeswipedirection(event);
+	    }
+	  };
+	
+	  GestureInputRecognizer.prototype.swipedirectionend = function(event) {
+	    var direction;
+	    if (!this.session.started.swipedirection) {
+	      return;
+	    }
+	    direction = this.session.started.swipedirection.offsetDirection;
+	    return this._dispatchEvent("swipe" + direction + "end", event);
+	  };
+	
+	  GestureInputRecognizer.prototype.edgeswipedirection = function(event) {
+	    var swipeEdge;
+	    swipeEdge = this._edgeForSwipeDirection(this.session.started.edgeswipedirection.offsetDirection);
+	    Screen.emit("edgeswipe", this._createEvent("edgeswipe", event));
+	    return Screen.emit("edgeswipe" + swipeEdge, this._createEvent("edgeswipe" + swipeEdge, event));
+	  };
+	
+	  GestureInputRecognizer.prototype.edgeswipedirectionstart = function(event) {
+	    var swipeEdge;
+	    if (this.session.started.edgeswipedirection) {
+	      return;
+	    }
+	    this.session.started.edgeswipedirection = event;
+	    swipeEdge = this._edgeForSwipeDirection(this.session.started.edgeswipedirection.offsetDirection);
+	    Screen.emit("edgeswipestart", this._createEvent("edgeswipestart", event));
+	    return Screen.emit("edgeswipe" + swipeEdge + "start", this._createEvent("edgeswipe" + swipeEdge + "start", event));
+	  };
+	
+	  GestureInputRecognizer.prototype.edgeswipedirectionend = function(event) {
+	    var swipeEdge;
+	    swipeEdge = this._edgeForSwipeDirection(this.session.started.edgeswipedirection.offsetDirection);
+	    Screen.emit("edgeswipeend", this._createEvent("edgeswipeend", event));
+	    return Screen.emit("edgeswipe" + swipeEdge + "end", this._createEvent("edgeswipe" + swipeEdge + "end", event));
+	  };
+	
+	  GestureInputRecognizer.prototype._process = function(event) {
+	    if (!this.session) {
+	      return;
+	    }
+	    this.session.events.push(event);
+	    event.eventCount = this.session.eventCount++;
+	    if (Math.abs(event.delta.x) > 0 || Math.abs(event.delta.y) > 0) {
+	      if (!this.session.started.pan) {
+	        this.panstart(event);
+	      } else {
+	        this.pan(event);
+	      }
+	    }
+	    if (this.session.started.pinch && event.fingers === 1) {
+	      this.pinchend(event);
+	    } else if (!this.session.started.pinch && event.fingers === 2) {
+	      this.pinchstart(event);
+	    } else if (this.session.started.pinch) {
+	      this.pinch(event);
+	    }
+	    if (!this.session.started.swipe && (Math.abs(event.offset.x) > GestureInputSwipeThreshold || Math.abs(event.offset.y) > GestureInputSwipeThreshold)) {
+	      this.swipestart(event);
+	    } else if (this.session.started.swipe) {
+	      this.swipe(event);
+	    }
+	    return this.session.lastEvent = event;
+	  };
+	
+	  GestureInputRecognizer.prototype._getEventPoint = function(event) {
+	    var ref;
+	    if ((ref = event.touches) != null ? ref.length : void 0) {
+	      return this._getTouchPoint(event, 0);
+	    }
+	    return {
+	      x: event.pageX,
+	      y: event.pageY
+	    };
+	  };
+	
+	  GestureInputRecognizer.prototype._getGestureEvent = function(event) {
+	    var events, i, len, pointKey, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, touchPointA, touchPointB;
+	    _.extend(event, {
+	      time: Date.now(),
+	      point: this._getEventPoint(event),
+	      start: this._getEventPoint(event),
+	      previous: this._getEventPoint(event),
+	      offset: {
+	        x: 0,
+	        y: 0
+	      },
+	      offsetTime: 0,
+	      offsetAngle: 0,
+	      offsetDirection: null,
+	      delta: {
+	        x: 0,
+	        y: 0
+	      },
+	      deltaTime: 0,
+	      deltaAngle: 0,
+	      deltaDirection: null,
+	      force: 0,
+	      velocity: {
+	        x: 0,
+	        y: 0
+	      },
+	      fingers: ((ref = event.touches) != null ? ref.length : void 0) || 0,
+	      touchCenter: this._getEventPoint(event),
+	      touchOffset: {
+	        x: 0,
+	        y: 0
+	      },
+	      touchDistance: 0,
+	      scale: 1,
+	      scaleDirection: null,
+	      rotation: 0
+	    });
+	    if ((ref1 = this.session) != null ? ref1.startEvent : void 0) {
+	      event.start = this.session.startEvent.point;
+	      event.offset = Utils.pointSubtract(event.point, event.start);
+	      event.offsetTime = event.time - this.session.startEvent.time;
+	      event.offsetAngle = Utils.pointAngle(this.session.startEvent.point, event.point);
+	      event.offsetDirection = this._getDirection(event.offset);
+	      event.touchCenterStart = this.session.startEvent.touchCenter;
+	    }
+	    if ((ref2 = this.session) != null ? ref2.lastEvent : void 0) {
+	      event.previous = this.session.lastEvent.point;
+	      event.deltaTime = event.time - this.session.lastEvent.time;
+	      event.delta = Utils.pointSubtract(event.point, this.session.lastEvent.point);
+	      event.deltaAngle = Utils.pointAngle(event.point, this.session.lastEvent.point);
+	      event.deltaDirection = this._getDirection(event.delta);
+	    }
+	    if (event.fingers > 1) {
+	      touchPointA = this._getTouchPoint(event, 0);
+	      touchPointB = this._getTouchPoint(event, 1);
+	      event.touchCenter = Utils.pointCenter(touchPointB, touchPointA);
+	      event.touchOffset = Utils.pointSubtract(touchPointB, touchPointA);
+	      event.touchDistance = _.max([GestureInputMinimumFingerDistance, Utils.pointDistance(touchPointA, touchPointB)]);
+	      event.rotation = Utils.pointAngle(touchPointA, touchPointB);
+	    }
+	    if ((ref3 = this.session) != null ? ref3.events : void 0) {
+	      events = _.filter(this.session.events, function(e) {
+	        if (e.eventCount === 0) {
+	          return false;
+	        }
+	        return e.time > (event.time - (GestureInputVelocityTime * 1000));
+	      });
+	      event.velocity = this._getVelocity(events);
+	    }
+	    if ((ref4 = this.session) != null ? ref4.started.pinch : void 0) {
+	      event.scale = event.touchDistance / this.session.started.pinch.touchDistance;
+	      event.scaleDirection = this._getScaleDirection(event.scale - this.session.lastEvent.scale);
+	      if (!event.scaleDirection && ((ref5 = this.session) != null ? ref5.lastEvent : void 0)) {
+	        event.scaleDirection = this.session.lastEvent.scaleDirection;
+	      }
+	    }
+	    if ((ref6 = this.session) != null ? ref6.lastEvent : void 0) {
+	      if ((event.fingers !== (ref7 = this.session.lastEvent.fingers) && ref7 === 2)) {
+	        event.delta = {
+	          x: 0,
+	          y: 0
+	        };
+	      }
+	      if (event.fingers === 2 && this.session.lastEvent.fingers === 2) {
+	        event.delta = Utils.pointSubtract(event.touchCenter, this.session.lastEvent.touchCenter);
+	      }
+	    }
+	    if ((ref8 = this.session) != null ? ref8.lastEvent : void 0) {
+	      if (this.session.force) {
+	        event.force = this.session.force;
+	      }
+	    }
+	    ref9 = ["point", "start", "previous", "offset", "delta", "velocity", "touchCenter", "touchOffset"];
+	    for (i = 0, len = ref9.length; i < len; i++) {
+	      pointKey = ref9[i];
+	      event[pointKey + "X"] = event[pointKey].x;
+	      event[pointKey + "Y"] = event[pointKey].y;
+	    }
+	    return event;
+	  };
+	
+	  GestureInputRecognizer.prototype._getTouchPoint = function(event, index) {
+	    var point;
+	    return point = {
+	      x: event.touches[index].pageX,
+	      y: event.touches[index].pageY
+	    };
+	  };
+	
+	  GestureInputRecognizer.prototype._getDirection = function(offset) {
+	    if (Math.abs(offset.x) > Math.abs(offset.y)) {
+	      if (offset.x > 0) {
+	        return "right";
+	      }
+	      if (offset.x < 0) {
+	        return "left";
+	      }
+	    }
+	    if (Math.abs(offset.x) < Math.abs(offset.y)) {
+	      if (offset.y < 0) {
+	        return "up";
+	      }
+	      if (offset.y > 0) {
+	        return "down";
+	      }
+	    }
+	    return null;
+	  };
+	
+	  GestureInputRecognizer.prototype._edgeForSwipeDirection = function(direction) {
+	    if (direction === "down") {
+	      return "top";
+	    }
+	    if (direction === "left") {
+	      return "right";
+	    }
+	    if (direction === "up") {
+	      return "bottom";
+	    }
+	    if (direction === "right") {
+	      return "left";
+	    }
+	    return null;
+	  };
+	
+	  GestureInputRecognizer.prototype._getScaleDirection = function(offset) {
+	    if (offset > 0) {
+	      return "up";
+	    }
+	    if (offset < 0) {
+	      return "down";
+	    }
+	    return null;
+	  };
+	
+	  GestureInputRecognizer.prototype._createEvent = function(type, event) {
+	    var k, touchEvent, v;
+	    touchEvent = document.createEvent("MouseEvent");
+	    touchEvent.initMouseEvent(type, true, true, window, event.detail, event.screenX, event.screenY, event.clientX, event.clientY, event.ctrlKey, event.shiftKey, event.altKey, event.metaKey, event.button, event.relatedTarget);
+	    touchEvent.touches = event.touches;
+	    touchEvent.changedTouches = event.touches;
+	    touchEvent.targetTouches = event.touches;
+	    for (k in event) {
+	      v = event[k];
+	      touchEvent[k] = v;
+	    }
+	    return touchEvent;
+	  };
+	
+	  GestureInputRecognizer.prototype._dispatchEvent = function(type, event, target) {
+	    var touchEvent;
+	    touchEvent = this._createEvent(type, event);
+	    if (target == null) {
+	      target = event.target;
+	    }
+	    return target.dispatchEvent(touchEvent);
+	  };
+	
+	  GestureInputRecognizer.prototype._getVelocity = function(events) {
+	    var current, first, time, velocity;
+	    if (events.length < 2) {
+	      return {
+	        x: 0,
+	        y: 0
+	      };
+	    }
+	    current = events[events.length - 1];
+	    first = events[0];
+	    time = current.time - first.time;
+	    velocity = {
+	      x: (current.point.x - first.point.x) / time,
+	      y: (current.point.y - first.point.y) / time
+	    };
+	    if (velocity.x === Infinity) {
+	      velocity.x = 0;
+	    }
+	    if (velocity.y === Infinity) {
+	      velocity.y = 0;
+	    }
+	    return velocity;
+	  };
+	
+	  return GestureInputRecognizer;
+
+	})();
+
+
+/***/ },
+/* 54 */
 /***/ function(module, exports) {
 
-	exports.date = 1453498773;
+	exports.date = 1455433948;
 	
 	exports.branch = "tisho/animation-paths";
 	
-	exports.hash = "40ae942";
+	exports.hash = "707f464";
 	
-	exports.build = 1374;
+	exports.build = 1466;
 	
 	exports.version = exports.branch + "/" + exports.hash;
 

@@ -1,5 +1,5 @@
 {
-  "updateDelay" : -1,
+  "updateDelay" : 0.3,
   "deviceScale" : -1,
   "deviceOrientation" : 0,
   "contentScale" : 1,
