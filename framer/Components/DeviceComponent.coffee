@@ -135,8 +135,6 @@ class exports.DeviceComponent extends BaseClass
 			@content.scale = contentScaleFactor
 			@_positionKeyboard()
 
-			@screen.backgroundColor = "white"
-
 		else
 			backgroundOverlap = 100
 
@@ -161,8 +159,6 @@ class exports.DeviceComponent extends BaseClass
 			@screen.center()
 
 			@setHand(@selectedHand) if @selectedHand && @_orientation == 0
-
-			@screen.backgroundColor = "black"
 
 	_shouldRenderFullScreen: ->
 
@@ -253,6 +249,11 @@ class exports.DeviceComponent extends BaseClass
 
 			# If we switch from fullscreen to a device, we should zoom to fit
 			shouldZoomToFit = @_deviceType is "fullscreen"
+
+			if deviceType is "fullscreen"
+				@screen.backgroundColor = "white"
+			else
+				@screen.backgroundColor = "black"
 
 			@_device = _.clone(device)
 			@_deviceType = deviceType
