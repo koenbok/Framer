@@ -43,13 +43,12 @@ Framer.BezierCurveAnimator = (require "./Animators/BezierCurveAnimator").BezierC
 Framer.SpringDHOAnimator = (require "./Animators/SpringDHOAnimator").SpringDHOAnimator
 Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4Animator
 Framer.LayerDraggable = (require "./LayerDraggable").LayerDraggable
+
 Framer.Importer = (require "./Importer").Importer
-Framer.Debug = (require "./Debug").Debug
 Framer.Extras = require "./Extras/Extras"
 
-# Add version info
+Framer.GestureInputRecognizer = new (require "./GestureInputRecognizer").GestureInputRecognizer
 Framer.Version = require "../build/Version"
-
 Framer.Loop = new Framer.AnimationLoop()
 Utils.domComplete(Framer.Loop.start)
 
@@ -63,6 +62,5 @@ Framer.resetDefaults = Defaults.reset
 Framer.DefaultContext = new Framer.Context(name:"Default")
 Framer.CurrentContext = Framer.DefaultContext
 
-# Fix for mobile scrolling
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
-Framer.Extras.TouchEmulator.enable()
+Framer.Extras.TouchEmulator.enable() if not Utils.isTouch()

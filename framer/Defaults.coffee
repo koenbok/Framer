@@ -4,7 +4,7 @@ Utils = require "./Utils"
 
 # You can set Framer Defaults before loading Framer (sort of enviroment variables) in window.FramerDefaults
 
-Originals = 
+Originals =
 	Layer:
 		backgroundColor: "rgba(0, 124, 255, 0.5)"
 		color: "white"
@@ -34,15 +34,15 @@ Originals =
 	LayerDraggable:
 		momentum: true
 		momentumOptions:
-			friction: 2.1 
-			tolerance: 1 
+			friction: 2.1
+			tolerance: 1
 		bounce: true
 		bounceOptions:
 			friction: 40
 			tension: 200
 			tolerance: 1
 		directionLock: false
-		directionLockThreshold: 
+		directionLockThreshold:
 			x: 10
 			y: 10
 		overdrag: true
@@ -87,7 +87,7 @@ exports.Defaults =
 
 		# Include a secret property with the default keys
 		# options._defaultValues = defaults
-		
+
 		options
 
 	setup: ->

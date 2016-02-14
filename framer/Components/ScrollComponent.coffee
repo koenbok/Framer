@@ -46,9 +46,9 @@ EventMappers[Events.Move] = Events.Move
 EventMappers[Events.ScrollStart] = Events.DragStart
 EventMappers[Events.ScrollMove] = Events.DragMove
 EventMappers[Events.ScrollEnd] = Events.DragEnd
-EventMappers[Events.ScrollAnimationDidStart] = Events.DragAnimationDidStart
-EventMappers[Events.ScrollAnimationDidEnd] = Events.DragAnimationDidEnd
-EventMappers[Events.DirectionLockDidStart] = Events.DirectionLockDidStart
+EventMappers[Events.ScrollAnimationDidStart] = Events.DragAnimationStart
+EventMappers[Events.ScrollAnimationDidEnd] = Events.DragAnimationEnd
+EventMappers[Events.DirectionLockStart] = Events.DirectionLockStart
 
 class exports.ScrollComponent extends Layer
 
@@ -83,7 +83,7 @@ class exports.ScrollComponent extends Layer
 		@_contentInset = options.contentInset or Utils.rectZero()
 		@setContentLayer(new Layer)
 
-		# Because we did not have a content layer before, we want to re-apply 
+		# Because we did not have a content layer before, we want to re-apply
 		# the options again so everything gets configures properly.
 		@_applyOptionsAndDefaults(options)
 		@_enableMouseWheelHandling()
@@ -99,7 +99,7 @@ class exports.ScrollComponent extends Layer
 
 		contentFrame = @content.contentFrame()
 
-		return size = 
+		return size =
 			x: 0
 			y: 0
 			width:  Math.max(@width,  contentFrame.x + contentFrame.width)
@@ -137,7 +137,7 @@ class exports.ScrollComponent extends Layer
 		# It defaults to just the direct sub layers of the content, not recursive.
 
 		# This function automatically gets called when you add or remove content layers,
-		# but not when you change the size of the content layers. It's totally okay to 
+		# but not when you change the size of the content layers. It's totally okay to
 		# call it yourself, but make sure you don't overdo it.
 
 		return unless @content
@@ -151,15 +151,15 @@ class exports.ScrollComponent extends Layer
 		constraintsFrame =
 			x: -constraintsFrame.width  + @width - @_contentInset.right
 			y: -constraintsFrame.height + @height - @_contentInset.bottom
-			width: 	constraintsFrame.width  + constraintsFrame.width  - @width + 
+			width: 	constraintsFrame.width  + constraintsFrame.width  - @width +
 				@_contentInset.left + @_contentInset.right
-			height: constraintsFrame.height + constraintsFrame.height - @height + 
+			height: constraintsFrame.height + constraintsFrame.height - @height +
 				@_contentInset.top + @_contentInset.bottom
 
 		@content.draggable.constraints = constraintsFrame
 
-		# Change the default background color if we added children. We keep the default 
-		# color around until you set a content layer so you can see the ScrollComponent 
+		# Change the default background color if we added children. We keep the default
+		# color around until you set a content layer so you can see the ScrollComponent
 		# on your screen after creation.
 		if @content.children.length
 			if @content.backgroundColor?.isEqual(Framer.Defaults.Layer.backgroundColor)
@@ -180,7 +180,7 @@ class exports.ScrollComponent extends Layer
 		return Utils.pointInvert(point)
 
 	@define "scrollX",
-		get: -> 
+		get: ->
 			return 0 if not @content
 			return 0 - @content.x + @contentInset.left
 		set: (value) ->
@@ -189,10 +189,10 @@ class exports.ScrollComponent extends Layer
 			@content.x = @_calculateContentPoint({x:value, y:0}).x
 
 	@define "scrollY",
-		get: -> 
+		get: ->
 			return 0 if not @content
 			return 0 - @content.y + @contentInset.top
-		set: (value) -> 
+		set: (value) ->
 			return unless @content
 			@content.draggable.animateStop()
 			@content.y = @_calculateContentPoint({x:0, y:value}).y
@@ -200,7 +200,7 @@ class exports.ScrollComponent extends Layer
 	@define "scrollPoint",
 		importable: true
 		exportable: false
-		get: -> 
+		get: ->
 			point =
 				x: @scrollX
 				y: @scrollY
@@ -246,7 +246,7 @@ class exports.ScrollComponent extends Layer
 			return -@content.draggable.angle
 
 	scrollToPoint: (point, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
-		
+
 		# We never let you scroll to a point that does not make sense (out of bounds). If you still
 		# would like to do that, access the .content.y directly.
 		contentPoint = @_calculateContentPoint(point)
@@ -268,7 +268,7 @@ class exports.ScrollComponent extends Layer
 	scrollToLayer: (contentLayer, originX=0, originY=0, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
 
 		if contentLayer and contentLayer.parent isnt @content
-			throw Error("This layer is not in the scroll component content")
+			throw Error("Can't scroll to this layer because it's not in the ScrollComponent. Add it to the content like layer.parent = scroll.content.")
 
 		if not contentLayer or @content.children.length == 0
 			scrollPoint = {x:0, y:0}
@@ -308,7 +308,7 @@ class exports.ScrollComponent extends Layer
 		{minX, maxX, minY, maxY} = @content.draggable.
 			_calculateConstraints(@content.draggable.constraints)
 
-		point = 
+		point =
 			x: -Utils.clamp(-point.x, minX, maxX)
 			y: -Utils.clamp(-point.y, minY, maxY)
 
@@ -326,7 +326,7 @@ class exports.ScrollComponent extends Layer
 		super
 		for eventName in eventNames
 			@content.off(EventMappers[eventName], listener) if eventName in _.keys(EventMappers)
-	
+
 	on: @::addListener
 	off: @::removeListener
 
@@ -352,14 +352,14 @@ class exports.ScrollComponent extends Layer
 			@emit(Events.ScrollStart, event)
 
 		@content.animateStop()
-		
+
 		{minX, maxX, minY, maxY} = @content.draggable._calculateConstraints(
 			@content.draggable.constraints)
-		
-		point = 
+
+		point =
 			x: Utils.clamp(@content.x + (event.wheelDeltaX * @mouseWheelSpeedMultiplier), minX, maxX)
 			y: Utils.clamp(@content.y + (event.wheelDeltaY * @mouseWheelSpeedMultiplier), minY, maxY)
-		
+
 		@content.point = point
 
 		@emit(Events.Scroll, event)
@@ -413,24 +413,24 @@ wrapComponent = (instance, layer, options = {correct:true}) ->
 			layer = wrapper
 
 			# console.info "Corrected the scroll component without sub layers"
-	
+
 	scroll.frame = layer.frame
 	scroll.parent = layer.parent
 	scroll.index = layer.index
-	
+
 	# Copy over the name, if we don't have it try to use the variable
 	# name from Framer Studio if it was given.
 	if layer.name and layer.name isnt ""
 		scroll.name = layer.name
 	else if layer.__framerInstanceInfo?.name
 		scroll.name = layer.__framerInstanceInfo.name
-		
+
 	# If we have an image set, it makes way more sense to add it to the
 	# background of the wrapper then the content.
 	if layer.image
 		scroll.image = layer.image
 		layer.image = null
-	
+
 	# Set the original layer as the content layer for the scroll
 	scroll.setContentLayer(layer)
 
@@ -441,7 +441,7 @@ wrapComponent = (instance, layer, options = {correct:true}) ->
 	# component size becomes the same as it's content.
 
 	# This only makes sense if your scroll component is on the screen
-	# to begin with so we check that first. Because maybe you put it 
+	# to begin with so we check that first. Because maybe you put it
 	# offscreen to move it onscreen later.
 
 	# You can turn this off by setting correct to false

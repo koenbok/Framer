@@ -3,7 +3,7 @@
 # Framer.js
 
 **Framer.js** is an open source JavaScript framework for rapid prototyping.
-Framer.js allows you to define animations and interactions, complete with filters, spring physics, 3D effects and more. It's bundled with **Framer Generator**, an application that allows you to import layers directly out of Photoshop and Sketch. 
+Framer.js allows you to define animations and interactions, complete with filters, spring physics, 3D effects and more. It's bundled with **Framer Generator**, an application that allows you to import layers directly out of Photoshop and Sketch.
 
 [Framer Studio](http://framerjs.com) is a prototyping app for Mac, based on Framer.js. Framer Studio includes an editor based on CoffeeScript, instant visual feedback and much more.
 
@@ -54,7 +54,7 @@ imageLayer.on(Events.Click, function() {
 
 
 ## Framer Generator
-With a Sketch or Photoshop file open, open Framer Generator and click **Import**. Only layer groups are imported; single layers are ignored. The hierarchy of your layer groups is respected. 
+With a Sketch or Photoshop file open, open Framer Generator and click **Import**. Only layer groups are imported; single layers are ignored. The hierarchy of your layer groups is respected.
 
 You can safely move things around in Sketch or Photoshop and re-import. Generator will update the images and any changes in hierarchy, but leave your code intact. [See our documentation](http://framerjs.com/learn/import/) for more.
 
@@ -92,4 +92,3 @@ There are also a set of visual and interactive tests for Framer Studio which you
 - [Framer Studio](http://framerjs.com) - Prototyping application for OS X, built on Framer
 - [Latest Builds](http://builds.framerjs.com) - Latest builds of Framer.js
 - [Framer 3 Changes](https://github.com/koenbok/Framer/wiki/Framer-3-Changes) - What's new in Framer 3
-

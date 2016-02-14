@@ -73,7 +73,7 @@ gulp.task "test", ["build-debug", "build-test"], ->
 	return gulp
 		.src("test/phantomjs/index.html")
 		.pipe(phantomjs({
-			reporter:"dot", 
+			reporter:"dot",
 			viewportSize: {width: 1024, height: 768},
 			useColors: true,
 			loadImages: false

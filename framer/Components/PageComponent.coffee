@@ -62,7 +62,7 @@ class exports.PageComponent extends ScrollComponent
 			layers = _.without(layers, currentPage)
 
 		layers = Utils.frameSortByAbsoluteDistance(point, layers, @originX, @originY)
-		
+
 		return _.first(layers)
 
 	snapToPage: (page, animate=true, animationOptions=null) ->
@@ -98,7 +98,7 @@ class exports.PageComponent extends ScrollComponent
 			direction = "right"
 			throw new Error("#{direction} should be in #{directions}")
 
-		# For allowing pages added with 'addPage' to behave consistently with pages added 
+		# For allowing pages added with 'addPage' to behave consistently with pages added
 		# to the PageComponent using 'parent', keep the original page point
 		# so one of the two coordinates is left untouched after the page is added
 		point = page.point
@@ -108,7 +108,7 @@ class exports.PageComponent extends ScrollComponent
 			point.y = Utils.frameGetMaxY(@content.contentFrame()) if direction in ["down", "bottom", "south"]
 
 		page.point = point
-		
+
 		if page.parent isnt @content
 			page.parent = @content
 		else
@@ -116,12 +116,12 @@ class exports.PageComponent extends ScrollComponent
 
 	setContentLayer: (contentLayer) ->
 		if @content
-			@_onAminateStop()
-			@content.off(Events.AnimationStart, @_onAminationStart)
-			@content.off(Events.AnimationStop, @_onAminationEnd)
+			@_onAnimationStop()
+			@content.off(Events.AnimationStart, @_onAnimationStart)
+			@content.off(Events.AnimationStop, @_onAnimationStop)
 		super contentLayer
-		@content.on(Events.AnimationStart, @_onAminationStart)
-		@content.on(Events.AnimationStop, @_onAminationEnd)
+		@content.on(Events.AnimationStart, @_onAnimationStart)
+		@content.on(Events.AnimationStop, @_onAnimationStop)
 
 	horizontalPageIndex: (page) ->
 		(_.sortBy(@content.children, (l) -> l.x)).indexOf(page)
@@ -140,18 +140,18 @@ class exports.PageComponent extends ScrollComponent
 			@_previousPages.push(currentPage)
 			@emit("change:currentPage", {old:@previousPage, new:currentPage})
 
-	_onAminationStart: => 
+	_onAnimationStart: =>
 		@_isMoving = true
 		@_isAnimating = true
-		@content.on("change:frame", @_onAminationStep)
-	
-	_onAminationStep: =>
+		@content.on("change:frame", @_onAnimationStep)
+
+	_onAnimationStep: =>
 		@emit(Events.Move, @content.point)
 
-	_onAminationEnd: =>
+	_onAnimationStop: =>
 		@_isMoving = false
 		@_isAnimating = false
-		@content.off("change:frame", @_onAminationStep)
+		@content.off("change:frame", @_onAnimationStep)
 
 	_scrollEnd: =>
 
@@ -175,7 +175,7 @@ class exports.PageComponent extends ScrollComponent
 			if start.x != end.x || start.y != end.y
 				@snapToPage(@closestPage, true, @animationOptions)
 
-			return 
+			return
 
 		# Figure out which direction we are scrolling to and make a sorted list of
 		# layers on that side, sorted by absolute distance so we can pick the first.
@@ -187,7 +187,7 @@ class exports.PageComponent extends ScrollComponent
 
 		# print Math.max(Math.abs(velocity.x), Math.abs(velocity.y))
 		# print @direction, nextPage
-		
+
 		@snapToPage(nextPage, true, @animationOptions)
 
 	_originScrollPoint: ->

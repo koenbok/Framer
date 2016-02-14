@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		
+		<meta name="format-detection" content="telephone=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<script type="text/javascript">
+		// This automatically sets the right viewport scale on mobile devices
+		(function() {
+ 		var scale = 1 / window.devicePixelRatio
+ 		var viewport = "width=device-width, height=device-height, initial-scale=" + scale + ", maximum-scale=" + scale + ", user-scalable=no"
+ 		var iOS = /iPad|iPhone|iPod/.test(navigator.platform)
+ 		if (iOS) { viewport += ", shrink-to-fit=no" }
+ 		document.write("<meta name=\"viewport\" content=\"" + viewport + "\">")
+		})()
+		</script>
+
+		<link rel="apple-touch-icon" href="framer/images/icon-120.png">
+		<link rel="apple-touch-icon" href="framer/images/icon-76.png" sizes="76x76">
+		<link rel="apple-touch-icon" href="framer/images/icon-120.png" sizes="120x120">
+		<link rel="apple-touch-icon" href="framer/images/icon-152.png" sizes="152x152">
+		<link rel="apple-touch-icon" href="framer/images/icon-180.png" sizes="180x180">
+		<link rel="apple-touch-icon" href="framer/images/icon-192.png" sizes="192x192">
+
+		<link rel="stylesheet" type="text/css" href="framer/style.css">
+
+		<script type="text/javascript">
+		
+		var warningWindowNode;
+
+		function getWarningWindowNode() {
+			if (!warningWindowNode) {
+				var div = document.createElement("div");
+				div.style.background = "red";
+				div.style.color = "white";
+				div.style.font = "11px/1.35em Menlo"
+				div.style.padding = "8px"
+				div.style.whiteSpace = "pre"
+				div.style["-webkit-user-select"] = "auto"
+				div.style.zIndex = 1000000
+
+				document.body.appendChild(div);
+				warningWindowNode = div
+			}
+			return warningWindowNode
+		}
+
+		function addGlobalWarning() {
+			var args = Array.prototype.slice.call(arguments)
+			var div = document.createElement("div");
+			div.innerHTML = args.join(" ");
+			getWarningWindowNode().appendChild(div)
+		}
+
+		var _console = {
+			log: console.log,
+			error: console.error
+		}
+
+		console.log = function() {
+			var args = Array.prototype.slice.call(arguments)
+			
+			if (args.length && args[0].indexOf("[WDS]") != -1) {
+				addGlobalWarning.apply(this, args)
+			}
+
+			_console.log.apply(this, args)
+		}
+
+		console.error = function() {
+			var args = Array.prototype.slice.call(arguments)
+			addGlobalWarning.apply(this, args)
+			_console.error.apply(this, args)
+		}
+
+		</script>
+
+		<script crossorigin="anonymous" src="http://localhost:8123/webpack-dev-server.js"></script>
+		<script crossorigin="anonymous" src="http://localhost:8123/framer.js"></script>
+
+		<script src="framer/coffee-script.js"></script>
+		<script src="framer/framer.generated.js"></script>
+		<script src="framer/framer.modules.js"></script>
+		<script src="framer/framer.init.js"></script>
+
+	</head>
+	<body>
+	</body>
+</html>

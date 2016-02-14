@@ -28,7 +28,7 @@ exports.LayerStyle =
 
 	width: (layer) ->
 		layer._properties.width + "px"
-	
+
 	height: (layer) ->
 		layer._properties.height + "px"
 
@@ -161,7 +161,7 @@ exports.LayerStyle =
 			return ""
 		else if props.shadowX == 0 and props.shadowY == 0 and props.shadowBlur == 0 and props.shadowSpread == 0
 			return ""
-		
+
 		return "#{layer._properties.shadowX}px #{layer._properties.shadowY}px #{layer._properties.shadowBlur}px #{layer._properties.shadowSpread}px #{layer._properties.shadowColor}"
 
 
@@ -176,10 +176,8 @@ exports.LayerStyle =
 		# Compatibility fix, remove later
 		if not _.isNumber(layer._properties.borderRadius)
 			return layer._properties.borderRadius
-		
+
 		return layer._properties.borderRadius + "px"
 
 	border: (layer) ->
 		return "#{layer._properties.borderWidth}px solid #{layer._properties.borderColor}"
-		
-

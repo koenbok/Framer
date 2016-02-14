@@ -54,7 +54,7 @@ build = ->
 
 	exec "git log --pretty=format:\"%h\t%an\t%ad\t%s\" --first-parent master", (err, output) ->
 		throw err if err
-		
+
 		start = false
 
 		for line in output.split "\n"
@@ -100,7 +100,7 @@ uploadFile = (path, remotePath="") ->
 uploadDir = (path, remotePath="") ->
 
 	for fileName in fs.readdirSync path
-		
+
 		continue if fileName[0] is "."
 
 		filePath = join(path, fileName)

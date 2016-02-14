@@ -15,7 +15,6 @@ Utils = require "./Utils"
 {LayerDraggable} = require "./LayerDraggable"
 {LayerPinchable} = require "./LayerPinchable"
 {Gestures} = require "./Gestures"
-{GestureManager} = require "./GestureManager"
 
 NoCacheDateKey = Date.now()
 
@@ -74,7 +73,6 @@ class exports.Layer extends BaseClass
 
 		# Private setting for canceling of click event if wrapped in moved draggable
 		@_cancelClickEventInDragSession = true
-		@_cancelClickEventInDragSessionTolerance = 4
 
 		# We have to create the element before we set the defaults
 		@_createElement()
@@ -123,7 +121,7 @@ class exports.Layer extends BaseClass
 	@define "visible", layerProperty(@, "visible", "display", true, _.isBoolean)
 	@define "opacity", layerProperty(@, "opacity", "opacity", 1, _.isNumber)
 	@define "index", layerProperty(@, "index", "zIndex", 0, _.isNumber, null, {importable:false, exportable:false})
-	@define "clip", layerProperty(@, "clip", "overflow", true, _.isBoolean)
+	@define "clip", layerProperty(@, "clip", "overflow", false, _.isBoolean)
 
 	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBoolean, null, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
@@ -299,6 +297,7 @@ class exports.Layer extends BaseClass
 		get: -> _.pick(@, ["x", "y"])
 		set: (point) ->
 			return if not point
+			point = {x: point, y: point} if _.isNumber(point)
 			for k in ["x", "y"]
 				@[k] = point[k] if point.hasOwnProperty(k)
 
@@ -306,6 +305,7 @@ class exports.Layer extends BaseClass
 		get: -> _.pick(@, ["width", "height"])
 		set: (size) ->
 			return if not size
+			size = {width: size, height: size} if _.isNumber(size)
 			for k in ["width", "height"]
 				@[k] = size[k] if size.hasOwnProperty(k)
 
@@ -636,7 +636,7 @@ class exports.Layer extends BaseClass
 
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
-			
+
 			if @_domEventManager.listeners(Events.ImageLoaded) or @_domEventManager.listeners(Events.ImageLoadError)
 
 				loader = new Image()
@@ -941,12 +941,10 @@ class exports.Layer extends BaseClass
 		# you expect when you add a button to a scroll content layer.
 
 		if @_cancelClickEventInDragSession
-			if eventName is Events.Click
-				parentDraggableLayer = @_parentDraggableLayer()
-				if parentDraggableLayer
-					offset = parentDraggableLayer.draggable.offset
-					return if Math.abs(0 - offset.x) > @_cancelClickEventInDragSessionTolerance
-					return if Math.abs(0 - offset.y) > @_cancelClickEventInDragSessionTolerance
+			if eventName in [Events.Click,
+				Events.Tap, Events.TapStart, Events.TapEnd,
+				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
+				return if @_parentDraggableLayer()?.draggable.isMoving
 
 		# Always scope the event this to the layer and pass the layer as
 		# last argument for every event.
@@ -957,10 +955,13 @@ class exports.Layer extends BaseClass
 		@_addListener(eventName, listener)
 
 	addListener: (eventName, listener) =>
+		throw Error("Layer.on needs a valid event name") unless eventName
+		throw Error("Layer.on needs an event listener") unless listener
 		super(eventName, listener)
 		@_addListener(eventName, listener)
 
 	removeListener: (eventName, listener) ->
+		throw Error("Layer.off needs a valid event name") unless eventName
 		super(eventName, listener)
 		@_removeListener(eventName, listener)
 
@@ -970,26 +971,14 @@ class exports.Layer extends BaseClass
 		if not _.startsWith(eventName, "change:")
 			@ignoreEvents = false
 
-		# If this is a gesture event, pass it on to the gesture manager
-		if _.startsWith(eventName, Gestures._prefix)
-			@_gestureManager ?= new GestureManager(@)
-			@_gestureManager.on(eventName, listener)
-			return
-
 		# If this is a dom event, we want the actual dom node to let us know
 		# when it gets triggered, so we can emit the event through the system.
-		if Utils.domValidEvent(@_element, eventName)
+		if Utils.domValidEvent(@_element, eventName) or eventName in _.values(Gestures)
 			if not @_domEventManager.listeners(eventName).length
 				@_domEventManager.addEventListener eventName, (event) =>
 					@emit(eventName, event)
 
 	_removeListener: (eventName, listener) ->
-
-		# If this is a gesture event, pass it on to the gesture manager
-		if _.startsWith(eventName, Gestures._prefix)
-			@_gestureManager ?= new GestureManager(@)
-			@_gestureManager.off(eventName, listener)
-			return
 
 		# Do cleanup for dom events if this is the last one of it's type.
 		# We are assuming we're the only ones adding dom events to the manager.
@@ -997,7 +986,7 @@ class exports.Layer extends BaseClass
 			@_domEventManager.removeAllListeners(eventName)
 
 	_parentDraggableLayer: ->
-		for layer in @ancestors().concat(@)
+		for layer in @ancestors()
 			return layer if layer._draggable?.enabled
 		return null
 
@@ -1039,19 +1028,73 @@ class exports.Layer extends BaseClass
 	onDragDidMove: (cb) -> @on(Events.DragDidMove, cb)
 	onDrag: (cb) -> @on(Events.Drag, cb)
 	onDragEnd: (cb) -> @on(Events.DragEnd, cb)
-	onDragAnimationDidStart: (cb) -> @on(Events.DragAnimationDidStart, cb)
-	onDragAnimationDidEnd: (cb) -> @on(Events.DragAnimationDidEnd, cb)
-	onDirectionLockDidStart: (cb) -> @on(Events.DirectionLockDidStart, cb)
+	onDragAnimationStart: (cb) -> @on(Events.DragAnimationStart, cb)
+	onDragAnimationEnd: (cb) -> @on(Events.DragAnimationEnd, cb)
+	onDirectionLockStart: (cb) -> @on(Events.DirectionLockStart, cb)
 
-	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
-	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
-	onPinch: (cb) -> @on(Events.Pinch, cb)
-	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
-	onRotate: (cb) -> @on(Events.Rotate, cb)
-	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
-	onScaleStart: (cb) -> @on(Events.ScaleStart, cb)
-	onScale: (cb) -> @on(Events.Scale, cb)
-	onScaleEnd: (cb) -> @on(Events.ScaleEnd, cb)
+	# Gestures
+
+	# Tap
+	onTap:(cb) -> @on(Events.Tap, cb)
+	onTapStart:(cb) -> @on(Events.TapStart, cb)
+	onTapEnd:(cb) -> @on(Events.TapEnd, cb)
+	onDoubleTap:(cb) -> @on(Events.DoubleTap, cb)
+
+	# Force Tap
+	onForceTap:(cb) -> @on(Events.ForceTap, cb)
+	onForceTapChange:(cb) -> @on(Events.ForceTapChange, cb)
+	onForceTapStart:(cb) -> @on(Events.ForceTapStart, cb)
+	onForceTapEnd:(cb) -> @on(Events.ForceTapEnd, cb)
+
+	# Press
+	onLongPress:(cb) -> @on(Events.LongPress, cb)
+	onLongPressStart:(cb) -> @on(Events.LongPressStart, cb)
+	onLongPressEnd:(cb) -> @on(Events.LongPressEnd, cb)
+
+	# Swipe
+	onSwipe:(cb) -> @on(Events.Swipe, cb)
+	onSwipeStart:(cb) -> @on(Events.SwipeStart, cb)
+	onSwipeEnd:(cb) -> @on(Events.SwipeEnd, cb)
+
+	onSwipeUp:(cb) -> @on(Events.SwipeUp, cb)
+	onSwipeUpStart:(cb) -> @on(Events.SwipeUpStart, cb)
+	onSwipeUpEnd:(cb) -> @on(Events.SwipeUpEnd, cb)
+
+	onSwipeDown:(cb) -> @on(Events.SwipeDown, cb)
+	onSwipeDownStart:(cb) -> @on(Events.SwipeDownStart, cb)
+	onSwipeDownEnd:(cb) -> @on(Events.SwipeDownEnd, cb)
+
+	onSwipeLeft:(cb) -> @on(Events.SwipeLeft, cb)
+	onSwipeLeftStart:(cb) -> @on(Events.SwipeLeftStart, cb)
+	onSwipeLeftEnd:(cb) -> @on(Events.SwipeLeftEnd, cb)
+
+	onSwipeRight:(cb) -> @on(Events.SwipeRight, cb)
+	onSwipeRightStart:(cb) -> @on(Events.SwipeRightStart, cb)
+	onSwipeRightEnd:(cb) -> @on(Events.SwipeRightEnd, cb)
+
+	# Pan
+	onPan:(cb) -> @on(Events.Pan, cb)
+	onPanStart:(cb) -> @on(Events.PanStart, cb)
+	onPanEnd:(cb) -> @on(Events.PanEnd, cb)
+	onPanLeft:(cb) -> @on(Events.PanLeft, cb)
+	onPanRight:(cb) -> @on(Events.PanRight, cb)
+	onPanUp:(cb) -> @on(Events.PanUp, cb)
+	onPanDown:(cb) -> @on(Events.PanDown, cb)
+
+	# Pinch
+	onPinch:(cb) -> @on(Events.Pinch, cb)
+	onPinchStart:(cb) -> @on(Events.PinchStart, cb)
+	onPinchEnd:(cb) -> @on(Events.PinchEnd, cb)
+
+	# Scale
+	onScale:(cb) -> @on(Events.Scale, cb)
+	onScaleStart:(cb) -> @on(Events.ScaleStart, cb)
+	onScaleEnd:(cb) -> @on(Events.ScaleEnd, cb)
+
+	# Rotate
+	onRotate:(cb) -> @on(Events.Rotate, cb)
+	onRotateStart:(cb) -> @on(Events.RotateStart, cb)
+	onRotateEnd:(cb) -> @on(Events.RotateEnd, cb)
 
 	##############################################################
 	## DESCRIPTOR

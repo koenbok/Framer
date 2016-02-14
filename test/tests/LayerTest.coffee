@@ -12,26 +12,26 @@ describe "Layer", ->
 	describe "Defaults", ->
 
 		it "should set defaults", ->
-			
+
 			Framer.Defaults =
 				Layer:
 					width: 200
 					height: 200
-					
+
 			layer = new Layer()
-			
+
 			layer.width.should.equal 200
 			layer.height.should.equal 200
 
 			Framer.resetDefaults()
 
 			layer = new Layer()
-			
+
 			layer.width.should.equal 100
 			layer.height.should.equal 100
 
 		it "should set default background color", ->
-			
+
 			# if the default background color is not set the content layer of scrollcomponent is not hidden when layers are added
 			layer = new Layer()
 
@@ -40,15 +40,15 @@ describe "Layer", ->
 			Framer.Defaults =
 				Layer:
 					backgroundColor: "red"
-					
+
 			layer = new Layer()
-			
+
 			layer.style.backgroundColor.should.equal new Color("red").toString()
 
 			Framer.resetDefaults()
 
 		it "should set defaults with override", ->
-			
+
 			layer = new Layer x:50, y:50
 			layer.x.should.equal 50
 			layer.x.should.equal 50
@@ -56,37 +56,37 @@ describe "Layer", ->
 	describe "Properties", ->
 
 		it "should set defaults", ->
-			
+
 			layer = new Layer()
-			
+
 			layer.x.should.equal 0
 			layer.y.should.equal 0
 			layer.z.should.equal 0
-			
+
 			layer.width.should.equal 100
 			layer.height.should.equal 100
 
 		it "should set width", ->
-			
+
 			layer = new Layer width:200
 
 			layer.width.should.equal 200
 			layer.style.width.should.equal "200px"
 
 		it "should set x and y", ->
-			
+
 			layer = new Layer
-			
+
 			layer.x = 100
 			layer.x.should.equal 100
 			layer.y = 50
 			layer.y.should.equal 50
-			
+
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
 			layer.style.webkitTransform.should.equal "translate3d(100px, 50px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
-			
+
 		it "should set scale", ->
-			
+
 			layer = new Layer
 
 			layer.scaleX = 100
@@ -130,7 +130,7 @@ describe "Layer", ->
 
 
 		it "should set local image", (done) ->
-	
+
 			prefix = "../"
 			imagePath = "static/test.png"
 			fullPath = prefix + imagePath
@@ -147,7 +147,7 @@ describe "Layer", ->
 				layer.style["background-image"].indexOf("file://").should.not.equal(-1)
 				layer.style["background-image"].indexOf("?nocache=").should.not.equal(-1)
 				done()
-			
+
 			#layer.computedStyle()["background-size"].should.equal "cover"
 			#layer.computedStyle()["background-repeat"].should.equal "no-repeat"
 
@@ -184,11 +184,11 @@ describe "Layer", ->
 			layer._element.getAttribute("name").should.equal "Test"
 
 		# it "should handle background color with image", ->
-			
+
 		# 	# We want the background color to be there until an images
 		# 	# is set UNLESS we set another backgroundColor explicitly
 
-		# 	imagePath = "static/test.png"	
+		# 	imagePath = "static/test.png"
 
 		# 	layer = new Layer image:imagePath
 		# 	layer.backgroundColor.should.equal ""
@@ -213,7 +213,7 @@ describe "Layer", ->
 
 
 		it "should set visible", ->
-			
+
 			layer = new Layer
 
 			layer.visible.should.equal true
@@ -224,32 +224,31 @@ describe "Layer", ->
 			layer.style["display"].should.equal "none"
 
 		it "should set clip", ->
-			
+
 			layer = new Layer
 
-			layer.clip.should.equal true
-			layer.style["overflow"].should.equal "hidden"
-
-			layer.clip = false
-			layer.scroll.should.equal false
+			layer.clip.should.equal false
 			layer.style["overflow"].should.equal "visible"
 
+			layer.clip = true
+			layer.style["overflow"].should.equal "hidden"
+
 		it "should set scroll", ->
-			
+
 			layer = new Layer
 
 			layer.scroll.should.equal false
-			layer.style["overflow"].should.equal "hidden"
+			layer.style["overflow"].should.equal "visible"
 
 			layer.scroll = true
 			layer.scroll.should.equal true
 			layer.style["overflow"].should.equal "scroll"
-			
+
 			layer.ignoreEvents.should.equal false
 
 			layer.scroll = false
 			layer.scroll.should.equal false
-			layer.style["overflow"].should.equal "hidden"
+			layer.style["overflow"].should.equal "visible"
 
 		it "should set scroll from properties", ->
 
@@ -260,11 +259,11 @@ describe "Layer", ->
 			layer.scroll.should.equal true
 
 		it "should set scrollHorizontal", ->
-			
+
 			layer = new Layer
 
 			layer.scroll.should.equal false
-			layer.style["overflow"].should.equal "hidden"
+			layer.style["overflow"].should.equal "visible"
 			layer.ignoreEvents.should.equal true
 
 			layer.scroll = true
@@ -359,12 +358,12 @@ describe "Layer", ->
 	describe "Filter Properties", ->
 
 		it "should set nothing on defaults", ->
-			
+
 			layer = new Layer
 			layer.style.webkitFilter.should.equal ""
 
 		it "should set only the filter that is non default", ->
-			
+
 			layer = new Layer
 
 			layer.blur = 10
@@ -378,12 +377,12 @@ describe "Layer", ->
 	describe "Shadow Properties", ->
 
 		it "should set nothing on defaults", ->
-			
+
 			layer = new Layer
 			layer.style.boxShadow.should.equal ""
 
 		it "should set the shadow", ->
-			
+
 			layer = new Layer
 
 			layer.shadowX = 10
@@ -404,7 +403,7 @@ describe "Layer", ->
 			layer.shadowColor.g.should.equal 0
 			layer.shadowColor.b.should.equal 0
 			layer.shadowColor.a.should.equal 1
-			
+
 			layer.style.boxShadow.should.equal "rgb(255, 0, 0) 10px 10px 10px 10px"
 
 			# Only after we set a color a shadow should be drawn
@@ -446,49 +445,6 @@ describe "Layer", ->
 
 			simulate.mouseover(layer._element)
 
-		it "should not emit click event if a parent draggable was moved", ->
-
-			clicked = false
-
-			layerA = new Layer
-			layerB = new Layer superLayer:layerA
-
-			layerA.draggable.enabled = true
-			layerA.draggable._correctedLayerStartPoint = {x:10, y:10}
-			layerA.draggable.offset.should.eql {x:-10, y:-10}
-
-			layerB.on Events.Click, ->
-				clicked = true
-
-			layerB.emit(Events.Click)
-			clicked.should.equal false
-
-			layerA.draggable.enabled = false
-
-			layerB.emit(Events.Click)
-			clicked.should.equal true
-
-		it "should not emit click event if a parent draggable was moved on draggable", ->
-
-			clicked = false
-
-			layerA = new Layer
-
-			layerA.draggable.enabled = true
-			layerA.draggable._correctedLayerStartPoint = {x:10, y:10}
-			layerA.draggable.offset.should.eql {x:-10, y:-10}
-
-			layerA.on Events.Click, ->
-				clicked = true
-
-			layerA.emit(Events.Click)
-			clicked.should.equal false
-
-			layerA.draggable.enabled = false
-
-			layerA.emit(Events.Click)
-			clicked.should.equal true
-
 		it "should only pass dom events to the event manager", ->
 
 			layer = new Layer
@@ -498,11 +454,11 @@ describe "Layer", ->
 			layer._domEventManager.listenerEvents().should.eql([Events.Click])
 
 	describe "Hierarchy", ->
-		
+
 		it "should insert in dom", ->
-			
+
 			layer = new Layer
-			
+
 			assert.equal layer._element.parentNode.id, "FramerContextRoot-Default"
 			assert.equal layer.superLayer, null
 
@@ -512,10 +468,10 @@ describe "Layer", ->
 			f.should.throw()
 
 		it "should add child", ->
-			
+
 			layerA = new Layer
 			layerB = new Layer superLayer:layerA
-			
+
 			assert.equal layerB._element.parentNode, layerA._element
 			assert.equal layerB.superLayer, layerA
 
@@ -599,7 +555,7 @@ describe "Layer", ->
 				superLayer: layerA
 			layerA.children.should.eql [layerB]
 			layerA.subLayers.should.eql [layerB]
-			
+
 
 	describe "Layering", ->
 
@@ -714,7 +670,7 @@ describe "Layer", ->
 
 		it "should set after create", ->
 
-			layer = new Layer 
+			layer = new Layer
 			layer.frame = {x:111, y:222, width:333, height:444}
 
 			assert.equal layer.x, 111
@@ -778,7 +734,7 @@ describe "Layer", ->
 			layer.y.should.equal 100
 
 		it "should get and set canvasFrame", ->
-			
+
 			layerA = new Layer x:100, y:100, width:100, height:100
 			layerB = new Layer x:300, y:300, width:100, height:100, superLayer:layerA
 
@@ -808,7 +764,7 @@ describe "Layer", ->
 			layerA.scaledFrame().should.eql {"x":225,"y":225,"width":250,"height":450}
 
 		it "should calculate scaled screen frame", ->
-			
+
 			layerA = new Layer x:100, width:500, height:900, scale:0.5
 			layerB = new Layer y:50, width:600, height:600, scale:0.8, superLayer:layerA
 			layerC = new Layer y:-60, width:800, height:700, scale:1.2, superLayer:layerB
@@ -816,6 +772,16 @@ describe "Layer", ->
 			layerA.screenScaledFrame().should.eql {"x":225,"y":225,"width":250,"height":450}
 			layerB.screenScaledFrame().should.eql {"x":255,"y":280,"width":240,"height":240}
 			layerC.screenScaledFrame().should.eql {"x":223,"y":228,"width":384,"height":336}
+
+		it "should accept point shortcut", ->
+			layer = new Layer point:10
+			layer.x.should.equal 10
+			layer.y.should.equal 10
+
+		it "should accept size shortcut", ->
+			layer = new Layer size:10
+			layer.width.should.equal 10
+			layer.height.should.equal 10
 
 	describe "Center", ->
 
@@ -851,7 +817,7 @@ describe "Layer", ->
 			assert.equal layerB.y, 44
 
 		it "should center with border", ->
-			
+
 			layer = new Layer
 				width: 200
 				height: 200
@@ -1067,7 +1033,3 @@ describe "Layer", ->
 
 		# 	layer2 = layer.copy()
 		# 	layer2.style.backgroundColor.should.equal "yellow"
-
-
-
-

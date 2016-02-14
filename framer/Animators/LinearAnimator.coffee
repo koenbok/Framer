@@ -3,7 +3,7 @@ Utils = require "../Utils"
 {Animator} = require "../Animator"
 
 class exports.LinearAnimator extends Animator
-	
+
 	setup: (options) ->
 
 		@options = _.defaults options,
@@ -13,7 +13,7 @@ class exports.LinearAnimator extends Animator
 		@_time = 0
 
 	next: (delta) ->
-		
+
 		@_time += delta
 
 		if @finished()

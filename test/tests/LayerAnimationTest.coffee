@@ -167,11 +167,11 @@ describe "LayerAnimation", ->
 			(animation in layer.animations()).should.be.true
 			layer.animateStop()
 			(animation in layer.animations()).should.be.false
-			
+
 		it "should list running animations correctly", (done) ->
 
 			layer = new Layer()
-			
+
 			animation = layer.animate
 				properties: {x: 100}
 				time: 0.5
@@ -198,7 +198,7 @@ describe "LayerAnimation", ->
 			layer.isAnimating.should.equal(true)
 			layer.animateStop()
 			layer.isAnimating.should.equal(false)
-			
+
 
 	describe "Events", ->
 
@@ -333,7 +333,7 @@ describe "LayerAnimation", ->
 			readyLayers = []
 
 			ready = (animation, layer) ->
-				
+
 				(layer in readyLayers).should.equal false
 
 				readyLayers.push layer

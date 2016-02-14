@@ -8,7 +8,7 @@ commandArguments = process.argv[4..]
 child = null
 
 runCommand = ->
-	
+
 	if not command
 		return console.log "Missing command"
 
@@ -37,4 +37,3 @@ watchr.watch
 			if filePath.indexOf(".coffee") > -1
 				console.log "Change: #{filePath}"
 				runCommand()
-				

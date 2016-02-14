@@ -1,11 +1,12 @@
 {BaseClass} = require "./BaseClass"
 
 class ScreenClass extends BaseClass
-	
+
 	@define "width",  get: -> Framer.CurrentContext.width
 	@define "height", get: -> Framer.CurrentContext.height
-	@define "size", get: -> {width:@width, height:@height}
-	@define "frame", get: -> {x:0, y:0, width:@width, height:@height}
+	@define "size", get: -> Framer.CurrentContext.size
+	@define "frame", get: -> Framer.CurrentContext.frame
+	@define "canvasFrame", get: -> Framer.CurrentContext.canvasFrame
 
 	@define "backgroundColor",
 		importable: false
@@ -46,6 +47,27 @@ class ScreenClass extends BaseClass
 
 		return "<Screen #{round(@width)}x#{round(@height)}>"
 
-	
+	# Edge Swipe
+
+	onEdgeSwipe:(cb) -> @on(Events.EdgeSwipe, cb)
+	onEdgeSwipeStart:(cb) -> @on(Events.EdgeSwipeStart, cb)
+	onEdgeSwipeEnd:(cb) -> @on(Events.EdgeSwipeEnd, cb)
+
+	onEdgeSwipeTop:(cb) -> @on(Events.EdgeSwipeTop, cb)
+	onEdgeSwipeTopStart:(cb) -> @on(Events.EdgeSwipeTopStart, cb)
+	onEdgeSwipeTopEnd:(cb) -> @on(Events.EdgeSwipeTopEnd, cb)
+
+	onEdgeSwipeRight:(cb) -> @on(Events.EdgeSwipeRight, cb)
+	onEdgeSwipeRightStart:(cb) -> @on(Events.EdgeSwipeRightStart, cb)
+	onEdgeSwipeRightEnd:(cb) -> @on(Events.EdgeSwipeRightEnd, cb)
+
+	onEdgeSwipeBottom:(cb) -> @on(Events.EdgeSwipeBottom, cb)
+	onEdgeSwipeBottomStart:(cb) -> @on(Events.EdgeSwipeBottomStart, cb)
+	onEdgeSwipeBottomEnd:(cb) -> @on(Events.EdgeSwipeBottomEnd, cb)
+
+	onEdgeSwipeLeft:(cb) -> @on(Events.EdgeSwipeLeft, cb)
+	onEdgeSwipeLeftStart:(cb) -> @on(Events.EdgeSwipeLeftStart, cb)
+	onEdgeSwipeLeftEnd:(cb) -> @on(Events.EdgeSwipeLeftEnd, cb)
+
 # We use this as a singleton
 exports.Screen = new ScreenClass

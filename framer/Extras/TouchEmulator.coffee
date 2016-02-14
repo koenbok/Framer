@@ -13,20 +13,20 @@ createTouch = (event, identifier, offset={x:0, y:0}) ->
 		screenY: event.screenY - offset.y
 
 dispatchTouchEvent = (type, target, event, offset) ->
-	
+
 	target ?= event.target
 
 	touchEvent = document.createEvent("MouseEvent")
-	touchEvent.initMouseEvent(type, true, true, window, 
-		event.detail, event.screenX, event.screenY, 
-		event.clientX, event.clientY, 
-		event.ctrlKey, event.shiftKey, event.altKey, event.metaKey, 
+	touchEvent.initMouseEvent(type, true, true, window,
+		event.detail, event.screenX, event.screenY,
+		event.clientX, event.clientY,
+		event.ctrlKey, event.shiftKey, event.altKey, event.metaKey,
 		event.button, event.relatedTarget)
-	
+
 	touches = []
 	touches.push(createTouch(event, 1))
 	touches.push(createTouch(event, 2, offset)) if offset
-			
+
 	touchEvent.touches = touchEvent.changedTouches = touchEvent.targetTouches = touches
 
 	target.dispatchEvent(touchEvent)
@@ -38,39 +38,141 @@ cancelEvent = (event) ->
 class TouchEmulator extends BaseClass
 
 	constructor: ->
-		
-		if not @isHammerTouchSupported()
-			throw new Error "Touch emulation for hammer is not supported"
-		
-		@touchPointerImage = "framer/images/cursor@2x.png"
-		@touchPointerImageActive = "framer/images/cursor-active@2x.png"
+
+		@touchPointerImage = "url('data:image/png;base64,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')"
+		@touchPointerImageActive = "url('data:image/png;base64,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')"
 		@touchPointerImageSize = 64
 		@touchPointerInitialOffset = {x:0, y:0}
-		
+
 		@keyPinchCode = 18 # Alt
 		@keyPanCode = 91 # Command
-		
+
 		@context = new Framer.Context name:"TouchEmulator"
 		@context._element.style.zIndex = 10000
 		@wrap = @context.domEventManager.wrap
-		
+
 		@wrap(document).addEventListener("mousedown", @mousedown, true)
-		@wrap(document).addEventListener("mousemove", @mousemovePosition, true)
+		@wrap(document).addEventListener("mousemove", @mousemove, true)
+		@wrap(document).addEventListener("mouseup", @mouseup, true)
 		@wrap(document).addEventListener("keydown", @keydown, true)
-		
+		@wrap(document).addEventListener("keyup", @keyup, true)
+		@wrap(document).addEventListener("mouseout", @mouseout, true)
+
 		@isMouseDown = false
 		@isPinchKeyDown = false
 		@isPanKeyDown = false
-		
+
 		touchPointerInitialOffset = @touchPointerInitialOffset
 
 		@context.run =>
 			@touchPointLayer = new Layer
 				width: @touchPointerImageSize
 				height: @touchPointerImageSize
-				image: @touchPointerImage
+				backgroundColor: null
 				opacity: 0
-	
+			@touchPointLayer.style.backgroundImage = @touchPointerImage
+
+	destroy: ->
+		@context.reset()
+		@context = null
+
+	# Event handlers
+
+	keydown: (event) =>
+
+		if event.keyCode is @keyPinchCode
+			@isPinchKeyDown = true
+			@startPoint = @centerPoint = null
+			@showTouchCursor()
+			@touchPointLayer.midX = @point.x
+			@touchPointLayer.midY = @point.y
+
+		if event.keyCode is @keyPanCode
+			@isPanKeyDown = true
+			cancelEvent(event)
+
+	keyup: (event) =>
+
+		if event.keyCode is @keyPinchCode
+			cancelEvent(event)
+			@isPinchKeyDown = false
+			@hideTouchCursor()
+
+		if event.keyCode is @keyPanCode
+			cancelEvent(event)
+			if @touchPoint and @point
+				@centerPoint = Utils.pointCenter(@touchPoint, @point)
+				@isPanKeyDown = false
+
+
+	mousedown: (event) =>
+
+		# cancelEvent(event)
+
+		@isMouseDown = true
+		@target = event.target
+
+		if @isPinchKeyDown
+			dispatchTouchEvent("touchstart", @target, event, @touchPointDelta)
+		else
+			dispatchTouchEvent("touchstart", @target, event)
+
+		@touchPointLayer.style.backgroundImage = @touchPointerImageActive
+
+	mousemove: (event) =>
+
+		@point =
+			x: event.pageX
+			y: event.pageY
+
+		# cancelEvent(event)
+
+		@startPoint ?= @point
+		@centerPoint ?= @point
+
+		if @isPinchKeyDown and not @isPanKeyDown
+			if @touchPointerInitialOffset and @centerPoint
+				@touchPoint = Utils.pointAdd(@touchPointerInitialOffset, @pinchPoint(@point, @centerPoint))
+				@touchPointDelta = Utils.pointSubtract(@point, @touchPoint)
+
+		if @isPinchKeyDown and @isPanKeyDown
+			if @touchPoint and @touchPointDelta
+				@touchPoint = @panPoint(@point, @touchPointDelta)
+
+		if @isPinchKeyDown or @isPanKeyDown
+			if @touchPoint
+				@touchPointLayer.visible = true
+				@touchPointLayer.midX = @touchPoint.x
+				@touchPointLayer.midY = @touchPoint.y
+
+		if @isMouseDown
+			if (@isPinchKeyDown or @isPanKeyDown) and @touchPointDelta
+				dispatchTouchEvent("touchmove", @target, event, @touchPointDelta)
+			else
+				dispatchTouchEvent("touchmove", @target, event)
+
+	mouseup: (event) =>
+
+		# cancelEvent(event)
+
+		if @isPinchKeyDown or @isPanKeyDown
+			dispatchTouchEvent("touchend", @target, event, @touchPointDelta)
+		else
+			dispatchTouchEvent("touchend", @target, event)
+
+		@endMultiTouch()
+
+	mouseout: (event) =>
+
+		return if @isMouseDown
+
+		fromElement = event.relatedTarget or event.toElement
+
+		if not fromElement or fromElement.nodeName is "HTML"
+			@endMultiTouch()
+
+	# Utilities
+
 	showTouchCursor: ->
 		@touchPointLayer.animateStop()
 		@touchPointLayer.midX = @point.x
@@ -93,114 +195,20 @@ class TouchEmulator extends BaseClass
 				scale: 1.2
 			time: 0.08
 
-	isHammerTouchSupported: ->
-		window.ontouchstart is null 
-	
-	keydown: (event) =>
-
-		if event.keyCode is @keyPinchCode	
-			@isPinchKeyDown = true
-			@startPoint = @centerPoint = null
-			@showTouchCursor()
-			@touchPointLayer.midX = @point.x
-			@touchPointLayer.midY = @point.y
-			@wrap(document).addEventListener("keyup", @keyup, true)
-			@wrap(document).addEventListener("mousemove", @mousemove, true)
-			
-		if event.keyCode is @keyPanCode
-			@isPanKeyDown = true
-			cancelEvent(event)
-			
-	keyup: (event) =>
-	
-		if event.keyCode is @keyPinchCode
-			cancelEvent(event)	
-			@isPinchKeyDown = false
-			@hideTouchCursor()
-			
-			@wrap(document).removeEventListener("mousemove", @mousemove, true)
-		
-		if event.keyCode is @keyPanCode
-			cancelEvent(event)
-			if @touchPoint and @point
-				@centerPoint = Utils.pointCenter(@touchPoint, @point)
-				@isPanKeyDown = false
-			
-
-	mousedown: (event) =>
-	
-		cancelEvent(event)
-		
-		@isMouseDown = true
-		@target = event.target
-			
-		@wrap(document).addEventListener("mousemove", @mousemove, true)
-		@wrap(document).addEventListener("mouseup", @mouseup, true)
-
-		if @isPinchKeyDown
-			dispatchTouchEvent("touchstart", @target, event, @touchPointDelta)
-		else
-			dispatchTouchEvent("touchstart", @target, event)
-		
-		@touchPointLayer.image = @touchPointerImageActive
-
 	mousemovePosition: (event) =>
 		@point =
 			x: event.pageX
 			y: event.pageY
-	
-	mousemove: (event) =>
-		
-		cancelEvent(event)
 
-		@point =
-			x: event.pageX
-			y: event.pageY
-
-		@startPoint ?= @point 
-		@centerPoint ?= @point
-		
-		if @isPinchKeyDown and not @isPanKeyDown
-			if @touchPointerInitialOffset and @centerPoint
-				@touchPoint = Utils.pointAdd(@touchPointerInitialOffset, @pinchPoint(@point, @centerPoint))
-				@touchPointDelta = Utils.pointSubtract(@point, @touchPoint)
-			
-		if @isPinchKeyDown and @isPanKeyDown
-			if @touchPoint and @touchPointDelta
-				@touchPoint = @panPoint(@point, @touchPointDelta)
-
-		if @isPinchKeyDown or @isPanKeyDown
-			if @touchPoint
-				@touchPointLayer.visible = true
-				@touchPointLayer.midX = @touchPoint.x
-				@touchPointLayer.midY = @touchPoint.y
-	
-		if (@isPinchKeyDown or @isPanKeyDown) and @touchPointDelta
-			dispatchTouchEvent("touchmove", @target, event, @touchPointDelta)
-		else
-			dispatchTouchEvent("touchmove", @target, event)
-
-	mouseup: (event) =>
-		
+	endMultiTouch: ->
 		@isMouseDown = false
-		
-		cancelEvent(event)
-		
-		@wrap(document).removeEventListener("mousemove", @mousemove, true)
-		@wrap(document).removeEventListener("mouseup", @mouseup, true)
-
-		if @isPinchKeyDown or @isPanKeyDown
-			dispatchTouchEvent("touchend", @target, event, @touchPointDelta)
-		else
-			dispatchTouchEvent("touchend", @target, event)
-	
-		@touchPointLayer.image = @touchPointerImage
+		@touchPointLayer.style.backgroundImage = @touchPointerImage
 		@hideTouchCursor()
-	
+
 	pinchPoint: (point, centerPoint) ->
-		return Utils.pointSubtract(centerPoint, 
+		return Utils.pointSubtract(centerPoint,
 			Utils.pointSubtract(point, centerPoint))
-	
+
 	panPoint: (point, offsetPoint) ->
 		return Utils.pointSubtract(point, offsetPoint)
 
@@ -209,3 +217,7 @@ touchEmulator = null
 exports.enable = ->
 	return if Utils.isTouch()
 	touchEmulator ?= new TouchEmulator()
+
+exports.disable = ->
+	return unless touchEmulator
+	touchEmulator.destroy()

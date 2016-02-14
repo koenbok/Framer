@@ -292,9 +292,9 @@ Utils.isSafari = ->
 Utils.isTouch = ->
 	# This needs to be a little more extensive because we
 	# patch ontouchstart to fake Hammer
-	window.ontouchstart is null and 
-	window.ontouchmove is null and 
-	window.ontouchend is null 
+	window.ontouchstart is null and
+	window.ontouchmove is null and
+	window.ontouchend is null
 
 Utils.isDesktop = ->
 	Utils.deviceType() is "desktop"
@@ -548,10 +548,10 @@ Utils.loadImage = (url, callback, context) ->
 
 # Point
 
-Utils.pointDivide = (pointA, pointB, fraction) ->
+Utils.pointDivide = (point, fraction) ->
 	return point =
-		x: (pointA.x + pointB.x) / fraction
-		y: (pointA.y + pointB.y) / fraction
+		x: point.x / fraction
+		y: point.y / fraction
 
 Utils.pointAdd = (pointA, pointB) ->
 	return point =
@@ -578,10 +578,15 @@ Utils.pointMax = ->
 		x: _.max points.map (size) -> size.x
 		y: _.max points.map (size) -> size.y
 
+Utils.pointDelta = (pointA, pointB) ->
+	delta =
+		x: pointB.x - pointA.x
+		y: pointB.y - pointA.y
+
 Utils.pointDistance = (pointA, pointB) ->
-	distance =
-		x: Math.abs(pointB.x - pointA.x)
-		y: Math.abs(pointB.y - pointA.y)
+	a = pointA.x - pointB.x
+	b = pointA.y - pointB.y
+	return Math.sqrt((a * a) + (b * b))
 
 Utils.pointInvert = (point) ->
 	point =
@@ -602,8 +607,12 @@ Utils.pointInFrame = (point, frame) ->
 	return true
 
 Utils.pointCenter = (pointA, pointB) ->
-	return Utils.pointDivide(pointA, pointB, 2)
+	return point =
+		x: (pointA.x + pointB.x) / 2
+		y: (pointA.y + pointB.y) / 2
 
+Utils.pointAngle = (pointA, pointB) ->
+	return Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x) * 180 / Math.PI
 
 
 # Size
@@ -759,7 +768,7 @@ Utils.frameInset = (frame, inset) ->
 
 Utils.frameSortByAbsoluteDistance = (point, frames, originX=0, originY=0) ->
 	distance = (frame) ->
-		result = Utils.pointDistance(point, Utils.framePointForOrigin(frame, originX, originY))
+		result = Utils.pointDelta(point, Utils.framePointForOrigin(frame, originX, originY))
 		result = Utils.pointAbs(result)
 		result = Utils.pointTotal(result)
 		result
@@ -785,14 +794,35 @@ Utils.pointInPolygon = (point, vs) ->
 		j = i++
 	inside
 
-Utils.pointAngle = (p1, p2) ->
-	Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+Utils.frameCenterPoint = (frame) ->
+	return point =
+		x: Utils.frameGetMidX(frame)
+		y: Utils.frameGetMidY(frame)
+
+# Rotation
+
+Utils.rotationNormalizer = ->
+
+	lastValue = null
+
+	return (value) =>
+		lastValue = value if not lastValue?
+
+		diff = lastValue - value
+		maxDiff = Math.abs(diff) + 180
+		nTimes = Math.floor(maxDiff / 360)
+
+		value -= (nTimes * 360) if diff < 180
+		value += (nTimes * 360) if diff > 180
+
+		lastValue = value
+		return value
 
 
 # Coordinate system
 
 # convert a point from a layer to the context level, with rootContext enabled you can make it cross to the top context
-Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLayer = true) ->
+Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLayer=true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
 	ancestors = layer.ancestors(rootContext)
 	ancestors.unshift(layer) if includeLayer
@@ -804,7 +834,7 @@ Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLaye
 
 	return point
 
-Utils.convertFrameToContext = (frame = {}, layer, rootContext=false, includeLayer = true) ->
+Utils.convertFrameToContext = (frame = {}, layer, rootContext=false, includeLayer=true) ->
 	frame = _.defaults(frame, {x:0, y:0, width:100, height:100})
 	corners = Utils.pointsFromFrame(frame)
 	convertedCorners = corners.map (point) =>
@@ -812,7 +842,7 @@ Utils.convertFrameToContext = (frame = {}, layer, rootContext=false, includeLaye
 	return Utils.frameFromPoints(convertedCorners)
 
 # convert a point from the context level to a layer, with rootContext enabled you can make it cross from the top context
-Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLayer = true) ->
+Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLayer=true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
 	ancestors = layer.ancestors(rootContext)
 	ancestors.reverse()
@@ -822,7 +852,7 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 	return point
 
 # convert a frame from the context level to a layer, with rootContext enabled you can make it start from the top context
-Utils.convertFrameFromContext = (frame = {}, layer, rootContext=false, includeLayer = true) ->
+Utils.convertFrameFromContext = (frame = {}, layer, rootContext=false, includeLayer=true) ->
 	frame = _.defaults(frame, {x:0, y:0, width:100, height:100})
 	corners = Utils.pointsFromFrame(frame)
 	convertedCorners = corners.map (point) =>

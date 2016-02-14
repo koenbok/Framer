@@ -337,7 +337,7 @@ class exports.Animation extends EventEmitter
 
 	##############################################################
 	## EVENT HELPERS
-	
+
 	onAnimationStart: (cb) -> @on(Events.AnimationStart, cb)
 	onAnimationStop: (cb) -> @on(Events.AnimationStop, cb)
 	onAnimationEnd: (cb) -> @on(Events.AnimationEnd, cb)

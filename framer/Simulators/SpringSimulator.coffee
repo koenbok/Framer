@@ -13,7 +13,7 @@ class exports.SpringSimulator extends Simulator
 			velocity: 0
 			position: 0
 			offset: 0
-			
+
 		@_state =
 			x: @options.position
 			v: @options.velocity
@@ -23,7 +23,7 @@ class exports.SpringSimulator extends Simulator
 
 	next: (delta) ->
 		@_state = @_integrator.integrateState(@_state, delta)
-		
+
 		# Return a copy of the state so it cannot be modified
 		return @getState()
 
@@ -31,12 +31,12 @@ class exports.SpringSimulator extends Simulator
 		positionNearZero = Math.abs(@_state.x) < @options.tolerance
 		velocityNearZero = Math.abs(@_state.v) < @options.tolerance
 		positionNearZero and velocityNearZero
-	
-	# Internally, the spring always rests at state.x == 0. However, since it's a 
+
+	# Internally, the spring always rests at state.x == 0. However, since it's a
 	# common use case to rest at a non-zero position, offset is automatically
 	# applied to position for convenience when interfacing with the outside world.
 	setState: (state) ->
-		@_state = 
+		@_state =
 			x: state.x - @options.offset
 			v: state.v
 

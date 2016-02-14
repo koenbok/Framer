@@ -14,16 +14,17 @@ Events.ScaleStart = "scalestart"
 Events.Scale = "scale"
 Events.ScaleEnd = "scaleend"
 
+
 class exports.LayerPinchable extends BaseClass
 
 	@define "enabled", @simpleProperty("enabled", true)
 	@define "threshold", @simpleProperty("threshold", 0)
-	@define "setOrigin", @simpleProperty("setOrigin", true)
+	@define "centerOrigin", @simpleProperty("centerOrigin", true)
 
 	@define "scale", @simpleProperty("scale", true)
 	@define "scaleIncrements", @simpleProperty("scaleIncrements", 0)
-	@define "scaleMin", @simpleProperty("scaleMin", 0)
-	@define "scaleMax", @simpleProperty("scaleMax", Number.MAX_VALUE)
+	@define "minScale", @simpleProperty("minScale", 0)
+	@define "maxScale", @simpleProperty("maxScale", Number.MAX_VALUE)
 	@define "scaleFactor", @simpleProperty("scaleFactor", 1)
 
 	@define "rotate", @simpleProperty("rotate", true)
@@ -38,52 +39,64 @@ class exports.LayerPinchable extends BaseClass
 
 	_attach: ->
 		@layer.on(Gestures.PinchStart, @_pinchStart)
-		@layer.on(Gestures.PinchMove, @_pinchMove)
+		@layer.on(Gestures.Pinch, @_pinch)
 		@layer.on(Gestures.PinchEnd, @_pinchEnd)
+		@layer.on(Gestures.TapStart, @_tapStart)
 
 	_reset: ->
 		@_scaleStart = null
 		@_rotationStart = null
 		@_rotationOffset = null
 
+	_tapStart: (event) ->
+		#@_centerOrigin(event) if @centerOrigin
+
+	_centerOrigin: (event) =>
+
+		topInSuperBefore = Utils.convertPoint({}, @layer, @layer.superLayer)
+		pinchLocation = Utils.convertPointFromContext(event.touchCenter, @layer, true, true)
+		@layer.originX = pinchLocation.x / @layer.width
+		@layer.originY = pinchLocation.y / @layer.height
+
+		topInSuperAfter = Utils.convertPoint({}, @layer, @layer.superLayer)
+		originDelta =
+			x: topInSuperAfter.x - topInSuperBefore.x
+			y: topInSuperAfter.y - topInSuperBefore.y
+
+		@layer.x -= originDelta.x
+		@layer.y -= originDelta.y
+
 	_pinchStart: (event) =>
 		@_reset()
-		@emit(Events.PinchStart, event)
-		@emit(Events.ScaleStart, event) if @scale
-		@emit(Events.RotateStart, event) if @rotate
+		@_centerOrigin(event) if @centerOrigin
+		@normalizeRotation = Utils.rotationNormalizer()
 
-		if @setOrigin
+	_pinch: (event) =>
 
-			topInSuperBefore = Utils.convertPoint({}, @layer, @layer.superLayer)
-			pinchLocation = Utils.convertPointFromContext(event.center, @layer, true, true)
-			@layer.originX = pinchLocation.x / @layer.width
-			@layer.originY = pinchLocation.y / @layer.height
-			topInSuperAfter = Utils.convertPoint({}, @layer, @layer.superLayer)
-			xDiff = topInSuperAfter.x - topInSuperBefore.x
-			yDiff = topInSuperAfter.y - topInSuperBefore.y
-			@layer.x -= xDiff
-			@layer.y -= yDiff
-
-	_pinchMove: (event) =>
-
-		return unless event.pointers.length is 2
+		return unless event.touches.length is 2
 		return unless @enabled
 
 		pointA =
-			x: event.pointers[0].pageX
-			y: event.pointers[0].pageY
+			x: event.touches[0].pageX
+			y: event.touches[0].pageY
 
 		pointB =
-			x: event.pointers[1].pageX
-			y: event.pointers[1].pageY
+			x: event.touches[1].pageX
+			y: event.touches[1].pageY
 
 		return unless Utils.pointTotal(Utils.pointAbs(Utils.pointSubtract(pointA, pointB))) > @threshold
 
 		if @scale
 			@_scaleStart ?= @layer.scale
-			scale = event.scale * @_scaleStart
-			scale = scale * @scaleFactor
-			scale = Utils.clamp(scale, @scaleMin, @scaleMax) if (@scaleMin and @scaleMax)
+			scale = (((event.scale - 1) * @scaleFactor) + 1) * @_scaleStart
+
+			if @minScale and @maxScale
+				scale = Utils.clamp(scale, @minScale, @maxScale)
+			else if @minScale
+				scale = Utils.clamp(scale, @minScale, 1000000)
+			else if @maxScale
+				scale = Utils.clamp(scale, 0.00001, @maxScale)
+
 			scale = Utils.nearestIncrement(scale, @scaleIncrements) if @scaleIncrements
 			@layer.scale = scale
 			@emit(Events.Scale, event)
@@ -93,29 +106,10 @@ class exports.LayerPinchable extends BaseClass
 			@_rotationOffset ?= event.rotation
 			rotation = event.rotation - @_rotationOffset + @_rotationStart
 			rotation = rotation * @rotateFactor
+			rotation = @normalizeRotation(rotation)
 			rotation = Utils.clamp(rotation, @rotateMin, @rotateMax) if (@rotateMin and @rotateMax)
 			rotation = Utils.nearestIncrement(rotation, @rotateIncrements) if @rotateIncrements
 			@layer.rotation = rotation
-			@emit(Events.Rotate, event)
-
-		@emit(Events.Pinch, event)
 
 	_pinchEnd: (event) =>
 		@_reset()
-		@emit(Events.PinchEnd, event)
-		@emit(Events.ScaleEnd, event) if @scale
-		@emit(Events.RotateEnd, event) if @rotate
-
-	emit: (eventName, event) ->
-		@layer.emit(eventName, event, @)
-		super eventName, event, @
-
-	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
-	onPinch: (cb) -> @on(Events.Pinch, cb)
-	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
-	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
-	onRotate: (cb) -> @on(Events.Rotate, cb)
-	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
-	onScaleStart: (cb) -> @on(Events.ScaleStart, cb)
-	onScale: (cb) -> @on(Events.Scale, cb)
-	onScaleEnd: (cb) -> @on(Events.ScaleEnd, cb)
