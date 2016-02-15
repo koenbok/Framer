@@ -599,7 +599,7 @@ class exports.DeviceComponent extends BaseClass
 		return @_device.hands != undefined
 
 	nextHand: ->
-		return if @orientation != 0
+		return if @hands.rotationZ != 0
 		if @handSwitchingSupported()
 			hands = _.keys(@_device.hands)
 			if hands.length > 0
