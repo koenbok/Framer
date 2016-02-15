@@ -381,6 +381,8 @@ class exports.DeviceComponent extends BaseClass
 		# Never scale the phone beyond 100%
 		phoneScale = 1 if phoneScale > 1
 
+		@emit("change:phoneScale", phoneScale)
+
 		return phoneScale
 
 	###########################################################################
