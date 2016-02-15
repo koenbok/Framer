@@ -366,9 +366,6 @@ class exports.DeviceComponent extends BaseClass
 
 		# Calculates a phone scale that fits the screen unless a fixed value is set
 
-		if @_deviceScale and @_deviceScale isnt "fit"
-			return @_deviceScale
-
 		[width, height] = @_getOrientationDimensions(@phone.width, @phone.height)
 
 		paddingOffset = @_device?.paddingOffset or 0
@@ -382,6 +379,9 @@ class exports.DeviceComponent extends BaseClass
 		phoneScale = 1 if phoneScale > 1
 
 		@emit("change:phoneScale", phoneScale)
+
+		if @_deviceScale and @_deviceScale isnt "fit"
+			return @_deviceScale
 
 		return phoneScale
 
