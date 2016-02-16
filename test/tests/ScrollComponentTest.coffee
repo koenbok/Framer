@@ -81,3 +81,7 @@ describe "ScrollComponent", ->
 		it "should throw a warning on no layer", ->
 			f = -> ScrollComponent.wrap()
 			f.should.throw()
+
+		it "should set content clip to true", ->
+			scroll = new ScrollComponent()
+			scroll.content.clip.should.equal true

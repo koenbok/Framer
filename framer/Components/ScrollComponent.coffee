@@ -116,7 +116,7 @@ class exports.ScrollComponent extends Layer
 		@_content = layer
 		@_content.parent = @
 		@_content.name = "content"
-		@_content.clip = false
+		@_content.clip = true
 		@_content.draggable.enabled = true
 		@_content.draggable.momentum = true
 		@_content.on("change:children", @updateContent)
