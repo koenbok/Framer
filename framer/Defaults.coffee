@@ -30,8 +30,8 @@ Originals =
 		orientation: "portrait"
 		keyboard: false
 		animationOptions:
-			time: .2
-			curve: "ease-out"
+			time: .3
+			curve: "ease-in-out"
 	LayerDraggable:
 		momentum: true
 		momentumOptions:
