@@ -75,16 +75,16 @@ class exports.DeviceComponent extends BaseClass
 
 		@_setupDone = true
 
-		@background = new Layer
+		@background = new Layer name:"DeviceBackground", clip:true
 		@background.clip = true
 		@background.backgroundColor = "transparent"
 		@background.classList.add("DeviceBackground")
 
 		# @phone = new Layer parent:@background
-		@phone = new Layer
-		@screen   = new Layer parent:@phone
-		@viewport = new Layer parent:@screen
-		@content  = new Layer parent:@viewport
+		@phone = new Layer name:"DevicePhone", clip:true
+		@screen   = new Layer parent:@phone, name:"DeviceScreen", clip:true
+		@viewport = new Layer parent:@screen, name:"DeviceViewPort", clip:true
+		@content  = new Layer parent:@viewport, name:"DeviceContent", clip:true
 
 		@phone.backgroundColor = "transparent"
 		@phone.classList.add("DevicePhone")
@@ -101,10 +101,10 @@ class exports.DeviceComponent extends BaseClass
 		@content.originX = 0
 		@content.originY = 0
 
-		@keyboardLayer = new Layer parent:@viewport
-		@keyboardLayer.on "click", => @toggleKeyboard()
-		@keyboardLayer.classList.add("DeviceKeyboard")
-		@keyboardLayer.backgroundColor = "transparent"
+		# @keyboardLayer = new Layer parent:@viewport, name:"DeviceKeyboard"
+		# @keyboardLayer.on "click", => @toggleKeyboard()
+		# @keyboardLayer.classList.add("DeviceKeyboard")
+		# @keyboardLayer.backgroundColor = "transparent"
 
 		Framer.CurrentContext.domEventManager.wrap(window).addEventListener("resize", @_update)
 
@@ -130,7 +130,7 @@ class exports.DeviceComponent extends BaseClass
 				layer.scale = 1
 
 			@content.scale = contentScaleFactor
-			@_positionKeyboard()
+			# @_positionKeyboard()
 
 		else
 			backgroundOverlap = 100
@@ -209,8 +209,8 @@ class exports.DeviceComponent extends BaseClass
 			@_updateDeviceImage()
 
 		@_update()
-		@keyboard = false
-		@_positionKeyboard()
+		# @keyboard = false
+		# @_positionKeyboard()
 		@emit("change:fullScreen")
 
 
@@ -245,8 +245,8 @@ class exports.DeviceComponent extends BaseClass
 			@fullscreen = false
 			@_updateDeviceImage()
 			@_update()
-			@keyboard = false
-			@_positionKeyboard()
+			# @keyboard = false
+			# @_positionKeyboard()
 			@emit("change:deviceType")
 
 			if shouldZoomToFit
@@ -433,10 +433,10 @@ class exports.DeviceComponent extends BaseClass
 			x: x
 			y: y
 
-		_hadKeyboard = @keyboard
-
-		if _hadKeyboard
-			@hideKeyboard(false)
+		# _hadKeyboard = @keyboard
+		#
+		# if _hadKeyboard
+		# 	@hideKeyboard(false)
 
 		@phone.animateStop()
 		@viewport.animateStop()
@@ -454,19 +454,19 @@ class exports.DeviceComponent extends BaseClass
 			animation.on Events.AnimationEnd, =>
 				@_update()
 
-			if _hadKeyboard
-				animation.on Events.AnimationEnd, =>
-					@showKeyboard(true)
+			# if _hadKeyboard
+			# 	animation.on Events.AnimationEnd, =>
+			# 		@showKeyboard(true)
 
 		else
 			@phone.props = phoneProperties
 			@viewport.props = contentProperties
 			@_update()
 
-			if _hadKeyboard
-				@showKeyboard(true)
-
-		@_renderKeyboard()
+		# 	if _hadKeyboard
+		# 		@showKeyboard(true)
+		#
+		# @_renderKeyboard()
 
 		@emit("change:orientation")
 
@@ -494,78 +494,78 @@ class exports.DeviceComponent extends BaseClass
 	###########################################################################
 	# KEYBOARD
 
-	@define "keyboard",
-		get: -> @_keyboard
-		set: (keyboard) -> @setKeyboard(keyboard, false)
-
-	setKeyboard: (keyboard, animate=false) ->
-
-		# Check if this device has a keyboard at all
-		if not @_device.hasOwnProperty("keyboards")
-			return
-
-		if _.isString(keyboard)
-			if keyboard.toLowerCase() in ["1", "true"]
-				keyboard = true
-			else if keyboard.toLowerCase() in ["0", "false"]
-				keyboard = false
-			else
-				return
-
-		if not _.isBoolean(keyboard)
-			return
-
-		if keyboard is @_keyboard
-			return
-
-		@_keyboard = keyboard
-
-		@emit("change:keyboard")
-
-		if keyboard is true
-			@emit("keyboard:show:start")
-			@_animateKeyboard @_keyboardShowY(), animate, =>
-				@emit("keyboard:show:end")
-		else
-			@emit("keyboard:hide:start")
-			@_animateKeyboard @_keyboardHideY(), animate, =>
-				@emit("keyboard:hide:end")
-
-	showKeyboard: (animate=true) ->
-		@setKeyboard(true, animate)
-
-	hideKeyboard: (animate=true) ->
-		@setKeyboard(false, animate)
-
-	toggleKeyboard: (animate=true) ->
-		@setKeyboard(!@keyboard, animate)
-
-	_renderKeyboard: ->
-		return unless @_device.keyboards
-		@keyboardLayer.image  = @_deviceImageUrl @_device.keyboards[@orientationName].image
-		@keyboardLayer.width  = @_device.keyboards[@orientationName].width
-		@keyboardLayer.height = @_device.keyboards[@orientationName].height
-
-	_positionKeyboard: ->
-		@keyboardLayer.centerX()
-		if @keyboard
-			@_animateKeyboard(@_keyboardShowY(), false)
-		else
-			@_animateKeyboard(@_keyboardHideY(), false)
-
-	_animateKeyboard: (y, animate, callback) =>
-		@keyboardLayer.bringToFront()
-		@keyboardLayer.animateStop()
-		if animate is false
-			@keyboardLayer.y = y
-			callback?()
-		else
-			animation = @keyboardLayer.animate _.extend @animationOptions,
-				properties: {y:y}
-			animation.on Events.AnimationEnd, callback
-
-	_keyboardShowY: -> @viewport.height - @keyboardLayer.height
-	_keyboardHideY: -> @viewport.height
+	# @define "keyboard",
+	# 	get: -> @_keyboard
+	# 	set: (keyboard) -> @setKeyboard(keyboard, false)
+	#
+	# setKeyboard: (keyboard, animate=false) ->
+	#
+	# 	# Check if this device has a keyboard at all
+	# 	if not @_device.hasOwnProperty("keyboards")
+	# 		return
+	#
+	# 	if _.isString(keyboard)
+	# 		if keyboard.toLowerCase() in ["1", "true"]
+	# 			keyboard = true
+	# 		else if keyboard.toLowerCase() in ["0", "false"]
+	# 			keyboard = false
+	# 		else
+	# 			return
+	#
+	# 	if not _.isBoolean(keyboard)
+	# 		return
+	#
+	# 	if keyboard is @_keyboard
+	# 		return
+	#
+	# 	@_keyboard = keyboard
+	#
+	# 	@emit("change:keyboard")
+	#
+	# 	if keyboard is true
+	# 		@emit("keyboard:show:start")
+	# 		@_animateKeyboard @_keyboardShowY(), animate, =>
+	# 			@emit("keyboard:show:end")
+	# 	else
+	# 		@emit("keyboard:hide:start")
+	# 		@_animateKeyboard @_keyboardHideY(), animate, =>
+	# 			@emit("keyboard:hide:end")
+	#
+	# showKeyboard: (animate=true) ->
+	# 	@setKeyboard(true, animate)
+	#
+	# hideKeyboard: (animate=true) ->
+	# 	@setKeyboard(false, animate)
+	#
+	# toggleKeyboard: (animate=true) ->
+	# 	@setKeyboard(!@keyboard, animate)
+	#
+	# _renderKeyboard: ->
+	# 	return unless @_device.keyboards
+	# 	@keyboardLayer.image  = @_deviceImageUrl @_device.keyboards[@orientationName].image
+	# 	@keyboardLayer.width  = @_device.keyboards[@orientationName].width
+	# 	@keyboardLayer.height = @_device.keyboards[@orientationName].height
+	#
+	# _positionKeyboard: ->
+	# 	@keyboardLayer.centerX()
+	# 	if @keyboard
+	# 		@_animateKeyboard(@_keyboardShowY(), false)
+	# 	else
+	# 		@_animateKeyboard(@_keyboardHideY(), false)
+	#
+	# _animateKeyboard: (y, animate, callback) =>
+	# 	@keyboardLayer.bringToFront()
+	# 	@keyboardLayer.animateStop()
+	# 	if animate is false
+	# 		@keyboardLayer.y = y
+	# 		callback?()
+	# 	else
+	# 		animation = @keyboardLayer.animate _.extend @animationOptions,
+	# 			properties: {y:y}
+	# 		animation.on Events.AnimationEnd, callback
+	#
+	# _keyboardShowY: -> @viewport.height - @keyboardLayer.height
+	# _keyboardHideY: -> @viewport.height
 
 
 ###########################################################################

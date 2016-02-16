@@ -308,3 +308,12 @@ class exports.Context extends BaseClass
 			if _.isNumber(value)
 				@_perspectiveOriginY = value
 				@_updatePerspective()
+
+	toInspect: ->
+
+		round = (value) ->
+			if parseInt(value) == value
+				return parseInt(value)
+			return Utils.round(value, 1)
+
+		return "<#{@constructor.name} id:#{@id} name:#{@_name} #{round(@width)}x#{round(@height)}>"
