@@ -352,7 +352,8 @@ Path = (init) ->
 	# Public
 	{ moveTo, lineTo, hlineTo, vlineTo, closePath, curve, curveTo, smoothCurveTo,
 		qcurveTo, smoothqCurveTo, arc, thru, pointAtLength,
-		elementForDebugRepresentation, start, end, length, node, forLayer, toString }
+		elementForDebugRepresentation, start, end, length, node, forLayer, toString,
+		points }
 
 # Initializers that let you write Path.curve, instead of Path().curve
 for method in ['curve', 'arc', 'thru', 'moveTo']
