@@ -250,10 +250,8 @@ class exports.DeviceComponent extends BaseClass
 			# If we switch from fullscreen to a device, we should zoom to fit
 			shouldZoomToFit = @_deviceType is "fullscreen"
 
-			if deviceType is "fullscreen"
-				@screen.backgroundColor = "white"
-			else
-				@screen.backgroundColor = "black"
+			@screen.backgroundColor = "black"
+			@screen.backgroundColor = device.backgroundColor if device.backgroundColor?
 
 			@_device = _.clone(device)
 			@_deviceType = deviceType
@@ -1068,6 +1066,7 @@ Devices =
 	"fullscreen":
 		name: "Fullscreen"
 		deviceType: "desktop"
+		backgroundColor: "white"
 
 	# iPad Air
 	"apple-ipad-air-2-silver": _.clone(iPadAir2BaseDevice)
@@ -1170,9 +1169,6 @@ Devices =
 	"samsung-galaxy-note-5-silver-titanium": _.clone(SamsungGalaxyNote5BaseDevice)
 	"samsung-galaxy-note-5-white": _.clone(SamsungGalaxyNote5BaseDevice)
 
-
-	# OLD DEVICES
-
 	# Desktop Browser
 	"desktop-safari-1024-600":
 		deviceType: "browser"
@@ -1182,7 +1178,7 @@ Devices =
 		deviceImageWidth: 1136
 		deviceImageHeight: 760
 		deviceImageJP2: true
-		maxStudioVersion: oldDeviceMaxVersion
+		backgroundColor: "white"
 	"desktop-safari-1280-800":
 		deviceType: "browser"
 		name: "Desktop Safari 1280 x 800"
@@ -1191,7 +1187,7 @@ Devices =
 		deviceImageWidth: 1392
 		deviceImageHeight: 960
 		deviceImageJP2: true
-		maxStudioVersion: oldDeviceMaxVersion
+		backgroundColor: "white"
 	"desktop-safari-1440-900":
 		deviceType: "browser"
 		name: "Desktop Safari 1440 x 900"
@@ -1200,7 +1196,9 @@ Devices =
 		deviceImageWidth: 1552
 		deviceImageHeight: 1060
 		deviceImageJP2: true
-		maxStudioVersion: oldDeviceMaxVersion
+		backgroundColor: "white"
+
+	# OLD DEVICES
 
 	# iPhone 6
 	"iphone-6-spacegray": _.clone(old_iPhone6BaseDevice)
