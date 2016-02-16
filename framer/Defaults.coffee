@@ -30,7 +30,8 @@ Originals =
 		orientation: "portrait"
 		keyboard: false
 		animationOptions:
-			curve: "spring(400,40,0,0.06)"
+			time: .2
+			curve: "ease-out"
 	LayerDraggable:
 		momentum: true
 		momentumOptions:
