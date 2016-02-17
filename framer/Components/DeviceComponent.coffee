@@ -1,8 +1,6 @@
 Utils = require "../Utils"
 {_}   = require "../Underscore"
 
-DeviceComponentDefaultDevice = "iphone-6-silver"
-
 {BaseClass} = require "../BaseClass"
 {Layer} = require "../Layer"
 {Defaults} = require "../Defaults"
@@ -26,18 +24,11 @@ Device.rotateRight()
 Device.setDeviceScale(zoom:float, animate:bool)
 Device.setContentScale(zoom:float, animate:bool)
 
-Device.keyboard bool
-Device.setKeyboard(visible:bool, animate:bool)
-Device.showKeyboard(animate:bool)
-Device.hideKeyboard(animate:bool)
-Device.toggleKeyboard(animate:bool)
-
+Device.nextHand()
 
 # Events
 Events.DeviceTypeDidChange
 Events.DeviceFullScreenDidChange
-Events.DeviceKeyboardWillShow
-Events.DeviceKeyboardDidShow
 
 
 ###
@@ -68,6 +59,8 @@ class exports.DeviceComponent extends BaseClass
 
 		_.extend(@, _.defaults(options, defaults))
 
+		window.addEventListener("orientationchange", @_orientationChange, true)
+
 	_setup: ->
 
 		if @_setupDone
@@ -75,22 +68,27 @@ class exports.DeviceComponent extends BaseClass
 
 		@_setupDone = true
 
-		@background = new Layer name:"DeviceBackground", clip:true
+		@background = new Layer
 		@background.clip = true
 		@background.backgroundColor = "transparent"
 		@background.classList.add("DeviceBackground")
 
-		# @phone = new Layer parent:@background
-		@phone = new Layer name:"DevicePhone", clip:true
-		@screen   = new Layer parent:@phone, name:"DeviceScreen", clip:true
-		@viewport = new Layer parent:@screen, name:"DeviceViewPort", clip:true
-		@content  = new Layer parent:@viewport, name:"DeviceContent", clip:true
+		@hands    = new Layer
+		@handsImageLayer = new Layer parent:@hands
+		@phone    = new Layer parent:@hands
+		@screen   = new Layer parent:@phone
+		@viewport = new Layer parent:@screen
+		@content  = new Layer parent:@viewport
+
+		@hands.backgroundColor = "transparent"
+		@hands._alwaysUseImageCache = true
+		@handsImageLayer.backgroundColor = "transparent"
 
 		@phone.backgroundColor = "transparent"
 		@phone.classList.add("DevicePhone")
 
-		@screen.backgroundColor = "transparent"
 		@screen.classList.add("DeviceScreen")
+		@screen.clip = true
 
 		@viewport.backgroundColor = "transparent"
 		@viewport.classList.add("DeviceComponentPort")
@@ -100,11 +98,6 @@ class exports.DeviceComponent extends BaseClass
 
 		@content.originX = 0
 		@content.originY = 0
-
-		# @keyboardLayer = new Layer parent:@viewport, name:"DeviceKeyboard"
-		# @keyboardLayer.on "click", => @toggleKeyboard()
-		# @keyboardLayer.classList.add("DeviceKeyboard")
-		# @keyboardLayer.backgroundColor = "transparent"
 
 		Framer.CurrentContext.domEventManager.wrap(window).addEventListener("resize", @_update)
 
@@ -123,14 +116,13 @@ class exports.DeviceComponent extends BaseClass
 		contentScaleFactor = 1 if contentScaleFactor > 1
 
 		if @_shouldRenderFullScreen()
-			for layer in [@background, @phone, @viewport, @content, @screen]
+			for layer in [@background, @hands, @phone, @viewport, @content, @screen]
 				layer.x = layer.y = 0
 				layer.width = window.innerWidth / contentScaleFactor
 				layer.height = window.innerHeight / contentScaleFactor
 				layer.scale = 1
 
 			@content.scale = contentScaleFactor
-			# @_positionKeyboard()
 
 		else
 			backgroundOverlap = 100
@@ -140,7 +132,8 @@ class exports.DeviceComponent extends BaseClass
 			@background.width  = window.innerWidth  + (2 * backgroundOverlap)
 			@background.height = window.innerHeight + (2 * backgroundOverlap)
 
-			@phone.scale = @_calculatePhoneScale()
+			@hands.scale = @_calculatePhoneScale()
+			@hands.center()
 			@phone.center()
 
 			[width, height] = @_getOrientationDimensions(
@@ -153,6 +146,8 @@ class exports.DeviceComponent extends BaseClass
 			@viewport.width  = @content.width  = width
 			@viewport.height = @content.height = height
 			@screen.center()
+
+			@setHand(@selectedHand) if @selectedHand && @_orientation == 0
 
 	_shouldRenderFullScreen: ->
 
@@ -205,12 +200,11 @@ class exports.DeviceComponent extends BaseClass
 
 		if fullScreen is true
 			@phone.image = ""
+			@hands.image = ""
 		else
 			@_updateDeviceImage()
 
 		@_update()
-		# @keyboard = false
-		# @_positionKeyboard()
 		@emit("change:fullScreen")
 
 
@@ -229,7 +223,10 @@ class exports.DeviceComponent extends BaseClass
 			device = null
 
 			if _.isString(deviceType)
-				device = Devices[deviceType.toLowerCase()]
+				lDevicetype = deviceType.toLowerCase()
+				for key in _.keys(Devices)
+					lKey = key.toLowerCase()
+					device = Devices[key] if lDevicetype == lKey
 
 			if not device
 				throw Error "No device named #{deviceType}. Options are: #{_.keys Devices}"
@@ -240,13 +237,14 @@ class exports.DeviceComponent extends BaseClass
 			# If we switch from fullscreen to a device, we should zoom to fit
 			shouldZoomToFit = @_deviceType is "fullscreen"
 
+			@screen.backgroundColor = "black"
+			@screen.backgroundColor = device.backgroundColor if device.backgroundColor?
+
 			@_device = _.clone(device)
 			@_deviceType = deviceType
 			@fullscreen = false
 			@_updateDeviceImage()
 			@_update()
-			# @keyboard = false
-			# @_positionKeyboard()
 			@emit("change:deviceType")
 
 			if shouldZoomToFit
@@ -259,6 +257,7 @@ class exports.DeviceComponent extends BaseClass
 
 		if @_shouldRenderFullScreen()
 			@phone.image  = ""
+			@hands.image  = ""
 		else if not @_deviceImageUrl(@_deviceImageName())
 			@phone.image  = ""
 		else
@@ -266,6 +265,8 @@ class exports.DeviceComponent extends BaseClass
 			@phone.image  = @_deviceImageUrl(@_deviceImageName())
 			@phone.width  = @_device.deviceImageWidth
 			@phone.height = @_device.deviceImageHeight
+			@hands.width  = @phone.width
+			@hands.height = @phone.height
 
 	_deviceImageName: ->
 		if @_device.hasOwnProperty("deviceImage")
@@ -289,7 +290,12 @@ class exports.DeviceComponent extends BaseClass
 
 		# If we're running Framer Studio and have local files, we'd like to use those
 		if Utils.isFramerStudio() and window.FramerStudioInfo
-			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
+
+			if @_device.minStudioVersion and Utils.framerStudioVersion() >= @_device.minStudioVersion or !@_device.minStudioVersion
+
+				if @_device.maxStudioVersion and Utils.framerStudioVersion() <= @_device.maxStudioVersion or !@_device.maxStudioVersion
+
+					resourceUrl = window.FramerStudioInfo.deviceImagesUrl
 
 		# We'd like to use jp2 if possible, or check if we don't for this specific device
 		if Utils.isJP2Supported() and @_device.deviceImageJP2 is true
@@ -327,14 +333,14 @@ class exports.DeviceComponent extends BaseClass
 		else
 			phoneScale = deviceScale
 
-		@phone.animateStop()
+		@hands.animateStop()
 
 		if animate
-			@phone.animate _.extend @animationOptions,
+			@hands.animate _.extend @animationOptions,
 				properties: {scale:phoneScale}
 		else
-			@phone.scale = phoneScale
-			@phone.center()
+			@hands.scale = phoneScale
+			@hands.center()
 
 		@emit("change:deviceScale")
 
@@ -342,9 +348,6 @@ class exports.DeviceComponent extends BaseClass
 	_calculatePhoneScale: ->
 
 		# Calculates a phone scale that fits the screen unless a fixed value is set
-
-		if @_deviceScale and @_deviceScale isnt "fit"
-			return @_deviceScale
 
 		[width, height] = @_getOrientationDimensions(@phone.width, @phone.height)
 
@@ -357,6 +360,11 @@ class exports.DeviceComponent extends BaseClass
 
 		# Never scale the phone beyond 100%
 		phoneScale = 1 if phoneScale > 1
+
+		@emit("change:phoneScale", phoneScale)
+
+		if @_deviceScale and @_deviceScale isnt "fit"
+			return @_deviceScale
 
 		return phoneScale
 
@@ -394,10 +402,15 @@ class exports.DeviceComponent extends BaseClass
 	# PHONE ORIENTATION
 
 	@define "orientation",
-		get: -> @_orientation or 0
+		get: ->
+			return window.orientation if Utils.isMobile()
+			return @_orientation or 0
+
 		set: (orientation) -> @setOrientation(orientation, false)
 
 	setOrientation: (orientation, animate=false) ->
+
+		orientation *= -1 if Utils.framerStudioVersion() == oldDeviceMaxVersion
 
 		if orientation == "portrait"
 			orientation = 0
@@ -420,25 +433,20 @@ class exports.DeviceComponent extends BaseClass
 
 		# Calculate properties for the phone
 		phoneProperties =
-			rotationZ: @_orientation
+			rotationZ: -@_orientation
 			scale: @_calculatePhoneScale()
 
 		[width, height] = @_getOrientationDimensions(@_device.screenWidth, @_device.screenHeight)
 		[x, y] = [(@screen.width - width) / 2, (@screen.height - height) / 2]
 
 		contentProperties =
-			rotationZ: -@_orientation
+			rotationZ: @_orientation
 			width:  width
 			height: height
 			x: x
 			y: y
 
-		# _hadKeyboard = @keyboard
-		#
-		# if _hadKeyboard
-		# 	@hideKeyboard(false)
-
-		@phone.animateStop()
+		@hands.animateStop()
 		@viewport.animateStop()
 
 		# FIXME: After a rotation we call _update() again to set all the right
@@ -446,7 +454,7 @@ class exports.DeviceComponent extends BaseClass
 		# the animation.
 
 		if animate
-			animation = @phone.animate _.extend @animationOptions,
+			animation = @hands.animate _.extend @animationOptions,
 				properties: phoneProperties
 			@viewport.animate _.extend @animationOptions,
 				properties: contentProperties
@@ -454,21 +462,17 @@ class exports.DeviceComponent extends BaseClass
 			animation.on Events.AnimationEnd, =>
 				@_update()
 
-			# if _hadKeyboard
-			# 	animation.on Events.AnimationEnd, =>
-			# 		@showKeyboard(true)
-
 		else
-			@phone.props = phoneProperties
+			@hands.props = phoneProperties
 			@viewport.props = contentProperties
 			@_update()
 
-		# 	if _hadKeyboard
-		# 		@showKeyboard(true)
-		#
-		# @_renderKeyboard()
+		@handsImageLayer.image = "" if @_orientation != 0
 
-		@emit("change:orientation")
+		@emit("change:orientation", @_orientation)
+
+	_orientationChange: =>
+		@emit("change:orientation", window.orientation)
 
 	isPortrait: -> Math.abs(@_orientation) != 90
 	isLandscape: -> !@isPortrait()
@@ -490,235 +494,564 @@ class exports.DeviceComponent extends BaseClass
 	_getOrientationDimensions: (width, height) ->
 		if @isLandscape() then [height, width] else [width, height]
 
-
 	###########################################################################
-	# KEYBOARD
+	# HANDS
 
-	# @define "keyboard",
-	# 	get: -> @_keyboard
-	# 	set: (keyboard) -> @setKeyboard(keyboard, false)
-	#
-	# setKeyboard: (keyboard, animate=false) ->
-	#
-	# 	# Check if this device has a keyboard at all
-	# 	if not @_device.hasOwnProperty("keyboards")
-	# 		return
-	#
-	# 	if _.isString(keyboard)
-	# 		if keyboard.toLowerCase() in ["1", "true"]
-	# 			keyboard = true
-	# 		else if keyboard.toLowerCase() in ["0", "false"]
-	# 			keyboard = false
-	# 		else
-	# 			return
-	#
-	# 	if not _.isBoolean(keyboard)
-	# 		return
-	#
-	# 	if keyboard is @_keyboard
-	# 		return
-	#
-	# 	@_keyboard = keyboard
-	#
-	# 	@emit("change:keyboard")
-	#
-	# 	if keyboard is true
-	# 		@emit("keyboard:show:start")
-	# 		@_animateKeyboard @_keyboardShowY(), animate, =>
-	# 			@emit("keyboard:show:end")
-	# 	else
-	# 		@emit("keyboard:hide:start")
-	# 		@_animateKeyboard @_keyboardHideY(), animate, =>
-	# 			@emit("keyboard:hide:end")
-	#
-	# showKeyboard: (animate=true) ->
-	# 	@setKeyboard(true, animate)
-	#
-	# hideKeyboard: (animate=true) ->
-	# 	@setKeyboard(false, animate)
-	#
-	# toggleKeyboard: (animate=true) ->
-	# 	@setKeyboard(!@keyboard, animate)
-	#
-	# _renderKeyboard: ->
-	# 	return unless @_device.keyboards
-	# 	@keyboardLayer.image  = @_deviceImageUrl @_device.keyboards[@orientationName].image
-	# 	@keyboardLayer.width  = @_device.keyboards[@orientationName].width
-	# 	@keyboardLayer.height = @_device.keyboards[@orientationName].height
-	#
-	# _positionKeyboard: ->
-	# 	@keyboardLayer.centerX()
-	# 	if @keyboard
-	# 		@_animateKeyboard(@_keyboardShowY(), false)
-	# 	else
-	# 		@_animateKeyboard(@_keyboardHideY(), false)
-	#
-	# _animateKeyboard: (y, animate, callback) =>
-	# 	@keyboardLayer.bringToFront()
-	# 	@keyboardLayer.animateStop()
-	# 	if animate is false
-	# 		@keyboardLayer.y = y
-	# 		callback?()
-	# 	else
-	# 		animation = @keyboardLayer.animate _.extend @animationOptions,
-	# 			properties: {y:y}
-	# 		animation.on Events.AnimationEnd, callback
-	#
-	# _keyboardShowY: -> @viewport.height - @keyboardLayer.height
-	# _keyboardHideY: -> @viewport.height
+	handSwitchingSupported: ->
+		return @_device.hands isnt undefined
+
+	nextHand: ->
+		return if @hands.rotationZ isnt 0
+		if @handSwitchingSupported()
+			hands = _.keys(@_device.hands)
+			if hands.length > 0
+				nextHandIndex = hands.indexOf(@selectedHand) + 1
+				nextHand = ""
+				nextHand = hands[nextHandIndex] if nextHandIndex < hands.length
+				hand = @setHand(nextHand)
+				@_update()
+				return hand
+		return false
+
+	setHand: (hand) ->
+		@selectedHand = hand
+		return @handsImageLayer.image = "" if !hand or !@handSwitchingSupported()
+
+		handData = @_device.hands[hand]
+		if handData
+			@hands.width = handData.width
+			@hands.height = handData.height
+			@hands.center()
+			@phone.center()
+			@handsImageLayer.size = @hands.size
+			@handsImageLayer.y = 0
+			@handsImageLayer.y = handData.offset if handData.offset
+			@handsImageLayer.image = @handImageUrl(hand)
+			return hand
+
+	handImageUrl: (hand) ->
+
+		# We want to get these image from our public resources server
+		resourceUrl = "//resources.framerjs.com/static/DeviceResources"
+
+		# If we're running Framer Studio and have local files, we'd like to use those
+		if Utils.isFramerStudio() and window.FramerStudioInfo and Utils.framerStudioVersion() >= newDeviceMinVersion
+			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
+
+		# We'd like to use jp2 if possible, or check if we don't for this specific device
+		# if Utils.isJP2Supported() and @_device.deviceImageJP2 is true
+		# 	return "#{resourceUrl}/#{hand}.jp2"
+
+		return "#{resourceUrl}/#{hand}.png"
 
 
 ###########################################################################
 # DEVICE CONFIGURATIONS
 
+newDeviceMinVersion = 53
+oldDeviceMaxVersion = 52
+
+iPadAir2BaseDevice =
+	deviceImageWidth: 1856
+	deviceImageHeight: 2608
+	deviceImageJP2: true
+	screenWidth: 1536
+	screenHeight: 2048
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+
+iPadMini4BaseDevice =
+	deviceImageWidth: 1936
+	deviceImageHeight: 2688
+	deviceImageJP2: true
+	screenWidth: 1536
+	screenHeight: 2048
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+
+iPadProBaseDevice =
+	deviceImageWidth: 2448
+	deviceImageHeight: 3432
+	deviceImageJP2: true
+	screenWidth: 2048
+	screenHeight: 2732
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+
 iPhone6BaseDevice =
+	deviceImageWidth: 874
+	deviceImageHeight: 1792
+	deviceImageJP2: true
+	screenWidth: 750
+	screenHeight: 1334
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+	hands:
+		"iphone-hands-2":
+			width:  2400
+			height: 3740
+		"iphone-hands-1":
+			width:  2400
+			height: 3740
+
+iPhone6PlusBaseDevice =
+	deviceImageWidth: 1452
+	deviceImageHeight: 2968
+	deviceImageJP2: true
+	screenWidth: 1242
+	screenHeight: 2208
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+	hands:
+		"iphone-hands-2":
+			width:  3987
+			height: 6212
+		"iphone-hands-1":
+			width:  3987
+			height: 6212
+
+iPhone5BaseDevice =
+	deviceImageWidth: 768
+	deviceImageHeight: 1612
+	deviceImageJP2: true
+	screenWidth: 640
+	screenHeight: 1136
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+	hands:
+		"iphone-hands-2":
+			width:  2098
+			height: 3269
+			offset: 19
+		"iphone-hands-1":
+			width:  2098
+			height: 3269
+			offset: 19
+
+iPhone5CBaseDevice =
+	deviceImageWidth: 776
+	deviceImageHeight: 1620
+	deviceImageJP2: true
+	screenWidth: 640
+	screenHeight: 1136
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+	hands:
+		"iphone-hands-2":
+			width:  2098
+			height: 3269
+			offset: 28
+		"iphone-hands-1":
+			width:  2098
+			height: 3269
+			offset: 28
+
+Nexus4BaseDevice =
+	deviceImageWidth: 860
+	deviceImageHeight: 1668
+	deviceImageJP2: true
+	screenWidth: 768
+	screenHeight: 1280
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+	hands:
+		"iphone-hands-2":
+			width:  2362
+			height: 3681
+			offset: -52
+		"iphone-hands-1":
+			width:  2362
+			height: 3681
+			offset: -52
+
+Nexus5BaseDevice =
+	deviceImageWidth: 1204
+	deviceImageHeight: 2432
+	deviceImageJP2: true
+	screenWidth: 1080
+	screenHeight: 1920
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+	hands:
+		"iphone-hands-2":
+			width:  3292
+			height: 5130
+			offset: 8
+		"iphone-hands-1":
+			width:  3292
+			height: 5130
+			offset: 8
+
+Nexus6BaseDevice =
+	deviceImageWidth: 1576
+	deviceImageHeight: 3220
+	deviceImageJP2: true
+	screenWidth: 1440
+	screenHeight: 2560
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+	hands:
+		"iphone-hands-2":
+			width:  4304
+			height: 6707
+			offset: 8
+		"iphone-hands-1":
+			width:  4304
+			height: 6707
+			offset: 8
+
+Nexus9BaseDevice =
+	deviceImageWidth: 1896
+	deviceImageHeight: 2648
+	deviceImageJP2: true
+	screenWidth: 1536
+	screenHeight: 2048
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+
+HTCa9BaseDevice =
+	deviceImageWidth: 1252
+	deviceImageHeight: 2592
+	deviceImageJP2: true
+	screenWidth: 1080
+	screenHeight: 1920
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+	hands:
+		"iphone-hands-2":
+			width:  3436
+			height: 5354
+			offset: 36
+		"iphone-hands-1":
+			width:  3436
+			height: 5354
+			offset: 36
+
+HTCm8BaseDevice =
+	deviceImageWidth: 1232
+	deviceImageHeight: 2572
+	deviceImageJP2: true
+	screenWidth: 1080
+	screenHeight: 1920
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+	hands:
+		"iphone-hands-2":
+			width:  3436
+			height: 5354
+			offset: 12
+		"iphone-hands-1":
+			width:  3436
+			height: 5354
+			offset: 12
+
+MSFTLumia950BaseDevice =
+	deviceImageWidth: 1660
+	deviceImageHeight: 3292
+	deviceImageJP2: true
+	screenWidth: 1440
+	screenHeight: 2560
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+	hands:
+		"iphone-hands-2":
+			width:  4494
+			height: 7003
+			offset: -84
+		"iphone-hands-1":
+			width:  4494
+			height: 7003
+			offset: -84
+
+SamsungGalaxyNote5BaseDevice =
+	deviceImageWidth: 1572
+	deviceImageHeight: 3140
+	deviceImageJP2: true
+	screenWidth: 1440
+	screenHeight: 2560
+	deviceType: "phone"
+	minStudioVersion: newDeviceMinVersion
+	hands:
+		"iphone-hands-2":
+			width:  4279
+			height: 6668
+			offset: -24
+		"iphone-hands-1":
+			width:  4279
+			height: 6668
+			offset: -84
+
+AppleWatch42Device =
+	deviceImageWidth: 512
+	deviceImageHeight: 990
+	deviceImageJP2: true
+	screenWidth: 312
+	screenHeight: 390
+	minStudioVersion: newDeviceMinVersion
+
+AppleWatch38Device =
+	deviceImageWidth: 472
+	deviceImageHeight: 772
+	deviceImageJP2: true
+	screenWidth: 272
+	screenHeight: 340
+	minStudioVersion: newDeviceMinVersion
+
+AppleWatch38BlackLeatherDevice =
+	deviceImageWidth: 472
+	deviceImageHeight: 796
+	deviceImageJP2: true
+	screenWidth: 272
+	screenHeight: 340
+	minStudioVersion: newDeviceMinVersion
+
+###########################################################################
+# OLD DEVICE CONFIGURATIONS
+
+old_iPhone6BaseDevice =
 	deviceImageWidth: 870
 	deviceImageHeight: 1738
 	deviceImageJP2: true
 	screenWidth: 750
 	screenHeight: 1334
 	deviceType: "phone"
+	maxStudioVersion: oldDeviceMaxVersion
 
-iPhone6BaseDeviceHand = _.extend {}, iPhone6BaseDevice,
+old_iPhone6BaseDeviceHand = _.extend {}, old_iPhone6BaseDevice,
 	deviceImageWidth: 1988
 	deviceImageHeight: 2368
 	deviceImageJP2: true
 	paddingOffset: -150
+	maxStudioVersion: oldDeviceMaxVersion
 
-iPhone6PlusBaseDevice =
+old_iPhone6PlusBaseDevice =
 	deviceImageWidth: 1460
 	deviceImageHeight: 2900
 	deviceImageJP2: true
 	screenWidth: 1242
 	screenHeight: 2208
 	deviceType: "phone"
+	maxStudioVersion: oldDeviceMaxVersion
 
-iPhone6PlusBaseDeviceHand = _.extend {}, iPhone6PlusBaseDevice,
+old_iPhone6PlusBaseDeviceHand = _.extend {}, old_iPhone6PlusBaseDevice,
 	deviceImageWidth: 3128
 	deviceImageHeight: 3487
 	deviceImageJP2: true
 	paddingOffset: -150
+	maxStudioVersion: oldDeviceMaxVersion
 
-
-iPhone5BaseDevice =
+old_iPhone5BaseDevice =
 	deviceImageWidth: 780
 	deviceImageHeight: 1608
 	deviceImageJP2: true
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
-	# keyboards:
-	# 	portrait:
-	# 		image:  "ios-keyboard.png"
-	# 		width: 640
-	# 		height: 432
-	# 	landscape:
-	# 		image: "ios-keyboard-landscape-light.png"
-	# 		width: 1136
-	# 		height: 322
+	maxStudioVersion: oldDeviceMaxVersion
 
-iPhone5BaseDeviceHand = _.extend {}, iPhone5BaseDevice,
+old_iPhone5BaseDeviceHand = _.extend {}, old_iPhone5BaseDevice,
 	deviceImageWidth: 1884
 	deviceImageHeight: 2234
 	deviceImageJP2: true
 	paddingOffset: -200
+	maxStudioVersion: oldDeviceMaxVersion
 
-
-iPhone5CBaseDevice =
+old_iPhone5CBaseDevice =
 	deviceImageWidth: 776
 	deviceImageHeight: 1612
 	deviceImageJP2: true
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
-	# keyboards:
-	# 	portrait:
-	# 		image:  "ios-keyboard.png"
-	# 		width: 640
-	# 		height: 432
-	# 	landscape:
-	# 		image: "ios-keyboard-landscape-light.png"
-	# 		width: 1136
-	# 		height: 322
+	maxStudioVersion: oldDeviceMaxVersion
 
-iPhone5CBaseDeviceHand = _.extend {}, iPhone5CBaseDevice,
+old_iPhone5CBaseDeviceHand = _.extend {}, old_iPhone5CBaseDevice,
 	deviceImageWidth: 1894
 	deviceImageHeight: 2244
 	deviceImageJP2: true
 	paddingOffset: -200
+	maxStudioVersion: oldDeviceMaxVersion
 
-
-iPadMiniBaseDevice =
+old_iPadMiniBaseDevice =
 	deviceImageWidth: 872
 	deviceImageHeight: 1292
 	deviceImageJP2: true
 	screenWidth: 768
 	screenHeight: 1024
 	deviceType: "tablet"
+	maxStudioVersion: oldDeviceMaxVersion
 
-iPadMiniBaseDeviceHand = _.extend {}, iPadMiniBaseDevice,
+old_iPadMiniBaseDeviceHand = _.extend {}, old_iPadMiniBaseDevice,
 	deviceImageWidth: 1380
 	deviceImageHeight: 2072
 	deviceImageJP2: true
 	paddingOffset: -120
+	maxStudioVersion: oldDeviceMaxVersion
 
-
-iPadAirBaseDevice =
+old_iPadAirBaseDevice =
 	deviceImageWidth: 1769
 	deviceImageHeight: 2509
 	deviceImageJP2: true
 	screenWidth: 1536
 	screenHeight: 2048
 	deviceType: "tablet"
+	maxStudioVersion: oldDeviceMaxVersion
 
-iPadAirBaseDeviceHand = _.extend {}, iPadAirBaseDevice,
+old_iPadAirBaseDeviceHand = _.extend {}, old_iPadAirBaseDevice,
 	deviceImageWidth: 4744
 	deviceImageHeight: 4101
 	deviceImageJP2: true
 	paddingOffset: -120
+	maxStudioVersion: oldDeviceMaxVersion
 
-
-Nexus5BaseDevice =
+old_Nexus5BaseDevice =
 	deviceImageWidth: 1208
 	deviceImageHeight: 2440
 	deviceImageJP2: true
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
+	maxStudioVersion: oldDeviceMaxVersion
 
-Nexus5BaseDeviceHand = _.extend {}, Nexus5BaseDevice, # 2692 × 2996
+old_Nexus5BaseDeviceHand = _.extend {}, old_Nexus5BaseDevice, # 2692 × 2996
 	deviceImageWidth: 2692
 	deviceImageHeight: 2996
 	deviceImageJP2: true
 	paddingOffset: -120
+	maxStudioVersion: oldDeviceMaxVersion
 
-Nexus9BaseDevice =
+old_Nexus9BaseDevice =
 	deviceImageWidth: 1733
 	deviceImageHeight: 2575
 	deviceImageJP2: true
 	screenWidth: 1536
 	screenHeight: 2048
 	deviceType: "tablet"
+	maxStudioVersion: oldDeviceMaxVersion
 
-AppleWatch42Device =
+old_AppleWatch42Device =
 	deviceImageWidth: 552
 	deviceImageHeight: 938
 	deviceImageJP2: true
 	screenWidth: 312
 	screenHeight: 390
+	maxStudioVersion: oldDeviceMaxVersion
 
-AppleWatch38Device =
+old_AppleWatch38Device =
 	deviceImageWidth: 508
 	deviceImageHeight: 900
 	deviceImageJP2: true
 	screenWidth: 272
 	screenHeight: 340
+	maxStudioVersion: oldDeviceMaxVersion
 
 Devices =
 
 	"fullscreen":
 		name: "Fullscreen"
 		deviceType: "desktop"
+		backgroundColor: "white"
+
+	# iPad Air
+	"apple-ipad-air-2-silver": _.clone(iPadAir2BaseDevice)
+	"apple-ipad-air-2-gold": _.clone(iPadAir2BaseDevice)
+	"apple-ipad-air-2-space-gray": _.clone(iPadAir2BaseDevice)
+
+	# iPad Mini
+	"apple-ipad-mini-4-silver": _.clone(iPadMini4BaseDevice)
+	"apple-ipad-mini-4-gold": _.clone(iPadMini4BaseDevice)
+	"apple-ipad-mini-4-space-gray": _.clone(iPadMini4BaseDevice)
+
+	# iPad Pro
+	"apple-ipad-pro-silver": _.clone(iPadProBaseDevice)
+	"apple-ipad-pro-gold": _.clone(iPadProBaseDevice)
+	"apple-ipad-pro-space-gray": _.clone(iPadProBaseDevice)
+
+	# iPhone 6
+	"apple-iphone-6s-gold": _.clone(iPhone6BaseDevice)
+	"apple-iphone-6s-rose-gold": _.clone(iPhone6BaseDevice)
+	"apple-iphone-6s-silver" : _.clone(iPhone6BaseDevice)
+	"apple-iphone-6s-space-gray": _.clone(iPhone6BaseDevice)
+
+	# iPhone 6+
+	"apple-iphone-6s-plus-gold": _.clone(iPhone6PlusBaseDevice)
+	"apple-iphone-6s-plus-rose-gold": _.clone(iPhone6PlusBaseDevice)
+	"apple-iphone-6s-plus-silver": _.clone(iPhone6PlusBaseDevice)
+	"apple-iphone-6s-plus-space-gray": _.clone(iPhone6PlusBaseDevice)
+
+	# iPhone 5S
+	"apple-iphone-5s-gold": _.clone(iPhone5BaseDevice)
+	"apple-iphone-5s-silver": _.clone(iPhone5BaseDevice)
+	"apple-iphone-5s-space-gray": _.clone(iPhone5BaseDevice)
+
+	# iPhone 5C
+	"apple-iphone-5c-blue": _.clone(iPhone5CBaseDevice)
+	"apple-iphone-5c-green": _.clone(iPhone5CBaseDevice)
+	"apple-iphone-5c-red": _.clone(iPhone5CBaseDevice)
+	"apple-iphone-5c-white": _.clone(iPhone5CBaseDevice)
+	"apple-iphone-5c-yellow": _.clone(iPhone5CBaseDevice)
+
+	# Apple Watch 38mm
+
+	"apple-watch-38mm-gold-black-leather-closed": _.clone(AppleWatch38BlackLeatherDevice)
+	"apple-watch-38mm-rose-gold-black-leather-closed": _.clone(AppleWatch38BlackLeatherDevice)
+	"apple-watch-38mm-stainless-steel-black-leather-closed": _.clone(AppleWatch38BlackLeatherDevice)
+
+	"apple-watch-38mm-black-steel-black-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-gold-midnight-blue-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-rose-gold-lavender-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-blue-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-fog-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-green-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-red-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-walnut-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-white-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-gold-antique-white-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-aluminum-rose-gold-stone-closed": _.clone(AppleWatch38Device)
+	"apple-watch-38mm-sport-space-gray-black-closed": _.clone(AppleWatch38Device)
+
+	# Apple Watch 42mm
+	"apple-watch-42mm-black-steel-black-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-gold-black-leather-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-gold-midnight-blue-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-rose-gold-black-leather-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-rose-gold-lavender-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-blue-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-fog-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-green-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-red-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-walnut-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-white-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-gold-antique-white-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-aluminum-rose-gold-stone-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-sport-space-gray-black-closed": _.clone(AppleWatch42Device)
+	"apple-watch-42mm-stainless-steel-black-leather-closed": _.clone(AppleWatch42Device)
+
+	# NEXUS
+	"google-nexus-4": _.clone(Nexus4BaseDevice)
+	"google-nexus-5x": _.clone(Nexus5BaseDevice)
+	"google-nexus-6p": _.clone(Nexus6BaseDevice)
+	"google-nexus-9": _.clone(Nexus9BaseDevice)
+
+	# HTC ONE A9
+	"htc-one-a9-black": _.clone(HTCa9BaseDevice)
+	"htc-one-a9-white": _.clone(HTCa9BaseDevice)
+
+	# HTC ONE M8
+	"htc-one-m8-black": _.clone(HTCm8BaseDevice)
+	"htc-one-m8-gold": _.clone(HTCm8BaseDevice)
+	"htc-one-m8-silver": _.clone(HTCm8BaseDevice)
+
+	# MICROSOFT LUMIA 950
+	"microsoft-lumia-950-black": _.clone(MSFTLumia950BaseDevice)
+	"microsoft-lumia-950-white": _.clone(MSFTLumia950BaseDevice)
+
+	# SAMSUNG NOTE 5
+	"samsung-galaxy-note-5-black": _.clone(SamsungGalaxyNote5BaseDevice)
+	"samsung-galaxy-note-5-gold": _.clone(SamsungGalaxyNote5BaseDevice)
+	"samsung-galaxy-note-5-pink": _.clone(SamsungGalaxyNote5BaseDevice)
+	"samsung-galaxy-note-5-silver-titanium": _.clone(SamsungGalaxyNote5BaseDevice)
+	"samsung-galaxy-note-5-white": _.clone(SamsungGalaxyNote5BaseDevice)
 
 	# Desktop Browser
 	"desktop-safari-1024-600":
@@ -729,6 +1062,7 @@ Devices =
 		deviceImageWidth: 1136
 		deviceImageHeight: 760
 		deviceImageJP2: true
+		backgroundColor: "white"
 	"desktop-safari-1280-800":
 		deviceType: "browser"
 		name: "Desktop Safari 1280 x 800"
@@ -737,6 +1071,7 @@ Devices =
 		deviceImageWidth: 1392
 		deviceImageHeight: 960
 		deviceImageJP2: true
+		backgroundColor: "white"
 	"desktop-safari-1440-900":
 		deviceType: "browser"
 		name: "Desktop Safari 1440 x 900"
@@ -745,89 +1080,92 @@ Devices =
 		deviceImageWidth: 1552
 		deviceImageHeight: 1060
 		deviceImageJP2: true
+		backgroundColor: "white"
+
+	# OLD DEVICES
 
 	# iPhone 6
-	"iphone-6-spacegray": _.clone(iPhone6BaseDevice)
-	"iphone-6-spacegray-hand": _.clone(iPhone6BaseDeviceHand)
-	"iphone-6-silver": _.clone(iPhone6BaseDevice)
-	"iphone-6-silver-hand": _.clone(iPhone6BaseDeviceHand)
-	"iphone-6-gold": _.clone(iPhone6BaseDevice)
-	"iphone-6-gold-hand": _.clone(iPhone6BaseDeviceHand)
+	"iphone-6-spacegray": _.clone(old_iPhone6BaseDevice)
+	"iphone-6-spacegray-hand": _.clone(old_iPhone6BaseDeviceHand)
+	"iphone-6-silver": _.clone(old_iPhone6BaseDevice)
+	"iphone-6-silver-hand": _.clone(old_iPhone6BaseDeviceHand)
+	"iphone-6-gold": _.clone(old_iPhone6BaseDevice)
+	"iphone-6-gold-hand": _.clone(old_iPhone6BaseDeviceHand)
 
 	# iPhone 6+
-	"iphone-6plus-spacegray": _.clone(iPhone6PlusBaseDevice)
-	"iphone-6plus-spacegray-hand": _.clone(iPhone6PlusBaseDeviceHand)
-	"iphone-6plus-silver": _.clone(iPhone6PlusBaseDevice)
-	"iphone-6plus-silver-hand": _.clone(iPhone6PlusBaseDeviceHand)
-	"iphone-6plus-gold": _.clone(iPhone6PlusBaseDevice)
-	"iphone-6plus-gold-hand": _.clone(iPhone6PlusBaseDeviceHand)
+	"iphone-6plus-spacegray": _.clone(old_iPhone6PlusBaseDevice)
+	"iphone-6plus-spacegray-hand": _.clone(old_iPhone6PlusBaseDeviceHand)
+	"iphone-6plus-silver": _.clone(old_iPhone6PlusBaseDevice)
+	"iphone-6plus-silver-hand": _.clone(old_iPhone6PlusBaseDeviceHand)
+	"iphone-6plus-gold": _.clone(old_iPhone6PlusBaseDevice)
+	"iphone-6plus-gold-hand": _.clone(old_iPhone6PlusBaseDeviceHand)
 
 	# iPhone 5S
-	"iphone-5s-spacegray": _.clone(iPhone5BaseDevice)
-	"iphone-5s-spacegray-hand":_.clone(iPhone5BaseDeviceHand)
-	"iphone-5s-silver": _.clone(iPhone5BaseDevice)
-	"iphone-5s-silver-hand": _.clone(iPhone5BaseDeviceHand)
-	"iphone-5s-gold": _.clone(iPhone5BaseDevice)
-	"iphone-5s-gold-hand": _.clone(iPhone5BaseDeviceHand)
+	"iphone-5s-spacegray": _.clone(old_iPhone5BaseDevice)
+	"iphone-5s-spacegray-hand":_.clone(old_iPhone5BaseDeviceHand)
+	"iphone-5s-silver": _.clone(old_iPhone5BaseDevice)
+	"iphone-5s-silver-hand": _.clone(old_iPhone5BaseDeviceHand)
+	"iphone-5s-gold": _.clone(old_iPhone5BaseDevice)
+	"iphone-5s-gold-hand": _.clone(old_iPhone5BaseDeviceHand)
 
 	# iPhone 5C
-	"iphone-5c-green": _.clone(iPhone5CBaseDevice)
-	"iphone-5c-green-hand": _.clone(iPhone5CBaseDeviceHand)
-	"iphone-5c-blue": _.clone(iPhone5CBaseDevice)
-	"iphone-5c-blue-hand": _.clone(iPhone5CBaseDeviceHand)
-	"iphone-5c-pink": _.clone(iPhone5CBaseDevice)
-	"iphone-5c-pink-hand": _.clone(iPhone5CBaseDeviceHand)
-	"iphone-5c-white": _.clone(iPhone5CBaseDevice)
-	"iphone-5c-white-hand": _.clone(iPhone5CBaseDeviceHand)
-	"iphone-5c-yellow": _.clone(iPhone5CBaseDevice)
-	"iphone-5c-yellow-hand": _.clone(iPhone5CBaseDeviceHand)
+	"iphone-5c-green": _.clone(old_iPhone5CBaseDevice)
+	"iphone-5c-green-hand": _.clone(old_iPhone5CBaseDeviceHand)
+	"iphone-5c-blue": _.clone(old_iPhone5CBaseDevice)
+	"iphone-5c-blue-hand": _.clone(old_iPhone5CBaseDeviceHand)
+	"iphone-5c-pink": _.clone(old_iPhone5CBaseDevice)
+	"iphone-5c-pink-hand": _.clone(old_iPhone5CBaseDeviceHand)
+	"iphone-5c-white": _.clone(old_iPhone5CBaseDevice)
+	"iphone-5c-white-hand": _.clone(old_iPhone5CBaseDeviceHand)
+	"iphone-5c-yellow": _.clone(old_iPhone5CBaseDevice)
+	"iphone-5c-yellow-hand": _.clone(old_iPhone5CBaseDeviceHand)
 
 	# iPad Mini
-	"ipad-mini-spacegray": _.clone(iPadMiniBaseDevice)
-	"ipad-mini-spacegray-hand": _.clone(iPadMiniBaseDeviceHand)
-	"ipad-mini-silver": _.clone(iPadMiniBaseDevice)
-	"ipad-mini-silver-hand": _.clone(iPadMiniBaseDeviceHand)
+	"ipad-mini-spacegray": _.clone(old_iPadMiniBaseDevice)
+	"ipad-mini-spacegray-hand": _.clone(old_iPadMiniBaseDeviceHand)
+	"ipad-mini-silver": _.clone(old_iPadMiniBaseDevice)
+	"ipad-mini-silver-hand": _.clone(old_iPadMiniBaseDeviceHand)
 
 	# iPad Air
-	"ipad-air-spacegray": _.clone(iPadAirBaseDevice)
-	"ipad-air-spacegray-hand": _.clone(iPadAirBaseDeviceHand)
-	"ipad-air-silver": _.clone(iPadAirBaseDevice)
-	"ipad-air-silver-hand": _.clone(iPadAirBaseDeviceHand)
+	"ipad-air-spacegray": _.clone(old_iPadAirBaseDevice)
+	"ipad-air-spacegray-hand": _.clone(old_iPadAirBaseDeviceHand)
+	"ipad-air-silver": _.clone(old_iPadAirBaseDevice)
+	"ipad-air-silver-hand": _.clone(old_iPadAirBaseDeviceHand)
 
 	# Nexus 5
-	"nexus-5-black": _.clone(Nexus5BaseDevice)
-	"nexus-5-black-hand": _.clone(Nexus5BaseDeviceHand)
+	"nexus-5-black": _.clone(old_Nexus5BaseDevice)
+	"nexus-5-black-hand": _.clone(old_Nexus5BaseDeviceHand)
 
 	# Nexus 9
-	"nexus-9": _.clone(Nexus9BaseDevice)
+	"nexus-9": _.clone(old_Nexus9BaseDevice)
 
 	# Apple Watch 38mm
-	"applewatchsport-38-aluminum-sportband-black": _.clone(AppleWatch38Device)
-	"applewatchsport-38-aluminum-sportband-blue": _.clone(AppleWatch38Device)
-	"applewatchsport-38-aluminum-sportband-green": _.clone(AppleWatch38Device)
-	"applewatchsport-38-aluminum-sportband-pink": _.clone(AppleWatch38Device)
-	"applewatchsport-38-aluminum-sportband-white": _.clone(AppleWatch38Device)
-	"applewatch-38-black-bracelet": _.clone(AppleWatch38Device)
-	"applewatch-38-steel-bracelet": _.clone(AppleWatch38Device)
-	"applewatchedition-38-gold-buckle-blue": _.clone(AppleWatch38Device)
-	"applewatchedition-38-gold-buckle-gray": _.clone(AppleWatch38Device)
-	"applewatchedition-38-gold-buckle-red": _.clone(AppleWatch38Device)
-	"applewatchedition-38-gold-sportband-black": _.clone(AppleWatch38Device)
-	"applewatchedition-38-gold-sportband-white": _.clone(AppleWatch38Device)
+	"applewatchsport-38-aluminum-sportband-black": _.clone(old_AppleWatch38Device)
+	"applewatchsport-38-aluminum-sportband-blue": _.clone(old_AppleWatch38Device)
+	"applewatchsport-38-aluminum-sportband-green": _.clone(old_AppleWatch38Device)
+	"applewatchsport-38-aluminum-sportband-pink": _.clone(old_AppleWatch38Device)
+	"applewatchsport-38-aluminum-sportband-white": _.clone(old_AppleWatch38Device)
+	"applewatch-38-black-bracelet": _.clone(old_AppleWatch38Device)
+	"applewatch-38-steel-bracelet": _.clone(old_AppleWatch38Device)
+	"applewatchedition-38-gold-buckle-blue": _.clone(old_AppleWatch38Device)
+	"applewatchedition-38-gold-buckle-gray": _.clone(old_AppleWatch38Device)
+	"applewatchedition-38-gold-buckle-red": _.clone(old_AppleWatch38Device)
+	"applewatchedition-38-gold-sportband-black": _.clone(old_AppleWatch38Device)
+	"applewatchedition-38-gold-sportband-white": _.clone(old_AppleWatch38Device)
 
 	# Apple Watch 42mm
-	"applewatchsport-42-aluminum-sportband-black": _.clone(AppleWatch42Device)
-	"applewatchsport-42-aluminum-sportband-blue": _.clone(AppleWatch42Device)
-	"applewatchsport-42-aluminum-sportband-green": _.clone(AppleWatch42Device)
-	"applewatchsport-42-aluminum-sportband-pink": _.clone(AppleWatch42Device)
-	"applewatchsport-42-aluminum-sportband-white": _.clone(AppleWatch42Device)
-	"applewatch-42-black-bracelet": _.clone(AppleWatch42Device)
-	"applewatch-42-steel-bracelet": _.clone(AppleWatch42Device)
-	"applewatchedition-42-gold-buckle-blue": _.clone(AppleWatch42Device)
-	"applewatchedition-42-gold-buckle-gray": _.clone(AppleWatch42Device)
-	"applewatchedition-42-gold-buckle-red": _.clone(AppleWatch42Device)
-	"applewatchedition-42-gold-sportband-black": _.clone(AppleWatch42Device)
-	"applewatchedition-42-gold-sportband-white": _.clone(AppleWatch42Device)
+	"applewatchsport-42-aluminum-sportband-black": _.clone(old_AppleWatch42Device)
+	"applewatchsport-42-aluminum-sportband-blue": _.clone(old_AppleWatch42Device)
+	"applewatchsport-42-aluminum-sportband-green": _.clone(old_AppleWatch42Device)
+	"applewatchsport-42-aluminum-sportband-pink": _.clone(old_AppleWatch42Device)
+	"applewatchsport-42-aluminum-sportband-white": _.clone(old_AppleWatch42Device)
+	"applewatch-42-black-bracelet": _.clone(old_AppleWatch42Device)
+	"applewatch-42-steel-bracelet": _.clone(old_AppleWatch42Device)
+	"applewatchedition-42-gold-buckle-blue": _.clone(old_AppleWatch42Device)
+	"applewatchedition-42-gold-buckle-gray": _.clone(old_AppleWatch42Device)
+	"applewatchedition-42-gold-buckle-red": _.clone(old_AppleWatch42Device)
+	"applewatchedition-42-gold-sportband-black": _.clone(old_AppleWatch42Device)
+	"applewatchedition-42-gold-sportband-white": _.clone(old_AppleWatch42Device)
 
 
 exports.DeviceComponent.Devices = Devices
