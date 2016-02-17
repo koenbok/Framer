@@ -132,7 +132,10 @@ class exports.LayerDraggable extends BaseClass
 		# so we can use it to detect a click versus a drag.
 		@_isMoving = @isAnimating
 
-		@layer.animateStop()
+		for animation in @layer.animations()
+			if animation.options.properties.hasOwnProperty('x') or animation.options.properties.hasOwnProperty('y')
+				animation.stop()
+
 		@_stopSimulation()
 		@_resetdirectionLock()
 
