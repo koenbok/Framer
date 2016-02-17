@@ -59,6 +59,8 @@ class exports.DeviceComponent extends BaseClass
 
 		_.extend(@, _.defaults(options, defaults))
 
+		window.addEventListener("orientationchange", @_orientationChange, true)
+
 	_setup: ->
 
 		if @_setupDone
@@ -400,7 +402,10 @@ class exports.DeviceComponent extends BaseClass
 	# PHONE ORIENTATION
 
 	@define "orientation",
-		get: -> @_orientation or 0
+		get: ->
+			return window.orientation if Utils.isMobile()
+			return @_orientation or 0
+
 		set: (orientation) -> @setOrientation(orientation, false)
 
 	setOrientation: (orientation, animate=false) ->
@@ -426,14 +431,14 @@ class exports.DeviceComponent extends BaseClass
 
 		# Calculate properties for the phone
 		phoneProperties =
-			rotationZ: @_orientation
+			rotationZ: -@_orientation
 			scale: @_calculatePhoneScale()
 
 		[width, height] = @_getOrientationDimensions(@_device.screenWidth, @_device.screenHeight)
 		[x, y] = [(@screen.width - width) / 2, (@screen.height - height) / 2]
 
 		contentProperties =
-			rotationZ: -@_orientation
+			rotationZ: @_orientation
 			width:  width
 			height: height
 			x: x
@@ -462,7 +467,10 @@ class exports.DeviceComponent extends BaseClass
 
 		@handsImageLayer.image = "" if @_orientation != 0
 
-		@emit("change:orientation")
+		@emit("change:orientation", @_orientation)
+
+	_orientationChange: =>
+		@emit("change:orientation", window.orientation)
 
 	isPortrait: -> Math.abs(@_orientation) != 90
 	isLandscape: -> !@isPortrait()
