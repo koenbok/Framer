@@ -410,6 +410,8 @@ class exports.DeviceComponent extends BaseClass
 
 	setOrientation: (orientation, animate=false) ->
 
+		orientation *= -1 if Utils.framerStudioVersion() == oldDeviceMaxVersion
+
 		if orientation == "portrait"
 			orientation = 0
 
