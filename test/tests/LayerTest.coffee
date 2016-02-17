@@ -1026,10 +1026,24 @@ describe "Layer", ->
 			copy.width.should.equal 100
 			copy.height.should.equal 100
 
-		# it "copied layer should copy styles", ->
 
-		# 	layer = new Layer
-		# 	layer.style.backgroundColor = "yellow"
+	describe "Draggable", ->
 
-		# 	layer2 = layer.copy()
-		# 	layer2.style.backgroundColor.should.equal "yellow"
+		it "should stop x and y animations on drag start", ->
+
+			layer = new Layer
+			layer.draggable.enabled = true
+
+			a1 = layer.animate properties: {x:100}
+			a2 = layer.animate properties: {y:100}
+			a3 = layer.animate properties: {blur:1}
+
+			a1.isAnimating.should.equal true
+			a2.isAnimating.should.equal true
+			a3.isAnimating.should.equal true
+
+			layer.draggable.touchStart(document.createEvent("MouseEvent"))
+
+			a1.isAnimating.should.equal false
+			a2.isAnimating.should.equal false
+			a3.isAnimating.should.equal true
