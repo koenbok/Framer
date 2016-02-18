@@ -99,7 +99,7 @@ class exports.DeviceComponent extends BaseClass
 		@content.originX = 0
 		@content.originY = 0
 
-		Framer.CurrentContext.domEventManager.wrap(window).addEventListener("resize", @_update)
+		Framer.CurrentContext.domEventManager.wrap(window).addEventListener("resize", @_update) unless Utils.isMobile()
 
 		# This avoids rubber banding on mobile
 		for layer in [@background, @phone, @viewport, @content, @screen]
@@ -140,11 +140,11 @@ class exports.DeviceComponent extends BaseClass
 				@_device.screenWidth / contentScaleFactor,
 				@_device.screenHeight / contentScaleFactor)
 
-			@screen.width  = @_device.screenWidth
-			@screen.height = @_device.screenHeight
+			@screen.width  = @viewport.width = @_device.screenWidth
+			@screen.height = @viewport.height = @_device.screenHeight
 
-			@viewport.width  = @content.width  = width
-			@viewport.height = @content.height = height
+			@content.width  = width
+			@content.height = height
 			@screen.center()
 
 			@setHand(@selectedHand) if @selectedHand && @_orientation == 0
@@ -437,21 +437,26 @@ class exports.DeviceComponent extends BaseClass
 			scale: @_calculatePhoneScale()
 
 		[width, height] = @_getOrientationDimensions(@_device.screenWidth, @_device.screenHeight)
-		[x, y] = [(@screen.width - width) / 2, (@screen.height - height) / 2]
+
+		@content.width = width
+		@content.height = height
+
+		offset = (@screen.width - width) / 2
+		offset *= -1 if @_orientation == -90
+
+		[x, y] = [0, 0]
+
+		if @isLandscape()
+			x = offset
+			y = offset
 
 		contentProperties =
 			rotationZ: @_orientation
-			width:  width
-			height: height
 			x: x
 			y: y
 
 		@hands.animateStop()
 		@viewport.animateStop()
-
-		# FIXME: After a rotation we call _update() again to set all the right
-		# dimensions, but these should be correctly animated instead of set after
-		# the animation.
 
 		if animate
 			animation = @hands.animate _.extend @animationOptions,
@@ -472,9 +477,10 @@ class exports.DeviceComponent extends BaseClass
 		@emit("change:orientation", @_orientation)
 
 	_orientationChange: =>
+		@_update()
 		@emit("change:orientation", window.orientation)
 
-	isPortrait: -> Math.abs(@_orientation) != 90
+	isPortrait: -> Math.abs(@_orientation) == 0
 	isLandscape: -> !@isPortrait()
 
 	@define "orientationName",

@@ -59,6 +59,7 @@ Defaults.setup()
 Framer.resetDefaults = Defaults.reset
 
 Framer.DefaultContext = new Framer.Context(name:"Default")
+Framer.DefaultContext.backgroundColor = "white"
 Framer.CurrentContext = Framer.DefaultContext
 
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
