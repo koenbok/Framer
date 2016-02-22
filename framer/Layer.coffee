@@ -609,16 +609,10 @@ class exports.Layer extends BaseClass
 			if currentValue == value
 				return @emit "load"
 
-			# Todo: this is not very nice but I wanted to have it fixed
-			# defaults = Defaults.getDefaults "Layer", {}
-
-			# console.log defaults.backgroundColor
-			# console.log @_defaultValues?.backgroundColor
-
-			# if defaults.backgroundColor == @_defaultValues?.backgroundColor
-			# 	@backgroundColor = null
-
-			@backgroundColor = null
+			# Unset the background color only if it’s the default color 
+			defaults = Defaults.getDefaults "Layer", {}
+			if @backgroundColor?.isEqual(defaults.backgroundColor)
+				@backgroundColor = null
 
 			# Set the property value
 			@_setPropertyValue("image", value)
