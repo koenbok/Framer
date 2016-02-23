@@ -477,6 +477,7 @@ class exports.DeviceComponent extends BaseClass
 		@emit("change:orientation", @_orientation)
 
 	_orientationChange: =>
+		@_orientation = window.orientation
 		@_update()
 		@emit("change:orientation", window.orientation)
 
