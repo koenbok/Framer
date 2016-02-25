@@ -481,7 +481,7 @@ class exports.DeviceComponent extends BaseClass
 		@_update()
 		@emit("change:orientation", window.orientation)
 
-	isPortrait: -> Math.abs(@_orientation) == 0
+	isPortrait: -> Math.abs(@_orientation) is 0 or !@_orientation?
 	isLandscape: -> !@isPortrait()
 
 	@define "orientationName",
