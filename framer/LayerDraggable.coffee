@@ -22,7 +22,7 @@ Events.DirectionLockStart    = "directionlockstart"
 # Add deprecated aliases
 Events.DragAnimationDidStart = Events.DragAnimationStart
 Events.DragAnimationDidEnd = Events.DragAnimationEnd
-
+Events.DirectionLockDidStart = Events.DirectionLockStart
 
 """
 
