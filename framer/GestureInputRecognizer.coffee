@@ -21,13 +21,6 @@ if not Utils.isTouch()
 	TouchMove = "mousemove"
 	TouchEnd = "mouseup"
 
-Utils.sanitizeRotation = ->
-	previous = null
-	return sanitize = (value) ->
-		previous ?= value
-		return value
-
-
 class exports.GestureInputRecognizer
 
 	constructor: ->
@@ -58,7 +51,6 @@ class exports.GestureInputRecognizer
 			pressTimer: window.setTimeout(@longpressstart, GestureInputLongPressTime * 1000)
 			started: {}
 			events: []
-			sanitizeRotation: Utils.sanitizeRotation()
 			eventCount: 0
 
 		event = @_getGestureEvent(event)
@@ -77,6 +69,7 @@ class exports.GestureInputRecognizer
 		@_process(@_getGestureEvent(event))
 
 	touchend: (event) =>
+
 		# Only fire if there are no fingers left on the screen
 
 		if event.touches?
@@ -94,7 +87,14 @@ class exports.GestureInputRecognizer
 		for eventName, value of @session.started
 			@["#{eventName}end"](event) if value
 
-		@tap(event)
+		# We only want to fire a tap event if the original target is the same
+		# as the release target, so buttons work the way you expect if you
+		# release the mouse outside.
+		if not @session?.startEvent
+			@tap(event)
+		else if @session.startEvent.target is event.target
+			@tap(event)
+
 		@tapend(event)
 		@cancel()
 
@@ -465,6 +465,10 @@ class exports.GestureInputRecognizer
 
 	_dispatchEvent: (type, event, target) ->
 		touchEvent = @_createEvent(type, event)
+		# By default we want to send the event to the target at the beginning
+		# of this session, so we catch tap ends etc when the mouse is released
+		# outside of the original target.
+		target ?= @session?.startEvent?.target
 		target ?= event.target
 		target.dispatchEvent(touchEvent)
 
@@ -473,9 +477,8 @@ class exports.GestureInputRecognizer
 		return {x:0, y:0} if events.length < 2
 
 		current = events[events.length - 1]
-		first   = events[0]
-		time    = current.time - first.time
-
+		first = events[0]
+		time = current.time - first.time
 
 		velocity =
 			x: (current.point.x - first.point.x) / time
