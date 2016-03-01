@@ -12,6 +12,14 @@ GestureInputMinimumFingerDistance = 30
 
 {DOMEventManager} = require "./DOMEventManager"
 
+TouchStart = "touchstart"
+TouchMove = "touchmove"
+TouchEnd = "touchend"
+
+if not Utils.isTouch()
+	TouchStart = "mousedown"
+	TouchMove = "mousemove"
+	TouchEnd = "mouseup"
 
 Utils.sanitizeRotation = ->
 	previous = null
@@ -24,7 +32,7 @@ class exports.GestureInputRecognizer
 
 	constructor: ->
 		@em = new DOMEventManager()
-		@em.wrap(window).addEventListener("touchstart", @touchstart)
+		@em.wrap(window).addEventListener(TouchStart, @touchstart)
 
 	destroy: ->
 		@em.removeAllListeners()
@@ -38,8 +46,8 @@ class exports.GestureInputRecognizer
 		# Only fire if we are not already in a session
 		return if @session
 
-		@em.wrap(window).addEventListener("touchmove", @touchmove)
-		@em.wrap(window).addEventListener("touchend", @touchend)
+		@em.wrap(window).addEventListener(TouchMove, @touchmove)
+		@em.wrap(window).addEventListener(TouchEnd, @touchend)
 		@em.wrap(window).addEventListener("webkitmouseforcechanged", @_updateMacForce)
 
 		@session =
@@ -71,13 +79,14 @@ class exports.GestureInputRecognizer
 	touchend: (event) =>
 		# Only fire if there are no fingers left on the screen
 
-		if Utils.isTouch()
-			return unless (event.touches.length == 0)
-		else
-			return unless (event.touches.length == event.changedTouches.length)
+		if event.touches?
+			if Utils.isTouch()
+				return unless (event.touches.length == 0)
+			else
+				return unless (event.touches.length == event.changedTouches.length)
 
-		@em.wrap(window).removeEventListener("touchmove", @touchmove)
-		@em.wrap(window).removeEventListener("touchend", @touchend)
+		@em.wrap(window).removeEventListener(TouchMove, @touchmove)
+		@em.wrap(window).removeEventListener(TouchEnd, @touchend)
 		@em.wrap(window).removeEventListener("webkitmouseforcechanged", @_updateMacForce)
 
 		event = @_getGestureEvent(event)
