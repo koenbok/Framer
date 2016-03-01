@@ -274,8 +274,11 @@ class exports.Layer extends BaseClass
 
 		set: (value) ->
 
-			if value and not _.isNumber(value)
-				console.warn "Layer.borderRadius should be a numeric property, not type #{typeof(value)}"
+			if value and not (_.isNumber(value) or _.isArray(value))
+				console.warn "Layer.borderRadius should be a numeric property or an array, not type #{typeof(value)}"
+
+			if value and _.isArray(value) and value.length > 4
+				 console.warn "Layer.borderRadius should not be set to more than 4 values"
 
 			@_properties["borderRadius"] = value
 			@_element.style["borderRadius"] = LayerStyle["borderRadius"](@)
