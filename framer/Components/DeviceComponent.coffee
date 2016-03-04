@@ -388,7 +388,10 @@ class exports.DeviceComponent extends BaseClass
 		@_contentScale = contentScale
 
 		if animate
-			@content.animate @animationOptions
+			@content.animate _.extend @animationOptions,
+				properties: {scale: @_contentScale}
+		else
+			@content.scale = @_contentScale
 			
 		@_setViewportScale()
 		@_update()
