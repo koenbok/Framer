@@ -221,3 +221,4 @@ exports.enable = ->
 exports.disable = ->
 	return unless touchEmulator
 	touchEmulator.destroy()
+	touchEmulator = null

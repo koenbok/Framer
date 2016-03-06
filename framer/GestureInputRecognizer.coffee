@@ -12,19 +12,20 @@ GestureInputMinimumFingerDistance = 30
 
 {DOMEventManager} = require "./DOMEventManager"
 
+TouchStart = "touchstart"
+TouchMove = "touchmove"
+TouchEnd = "touchend"
 
-Utils.sanitizeRotation = ->
-	previous = null
-	return sanitize = (value) ->
-		previous ?= value
-		return value
-
+if not Utils.isTouch()
+	TouchStart = "mousedown"
+	TouchMove = "mousemove"
+	TouchEnd = "mouseup"
 
 class exports.GestureInputRecognizer
 
 	constructor: ->
 		@em = new DOMEventManager()
-		@em.wrap(window).addEventListener("touchstart", @touchstart)
+		@em.wrap(window).addEventListener(TouchStart, @touchstart)
 
 	destroy: ->
 		@em.removeAllListeners()
@@ -38,8 +39,8 @@ class exports.GestureInputRecognizer
 		# Only fire if we are not already in a session
 		return if @session
 
-		@em.wrap(window).addEventListener("touchmove", @touchmove)
-		@em.wrap(window).addEventListener("touchend", @touchend)
+		@em.wrap(window).addEventListener(TouchMove, @touchmove)
+		@em.wrap(window).addEventListener(TouchEnd, @touchend)
 		@em.wrap(window).addEventListener("webkitmouseforcechanged", @_updateMacForce)
 
 		@session =
@@ -50,7 +51,6 @@ class exports.GestureInputRecognizer
 			pressTimer: window.setTimeout(@longpressstart, GestureInputLongPressTime * 1000)
 			started: {}
 			events: []
-			sanitizeRotation: Utils.sanitizeRotation()
 			eventCount: 0
 
 		event = @_getGestureEvent(event)
@@ -69,15 +69,17 @@ class exports.GestureInputRecognizer
 		@_process(@_getGestureEvent(event))
 
 	touchend: (event) =>
+
 		# Only fire if there are no fingers left on the screen
 
-		if Utils.isTouch()
-			return unless (event.touches.length == 0)
-		else
-			return unless (event.touches.length == event.changedTouches.length)
+		if event.touches?
+			if Utils.isTouch()
+				return unless (event.touches.length == 0)
+			else
+				return unless (event.touches.length == event.changedTouches.length)
 
-		@em.wrap(window).removeEventListener("touchmove", @touchmove)
-		@em.wrap(window).removeEventListener("touchend", @touchend)
+		@em.wrap(window).removeEventListener(TouchMove, @touchmove)
+		@em.wrap(window).removeEventListener(TouchEnd, @touchend)
 		@em.wrap(window).removeEventListener("webkitmouseforcechanged", @_updateMacForce)
 
 		event = @_getGestureEvent(event)
@@ -85,7 +87,14 @@ class exports.GestureInputRecognizer
 		for eventName, value of @session.started
 			@["#{eventName}end"](event) if value
 
-		@tap(event)
+		# We only want to fire a tap event if the original target is the same
+		# as the release target, so buttons work the way you expect if you
+		# release the mouse outside.
+		if not @session?.startEvent
+			@tap(event)
+		else if @session.startEvent.target is event.target
+			@tap(event)
+
 		@tapend(event)
 		@cancel()
 
@@ -456,6 +465,10 @@ class exports.GestureInputRecognizer
 
 	_dispatchEvent: (type, event, target) ->
 		touchEvent = @_createEvent(type, event)
+		# By default we want to send the event to the target at the beginning
+		# of this session, so we catch tap ends etc when the mouse is released
+		# outside of the original target.
+		target ?= @session?.startEvent?.target
 		target ?= event.target
 		target.dispatchEvent(touchEvent)
 
@@ -464,9 +477,8 @@ class exports.GestureInputRecognizer
 		return {x:0, y:0} if events.length < 2
 
 		current = events[events.length - 1]
-		first   = events[0]
-		time    = current.time - first.time
-
+		first = events[0]
+		time = current.time - first.time
 
 		velocity =
 			x: (current.point.x - first.point.x) / time

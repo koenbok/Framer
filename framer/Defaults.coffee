@@ -24,13 +24,14 @@ Originals =
 	DeviceComponent:
 		fullScreen: false
 		padding: 50
-		deviceType: "iphone-5s-spacegray"
+		deviceType: "apple-iphone-6s-silver"
 		deviceZoom: "fit"
 		contentZoom: 1
 		orientation: "portrait"
 		keyboard: false
 		animationOptions:
-			curve: "spring(400,40,0)"
+			time: .3
+			curve: "ease-in-out"
 	LayerDraggable:
 		momentum: true
 		momentumOptions:

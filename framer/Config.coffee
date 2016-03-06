@@ -12,7 +12,6 @@ body {
 	right: 0;
 	bottom: 0;
 	pointer-events: none;
-	overflow: hidden;
 }
 
 .framerLayer {

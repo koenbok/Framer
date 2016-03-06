@@ -3,7 +3,7 @@ import os
 import sys
 
 path = os.path.join("extras", "DeviceResources")
-quality = 15
+quality = 25
 
 os.chdir(path)
 

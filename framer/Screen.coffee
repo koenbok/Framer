@@ -11,9 +11,9 @@ class ScreenClass extends BaseClass
 	@define "backgroundColor",
 		importable: false
 		exportable: false
-		get: -> Framer.CurrentContext.backgroundColor
+		get: -> Framer.Device.screen.backgroundColor
 		set: (value) ->
-			Framer.CurrentContext.backgroundColor = value
+			Framer.Device.screen.backgroundColor = value
 
 	@define "perspective",
 		importable: false

@@ -22,7 +22,7 @@ Events.DirectionLockStart    = "directionlockstart"
 # Add deprecated aliases
 Events.DragAnimationDidStart = Events.DragAnimationStart
 Events.DragAnimationDidEnd = Events.DragAnimationEnd
-
+Events.DirectionLockDidStart = Events.DirectionLockStart
 
 """
 
@@ -132,7 +132,12 @@ class exports.LayerDraggable extends BaseClass
 		# so we can use it to detect a click versus a drag.
 		@_isMoving = @isAnimating
 
-		@layer.animateStop()
+		# Stop any animations influencing the position, but no others.
+		for animation in @layer.animations()
+			properties = animation.options.properties
+			if properties.hasOwnProperty("x") or properties.hasOwnProperty("y")
+				animation.stop()
+
 		@_stopSimulation()
 		@_resetdirectionLock()
 
@@ -189,16 +194,6 @@ class exports.LayerDraggable extends BaseClass
 			x: touchEvent.clientX
 			y: touchEvent.clientY
 			t: Date.now() # We don't use timeStamp because it's different on Chrome/Safari
-
-		# Disable constraints drag if overdrag is disabled
-		if @overdrag is false
-			# TODO: We still need to account for the cursor offset here
-			frame = Utils.convertFrameToContext(@constraints, @layer, true, false)
-			return if event.point.x < Utils.frameGetMinX(frame)
-			return if event.point.x > Utils.frameGetMaxX(frame)
-			return if event.point.y < Utils.frameGetMinY(frame)
-			return if event.point.y > Utils.frameGetMaxY(frame)
-
 
 		point = _.clone(@_point)
 

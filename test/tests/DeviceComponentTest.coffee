@@ -3,7 +3,7 @@ describe "DeviceComponent", ->
 	it "should default to iphone 5s spacegray", ->
 
 		comp = new DeviceComponent()
-		comp.deviceType.should.equal "iphone-5s-spacegray"
+		comp.deviceType.should.equal "apple-iphone-6s-silver"
 
 	it "should use images on server for built in devices when not in Studio", ->
 
@@ -41,6 +41,12 @@ describe "DeviceComponent", ->
 			return true
 		Utils.isFramerStudio().should.be.true
 
+		# stub framerStudioVersion
+
+		_originalIsFramerStudioVersion = Utils.framerStudioVersion
+		Utils.framerStudioVersion = ->
+			return Number.MAX_VALUE
+
 		# example url
 		localFileUrl = "file:///Users/name/Library/Developer/Xcode/DerivedData/Framer_Studio/Build/Products/Debug/Framer%20Studio.app/Contents/Resources/DeviceImages/"
 
@@ -57,6 +63,7 @@ describe "DeviceComponent", ->
 
 		# reset stubs
 		Utils.isFramerStudio = _originalIsFramerStudio
+		Utils.framerStudioVersion = _originalIsFramerStudioVersion
 
 	it "should use deviceImageName when a custom device is used in Studio", ->
 
@@ -92,8 +99,8 @@ describe "DeviceComponent", ->
 
 		device = new DeviceComponent()
 		device.context.run ->
-			Screen.size.should.eql {width:640, height:1136}
-			Utils.inspect(Screen).should.equal "<Screen 640x1136>"
+			Screen.size.should.eql {width:750, height:1334}
+			Utils.inspect(Screen).should.equal "<Screen 750x1334>"
 
 		device.deviceType = "nexus-5-black"
 		device.context.run ->

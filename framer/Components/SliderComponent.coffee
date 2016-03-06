@@ -17,6 +17,8 @@ valueForPoint(<n>)
 animateToValue(value, animationOptions={})
 """
 
+Events.SliderValueChange  = "sliderValueChange"
+
 class Knob extends Layer
 
 	constructor: (options) ->
@@ -235,6 +237,7 @@ class exports.SliderComponent extends Layer
 
 	_updateValue: =>
 		@emit("change:value", @value)
+		@emit(Events.SliderValueChange, @value)
 
 	pointForValue: (value) ->
 		if @width > @height
@@ -269,3 +272,8 @@ class exports.SliderComponent extends Layer
 			@knob.on("change:y", @_updateValue)
 
 		@knob.animate(animationOptions)
+
+	##############################################################
+	## EVENT HELPERS
+
+	onValueChange: (cb) -> @on(Events.SliderValueChange, cb)

@@ -331,6 +331,22 @@ Utils.isLocalAssetUrl = (url, baseUrl) ->
 Utils.isFramerStudio = ->
 	navigator.userAgent.indexOf("FramerStudio") != -1
 
+Utils.framerStudioVersion = ->
+
+	if Utils.isFramerStudio()
+
+		isBeta = navigator.userAgent.indexOf("FramerStudio/beta") >= 0
+		isLocal = navigator.userAgent.indexOf("FramerStudio/local") >= 0
+		isFuture = navigator.userAgent.indexOf("FramerStudio/future") >= 0
+		return Number.MAX_VALUE if isBeta or isLocal or isFuture
+
+		matches = navigator.userAgent.match(/\d+$/)
+		version = parseInt(matches[0]) if matches and matches.length > 0
+		return version if _.isNumber(version)
+
+	# if we don't know the version we are probably running the beta or a local build
+	return Number.MAX_VALUE
+
 Utils.devicePixelRatio = ->
 	window.devicePixelRatio
 

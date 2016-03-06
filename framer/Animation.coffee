@@ -4,7 +4,7 @@ Utils = require "./Utils"
 
 {Config} = require "./Config"
 {Defaults} = require "./Defaults"
-{EventEmitter} = require "./EventEmitter"
+{BaseClass} = require "./BaseClass"
 
 {LinearAnimator} = require "./Animators/LinearAnimator"
 {BezierCurveAnimator} = require "./Animators/BezierCurveAnimator"
@@ -61,7 +61,7 @@ createDebugLayerForPath = (path) ->
 
 # Todo: this would normally be BaseClass but the properties keyword
 # is not compatible and causes problems.
-class exports.Animation extends EventEmitter
+class exports.Animation extends BaseClass
 
 	constructor: (options={}) ->
 
@@ -105,6 +105,9 @@ class exports.Animation extends EventEmitter
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
+
+	@define "isAnimating",
+		get: -> @ in @options.layer.context.animations
 
 	start: =>
 
@@ -334,6 +337,10 @@ class exports.Animation extends EventEmitter
 
 
 		return animatableProperties
+
+	toInspect: ->
+		return "<#{@constructor.name} id:#{@id} isAnimating:#{@isAnimating} [#{_.keys(@options.properties)}]>"
+
 
 	##############################################################
 	## EVENT HELPERS
