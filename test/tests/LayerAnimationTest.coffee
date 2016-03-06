@@ -112,6 +112,19 @@ describe "LayerAnimation", ->
 				layer.backgroundColor.toName().should.eql color
 				done()
 
+		it "should automatically compute the target position when the path option is specified", (done) ->
+			target = x: 100, y: 200
+			layer = new Layer()
+
+			layer.animate
+				path: Path.arc(to: target)
+				time: AnimationTime
+
+			layer.on "end", ->
+				layer.x.should.be.closeTo 50, 0.1
+				layer.y.should.be.closeTo 150, 0.1
+				done()
+
 	describe "Basic", ->
 
 		it "should stop", (done) ->

@@ -155,7 +155,9 @@ Path = (init) ->
 			to.y - o.y
 
 		largeArc ||= 0
+		largeArc = if largeArc then 1 else 0
 		sweep ||= 1
+		sweep = if sweep then 1 else 0
 
 		plus
 			command: 'A'
@@ -353,7 +355,7 @@ Path = (init) ->
 	{ moveTo, lineTo, hlineTo, vlineTo, closePath, curve, curveTo, smoothCurveTo,
 		qcurveTo, smoothqCurveTo, arc, thru, pointAtLength,
 		elementForDebugRepresentation, start, end, length, node, forLayer, toString,
-		points }
+		points, instructions }
 
 # Initializers that let you write Path.curve, instead of Path().curve
 for method in ['curve', 'arc', 'thru', 'moveTo']

@@ -1,8 +1,10 @@
 {
-  "updateDelay" : 0.3,
-  "deviceScale" : -1,
   "deviceOrientation" : 0,
-  "contentScale" : 1,
   "sharedPrototype" : 0,
-  "deviceType" : "fullscreen"
+  "contentScale" : 1,
+  "deviceType" : "fullscreen",
+  "selectedHand" : "",
+  "updateDelay" : 0.3,
+  "deviceScale" : 1,
+  "orientation" : 0
 }
