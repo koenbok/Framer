@@ -145,18 +145,18 @@ Path = (init) ->
 			{ x: 0, y: 0 }
 
 	arc = ({ to, rx, ry, xrot, largeArc, sweep}) ->
-		xrot ||= 0
-		rx ||= (instructions) ->
+		xrot ?= 0
+		rx ?= (instructions) ->
 			o = originOrZero(instructions)
 			to.x - o.x
 
-		ry ||= (instructions) ->
+		ry ?= (instructions) ->
 			o = originOrZero(instructions)
 			to.y - o.y
 
-		largeArc ||= 0
+		largeArc ?= 0
 		largeArc = if largeArc then 1 else 0
-		sweep ||= 1
+		sweep ?= 1
 		sweep = if sweep then 1 else 0
 
 		plus

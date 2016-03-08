@@ -88,6 +88,20 @@ describe 'Path', ->
       path = Path.moveTo(point1).arc(to: point2, largeArc: true)
       path.toString().should.match /M \d+ \d+ A \d+ \d+ \d 1 \d \d+ \d+/
 
+    it 'should default to a positive angle arc sweep', ->
+      point1 = { x: 10, y: 10 }
+      point2 = { x: 100, y: 100 }
+
+      path = Path.moveTo(point1).arc(to: point2)
+      path.toString().should.match /M \d+ \d+ A \d+ \d+ \d \d 1 \d+ \d+/
+
+    it 'should let you pick the negative angle arc sweep', ->
+      point1 = { x: 10, y: 10 }
+      point2 = { x: 100, y: 100 }
+
+      path = Path.moveTo(point1).arc(to: point2, sweep: 0)
+      path.toString().should.match /M \d+ \d+ A \d+ \d+ \d \d 0 \d+ \d+/
+
     it 'should let you specify a horizontal and vertical radius for the arc', ->
       point1 = { x: 10, y: 10 }
       point2 = { x: 100, y: 100 }
