@@ -432,7 +432,11 @@ wrapComponent = (instance, layer, options = {correct:true}) ->
 		layer.image = null
 
 	# Set the original layer as the content layer for the scroll
-	scroll.setContentLayer(layer)
+	if instance.constructor.name is "PageComponent"
+		for l in layer.children
+			scroll.addPage(l)
+	else
+		scroll.setContentLayer(layer)
 
 	# https://github.com/motif/Company/issues/208
 
