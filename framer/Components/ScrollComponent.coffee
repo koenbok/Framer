@@ -143,9 +143,8 @@ class exports.ScrollComponent extends Layer
 		return unless @content
 
 		contentFrame = @calculateContentFrame()
-		contentFrame.x = contentFrame.x + @_contentInset.left
-		contentFrame.y = contentFrame.y + @_contentInset.top
-		@content.frame = contentFrame
+		@content.width = contentFrame.width
+		@content.height = contentFrame.height
 
 		constraintsFrame = @calculateContentFrame()
 		constraintsFrame =
