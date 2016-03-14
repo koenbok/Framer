@@ -172,10 +172,9 @@ class exports.PageComponent extends ScrollComponent
 			start = @content.draggable._layerStartPoint
 			end = @content.draggable.layer.point
 
-			if start.x != end.x || start.y != end.y
+			if start.x isnt end.x or start.y isnt end.y
 				@snapToPage(@closestPage, true, @animationOptions)
-
-			return
+				return
 
 		# Figure out which direction we are scrolling to and make a sorted list of
 		# layers on that side, sorted by absolute distance so we can pick the first.
