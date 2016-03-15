@@ -173,6 +173,7 @@ class exports.ScrollComponent extends Layer
 			@scrollHorizontal = @scrollVertical = value
 
 	_calculateContentPoint: (scrollPoint) ->
+		scrollPoint = _.defaults(scrollPoint, {x:0, y:0})
 		scrollPoint.x -= @contentInset.left
 		scrollPoint.y -= @contentInset.top
 		point = @_pointInConstraints(scrollPoint)
