@@ -155,8 +155,8 @@ class exports.PageComponent extends ScrollComponent
 
 	_scrollEnd: =>
 
-		return if @_isAnimating
-		
+		return if @content.isAnimating
+
 		velocity = @content.draggable.velocity
 
 		# See if we meet the minimum velocity to scroll to the next page. If not we snap
@@ -174,9 +174,10 @@ class exports.PageComponent extends ScrollComponent
 			start = @content.draggable._layerStartPoint
 			end = @content.draggable.layer.point
 
-			if start.x isnt end.x or start.y isnt end.y
-				@snapToPage(@closestPage, true, @animationOptions)
-				return
+			if start? and end?
+				if start.x isnt end.x or start.y isnt end.y
+					@snapToPage(@closestPage, true, @animationOptions)
+					return
 
 		# Figure out which direction we are scrolling to and make a sorted list of
 		# layers on that side, sorted by absolute distance so we can pick the first.
