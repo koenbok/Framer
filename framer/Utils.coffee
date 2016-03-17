@@ -838,7 +838,7 @@ Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLaye
 	ancestors.unshift(layer) if includeLayer
 
 	for ancestor in ancestors
-		point.z = 0 if ancestor.flat
+		point.z = 0 if ancestor.flat or ancestor.clip
 		point = ancestor.matrix3d.point(point)
 		point.z = 0 unless ancestor.parent
 
