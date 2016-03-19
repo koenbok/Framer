@@ -122,7 +122,7 @@ class exports.LayerStates extends BaseClass
 				for k, v of properties
 					@layer[k] = v unless _.isNumber(v) or Color.isColorObject(v)
 
-				@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
+				@emit(Events.StateDidSwitch, _.last(@_previousStates), stateName, @) unless _.last(@_previousStates) is stateName
 
 
 
