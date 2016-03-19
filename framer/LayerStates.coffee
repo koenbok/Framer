@@ -107,7 +107,7 @@ class exports.LayerStates extends BaseClass
 		if instant is true
 			# We want to switch immediately without animation
 			@layer.props = properties
-			@emit Events.StateDidSwitch, _.last(@_previousStates), stateName, @
+			@emit Events.StateDidSwitch, _.last(@_previousStates), @_currentState, @
 
 		else
 			# Start the animation and update the state when finished
@@ -116,13 +116,13 @@ class exports.LayerStates extends BaseClass
 
 			@_animation?.stop()
 			@_animation = @layer.animate animationOptions
-			@_animation.on "stop", =>
+			@_animation.once "stop", =>
 
 				# Set all the values for keys that we couldn't animate
 				for k, v of properties
 					@layer[k] = v unless _.isNumber(v) or Color.isColorObject(v)
 
-				@emit(Events.StateDidSwitch, _.last(@_previousStates), stateName, @) unless _.last(@_previousStates) is stateName
+				@emit(Events.StateDidSwitch, _.last(@_previousStates), @_currentState, @) unless _.last(@_previousStates) is stateName
 
 
 
