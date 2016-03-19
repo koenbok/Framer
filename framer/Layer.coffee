@@ -1032,6 +1032,9 @@ class exports.Layer extends BaseClass
 	onDragAnimationEnd: (cb) -> @on(Events.DragAnimationEnd, cb)
 	onDirectionLockStart: (cb) -> @on(Events.DirectionLockStart, cb)
 
+	onStateDidSwitch: (cb) -> @on(Events.StateDidSwitch, cb)
+	onStateWillSwitch: (cb) -> @on(Events.StateWillSwitch, cb)
+
 	# Gestures
 
 	# Tap
