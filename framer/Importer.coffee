@@ -30,6 +30,12 @@ getScaleFromName = (str) ->
 startsWithNumber = (str) ->
 	return (new RegExp("^[0-9]")).test(str)
 
+sanitizeLayerName = (name) ->
+	for suffix in ["*", "-", ".png", ".jpg", ".pdf"]
+		if _.endsWith(name.toLowerCase(), suffix)
+			name = name[0..name.length-suffix.length-1]
+	return name
+
 class exports.Importer
 
 	constructor: (@path, @scale=1, @extraLayerProperties={}) ->
@@ -102,7 +108,7 @@ class exports.Importer
 
 		layerInfo =
 			shadow: true
-			name: info.name
+			name: sanitizeLayerName(info.name)
 			frame: info.layerFrame
 			clip: false
 			backgroundColor: null

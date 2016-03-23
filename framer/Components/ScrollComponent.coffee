@@ -143,9 +143,8 @@ class exports.ScrollComponent extends Layer
 		return unless @content
 
 		contentFrame = @calculateContentFrame()
-		contentFrame.x = contentFrame.x + @_contentInset.left
-		contentFrame.y = contentFrame.y + @_contentInset.top
-		@content.frame = contentFrame
+		@content.width = contentFrame.width
+		@content.height = contentFrame.height
 
 		constraintsFrame = @calculateContentFrame()
 		constraintsFrame =
@@ -174,6 +173,7 @@ class exports.ScrollComponent extends Layer
 			@scrollHorizontal = @scrollVertical = value
 
 	_calculateContentPoint: (scrollPoint) ->
+		scrollPoint = _.defaults(scrollPoint, {x:0, y:0})
 		scrollPoint.x -= @contentInset.left
 		scrollPoint.y -= @contentInset.top
 		point = @_pointInConstraints(scrollPoint)
@@ -432,7 +432,11 @@ wrapComponent = (instance, layer, options = {correct:true}) ->
 		layer.image = null
 
 	# Set the original layer as the content layer for the scroll
-	scroll.setContentLayer(layer)
+	if instance.constructor.name is "PageComponent"
+		for l in layer.children
+			scroll.addPage(l)
+	else
+		scroll.setContentLayer(layer)
 
 	# https://github.com/motif/Company/issues/208
 

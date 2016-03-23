@@ -836,7 +836,7 @@ Utils.rotationNormalizer = ->
 
 
 # Coordinate system
-
+ 
 # convert a point from a layer to the context level, with rootContext enabled you can make it cross to the top context
 Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLayer=true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
@@ -844,7 +844,7 @@ Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLaye
 	ancestors.unshift(layer) if includeLayer
 
 	for ancestor in ancestors
-		point.z = 0 if ancestor.flat
+		point.z = 0 if ancestor.flat or ancestor.clip
 		point = ancestor.matrix3d.point(point)
 		point.z = 0 unless ancestor.parent
 

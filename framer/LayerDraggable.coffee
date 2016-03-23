@@ -393,9 +393,9 @@ class exports.LayerDraggable extends BaseClass
 		# TODO: Add new event properties like position corrected for device
 
 		# Pass this to the layer above
-		@layer.emit(eventName, event, @)
+		@layer.emit(eventName, event)
 
-		super eventName, event, @
+		super eventName, event
 
 	##############################################################
 	# Lock Direction
