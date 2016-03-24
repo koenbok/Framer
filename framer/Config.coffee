@@ -20,6 +20,7 @@ body {
 	left: 0;
 	top: 0;
 	background-repeat: no-repeat;
+	background-position: center;
 	background-size: cover;
 	-webkit-overflow-scrolling: touch;
 	-webkit-box-sizing: border-box;
