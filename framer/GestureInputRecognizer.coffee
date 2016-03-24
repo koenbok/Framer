@@ -16,10 +16,12 @@ TouchStart = "touchstart"
 TouchMove = "touchmove"
 TouchEnd = "touchend"
 
-if not Utils.isTouch()
-	TouchStart = "mousedown"
-	TouchMove = "mousemove"
-	TouchEnd = "mouseup"
+# Fixme: this breaks pinch
+
+# if not Utils.isTouch()
+# 	TouchStart = "mousedown"
+# 	TouchMove = "mousemove"
+# 	TouchEnd = "mouseup"
 
 class exports.GestureInputRecognizer
 
