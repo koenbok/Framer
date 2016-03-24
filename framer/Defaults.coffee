@@ -6,7 +6,7 @@ Utils = require "./Utils"
 
 Originals =
 	Layer:
-		backgroundColor: "rgba(150,175,200,0.5)"
+		backgroundColor: "rgba(123,123,123,0.5)"
 		color: "white"
 		shadowColor: "black"
 		width: 100
