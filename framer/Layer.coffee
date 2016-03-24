@@ -998,7 +998,11 @@ class exports.Layer extends BaseClass
 
 	onClick: (cb) -> @on(Events.Click, cb)
 	onDoubleClick: (cb) -> @on(Events.DoubleClick, cb)
+	onScrollStart: (cb) -> @on(Events.ScrollStart, cb)
 	onScroll: (cb) -> @on(Events.Scroll, cb)
+	onScrollEnd: (cb) -> @on(Events.ScrollEnd, cb)
+	onScrollAnimationDidStart: (cb) -> @on(Events.ScrollAnimationDidStart, cb)
+	onScrollAnimationDidEnd: (cb) -> @on(Events.ScrollAnimationDidEnd, cb)
 
 	onTouchStart: (cb) -> @on(Events.TouchStart, cb)
 	onTouchEnd: (cb) -> @on(Events.TouchEnd, cb)
