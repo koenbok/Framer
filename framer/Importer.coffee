@@ -30,6 +30,12 @@ getScaleFromName = (str) ->
 startsWithNumber = (str) ->
 	return (new RegExp("^[0-9]")).test(str)
 
+sanitizeLayerName = (name) ->
+	for suffix in ["*", "-", ".png", ".jpg", ".pdf"]
+		if _.endsWith(name.toLowerCase(), suffix)
+			name = name[0..name.length-suffix.length-1]
+	return name
+
 class exports.Importer
 
 	constructor: (@path, @scale=1, @extraLayerProperties={}) ->
@@ -102,7 +108,7 @@ class exports.Importer
 
 		layerInfo =
 			shadow: true
-			name: info.name
+			name: sanitizeLayerName(info.name)
 			frame: info.layerFrame
 			clip: false
 			backgroundColor: null
@@ -119,9 +125,8 @@ class exports.Importer
 		if info.maskFrame
 			layerInfo.clip = true
 
-		if layerInfo.kind is "artboard"
-			layerInfo.frame.x = 0
-			layerInfo.frame.y = 0
+		if info.kind is "artboard"
+			layerInfo.backgroundColor = info.backgroundColor
 
 		# Figure out what the super layer should be. If this layer has a contentLayer
 		# (like a scroll view) we attach it to that instead.

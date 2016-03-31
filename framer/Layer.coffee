@@ -73,6 +73,7 @@ class exports.Layer extends BaseClass
 
 		# Private setting for canceling of click event if wrapped in moved draggable
 		@_cancelClickEventInDragSession = true
+		@_cancelClickEventInDragSessionVelocity = 0.1
 
 		# We have to create the element before we set the defaults
 		@_createElement()
@@ -608,16 +609,10 @@ class exports.Layer extends BaseClass
 			if currentValue == value
 				return @emit "load"
 
-			# Todo: this is not very nice but I wanted to have it fixed
-			# defaults = Defaults.getDefaults "Layer", {}
-
-			# console.log defaults.backgroundColor
-			# console.log @_defaultValues?.backgroundColor
-
-			# if defaults.backgroundColor == @_defaultValues?.backgroundColor
-			# 	@backgroundColor = null
-
-			@backgroundColor = null
+			# Unset the background color only if it’s the default color 
+			defaults = Defaults.getDefaults "Layer", {}
+			if @backgroundColor?.isEqual(defaults.backgroundColor)
+				@backgroundColor = null
 
 			# Set the property value
 			@_setPropertyValue("image", value)
@@ -944,7 +939,10 @@ class exports.Layer extends BaseClass
 			if eventName in [Events.Click,
 				Events.Tap, Events.TapStart, Events.TapEnd,
 				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
-				return if @_parentDraggableLayer()?.draggable.isMoving
+				if @_parentDraggableLayer()
+					velocity = @_parentDraggableLayer()?.draggable.velocity
+					return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
+					return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
 
 		# Always scope the event this to the layer and pass the layer as
 		# last argument for every event.
@@ -998,7 +996,11 @@ class exports.Layer extends BaseClass
 
 	onClick: (cb) -> @on(Events.Click, cb)
 	onDoubleClick: (cb) -> @on(Events.DoubleClick, cb)
+	onScrollStart: (cb) -> @on(Events.ScrollStart, cb)
 	onScroll: (cb) -> @on(Events.Scroll, cb)
+	onScrollEnd: (cb) -> @on(Events.ScrollEnd, cb)
+	onScrollAnimationDidStart: (cb) -> @on(Events.ScrollAnimationDidStart, cb)
+	onScrollAnimationDidEnd: (cb) -> @on(Events.ScrollAnimationDidEnd, cb)
 
 	onTouchStart: (cb) -> @on(Events.TouchStart, cb)
 	onTouchEnd: (cb) -> @on(Events.TouchEnd, cb)
