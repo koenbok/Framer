@@ -8,9 +8,10 @@ Originals =
 	Layer:
 		backgroundColor: "rgba(123,123,123,0.5)"
 		color: "white"
-		shadowColor: "black"
-		width: 100
-		height: 100
+		shadowColor: "rgba(123,123,123,0.5)"
+		borderColor: "rgba(123,123,123,0.5)"
+		width: 300
+		height: 300
 	Animation:
 		# curve: "spring(400,40,0)" # Or, the Cemre-Curve
 		curve: "ease"
