@@ -12,22 +12,16 @@ GestureInputMinimumFingerDistance = 30
 
 {DOMEventManager} = require "./DOMEventManager"
 
-TouchStart = "touchstart"
-TouchMove = "touchmove"
-TouchEnd = "touchend"
-
-# Fixme: this breaks pinch
-
-# if not Utils.isTouch()
-# 	TouchStart = "mousedown"
-# 	TouchMove = "mousemove"
-# 	TouchEnd = "mouseup"
+TouchStart = ["touchstart", "mousedown"]
+TouchMove = ["touchmove", "mousemove"]
+TouchEnd = ["touchend", "mouseup"]
 
 class exports.GestureInputRecognizer
 
 	constructor: ->
 		@em = new DOMEventManager()
-		@em.wrap(window).addEventListener(TouchStart, @touchstart)
+
+		TouchStart.map (e) => @em.wrap(window).addEventListener(e, @touchstart)
 
 	destroy: ->
 		@em.removeAllListeners()
@@ -41,8 +35,8 @@ class exports.GestureInputRecognizer
 		# Only fire if we are not already in a session
 		return if @session
 
-		@em.wrap(window).addEventListener(TouchMove, @touchmove)
-		@em.wrap(window).addEventListener(TouchEnd, @touchend)
+		TouchMove.map (e) => @em.wrap(window).addEventListener(e, @touchmove)
+		TouchEnd.map (e) => @em.wrap(window).addEventListener(e, @touchend)
 		@em.wrap(window).addEventListener("webkitmouseforcechanged", @_updateMacForce)
 
 		@session =
@@ -80,9 +74,9 @@ class exports.GestureInputRecognizer
 			else
 				return unless (event.touches.length == event.changedTouches.length)
 
-		@em.wrap(window).removeEventListener(TouchMove, @touchmove)
-		@em.wrap(window).removeEventListener(TouchEnd, @touchend)
-		@em.wrap(window).removeEventListener("webkitmouseforcechanged", @_updateMacForce)
+		TouchMove.map (e) => @em.wrap(window).removeEventListener(e, @touchmove)
+		TouchEnd.map (e) => @em.wrap(window).removeEventListener(e, @touchend)
+		@em.wrap(window).addEventListener("webkitmouseforcechanged", @_updateMacForce)
 
 		event = @_getGestureEvent(event)
 
