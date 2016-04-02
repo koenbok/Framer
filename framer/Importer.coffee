@@ -125,9 +125,8 @@ class exports.Importer
 		if info.maskFrame
 			layerInfo.clip = true
 
-		if layerInfo.kind is "artboard"
-			layerInfo.frame.x = 0
-			layerInfo.frame.y = 0
+		if info.kind is "artboard"
+			layerInfo.backgroundColor = info.backgroundColor
 
 		# Figure out what the super layer should be. If this layer has a contentLayer
 		# (like a scroll view) we attach it to that instead.
