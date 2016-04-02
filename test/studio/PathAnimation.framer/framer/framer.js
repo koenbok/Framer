@@ -144,6 +144,8 @@
 	  name: "Default"
 	});
 	
+	Framer.DefaultContext.backgroundColor = "white";
+	
 	Framer.CurrentContext = Framer.DefaultContext;
 	
 	if (Utils.isMobile()) {
@@ -13036,6 +13038,26 @@
 	  return navigator.userAgent.indexOf("FramerStudio") !== -1;
 	};
 	
+	Utils.framerStudioVersion = function() {
+	  var isBeta, isFuture, isLocal, matches, version;
+	  if (Utils.isFramerStudio()) {
+	    isBeta = navigator.userAgent.indexOf("FramerStudio/beta") >= 0;
+	    isLocal = navigator.userAgent.indexOf("FramerStudio/local") >= 0;
+	    isFuture = navigator.userAgent.indexOf("FramerStudio/future") >= 0;
+	    if (isBeta || isLocal || isFuture) {
+	      return Number.MAX_VALUE;
+	    }
+	    matches = navigator.userAgent.match(/\d+$/);
+	    if (matches && matches.length > 0) {
+	      version = parseInt(matches[0]);
+	    }
+	    if (_.isNumber(version)) {
+	      return version;
+	    }
+	  }
+	  return Number.MAX_VALUE;
+	};
+	
 	Utils.devicePixelRatio = function() {
 	  return window.devicePixelRatio;
 	};
@@ -13749,7 +13771,7 @@
 	  }
 	  for (o = 0, len = ancestors.length; o < len; o++) {
 	    ancestor = ancestors[o];
-	    if (ancestor.flat) {
+	    if (ancestor.flat || ancestor.clip) {
 	      point.z = 0;
 	    }
 	    point = ancestor.matrix3d.point(point);
@@ -14041,10 +14063,10 @@
 	    importable: false,
 	    exportable: false,
 	    get: function() {
-	      return Framer.CurrentContext.backgroundColor;
+	      return Framer.Device.screen.backgroundColor;
 	    },
 	    set: function(value) {
-	      return Framer.CurrentContext.backgroundColor = value;
+	      return Framer.Device.screen.backgroundColor = value;
 	    }
 	  });
 	
@@ -16176,6 +16198,7 @@
 	    this._prefer2d = false;
 	    this._alwaysUseImageCache = false;
 	    this._cancelClickEventInDragSession = true;
+	    this._cancelClickEventInDragSessionVelocity = 0.1;
 	    this._createElement();
 	    if (options.hasOwnProperty("frame")) {
 	      options = _.extend(options, options.frame);
@@ -16820,7 +16843,7 @@
 	      return this._getPropertyValue("image");
 	    },
 	    set: function(value) {
-	      var currentValue, imageUrl, loader;
+	      var currentValue, defaults, imageUrl, loader, ref;
 	      if (!(_.isString(value) || value === null)) {
 	        layerValueTypeError("image", value);
 	      }
@@ -16828,7 +16851,10 @@
 	      if (currentValue === value) {
 	        return this.emit("load");
 	      }
-	      this.backgroundColor = null;
+	      defaults = Defaults.getDefaults("Layer", {});
+	      if ((ref = this.backgroundColor) != null ? ref.isEqual(defaults.backgroundColor) : void 0) {
+	        this.backgroundColor = null;
+	      }
 	      this._setPropertyValue("image", value);
 	      if (value === null || value === "") {
 	        this.style["background-image"] = null;
@@ -17323,12 +17349,18 @@
 	  });
 	
 	  Layer.prototype.emit = function() {
-	    var args, eventName, ref;
+	    var args, eventName, ref, velocity;
 	    eventName = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
 	    if (this._cancelClickEventInDragSession) {
 	      if (eventName === Events.Click || eventName === Events.Tap || eventName === Events.TapStart || eventName === Events.TapEnd || eventName === Events.LongPress || eventName === Events.LongPressStart || eventName === Events.LongPressEnd) {
-	        if ((ref = this._parentDraggableLayer()) != null ? ref.draggable.isMoving : void 0) {
-	          return;
+	        if (this._parentDraggableLayer()) {
+	          velocity = (ref = this._parentDraggableLayer()) != null ? ref.draggable.velocity : void 0;
+	          if (Math.abs(velocity.x) > this._cancelClickEventInDragSessionVelocity) {
+	            return;
+	          }
+	          if (Math.abs(velocity.y) > this._cancelClickEventInDragSessionVelocity) {
+	            return;
+	          }
 	        }
 	      }
 	    }
@@ -17404,8 +17436,24 @@
 	    return this.on(Events.DoubleClick, cb);
 	  };
 	
+	  Layer.prototype.onScrollStart = function(cb) {
+	    return this.on(Events.ScrollStart, cb);
+	  };
+	
 	  Layer.prototype.onScroll = function(cb) {
 	    return this.on(Events.Scroll, cb);
+	  };
+	
+	  Layer.prototype.onScrollEnd = function(cb) {
+	    return this.on(Events.ScrollEnd, cb);
+	  };
+	
+	  Layer.prototype.onScrollAnimationDidStart = function(cb) {
+	    return this.on(Events.ScrollAnimationDidStart, cb);
+	  };
+	
+	  Layer.prototype.onScrollAnimationDidEnd = function(cb) {
+	    return this.on(Events.ScrollAnimationDidEnd, cb);
 	  };
 	
 	  Layer.prototype.onTouchStart = function(cb) {
@@ -17514,6 +17562,14 @@
 	
 	  Layer.prototype.onDirectionLockStart = function(cb) {
 	    return this.on(Events.DirectionLockStart, cb);
+	  };
+	
+	  Layer.prototype.onStateDidSwitch = function(cb) {
+	    return this.on(Events.StateDidSwitch, cb);
+	  };
+	
+	  Layer.prototype.onStateWillSwitch = function(cb) {
+	    return this.on(Events.StateWillSwitch, cb);
 	  };
 	
 	  Layer.prototype.onTap = function(cb) {
@@ -17711,7 +17767,7 @@
 	
 	Utils = __webpack_require__(4);
 	
-	FramerCSS = "body {\n	margin: 0;\n}\n\n.framerContext {\n	position: absolute;\n	left: 0;\n	top: 0;\n	right: 0;\n	bottom: 0;\n	pointer-events: none;\n	overflow: hidden;\n}\n\n.framerLayer {\n	display: block;\n	position: absolute;\n	left: 0;\n	top: 0;\n	background-repeat: no-repeat;\n	background-size: cover;\n	-webkit-overflow-scrolling: touch;\n	-webkit-box-sizing: border-box;\n	-webkit-user-select: none;\n}\n\n.framerLayer input,\n.framerLayer textarea,\n.framerLayer select,\n.framerLayer option,\n.framerLayer div[contenteditable=true]\n{\n	pointer-events: auto;\n	-webkit-user-select: auto;\n}\n\n.framerDebug {\n	padding: 6px;\n	color: #fff;\n	font: 10px/1em Monaco;\n}\n";
+	FramerCSS = "body {\n	margin: 0;\n}\n\n.framerContext {\n	position: absolute;\n	left: 0;\n	top: 0;\n	right: 0;\n	bottom: 0;\n	pointer-events: none;\n}\n\n.framerLayer {\n	display: block;\n	position: absolute;\n	left: 0;\n	top: 0;\n	background-repeat: no-repeat;\n	background-size: cover;\n	-webkit-overflow-scrolling: touch;\n	-webkit-box-sizing: border-box;\n	-webkit-user-select: none;\n}\n\n.framerLayer input,\n.framerLayer textarea,\n.framerLayer select,\n.framerLayer option,\n.framerLayer div[contenteditable=true]\n{\n	pointer-events: auto;\n	-webkit-user-select: auto;\n}\n\n.framerDebug {\n	padding: 6px;\n	color: #fff;\n	font: 10px/1em Monaco;\n}\n";
 	
 	Utils.domComplete(function() {
 	  return Utils.insertCSS(FramerCSS);
@@ -17963,13 +18019,14 @@
 	  DeviceComponent: {
 	    fullScreen: false,
 	    padding: 50,
-	    deviceType: "iphone-5s-spacegray",
+	    deviceType: "apple-iphone-6s-silver",
 	    deviceZoom: "fit",
 	    contentZoom: 1,
 	    orientation: "portrait",
 	    keyboard: false,
 	    animationOptions: {
-	      curve: "spring(400,40,0)"
+	      time: .3,
+	      curve: "ease-in-out"
 	    }
 	  },
 	  LayerDraggable: {
@@ -18064,7 +18121,7 @@
 /* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var AnimatorClassBezierPresets, AnimatorClasses, BezierCurveAnimator, Config, Defaults, EventEmitter, LinearAnimator, SpringDHOAnimator, SpringRK4Animator, Utils, _, createDebugLayerForPath, evaluateRelativeProperty, isRelativeProperty, numberRE, relativePropertyRE,
+	var AnimatorClassBezierPresets, AnimatorClasses, BaseClass, BezierCurveAnimator, Config, Defaults, LinearAnimator, SpringDHOAnimator, SpringRK4Animator, Utils, _, createDebugLayerForPath, evaluateRelativeProperty, isRelativeProperty, numberRE, relativePropertyRE,
 	  slice = [].slice,
 	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -18079,7 +18136,7 @@
 	
 	Defaults = __webpack_require__(17).Defaults;
 	
-	EventEmitter = __webpack_require__(7).EventEmitter;
+	BaseClass = __webpack_require__(6).BaseClass;
 	
 	LinearAnimator = __webpack_require__(19).LinearAnimator;
 	
@@ -18200,6 +18257,12 @@
 	    this._originalState = this._currentState();
 	    this._repeatCounter = this.options.repeat;
 	  }
+	
+	  Animation.define("isAnimating", {
+	    get: function() {
+	      return indexOf.call(this.options.layer.context.animations, this) >= 0;
+	    }
+	  });
 	
 	  Animation.prototype.start = function() {
 	    var AnimatorClass, animation, k, property, ref, ref1, ref2, v;
@@ -18470,6 +18533,10 @@
 	    return animatableProperties;
 	  };
 	
+	  Animation.prototype.toInspect = function() {
+	    return "<" + this.constructor.name + " id:" + this.id + " isAnimating:" + this.isAnimating + " [" + (_.keys(this.options.properties)) + "]>";
+	  };
+	
 	  Animation.prototype.onAnimationStart = function(cb) {
 	    return this.on(Events.AnimationStart, cb);
 	  };
@@ -18496,7 +18563,7 @@
 	
 	  return Animation;
 	
-	})(EventEmitter);
+	})(BaseClass);
 
 
 /***/ },
@@ -19205,7 +19272,7 @@
 	    }
 	    if (instant === true) {
 	      this.layer.props = properties;
-	      return this.emit(Events.StateDidSwitch, _.last(this._previousStates), stateName, this);
+	      return this.emit(Events.StateDidSwitch, _.last(this._previousStates), this._currentState, this);
 	    } else {
 	      if (animationOptions == null) {
 	        animationOptions = this.animationOptions;
@@ -19215,7 +19282,7 @@
 	        ref1.stop();
 	      }
 	      this._animation = this.layer.animate(animationOptions);
-	      return this._animation.on("stop", (function(_this) {
+	      return this._animation.once("stop", (function(_this) {
 	        return function() {
 	          for (k in properties) {
 	            v = properties[k];
@@ -19223,7 +19290,9 @@
 	              _this.layer[k] = v;
 	            }
 	          }
-	          return _this.emit(Events.StateDidSwitch, _.last(_this._previousStates), stateName, _this);
+	          if (_.last(_this._previousStates) !== stateName) {
+	            return _this.emit(Events.StateDidSwitch, _.last(_this._previousStates), _this._currentState, _this);
+	          }
 	        };
 	      })(this));
 	    }
@@ -19360,6 +19429,8 @@
 	Events.DragAnimationDidStart = Events.DragAnimationStart;
 	
 	Events.DragAnimationDidEnd = Events.DragAnimationEnd;
+	
+	Events.DirectionLockDidStart = Events.DirectionLockStart;
 	
 	"\n┌──────┐                   │\n│      │\n│      │  ───────────────▶ │ ◀────▶\n│      │\n└──────┘                   │\n\n════════  ═════════════════ ═══════\n\n  Drag         Momentum      Bounce\n";
 	
@@ -19522,9 +19593,16 @@
 	  };
 	
 	  LayerDraggable.prototype._touchStart = function(event) {
-	    var touchEvent;
+	    var animation, i, len, properties, ref, touchEvent;
 	    this._isMoving = this.isAnimating;
-	    this.layer.animateStop();
+	    ref = this.layer.animations();
+	    for (i = 0, len = ref.length; i < len; i++) {
+	      animation = ref[i];
+	      properties = animation.options.properties;
+	      if (properties.hasOwnProperty("x") || properties.hasOwnProperty("y")) {
+	        animation.stop();
+	      }
+	    }
 	    this._stopSimulation();
 	    this._resetdirectionLock();
 	    event.preventDefault();
@@ -19555,7 +19633,7 @@
 	  };
 	
 	  LayerDraggable.prototype._touchMove = function(event) {
-	    var frame, offset, point, scaleX, scaleY, touchEvent;
+	    var offset, point, scaleX, scaleY, touchEvent;
 	    if (!this.enabled) {
 	      return;
 	    }
@@ -19573,21 +19651,6 @@
 	      y: touchEvent.clientY,
 	      t: Date.now()
 	    });
-	    if (this.overdrag === false) {
-	      frame = Utils.convertFrameToContext(this.constraints, this.layer, true, false);
-	      if (event.point.x < Utils.frameGetMinX(frame)) {
-	        return;
-	      }
-	      if (event.point.x > Utils.frameGetMaxX(frame)) {
-	        return;
-	      }
-	      if (event.point.y < Utils.frameGetMinY(frame)) {
-	        return;
-	      }
-	      if (event.point.y > Utils.frameGetMaxY(frame)) {
-	        return;
-	      }
-	    }
 	    point = _.clone(this._point);
 	    scaleX = 1 / this.layer.canvasScaleX() * this.layer.scale * this.layer.scaleX;
 	    scaleY = 1 / this.layer.canvasScaleY() * this.layer.scale * this.layer.scaleY;
@@ -19810,8 +19873,8 @@
 	  };
 	
 	  LayerDraggable.prototype.emit = function(eventName, event) {
-	    this.layer.emit(eventName, event, this);
-	    return LayerDraggable.__super__.emit.call(this, eventName, event, this);
+	    this.layer.emit(eventName, event);
+	    return LayerDraggable.__super__.emit.call(this, eventName, event);
 	  };
 	
 	  LayerDraggable.prototype._updatedirectionLock = function(correctedDelta) {
@@ -20776,7 +20839,7 @@
 	
 	  LayerPinchable.prototype._pinch = function(event) {
 	    var pointA, pointB, rotation, scale;
-	    if (event.touches.length !== 2) {
+	    if (event.fingers !== 2) {
 	      return;
 	    }
 	    if (!this.enabled) {
@@ -21215,19 +21278,31 @@
 	  arc = function(arg) {
 	    var largeArc, rx, ry, sweep, to, xrot;
 	    to = arg.to, rx = arg.rx, ry = arg.ry, xrot = arg.xrot, largeArc = arg.largeArc, sweep = arg.sweep;
-	    xrot || (xrot = 0);
-	    rx || (rx = function(instructions) {
-	      var o;
-	      o = originOrZero(instructions);
-	      return to.x - o.x;
-	    });
-	    ry || (ry = function(instructions) {
-	      var o;
-	      o = originOrZero(instructions);
-	      return to.y - o.y;
-	    });
-	    largeArc || (largeArc = 0);
-	    sweep || (sweep = 1);
+	    if (xrot == null) {
+	      xrot = 0;
+	    }
+	    if (rx == null) {
+	      rx = function(instructions) {
+	        var o;
+	        o = originOrZero(instructions);
+	        return to.x - o.x;
+	      };
+	    }
+	    if (ry == null) {
+	      ry = function(instructions) {
+	        var o;
+	        o = originOrZero(instructions);
+	        return to.y - o.y;
+	      };
+	    }
+	    if (largeArc == null) {
+	      largeArc = 0;
+	    }
+	    largeArc = largeArc ? 1 : 0;
+	    if (sweep == null) {
+	      sweep = 1;
+	    }
+	    sweep = sweep ? 1 : 0;
 	    return plus({
 	      command: 'A',
 	      params: [rx, ry, xrot, largeArc, sweep, to.x, to.y]
@@ -21437,7 +21512,9 @@
 	    length: length,
 	    node: node,
 	    forLayer: forLayer,
-	    toString: toString
+	    toString: toString,
+	    points: points,
+	    instructions: instructions
 	  };
 	};
 	
@@ -21967,6 +22044,7 @@
 	    this._element.id = "FramerContextRoot-" + this._name;
 	    this._element.classList.add("framerContext");
 	    this._element.style["webkitPerspective"] = this.perspective;
+	    this._element.style["backgroundColor"] = this.backgroundColor;
 	    this.__pendingElementAppend = (function(_this) {
 	      return function() {
 	        var parentElement, ref;
@@ -22044,12 +22122,15 @@
 	
 	  Context.define("backgroundColor", {
 	    get: function() {
-	      var ref;
-	      return (ref = this._element) != null ? ref.style["backgroundColor"] : void 0;
+	      if (Color.isColor(this._backgroundColor)) {
+	        return this._backgroundColor;
+	      }
+	      return "transparent";
 	    },
 	    set: function(value) {
 	      var ref;
 	      if (Color.isColor(value)) {
+	        this._backgroundColor = value;
 	        return (ref = this._element) != null ? ref.style["backgroundColor"] = new Color(value.toString()) : void 0;
 	      }
 	    }
@@ -22102,6 +22183,17 @@
 	      }
 	    }
 	  });
+	
+	  Context.prototype.toInspect = function() {
+	    var round;
+	    round = function(value) {
+	      if (parseInt(value) === value) {
+	        return parseInt(value);
+	      }
+	      return Utils.round(value, 1);
+	    };
+	    return "<" + this.constructor.name + " id:" + this.id + " name:" + this._name + " " + (round(this.width)) + "x" + (round(this.height)) + ">";
+	  };
 	
 	  return Context;
 	
@@ -22292,7 +22384,7 @@
 	    this._contentInset = options.contentInset || Utils.rectZero();
 	    this.setContentLayer(new Layer);
 	    this._applyOptionsAndDefaults(options);
-	    this._enableMouseWheelHandling();
+	    this._enableMouseWheelHandling(options.mouseWheelEnabled);
 	    if (options.hasOwnProperty("wrap")) {
 	      wrapComponent(this, options.wrap);
 	    }
@@ -22316,7 +22408,7 @@
 	    this._content = layer;
 	    this._content.parent = this;
 	    this._content.name = "content";
-	    this._content.clip = false;
+	    this._content.clip = true;
 	    this._content.draggable.enabled = true;
 	    this._content.draggable.momentum = true;
 	    this._content.on("change:children", this.updateContent);
@@ -22336,9 +22428,8 @@
 	      return;
 	    }
 	    contentFrame = this.calculateContentFrame();
-	    contentFrame.x = contentFrame.x + this._contentInset.left;
-	    contentFrame.y = contentFrame.y + this._contentInset.top;
-	    this.content.frame = contentFrame;
+	    this.content.width = contentFrame.width;
+	    this.content.height = contentFrame.height;
 	    constraintsFrame = this.calculateContentFrame();
 	    constraintsFrame = {
 	      x: -constraintsFrame.width + this.width - this._contentInset.right,
@@ -22372,6 +22463,10 @@
 	
 	  ScrollComponent.prototype._calculateContentPoint = function(scrollPoint) {
 	    var point;
+	    scrollPoint = _.defaults(scrollPoint, {
+	      x: 0,
+	      y: 0
+	    });
 	    scrollPoint.x -= this.contentInset.left;
 	    scrollPoint.y -= this.contentInset.top;
 	    point = this._pointInConstraints(scrollPoint);
@@ -22749,7 +22844,7 @@
 	})(Layer);
 	
 	wrapComponent = function(instance, layer, options) {
-	  var ref, screenFrame, scroll, wrapper;
+	  var i, l, len, ref, ref1, screenFrame, scroll, wrapper;
 	  if (options == null) {
 	    options = {
 	      correct: true
@@ -22781,7 +22876,15 @@
 	    scroll.image = layer.image;
 	    layer.image = null;
 	  }
-	  scroll.setContentLayer(layer);
+	  if (instance.constructor.name === "PageComponent") {
+	    ref1 = layer.children;
+	    for (i = 0, len = ref1.length; i < len; i++) {
+	      l = ref1[i];
+	      scroll.addPage(l);
+	    }
+	  } else {
+	    scroll.setContentLayer(layer);
+	  }
 	  if (options.correct === true) {
 	    screenFrame = scroll.screenFrame;
 	    if (screenFrame.x < Screen.width) {
@@ -23038,6 +23141,9 @@
 	
 	  PageComponent.prototype._scrollEnd = function() {
 	    var end, nextPage, start, velocity, xDisabled, xLock, yDisabled, yLock;
+	    if (this.content.isAnimating) {
+	      return;
+	    }
 	    velocity = this.content.draggable.velocity;
 	    xDisabled = !this.scrollHorizontal && (this.direction === "right" || this.direction === "left");
 	    yDisabled = !this.scrollVertical && (this.direction === "down" || this.direction === "up");
@@ -23046,10 +23152,12 @@
 	    if (Math.max(Math.abs(velocity.x), Math.abs(velocity.y)) < this.velocityThreshold || xLock || yLock || xDisabled || yDisabled) {
 	      start = this.content.draggable._layerStartPoint;
 	      end = this.content.draggable.layer.point;
-	      if (start.x !== end.x || start.y !== end.y) {
-	        this.snapToPage(this.closestPage, true, this.animationOptions);
+	      if ((start != null) && (end != null)) {
+	        if (start.x !== end.x || start.y !== end.y) {
+	          this.snapToPage(this.closestPage, true, this.animationOptions);
+	          return;
+	        }
 	      }
-	      return;
 	    }
 	    nextPage = this.nextPage(this.direction, this._currentPage, false);
 	    if (nextPage == null) {
@@ -23092,6 +23200,8 @@
 	Events = __webpack_require__(15).Events;
 	
 	"SliderComponent\n\nknob <layer>\nknobSize <width, height>\nfill <layer>\nmin <number>\nmax <number>\n\npointForValue(<n>)\nvalueForPoint(<n>)\n\nanimateToValue(value, animationOptions={})";
+	
+	Events.SliderValueChange = "sliderValueChange";
 	
 	Knob = (function(superClass) {
 	  extend(Knob, superClass);
@@ -23365,7 +23475,8 @@
 	  });
 	
 	  SliderComponent.prototype._updateValue = function() {
-	    return this.emit("change:value", this.value);
+	    this.emit("change:value", this.value);
+	    return this.emit(Events.SliderValueChange, this.value);
 	  };
 	
 	  SliderComponent.prototype.pointForValue = function(value) {
@@ -23420,6 +23531,10 @@
 	    return this.knob.animate(animationOptions);
 	  };
 	
+	  SliderComponent.prototype.onValueChange = function(cb) {
+	    return this.on(Events.SliderValueChange, cb);
+	  };
+	
 	  return SliderComponent;
 	
 	})(Layer);
@@ -23429,7 +23544,7 @@
 /* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var AppleWatch38Device, AppleWatch42Device, BaseClass, BuiltInDevices, Defaults, DeviceComponentDefaultDevice, Devices, Events, Layer, Nexus5BaseDevice, Nexus5BaseDeviceHand, Nexus9BaseDevice, Utils, _, iPadAirBaseDevice, iPadAirBaseDeviceHand, iPadMiniBaseDevice, iPadMiniBaseDeviceHand, iPhone5BaseDevice, iPhone5BaseDeviceHand, iPhone5CBaseDevice, iPhone5CBaseDeviceHand, iPhone6BaseDevice, iPhone6BaseDeviceHand, iPhone6PlusBaseDevice, iPhone6PlusBaseDeviceHand,
+	var AppleWatch38BlackLeatherDevice, AppleWatch38Device, AppleWatch42Device, BaseClass, BuiltInDevices, Defaults, Devices, Events, HTCa9BaseDevice, HTCm8BaseDevice, Layer, MSFTLumia950BaseDevice, Nexus4BaseDevice, Nexus5BaseDevice, Nexus6BaseDevice, Nexus9BaseDevice, SamsungGalaxyNote5BaseDevice, Utils, _, iPadAir2BaseDevice, iPadMini4BaseDevice, iPadProBaseDevice, iPhone5BaseDevice, iPhone5CBaseDevice, iPhone6BaseDevice, iPhone6PlusBaseDevice, newDeviceMinVersion, oldDeviceMaxVersion, old_AppleWatch38Device, old_AppleWatch42Device, old_Nexus5BaseDevice, old_Nexus5BaseDeviceHand, old_Nexus9BaseDevice, old_iPadAirBaseDevice, old_iPadAirBaseDeviceHand, old_iPadMiniBaseDevice, old_iPadMiniBaseDeviceHand, old_iPhone5BaseDevice, old_iPhone5BaseDeviceHand, old_iPhone5CBaseDevice, old_iPhone5CBaseDeviceHand, old_iPhone6BaseDevice, old_iPhone6BaseDeviceHand, old_iPhone6PlusBaseDevice, old_iPhone6PlusBaseDeviceHand,
 	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty,
@@ -23438,8 +23553,6 @@
 	Utils = __webpack_require__(4);
 	
 	_ = __webpack_require__(1)._;
-	
-	DeviceComponentDefaultDevice = "iphone-6-silver";
 	
 	BaseClass = __webpack_require__(6).BaseClass;
 	
@@ -23468,18 +23581,11 @@
 	Device.setDeviceScale(zoom:float, animate:bool)
 	Device.setContentScale(zoom:float, animate:bool)
 	
-	Device.keyboard bool
-	Device.setKeyboard(visible:bool, animate:bool)
-	Device.showKeyboard(animate:bool)
-	Device.hideKeyboard(animate:bool)
-	Device.toggleKeyboard(animate:bool)
-	
+	Device.nextHand()
 	
 	 * Events
 	Events.DeviceTypeDidChange
 	Events.DeviceFullScreenDidChange
-	Events.DeviceKeyboardWillShow
-	Events.DeviceKeyboardDidShow
 	 */
 	
 	exports.DeviceComponent = (function(superClass) {
@@ -23496,7 +23602,7 @@
 	    if (options == null) {
 	      options = {};
 	    }
-	    this._animateKeyboard = bind(this._animateKeyboard, this);
+	    this._orientationChange = bind(this._orientationChange, this);
 	    this._updateDeviceImage = bind(this._updateDeviceImage, this);
 	    this._update = bind(this._update, this);
 	    defaults = Defaults.getDefaults("DeviceComponent", options);
@@ -23507,6 +23613,7 @@
 	    this.animationOptions = defaults.animationOptions;
 	    this.deviceType = defaults.deviceType;
 	    _.extend(this, _.defaults(options, defaults));
+	    window.addEventListener("orientationchange", this._orientationChange, true);
 	  }
 	
 	  DeviceComponent.prototype._setup = function() {
@@ -23519,7 +23626,13 @@
 	    this.background.clip = true;
 	    this.background.backgroundColor = "transparent";
 	    this.background.classList.add("DeviceBackground");
-	    this.phone = new Layer;
+	    this.hands = new Layer;
+	    this.handsImageLayer = new Layer({
+	      parent: this.hands
+	    });
+	    this.phone = new Layer({
+	      parent: this.hands
+	    });
 	    this.screen = new Layer({
 	      parent: this.phone
 	    });
@@ -23529,27 +23642,22 @@
 	    this.content = new Layer({
 	      parent: this.viewport
 	    });
+	    this.hands.backgroundColor = "transparent";
+	    this.hands._alwaysUseImageCache = true;
+	    this.handsImageLayer.backgroundColor = "transparent";
 	    this.phone.backgroundColor = "transparent";
 	    this.phone.classList.add("DevicePhone");
-	    this.screen.backgroundColor = "transparent";
 	    this.screen.classList.add("DeviceScreen");
+	    this.screen.clip = true;
 	    this.viewport.backgroundColor = "transparent";
 	    this.viewport.classList.add("DeviceComponentPort");
 	    this.content.backgroundColor = "transparent";
 	    this.content.classList.add("DeviceContent");
 	    this.content.originX = 0;
 	    this.content.originY = 0;
-	    this.keyboardLayer = new Layer({
-	      parent: this.viewport
-	    });
-	    this.keyboardLayer.on("click", (function(_this) {
-	      return function() {
-	        return _this.toggleKeyboard();
-	      };
-	    })(this));
-	    this.keyboardLayer.classList.add("DeviceKeyboard");
-	    this.keyboardLayer.backgroundColor = "transparent";
-	    Framer.CurrentContext.domEventManager.wrap(window).addEventListener("resize", this._update);
+	    if (!Utils.isMobile()) {
+	      Framer.CurrentContext.domEventManager.wrap(window).addEventListener("resize", this._update);
+	    }
 	    ref = [this.background, this.phone, this.viewport, this.content, this.screen];
 	    for (i = 0, len = ref.length; i < len; i++) {
 	      layer = ref[i];
@@ -23571,7 +23679,7 @@
 	      contentScaleFactor = 1;
 	    }
 	    if (this._shouldRenderFullScreen()) {
-	      ref = [this.background, this.phone, this.viewport, this.content, this.screen];
+	      ref = [this.background, this.hands, this.phone, this.viewport, this.content, this.screen];
 	      for (i = 0, len = ref.length; i < len; i++) {
 	        layer = ref[i];
 	        layer.x = layer.y = 0;
@@ -23579,22 +23687,25 @@
 	        layer.height = window.innerHeight / contentScaleFactor;
 	        layer.scale = 1;
 	      }
-	      this.content.scale = contentScaleFactor;
-	      return this._positionKeyboard();
+	      return this.content.scale = contentScaleFactor;
 	    } else {
 	      backgroundOverlap = 100;
 	      this.background.x = 0 - backgroundOverlap;
 	      this.background.y = 0 - backgroundOverlap;
 	      this.background.width = window.innerWidth + (2 * backgroundOverlap);
 	      this.background.height = window.innerHeight + (2 * backgroundOverlap);
-	      this.phone.scale = this._calculatePhoneScale();
+	      this.hands.scale = this._calculatePhoneScale();
+	      this.hands.center();
 	      this.phone.center();
 	      ref1 = this._getOrientationDimensions(this._device.screenWidth / contentScaleFactor, this._device.screenHeight / contentScaleFactor), width = ref1[0], height = ref1[1];
-	      this.screen.width = this._device.screenWidth;
-	      this.screen.height = this._device.screenHeight;
-	      this.viewport.width = this.content.width = width;
-	      this.viewport.height = this.content.height = height;
-	      return this.screen.center();
+	      this.screen.width = this.viewport.width = this._device.screenWidth;
+	      this.screen.height = this.viewport.height = this._device.screenHeight;
+	      this.content.width = width;
+	      this.content.height = height;
+	      this.screen.center();
+	      if (this.selectedHand && this._orientation === 0) {
+	        return this.setHand(this.selectedHand);
+	      }
 	    }
 	  };
 	
@@ -23646,12 +23757,11 @@
 	    this._fullScreen = fullScreen;
 	    if (fullScreen === true) {
 	      this.phone.image = "";
+	      this.hands.image = "";
 	    } else {
 	      this._updateDeviceImage();
 	    }
 	    this._update();
-	    this.keyboard = false;
-	    this._positionKeyboard();
 	    return this.emit("change:fullScreen");
 	  };
 	
@@ -23660,13 +23770,21 @@
 	      return this._deviceType;
 	    },
 	    set: function(deviceType) {
-	      var device, shouldZoomToFit;
+	      var device, i, key, lDevicetype, lKey, len, ref, shouldZoomToFit;
 	      if (deviceType === this._deviceType) {
 	        return;
 	      }
 	      device = null;
 	      if (_.isString(deviceType)) {
-	        device = Devices[deviceType.toLowerCase()];
+	        lDevicetype = deviceType.toLowerCase();
+	        ref = _.keys(Devices);
+	        for (i = 0, len = ref.length; i < len; i++) {
+	          key = ref[i];
+	          lKey = key.toLowerCase();
+	          if (lDevicetype === lKey) {
+	            device = Devices[key];
+	          }
+	        }
 	      }
 	      if (!device) {
 	        throw Error("No device named " + deviceType + ". Options are: " + (_.keys(Devices)));
@@ -23675,13 +23793,15 @@
 	        return;
 	      }
 	      shouldZoomToFit = this._deviceType === "fullscreen";
+	      this.screen.backgroundColor = "black";
+	      if (device.backgroundColor != null) {
+	        this.screen.backgroundColor = device.backgroundColor;
+	      }
 	      this._device = _.clone(device);
 	      this._deviceType = deviceType;
 	      this.fullscreen = false;
 	      this._updateDeviceImage();
 	      this._update();
-	      this.keyboard = false;
-	      this._positionKeyboard();
 	      this.emit("change:deviceType");
 	      if (shouldZoomToFit) {
 	        return this.deviceScale = "fit";
@@ -23694,14 +23814,17 @@
 	      return;
 	    }
 	    if (this._shouldRenderFullScreen()) {
-	      return this.phone.image = "";
+	      this.phone.image = "";
+	      return this.hands.image = "";
 	    } else if (!this._deviceImageUrl(this._deviceImageName())) {
 	      return this.phone.image = "";
 	    } else {
 	      this.phone._alwaysUseImageCache = true;
 	      this.phone.image = this._deviceImageUrl(this._deviceImageName());
 	      this.phone.width = this._device.deviceImageWidth;
-	      return this.phone.height = this._device.deviceImageHeight;
+	      this.phone.height = this._device.deviceImageHeight;
+	      this.hands.width = this.phone.width;
+	      return this.hands.height = this.phone.height;
 	    }
 	  };
 	
@@ -23725,7 +23848,11 @@
 	    }
 	    resourceUrl = "//resources.framerjs.com/static/DeviceResources";
 	    if (Utils.isFramerStudio() && window.FramerStudioInfo) {
-	      resourceUrl = window.FramerStudioInfo.deviceImagesUrl;
+	      if (this._device.minStudioVersion && Utils.framerStudioVersion() >= this._device.minStudioVersion || !this._device.minStudioVersion) {
+	        if (this._device.maxStudioVersion && Utils.framerStudioVersion() <= this._device.maxStudioVersion || !this._device.maxStudioVersion) {
+	          resourceUrl = window.FramerStudioInfo.deviceImagesUrl;
+	        }
+	      }
 	    }
 	    if (Utils.isJP2Supported() && this._device.deviceImageJP2 === true) {
 	      return resourceUrl + "/" + (name.replace(".png", ".jp2"));
@@ -23767,30 +23894,31 @@
 	    } else {
 	      phoneScale = deviceScale;
 	    }
-	    this.phone.animateStop();
+	    this.hands.animateStop();
 	    if (animate) {
-	      this.phone.animate(_.extend(this.animationOptions, {
+	      this.hands.animate(_.extend(this.animationOptions, {
 	        properties: {
 	          scale: phoneScale
 	        }
 	      }));
 	    } else {
-	      this.phone.scale = phoneScale;
-	      this.phone.center();
+	      this.hands.scale = phoneScale;
+	      this.hands.center();
 	    }
 	    return this.emit("change:deviceScale");
 	  };
 	
 	  DeviceComponent.prototype._calculatePhoneScale = function() {
 	    var height, paddingOffset, phoneScale, ref, ref1, width;
-	    if (this._deviceScale && this._deviceScale !== "fit") {
-	      return this._deviceScale;
-	    }
 	    ref = this._getOrientationDimensions(this.phone.width, this.phone.height), width = ref[0], height = ref[1];
 	    paddingOffset = ((ref1 = this._device) != null ? ref1.paddingOffset : void 0) || 0;
 	    phoneScale = _.min([(window.innerWidth - ((this.padding + paddingOffset) * 2)) / width, (window.innerHeight - ((this.padding + paddingOffset) * 2)) / height]);
 	    if (phoneScale > 1) {
 	      phoneScale = 1;
+	    }
+	    this.emit("change:phoneScale", phoneScale);
+	    if (this._deviceScale && this._deviceScale !== "fit") {
+	      return this._deviceScale;
 	    }
 	    return phoneScale;
 	  };
@@ -23831,6 +23959,9 @@
 	
 	  DeviceComponent.define("orientation", {
 	    get: function() {
+	      if (Utils.isMobile()) {
+	        return window.orientation;
+	      }
 	      return this._orientation || 0;
 	    },
 	    set: function(orientation) {
@@ -23839,9 +23970,12 @@
 	  });
 	
 	  DeviceComponent.prototype.setOrientation = function(orientation, animate) {
-	    var _hadKeyboard, animation, contentProperties, height, phoneProperties, ref, ref1, width, x, y;
+	    var animation, contentProperties, height, offset, phoneProperties, ref, ref1, width, x, y;
 	    if (animate == null) {
 	      animate = false;
+	    }
+	    if (Utils.framerStudioVersion() === oldDeviceMaxVersion) {
+	      orientation *= -1;
 	    }
 	    if (orientation === "portrait") {
 	      orientation = 0;
@@ -23861,26 +23995,30 @@
 	    }
 	    this._orientation = orientation;
 	    phoneProperties = {
-	      rotationZ: this._orientation,
+	      rotationZ: -this._orientation,
 	      scale: this._calculatePhoneScale()
 	    };
 	    ref = this._getOrientationDimensions(this._device.screenWidth, this._device.screenHeight), width = ref[0], height = ref[1];
-	    ref1 = [(this.screen.width - width) / 2, (this.screen.height - height) / 2], x = ref1[0], y = ref1[1];
+	    this.content.width = width;
+	    this.content.height = height;
+	    offset = (this.screen.width - width) / 2;
+	    if (this._orientation === -90) {
+	      offset *= -1;
+	    }
+	    ref1 = [0, 0], x = ref1[0], y = ref1[1];
+	    if (this.isLandscape()) {
+	      x = offset;
+	      y = offset;
+	    }
 	    contentProperties = {
-	      rotationZ: -this._orientation,
-	      width: width,
-	      height: height,
+	      rotationZ: this._orientation,
 	      x: x,
 	      y: y
 	    };
-	    _hadKeyboard = this.keyboard;
-	    if (_hadKeyboard) {
-	      this.hideKeyboard(false);
-	    }
-	    this.phone.animateStop();
+	    this.hands.animateStop();
 	    this.viewport.animateStop();
 	    if (animate) {
-	      animation = this.phone.animate(_.extend(this.animationOptions, {
+	      animation = this.hands.animate(_.extend(this.animationOptions, {
 	        properties: phoneProperties
 	      }));
 	      this.viewport.animate(_.extend(this.animationOptions, {
@@ -23891,27 +24029,25 @@
 	          return _this._update();
 	        };
 	      })(this));
-	      if (_hadKeyboard) {
-	        animation.on(Events.AnimationEnd, (function(_this) {
-	          return function() {
-	            return _this.showKeyboard(true);
-	          };
-	        })(this));
-	      }
 	    } else {
-	      this.phone.props = phoneProperties;
+	      this.hands.props = phoneProperties;
 	      this.viewport.props = contentProperties;
 	      this._update();
-	      if (_hadKeyboard) {
-	        this.showKeyboard(true);
-	      }
 	    }
-	    this._renderKeyboard();
-	    return this.emit("change:orientation");
+	    if (this._orientation !== 0) {
+	      this.handsImageLayer.image = "";
+	    }
+	    return this.emit("change:orientation", this._orientation);
+	  };
+	
+	  DeviceComponent.prototype._orientationChange = function() {
+	    this._orientation = window.orientation;
+	    this._update();
+	    return this.emit("change:orientation", window.orientation);
 	  };
 	
 	  DeviceComponent.prototype.isPortrait = function() {
-	    return Math.abs(this._orientation) !== 90;
+	    return Math.abs(this.orientation) === 0;
 	  };
 	
 	  DeviceComponent.prototype.isLandscape = function() {
@@ -23960,267 +24096,606 @@
 	    }
 	  };
 	
-	  DeviceComponent.define("keyboard", {
-	    get: function() {
-	      return this._keyboard;
-	    },
-	    set: function(keyboard) {
-	      return this.setKeyboard(keyboard, false);
-	    }
-	  });
+	  DeviceComponent.prototype.handSwitchingSupported = function() {
+	    return this._device.hands !== void 0;
+	  };
 	
-	  DeviceComponent.prototype.setKeyboard = function(keyboard, animate) {
-	    var ref, ref1;
-	    if (animate == null) {
-	      animate = false;
-	    }
-	    if (!this._device.hasOwnProperty("keyboards")) {
+	  DeviceComponent.prototype.nextHand = function() {
+	    var hand, hands, nextHand, nextHandIndex;
+	    if (this.hands.rotationZ !== 0) {
 	      return;
 	    }
-	    if (_.isString(keyboard)) {
-	      if ((ref = keyboard.toLowerCase()) === "1" || ref === "true") {
-	        keyboard = true;
-	      } else if ((ref1 = keyboard.toLowerCase()) === "0" || ref1 === "false") {
-	        keyboard = false;
-	      } else {
-	        return;
+	    if (this.handSwitchingSupported()) {
+	      hands = _.keys(this._device.hands);
+	      if (hands.length > 0) {
+	        nextHandIndex = hands.indexOf(this.selectedHand) + 1;
+	        nextHand = "";
+	        if (nextHandIndex < hands.length) {
+	          nextHand = hands[nextHandIndex];
+	        }
+	        hand = this.setHand(nextHand);
+	        this._update();
+	        return hand;
 	      }
 	    }
-	    if (!_.isBoolean(keyboard)) {
-	      return;
+	    return false;
+	  };
+	
+	  DeviceComponent.prototype.setHand = function(hand) {
+	    var handData;
+	    this.selectedHand = hand;
+	    if (!hand || !this.handSwitchingSupported()) {
+	      return this.handsImageLayer.image = "";
 	    }
-	    if (keyboard === this._keyboard) {
-	      return;
-	    }
-	    this._keyboard = keyboard;
-	    this.emit("change:keyboard");
-	    if (keyboard === true) {
-	      this.emit("keyboard:show:start");
-	      return this._animateKeyboard(this._keyboardShowY(), animate, (function(_this) {
-	        return function() {
-	          return _this.emit("keyboard:show:end");
-	        };
-	      })(this));
-	    } else {
-	      this.emit("keyboard:hide:start");
-	      return this._animateKeyboard(this._keyboardHideY(), animate, (function(_this) {
-	        return function() {
-	          return _this.emit("keyboard:hide:end");
-	        };
-	      })(this));
+	    handData = this._device.hands[hand];
+	    if (handData) {
+	      this.hands.width = handData.width;
+	      this.hands.height = handData.height;
+	      this.hands.center();
+	      this.phone.center();
+	      this.handsImageLayer.size = this.hands.size;
+	      this.handsImageLayer.y = 0;
+	      if (handData.offset) {
+	        this.handsImageLayer.y = handData.offset;
+	      }
+	      this.handsImageLayer.image = this.handImageUrl(hand);
+	      return hand;
 	    }
 	  };
 	
-	  DeviceComponent.prototype.showKeyboard = function(animate) {
-	    if (animate == null) {
-	      animate = true;
+	  DeviceComponent.prototype.handImageUrl = function(hand) {
+	    var resourceUrl;
+	    resourceUrl = "//resources.framerjs.com/static/DeviceResources";
+	    if (Utils.isFramerStudio() && window.FramerStudioInfo && Utils.framerStudioVersion() >= newDeviceMinVersion) {
+	      resourceUrl = window.FramerStudioInfo.deviceImagesUrl;
 	    }
-	    return this.setKeyboard(true, animate);
-	  };
-	
-	  DeviceComponent.prototype.hideKeyboard = function(animate) {
-	    if (animate == null) {
-	      animate = true;
-	    }
-	    return this.setKeyboard(false, animate);
-	  };
-	
-	  DeviceComponent.prototype.toggleKeyboard = function(animate) {
-	    if (animate == null) {
-	      animate = true;
-	    }
-	    return this.setKeyboard(!this.keyboard, animate);
-	  };
-	
-	  DeviceComponent.prototype._renderKeyboard = function() {
-	    if (!this._device.keyboards) {
-	      return;
-	    }
-	    this.keyboardLayer.image = this._deviceImageUrl(this._device.keyboards[this.orientationName].image);
-	    this.keyboardLayer.width = this._device.keyboards[this.orientationName].width;
-	    return this.keyboardLayer.height = this._device.keyboards[this.orientationName].height;
-	  };
-	
-	  DeviceComponent.prototype._positionKeyboard = function() {
-	    this.keyboardLayer.centerX();
-	    if (this.keyboard) {
-	      return this._animateKeyboard(this._keyboardShowY(), false);
-	    } else {
-	      return this._animateKeyboard(this._keyboardHideY(), false);
-	    }
-	  };
-	
-	  DeviceComponent.prototype._animateKeyboard = function(y, animate, callback) {
-	    var animation;
-	    this.keyboardLayer.bringToFront();
-	    this.keyboardLayer.animateStop();
-	    if (animate === false) {
-	      this.keyboardLayer.y = y;
-	      return typeof callback === "function" ? callback() : void 0;
-	    } else {
-	      animation = this.keyboardLayer.animate(_.extend(this.animationOptions, {
-	        properties: {
-	          y: y
-	        }
-	      }));
-	      return animation.on(Events.AnimationEnd, callback);
-	    }
-	  };
-	
-	  DeviceComponent.prototype._keyboardShowY = function() {
-	    return this.viewport.height - this.keyboardLayer.height;
-	  };
-	
-	  DeviceComponent.prototype._keyboardHideY = function() {
-	    return this.viewport.height;
+	    return resourceUrl + "/" + hand + ".png";
 	  };
 	
 	  return DeviceComponent;
 	
 	})(BaseClass);
 	
+	newDeviceMinVersion = 53;
+	
+	oldDeviceMaxVersion = 52;
+	
+	iPadAir2BaseDevice = {
+	  deviceImageWidth: 1856,
+	  deviceImageHeight: 2608,
+	  deviceImageJP2: true,
+	  screenWidth: 1536,
+	  screenHeight: 2048,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion
+	};
+	
+	iPadMini4BaseDevice = {
+	  deviceImageWidth: 1936,
+	  deviceImageHeight: 2688,
+	  deviceImageJP2: true,
+	  screenWidth: 1536,
+	  screenHeight: 2048,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion
+	};
+	
+	iPadProBaseDevice = {
+	  deviceImageWidth: 2448,
+	  deviceImageHeight: 3432,
+	  deviceImageJP2: true,
+	  screenWidth: 2048,
+	  screenHeight: 2732,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion
+	};
+	
 	iPhone6BaseDevice = {
+	  deviceImageWidth: 874,
+	  deviceImageHeight: 1792,
+	  deviceImageJP2: true,
+	  screenWidth: 750,
+	  screenHeight: 1334,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion,
+	  hands: {
+	    "iphone-hands-2": {
+	      width: 2400,
+	      height: 3740
+	    },
+	    "iphone-hands-1": {
+	      width: 2400,
+	      height: 3740
+	    }
+	  }
+	};
+	
+	iPhone6PlusBaseDevice = {
+	  deviceImageWidth: 1452,
+	  deviceImageHeight: 2968,
+	  deviceImageJP2: true,
+	  screenWidth: 1242,
+	  screenHeight: 2208,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion,
+	  hands: {
+	    "iphone-hands-2": {
+	      width: 3987,
+	      height: 6212
+	    },
+	    "iphone-hands-1": {
+	      width: 3987,
+	      height: 6212
+	    }
+	  }
+	};
+	
+	iPhone5BaseDevice = {
+	  deviceImageWidth: 768,
+	  deviceImageHeight: 1612,
+	  deviceImageJP2: true,
+	  screenWidth: 640,
+	  screenHeight: 1136,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion,
+	  hands: {
+	    "iphone-hands-2": {
+	      width: 2098,
+	      height: 3269,
+	      offset: 19
+	    },
+	    "iphone-hands-1": {
+	      width: 2098,
+	      height: 3269,
+	      offset: 19
+	    }
+	  }
+	};
+	
+	iPhone5CBaseDevice = {
+	  deviceImageWidth: 776,
+	  deviceImageHeight: 1620,
+	  deviceImageJP2: true,
+	  screenWidth: 640,
+	  screenHeight: 1136,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion,
+	  hands: {
+	    "iphone-hands-2": {
+	      width: 2098,
+	      height: 3269,
+	      offset: 28
+	    },
+	    "iphone-hands-1": {
+	      width: 2098,
+	      height: 3269,
+	      offset: 28
+	    }
+	  }
+	};
+	
+	Nexus4BaseDevice = {
+	  deviceImageWidth: 860,
+	  deviceImageHeight: 1668,
+	  deviceImageJP2: true,
+	  screenWidth: 768,
+	  screenHeight: 1280,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion,
+	  hands: {
+	    "iphone-hands-2": {
+	      width: 2362,
+	      height: 3681,
+	      offset: -52
+	    },
+	    "iphone-hands-1": {
+	      width: 2362,
+	      height: 3681,
+	      offset: -52
+	    }
+	  }
+	};
+	
+	Nexus5BaseDevice = {
+	  deviceImageWidth: 1204,
+	  deviceImageHeight: 2432,
+	  deviceImageJP2: true,
+	  screenWidth: 1080,
+	  screenHeight: 1920,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion,
+	  hands: {
+	    "iphone-hands-2": {
+	      width: 3292,
+	      height: 5130,
+	      offset: 8
+	    },
+	    "iphone-hands-1": {
+	      width: 3292,
+	      height: 5130,
+	      offset: 8
+	    }
+	  }
+	};
+	
+	Nexus6BaseDevice = {
+	  deviceImageWidth: 1576,
+	  deviceImageHeight: 3220,
+	  deviceImageJP2: true,
+	  screenWidth: 1440,
+	  screenHeight: 2560,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion,
+	  hands: {
+	    "iphone-hands-2": {
+	      width: 4304,
+	      height: 6707,
+	      offset: 8
+	    },
+	    "iphone-hands-1": {
+	      width: 4304,
+	      height: 6707,
+	      offset: 8
+	    }
+	  }
+	};
+	
+	Nexus9BaseDevice = {
+	  deviceImageWidth: 1896,
+	  deviceImageHeight: 2648,
+	  deviceImageJP2: true,
+	  screenWidth: 1536,
+	  screenHeight: 2048,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion
+	};
+	
+	HTCa9BaseDevice = {
+	  deviceImageWidth: 1252,
+	  deviceImageHeight: 2592,
+	  deviceImageJP2: true,
+	  screenWidth: 1080,
+	  screenHeight: 1920,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion,
+	  hands: {
+	    "iphone-hands-2": {
+	      width: 3436,
+	      height: 5354,
+	      offset: 36
+	    },
+	    "iphone-hands-1": {
+	      width: 3436,
+	      height: 5354,
+	      offset: 36
+	    }
+	  }
+	};
+	
+	HTCm8BaseDevice = {
+	  deviceImageWidth: 1232,
+	  deviceImageHeight: 2572,
+	  deviceImageJP2: true,
+	  screenWidth: 1080,
+	  screenHeight: 1920,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion,
+	  hands: {
+	    "iphone-hands-2": {
+	      width: 3436,
+	      height: 5354,
+	      offset: 12
+	    },
+	    "iphone-hands-1": {
+	      width: 3436,
+	      height: 5354,
+	      offset: 12
+	    }
+	  }
+	};
+	
+	MSFTLumia950BaseDevice = {
+	  deviceImageWidth: 1660,
+	  deviceImageHeight: 3292,
+	  deviceImageJP2: true,
+	  screenWidth: 1440,
+	  screenHeight: 2560,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion,
+	  hands: {
+	    "iphone-hands-2": {
+	      width: 4494,
+	      height: 7003,
+	      offset: -84
+	    },
+	    "iphone-hands-1": {
+	      width: 4494,
+	      height: 7003,
+	      offset: -84
+	    }
+	  }
+	};
+	
+	SamsungGalaxyNote5BaseDevice = {
+	  deviceImageWidth: 1572,
+	  deviceImageHeight: 3140,
+	  deviceImageJP2: true,
+	  screenWidth: 1440,
+	  screenHeight: 2560,
+	  deviceType: "phone",
+	  minStudioVersion: newDeviceMinVersion,
+	  hands: {
+	    "iphone-hands-2": {
+	      width: 4279,
+	      height: 6668,
+	      offset: -24
+	    },
+	    "iphone-hands-1": {
+	      width: 4279,
+	      height: 6668,
+	      offset: -84
+	    }
+	  }
+	};
+	
+	AppleWatch42Device = {
+	  deviceImageWidth: 512,
+	  deviceImageHeight: 990,
+	  deviceImageJP2: true,
+	  screenWidth: 312,
+	  screenHeight: 390,
+	  minStudioVersion: newDeviceMinVersion
+	};
+	
+	AppleWatch38Device = {
+	  deviceImageWidth: 472,
+	  deviceImageHeight: 772,
+	  deviceImageJP2: true,
+	  screenWidth: 272,
+	  screenHeight: 340,
+	  minStudioVersion: newDeviceMinVersion
+	};
+	
+	AppleWatch38BlackLeatherDevice = {
+	  deviceImageWidth: 472,
+	  deviceImageHeight: 796,
+	  deviceImageJP2: true,
+	  screenWidth: 272,
+	  screenHeight: 340,
+	  minStudioVersion: newDeviceMinVersion
+	};
+	
+	old_iPhone6BaseDevice = {
 	  deviceImageWidth: 870,
 	  deviceImageHeight: 1738,
 	  deviceImageJP2: true,
 	  screenWidth: 750,
 	  screenHeight: 1334,
-	  deviceType: "phone"
+	  deviceType: "phone",
+	  maxStudioVersion: oldDeviceMaxVersion
 	};
 	
-	iPhone6BaseDeviceHand = _.extend({}, iPhone6BaseDevice, {
+	old_iPhone6BaseDeviceHand = _.extend({}, old_iPhone6BaseDevice, {
 	  deviceImageWidth: 1988,
 	  deviceImageHeight: 2368,
 	  deviceImageJP2: true,
-	  paddingOffset: -150
+	  paddingOffset: -150,
+	  maxStudioVersion: oldDeviceMaxVersion
 	});
 	
-	iPhone6PlusBaseDevice = {
+	old_iPhone6PlusBaseDevice = {
 	  deviceImageWidth: 1460,
 	  deviceImageHeight: 2900,
 	  deviceImageJP2: true,
 	  screenWidth: 1242,
 	  screenHeight: 2208,
-	  deviceType: "phone"
+	  deviceType: "phone",
+	  maxStudioVersion: oldDeviceMaxVersion
 	};
 	
-	iPhone6PlusBaseDeviceHand = _.extend({}, iPhone6PlusBaseDevice, {
+	old_iPhone6PlusBaseDeviceHand = _.extend({}, old_iPhone6PlusBaseDevice, {
 	  deviceImageWidth: 3128,
 	  deviceImageHeight: 3487,
 	  deviceImageJP2: true,
-	  paddingOffset: -150
+	  paddingOffset: -150,
+	  maxStudioVersion: oldDeviceMaxVersion
 	});
 	
-	iPhone5BaseDevice = {
+	old_iPhone5BaseDevice = {
 	  deviceImageWidth: 780,
 	  deviceImageHeight: 1608,
 	  deviceImageJP2: true,
 	  screenWidth: 640,
 	  screenHeight: 1136,
-	  deviceType: "phone"
+	  deviceType: "phone",
+	  maxStudioVersion: oldDeviceMaxVersion
 	};
 	
-	iPhone5BaseDeviceHand = _.extend({}, iPhone5BaseDevice, {
+	old_iPhone5BaseDeviceHand = _.extend({}, old_iPhone5BaseDevice, {
 	  deviceImageWidth: 1884,
 	  deviceImageHeight: 2234,
 	  deviceImageJP2: true,
-	  paddingOffset: -200
+	  paddingOffset: -200,
+	  maxStudioVersion: oldDeviceMaxVersion
 	});
 	
-	iPhone5CBaseDevice = {
+	old_iPhone5CBaseDevice = {
 	  deviceImageWidth: 776,
 	  deviceImageHeight: 1612,
 	  deviceImageJP2: true,
 	  screenWidth: 640,
 	  screenHeight: 1136,
-	  deviceType: "phone"
+	  deviceType: "phone",
+	  maxStudioVersion: oldDeviceMaxVersion
 	};
 	
-	iPhone5CBaseDeviceHand = _.extend({}, iPhone5CBaseDevice, {
+	old_iPhone5CBaseDeviceHand = _.extend({}, old_iPhone5CBaseDevice, {
 	  deviceImageWidth: 1894,
 	  deviceImageHeight: 2244,
 	  deviceImageJP2: true,
-	  paddingOffset: -200
+	  paddingOffset: -200,
+	  maxStudioVersion: oldDeviceMaxVersion
 	});
 	
-	iPadMiniBaseDevice = {
+	old_iPadMiniBaseDevice = {
 	  deviceImageWidth: 872,
 	  deviceImageHeight: 1292,
 	  deviceImageJP2: true,
 	  screenWidth: 768,
 	  screenHeight: 1024,
-	  deviceType: "tablet"
+	  deviceType: "tablet",
+	  maxStudioVersion: oldDeviceMaxVersion
 	};
 	
-	iPadMiniBaseDeviceHand = _.extend({}, iPadMiniBaseDevice, {
+	old_iPadMiniBaseDeviceHand = _.extend({}, old_iPadMiniBaseDevice, {
 	  deviceImageWidth: 1380,
 	  deviceImageHeight: 2072,
 	  deviceImageJP2: true,
-	  paddingOffset: -120
+	  paddingOffset: -120,
+	  maxStudioVersion: oldDeviceMaxVersion
 	});
 	
-	iPadAirBaseDevice = {
+	old_iPadAirBaseDevice = {
 	  deviceImageWidth: 1769,
 	  deviceImageHeight: 2509,
 	  deviceImageJP2: true,
 	  screenWidth: 1536,
 	  screenHeight: 2048,
-	  deviceType: "tablet"
+	  deviceType: "tablet",
+	  maxStudioVersion: oldDeviceMaxVersion
 	};
 	
-	iPadAirBaseDeviceHand = _.extend({}, iPadAirBaseDevice, {
+	old_iPadAirBaseDeviceHand = _.extend({}, old_iPadAirBaseDevice, {
 	  deviceImageWidth: 4744,
 	  deviceImageHeight: 4101,
 	  deviceImageJP2: true,
-	  paddingOffset: -120
+	  paddingOffset: -120,
+	  maxStudioVersion: oldDeviceMaxVersion
 	});
 	
-	Nexus5BaseDevice = {
+	old_Nexus5BaseDevice = {
 	  deviceImageWidth: 1208,
 	  deviceImageHeight: 2440,
 	  deviceImageJP2: true,
 	  screenWidth: 1080,
 	  screenHeight: 1920,
-	  deviceType: "phone"
+	  deviceType: "phone",
+	  maxStudioVersion: oldDeviceMaxVersion
 	};
 	
-	Nexus5BaseDeviceHand = _.extend({}, Nexus5BaseDevice, {
+	old_Nexus5BaseDeviceHand = _.extend({}, old_Nexus5BaseDevice, {
 	  deviceImageWidth: 2692,
 	  deviceImageHeight: 2996,
 	  deviceImageJP2: true,
-	  paddingOffset: -120
+	  paddingOffset: -120,
+	  maxStudioVersion: oldDeviceMaxVersion
 	});
 	
-	Nexus9BaseDevice = {
+	old_Nexus9BaseDevice = {
 	  deviceImageWidth: 1733,
 	  deviceImageHeight: 2575,
 	  deviceImageJP2: true,
 	  screenWidth: 1536,
 	  screenHeight: 2048,
-	  deviceType: "tablet"
+	  deviceType: "tablet",
+	  maxStudioVersion: oldDeviceMaxVersion
 	};
 	
-	AppleWatch42Device = {
+	old_AppleWatch42Device = {
 	  deviceImageWidth: 552,
 	  deviceImageHeight: 938,
 	  deviceImageJP2: true,
 	  screenWidth: 312,
-	  screenHeight: 390
+	  screenHeight: 390,
+	  maxStudioVersion: oldDeviceMaxVersion
 	};
 	
-	AppleWatch38Device = {
+	old_AppleWatch38Device = {
 	  deviceImageWidth: 508,
 	  deviceImageHeight: 900,
 	  deviceImageJP2: true,
 	  screenWidth: 272,
-	  screenHeight: 340
+	  screenHeight: 340,
+	  maxStudioVersion: oldDeviceMaxVersion
 	};
 	
 	Devices = {
 	  "fullscreen": {
 	    name: "Fullscreen",
-	    deviceType: "desktop"
+	    deviceType: "desktop",
+	    backgroundColor: "white"
 	  },
+	  "apple-ipad-air-2-silver": _.clone(iPadAir2BaseDevice),
+	  "apple-ipad-air-2-gold": _.clone(iPadAir2BaseDevice),
+	  "apple-ipad-air-2-space-gray": _.clone(iPadAir2BaseDevice),
+	  "apple-ipad-mini-4-silver": _.clone(iPadMini4BaseDevice),
+	  "apple-ipad-mini-4-gold": _.clone(iPadMini4BaseDevice),
+	  "apple-ipad-mini-4-space-gray": _.clone(iPadMini4BaseDevice),
+	  "apple-ipad-pro-silver": _.clone(iPadProBaseDevice),
+	  "apple-ipad-pro-gold": _.clone(iPadProBaseDevice),
+	  "apple-ipad-pro-space-gray": _.clone(iPadProBaseDevice),
+	  "apple-iphone-6s-gold": _.clone(iPhone6BaseDevice),
+	  "apple-iphone-6s-rose-gold": _.clone(iPhone6BaseDevice),
+	  "apple-iphone-6s-silver": _.clone(iPhone6BaseDevice),
+	  "apple-iphone-6s-space-gray": _.clone(iPhone6BaseDevice),
+	  "apple-iphone-6s-plus-gold": _.clone(iPhone6PlusBaseDevice),
+	  "apple-iphone-6s-plus-rose-gold": _.clone(iPhone6PlusBaseDevice),
+	  "apple-iphone-6s-plus-silver": _.clone(iPhone6PlusBaseDevice),
+	  "apple-iphone-6s-plus-space-gray": _.clone(iPhone6PlusBaseDevice),
+	  "apple-iphone-5s-gold": _.clone(iPhone5BaseDevice),
+	  "apple-iphone-5s-silver": _.clone(iPhone5BaseDevice),
+	  "apple-iphone-5s-space-gray": _.clone(iPhone5BaseDevice),
+	  "apple-iphone-5c-blue": _.clone(iPhone5CBaseDevice),
+	  "apple-iphone-5c-green": _.clone(iPhone5CBaseDevice),
+	  "apple-iphone-5c-red": _.clone(iPhone5CBaseDevice),
+	  "apple-iphone-5c-white": _.clone(iPhone5CBaseDevice),
+	  "apple-iphone-5c-yellow": _.clone(iPhone5CBaseDevice),
+	  "apple-watch-38mm-gold-black-leather-closed": _.clone(AppleWatch38BlackLeatherDevice),
+	  "apple-watch-38mm-rose-gold-black-leather-closed": _.clone(AppleWatch38BlackLeatherDevice),
+	  "apple-watch-38mm-stainless-steel-black-leather-closed": _.clone(AppleWatch38BlackLeatherDevice),
+	  "apple-watch-38mm-black-steel-black-closed": _.clone(AppleWatch38Device),
+	  "apple-watch-38mm-gold-midnight-blue-closed": _.clone(AppleWatch38Device),
+	  "apple-watch-38mm-rose-gold-lavender-closed": _.clone(AppleWatch38Device),
+	  "apple-watch-38mm-sport-aluminum-blue-closed": _.clone(AppleWatch38Device),
+	  "apple-watch-38mm-sport-aluminum-fog-closed": _.clone(AppleWatch38Device),
+	  "apple-watch-38mm-sport-aluminum-green-closed": _.clone(AppleWatch38Device),
+	  "apple-watch-38mm-sport-aluminum-red-closed": _.clone(AppleWatch38Device),
+	  "apple-watch-38mm-sport-aluminum-walnut-closed": _.clone(AppleWatch38Device),
+	  "apple-watch-38mm-sport-aluminum-white-closed": _.clone(AppleWatch38Device),
+	  "apple-watch-38mm-sport-aluminum-gold-antique-white-closed": _.clone(AppleWatch38Device),
+	  "apple-watch-38mm-sport-aluminum-rose-gold-stone-closed": _.clone(AppleWatch38Device),
+	  "apple-watch-38mm-sport-space-gray-black-closed": _.clone(AppleWatch38Device),
+	  "apple-watch-42mm-black-steel-black-closed": _.clone(AppleWatch42Device),
+	  "apple-watch-42mm-gold-black-leather-closed": _.clone(AppleWatch42Device),
+	  "apple-watch-42mm-gold-midnight-blue-closed": _.clone(AppleWatch42Device),
+	  "apple-watch-42mm-rose-gold-black-leather-closed": _.clone(AppleWatch42Device),
+	  "apple-watch-42mm-rose-gold-lavender-closed": _.clone(AppleWatch42Device),
+	  "apple-watch-42mm-sport-aluminum-blue-closed": _.clone(AppleWatch42Device),
+	  "apple-watch-42mm-sport-aluminum-fog-closed": _.clone(AppleWatch42Device),
+	  "apple-watch-42mm-sport-aluminum-green-closed": _.clone(AppleWatch42Device),
+	  "apple-watch-42mm-sport-aluminum-red-closed": _.clone(AppleWatch42Device),
+	  "apple-watch-42mm-sport-aluminum-walnut-closed": _.clone(AppleWatch42Device),
+	  "apple-watch-42mm-sport-aluminum-white-closed": _.clone(AppleWatch42Device),
+	  "apple-watch-42mm-sport-aluminum-gold-antique-white-closed": _.clone(AppleWatch42Device),
+	  "apple-watch-42mm-sport-aluminum-rose-gold-stone-closed": _.clone(AppleWatch42Device),
+	  "apple-watch-42mm-sport-space-gray-black-closed": _.clone(AppleWatch42Device),
+	  "apple-watch-42mm-stainless-steel-black-leather-closed": _.clone(AppleWatch42Device),
+	  "google-nexus-4": _.clone(Nexus4BaseDevice),
+	  "google-nexus-5x": _.clone(Nexus5BaseDevice),
+	  "google-nexus-6p": _.clone(Nexus6BaseDevice),
+	  "google-nexus-9": _.clone(Nexus9BaseDevice),
+	  "htc-one-a9-black": _.clone(HTCa9BaseDevice),
+	  "htc-one-a9-white": _.clone(HTCa9BaseDevice),
+	  "htc-one-m8-black": _.clone(HTCm8BaseDevice),
+	  "htc-one-m8-gold": _.clone(HTCm8BaseDevice),
+	  "htc-one-m8-silver": _.clone(HTCm8BaseDevice),
+	  "microsoft-lumia-950-black": _.clone(MSFTLumia950BaseDevice),
+	  "microsoft-lumia-950-white": _.clone(MSFTLumia950BaseDevice),
+	  "samsung-galaxy-note-5-black": _.clone(SamsungGalaxyNote5BaseDevice),
+	  "samsung-galaxy-note-5-gold": _.clone(SamsungGalaxyNote5BaseDevice),
+	  "samsung-galaxy-note-5-pink": _.clone(SamsungGalaxyNote5BaseDevice),
+	  "samsung-galaxy-note-5-silver-titanium": _.clone(SamsungGalaxyNote5BaseDevice),
+	  "samsung-galaxy-note-5-white": _.clone(SamsungGalaxyNote5BaseDevice),
 	  "desktop-safari-1024-600": {
 	    deviceType: "browser",
 	    name: "Desktop Safari 1024 x 600",
@@ -24228,7 +24703,8 @@
 	    screenHeight: 600,
 	    deviceImageWidth: 1136,
 	    deviceImageHeight: 760,
-	    deviceImageJP2: true
+	    deviceImageJP2: true,
+	    backgroundColor: "white"
 	  },
 	  "desktop-safari-1280-800": {
 	    deviceType: "browser",
@@ -24237,7 +24713,8 @@
 	    screenHeight: 800,
 	    deviceImageWidth: 1392,
 	    deviceImageHeight: 960,
-	    deviceImageJP2: true
+	    deviceImageJP2: true,
+	    backgroundColor: "white"
 	  },
 	  "desktop-safari-1440-900": {
 	    deviceType: "browser",
@@ -24246,71 +24723,72 @@
 	    screenHeight: 900,
 	    deviceImageWidth: 1552,
 	    deviceImageHeight: 1060,
-	    deviceImageJP2: true
+	    deviceImageJP2: true,
+	    backgroundColor: "white"
 	  },
-	  "iphone-6-spacegray": _.clone(iPhone6BaseDevice),
-	  "iphone-6-spacegray-hand": _.clone(iPhone6BaseDeviceHand),
-	  "iphone-6-silver": _.clone(iPhone6BaseDevice),
-	  "iphone-6-silver-hand": _.clone(iPhone6BaseDeviceHand),
-	  "iphone-6-gold": _.clone(iPhone6BaseDevice),
-	  "iphone-6-gold-hand": _.clone(iPhone6BaseDeviceHand),
-	  "iphone-6plus-spacegray": _.clone(iPhone6PlusBaseDevice),
-	  "iphone-6plus-spacegray-hand": _.clone(iPhone6PlusBaseDeviceHand),
-	  "iphone-6plus-silver": _.clone(iPhone6PlusBaseDevice),
-	  "iphone-6plus-silver-hand": _.clone(iPhone6PlusBaseDeviceHand),
-	  "iphone-6plus-gold": _.clone(iPhone6PlusBaseDevice),
-	  "iphone-6plus-gold-hand": _.clone(iPhone6PlusBaseDeviceHand),
-	  "iphone-5s-spacegray": _.clone(iPhone5BaseDevice),
-	  "iphone-5s-spacegray-hand": _.clone(iPhone5BaseDeviceHand),
-	  "iphone-5s-silver": _.clone(iPhone5BaseDevice),
-	  "iphone-5s-silver-hand": _.clone(iPhone5BaseDeviceHand),
-	  "iphone-5s-gold": _.clone(iPhone5BaseDevice),
-	  "iphone-5s-gold-hand": _.clone(iPhone5BaseDeviceHand),
-	  "iphone-5c-green": _.clone(iPhone5CBaseDevice),
-	  "iphone-5c-green-hand": _.clone(iPhone5CBaseDeviceHand),
-	  "iphone-5c-blue": _.clone(iPhone5CBaseDevice),
-	  "iphone-5c-blue-hand": _.clone(iPhone5CBaseDeviceHand),
-	  "iphone-5c-pink": _.clone(iPhone5CBaseDevice),
-	  "iphone-5c-pink-hand": _.clone(iPhone5CBaseDeviceHand),
-	  "iphone-5c-white": _.clone(iPhone5CBaseDevice),
-	  "iphone-5c-white-hand": _.clone(iPhone5CBaseDeviceHand),
-	  "iphone-5c-yellow": _.clone(iPhone5CBaseDevice),
-	  "iphone-5c-yellow-hand": _.clone(iPhone5CBaseDeviceHand),
-	  "ipad-mini-spacegray": _.clone(iPadMiniBaseDevice),
-	  "ipad-mini-spacegray-hand": _.clone(iPadMiniBaseDeviceHand),
-	  "ipad-mini-silver": _.clone(iPadMiniBaseDevice),
-	  "ipad-mini-silver-hand": _.clone(iPadMiniBaseDeviceHand),
-	  "ipad-air-spacegray": _.clone(iPadAirBaseDevice),
-	  "ipad-air-spacegray-hand": _.clone(iPadAirBaseDeviceHand),
-	  "ipad-air-silver": _.clone(iPadAirBaseDevice),
-	  "ipad-air-silver-hand": _.clone(iPadAirBaseDeviceHand),
-	  "nexus-5-black": _.clone(Nexus5BaseDevice),
-	  "nexus-5-black-hand": _.clone(Nexus5BaseDeviceHand),
-	  "nexus-9": _.clone(Nexus9BaseDevice),
-	  "applewatchsport-38-aluminum-sportband-black": _.clone(AppleWatch38Device),
-	  "applewatchsport-38-aluminum-sportband-blue": _.clone(AppleWatch38Device),
-	  "applewatchsport-38-aluminum-sportband-green": _.clone(AppleWatch38Device),
-	  "applewatchsport-38-aluminum-sportband-pink": _.clone(AppleWatch38Device),
-	  "applewatchsport-38-aluminum-sportband-white": _.clone(AppleWatch38Device),
-	  "applewatch-38-black-bracelet": _.clone(AppleWatch38Device),
-	  "applewatch-38-steel-bracelet": _.clone(AppleWatch38Device),
-	  "applewatchedition-38-gold-buckle-blue": _.clone(AppleWatch38Device),
-	  "applewatchedition-38-gold-buckle-gray": _.clone(AppleWatch38Device),
-	  "applewatchedition-38-gold-buckle-red": _.clone(AppleWatch38Device),
-	  "applewatchedition-38-gold-sportband-black": _.clone(AppleWatch38Device),
-	  "applewatchedition-38-gold-sportband-white": _.clone(AppleWatch38Device),
-	  "applewatchsport-42-aluminum-sportband-black": _.clone(AppleWatch42Device),
-	  "applewatchsport-42-aluminum-sportband-blue": _.clone(AppleWatch42Device),
-	  "applewatchsport-42-aluminum-sportband-green": _.clone(AppleWatch42Device),
-	  "applewatchsport-42-aluminum-sportband-pink": _.clone(AppleWatch42Device),
-	  "applewatchsport-42-aluminum-sportband-white": _.clone(AppleWatch42Device),
-	  "applewatch-42-black-bracelet": _.clone(AppleWatch42Device),
-	  "applewatch-42-steel-bracelet": _.clone(AppleWatch42Device),
-	  "applewatchedition-42-gold-buckle-blue": _.clone(AppleWatch42Device),
-	  "applewatchedition-42-gold-buckle-gray": _.clone(AppleWatch42Device),
-	  "applewatchedition-42-gold-buckle-red": _.clone(AppleWatch42Device),
-	  "applewatchedition-42-gold-sportband-black": _.clone(AppleWatch42Device),
-	  "applewatchedition-42-gold-sportband-white": _.clone(AppleWatch42Device)
+	  "iphone-6-spacegray": _.clone(old_iPhone6BaseDevice),
+	  "iphone-6-spacegray-hand": _.clone(old_iPhone6BaseDeviceHand),
+	  "iphone-6-silver": _.clone(old_iPhone6BaseDevice),
+	  "iphone-6-silver-hand": _.clone(old_iPhone6BaseDeviceHand),
+	  "iphone-6-gold": _.clone(old_iPhone6BaseDevice),
+	  "iphone-6-gold-hand": _.clone(old_iPhone6BaseDeviceHand),
+	  "iphone-6plus-spacegray": _.clone(old_iPhone6PlusBaseDevice),
+	  "iphone-6plus-spacegray-hand": _.clone(old_iPhone6PlusBaseDeviceHand),
+	  "iphone-6plus-silver": _.clone(old_iPhone6PlusBaseDevice),
+	  "iphone-6plus-silver-hand": _.clone(old_iPhone6PlusBaseDeviceHand),
+	  "iphone-6plus-gold": _.clone(old_iPhone6PlusBaseDevice),
+	  "iphone-6plus-gold-hand": _.clone(old_iPhone6PlusBaseDeviceHand),
+	  "iphone-5s-spacegray": _.clone(old_iPhone5BaseDevice),
+	  "iphone-5s-spacegray-hand": _.clone(old_iPhone5BaseDeviceHand),
+	  "iphone-5s-silver": _.clone(old_iPhone5BaseDevice),
+	  "iphone-5s-silver-hand": _.clone(old_iPhone5BaseDeviceHand),
+	  "iphone-5s-gold": _.clone(old_iPhone5BaseDevice),
+	  "iphone-5s-gold-hand": _.clone(old_iPhone5BaseDeviceHand),
+	  "iphone-5c-green": _.clone(old_iPhone5CBaseDevice),
+	  "iphone-5c-green-hand": _.clone(old_iPhone5CBaseDeviceHand),
+	  "iphone-5c-blue": _.clone(old_iPhone5CBaseDevice),
+	  "iphone-5c-blue-hand": _.clone(old_iPhone5CBaseDeviceHand),
+	  "iphone-5c-pink": _.clone(old_iPhone5CBaseDevice),
+	  "iphone-5c-pink-hand": _.clone(old_iPhone5CBaseDeviceHand),
+	  "iphone-5c-white": _.clone(old_iPhone5CBaseDevice),
+	  "iphone-5c-white-hand": _.clone(old_iPhone5CBaseDeviceHand),
+	  "iphone-5c-yellow": _.clone(old_iPhone5CBaseDevice),
+	  "iphone-5c-yellow-hand": _.clone(old_iPhone5CBaseDeviceHand),
+	  "ipad-mini-spacegray": _.clone(old_iPadMiniBaseDevice),
+	  "ipad-mini-spacegray-hand": _.clone(old_iPadMiniBaseDeviceHand),
+	  "ipad-mini-silver": _.clone(old_iPadMiniBaseDevice),
+	  "ipad-mini-silver-hand": _.clone(old_iPadMiniBaseDeviceHand),
+	  "ipad-air-spacegray": _.clone(old_iPadAirBaseDevice),
+	  "ipad-air-spacegray-hand": _.clone(old_iPadAirBaseDeviceHand),
+	  "ipad-air-silver": _.clone(old_iPadAirBaseDevice),
+	  "ipad-air-silver-hand": _.clone(old_iPadAirBaseDeviceHand),
+	  "nexus-5-black": _.clone(old_Nexus5BaseDevice),
+	  "nexus-5-black-hand": _.clone(old_Nexus5BaseDeviceHand),
+	  "nexus-9": _.clone(old_Nexus9BaseDevice),
+	  "applewatchsport-38-aluminum-sportband-black": _.clone(old_AppleWatch38Device),
+	  "applewatchsport-38-aluminum-sportband-blue": _.clone(old_AppleWatch38Device),
+	  "applewatchsport-38-aluminum-sportband-green": _.clone(old_AppleWatch38Device),
+	  "applewatchsport-38-aluminum-sportband-pink": _.clone(old_AppleWatch38Device),
+	  "applewatchsport-38-aluminum-sportband-white": _.clone(old_AppleWatch38Device),
+	  "applewatch-38-black-bracelet": _.clone(old_AppleWatch38Device),
+	  "applewatch-38-steel-bracelet": _.clone(old_AppleWatch38Device),
+	  "applewatchedition-38-gold-buckle-blue": _.clone(old_AppleWatch38Device),
+	  "applewatchedition-38-gold-buckle-gray": _.clone(old_AppleWatch38Device),
+	  "applewatchedition-38-gold-buckle-red": _.clone(old_AppleWatch38Device),
+	  "applewatchedition-38-gold-sportband-black": _.clone(old_AppleWatch38Device),
+	  "applewatchedition-38-gold-sportband-white": _.clone(old_AppleWatch38Device),
+	  "applewatchsport-42-aluminum-sportband-black": _.clone(old_AppleWatch42Device),
+	  "applewatchsport-42-aluminum-sportband-blue": _.clone(old_AppleWatch42Device),
+	  "applewatchsport-42-aluminum-sportband-green": _.clone(old_AppleWatch42Device),
+	  "applewatchsport-42-aluminum-sportband-pink": _.clone(old_AppleWatch42Device),
+	  "applewatchsport-42-aluminum-sportband-white": _.clone(old_AppleWatch42Device),
+	  "applewatch-42-black-bracelet": _.clone(old_AppleWatch42Device),
+	  "applewatch-42-steel-bracelet": _.clone(old_AppleWatch42Device),
+	  "applewatchedition-42-gold-buckle-blue": _.clone(old_AppleWatch42Device),
+	  "applewatchedition-42-gold-buckle-gray": _.clone(old_AppleWatch42Device),
+	  "applewatchedition-42-gold-buckle-red": _.clone(old_AppleWatch42Device),
+	  "applewatchedition-42-gold-sportband-black": _.clone(old_AppleWatch42Device),
+	  "applewatchedition-42-gold-sportband-white": _.clone(old_AppleWatch42Device)
 	};
 	
 	exports.DeviceComponent.Devices = Devices;
@@ -24393,7 +24871,7 @@
 /* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ChromeAlert, Utils, _, getScaleFromName, resizeFrame, startsWithNumber;
+	var ChromeAlert, Utils, _, getScaleFromName, resizeFrame, sanitizeLayerName, startsWithNumber;
 	
 	_ = __webpack_require__(1)._;
 	
@@ -24431,6 +24909,18 @@
 	
 	startsWithNumber = function(str) {
 	  return (new RegExp("^[0-9]")).test(str);
+	};
+	
+	sanitizeLayerName = function(name) {
+	  var i, len, ref, suffix;
+	  ref = ["*", "-", ".png", ".jpg", ".pdf"];
+	  for (i = 0, len = ref.length; i < len; i++) {
+	    suffix = ref[i];
+	    if (_.endsWith(name.toLowerCase(), suffix)) {
+	      name = name.slice(0, +(name.length - suffix.length - 1) + 1 || 9e9);
+	    }
+	  }
+	  return name;
 	};
 	
 	exports.Importer = (function() {
@@ -24501,7 +24991,7 @@
 	    LayerClass = Layer;
 	    layerInfo = {
 	      shadow: true,
-	      name: info.name,
+	      name: sanitizeLayerName(info.name),
 	      frame: info.layerFrame,
 	      clip: false,
 	      backgroundColor: null,
@@ -24515,9 +25005,8 @@
 	    if (info.maskFrame) {
 	      layerInfo.clip = true;
 	    }
-	    if (layerInfo.kind === "artboard") {
-	      layerInfo.frame.x = 0;
-	      layerInfo.frame.y = 0;
+	    if (info.kind === "artboard") {
+	      layerInfo.backgroundColor = info.backgroundColor;
 	    }
 	    if (parent != null ? parent.contentLayer : void 0) {
 	      layerInfo.parent = parent.contentLayer;
@@ -24905,7 +25394,8 @@
 	  if (!touchEmulator) {
 	    return;
 	  }
-	  return touchEmulator.destroy();
+	  touchEmulator.destroy();
+	  return touchEmulator = null;
 	};
 
 
@@ -25004,7 +25494,7 @@
 /* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var DOMEventManager, GestureInputDoubleTapTime, GestureInputEdgeSwipeDistance, GestureInputForceTapDesktop, GestureInputForceTapMobile, GestureInputForceTapMobilePollTime, GestureInputLongPressTime, GestureInputMinimumFingerDistance, GestureInputSwipeThreshold, GestureInputVelocityTime, Utils,
+	var DOMEventManager, GestureInputDoubleTapTime, GestureInputEdgeSwipeDistance, GestureInputForceTapDesktop, GestureInputForceTapMobile, GestureInputForceTapMobilePollTime, GestureInputLongPressTime, GestureInputMinimumFingerDistance, GestureInputSwipeThreshold, GestureInputVelocityTime, TouchEnd, TouchMove, TouchStart, Utils,
 	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 	
 	Utils = __webpack_require__(4);
@@ -25029,16 +25519,11 @@
 	
 	DOMEventManager = __webpack_require__(42).DOMEventManager;
 	
-	Utils.sanitizeRotation = function() {
-	  var previous, sanitize;
-	  previous = null;
-	  return sanitize = function(value) {
-	    if (previous == null) {
-	      previous = value;
-	    }
-	    return value;
-	  };
-	};
+	TouchStart = ["touchstart", "mousedown"];
+	
+	TouchMove = ["touchmove", "mousemove"];
+	
+	TouchEnd = ["touchend", "mouseup"];
 	
 	exports.GestureInputRecognizer = (function() {
 	  function GestureInputRecognizer() {
@@ -25083,7 +25568,11 @@
 	    this.touchmove = bind(this.touchmove, this);
 	    this.touchstart = bind(this.touchstart, this);
 	    this.em = new DOMEventManager();
-	    this.em.wrap(window).addEventListener("touchstart", this.touchstart);
+	    TouchStart.map((function(_this) {
+	      return function(e) {
+	        return _this.em.wrap(window).addEventListener(e, _this.touchstart);
+	      };
+	    })(this));
 	  }
 	
 	  GestureInputRecognizer.prototype.destroy = function() {
@@ -25099,8 +25588,16 @@
 	    if (this.session) {
 	      return;
 	    }
-	    this.em.wrap(window).addEventListener("touchmove", this.touchmove);
-	    this.em.wrap(window).addEventListener("touchend", this.touchend);
+	    TouchMove.map((function(_this) {
+	      return function(e) {
+	        return _this.em.wrap(window).addEventListener(e, _this.touchmove);
+	      };
+	    })(this));
+	    TouchEnd.map((function(_this) {
+	      return function(e) {
+	        return _this.em.wrap(window).addEventListener(e, _this.touchend);
+	      };
+	    })(this));
 	    this.em.wrap(window).addEventListener("webkitmouseforcechanged", this._updateMacForce);
 	    this.session = {
 	      startEvent: this._getGestureEvent(event),
@@ -25110,7 +25607,6 @@
 	      pressTimer: window.setTimeout(this.longpressstart, GestureInputLongPressTime * 1000),
 	      started: {},
 	      events: [],
-	      sanitizeRotation: Utils.sanitizeRotation(),
 	      eventCount: 0
 	    };
 	    event = this._getGestureEvent(event);
@@ -25131,19 +25627,29 @@
 	  };
 	
 	  GestureInputRecognizer.prototype.touchend = function(event) {
-	    var eventName, ref, value;
-	    if (Utils.isTouch()) {
-	      if (!(event.touches.length === 0)) {
-	        return;
-	      }
-	    } else {
-	      if (!(event.touches.length === event.changedTouches.length)) {
-	        return;
+	    var eventName, ref, ref1, value;
+	    if (event.touches != null) {
+	      if (Utils.isTouch()) {
+	        if (!(event.touches.length === 0)) {
+	          return;
+	        }
+	      } else {
+	        if (!(event.touches.length === event.changedTouches.length)) {
+	          return;
+	        }
 	      }
 	    }
-	    this.em.wrap(window).removeEventListener("touchmove", this.touchmove);
-	    this.em.wrap(window).removeEventListener("touchend", this.touchend);
-	    this.em.wrap(window).removeEventListener("webkitmouseforcechanged", this._updateMacForce);
+	    TouchMove.map((function(_this) {
+	      return function(e) {
+	        return _this.em.wrap(window).removeEventListener(e, _this.touchmove);
+	      };
+	    })(this));
+	    TouchEnd.map((function(_this) {
+	      return function(e) {
+	        return _this.em.wrap(window).removeEventListener(e, _this.touchend);
+	      };
+	    })(this));
+	    this.em.wrap(window).addEventListener("webkitmouseforcechanged", this._updateMacForce);
 	    event = this._getGestureEvent(event);
 	    ref = this.session.started;
 	    for (eventName in ref) {
@@ -25152,7 +25658,11 @@
 	        this[eventName + "end"](event);
 	      }
 	    }
-	    this.tap(event);
+	    if (!((ref1 = this.session) != null ? ref1.startEvent : void 0)) {
+	      this.tap(event);
+	    } else if (this.session.startEvent.target === event.target) {
+	      this.tap(event);
+	    }
 	    this.tapend(event);
 	    return this.cancel();
 	  };
@@ -25624,8 +26134,11 @@
 	  };
 	
 	  GestureInputRecognizer.prototype._dispatchEvent = function(type, event, target) {
-	    var touchEvent;
+	    var ref, ref1, touchEvent;
 	    touchEvent = this._createEvent(type, event);
+	    if (target == null) {
+	      target = (ref = this.session) != null ? (ref1 = ref.startEvent) != null ? ref1.target : void 0 : void 0;
+	    }
 	    if (target == null) {
 	      target = event.target;
 	    }
@@ -25665,13 +26178,13 @@
 /* 54 */
 /***/ function(module, exports) {
 
-	exports.date = 1455433948;
+	exports.date = 1459564654;
 	
 	exports.branch = "tisho/animation-paths";
 	
-	exports.hash = "707f464";
+	exports.hash = "3c251d5";
 	
-	exports.build = 1466;
+	exports.build = 1642;
 	
 	exports.version = exports.branch + "/" + exports.hash;
 
