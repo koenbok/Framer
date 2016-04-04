@@ -73,7 +73,7 @@ class exports.LayerPinchable extends BaseClass
 
 	_pinch: (event) =>
 
-		return unless event.touches.length is 2
+		return unless event.fingers is 2
 		return unless @enabled
 
 		pointA =
