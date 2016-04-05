@@ -853,7 +853,17 @@ Utils.convertFrameToContext = (frame = {}, layer, rootContext=false, includeLaye
 
 # convert a point from the context level to a layer, with rootContext enabled you can make it cross from the top context
 Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLayer=true) ->
+
 	point = _.defaults(point, {x:0, y:0, z:0})
+
+	if rootContext
+		if includeLayer
+			node = layer._element
+		else
+			parent = layer.parent or layer.context
+			node = parent._element
+		return webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y))
+
 	ancestors = layer.ancestors(rootContext)
 	ancestors.reverse()
 	ancestors.push(layer) if includeLayer
