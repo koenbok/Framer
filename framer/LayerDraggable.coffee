@@ -258,7 +258,7 @@ class exports.LayerDraggable extends BaseClass
 		# be canceled by the user's animation (if the user animates x and/or y).
 		@_startSimulation()
 
-		@emit(Events.DragEnd, event)
+		@emit(Events.DragEnd, event) if @_isDragging
 
 		# Set _isDragging after DragEnd is fired, so that calls to calculateVelocity()
 		# still returns dragging velocity - both in case the user calls calculateVelocity(),
