@@ -856,7 +856,7 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 
 	point = _.defaults(point, {x:0, y:0, z:0})
 
-	if rootContext
+	if rootContext and webkitConvertPointFromPageToNode?
 		if includeLayer
 			node = layer._element
 		else
