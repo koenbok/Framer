@@ -885,8 +885,13 @@ Utils.convertPoint = (input, layerA, layerB, rootContext=false) ->
 	# Convert a point between two layer coordinate systems
 	point = _.defaults(input, {x:0, y:0, z:0})
 	point = Utils.convertPointToContext(point, layerA, rootContext) if layerA
-	return point unless layerB
-	return Utils.convertPointFromContext(point, layerB, rootContext)
+	if layerB?
+		return Utils.convertPointFromContext(point, layerB, rootContext)
+	else if layerA? and rootContext and webkitConvertPointFromPageToNode?
+		node = layerA.context._element
+		return webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y))
+	else
+		return point
 
 # get the bounding frame of a layer, either at the canvas (rootcontext) or screen level
 Utils.boundingFrame = (layer, rootContext=true) ->
