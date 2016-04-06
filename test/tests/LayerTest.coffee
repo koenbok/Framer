@@ -650,6 +650,17 @@ describe "Layer", ->
 			layerC = new Layer superLayer:layerB
 			layerC.superLayers().should.eql [layerB, layerA]
 
+	describe "Find", ->
+		it "should find the layer named B", ->
+			layerA = new Layer name: 'A'
+			layerB = new Layer name: 'B', parent: layerA
+			layerA.find('B').should.equal layerB
+
+		it "should find the layer named C", ->
+			layerA = new Layer name: 'A'
+			layerB = new Layer name: 'B', parent: layerA
+			layerC = new Layer name: 'C', parent: layerB
+			layerA.find('B > *').should.equal layerC
 
 	describe "Frame", ->
 

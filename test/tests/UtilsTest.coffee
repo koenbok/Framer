@@ -192,6 +192,43 @@ describe "Utils", ->
 	# 		test = -> Utils.domLoadDataSync("static/nonexisting.txt")
 	# 		test.should.throw()
 
+	describe "layerMatchesSelector", ->
+		it "should match exact", ->
+			layerA = new Layer name: "layerA"
+			Utils.layerMatchesSelector(layerA,'layerA').should.equal true
+
+		it "should match anything below", ->
+			layerA = new Layer name: "layerA"
+			layerB = new Layer name: "layerB", parent: layerA
+			layerC = new Layer name: "layerC", parent: layerB
+			Utils.layerMatchesSelector(layerB,'layerA > *').should.equal true
+
+		it "should match descendant with wildcard", ->
+			layerA = new Layer name: "layerA"
+			layerB = new Layer name: "layerB", parent: layerA
+			layerC = new Layer name: "layerC", parent: layerB
+			Utils.layerMatchesSelector(layerC,'layerA layer*').should.equal true
+
+		it "should match containing", ->
+			layerA = new Layer name: "layerA1"
+			layerB = new Layer name: "layerB1", parent: layerA
+			layerC = new Layer name: "layerC1", parent: layerB
+			Utils.layerMatchesSelector(layerB,'*rB*').should.equal true
+
+		it "should match multiple direct children", ->
+			layerA = new Layer name: "layerA"
+			layerB = new Layer name: "layerB", parent: layerA
+			layerC = new Layer name: "layerC", parent: layerB
+			Utils.layerMatchesSelector(layerC,'layerA>layerB>layerC').should.equal true
+
+		it "should match multiple direct children", ->
+			layerA = new Layer name: "layerA"
+			layerB = new Layer name: "layerB", parent: layerA
+			layerC = new Layer name: "layerC", parent: layerB
+			Utils.layerMatchesSelector(layerA,'layerB,layerC').should.equal false
+			Utils.layerMatchesSelector(layerB,'layerB,layerC').should.equal true
+			Utils.layerMatchesSelector(layerC,'layerB,layerC').should.equal true
+
 	describe "modulate", ->
 
 		it "should have the right results", ->
