@@ -27,6 +27,7 @@ watch: bootstrap
 	$(gulp) watch
 
 dev: bootstrap
+	gulp version
 	open -a "Framer Studio Beta" "extras/DevServer.framer"
 	$(bin)/coffee scripts/devserver.coffee
 
