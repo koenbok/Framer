@@ -30,8 +30,8 @@ class exports.PageComponent extends ScrollComponent
 		@content.draggable.momentum = false
 		@content.draggable.bounce = false
 
-		@on(Events.ScrollStart, @_scrollStart)
-		@on(Events.ScrollEnd, @_scrollEnd)
+		@content.on(Events.DragSessionStart, @_scrollStart)
+		@content.on(Events.DragSessionEnd, @_scrollEnd)
 
 		@content.on("change:frame", _.debounce(@_scrollMove, 16))
 		@content.on("change:children", @_resetHistory)
@@ -168,16 +168,10 @@ class exports.PageComponent extends ScrollComponent
 		xLock = @content.draggable._directionLockEnabledX and (@direction == "right" or @direction == "left")
 		yLock = @content.draggable._directionLockEnabledY and (@direction == "down" or @direction == "up")
 
-		if Math.max(Math.abs(velocity.x), Math.abs(velocity.y)) < @velocityThreshold or xLock or yLock or xDisabled or yDisabled
-			# print "velocity"
+		maximumVelocity = Math.max(Math.abs(velocity.x), Math.abs(velocity.y))
 
-			start = @content.draggable._layerStartPoint
-			end = @content.draggable.layer.point
-
-			if start? and end?
-				if start.x isnt end.x or start.y isnt end.y
-					@snapToPage(@closestPage, true, @animationOptions)
-					return
+		if maximumVelocity < @velocityThreshold or xLock or yLock or xDisabled or yDisabled
+			return @snapToPage(@closestPage, true, @animationOptions)
 
 		# Figure out which direction we are scrolling to and make a sorted list of
 		# layers on that side, sorted by absolute distance so we can pick the first.
@@ -187,7 +181,7 @@ class exports.PageComponent extends ScrollComponent
 		# that we are already at.
 		nextPage ?= @closestPage
 
-		# print Math.max(Math.abs(velocity.x), Math.abs(velocity.y))
+		# print @content, maximumVelocity, @velocityThreshold
 		# print @direction, nextPage
 
 		@snapToPage(nextPage, true, @animationOptions)
