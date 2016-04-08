@@ -205,6 +205,11 @@ class exports.SliderComponent extends Layer
 			@_updateValue()
 
 	_updateValue: =>
+		
+		if @_lastUpdatedValue is @value
+			return
+
+		@_lastUpdatedValue = @value
 		@emit("change:value", @value)
 		@emit(Events.SliderValueChange, @value)
 
