@@ -853,7 +853,17 @@ Utils.convertFrameToContext = (frame = {}, layer, rootContext=false, includeLaye
 
 # convert a point from the context level to a layer, with rootContext enabled you can make it cross from the top context
 Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLayer=true) ->
+
 	point = _.defaults(point, {x:0, y:0, z:0})
+
+	if rootContext and webkitConvertPointFromPageToNode?
+		if includeLayer
+			node = layer._element
+		else
+			parent = layer.parent or layer.context
+			node = parent._element
+		return webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y))
+
 	ancestors = layer.ancestors(rootContext)
 	ancestors.reverse()
 	ancestors.push(layer) if includeLayer
@@ -875,8 +885,13 @@ Utils.convertPoint = (input, layerA, layerB, rootContext=false) ->
 	# Convert a point between two layer coordinate systems
 	point = _.defaults(input, {x:0, y:0, z:0})
 	point = Utils.convertPointToContext(point, layerA, rootContext) if layerA
-	return point unless layerB
-	return Utils.convertPointFromContext(point, layerB, rootContext)
+	if layerB?
+		return Utils.convertPointFromContext(point, layerB, rootContext)
+	else if layerA? and rootContext and webkitConvertPointFromPageToNode?
+		node = layerA.context._element
+		return webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y))
+	else
+		return point
 
 # get the bounding frame of a layer, either at the canvas (rootcontext) or screen level
 Utils.boundingFrame = (layer, rootContext=true) ->
