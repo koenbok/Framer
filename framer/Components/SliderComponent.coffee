@@ -89,7 +89,6 @@ class exports.SliderComponent extends Layer
 		@knob.on("change:frame", @_updateValue)
 
 		@sliderOverlay.on(Events.TapStart, @_touchStart)
-		@sliderOverlay.on(Events.Pan, @_touchMove)
 		@sliderOverlay.on(Events.TapEnd, @_touchEnd)
 
 	_touchStart: (event) =>
@@ -106,11 +105,7 @@ class exports.SliderComponent extends Layer
 		@knob.draggable._touchStart(event)
 		@_updateValue()
 
-	_touchMove: (event) =>
-		@knob.draggable._touchMove(event)
-
 	_touchEnd: (event) =>
-		@knob.draggable._touchEnd(event)
 		@_updateValue()
 
 	_updateFill: =>
