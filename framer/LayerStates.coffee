@@ -84,7 +84,7 @@ class exports.LayerStates extends BaseClass
 				continue
 
 			# Allow dynamic properties as functions
-			value = value.call(@layer, @layer, stateName) if _.isFunction(value)
+			value = value.call(@layer, @layer, propertyName, stateName) if _.isFunction(value)
 
 			# Set the new value
 			properties[propertyName] = value

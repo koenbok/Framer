@@ -35,8 +35,8 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 			# console.log "Layer.#{name}.set #{value} current:#{@[name]}"
 
-			if transformer
-				value = transformer(value)
+			# Convert the value
+			value = transformer(value, @, name) if transformer
 
 			# Return unless we get a new value
 			return if value is @_properties[name]
@@ -56,6 +56,12 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 			@emit("change:rotation", value) if name in ["rotationZ"]
 
 	result = _.extend(result, options)
+
+layerPropertyPointTransformer = (value, layer, property) ->
+	if _.isFunction(value)
+		value = value(layer, property)
+
+	return value
 
 class exports.Layer extends BaseClass
 
@@ -104,6 +110,9 @@ class exports.Layer extends BaseClass
 		if options.hasOwnProperty("index")
 			@index = options.index
 
+		@x = options.x if options.hasOwnProperty("x")
+		@y = options.y if options.hasOwnProperty("y")
+
 		@_context.emit("layer:create", @)
 
 	##############################################################
@@ -138,8 +147,8 @@ class exports.Layer extends BaseClass
 	@define "ignoreEvents", layerProperty(@, "ignoreEvents", "pointerEvents", true, _.isBoolean)
 
 	# Matrix properties
-	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber)
-	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber)
+	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber, layerPropertyPointTransformer)
+	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber, layerPropertyPointTransformer)
 	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber)
 
 	@define "scaleX", layerProperty(@, "scaleX", "webkitTransform", 1, _.isNumber)

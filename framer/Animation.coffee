@@ -88,7 +88,7 @@ class exports.Animation extends BaseClass
 
 			# Evaluate function properties
 			if _.isFunction(v)
-				v = v()
+				v = v(@options.layer, k)
 
 			# Evaluate relative properties
 			else if isRelativeProperty(v)
