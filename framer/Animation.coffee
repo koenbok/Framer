@@ -181,28 +181,38 @@ class exports.Animation extends BaseClass
 		@emit("start")
 		Framer.Loop.on("update", @_update)
 
+		# Figure out what kind of values we have so we don't have to do it in
+		# the actual update loop. This saves a lot of frame budget.
+
+		@_valueUpdaters = {}
+	
+		for k, v of @_stateB
+			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
+				@_valueUpdaters[k] = @_updateColorValue
+			else
+				@_valueUpdaters[k] = @_updateNumberValue
+
 	_update: (delta) =>
 		if @_animator.finished()
-			@_updateValue(1)
+			@_updateValues(1)
 			@stop(emit=false)
 			@emit("end")
 			@emit("stop")
 		else
-			@_updateValue(@_animator.next(delta))
+			@_updateValues(@_animator.next(delta))
 
-	_updateValue: (value) =>
+	_updateValues: (value) =>
+		@_valueUpdaters[k](k, value) for k, v of @_stateB
+		return null
 
-		for k, v of @_stateB
-
-			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
-				@_target[k] = Color.mix(@_stateA[k], @_stateB[k], value, false, @options.colorModel)
-			else
-				@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
-
-		return
+	_updateNumberValue: (key, value) =>
+		@_target[key] = Utils.mapRange(value, 0, 1, @_stateA[key], @_stateB[key])
+		
+	_updateColorValue: (key, value) =>
+		@_target[key] = Color.mix(@_stateA[key], @_stateB[key], value, false, @options.colorModel)
 
 	_currentState: ->
-		_.pick @options.layer, _.keys(@options.properties)
+		return _.pick(@options.layer, _.keys(@options.properties))
 
 	_animatorClass: ->
 
