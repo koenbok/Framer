@@ -19,7 +19,6 @@ class FPS
 	
 	totalTime: ->
 		@_time - @_start
-		
 	
 	droppedFrames: ->
 		_.filter @_frames, (t) -> t > (1 / 60) * 1.1
@@ -53,15 +52,17 @@ testLayers = (n, options={}, callback) ->
 		width: options.width
 		height: options.height
 		backgroundColor: "rgba(0, 0, 0, .1)"
+		clip: true
 	
 	root.center()
 			
 	layers = for i in [0..n]
 		
 		layer = new Layer
+			width: 100, height: 100,
 			x: Math.random() * options.width - (.5 * 100)
 			y: Math.random() * options.height - (.5 * 100)
-			backgroundColor: Color.random(.3)
+			backgroundColor: Utils.randomColor(.3)
 			superLayer: root
 
 	fps = new FPS
