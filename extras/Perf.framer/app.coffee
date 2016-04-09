@@ -133,6 +133,8 @@ drawChart = (stats) ->
 	options = {}
 
 	
-	lineChart = new Chart(canvasElement.getContext("2d")).Line(data, options);
+	lineChart = new Chart(canvasElement.getContext("2d")).Line(data, options)
+	
+	print Framer.Version
 
 	
