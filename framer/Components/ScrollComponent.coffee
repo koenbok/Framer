@@ -126,6 +126,7 @@ class exports.ScrollComponent extends Layer
 		@on("change:height", @updateContent)
 
 		@updateContent()
+
 		@scrollPoint = {x:0, y:0}
 
 		return @_content
@@ -141,7 +142,7 @@ class exports.ScrollComponent extends Layer
 		# call it yourself, but make sure you don't overdo it.
 
 		return unless @content
-
+		
 		contentFrame = @calculateContentFrame()
 		@content.width = contentFrame.width
 		@content.height = contentFrame.height
@@ -225,6 +226,12 @@ class exports.ScrollComponent extends Layer
 			_.clone(@_contentInset)
 		set: (contentInset) ->
 			@_contentInset = Utils.rectZero(Utils.parseRect(contentInset))
+			
+			# If we reset the content inset, we need to reset the content position
+			contentFrame = @calculateContentFrame()
+			contentFrame.x = contentFrame.x + @_contentInset.left
+			contentFrame.y = contentFrame.y + @_contentInset.top
+			@content.frame = contentFrame
 			@updateContent()
 
 	@define "direction",
