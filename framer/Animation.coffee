@@ -97,7 +97,7 @@ class exports.Animation extends BaseClass
 			# Filter out the properties that are equal
 			@_stateB[k] = v if @_stateA[k] != v
 
-		if _.keys(@_stateA).length is 0 or _.keys(@_stateB).length is 0
+		if _.keys(@_stateA).length is 0
 			console.warn "Animation: nothing to animate, no animatable properties"
 			return false
 
