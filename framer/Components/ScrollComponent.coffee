@@ -93,6 +93,8 @@ class exports.ScrollComponent extends Layer
 
 	calculateContentFrame: ->
 
+		return Utils.rectZero() unless @content
+
 		# Calculates the size of the content. By default this returns the total
 		# size of all the content layers based on width and height. You can override
 		# this for example to take scaling into account.
@@ -226,6 +228,8 @@ class exports.ScrollComponent extends Layer
 			_.clone(@_contentInset)
 		set: (contentInset) ->
 			@_contentInset = Utils.rectZero(Utils.parseRect(contentInset))
+			
+			return unless @content
 			
 			# If we reset the content inset, we need to reset the content position
 			contentFrame = @calculateContentFrame()
