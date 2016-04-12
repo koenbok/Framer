@@ -12,16 +12,12 @@ GestureInputMinimumFingerDistance = 30
 
 {DOMEventManager} = require "./DOMEventManager"
 
-TouchStart = ["touchstart", "mousedown"]
-TouchMove = ["touchmove", "mousemove"]
-TouchEnd = ["touchend", "mouseup"]
-
 class exports.GestureInputRecognizer
 
 	constructor: ->
 		@em = new DOMEventManager()
-
-		TouchStart.map (e) => @em.wrap(window).addEventListener(e, @touchstart)
+		@em.wrap(window).addEventListener("mousedown", @startMouse)
+		@em.wrap(window).addEventListener("touchstart", @startTouch)
 
 	destroy: ->
 		@em.removeAllListeners()
@@ -30,13 +26,23 @@ class exports.GestureInputRecognizer
 		window.clearTimeout(@session.pressTimer)
 		@session = null
 
+	startMouse: (event) =>
+		return if @session
+		@em.wrap(window).addEventListener("mousemove", @touchmove)
+		@em.wrap(window).addEventListener("mouseup", @touchend)
+		@touchstart(event)
+
+	startTouch: (event) =>
+		return if @session
+		@em.wrap(window).addEventListener("touchmove", @touchmove)
+		@em.wrap(window).addEventListener("touchend", @touchend)
+		@touchstart(event)
+
 	touchstart: (event) =>
 
 		# Only fire if we are not already in a session
 		return if @session
 
-		TouchMove.map (e) => @em.wrap(window).addEventListener(e, @touchmove)
-		TouchEnd.map (e) => @em.wrap(window).addEventListener(e, @touchend)
 		@em.wrap(window).addEventListener("webkitmouseforcechanged", @_updateMacForce)
 
 		@session =
@@ -74,8 +80,11 @@ class exports.GestureInputRecognizer
 			else
 				return unless (event.touches.length == event.changedTouches.length)
 
-		TouchMove.map (e) => @em.wrap(window).removeEventListener(e, @touchmove)
-		TouchEnd.map (e) => @em.wrap(window).removeEventListener(e, @touchend)
+		@em.wrap(window).removeEventListener("mousemove", @touchmove)
+		@em.wrap(window).removeEventListener("mouseup", @touchend)
+		@em.wrap(window).removeEventListener("touchmove", @touchmove)
+		@em.wrap(window).removeEventListener("touchend", @touchend)
+
 		@em.wrap(window).addEventListener("webkitmouseforcechanged", @_updateMacForce)
 
 		event = @_getGestureEvent(event)
@@ -274,7 +283,6 @@ class exports.GestureInputRecognizer
 	# Utilities
 
 	_process: (event) =>
-
 		return unless @session
 
 		@session.events.push(event)
