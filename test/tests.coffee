@@ -14,6 +14,7 @@ chai.config.showDiff = true
 mocha.setup({ui:"bdd", bail:true, reporter:"dot"})
 mocha.globals(["__import__"])
 
+require "./tests/AlignTest"
 require "./tests/EventEmitterTest"
 require "./tests/UtilsTest"
 require "./tests/BaseClassTest"
