@@ -20,21 +20,43 @@ describe "Align", ->
 			child.x.should.equal 200
 			{child} = createAlignedLayers('y',Align.center)
 			child.y.should.equal 50
+		it "should work when the layer has no parent", ->
+			layer = new Layer
+				width: 100
+				height: 150
+				x: Align.center
+				y: Align.center
+			layer.x.should.equal 150
+			layer.y.should.equal 75
 		it "should take borderWidth into account", ->
 			{child} = createAlignedLayers('x',Align.center,{borderWidth:30})
 			child.x.should.equal 170
 			{child} = createAlignedLayers('y',Align.center,{borderWidth:30})
 			child.y.should.equal 20
 
+
 	describe "left", ->
 		it "should left align the layer", ->
 			{child} = createAlignedLayers('x',Align.left)
+			child.x.should.equal 0
+		it "should work when the layer has no parent", ->
+			layer = new Layer
+				width: 100
+				x: Align.left
+			layer.x.should.equal 0
+		it "should take borderWidth into account", ->
+			{child} = createAlignedLayers('x',Align.left,{borderWidth:30})
 			child.x.should.equal 0
 
 	describe "right", ->
 		it "should right align the layer", ->
 			{child} = createAlignedLayers('x',Align.right)
 			child.x.should.equal 400
+		it "should work when the layer has no parent", ->
+			layer = new Layer
+				width: 100
+				x: Align.right
+			layer.x.should.equal 300
 		it "should take borderWidth into account", ->
 			{child} = createAlignedLayers('x',Align.right,{borderWidth:30})
 			child.x.should.equal 340
@@ -43,6 +65,11 @@ describe "Align", ->
 		it "should top align the layer", ->
 			{child} = createAlignedLayers('y',Align.top)
 			child.y.should.equal 0
+		it "should work when the layer has no parent", ->
+			layer = new Layer
+				height: 100
+				y: Align.top
+			layer.y.should.equal 0
 		it "should take borderWidth into account", ->
 			{child} = createAlignedLayers('y',Align.top,{borderWidth:30})
 			child.y.should.equal 0
@@ -51,6 +78,11 @@ describe "Align", ->
 		it "should bottom align the layer", ->
 			{child} = createAlignedLayers('y',Align.bottom)
 			child.y.should.equal 100
+		it "should work when the layer has no parent", ->
+			layer = new Layer
+				height: 100
+				y: Align.bottom
+			layer.y.should.equal 200
 		it "should take borderWidth into account", ->
 			{child} = createAlignedLayers('y',Align.bottom,{borderWidth:30})
 			child.y.should.equal 40
