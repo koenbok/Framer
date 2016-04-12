@@ -15,7 +15,7 @@ right = (layer, property, offset=0) ->
 	throw Error "Align.right only works for x" unless property is "x"
 	parent = Screen
 	parent = layer.parent if layer.parent
-	return parent.width - (2*parent.borderWidth) - layer.width + offset
+	return parent.width - (2 * parent.borderWidth) - layer.width + offset
 
 top = (layer, property, offset=0) ->
 	throw Error "Align.top only works for y" unless property is "y"
@@ -27,7 +27,7 @@ bottom = (layer, property, offset=0) ->
 	throw Error "Align.bottom only works for y" unless property is "y"
 	parent = Screen
 	parent = layer.parent if layer.parent
-	return parent.height - (2*parent.borderWidth) - layer.height + offset
+	return parent.height - (2 * parent.borderWidth) - layer.height + offset
 
 wrapper = (f) ->
 	return (a, b) ->
