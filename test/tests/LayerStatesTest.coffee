@@ -51,6 +51,15 @@ describe "LayerStates", ->
 
 			Framer.resetDefaults()
 
+		it "should convert string to colors in states", ->
+			layer = new Layer
+			layer.states.add
+				test:
+					backgroundColor:"fff"
+					color: "000"
+			layer.states._states.test.backgroundColor.isEqual(new Color("fff")).should.be.true
+			layer.states._states.test.color.isEqual(new Color("000")).should.be.true
+
 
 
 	describe "Switch", ->
@@ -69,6 +78,12 @@ describe "LayerStates", ->
 			layer.states.switchInstant "stateB"
 			layer.states.current.should.equal "stateB"
 			layer.y.should.equal 123
+
+		it "should not change html when using switch instant", ->
+			layer = new Layer
+				html: "fff"
+			layer.states.switchInstant('default')
+			layer.html.should.equal "fff"
 
 
 	describe "Properties", ->
