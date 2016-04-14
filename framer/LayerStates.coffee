@@ -177,8 +177,7 @@ class exports.LayerStates extends BaseClass
 
 		# TODO: Maybe we want to support advanced data structures like objects in the future too.
 		for k, v of properties
-
-			if _.isString(v) && _.endsWith(k.toLowerCase(),'color') && Color.isColorString(v)
+			if _.isString(v) and _.endsWith(k.toLowerCase(),"color") and Color.isColorString(v)
 				stateProperties[k] = new Color(v)
 			else if _.isNumber(v) or _.isFunction(v) or _.isBoolean(v) or _.isString(v) or Color.isColorObject(v) or v == null
 				stateProperties[k] = v
