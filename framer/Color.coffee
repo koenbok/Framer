@@ -1,3 +1,4 @@
+{_} = require "./Underscore"
 {BaseClass} = require "./BaseClass"
 libhusl		= require "husl"
 
@@ -67,7 +68,7 @@ class exports.Color extends BaseClass
 				g: Math.round(@_g)
 				b: Math.round(@_b)
 				a: @_a
-		return @_rgb
+		return _.clone(@_rgb)
 
 	toRgbString: ->
 		if @_a == 1 then "rgb(#{Utils.round(@_r, 0)}, #{Utils.round(@_g, 0)}, #{Utils.round(@_b, 0)})"
@@ -80,7 +81,7 @@ class exports.Color extends BaseClass
 				s: @s
 				l: @l
 				a: @a
-		return @_hsl
+		return _.clone(@_hsl)
 
 	toHusl: ->
 		if @_husl == undefined
@@ -88,7 +89,7 @@ class exports.Color extends BaseClass
 			husl = c.lch.husl c.luv.lch c.xyz.luv c.rgb.xyz([@r/255, @g/255, @b/255])
 			@_husl = { h: husl[0], s: husl[1], l: husl[2] }
 
-		return @_husl
+		return _.clone(@_husl)
 
 	toHslString: ->
 		if @_hslString == undefined
