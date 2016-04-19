@@ -56,6 +56,17 @@ describe "Color", ->
 		mix.g.should.equal 255
 		mix.b.should.equal 255
 
+	describe "when changing the color", ->
+		testModifyFunction = (f) ->
+			it "with #{f}, it should not change the instance it is applied to", ->
+				color = new Color(10, 20, 30, 1)
+				first = color[f](10)
+				second = color[f](10)
+				first.isEqual(second).should.be.true
+
+		for f in ['lighten','brighten','darken','desaturate','saturate','grayscale']
+			testModifyFunction(f)
+
 	it "should brighten color", ->
 
 		orange = new Color "orange"
