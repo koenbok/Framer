@@ -27,9 +27,9 @@ watch: bootstrap
 	$(gulp) watch
 
 dev: bootstrap
-	gulp version
+	$(gulp) version
 	open -a "Framer Studio Beta" "extras/DevServer.framer"
-	$(bin)/coffee scripts/devserver.coffee
+	$(coffee) scripts/devserver.coffee
 
 test: bootstrap
 	$(gulp) test
@@ -83,6 +83,6 @@ resources%upload:
 	cd extras/resources.framerjs.com; cactus deploy
 
 lint:
-	./node_modules/.bin/coffeelint -f coffeelint.json -r framer
+	$(bin)/coffeelint -f coffeelint.json -r framer
 
 .PHONY: all build test clean perf watch
