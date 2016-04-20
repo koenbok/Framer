@@ -18,6 +18,7 @@ class exports.GestureInputRecognizer
 		@em = new DOMEventManager()
 		@em.wrap(window).addEventListener("mousedown", @startMouse)
 		@em.wrap(window).addEventListener("touchstart", @startTouch)
+		@em.wrap(window).addEventListener("gesturestart", @startGesture)
 
 	destroy: ->
 		@em.removeAllListeners()
@@ -38,6 +39,11 @@ class exports.GestureInputRecognizer
 		@em.wrap(window).addEventListener("touchend", @touchend)
 		@touchstart(event)
 
+	startGesture: (event) =>
+		@em.wrap(window).addEventListener("gesturechange", @gesturechange)
+		@em.wrap(window).addEventListener("gestureend", @gestureend)
+		@gesturestart(event)
+
 	touchstart: (event) =>
 
 		# Only fire if we are not already in a session
@@ -45,15 +51,7 @@ class exports.GestureInputRecognizer
 
 		@em.wrap(window).addEventListener("webkitmouseforcechanged", @_updateMacForce)
 
-		@session =
-			startEvent: @_getGestureEvent(event)
-			lastEvent: null
-			startMultiEvent: null
-			startTime: Date.now()
-			pressTimer: window.setTimeout(@longpressstart, GestureInputLongPressTime * 1000)
-			started: {}
-			events: []
-			eventCount: 0
+		@_startSession(@_getGestureEvent(event))
 
 		event = @_getGestureEvent(event)
 
@@ -101,6 +99,22 @@ class exports.GestureInputRecognizer
 			@tap(event)
 
 		@tapend(event)
+		@cancel()
+
+  # Native gestures
+
+	gesturestart: (event) =>
+		event = @_getGestureEvent(event)
+		@_startSession(event) unless @session
+		@session.nativeGesture = true
+		@pinchstart(event)
+
+	gesturechange: (event) =>
+		@_process(@_getGestureEvent(event))
+
+	gestureend: (event) =>
+		event = @_getGestureEvent(event)
+		@pinchend(event)
 		@cancel()
 
 	# Tap
@@ -352,9 +366,9 @@ class exports.GestureInputRecognizer
 			touchCenter: @_getEventPoint(event) # Center between two fingers √
 			touchOffset: {x:0, y:0} # Offset between two fingers √
 			touchDistance: 0 # Distance between two fingers √
-			scale: 1 # Scale value from two fingers √
+			scale: if not isNaN(event.scale) then event.scale else 1 # Scale value from two fingers √
 			scaleDirection: null # Direction for scale: up or down √
-			rotation: 0 # Rotation value from two fingers √
+			rotation: event.rotation or 0 # Rotation value from two fingers √
 
 		# Properties relative to a start event
 		if @session?.startEvent
@@ -374,7 +388,7 @@ class exports.GestureInputRecognizer
 			event.deltaDirection = @_getDirection(event.delta)
 
 		# Properties related to multi touch
-		if event.fingers > 1
+		if event.fingers > 1 and not @session?.nativeGesture
 			touchPointA = @_getTouchPoint(event, 0)
 			touchPointB = @_getTouchPoint(event, 1)
 			event.touchCenter = Utils.pointCenter(touchPointB, touchPointA)
@@ -394,8 +408,8 @@ class exports.GestureInputRecognizer
 
 		# Scale can only be set after we started a pinch session
 		if @session?.started.pinch
-			event.scale = event.touchDistance / @session.started.pinch.touchDistance
-			event.scaleDirection = @_getScaleDirection(event.scale - @session.lastEvent.scale)
+			event.scale = event.touchDistance / @session.started.pinch.touchDistance unless @session.nativeGesture
+			event.scaleDirection = @_getScaleDirection(event.scale - @session.lastEvent.scale) if @session.lastEvent
 
 			# If this is a pinch end event, there was no movement so we use the last one
 			if not event.scaleDirection and @session?.lastEvent
@@ -448,6 +462,17 @@ class exports.GestureInputRecognizer
 		return "up" if offset > 0
 		return "down" if offset < 0
 		return null
+
+	_startSession: (event) ->
+		@session =
+			startEvent: event
+			lastEvent: null
+			startTime: Date.now()
+			pressTimer: window.setTimeout(@longpressstart, GestureInputLongPressTime * 1000)
+			started: {}
+			events: []
+			eventCount: 0
+			nativeGesture: false
 
 	_createEvent: (type, event) ->
 

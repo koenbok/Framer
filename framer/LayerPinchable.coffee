@@ -73,18 +73,24 @@ class exports.LayerPinchable extends BaseClass
 
 	_pinch: (event) =>
 
-		return unless event.fingers is 2
 		return unless @enabled
 
-		pointA =
-			x: event.touches[0].pageX
-			y: event.touches[0].pageY
+		if event.fingers is 2
+			pointA =
+				x: event.touches[0].pageX
+				y: event.touches[0].pageY
 
-		pointB =
-			x: event.touches[1].pageX
-			y: event.touches[1].pageY
+			pointB =
+				x: event.touches[1].pageX
+				y: event.touches[1].pageY
 
-		return unless Utils.pointTotal(Utils.pointAbs(Utils.pointSubtract(pointA, pointB))) > @threshold
+			return unless Utils.pointTotal(Utils.pointAbs(Utils.pointSubtract(pointA, pointB))) > @threshold
+
+		else if event.fingers is 0 # Native gesture
+			return unless event.scale > @threshold or event.rotation > @threshold
+
+		else
+			return
 
 		if @scale
 			@_scaleStart ?= @layer.scale
