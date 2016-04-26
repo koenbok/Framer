@@ -3,6 +3,8 @@ bin = $(pwd)/node_modules/.bin
 coffee = "$(bin)/coffee"
 githash = `git rev-parse --short HEAD`
 gulp = "$(bin)/gulp"
+generatorHost = http://framergenerator-update.s3-website-us-east-1.amazonaws.com/
+latestGenerator = curl "$(generatorHost)latest.txt"
 
 all: build
 
@@ -55,6 +57,7 @@ dist: build
 	mkdir -p build/Framer/Project/framer
 	cp build/framer.js build/Framer/Project/framer/framer.js
 	cp build/framer.js.map build/Framer/Project/framer/framer.js.map
+	cd build/Framer; wget "$(generatorHost)`$(latestGenerator)`" -O "generator.tgz"; tar zxf "./generator.tgz"; rm "./generator.tgz"
 	find build/Framer -name ".DS_Store" -depth -exec rm {} \;
 	cd build; zip -r Framer.zip Framer
 
