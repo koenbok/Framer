@@ -160,6 +160,10 @@ class exports.ScrollComponent extends Layer
 
 		@content.draggable.constraints = constraintsFrame
 
+		# Reset the scroll points to the right postions, this is needed so it can calculate
+		# the new scroll points within the updated constraints for this new size.
+		@scrollPoint = @scrollPoint
+
 		# Change the default background color if we added children. We keep the default
 		# color around until you set a content layer so you can see the ScrollComponent
 		# on your screen after creation.
@@ -438,6 +442,8 @@ wrapComponent = (instance, layer, options = {correct:true}) ->
 
 	# If we have an image set, it makes way more sense to add it to the
 	# background of the wrapper then the content.
+	# Note: I ran into a situation where this had a weird result, maybe
+	# we should revise this in the future.
 	if layer.image
 		scroll.image = layer.image
 		layer.image = null
