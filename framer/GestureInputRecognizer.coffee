@@ -11,8 +11,9 @@ GestureInputForceTapMobilePollTime = 1/30
 GestureInputMinimumFingerDistance = 30
 
 {DOMEventManager} = require "./DOMEventManager"
+{EventEmitter} = require "./EventEmitter"
 
-class exports.GestureInputRecognizer
+class exports.GestureInputRecognizer extends EventEmitter
 
 	constructor: ->
 		@em = new DOMEventManager()
@@ -285,6 +286,8 @@ class exports.GestureInputRecognizer
 	_process: (event) =>
 		return unless @session
 
+		@emit("event", event)
+
 		@session.events.push(event)
 		event.eventCount = @session.eventCount++
 
@@ -475,6 +478,7 @@ class exports.GestureInputRecognizer
 		target ?= @session?.startEvent?.target
 		target ?= event.target
 		target.dispatchEvent(touchEvent)
+
 
 	_getVelocity: (events) ->
 
