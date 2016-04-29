@@ -1,8 +1,8 @@
 {Layer} = require "./Layer"
 {Events} = require "./Events"
 
-Events.OnEnterKey  = "OnEnterKey"
-Events.OnBackSpaceKey  = "OnBackSpaceKey"
+Events.EnterKey  = "EnterKey"
+Events.BackSpaceKey  = "BackSpaceKey"
 
 class exports.InputLayer extends Layer
 	constructor: (options={}) ->
@@ -46,11 +46,11 @@ class exports.InputLayer extends Layer
 
 			# If enter key is pressed
 			if e.which is 13
-				@emit(Events.OnEnterKey, event)
+				@emit(Events.EnterKey, event)
 
 			# If backspace key
 			if e.which is 8
-				@emit(Events.OnBackSpaceKey, event)
+				@emit(Events.BackSpaceKey, event)
 
 	@define "value",
 		get: -> @input.value
@@ -58,5 +58,5 @@ class exports.InputLayer extends Layer
 	@isInArray: (value, array) ->
 		return array.indexOf(value) > -1
 
-	OnEnterKey: (cb) -> @on(Events.OnEnterKey, cb)
-	OnBackSpaceKey: (cb) -> @on(Events.OnBackSpaceKey, cb)
+	onEnterKey: (cb) -> @on(Events.EnterKey, cb)
+	onBackSpaceKey: (cb) -> @on(Events.BackSpaceKey, cb)
