@@ -1,9 +1,5 @@
 {_} = require "./Underscore"
 
-# Before we do anything else, we need to patch touch events
-if window.ontouchstart is undefined
-	window.ontouchstart = null
-
 Framer = {}
 
 # Root level modules
@@ -27,9 +23,10 @@ Framer.ScrollComponent = (require "./Components/ScrollComponent").ScrollComponen
 Framer.PageComponent = (require "./Components/PageComponent").PageComponent
 Framer.SliderComponent = (require "./Components/SliderComponent").SliderComponent
 Framer.DeviceComponent = (require "./Components/DeviceComponent").DeviceComponent
+Framer.GridComponent = (require "./Components/GridComponent").GridComponent
 Framer.DeviceView = Framer.DeviceComponent # Compat
 
-_.extend window, Framer if window
+_.extend(window, Framer) if window
 
 # Framer level modules
 Framer.Context = (require "./Context").Context
