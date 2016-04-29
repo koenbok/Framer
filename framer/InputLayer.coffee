@@ -1,4 +1,5 @@
 {Layer} = require "./Layer"
+{Events} = require "./Events"
 
 Events.OnEnterKey  = "OnEnterKey"
 Events.OnBackSpaceKey  = "OnBackSpaceKey"
