@@ -147,6 +147,14 @@ Utils.randomNumber = (a=0, b=1) ->
 	# Return a random number between a and b
 	Utils.mapRange Math.random(), 0, 1, a, b
 
+Utils.randomImage = (layer, offset=50) ->
+
+	width = Utils.round(layer.width, 0, 100, 100)
+	height = Utils.round(layer.height, 0, 100, 100)
+	
+	# return "https://source.unsplash.com/category/nature/#{width}x#{height}"
+	return "https://unsplash.it/#{width}/#{height}?image=#{layer.id + offset}"
+
 Utils.defineEnum = (names = [], offset = 0, geometric = 0) ->
 	Enum = {}
 	for name, i in names
@@ -290,8 +298,6 @@ Utils.isSafari = ->
 	(/safari/).test(navigator.userAgent.toLowerCase())
 
 Utils.isTouch = ->
-	# This needs to be a little more extensive because we
-	# patch ontouchstart to fake Hammer
 	window.ontouchstart is null and
 	window.ontouchmove is null and
 	window.ontouchend is null
@@ -373,9 +379,16 @@ Utils.pathJoin = ->
 ######################################################
 # MATH FUNCTIONS
 
-Utils.round = (value, decimals=0) ->
-	d = Math.pow 10, decimals
-	Math.round(value * d) / d
+Utils.round = (value, decimals=0, increment=null, min=null, max=null) ->
+	
+	d = Math.pow(10, decimals)
+	
+	value = Math.round(value / increment) * increment if increment
+	value = Math.round(value * d) / d
+
+	return min if min and value < min
+	return max if max and value > max
+	return value
 
 Utils.clamp = (value, a, b) ->
 
