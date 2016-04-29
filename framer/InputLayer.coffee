@@ -43,7 +43,7 @@ class exports.InputLayer extends Layer
 			lastCharacter = @input.value.substr(@input.value.length - 1)
 
 			# Exclude enter, space and caps lock
-			unless e.which is 20 or e.which is 13 or e.which is 8
+			unless e.which is 20 or e.which is 13 or @value is ""
 				@emit("change:value", @input.value)
 
 			# If enter key is pressed
