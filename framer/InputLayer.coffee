@@ -30,10 +30,6 @@ class exports.InputLayer extends Layer
 			@style.color = "#000"
 			@value = ""
 
-		# Supported characters
-		# characters =
-		# 	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@{}#$%^&*()_+1234567890".split("")
-
 		isInArray = (value, array) ->
 			return array.indexOf(value) > -1
 
