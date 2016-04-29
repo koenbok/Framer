@@ -30,7 +30,9 @@ class exports.InputLayer extends Layer
 			@style.color = "#000"
 			@value = ""
 
-		alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@{}#$%^&*()_+1234567890".split("")
+		# Supported characters
+		# characters =
+		# 	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@{}#$%^&*()_+1234567890".split("")
 
 		isInArray = (value, array) ->
 			return array.indexOf(value) > -1
@@ -41,7 +43,7 @@ class exports.InputLayer extends Layer
 			lastCharacter = @input.value.substr(@input.value.length - 1)
 
 			# Exclude enter, space and caps lock
-			if isInArray(lastCharacter, alphabet) and e.which isnt 20
+			unless e.which is 20 or e.which is 13 or e.which is 8
 				@emit("change:value", @input.value)
 
 			# If enter key is pressed
