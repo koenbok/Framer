@@ -3,15 +3,27 @@
 class exports.TextLayer extends Layer
 	constructor: (options={}) ->
 
+		options.width ?= 300
 		options.backgroundColor ?= "transparent"
 		options.html ?= "Type Something"
-		options.color ?= "#eee"
+		options.color ?= "#808080"
 
 		super options
 
 		# Set type defaults
 		if not @fontFamily
-			@_setStyle("-apple-system, SF UI Text, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
+
+			currentDevice = Framer.Device.deviceType
+
+			# Apple Device: SF UI
+			if currentDevice.indexOf("apple") > -1
+				@_setStyle("-apple-system, SF UI Text, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
+
+			# Google Device: Roboto
+			if currentDevice.indexOf("google") > -1
+				@_setStyle("Roboto, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
+
+
 
 		if not @fontSize
 			@_setStyle(@fontFamily, 40, @fontWeight, @lineHeight)
@@ -22,18 +34,22 @@ class exports.TextLayer extends Layer
 		if not @lineHeight
 			@_setStyle(@fontFamily, @fontSize, @fontWeight, 1.25)
 
-		# Reset width and height
-		if @autoWidth
-			@_setSize(true, false)
-		if @autoHeight
-			@_setSize(false, true)
 
-	_setStyle: (fontFamily, fontSize, fontWeight, lineHeight) =>
+		# Reset width and height
+		if @autoWidth and not @autoHeight
+			@_setSize(true, false)
+		if @autoHeight and not @autoWidth
+			@_setSize(false, true)
+		if @autoWidth and @autoHeight
+			@_setSize(true, true)
+
+	_setStyle: (fontFamily, fontSize, fontWeight, lineHeight, letterSpacing) =>
 		@style =
 			fontFamily: fontFamily
 			fontWeight: "#{fontWeight}"
 			fontSize: "#{fontSize}px"
 			lineHeight: "#{lineHeight}"
+			letterSpacing: "#{letterSpacing}px"
 
 	_setSize: (width, height) =>
 
@@ -43,14 +59,18 @@ class exports.TextLayer extends Layer
 			fontSize: @fontSize
 			fontWeight: @fontWeight
 			lineHeight: @lineHeight
+			letterSpacing: @letterSpacing
 
 		# Set width and height based on style
 		constraints = width: @width
 
-		if width
+		if width and not height
 			@width = Utils.textSize(@text, currentStyle).width
-		if height
+		if height and not width
 			@height = Utils.textSize(@text, currentStyle, constraints).height
+		if width and height
+			@size = Utils.textSize(@text, currentStyle)
+
 
 	@define "text",
 		get: -> @html
@@ -58,19 +78,23 @@ class exports.TextLayer extends Layer
 
 	@define "fontFamily",
 		get: -> @style.fontFamily
-		set: (value) -> @_setStyle(value, @fontSize, @fontWeight, @lineHeight)
+		set: (value) -> @_setStyle(value, @fontSize, @fontWeight, @lineHeight, @letterSpacing)
 
 	@define "fontSize",
 		get: -> @style.fontSize
-		set: (value) -> @_setStyle(@fontFamily, value, @fontWeight, @lineHeight)
+		set: (value) -> @_setStyle(@fontFamily, value, @fontWeight, @lineHeight, @letterSpacing)
 
 	@define "fontWeight",
 		get: -> @style.fontWeight
-		set: (value) -> @_setStyle(@fontFamily, @fontSize, value, @lineHeight)
+		set: (value) -> @_setStyle(@fontFamily, @fontSize, value, @lineHeight, @letterSpacing)
 
 	@define "lineHeight",
 		get: -> @style.lineHeight
-		set: (value) -> @_setStyle(@fontFamily, @fontSize, @fontWeight, value)
+		set: (value) -> @_setStyle(@fontFamily, @fontSize, @fontWeight, value, @letterSpacing)
+
+	@define "letterSpacing",
+		get: -> @style.letterSpacing
+		set: (value) -> @_setStyle(@fontFamily, @fontSize, @fontWeight, @lineHeight, value)
 
 	@define "autoWidth", @simpleProperty("autoWidth", false)
 	@define "autoHeight", @simpleProperty("autoHeight", false)
