@@ -577,6 +577,21 @@ Utils.loadImage = (url, callback, context) ->
 
 # Point
 
+Utils.point = (input) ->
+	
+	return Utils.pointZero(input) if _.isNumber(input)
+	return Utils.pointZero() unless input
+
+	result = Utils.sizeZero()
+
+	for k in ["x", "y"]
+		result[k] = input[k] if _.isNumber(input[k])
+
+	return result
+
+Utils.pointZero = (n=0) ->
+	return {x:n, y:n}
+
 Utils.pointDivide = (point, fraction) ->
 	return point =
 		x: point.x / fraction
@@ -591,9 +606,6 @@ Utils.pointSubtract = (pointA, pointB) ->
 	return point =
 		x: pointA.x - pointB.x
 		y: pointA.y - pointB.y
-
-Utils.pointZero = (args={}) ->
-	return _.defaults(args, {x:0, y:0})
 
 Utils.pointMin = ->
 	points = Utils.arrayFromArguments arguments
@@ -646,8 +658,20 @@ Utils.pointAngle = (pointA, pointB) ->
 
 # Size
 
-Utils.sizeZero = (args={}) ->
-	return _.defaults(args, {width:0, height:0})
+Utils.size = (input) ->
+	
+	return Utils.sizeZero(input) if _.isNumber(input)
+	return Utils.sizeZero() unless input
+
+	result = Utils.sizeZero()
+
+	for k in ["width", "height"]
+		result[k] = input[k] if _.isNumber(input[k])
+
+	return result
+
+Utils.sizeZero = (n=0)->
+	return {width:n, height:n}
 
 Utils.sizeMin = ->
 	sizes = Utils.arrayFromArguments arguments
@@ -709,8 +733,20 @@ Utils.frameGetMaxY = (frame) ->
 Utils.frameSetMaxY = (frame, value) ->
 	frame.y = if frame.height is 0 then 0 else value - frame.height
 
-Utils.frameZero = (args={}) ->
-	return _.defaults(args, {top:0, right:0, bottom:0, left:0})
+Utils.frame = (input) ->
+	
+	return Utils.frameZero(input) if _.isNumber(input)
+	return Utils.frameZero() unless input
+
+	result = Utils.frameZero()
+
+	for k in ["x", "y", "width", "height"]
+		result[k] = input[k] if _.isNumber(input[k])
+
+	return result
+
+Utils.frameZero = (n=0) ->
+	return {x:n, y:n}
 
 Utils.frameSize = (frame) ->
 	size =

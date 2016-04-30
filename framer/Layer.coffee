@@ -303,28 +303,55 @@ class exports.Layer extends BaseClass
 	##############################################################
 	# Geometry
 
+	# @define "point",
+	# 	get: -> _.pick(@, ["x", "y"])
+	# 	set: (point) ->
+	# 		return if not point
+	# 		point = {x: point, y: point} if _.isNumber(point)
+	# 		for k in ["x", "y"]
+	# 			@[k] = point[k] if point.hasOwnProperty(k)
+
+	# @define "size",
+	# 	get: -> _.pick(@, ["width", "height"])
+	# 	set: (size) ->
+	# 		return if not size
+	# 		size = {width: size, height: size} if _.isNumber(size)
+	# 		for k in ["width", "height"]
+	# 			@[k] = size[k] if size.hasOwnProperty(k)
+
+	# @define "frame",
+	# 	get: -> _.pick(@, ["x", "y", "width", "height"])
+	# 	set: (frame) ->
+	# 		return if not frame
+	# 		for k in ["x", "y", "width", "height"]
+	# 			@[k] = frame[k] if frame.hasOwnProperty(k)
+
+	_setGeometryValues: (input, keys) ->
+
+		# If this is a number, we set everything to that number
+		if _.isNumber(input)
+			for k in keys
+				@[k] = input
+		else
+
+			# If there is nothing to work with we exit
+			return unless input
+			
+			# Set every numeric value for eacht key
+			for k in keys
+				@[k] = input[k] if _.isNumber(input[k])		
+
 	@define "point",
-		get: -> _.pick(@, ["x", "y"])
-		set: (point) ->
-			return if not point
-			point = {x: point, y: point} if _.isNumber(point)
-			for k in ["x", "y"]
-				@[k] = point[k] if point.hasOwnProperty(k)
+		get: -> Utils.point(@)
+		set: (input) -> @_setGeometryValues(input, ["x", "y"])
 
 	@define "size",
-		get: -> _.pick(@, ["width", "height"])
-		set: (size) ->
-			return if not size
-			size = {width: size, height: size} if _.isNumber(size)
-			for k in ["width", "height"]
-				@[k] = size[k] if size.hasOwnProperty(k)
+		get: -> Utils.size(@)
+		set: (input) -> @_setGeometryValues(input, ["width", "height"])
 
 	@define "frame",
-		get: -> _.pick(@, ["x", "y", "width", "height"])
-		set: (frame) ->
-			return if not frame
-			for k in ["x", "y", "width", "height"]
-				@[k] = frame[k] if frame.hasOwnProperty(k)
+		get: -> Utils.frame(@)
+		set: (input) -> @_setGeometryValues(input, ["x", "y", "width", "height"])
 
 	@define "minX",
 		importable: true
