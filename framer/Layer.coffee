@@ -1137,6 +1137,37 @@ class exports.Layer extends BaseClass
 	onRotateStart:(cb) -> @on(Events.RotateStart, cb)
 	onRotateEnd:(cb) -> @on(Events.RotateEnd, cb)
 
+
+	##############################################################
+	## HINT
+
+	shouldShowHint: ->
+		return true if @ignoreEvents is false
+		return false
+
+	showHint: ->
+		
+		if not @shouldShowHint()
+			return _.invoke(@children, "showHint")
+		
+		color = new Color(40, 175, 250)
+
+		layer = new Layer
+			frame: @canvasFrame
+			backgroundColor: color.alpha(0.4)
+			borderColor: color.alpha(0.9)
+			borderWidth: 1
+		
+		animation = layer.animate
+			properties:
+				opacity: 0
+			time: 0.4
+		
+		animation.onAnimationEnd ->
+			layer.destroy()
+
+		_.invoke(@children, "showHint")
+
 	##############################################################
 	## DESCRIPTOR
 

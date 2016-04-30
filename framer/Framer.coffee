@@ -60,5 +60,6 @@ Framer.DefaultContext = new Framer.Context(name:"Default")
 Framer.DefaultContext.backgroundColor = "white"
 Framer.CurrentContext = Framer.DefaultContext
 
+Framer.Extras.Hints.enable()
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
 Framer.Extras.TouchEmulator.enable() if not Utils.isTouch()
