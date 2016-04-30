@@ -1,23 +1,12 @@
 Utils = require "../Utils"
 
+{Defaults} = require "../Defaults"
 {Layer} = require "../Layer"
-
 
 class exports.GridComponent extends Layer
 
-	constructor: (options) ->
-
-		defaults = 
-			rows: 3
-			columns: 3
-			spacing: 0
-			backgroundColor: "transparent"
-
-		options = _.defaults(options, defaults)
-
-		super options
-	
-		_.extend(@, _.pick(options, _.keys(defaults)))
+	constructor: (options={}) ->
+		super Defaults.getDefaults("GridComponent", options)
 
 	@define "rows",
 		get: -> @_rows
@@ -43,7 +32,10 @@ class exports.GridComponent extends Layer
 		get: -> @_renderCell or @_defaultRenderCell
 		set: (f) ->
 			return if f is @_renderCell
-			throw Error "GridComponent.renderCell should be a function, not #{typeof(f)}" unless _.isFunction(f)
+
+			if not _.isFunction(f)
+				throw Error "GridComponent.renderCell should be a function, not #{typeof(f)}"
+
 			@_renderCell = f
 			@render()
 

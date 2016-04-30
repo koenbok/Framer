@@ -67,6 +67,11 @@ Originals =
 			tension: 500
 			friction: 10
 			tolerance: 1
+	GridComponent:
+		rows: 3
+		columns: 3
+		spacing: 0
+		backgroundColor: "transparent"
 
 exports.Defaults =
 
