@@ -79,6 +79,7 @@ class exports.Context extends BaseClass
 	# Layers
 	@define "layers", get: -> _.clone(@_layers)
 	@define "layerCounter", get: -> @_layerCounter
+	@define "rootLayers", get: -> _.filter @_layers, (layer) -> layer.parent is null
 
 	addLayer: (layer) ->
 		return if layer in @_layers
@@ -93,6 +94,15 @@ class exports.Context extends BaseClass
 		@_layers = []
 		@_layerCounter = 0
 
+	layerForElement: (element) ->
+		for layer in @_layers
+			return layer if layer._element is element
+		return null
+
+	layerForId: (layerId) ->
+		for layer in @_layers
+			return layer if layer.id is layerId
+		return null
 
 	# Animations
 	@define "animations", get: -> _.clone(@_animations)

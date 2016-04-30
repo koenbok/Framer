@@ -160,6 +160,54 @@ describe "Context", ->
 			context.timers.should.eql []
 
 
+	describe "Layers", ->
+
+		it "should add and remove layers", ->
+			
+			context = new Framer.Context(name:"Test")
+			
+			context.run ->
+				
+				layerA = new Layer
+				layerB = new Layer
+				layerC = new Layer
+				layerD = new Layer
+
+				context.layers.should.eql [layerA, layerB, layerC, layerD]
+				_.invoke(context.layers, "destroy")
+				context.layers.should.eql []
+
+		it "should list root layers", ->
+			
+			context = new Framer.Context(name:"Test")
+			
+			context.run ->
+				
+				layerA = new Layer
+				layerB = new Layer parent:layerA
+
+				context.rootLayers.should.eql [layerA]
+				layerB.parent = null
+				context.rootLayers.should.eql [layerA, layerB]
+
+		it "should get layers by id", ->
+
+			context = new Framer.Context(name:"Test")
+			
+			context.run ->
+				layerA = new Layer
+				context.layerForId(layerA.id).should.equal layerA
+
+		it "should get layers by element", ->
+
+			context = new Framer.Context(name:"Test")
+			
+			context.run ->
+				layerA = new Layer
+				context.layerForElement(layerA._element).should.equal layerA
+
+
+
 	describe "Events", ->
 
 		it "should emit reset", (callback) ->
