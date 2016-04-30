@@ -69,9 +69,9 @@ class exports.Context extends BaseClass
 
 		@emit("reset", @)
 
-	# destroy: ->
-	# 	@reset()
-
+	destroy: ->
+		@reset()
+		@_destroyRootElement()
 
 	##############################################################
 	# Collections
