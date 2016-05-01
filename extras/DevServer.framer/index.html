@@ -40,7 +40,7 @@
 				div.style.padding = "8px"
 				div.style.whiteSpace = "pre"
 				div.style["-webkit-user-select"] = "auto"
-				div.style.zIndex = 1000000
+				div.style.zIndex = 100000000
 
 				document.body.appendChild(div);
 				warningWindowNode = div
@@ -63,7 +63,7 @@
 		console.log = function() {
 			var args = Array.prototype.slice.call(arguments)
 			
-			if (args.length && args[0].indexOf("[WDS]") != -1) {
+			if (args.length && typeof(args[0]) == "string" && args[0].indexOf("[WDS]") != -1) {
 				addGlobalWarning.apply(this, args)
 			}
 
