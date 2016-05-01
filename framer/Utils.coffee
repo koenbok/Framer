@@ -582,7 +582,7 @@ Utils.point = (input) ->
 	return Utils.pointZero(input) if _.isNumber(input)
 	return Utils.pointZero() unless input
 
-	result = Utils.sizeZero()
+	result = Utils.pointZero()
 
 	for k in ["x", "y"]
 		result[k] = input[k] if _.isNumber(input[k])
