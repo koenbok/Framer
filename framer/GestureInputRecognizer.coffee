@@ -126,7 +126,7 @@ class exports.GestureInputRecognizer
 	# ForceTap
 
 	_updateTouchForce: =>
-		return unless @session?.lastEvent?.touches.length
+		return unless @session?.lastEvent?.touches?.length
 		@session.force = @session.lastEvent.touches[0].force or 0
 		event = @_getGestureEvent(@session.lastEvent)
 		@forcetapchange(event)
