@@ -3,6 +3,7 @@ Utils = require "../Utils"
 
 {Layer} = require "../Layer"
 {Events} = require "../Events"
+{Defaults} = require "../Defaults"
 
 """
 ScrollComponent
@@ -53,13 +54,13 @@ EventMappers[Events.DirectionLockStart] = Events.DirectionLockStart
 class exports.ScrollComponent extends Layer
 
 	# Proxy properties directly from the draggable
-	@define "velocity", @proxyProperty "content.draggable.velocity", importable: false
+	@define "velocity", @proxyProperty("content.draggable.velocity", {importable: false, exportable: false})
 	@define "scrollHorizontal", @proxyProperty("content.draggable.horizontal")
 	@define "scrollVertical", @proxyProperty("content.draggable.vertical")
 	@define "speedX", @proxyProperty("content.draggable.speedX")
 	@define "speedY", @proxyProperty("content.draggable.speedY")
-	@define "isDragging", @proxyProperty "content.draggable.isDragging", importable: false
-	@define "isMoving", @proxyProperty "content.draggable.isMoving", importable: false
+	@define "isDragging", @proxyProperty("content.draggable.isDragging", {importable: false, exportable: false})
+	@define "isMoving", @proxyProperty("content.draggable.isMoving", {importable: false, exportable: false})
 	@define "propagateEvents", @proxyProperty("content.draggable.propagateEvents")
 	@define "directionLock", @proxyProperty("content.draggable.directionLock")
 	@define "directionLockThreshold", @proxyProperty("content.draggable.directionLockThreshold")
@@ -73,19 +74,15 @@ class exports.ScrollComponent extends Layer
 
 	constructor: (options={}) ->
 
-		# options.backgroundColor ?= null
-		options.clip ?= true
-		options.mouseWheelEnabled ?= false
-		options.backgroundColor ?= null
-
-		super options
+		super Defaults.getDefaults("ScrollComponent", options)
 
 		@_contentInset = options.contentInset or Utils.rectZero()
 		@setContentLayer(new Layer)
 
-		# Because we did not have a content layer before, we want to re-apply
-		# the options again so everything gets configures properly.
-		@_applyOptionsAndDefaults(options)
+		# Only at this point we can set all the proxy properties, because before
+		# this the content layer did not exist. So we have to apply those again.
+		@_applyProxyDefaults(options)
+
 		@_enableMouseWheelHandling(options.mouseWheelEnabled)
 
 		if options.hasOwnProperty("wrap")
@@ -106,7 +103,6 @@ class exports.ScrollComponent extends Layer
 			y: 0
 			width:  Math.max(@width,  contentFrame.x + contentFrame.width)
 			height: Math.max(@height, contentFrame.y + contentFrame.height)
-
 
 	setContentLayer: (layer) ->
 
