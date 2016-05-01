@@ -105,7 +105,7 @@ class exports.DeviceComponent extends BaseClass
 		for layer in [@background, @phone, @viewport, @content, @screen]
 			layer.on "touchmove", (event) -> event.preventDefault()
 
-		@_context = new Framer.Context(parent:@content, name:"Device")
+		@_context = new Framer.Context(parent:@content, name:"DeviceScreen")
 		@_context.perspective = 1200
 
 	_update: =>
