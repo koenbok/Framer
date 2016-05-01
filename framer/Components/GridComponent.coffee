@@ -73,8 +73,8 @@ class exports.GridComponent extends Layer
 		
 		@_reset()
 		
-		for column in [@columns-1..0]
-			for row in [@rows-1..0]
+		for row in [@rows-1..0]
+			for column in [@columns-1..0]
 					
 				frame =
 					x: @cellX(column)
@@ -98,4 +98,8 @@ class exports.GridComponent extends Layer
 	_reset: ->
 		_.invoke(@cells, "destroy")
 		@_cells = {}
+
+	# copy: ->
+	# 	result = super
+	# 	result.render()
 	
