@@ -73,6 +73,15 @@ describe "Layer", ->
 			layer.width.should.equal 200
 			layer.style.width.should.equal "200px"
 
+		it "should set width not to scientific notation", ->
+
+			n = 0.000000000000002
+			n.toString().should.equal("2e-15")
+
+			layer = new Layer
+			layer.x = n
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+
 		it "should set x and y", ->
 
 			layer = new Layer
