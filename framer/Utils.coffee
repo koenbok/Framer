@@ -819,6 +819,8 @@ Utils.frameInset = (frame, inset) ->
 	if _.isNumber(inset)
 		inset = {top:inset, right:inset, bottom:inset, left:inset}
 
+	frame = Utils.frame(frame)
+
 	frame =
 		x: frame.x + inset.left
 		y: frame.y + inset.top
