@@ -45,6 +45,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 				layerValueTypeError(name, value)
 
 			@_properties[name] = value
+
 			if cssProperty != null
 				@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
@@ -84,12 +85,7 @@ class exports.Layer extends BaseClass
 		# We have to create the element before we set the defaults
 		@_createElement()
 
-		if options.hasOwnProperty "frame"
-			options = _.extend(options, options.frame)
-
-		options = Defaults.getDefaults "Layer", options
-
-		super options
+		super Defaults.getDefaults("Layer", options)
 
 		# Add this layer to the current context
 		@_context.addLayer(@)
@@ -106,12 +102,15 @@ class exports.Layer extends BaseClass
 		else
 			@parent = options.parent
 
-		# If an index was set, we would like to use that one
-		if options.hasOwnProperty("index")
-			@index = options.index
+		# Set some calculated properties
+		for p in ["index", "point", "size", "frame"]
+			if options.hasOwnProperty(p)
+				@[p] = options[p]
 
-		@x = options.x if options.hasOwnProperty("x")
-		@y = options.y if options.hasOwnProperty("y")
+		# x and y always win from point, frame or size
+		for p in ["x", "y", "width", "height"]
+			if options.hasOwnProperty(p)
+				@[p] = options[p]
 
 		@_context.emit("layer:create", @)
 
@@ -303,29 +302,6 @@ class exports.Layer extends BaseClass
 	##############################################################
 	# Geometry
 
-	# @define "point",
-	# 	get: -> _.pick(@, ["x", "y"])
-	# 	set: (point) ->
-	# 		return if not point
-	# 		point = {x: point, y: point} if _.isNumber(point)
-	# 		for k in ["x", "y"]
-	# 			@[k] = point[k] if point.hasOwnProperty(k)
-
-	# @define "size",
-	# 	get: -> _.pick(@, ["width", "height"])
-	# 	set: (size) ->
-	# 		return if not size
-	# 		size = {width: size, height: size} if _.isNumber(size)
-	# 		for k in ["width", "height"]
-	# 			@[k] = size[k] if size.hasOwnProperty(k)
-
-	# @define "frame",
-	# 	get: -> _.pick(@, ["x", "y", "width", "height"])
-	# 	set: (frame) ->
-	# 		return if not frame
-	# 		for k in ["x", "y", "width", "height"]
-	# 			@[k] = frame[k] if frame.hasOwnProperty(k)
-
 	_setGeometryValues: (input, keys) ->
 
 		# If this is a number, we set everything to that number
@@ -333,7 +309,6 @@ class exports.Layer extends BaseClass
 			for k in keys
 				@[k] = input
 		else
-
 			# If there is nothing to work with we exit
 			return unless input
 			
@@ -343,7 +318,9 @@ class exports.Layer extends BaseClass
 
 	@define "point",
 		get: -> Utils.point(@)
-		set: (input) -> @_setGeometryValues(input, ["x", "y"])
+		set: (input) -> 
+			input = layerPropertyPointTransformer(input, @, "point")
+			@_setGeometryValues(input, ["x", "y"])
 
 	@define "size",
 		get: -> Utils.size(@)
@@ -1154,8 +1131,9 @@ class exports.Layer extends BaseClass
 
 		layer = new Layer
 			frame: @canvasFrame
-			backgroundColor: color.alpha(0.4)
-			borderColor: color.alpha(0.9)
+			backgroundColor: new Color(40, 175, 250, 0.4)
+			borderColor: new Color("white").alpha(.5)
+			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 1
 		
 		animation = layer.animate

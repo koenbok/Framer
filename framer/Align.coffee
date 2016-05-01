@@ -1,10 +1,17 @@
 center = (layer, property, offset=0) ->
+
 	parent = Screen
 	parent = layer.parent if layer.parent
+
 	borderWidth = parent.borderWidth
 	borderWidth ?= 0
-	return (parent.width / 2) - (layer.width / 2) - borderWidth + offset if property is "x"
-	return (parent.height / 2) - (layer.height / 2) - borderWidth + offset if property is "y"
+
+	x = (parent.width / 2) - (layer.width / 2) - borderWidth + offset
+	y = (parent.height / 2) - (layer.height / 2) - borderWidth + offset
+
+	return x if property is "x"
+	return y if property is "y"
+	return {x:x, y:y} if property is "point"
 	return 0
 
 left = (layer, property, offset=0) ->
@@ -35,6 +42,7 @@ bottom = (layer, property, offset=0) ->
 	borderWidth ?= 0
 	return parent.height - (2 * borderWidth) - layer.height + offset
 
+# Helper to see if we are dealing with a function or result of a function
 wrapper = (f) ->
 	return (a, b) ->
 		return ((l, p) -> f(l, p, a)) if not a? or _.isNumber(a)
