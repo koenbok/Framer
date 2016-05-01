@@ -18,7 +18,6 @@ class exports.InputLayer extends TextLayer
 		@input = document.createElement("input")
 		@_element.appendChild(@input)
 
-
 		# Match TextLayer defaults and type properties
 		@input.style.fontFamily = @fontFamily
 		@input.style.fontSize = @fontSize
@@ -26,10 +25,12 @@ class exports.InputLayer extends TextLayer
 		@input.style.fontWeight = @fontWeight
 		@input.style.outline = "none"
 		@input.style.backgroundColor = "transparent"
-		@input.style.width = "#{@width}px"
+		@input.style.width = "#{@width - 64}px"
 		@input.style.height = "#{@height}px"
-		@input.style.color = "#aaa"
+		@input.style.marginLeft = "32px"
+		@input.style.color = if @color? then @color else "#aaa"
 		@input.style.cursor = "auto"
+
 
 		# If text has been defined, use that, otherwise default to placeholder
 		@input.value = if @text isnt "Type Something" then @text else "Placeholder"
