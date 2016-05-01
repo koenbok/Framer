@@ -72,6 +72,10 @@ Originals =
 		columns: 3
 		spacing: 0
 		backgroundColor: "transparent"
+	ScrollComponent:
+		clip: true
+		mouseWheelEnabled: false
+		backgroundColor: null
 
 exports.Defaults =
 
