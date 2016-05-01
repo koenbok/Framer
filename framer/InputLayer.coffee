@@ -3,6 +3,7 @@
 
 Events.EnterKey  = "EnterKey"
 Events.BackSpaceKey  = "BackSpaceKey"
+Events.InputValueChange = "InputValueChange"
 
 class exports.InputLayer extends Layer
 	constructor: (options={}) ->
@@ -40,7 +41,8 @@ class exports.InputLayer extends Layer
 
 			# Exclude enter, space and caps lock
 			unless e.which is 20 or e.which is 13 or @value is ""
-				@emit("change:value", @input.value)
+				@emit("change:value", @value)
+				@emit(Events.InputValueChange, @value)
 
 			# If enter key is pressed
 			if e.which is 13
@@ -58,3 +60,4 @@ class exports.InputLayer extends Layer
 
 	onEnterKey: (cb) -> @on(Events.EnterKey, cb)
 	onBackSpaceKey: (cb) -> @on(Events.BackSpaceKey, cb)
+	onInputChange: (cb) -> @on(Events.InputValueChange, cb)
