@@ -14,7 +14,6 @@ Framer.Gestures = (require "./Gestures").Gestures
 Framer.Animation = (require "./Animation").Animation
 Framer.AnimationGroup = (require "./AnimationGroup").AnimationGroup
 Framer.Screen = (require "./Screen").Screen
-Framer.Canvas = (require "./Canvas").Canvas
 Framer.Align = (require "./Align").Align
 Framer.print = (require "./Print").print
 
@@ -60,5 +59,6 @@ Framer.DefaultContext = new Framer.Context(name:"Default")
 Framer.DefaultContext.backgroundColor = "white"
 Framer.CurrentContext = Framer.DefaultContext
 
+window.Canvas = new (require "./Canvas").Canvas
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
 Framer.Extras.TouchEmulator.enable() if not Utils.isTouch()
