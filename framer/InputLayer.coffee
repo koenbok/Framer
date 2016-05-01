@@ -1,11 +1,12 @@
 {Layer} = require "./Layer"
+{TextLayer} = require "./TextLayer"
 {Events} = require "./Events"
 
 Events.EnterKey  = "EnterKey"
 Events.BackSpaceKey  = "BackSpaceKey"
 Events.InputValueChange = "InputValueChange"
 
-class exports.InputLayer extends Layer
+class exports.InputLayer extends TextLayer
 	constructor: (options={}) ->
 
 		options.backgroundColor ?= "#fff"
@@ -17,16 +18,26 @@ class exports.InputLayer extends Layer
 		@input = document.createElement("input")
 		@_element.appendChild(@input)
 
-		@input.style.font = "400 40px/1.25 -apple-system, SF UI Text, Helvetica Neue"
+
+		# Match TextLayer defaults and type properties
+		@input.style.fontFamily = @fontFamily
+		@input.style.fontSize = @fontSize
+		@input.style.lineHeight = @lineHeight
+		@input.style.fontWeight = @fontWeight
 		@input.style.outline = "none"
 		@input.style.backgroundColor = "transparent"
 		@input.style.width = "#{@width}px"
 		@input.style.height = "#{@height}px"
-		@input.style.paddingLeft = "32px"
 		@input.style.color = "#aaa"
 		@input.style.cursor = "auto"
-		@input.value = "Placeholder"
 
+		# If text has been defined, use that, otherwise default to placeholder
+		@input.value = if @text isnt "Type Something" then @text else "Placeholder"
+
+		# Override text property setting the html
+		@html = ""
+
+		# Default focus interaction
 		@input.onfocus = ->
 			@style.color = "#000"
 			@value = ""
