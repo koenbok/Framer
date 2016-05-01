@@ -21,6 +21,10 @@ class DOMEventManagerElement extends EventEmitter
 	addEventListener: @::addListener
 	removeEventListener: @::removeListener
 
+	# Keep the Node API working
+	on: @::addListener
+	off: @::removeListener
+
 class exports.DOMEventManager
 
 	constructor: (element) ->
