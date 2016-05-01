@@ -68,6 +68,10 @@ class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
 
+		# Make sure we never call the constructor twice
+		throw Error("Layer.constructor #{@toInspect()} called twice") if @__constructed
+		@__constructed = true
+
 		# Set needed private variables
 		@_properties = {}
 		@_style = {}
@@ -102,13 +106,8 @@ class exports.Layer extends BaseClass
 		else
 			@parent = options.parent
 
-		# Set some calculated properties
-		for p in ["index", "point", "size", "frame"]
-			if options.hasOwnProperty(p)
-				@[p] = options[p]
-
-		# x and y always win from point, frame or size
-		for p in ["x", "y", "width", "height"]
+		# Set some calculated properties, the order is important
+		for p in ["index", "width", "height", "x", "y"]
 			if options.hasOwnProperty(p)
 				@[p] = options[p]
 
@@ -146,8 +145,10 @@ class exports.Layer extends BaseClass
 	@define "ignoreEvents", layerProperty(@, "ignoreEvents", "pointerEvents", true, _.isBoolean)
 
 	# Matrix properties
-	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber, layerPropertyPointTransformer)
-	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber, layerPropertyPointTransformer)
+	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber, 
+		layerPropertyPointTransformer, {depends: ["width", "height", "parent"]})
+	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber, 
+		layerPropertyPointTransformer, {depends: ["width", "height", "parent"]})
 	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber)
 
 	@define "scaleX", layerProperty(@, "scaleX", "webkitTransform", 1, _.isNumber)
@@ -317,18 +318,26 @@ class exports.Layer extends BaseClass
 				@[k] = input[k] if _.isNumber(input[k])		
 
 	@define "point",
+		importable: true
+		exportable: false
+		depends: ["width", "height", "size", "parent"]
 		get: -> Utils.point(@)
 		set: (input) -> 
 			input = layerPropertyPointTransformer(input, @, "point")
 			@_setGeometryValues(input, ["x", "y"])
 
 	@define "size",
+		importable: true
+		exportable: false
 		get: -> Utils.size(@)
 		set: (input) -> @_setGeometryValues(input, ["width", "height"])
 
 	@define "frame",
+		importable: true
+		exportable: false
 		get: -> Utils.frame(@)
 		set: (input) -> @_setGeometryValues(input, ["x", "y", "width", "height"])
+
 
 	@define "minX",
 		importable: true
@@ -591,19 +600,16 @@ class exports.Layer extends BaseClass
 
 	copy: ->
 
-		# Todo: what about events, states, etc.
-
 		layer = @copySingle()
 
 		for child in @children
 			copiedChild = child.copy()
 			copiedChild.parent = layer
 
-		layer
+		return layer
 
 	copySingle: ->
-		copy = new @constructor(@props)
-		return copy
+		return new @constructor(@props)
 
 	##############################################################
 	## IMAGE
