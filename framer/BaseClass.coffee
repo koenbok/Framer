@@ -7,6 +7,7 @@ Utils = require "./Utils"
 CounterKey = "_ObjectCounter"
 DefinedPropertiesKey = "_DefinedPropertiesKey"
 DefinedPropertiesValuesKey = "_DefinedPropertiesValuesKey"
+DefinedPropertiesOrderKey = "_DefinedPropertiesOrderKey"
 
 capitalizeFirstLetter = (string) ->
 	string.charAt(0).toUpperCase() + string.slice(1)
@@ -18,26 +19,9 @@ class exports.BaseClass extends EventEmitter
 
 	@define = (propertyName, descriptor) ->
 
-		for i in ["enumerable", "exportable", "importable"]
-			if descriptor.hasOwnProperty(i)
-				throw Error("woops #{propertyName} #{descriptor[i]}") if not _.isBoolean(descriptor[i])
-
 		# See if we need to add this property to the internal properties class
 		if @ isnt BaseClass
-			descriptor.propertyName = propertyName
-
-			# Have the following flags set to true when undefined:
-			descriptor.enumerable ?= true
-			descriptor.exportable ?= true
-			descriptor.importable ?= true
-
-			# Toggle importable to false when there's no setter defined:
-			descriptor.importable = descriptor.importable and descriptor.set
-
-			# Only retain options that are importable, exportable or both:
-			if descriptor.exportable or descriptor.importable
-				@[DefinedPropertiesKey] ?= {}
-				@[DefinedPropertiesKey][propertyName] = descriptor
+			@_addDescriptor(propertyName, descriptor)
 
 		# Set the getter/setter as setProperty on this object so we can access and override it easily
 		getName = "get#{capitalizeFirstLetter(propertyName)}"
@@ -49,8 +33,51 @@ class exports.BaseClass extends EventEmitter
 			@::[setName] = descriptor.set
 			descriptor.set = @::[setName]
 
+		# Better readonly errors for debugging
+
+		# else
+		# 	descriptor.set = (value) -> 
+		# 		throw Error("#{@constructor.name}.#{propertyName} is readonly")
+
 		# Define the property
 		Object.defineProperty(@prototype, propertyName, descriptor)
+
+	@_addDescriptor: (propertyName, descriptor) ->
+
+		# for key in ["enumerable", "exportable", "importable"]
+		# 	if descriptor.hasOwnProperty(key)
+		# 		throw Error("woops #{propertyName} #{descriptor[key]}") if not _.isBoolean(descriptor[key])
+
+		descriptor.propertyName = propertyName
+
+		# Have the following flags set to true when undefined:
+		descriptor.enumerable ?= true
+		descriptor.exportable ?= true
+		descriptor.importable ?= true
+
+		# We assume we don't import if there is no setter, because we can't
+		descriptor.importable = descriptor.importable and descriptor.set
+		# We also assume we don't export if there is no setter, because 
+		# it is likely a calculated property, and we can't set it.
+		descriptor.exportable = descriptor.exportable and descriptor.set
+
+		# We assume that every property with an underscore is private
+		return if _.startsWith(propertyName, "_")
+
+		# Only retain options that are importable, exportable or both:
+		if descriptor.exportable or descriptor.importable
+			@[DefinedPropertiesKey] ?= {}
+			@[DefinedPropertiesKey][propertyName] = descriptor
+
+			# Set the order, insert it's dependants before, we'll check if they exist later
+			@[DefinedPropertiesOrderKey] ?= []
+
+			if descriptor.depends
+				for depend in descriptor.depends
+					if depend not in @[DefinedPropertiesOrderKey]
+						@[DefinedPropertiesOrderKey].push(depend)
+			
+			@[DefinedPropertiesOrderKey].push(propertyName)
 
 	@simpleProperty = (name, fallback, options={}) ->
 		return _.extend options,
@@ -59,16 +86,20 @@ class exports.BaseClass extends EventEmitter
 			set: (value) -> @_setPropertyValue(name, value)
 
 	@proxyProperty = (keyPath, options={}) ->
+
 		# Allows to easily proxy properties from an instance object
 		# Object property is in the form of "object.property"
+		
 		objectKey = keyPath.split(".")[0]
-		return _.extend options,
+		
+		descriptor = _.extend options,
 			get: ->
 				return unless _.isObject(@[objectKey])
 				Utils.getValueForKeyPath(@, keyPath)
 			set: (value) ->
 				return unless _.isObject(@[objectKey])
 				Utils.setValueForKeyPath(@, keyPath, value)
+			proxy: true
 
 	_setPropertyValue: (k, v) =>
 		@[DefinedPropertiesValuesKey][k] = v
@@ -125,24 +156,51 @@ class exports.BaseClass extends EventEmitter
 		# Create a holder for the property values
 		@[DefinedPropertiesValuesKey] = {}
 
+		@_applyDefaults(options)
+
 		# Count the creation for these objects and set the id
 		@constructor[CounterKey] ?= 0
 		@constructor[CounterKey] += 1
 
+		# We set this last so if we print a layer during construction
+		# we don't get confused because the id changes from global to context
 		@_id = @constructor[CounterKey]
 
-		@_applyOptionsAndDefaults(options)
+	_applyDefaults: (options) ->
+		
+		return unless @constructor[DefinedPropertiesOrderKey]
+		return unless options
 
-	_applyOptionsAndDefaults: (options) ->
-		for key, descriptor of @_propertyList()
-			# For each known property (registered with @define) that has a setter, fetch
-			# the value from the options object, unless the prop is not importable.
-			# When there's no user value, apply the default value:
-			if descriptor.set
-				value = Utils.valueOrDefault(
-					(options?[key] if descriptor.importable),
-					@_getPropertyDefaultValue(key)
-				)
+		for k in @constructor[DefinedPropertiesOrderKey]
+			@_applyDefault(k, options[k])
 
-				if not (value in [null, undefined])
-					@[key] = value
+	_applyProxyDefaults: (options) ->
+
+		return unless @constructor[DefinedPropertiesOrderKey]
+		return unless options
+
+		for k in @constructor[DefinedPropertiesOrderKey]
+			descriptor = @constructor[DefinedPropertiesKey][k]
+			continue unless descriptor?.proxy? is true
+			@_applyDefault(k, options[k])
+
+	_applyDefault: (key, optionValue) ->
+
+		descriptor = @constructor[DefinedPropertiesKey][key]
+
+		# If this was listed as a dependent property, but it did not get defined, we err.
+		throw Error("Missing dependant descriptor: #{key}") unless descriptor
+
+		# For each known property (registered with @define) that has a setter, fetch
+		# the value from the options object, unless the prop is not importable.
+		# When there's no user value, apply the default value:
+		
+		return unless descriptor.set
+
+		value = optionValue if descriptor.importable
+		value = Utils.valueOrDefault(optionValue, @_getPropertyDefaultValue(key))
+
+		return if value in [null, undefined]
+		
+		@[key] = value
+
