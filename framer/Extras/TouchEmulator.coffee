@@ -47,7 +47,7 @@ class TouchEmulator extends BaseClass
 		@keyPinchCode = 18 # Alt
 		@keyPanCode = 91 # Command
 
-		@context = new Framer.Context name:"TouchEmulator"
+		@context = new Framer.Context(name:"TouchEmulator")
 		@context._element.style.zIndex = 10000
 		@wrap = @context.domEventManager.wrap
 
@@ -174,6 +174,13 @@ class TouchEmulator extends BaseClass
 	# Utilities
 
 	showTouchCursor: ->
+
+		# If the mouse did not move yet, we capture the point here
+		if not @point
+			@point =
+				x: event.pageX
+				y: event.pageY
+
 		@touchPointLayer.animateStop()
 		@touchPointLayer.midX = @point.x
 		@touchPointLayer.midY = @point.y
