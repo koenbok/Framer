@@ -52,8 +52,11 @@ class exports.InputLayer extends TextLayer
 
 		# Default focus interaction
 		@input.onfocus = (e) =>
+			
 			@input.style.color = "#000"
 			@input.value = ""
+
+			# Emit focus event
 			@emit(Events.InputFocus, event)
 
 		@input.onkeyup = (e) =>
@@ -83,9 +86,14 @@ class exports.InputLayer extends TextLayer
 		textarea = document.createElement("textarea")
 		input.replaceWith(textarea)
 
-
 	@define "value",
 		get: -> @input.value
+
+	@define "focusColor",
+		get: -> @input.style.color
+		set: (value) ->
+			@onInputFocus ->
+				@input.style.color = value
 
 	@define "multiLine", @simpleProperty("multiLine", false)
 
