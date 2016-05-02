@@ -5,6 +5,7 @@
 Events.EnterKey  = "EnterKey"
 Events.BackSpaceKey  = "BackSpaceKey"
 Events.InputValueChange = "InputValueChange"
+Events.InputFocus = "InputFocus"
 
 class exports.InputLayer extends TextLayer
 	constructor: (options={}) ->
@@ -39,12 +40,11 @@ class exports.InputLayer extends TextLayer
 		@html = ""
 
 		# Default focus interaction
-		@input.onfocus = ->
-			@style.color = "#000"
-			@value = ""
+		@input.onfocus = (e) =>
+			@input.style.color = "#000"
+			@input.value = ""
+			@emit(Events.InputFocus, event)
 
-		isInArray = (value, array) ->
-			return array.indexOf(value) > -1
 
 		@input.onkeyup = (e) =>
 
@@ -67,9 +67,7 @@ class exports.InputLayer extends TextLayer
 	@define "value",
 		get: -> @input.value
 
-	@isInArray: (value, array) ->
-		return array.indexOf(value) > -1
-
 	onEnterKey: (cb) -> @on(Events.EnterKey, cb)
 	onBackSpaceKey: (cb) -> @on(Events.BackSpaceKey, cb)
 	onInputChange: (cb) -> @on(Events.InputValueChange, cb)
+	onInputFocus: (cb) -> @on(Events.InputFocus, cb)
