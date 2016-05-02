@@ -67,8 +67,8 @@ class exports.InputLayer extends TextLayer
 			# Check last character
 			lastCharacter = @input.value.substr(@input.value.length - 1)
 
-			# Exclude enter, space and caps lock
-			unless e.which is 20 or e.which is 13 or @value is ""
+			# Exclude enter, shift, caps lock, control, alt, command etc.
+			unless e.which in [13, 16, 17, 18, 20, 91, 93] or @value is ""
 				@emit("change:value", @value)
 				@emit(Events.InputValueChange, @value)
 
