@@ -68,7 +68,7 @@ class exports.InputLayer extends TextLayer
 			lastCharacter = @input.value.substr(@input.value.length - 1)
 
 			# Exclude enter, shift, caps lock, control, alt, command etc.
-			unless e.which in [13, 16, 17, 18, 20, 91, 93] or @value is ""
+			unless e.which in [13, 16, 17, 18, 20, 91, 93]
 				@emit("change:value", @value)
 				@emit(Events.InputValueChange, @value)
 
@@ -79,6 +79,7 @@ class exports.InputLayer extends TextLayer
 			# If backspace key
 			if e.which is 8
 				@emit(Events.BackSpaceKey, event)
+
 
 	_setPlaceholder: =>
 		@input.value =
