@@ -49,6 +49,9 @@ class exports.InputLayer extends TextLayer
 		# Override text property setting the html
 		@html = ""
 
+		# Check if in focus
+		@_isFocused = false
+
 		# Default focus interaction
 		@input.onfocus = (e) =>
 
@@ -58,9 +61,8 @@ class exports.InputLayer extends TextLayer
 			# Emit focus event
 			@emit(Events.InputFocus, event)
 
-		@input.onblur = (e) =>
-			if @value is ""
-				@_setPlaceholder()
+			@_isFocused = true
+
 
 		@input.onkeyup = (e) =>
 
@@ -80,13 +82,17 @@ class exports.InputLayer extends TextLayer
 			if e.which is 8
 				@emit(Events.BackSpaceKey, event)
 
+			# Revert to placeholder
+			if @value is ""
+				@_setPlaceholder()
 
 	_setPlaceholder: =>
-		@input.value =
+		@input.placeholder =
 			if @text isnt "" and @text isnt "Type Something" then @text else "Placeholder"
 
-		@input.style.color =
-			if @color? then @color else "#aaa"
+		unless @_isFocused
+			@input.style.color =
+				if @color? then @color else "#aaa"
 
 	@define "value",
 		get: -> @input.value
