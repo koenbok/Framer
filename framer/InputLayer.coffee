@@ -8,15 +8,22 @@ Events.InputValueChange = "InputValueChange"
 Events.InputFocus = "InputFocus"
 
 class exports.InputLayer extends TextLayer
+
 	constructor: (options={}) ->
 
-		options.backgroundColor ?= "#fff"
-		options.width ?= 480
-		options.height ?= 100
+		_.defaults options,
+			backgroundColor: "#fff"
+			width: 500
+			height: 100
+			color: "#aaa"
 
 		super options
 
-		@input = document.createElement("input")
+		if not @multiLine
+			@input = document.createElement("input")
+		else
+			@input = document.createElement("textarea")
+
 		@_element.appendChild(@input)
 
 		# Match TextLayer defaults and type properties
@@ -28,10 +35,14 @@ class exports.InputLayer extends TextLayer
 		@input.style.backgroundColor = "transparent"
 		@input.style.width = "#{@width - 64}px"
 		@input.style.height = "#{@height}px"
-		@input.style.marginLeft = "32px"
 		@input.style.color = if @color? then @color else "#aaa"
 		@input.style.cursor = "auto"
 
+		# Input text spacing
+		@input.style.marginLeft = "32px"
+
+		if @multiLine
+			@input.style.marginTop = "32px"
 
 		# If text has been defined, use that, otherwise default to placeholder
 		@input.value = if @text isnt "Type Something" then @text else "Placeholder"
@@ -44,7 +55,6 @@ class exports.InputLayer extends TextLayer
 			@input.style.color = "#000"
 			@input.value = ""
 			@emit(Events.InputFocus, event)
-
 
 		@input.onkeyup = (e) =>
 
@@ -64,8 +74,20 @@ class exports.InputLayer extends TextLayer
 			if e.which is 8
 				@emit(Events.BackSpaceKey, event)
 
+
+	_updateInput: =>
+		@input.style.width = "#{@width - 64}px"
+		@input.style.height = "#{@height}px"
+
+	_makeTextArea: (input) =>
+		textarea = document.createElement("textarea")
+		input.replaceWith(textarea)
+
+
 	@define "value",
 		get: -> @input.value
+
+	@define "multiLine", @simpleProperty("multiLine", false)
 
 	onEnterKey: (cb) -> @on(Events.EnterKey, cb)
 	onBackSpaceKey: (cb) -> @on(Events.BackSpaceKey, cb)
