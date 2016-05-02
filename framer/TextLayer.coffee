@@ -41,13 +41,14 @@ class exports.TextLayer extends Layer
 		if @autoWidth and @autoHeight
 			@_setSize(true, true)
 
-	_setStyle: (fontFamily, fontSize, fontWeight, lineHeight, letterSpacing) =>
+	_setStyle: (fontFamily, fontSize, fontWeight, lineHeight, letterSpacing, textAlign) =>
 		@style =
 			fontFamily: fontFamily
 			fontWeight: "#{fontWeight}"
 			fontSize: "#{fontSize}px"
 			lineHeight: "#{lineHeight}"
 			letterSpacing: "#{letterSpacing}px"
+			textAlign: textAlign
 
 	_setSize: (width, height) =>
 
@@ -58,6 +59,7 @@ class exports.TextLayer extends Layer
 			fontWeight: @fontWeight
 			lineHeight: @lineHeight
 			letterSpacing: @letterSpacing
+			textAlign: @textAlign
 
 		# Set width and height based on style
 		constraints = width: @width
@@ -69,30 +71,33 @@ class exports.TextLayer extends Layer
 		if width and height
 			@size = Utils.textSize(@text, currentStyle)
 
-
 	@define "text",
 		get: -> @html
 		set: (value) -> @html = value
 
 	@define "fontFamily",
 		get: -> @style.fontFamily
-		set: (value) -> @_setStyle(value, @fontSize, @fontWeight, @lineHeight, @letterSpacing)
+		set: (value) -> @_setStyle(value, @fontSize, @fontWeight, @lineHeight, @letterSpacing, @textAlign)
 
 	@define "fontSize",
 		get: -> @style.fontSize
-		set: (value) -> @_setStyle(@fontFamily, value, @fontWeight, @lineHeight, @letterSpacing)
+		set: (value) -> @_setStyle(@fontFamily, value, @fontWeight, @lineHeight, @letterSpacing, @textAlign)
 
 	@define "fontWeight",
 		get: -> @style.fontWeight
-		set: (value) -> @_setStyle(@fontFamily, @fontSize, value, @lineHeight, @letterSpacing)
+		set: (value) -> @_setStyle(@fontFamily, @fontSize, value, @lineHeight, @letterSpacing, @textAlign)
 
 	@define "lineHeight",
 		get: -> @style.lineHeight
-		set: (value) -> @_setStyle(@fontFamily, @fontSize, @fontWeight, value, @letterSpacing)
+		set: (value) -> @_setStyle(@fontFamily, @fontSize, @fontWeight, value, @letterSpacing, @textAlign)
 
 	@define "letterSpacing",
 		get: -> @style.letterSpacing
-		set: (value) -> @_setStyle(@fontFamily, @fontSize, @fontWeight, @lineHeight, value)
+		set: (value) -> @_setStyle(@fontFamily, @fontSize, @fontWeight, @lineHeight, value, @textAlign)
+
+	@define "textAlign",
+		get: -> @style.textAlign
+		set: (value) -> @_setStyle(@fontFamily, @fontSize, @fontWeight, @lineHeight, @letterSpacing, value)
 
 	@define "autoWidth", @simpleProperty("autoWidth", false)
 	@define "autoHeight", @simpleProperty("autoHeight", false)
