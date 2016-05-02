@@ -35,7 +35,6 @@ class exports.InputLayer extends TextLayer
 		@input.style.backgroundColor = "transparent"
 		@input.style.width = "#{@width - 64}px"
 		@input.style.height = "#{@height}px"
-		@input.style.color = if @color? then @color else "#aaa"
 		@input.style.cursor = "auto"
 
 		# Input text spacing
@@ -45,19 +44,23 @@ class exports.InputLayer extends TextLayer
 			@input.style.marginTop = "32px"
 
 		# If text has been defined, use that, otherwise default to placeholder
-		@input.value = if @text isnt "Type Something" then @text else "Placeholder"
+		@_setPlaceholder()
 
 		# Override text property setting the html
 		@html = ""
 
 		# Default focus interaction
 		@input.onfocus = (e) =>
-			
+
 			@input.style.color = "#000"
 			@input.value = ""
 
 			# Emit focus event
 			@emit(Events.InputFocus, event)
+
+		@input.onblur = (e) =>
+			if @value is ""
+				@_setPlaceholder()
 
 		@input.onkeyup = (e) =>
 
@@ -77,14 +80,12 @@ class exports.InputLayer extends TextLayer
 			if e.which is 8
 				@emit(Events.BackSpaceKey, event)
 
+	_setPlaceholder: =>
+		@input.value =
+			if @text isnt "" and @text isnt "Type Something" then @text else "Placeholder"
 
-	_updateInput: =>
-		@input.style.width = "#{@width - 64}px"
-		@input.style.height = "#{@height}px"
-
-	_makeTextArea: (input) =>
-		textarea = document.createElement("textarea")
-		input.replaceWith(textarea)
+		@input.style.color =
+			if @color? then @color else "#aaa"
 
 	@define "value",
 		get: -> @input.value
