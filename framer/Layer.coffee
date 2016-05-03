@@ -302,18 +302,52 @@ class exports.Layer extends BaseClass
 		importable: true
 		exportable: true
 		default: 0
+
 		get: ->
 			@_properties["borderRadius"]
 
 		set: (value) ->
 
-			if value and not _.isNumber(value)
-				console.warn "Layer.borderRadius should be a numeric property, not type #{typeof(value)}"
+			if value and _.isString(value)
+				throw Error "Layer.borderRadius should be a numeric property, not type #{typeof(value)}"
 
-			@_properties["borderRadius"] = value
-			@_element.style["borderRadius"] = LayerStyle["borderRadius"](@)
+			borderRadius = value
+
+			radius =
+				topLeft: value.topLeft
+				topRight: value.topRight
+				bottomLeft: value.bottomLeft
+				bottomRight: value.bottomRight
+
+			@_properties["borderRadius"] = radius
+
+			if _.isNumber(value)
+				@_element.style["borderRadius"] = value + "px"
+
+			else
+				@_element.style["borderTopLeftRadius"] = radius.topLeft + "px"
+				@_element.style["borderTopRightRadius"] = radius.topRight + "px"
+				@_element.style["borderBottomLeftRadius"] = radius.bottomLeft + "px"
+				@_element.style["borderBottomRightRadius"] = radius.bottomRight + "px"
 
 			@emit("change:borderRadius", value)
+
+	# @define "borderRadius",
+	# 	importable: true
+	# 	exportable: true
+	# 	default: 0
+	# 	get: ->
+	# 		@_properties["borderRadius"]
+	#
+	# 	set: (value) ->
+	#
+	# 		if value and not _.isNumber(value)
+	# 			console.warn "Layer.borderRadius should be a numeric property, not type #{typeof(value)}"
+	#
+	# 		@_properties["borderRadius"] = value
+	# 		@_element.style["borderRadius"] = LayerStyle["borderRadius"](@)
+	#
+	# 		@emit("change:borderRadius", value)
 
 	# And, because it should be cornerRadius, we alias it here
 	@define "cornerRadius",
