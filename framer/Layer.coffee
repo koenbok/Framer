@@ -145,9 +145,9 @@ class exports.Layer extends BaseClass
 	@define "ignoreEvents", layerProperty(@, "ignoreEvents", "pointerEvents", true, _.isBoolean)
 
 	# Matrix properties
-	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber, 
+	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber,
 		layerPropertyPointTransformer, {depends: ["width", "height", "parent"]})
-	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber, 
+	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber,
 		layerPropertyPointTransformer, {depends: ["width", "height", "parent"]})
 	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber)
 
@@ -279,16 +279,33 @@ class exports.Layer extends BaseClass
 		importable: true
 		exportable: true
 		default: 0
+
 		get: ->
 			@_properties["borderRadius"]
 
 		set: (value) ->
 
-			if value and not _.isNumber(value)
-				console.warn "Layer.borderRadius should be a numeric property, not type #{typeof(value)}"
+			if value and _.isString(value)
+				throw Error "Layer.borderRadius should be a numeric property, not type #{typeof(value)}"
 
-			@_properties["borderRadius"] = value
-			@_element.style["borderRadius"] = LayerStyle["borderRadius"](@)
+			borderRadius = value
+
+			radius =
+				topLeft: value.topLeft
+				topRight: value.topRight
+				bottomLeft: value.bottomLeft
+				bottomRight: value.bottomRight
+
+			@_properties["borderRadius"] = radius
+
+			if _.isNumber(value)
+				@_element.style["borderRadius"] = value + "px"
+
+			else
+				@_element.style["borderTopLeftRadius"] = radius.topLeft + "px"
+				@_element.style["borderTopRightRadius"] = radius.topRight + "px"
+				@_element.style["borderBottomLeftRadius"] = radius.bottomLeft + "px"
+				@_element.style["borderBottomRightRadius"] = radius.bottomRight + "px"
 
 			@emit("change:borderRadius", value)
 
@@ -312,17 +329,17 @@ class exports.Layer extends BaseClass
 		else
 			# If there is nothing to work with we exit
 			return unless input
-			
+
 			# Set every numeric value for eacht key
 			for k in keys
-				@[k] = input[k] if _.isNumber(input[k])		
+				@[k] = input[k] if _.isNumber(input[k])
 
 	@define "point",
 		importable: true
 		exportable: false
 		depends: ["width", "height", "size", "parent"]
 		get: -> Utils.point(@)
-		set: (input) -> 
+		set: (input) ->
 			input = layerPropertyPointTransformer(input, @, "point")
 			@_setGeometryValues(input, ["x", "y"])
 
@@ -628,7 +645,7 @@ class exports.Layer extends BaseClass
 			if currentValue == value
 				return @emit "load"
 
-			# Unset the background color only if it’s the default color 
+			# Unset the background color only if it’s the default color
 			defaults = Defaults.getDefaults "Layer", {}
 			if @backgroundColor?.isEqual(defaults.backgroundColor)
 				@backgroundColor = null
@@ -1129,10 +1146,10 @@ class exports.Layer extends BaseClass
 		return false
 
 	showHint: ->
-		
+
 		if not @shouldShowHint()
 			return _.invoke(@children, "showHint")
-		
+
 		color = new Color(40, 175, 250)
 
 		layer = new Layer
@@ -1141,12 +1158,12 @@ class exports.Layer extends BaseClass
 			borderColor: new Color("white").alpha(.5)
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 1
-		
+
 		animation = layer.animate
 			properties:
 				opacity: 0
 			time: 0.4
-		
+
 		animation.onAnimationEnd ->
 			layer.destroy()
 
