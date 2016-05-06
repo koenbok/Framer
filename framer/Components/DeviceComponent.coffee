@@ -564,7 +564,7 @@ iPadAir2BaseDevice =
 	deviceImageJP2: true
 	screenWidth: 1536
 	screenHeight: 2048
-	deviceType: "phone"
+	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
 
 iPadMini4BaseDevice =
@@ -573,7 +573,7 @@ iPadMini4BaseDevice =
 	deviceImageJP2: true
 	screenWidth: 1536
 	screenHeight: 2048
-	deviceType: "phone"
+	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
 
 iPadProBaseDevice =
@@ -582,7 +582,7 @@ iPadProBaseDevice =
 	deviceImageJP2: true
 	screenWidth: 2048
 	screenHeight: 2732
-	deviceType: "phone"
+	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
 
 iPhone6BaseDevice =
@@ -713,7 +713,7 @@ Nexus9BaseDevice =
 	deviceImageJP2: true
 	screenWidth: 1536
 	screenHeight: 2048
-	deviceType: "phone"
+	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
 
 HTCa9BaseDevice =
