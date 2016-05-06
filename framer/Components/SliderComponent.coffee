@@ -86,7 +86,10 @@ class exports.SliderComponent extends Layer
 		@on("change:borderRadius", @_setRadius)
 		@knob.on("change:size", @_updateKnob)
 		@knob.on("change:frame", @_updateFill)
-		@knob.on("change:frame", @_updateValue)
+
+		# Only update the value on move events, not on frame change (to prevent events loop)
+		@knob.on Events.Move, => 
+			@_updateValue
 
 		@sliderOverlay.on(Events.TapStart, @_touchStart)
 		@sliderOverlay.on(Events.TapEnd, @_touchEnd)
