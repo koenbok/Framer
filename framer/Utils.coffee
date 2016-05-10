@@ -292,10 +292,22 @@ Utils.webkitVersion = ->
 	version
 
 Utils.isChrome = ->
-	return /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)
+	return /Chrome/.test(navigator.userAgent) and /Google Inc/.test(navigator.vendor)
 
 Utils.isSafari = ->
-	return /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor)
+	return /Safari/.test(navigator.userAgent) and /Apple Computer/.test(navigator.vendor)
+
+Utils.isAndroid = ->
+	return /(android)/i.test(navigator.userAgent)
+
+Utils.isIOS = ->
+	return /(iPhone|iPod|iPad)/i.test(navigator.platform)
+
+Utils.isMacOS = ->
+	return /Mac/.test(navigator.platform)
+
+Utils.isWindows = ->
+	return /Win/.test(navigator.platform)
 
 Utils.isTouch = ->
 	window.ontouchstart is null and
@@ -375,6 +387,22 @@ Utils.deviceType = ->
 
 Utils.pathJoin = ->
 	Utils.arrayFromArguments(arguments).join("/")
+
+Utils.deviceFont = (os) ->
+
+	# https://github.com/jonathantneal/system-font-css
+	
+	if not os
+		os = "macos" if Utils.isMacOS()
+		os = "ios" if Utils.isIOS()
+		os = "android" if Utils.isAndroid()
+		os = "windows" if Utils.isWindows()
+
+	return "-apple-system, SF UI Text, Helvetica Neue" if os is "macos"
+	return "-apple-system, SF UI Text, Helvetica Neue" if os is "ios"
+	return "Roboto, Helvetica Neue" if os is "android"
+	return "Segoe UI" if os is "windows"
+	return "Helvetica"
 
 ######################################################
 # MATH FUNCTIONS

@@ -16,7 +16,7 @@ if Utils.isMobile()
 else
 	Config.height = 40
 	Config.textInset = 12
-	Config.fontSize = 14
+	Config.fontSize = 13
 
 
 class ErrorDisplay extends BaseClass
@@ -56,8 +56,8 @@ class ErrorDisplay extends BaseClass
 				clip: true
 			
 			error.text.style =
-				font: "#{Config.fontSize}px/1em Helvetica"
-				lineHeight: "#{parseInt(error.text.height * 0.95)}px"
+				font: "#{Config.fontSize}px/1em #{Utils.deviceFont()}"
+				lineHeight: "#{error.text.height}px"
 				textAlign: "center"
 				wordWrap: "break-word"
 				textOverflow: "ellipsis"
@@ -81,13 +81,18 @@ class ErrorDisplay extends BaseClass
 
 		error = @createLayer()
 		error.scale = 1.1
-		error.animate
-			properties:
-				scale: 1
-			curve: "spring(800, 60, 10)"
-		
 		error.text.html = message
 
+		animation = error.animate
+			properties:
+				scale: 1
+			curve: "spring(800, 55, 10)"
+		
+		# Terrible hacky fix for blurred text bug on Chrome desktop
+		if Utils.isChrome() and Utils.isDesktop()
+			animation.onAnimationEnd ->
+				Utils.delay 0, -> error.text.html = message + " "
+		
 	destroy: ->
 		@_context?.destroy()
 
