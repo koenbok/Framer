@@ -292,10 +292,10 @@ Utils.webkitVersion = ->
 	version
 
 Utils.isChrome = ->
-	(/chrome/).test(navigator.userAgent.toLowerCase())
+	return /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)
 
 Utils.isSafari = ->
-	(/safari/).test(navigator.userAgent.toLowerCase())
+	return /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor)
 
 Utils.isTouch = ->
 	window.ontouchstart is null and
