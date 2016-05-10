@@ -1,4 +1,5 @@
 # exports.Hints = require "./Hints"
 exports.TouchEmulator = require "./TouchEmulator"
 exports.MobileScrollFix = require "./MobileScrollFix"
+exports.ErrorDisplay = require "./ErrorDisplay"
 exports.OmitNew = require "./OmitNew"

@@ -61,4 +61,5 @@ Framer.CurrentContext = Framer.DefaultContext
 
 window.Canvas = new (require "./Canvas").Canvas
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
+Framer.Extras.ErrorDisplay.enable() if not Utils.isFramerStudio()
 Framer.Extras.TouchEmulator.enable() if not Utils.isTouch()
