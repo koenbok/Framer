@@ -57,6 +57,11 @@ class exports.Context extends BaseClass
 
 		@reset()
 
+		if options.hasOwnProperty("index")
+			@index = options.index
+		else
+			@index = @id
+
 	reset: ->
 
 		@_createDOMEventManager()
@@ -321,6 +326,12 @@ class exports.Context extends BaseClass
 			if _.isNumber(value)
 				@_perspectiveOriginY = value
 				@_updatePerspective()
+
+	@define "index",
+		get: -> @_element?.style["z-index"] or 0 or 0
+		set: (value) ->
+			return unless @_element
+			@_element.style["z-index"] = value
 
 	toInspect: ->
 
