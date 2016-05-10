@@ -16,7 +16,7 @@ if Utils.isMobile()
 else
 	Config.height = 40
 	Config.textInset = 12
-	Config.fontSize = 13
+	Config.fontSize = 14
 
 
 class ErrorDisplay extends BaseClass
@@ -57,7 +57,7 @@ class ErrorDisplay extends BaseClass
 			
 			error.text.style =
 				font: "#{Config.fontSize}px/1em #{Utils.deviceFont()}"
-				lineHeight: "#{error.text.height}px"
+				lineHeight: "#{parseInt(error.text.height - 2)}px"
 				textAlign: "center"
 				wordWrap: "break-word"
 				textOverflow: "ellipsis"
