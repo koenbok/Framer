@@ -64,6 +64,16 @@ layerPropertyPointTransformer = (value, layer, property) ->
 
 	return value
 
+layerPropertyIgnore = (options, propertyName, properties) ->
+	return options unless options.hasOwnProperty(propertyName)
+
+	for p in properties
+		if options.hasOwnProperty(p)
+			delete options[propertyName]
+			return options
+
+	return options
+
 class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
@@ -89,6 +99,11 @@ class exports.Layer extends BaseClass
 		# We have to create the element before we set the defaults
 		@_createElement()
 
+		# Sanitize calculated property setters so direct properties always win
+		layerPropertyIgnore(options, "point", ["x", "y"])
+		layerPropertyIgnore(options, "size", ["width", "height"])
+		layerPropertyIgnore(options, "frame", ["x", "y", "width", "height"])
+
 		super Defaults.getDefaults("Layer", options)
 
 		# Add this layer to the current context
@@ -106,10 +121,9 @@ class exports.Layer extends BaseClass
 		else
 			@parent = options.parent
 
-		# Set some calculated properties, the order is important
-		for p in ["index", "width", "height", "x", "y"]
-			if options.hasOwnProperty(p)
-				@[p] = options[p]
+		# Make sure we set the right index
+		if options.hasOwnProperty("index")
+			@index = options.index
 
 		@_context.emit("layer:create", @)
 
