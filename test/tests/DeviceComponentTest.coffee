@@ -98,11 +98,27 @@ describe "DeviceComponent", ->
 	it "should influence screen", ->
 
 		device = new DeviceComponent()
+
+		device.deviceType = "fullscreen"
 		device.context.run ->
-			Screen.size.should.eql {width:750, height:1334}
-			Utils.inspect(Screen).should.equal "<Screen 750x1334>"
+			Screen.size.should.eql Canvas.size
 
 		device.deviceType = "nexus-5-black"
 		device.context.run ->
 			Screen.size.should.eql {width:1080, height:1920}
 			Utils.inspect(Screen).should.equal "<Screen 1080x1920>"
+
+	it "should calculate canvas frames", ->
+
+		Screen.size.should.eql Canvas.size
+
+		device = new DeviceComponent()
+
+		device.deviceType = "nexus-5-black"
+		device.context.run ->
+			Screen.size.should.eql {width:1080, height:1920}
+			Screen.canvasFrame.should.eql device.screen.canvasFrame
+
+		device.deviceType = "fullscreen"
+		device.context.run ->
+			Screen.size.should.eql Canvas.size
