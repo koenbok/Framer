@@ -5,8 +5,8 @@ class Canvas extends BaseClass
 
 	@define "width",  get: -> window.innerWidth
 	@define "height", get: -> window.innerHeight
-	@define "size", get: -> {width:@width, height:@height}
-	@define "frame", get: -> {x:0, y:0, width:@width, height:@height}
+	@define "size", get: -> Utils.size(@)
+	@define "frame", get: -> Utils.frame(@)
 
 	@define "backgroundColor",
 		importable: false
@@ -26,14 +26,14 @@ class Canvas extends BaseClass
 
 	onResize: (cb) -> @on("resize", cb)
 
-	toInspect: ->
-		return "<#{@constructor.name} #{@width}x#{@height}>"
-
 	_handleResize: (event) =>
 		@emit("resize")
 		@emit("change:width")
 		@emit("change:height")
 		@emit("change:size")
 		@emit("change:frame")
+
+	toInspect: ->
+		return "<#{@constructor.name} #{@width}x#{@height}>"
 
 exports.Canvas = Canvas
