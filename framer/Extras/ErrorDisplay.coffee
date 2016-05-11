@@ -23,7 +23,7 @@ class ErrorDisplay extends BaseClass
 
 	constructor: ->
 
-		@_context ?= new Context name:"Mobile Error"
+		@_context ?= new Context name:"ErrorDisplay"
 		@_context.index = 1000
 
 		@_context.run =>
@@ -43,7 +43,7 @@ class ErrorDisplay extends BaseClass
 			error = new Layer
 				name: "error"
 				y: Align.bottom
-				width: Screen.width
+				width: Canvas.width
 				height: Config.height
 				backgroundColor: "rgba(255,0,0,1)"
 			
@@ -67,13 +67,14 @@ class ErrorDisplay extends BaseClass
 				@_errorLayer = null
 
 			@_errorLayer = error
+			@resize()
 
 		return @_errorLayer
 
 	resize: =>
 		return unless @_errorLayer
-		@_errorLayer.width = Screen.width
-		@_errorLayer.y = Align.bottom
+		@_errorLayer.width = Canvas.width
+		@_errorLayer.y = Canvas.height - @_errorLayer.height
 		@_errorLayer.text.size = Utils.frameInset(@_errorLayer, Config.textInset)
 		@_errorLayer.text.point = Align.center
 
@@ -87,11 +88,6 @@ class ErrorDisplay extends BaseClass
 			properties:
 				scale: 1
 			curve: "spring(800, 55, 10)"
-		
-		# Terrible hacky fix for blurred text bug on Chrome desktop
-		if Utils.isChrome() and Utils.isDesktop()
-			animation.onAnimationEnd ->
-				Utils.delay 0, -> error.text.html = message + " "
 		
 	destroy: ->
 		@_context?.destroy()
