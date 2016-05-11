@@ -107,6 +107,7 @@ class exports.DeviceComponent extends BaseClass
 
 		@_context = new Framer.Context(parent:@content, name:"DeviceScreen")
 		@_context.perspective = 1200
+		@_context.device = @
 
 	_update: =>
 
@@ -207,7 +208,15 @@ class exports.DeviceComponent extends BaseClass
 		@_update()
 		@emit("change:fullScreen")
 
+	@define "screenSize",
+		get: ->
 
+			if @_shouldRenderFullScreen()
+				return Canvas.size
+
+			return size =
+				width: @_device.screenWidth
+				height: @_device.screenHeight
 
 	###########################################################################
 	# DEVICE TYPE
@@ -550,6 +559,9 @@ class exports.DeviceComponent extends BaseClass
 		# 	return "#{resourceUrl}/#{hand}.jp2"
 
 		return "#{resourceUrl}/#{hand}.png"
+
+	toInspect: ->
+		return "<Device '#{@deviceType}' #{@screenSize.width}x#{@screenSize.height}>"
 
 
 ###########################################################################
