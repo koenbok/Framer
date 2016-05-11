@@ -418,6 +418,11 @@ Utils.round = (value, decimals=0, increment=null, min=null, max=null) ->
 	return max if max and value > max
 	return value
 
+Utils.roundWhole = (value, decimals=1) ->
+	# Return integer if whole value, else include decimals
+	return parseInt(value) if parseInt(value) is value
+	return Utils.round(value, decimals)
+
 Utils.clamp = (value, a, b) ->
 
 	min = Math.min(a, b)
