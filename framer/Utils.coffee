@@ -147,17 +147,19 @@ Utils.randomNumber = (a=0, b=1) ->
 	# Return a random number between a and b
 	Utils.mapRange Math.random(), 0, 1, a, b
 
-Utils.randomImage = (size, offset=50) ->
+Utils.randomImage = (layer, offset=50) ->
 
-	size ?= {width:800, height:600}
+	layer ?= {width:800, height:600}
+	id = layer.id or Utils.round(Utils.randomNumber(0, 1000))
 
-	width = Utils.round(size.width, 0, 100, 100)
-	height = Utils.round(size.height, 0, 100, 100)
+	width = Utils.round(layer.width, 0, 100, 100)
+	height = Utils.round(layer.height, 0, 100, 100)
 	
 	# return "https://source.unsplash.com/category/nature/#{width}x#{height}"
-	return "https://unsplash.it/#{width}/#{height}?image=#{layer.id + offset}"
+	return "https://unsplash.it/#{width}/#{height}?image=#{id + offset}"
 
 Utils.defineEnum = (names = [], offset = 0, geometric = 0) ->
+	# TODO: What is this doing here?
 	Enum = {}
 	for name, i in names
 		j = i
