@@ -122,3 +122,30 @@ describe "DeviceComponent", ->
 		device.deviceType = "fullscreen"
 		device.context.run ->
 			Screen.size.should.eql Canvas.size
+
+	it "should return landscape and portrait screen sizes", ->
+
+		Screen.size.should.eql Canvas.size
+
+		device = new DeviceComponent()
+
+		device.deviceType = "nexus-5-black"
+
+		device.orientation.should.equal 0
+		device.isPortrait.should.equal true
+		device.screenSize.should.eql {width:1080, height:1920}
+
+		device.rotateLeft(false)
+		device.orientation.should.equal 90
+		device.isPortrait.should.equal false
+		device.screenSize.should.eql {width:1920, height:1080}
+
+		device.rotateRight(false)
+		device.orientation.should.equal 0
+		device.isPortrait.should.equal true
+		device.screenSize.should.eql {width:1080, height:1920}
+
+		device.rotateRight(false)
+		device.orientation.should.equal -90
+		device.isPortrait.should.equal false
+		device.screenSize.should.eql {width:1920, height:1080}

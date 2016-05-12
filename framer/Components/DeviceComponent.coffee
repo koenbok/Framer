@@ -214,9 +214,14 @@ class exports.DeviceComponent extends BaseClass
 			if @_shouldRenderFullScreen()
 				return Canvas.size
 
-			return size =
-				width: @_device.screenWidth
-				height: @_device.screenHeight
+			if @isLandscape
+				return size =
+					width: @_device.screenHeight
+					height: @_device.screenWidth
+			else
+				return size =
+					width: @_device.screenWidth
+					height: @_device.screenHeight
 
 	###########################################################################
 	# DEVICE TYPE
@@ -455,7 +460,7 @@ class exports.DeviceComponent extends BaseClass
 
 		[x, y] = [0, 0]
 
-		if @isLandscape()
+		if @isLandscape
 			x = offset
 			y = offset
 
@@ -490,13 +495,13 @@ class exports.DeviceComponent extends BaseClass
 		@_update()
 		@emit("change:orientation", window.orientation)
 
-	isPortrait: -> Math.abs(@orientation) is 0
-	isLandscape: -> !@isPortrait()
+	@define "isPortrait", get: -> Math.abs(@orientation) % 180 is 0
+	@define "isLandscape", get: -> !@isPortrait
 
 	@define "orientationName",
 		get: ->
-			return "portrait" if @isPortrait()
-			return "landscape" if @isLandscape()
+			return "portrait" if @isPortrait
+			return "landscape" if @isLandscape
 		set: (orientationName) -> @setOrientation(orientationName, false)
 
 	rotateLeft: (animate=true) ->
@@ -508,7 +513,7 @@ class exports.DeviceComponent extends BaseClass
 		@setOrientation(@orientation - 90, animate)
 
 	_getOrientationDimensions: (width, height) ->
-		if @isLandscape() then [height, width] else [width, height]
+		if @isLandscape then [height, width] else [width, height]
 
 	###########################################################################
 	# HANDS
