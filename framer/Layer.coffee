@@ -64,6 +64,16 @@ layerPropertyPointTransformer = (value, layer, property) ->
 
 	return value
 
+layerPropertyIgnore = (options, propertyName, properties) ->
+	return options unless options.hasOwnProperty(propertyName)
+
+	for p in properties
+		if options.hasOwnProperty(p)
+			delete options[propertyName]
+			return options
+
+	return options
+
 class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
@@ -89,6 +99,11 @@ class exports.Layer extends BaseClass
 		# We have to create the element before we set the defaults
 		@_createElement()
 
+		# Sanitize calculated property setters so direct properties always win
+		layerPropertyIgnore(options, "point", ["x", "y"])
+		layerPropertyIgnore(options, "size", ["width", "height"])
+		layerPropertyIgnore(options, "frame", ["x", "y", "width", "height"])
+
 		super Defaults.getDefaults("Layer", options)
 
 		# Add this layer to the current context
@@ -107,9 +122,9 @@ class exports.Layer extends BaseClass
 			@parent = options.parent
 
 		# Set some calculated properties
-		for p in ["index", "point", "size", "frame"]
-			if options.hasOwnProperty(p)
-				@[p] = options[p]
+		# Make sure we set the right index
+		if options.hasOwnProperty("index")
+			@index = options.index
 
 		# x and y always win from point, frame or size
 		for p in ["x", "y", "width", "height"]
@@ -150,9 +165,9 @@ class exports.Layer extends BaseClass
 	@define "ignoreEvents", layerProperty(@, "ignoreEvents", "pointerEvents", true, _.isBoolean)
 
 	# Matrix properties
-	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber, 
+	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber,
 		layerPropertyPointTransformer, {depends: ["width", "height", "parent"]})
-	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber, 
+	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber,
 		layerPropertyPointTransformer, {depends: ["width", "height", "parent"]})
 	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber)
 
@@ -317,17 +332,17 @@ class exports.Layer extends BaseClass
 		else
 			# If there is nothing to work with we exit
 			return unless input
-			
+
 			# Set every numeric value for eacht key
 			for k in keys
-				@[k] = input[k] if _.isNumber(input[k])		
+				@[k] = input[k] if _.isNumber(input[k])
 
 	@define "point",
 		importable: true
 		exportable: false
 		depends: ["width", "height", "size", "parent"]
 		get: -> Utils.point(@)
-		set: (input) -> 
+		set: (input) ->
 			input = layerPropertyPointTransformer(input, @, "point")
 			@_setGeometryValues(input, ["x", "y"])
 
@@ -633,7 +648,7 @@ class exports.Layer extends BaseClass
 			if currentValue == value
 				return @emit "load"
 
-			# Unset the background color only if it’s the default color 
+			# Unset the background color only if it’s the default color
 			defaults = Defaults.getDefaults "Layer", {}
 			if @backgroundColor?.isEqual(defaults.backgroundColor)
 				@backgroundColor = null
@@ -643,6 +658,11 @@ class exports.Layer extends BaseClass
 
 			if value in [null, ""]
 				@style["background-image"] = null
+				return
+
+			# Show placeholder image on any browser that doesn't support inline pdf
+			if _.endsWith(value.toLowerCase?(), ".pdf") and (not Utils.isWebKit() or Utils.isChrome())
+				@style["background-image"] = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAVlJREFUaAXtlwEOwiAMRdF4Cr3/0fQaSre9ZFSYLCrQpSSG/FLW9v92agghXJdP3KZlCp/J2up+WiUuzMt6zNukzPDYvALCsKme1/maV8BnQHqw9/IZ6KmAz0BP9ontMwATPXafgR6s65g+A5qRlrhmBu6FhG6LXf9/+JU/YclROkVWEs/8r9FLrChb2apSqVqWZgKmtRKz9/f+CdPxoVl8CAWylcWKUQZGwfhjB3OOHcw5djDn2MH6fBNLC42yaEnyoTXB2V36+lPlz+zN9x6HKfxrZwZ/HUbf5/lJviMpoBPWBWWxFJCtLNqplItIWuvPffx5Dphz7GB9vonNv4X2zICWuMTM3p7Gv/b5iVLmFaiZgb3M/Ns/Ud68AvIGkJ6ir8xh8wrQrzAve9Jjo2PzCsC8z4Aw0WP5DPRgXcf07wHNSEvsM9CS7VIsn4ESMy3sPgMtWN6K8QKfubDo2UqVogAAAABJRU5ErkJggg==')"
 				return
 
 			imageUrl = value
@@ -1134,10 +1154,10 @@ class exports.Layer extends BaseClass
 		return false
 
 	showHint: ->
-		
+
 		if not @shouldShowHint()
 			return _.invoke(@children, "showHint")
-		
+
 		color = new Color(40, 175, 250)
 
 		layer = new Layer
@@ -1146,12 +1166,12 @@ class exports.Layer extends BaseClass
 			borderColor: new Color("white").alpha(.5)
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 1
-		
+
 		animation = layer.animate
 			properties:
 				opacity: 0
 			time: 0.4
-		
+
 		animation.onAnimationEnd ->
 			layer.destroy()
 
@@ -1160,13 +1180,9 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## DESCRIPTOR
 
-	toInspect: ->
-
-		round = (value) ->
-			if parseInt(value) == value
-				return parseInt(value)
-			return Utils.round(value, 1)
-
-		if @name
-			return "<#{@constructor.name} id:#{@id} name:#{@name} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}>"
-		return "<#{@constructor.name} id:#{@id} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}>"
+	toInspect: (constructor) ->
+		constructor ?= @constructor.name
+		name = if @name then "name:#{@name} " else ""
+		return "<#{constructor} id:#{@id} #{name}
+			(#{Utils.roundWhole(@x)},#{Utils.roundWhole(@y)})
+			#{Utils.roundWhole(@width)}x#{Utils.roundWhole(@height)}>"

@@ -149,13 +149,17 @@ Utils.randomNumber = (a=0, b=1) ->
 
 Utils.randomImage = (layer, offset=50) ->
 
+	layer ?= {width:800, height:600}
+	id = layer.id or Utils.round(Utils.randomNumber(0, 1000))
+
 	width = Utils.round(layer.width, 0, 100, 100)
 	height = Utils.round(layer.height, 0, 100, 100)
 	
 	# return "https://source.unsplash.com/category/nature/#{width}x#{height}"
-	return "https://unsplash.it/#{width}/#{height}?image=#{layer.id + offset}"
+	return "https://unsplash.it/#{width}/#{height}?image=#{id + offset}"
 
 Utils.defineEnum = (names = [], offset = 0, geometric = 0) ->
+	# TODO: What is this doing here?
 	Enum = {}
 	for name, i in names
 		j = i
@@ -292,10 +296,22 @@ Utils.webkitVersion = ->
 	version
 
 Utils.isChrome = ->
-	(/chrome/).test(navigator.userAgent.toLowerCase())
+	return /Chrome/.test(navigator.userAgent) and /Google Inc/.test(navigator.vendor)
 
 Utils.isSafari = ->
-	(/safari/).test(navigator.userAgent.toLowerCase())
+	return /Safari/.test(navigator.userAgent) and /Apple Computer/.test(navigator.vendor)
+
+Utils.isAndroid = ->
+	return /(android)/i.test(navigator.userAgent)
+
+Utils.isIOS = ->
+	return /(iPhone|iPod|iPad)/i.test(navigator.platform)
+
+Utils.isMacOS = ->
+	return /Mac/.test(navigator.platform)
+
+Utils.isWindows = ->
+	return /Win/.test(navigator.platform)
 
 Utils.isTouch = ->
 	window.ontouchstart is null and
@@ -376,6 +392,22 @@ Utils.deviceType = ->
 Utils.pathJoin = ->
 	Utils.arrayFromArguments(arguments).join("/")
 
+Utils.deviceFont = (os) ->
+
+	# https://github.com/jonathantneal/system-font-css
+	
+	if not os
+		os = "macos" if Utils.isMacOS()
+		os = "ios" if Utils.isIOS()
+		os = "android" if Utils.isAndroid()
+		os = "windows" if Utils.isWindows()
+
+	return "-apple-system, SF UI Text, Helvetica Neue" if os is "macos"
+	return "-apple-system, SF UI Text, Helvetica Neue" if os is "ios"
+	return "Roboto, Helvetica Neue" if os is "android"
+	return "Segoe UI" if os is "windows"
+	return "Helvetica"
+
 ######################################################
 # MATH FUNCTIONS
 
@@ -389,6 +421,11 @@ Utils.round = (value, decimals=0, increment=null, min=null, max=null) ->
 	return min if min and value < min
 	return max if max and value > max
 	return value
+
+Utils.roundWhole = (value, decimals=1) ->
+	# Return integer if whole value, else include decimals
+	return parseInt(value) if parseInt(value) is value
+	return Utils.round(value, decimals)
 
 Utils.clamp = (value, a, b) ->
 

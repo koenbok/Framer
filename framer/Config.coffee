@@ -27,6 +27,12 @@ body {
 	-webkit-user-select: none;
 }
 
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) { 
+	.framerLayer {
+		image-rendering: pixelated;
+	}
+}
+
 .framerLayer input,
 .framerLayer textarea,
 .framerLayer select,

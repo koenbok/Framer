@@ -107,6 +107,7 @@ class exports.DeviceComponent extends BaseClass
 
 		@_context = new Framer.Context(parent:@content, name:"DeviceScreen")
 		@_context.perspective = 1200
+		@_context.device = @
 
 	_update: =>
 
@@ -207,7 +208,20 @@ class exports.DeviceComponent extends BaseClass
 		@_update()
 		@emit("change:fullScreen")
 
+	@define "screenSize",
+		get: ->
 
+			if @_shouldRenderFullScreen()
+				return Canvas.size
+
+			if @isLandscape
+				return size =
+					width: @_device.screenHeight
+					height: @_device.screenWidth
+			else
+				return size =
+					width: @_device.screenWidth
+					height: @_device.screenHeight
 
 	###########################################################################
 	# DEVICE TYPE
@@ -446,7 +460,7 @@ class exports.DeviceComponent extends BaseClass
 
 		[x, y] = [0, 0]
 
-		if @isLandscape()
+		if @isLandscape
 			x = offset
 			y = offset
 
@@ -481,13 +495,13 @@ class exports.DeviceComponent extends BaseClass
 		@_update()
 		@emit("change:orientation", window.orientation)
 
-	isPortrait: -> Math.abs(@orientation) is 0
-	isLandscape: -> !@isPortrait()
+	@define "isPortrait", get: -> Math.abs(@orientation) % 180 is 0
+	@define "isLandscape", get: -> !@isPortrait
 
 	@define "orientationName",
 		get: ->
-			return "portrait" if @isPortrait()
-			return "landscape" if @isLandscape()
+			return "portrait" if @isPortrait
+			return "landscape" if @isLandscape
 		set: (orientationName) -> @setOrientation(orientationName, false)
 
 	rotateLeft: (animate=true) ->
@@ -499,7 +513,7 @@ class exports.DeviceComponent extends BaseClass
 		@setOrientation(@orientation - 90, animate)
 
 	_getOrientationDimensions: (width, height) ->
-		if @isLandscape() then [height, width] else [width, height]
+		if @isLandscape then [height, width] else [width, height]
 
 	###########################################################################
 	# HANDS
@@ -551,6 +565,9 @@ class exports.DeviceComponent extends BaseClass
 
 		return "#{resourceUrl}/#{hand}.png"
 
+	toInspect: ->
+		return "<Device '#{@deviceType}' #{@screenSize.width}x#{@screenSize.height}>"
+
 
 ###########################################################################
 # DEVICE CONFIGURATIONS
@@ -564,7 +581,7 @@ iPadAir2BaseDevice =
 	deviceImageJP2: true
 	screenWidth: 1536
 	screenHeight: 2048
-	deviceType: "phone"
+	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
 
 iPadMini4BaseDevice =
@@ -573,7 +590,7 @@ iPadMini4BaseDevice =
 	deviceImageJP2: true
 	screenWidth: 1536
 	screenHeight: 2048
-	deviceType: "phone"
+	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
 
 iPadProBaseDevice =
@@ -582,7 +599,7 @@ iPadProBaseDevice =
 	deviceImageJP2: true
 	screenWidth: 2048
 	screenHeight: 2732
-	deviceType: "phone"
+	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
 
 iPhone6BaseDevice =
@@ -713,7 +730,7 @@ Nexus9BaseDevice =
 	deviceImageJP2: true
 	screenWidth: 1536
 	screenHeight: 2048
-	deviceType: "phone"
+	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
 
 HTCa9BaseDevice =

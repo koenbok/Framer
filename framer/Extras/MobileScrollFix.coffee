@@ -47,5 +47,11 @@ exports.enable = ->
 				@off "touchmove", handleScrollingLayerTouchMove
 				@off "touchstart", handleScrollingLayerTouchStart
 
+		toInspect: ->
+			if @constructor.name is "MobileScrollFixLayer"
+				super "Layer"
+			else
+				super
+
 	# Override the standard window Layer with this patched one
 	window.Layer = window.Framer.Layer = MobileScrollFixLayer

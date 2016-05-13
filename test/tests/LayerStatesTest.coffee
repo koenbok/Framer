@@ -1,3 +1,5 @@
+assert = require "assert"
+
 describe "LayerStates", ->
 
 	describe "Events", ->
@@ -179,3 +181,21 @@ describe "LayerStates", ->
 
 			layer.states.switchInstant "default"
 			layer.x.should.equal 0
+
+		it "should set the parent", ->
+
+			layerA = new Layer
+			layerB = new Layer
+				parent: layerA
+
+			layerB.states.add
+				stateA:
+					parent: null
+
+			assert.equal(layerB.parent, layerA)
+
+			layerB.states.switchInstant "stateA"
+			assert.equal(layerB.parent, null)
+
+			layerB.states.switchInstant "default"
+			# assert.equal(layerB.parent, layerA)
