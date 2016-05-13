@@ -1149,33 +1149,79 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## HINT
 
+	_showHint: ->
+
+		# If this layer isnt visible we can just exit
+		return if not @visible
+		return if @opacity is 0
+
+		# We do not support rotated layers
+		return if @rotation isnt 0
+		return if @rotationX isnt 0
+		return if @rotationY isnt 0
+		return if @rotationZ isnt 0
+
+		# If we don't need to show a hint exit but pass to children
+		unless @shouldShowHint()
+			_.invoke(@children, "_showHint")
+			return
+
+		# Figure out the frame we want to show the hint in, if any of the
+		# parent layers clip, we need to intersect the rectangle with it.
+		frame = @canvasFrame
+
+		for parent in @ancestors()
+			if parent.clip
+				 frame = Utils.frameIntersection(frame, parent.canvasFrame)
+			if not frame
+				return
+
+		# Show the actual hint
+		@showHint(frame)
+
+		# Tell the children to show their hints
+		_.invoke(@children, "_showHint")
+
 	shouldShowHint: ->
 		return true if @ignoreEvents is false
 		return false
 
-	showHint: ->
+	showHint: (frame) ->
 
-		if not @shouldShowHint()
-			return _.invoke(@children, "showHint")
-
-		color = new Color(40, 175, 250)
-
+		# Start an animation with a blue rectangle fading out over time
 		layer = new Layer
-			frame: @canvasFrame
+			frame: frame
 			backgroundColor: new Color(40, 175, 250, 0.4)
 			borderColor: new Color("white").alpha(.5)
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 1
 
-		animation = layer.animate
-			properties:
-				opacity: 0
-			time: 0.4
+		if @_draggable and @_draggable.enabled
 
-		animation.onAnimationEnd ->
-			layer.destroy()
+			offset = 16
 
-		_.invoke(@children, "showHint")
+			layer.x += offset if (@_draggable.horizontal and @_draggable.speedX)
+			layer.y += offset if (@_draggable.vertical and @_draggable.speedY)
+
+			properties = {}
+			properties.x = frame.x - offset if (@_draggable.horizontal and @_draggable.speedX)
+			properties.y = frame.y - offset if (@_draggable.vertical and @_draggable.speedY)
+
+			animation = layer.animate
+				properties: properties
+				time: 0.4
+
+			animation.onAnimationEnd ->
+				layer.destroy()
+
+		else
+			animation = layer.animate
+				properties:
+					opacity: 0
+				time: 0.4
+
+			animation.onAnimationEnd ->
+				layer.destroy()
 
 	##############################################################
 	## DESCRIPTOR
