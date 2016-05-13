@@ -106,8 +106,13 @@ class exports.Layer extends BaseClass
 		else
 			@parent = options.parent
 
-		# Set some calculated properties, the order is important
-		for p in ["index", "width", "height", "x", "y"]
+		# Set some calculated properties
+		for p in ["index", "point", "size", "frame"]
+			if options.hasOwnProperty(p)
+				@[p] = options[p]
+
+		# x and y always win from point, frame or size
+		for p in ["x", "y", "width", "height"]
 			if options.hasOwnProperty(p)
 				@[p] = options[p]
 
