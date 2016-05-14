@@ -237,12 +237,16 @@ class exports.Layer extends BaseClass
 	@define "name",
 		default: ""
 		get: ->
-			@_getPropertyValue "name"
+			name = @_getPropertyValue("name")
+			return name if name
+			# In Framer Studio, we can use the variable name
+			return @__framerInstanceInfo?.name or ""
+
 		set: (value) ->
-			@_setPropertyValue "name", value
+			@_setPropertyValue("name", value)
 			# Set the name attribute of the dom element too
 			# See: https://github.com/koenbok/Framer/issues/63
-			@_element.setAttribute "name", value
+			@_element.setAttribute("name", value)
 
 	##############################################################
 	# Matrices
