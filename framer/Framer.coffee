@@ -23,6 +23,7 @@ Framer.PageComponent = (require "./Components/PageComponent").PageComponent
 Framer.SliderComponent = (require "./Components/SliderComponent").SliderComponent
 Framer.DeviceComponent = (require "./Components/DeviceComponent").DeviceComponent
 Framer.GridComponent = (require "./Components/GridComponent").GridComponent
+Framer.NavComponent = (require "./Components/NavComponent").NavComponent
 Framer.DeviceView = Framer.DeviceComponent # Compat
 
 _.extend(window, Framer) if window
