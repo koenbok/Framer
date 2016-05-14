@@ -911,7 +911,7 @@ Utils.frameIntersection = (rectA, rect) ->
 	if x2 <= x1 or y2 <= y1
 		return null
 
-	return rect = 
+	return rect =
 		x: x1
 		y: y1
 		width: x2 - x1
