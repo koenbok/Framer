@@ -154,7 +154,7 @@ Utils.randomImage = (layer, offset=50) ->
 
 	width = Utils.round(layer.width, 0, 100, 100)
 	height = Utils.round(layer.height, 0, 100, 100)
-	
+
 	# return "https://source.unsplash.com/category/nature/#{width}x#{height}"
 	return "https://unsplash.it/#{width}/#{height}?image=#{id + offset}"
 
@@ -395,7 +395,7 @@ Utils.pathJoin = ->
 Utils.deviceFont = (os) ->
 
 	# https://github.com/jonathantneal/system-font-css
-	
+
 	if not os
 		os = "macos" if Utils.isMacOS()
 		os = "ios" if Utils.isIOS()
@@ -412,9 +412,9 @@ Utils.deviceFont = (os) ->
 # MATH FUNCTIONS
 
 Utils.round = (value, decimals=0, increment=null, min=null, max=null) ->
-	
+
 	d = Math.pow(10, decimals)
-	
+
 	value = Math.round(value / increment) * increment if increment
 	value = Math.round(value * d) / d
 
@@ -615,7 +615,7 @@ Utils.loadImage = (url, callback, context) ->
 # Point
 
 Utils.point = (input) ->
-	
+
 	return Utils.pointZero(input) if _.isNumber(input)
 	return Utils.pointZero() unless input
 
@@ -696,7 +696,7 @@ Utils.pointAngle = (pointA, pointB) ->
 # Size
 
 Utils.size = (input) ->
-	
+
 	return Utils.sizeZero(input) if _.isNumber(input)
 	return Utils.sizeZero() unless input
 
@@ -773,7 +773,7 @@ Utils.frameSetMaxY = (frame, value) ->
 	frame.y = if frame.height is 0 then 0 else value - frame.height
 
 Utils.frame = (input) ->
-	
+
 	return Utils.frameZero(input) if _.isNumber(input)
 	return Utils.frameZero() unless input
 
@@ -894,6 +894,32 @@ Utils.pointInPolygon = (point, vs) ->
 		j = i++
 	inside
 
+Utils.frameIntersection = (rectA, rect) ->
+
+	x1 = rect.x
+	y1 = rect.y
+
+	x2 = x1 + rect.width
+	y2 = y1 + rect.height
+
+	if rectA.x > x1
+		x1 = rectA.x
+	if rectA.y > y1
+		y1 = rectA.y
+	if rectA.x + rectA.width < x2
+		x2 = rectA.x + rectA.width
+	if rectA.y + rectA.height < y2
+		y2 = rectA.y + rectA.height
+	if x2 <= x1 or y2 <= y1
+		return null
+
+	return rect =
+		x: x1
+		y: y1
+		width: x2 - x1
+		height: y2 - y1
+
+
 Utils.frameCenterPoint = (frame) ->
 	return point =
 		x: Utils.frameGetMidX(frame)
@@ -920,7 +946,7 @@ Utils.rotationNormalizer = ->
 
 
 # Coordinate system
- 
+
 # convert a point from a layer to the context level, with rootContext enabled you can make it cross to the top context
 Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLayer=true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})

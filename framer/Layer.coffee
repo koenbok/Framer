@@ -121,9 +121,15 @@ class exports.Layer extends BaseClass
 		else
 			@parent = options.parent
 
+		# Set some calculated properties
 		# Make sure we set the right index
 		if options.hasOwnProperty("index")
 			@index = options.index
+
+		# x and y always win from point, frame or size
+		for p in ["x", "y", "width", "height"]
+			if options.hasOwnProperty(p)
+				@[p] = options[p]
 
 		@_context.emit("layer:create", @)
 
@@ -231,12 +237,16 @@ class exports.Layer extends BaseClass
 	@define "name",
 		default: ""
 		get: ->
-			@_getPropertyValue "name"
+			name = @_getPropertyValue("name")
+			return name if name
+			# In Framer Studio, we can use the variable name
+			return @__framerInstanceInfo?.name or ""
+
 		set: (value) ->
-			@_setPropertyValue "name", value
+			@_setPropertyValue("name", value)
 			# Set the name attribute of the dom element too
 			# See: https://github.com/koenbok/Framer/issues/63
-			@_element.setAttribute "name", value
+			@_element.setAttribute("name", value)
 
 	##############################################################
 	# Matrices
@@ -1143,19 +1153,48 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## HINT
 
+	_showHint: ->
+
+		# If this layer isnt visible we can just exit
+		return if not @visible
+		return if @opacity is 0
+
+		# We do not support rotated layers
+		return if @rotation isnt 0
+		return if @rotationX isnt 0
+		return if @rotationY isnt 0
+		return if @rotationZ isnt 0
+
+		# If we don't need to show a hint exit but pass to children
+		unless @shouldShowHint()
+			_.invoke(@children, "_showHint")
+			return
+
+		# Figure out the frame we want to show the hint in, if any of the
+		# parent layers clip, we need to intersect the rectangle with it.
+		frame = @canvasFrame
+
+		for parent in @ancestors(context=true)
+			if parent.clip
+				 frame = Utils.frameIntersection(frame, parent.canvasFrame)
+			if not frame
+				return
+
+		# Show the actual hint
+		@showHint(frame)
+
+		# Tell the children to show their hints
+		_.invoke(@children, "_showHint")
+
 	shouldShowHint: ->
 		return true if @ignoreEvents is false
 		return false
 
-	showHint: ->
+	showHint: (frame) ->
 
-		if not @shouldShowHint()
-			return _.invoke(@children, "showHint")
-
-		color = new Color(40, 175, 250)
-
+		# Start an animation with a blue rectangle fading out over time
 		layer = new Layer
-			frame: @canvasFrame
+			frame: frame
 			backgroundColor: new Color(40, 175, 250, 0.4)
 			borderColor: new Color("white").alpha(.5)
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
@@ -1168,8 +1207,6 @@ class exports.Layer extends BaseClass
 
 		animation.onAnimationEnd ->
 			layer.destroy()
-
-		_.invoke(@children, "showHint")
 
 	##############################################################
 	## DESCRIPTOR
