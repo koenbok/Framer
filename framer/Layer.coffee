@@ -1196,32 +1196,13 @@ class exports.Layer extends BaseClass
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 1
 
-		if @_draggable and @_draggable.enabled
+		animation = layer.animate
+			properties:
+				opacity: 0
+			time: 0.4
 
-			offset = 16
-
-			layer.x += offset if (@_draggable.horizontal and @_draggable.speedX)
-			layer.y += offset if (@_draggable.vertical and @_draggable.speedY)
-
-			properties = {}
-			properties.x = frame.x - offset if (@_draggable.horizontal and @_draggable.speedX)
-			properties.y = frame.y - offset if (@_draggable.vertical and @_draggable.speedY)
-
-			animation = layer.animate
-				properties: properties
-				time: 0.4
-
-			animation.onAnimationEnd ->
-				layer.destroy()
-
-		else
-			animation = layer.animate
-				properties:
-					opacity: 0
-				time: 0.4
-
-			animation.onAnimationEnd ->
-				layer.destroy()
+		animation.onAnimationEnd ->
+			layer.destroy()
 
 	##############################################################
 	## DESCRIPTOR
