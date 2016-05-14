@@ -40,6 +40,70 @@ class NavComponentTransition
 		else
 			_.extend(layer, properties)
 
+class NavComponentAlertTransition
+
+	constructor: (@navComponent, @layerA, @layerB) ->
+
+	forward: (animate=true) ->
+
+		background = @navComponent.background
+
+		if background and @layerB
+			background.placeBehind(@layerB)
+
+		if @layerB
+			@layerB.point = Align.center
+			@layerB.scale = 0.8
+			@layerB.opacity = 0
+
+			@layerB.animate
+				properties:
+					scale: 1
+					opacity: 1
+				curve: "spring(800,28,0)"
+
+		if background
+			background.frame = @navComponent.frame
+			background.opacity = 0
+			background.visible = true
+
+			background.animate
+				properties:
+					opacity: 0.5
+				curve: "ease-out"
+				time: 0.2
+
+	back: (animate=true) ->
+
+		background = @navComponent.background
+
+		if @layerB
+			@layerB.animate
+				properties:
+					scale: 0.8
+					opacity: 0
+				curve: "ease-out"
+				time: 0.1
+
+		if background
+			animation = background.animate
+				properties:
+					opacity: 0
+				curve: "ease-out"
+				time: 0.1
+
+			animation.onAnimationEnd ->
+				background.visible = false
+
+	_startAnimation: (animate, layer, properties, animationOptions) ->
+		if animate
+			layer.animate
+				properties: properties
+				curve: "spring(800,50,0)"
+		else
+			_.extend(layer, properties)
+
+
 NavComponentLayerScrollKey = "_navComponentWrapped"
 
 class exports.NavComponent extends Layer
@@ -58,6 +122,16 @@ class exports.NavComponent extends Layer
 
 		@animationOptions =
 			curve: "spring(600, 62, 0)"
+
+		@background = new Layer
+			name: "background"
+			parent: @
+			size: @size
+			backgroundColor: "black"
+			visible: false
+
+		@background.onTap =>
+			@back()
 
 		# Screen.onEdgeSwipeLeftEnd (e) =>
 		# 	@back()
@@ -120,10 +194,14 @@ class exports.NavComponent extends Layer
 		wrappedLayer = @_wrapLayer(layer) if wrap
 		wrappedLayer.parent = @
 
-		transition = new NavComponentTransition(@, @_wrappedLayer(@current), wrappedLayer)
+		transition = new TransitionType(@, @_wrappedLayer(@current), wrappedLayer)
 		transition.forward(animate)
 
 		@_stack.push({layer:layer, transition:transition})
+
+	alert: (layer)->
+		@push(layer, NavComponentAlertTransition, true, false)
+
 
 	back: ->
 		return unless @previous
