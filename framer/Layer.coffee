@@ -1174,7 +1174,7 @@ class exports.Layer extends BaseClass
 		# parent layers clip, we need to intersect the rectangle with it.
 		frame = @canvasFrame
 
-		for parent in @ancestors()
+		for parent in @ancestors(context=true)
 			if parent.clip
 				 frame = Utils.frameIntersection(frame, parent.canvasFrame)
 			if not frame
