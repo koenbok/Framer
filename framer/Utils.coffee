@@ -737,6 +737,8 @@ Utils.parseRect = (args) ->
 		return args[0]
 	if _.isObject(args)
 		return args
+	if _.isNumber(args)
+		return {top:args, right:args, bottom:args, left:args}
 
 	return {}
 
