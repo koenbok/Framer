@@ -95,6 +95,7 @@ class exports.Layer extends BaseClass
 		# Private setting for canceling of click event if wrapped in moved draggable
 		@_cancelClickEventInDragSession = true
 		@_cancelClickEventInDragSessionVelocity = 0.1
+		@_cancelClickEventInDragSessionOffset = 8
 
 		# We have to create the element before we set the defaults
 		@_createElement()
@@ -987,8 +988,12 @@ class exports.Layer extends BaseClass
 			if eventName in [Events.Click,
 				Events.Tap, Events.TapStart, Events.TapEnd,
 				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
-				if @_parentDraggableLayer()
-					velocity = @_parentDraggableLayer()?.draggable.velocity
+				parentDraggableLayer = @_parentDraggableLayer()
+				if parentDraggableLayer
+					offset = parentDraggableLayer.draggable.offset
+					return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
+					return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
+					velocity = parentDraggableLayer.draggable.velocity
 					return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
 					return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
 
