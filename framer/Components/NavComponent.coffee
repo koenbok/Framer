@@ -1,111 +1,8 @@
-
 Utils = require "../Utils"
 
 {Layer} = require "../Layer"
-
-class NavComponentTransition
-
-	constructor: (@navComponent, @layerA, @layerB) ->
-
-	forward: (animate=true) ->
-
-		if @layerA
-			animation = @_startAnimation animate, @layerA,
-				x: 0 - (@navComponent.width / 2)
-				opacity: 0
-			animation.onAnimationEnd =>
-				@layerA.visible = false
-
-		if @layerB
-			@layerB.point =
-				x: @navComponent.width
-				y: 0
-			@_startAnimation animate, @layerB,
-				x: 0
-
-	back: (animate=true) ->
-
-		if @layerA
-			@layerA.visible = true
-			@_startAnimation animate, @layerA,
-				x: 0
-				opacity: 1
-
-		if @layerB
-			@_startAnimation animate, @layerB,
-				x: @navComponent.width
-
-	_startAnimation: (animate, layer, properties) ->
-		if animate
-			layer.animate
-				properties: properties
-				curve: "spring(300,35,0)"
-		else
-			_.extend(layer, properties)
-
-class NavComponentAlertTransition
-
-	constructor: (@navComponent, @layerA, @layerB) ->
-
-	forward: (animate=true) ->
-
-		background = @navComponent.background
-
-		if background and @layerB
-			background.placeBehind(@layerB)
-
-		if @layerB
-			@layerB.point = Align.center
-			@layerB.scale = 0.8
-			@layerB.opacity = 0
-
-			@layerB.animate
-				properties:
-					scale: 1
-					opacity: 1
-				curve: "spring(800,28,0)"
-
-		if background
-			background.frame = @navComponent.frame
-			background.opacity = 0
-			background.visible = true
-
-			background.animate
-				properties:
-					opacity: 0.5
-				curve: "ease-out"
-				time: 0.2
-
-	back: (animate=true) ->
-
-		background = @navComponent.background
-
-		if @layerB
-			@layerB.animate
-				properties:
-					scale: 0.8
-					opacity: 0
-				curve: "ease-out"
-				time: 0.1
-
-		if background
-			animation = background.animate
-				properties:
-					opacity: 0
-				curve: "ease-out"
-				time: 0.1
-
-			animation.onAnimationEnd ->
-				background.visible = false
-
-	_startAnimation: (animate, layer, properties, animationOptions) ->
-		if animate
-			layer.animate
-				properties: properties
-				curve: "spring(800,50,0)"
-		else
-			_.extend(layer, properties)
-
+{LayerStates} = require "../LayerStates"
+Transitions = require "./NavComponentTransitions"
 
 NavComponentLayerScrollKey = "_navComponentWrapped"
 
@@ -181,7 +78,7 @@ class exports.NavComponent extends Layer
 		return if layer is @current
 
 		# Set the default values
-		TransitionType ?= NavComponentTransition
+		TransitionType ?= Transitions.default
 		animate ?= if @_stack.length then true else false
 		wrap ?= true
 
@@ -199,9 +96,11 @@ class exports.NavComponent extends Layer
 
 		@_stack.push({layer:layer, transition:transition})
 
-	alert: (layer)->
-		@push(layer, NavComponentAlertTransition, true, false)
+	dialog: (layer)->
+		@push(layer, Transitions.dialog, true, false)
 
+	modal: (layer)->
+		@push(layer, Transitions.modal, true, false)
 
 	back: ->
 		return unless @previous
