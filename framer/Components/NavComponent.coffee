@@ -10,9 +10,11 @@ class NavComponentTransition
 	forward: (animate=true) ->
 
 		if @layerA
-			@_startAnimation animate, @layerA,
+			animation = @_startAnimation animate, @layerA,
 				x: 0 - (@navComponent.width / 2)
 				opacity: 0
+			animation.onAnimationEnd =>
+				@layerA.visible = false
 
 		if @layerB
 			@layerB.point =
@@ -24,6 +26,7 @@ class NavComponentTransition
 	back: (animate=true) ->
 
 		if @layerA
+			@layerA.visible = true
 			@_startAnimation animate, @layerA,
 				x: 0
 				opacity: 1

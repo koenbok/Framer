@@ -1187,6 +1187,7 @@ class exports.Layer extends BaseClass
 		_.invoke(@children, "_showHint")
 
 	shouldShowHint: ->
+		return false if @isAnimating is true
 		return true if @ignoreEvents is false
 		return false
 
@@ -1195,8 +1196,8 @@ class exports.Layer extends BaseClass
 		# Start an animation with a blue rectangle fading out over time
 		layer = new Layer
 			frame: frame
-			backgroundColor: new Color(40, 175, 250, 0.4)
-			borderColor: new Color("white").alpha(.5)
+			backgroundColor: new Color("9013FE").alpha(.5)
+			borderColor: new Color("460054").alpha(.5)
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 1
 

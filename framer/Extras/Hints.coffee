@@ -6,10 +6,12 @@ class Hints
 		@_context._element.style.zIndex = 1000000
 
 		@_context.run =>
-			Events.wrap(document).addEventListener("mousedown", @_handleDown)
-			Events.wrap(document).addEventListener("mouseup", @_handleUp)
-			Events.wrap(document).addEventListener("touchdown", @_handleDown)
-			Events.wrap(document).addEventListener("touchup", @_handleUp)
+			if Utils.isTouch()
+				Events.wrap(document).addEventListener("touchstart", @_handleDown)
+				Events.wrap(document).addEventListener("touchend", @_handleUp)
+			else
+				Events.wrap(document).addEventListener("mousedown", @_handleDown)
+				Events.wrap(document).addEventListener("mouseup", @_handleUp)
 
 	_handleDown: (event) =>
 		@_target = event.target
