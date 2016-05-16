@@ -1,12 +1,26 @@
-#Import file "NavComponent"
-{home, Unlock, table, back, update, dialog} = 
-	Framer.Importer.load("imported/NavComponent@1x")
+nav = new NavComponent
 
-dialog.borderRadius = 10
+grid = new GridComponent
+	width: Screen.width
+	height: Screen.height * 2
+	rows: 8
+	columns: 3
 
-nav = new NavComponent height:Screen.height
-nav.push(home)
+nav.push(grid)
 
-Unlock.onTap -> nav.push(table)
-back.onTap -> nav.back()
-update.onTap -> nav.alert(dialog)
+grid.renderCell = (layer) ->
+	
+	layer.image = Utils.randomImage(layer)
+
+	layer.onClick ->
+		
+		large = new Layer
+			size: Utils.frameInset(nav, 80)
+			image: @image
+					
+		large.onTap ->
+			nav.back()
+		
+		nav.modal(large)
+
+
