@@ -9,67 +9,26 @@ template = require("gulp-template")
 gutil = require("gulp-util")
 {exec} = require("child_process")
 
-command = (cmd, cb) ->
-	exec cmd, {cwd: __dirname}, (err, stdout, stderr) ->
-		cb(null, stdout.split('\n').join(''))
+################################################################################
+# Base webpack config
 
-CONFIG =
+WEBPACK =
+	entry: "./framer/Framer.coffee"
 	module:
 		loaders: [{test: /\.coffee$/, loader: "coffee-loader"}]
 	resolve:
 		extensions: ["", ".web.coffee", ".web.js", ".coffee", ".js"]
-	cache: true
 	devtool: "sourcemap"
+	cache: true
 	quiet: true
 
-gulp.task "build-release", ["version"], ->
+################################################################################
+# Gulp tasks
 
-	config = _.extend CONFIG,
-		entry: "./framer/Framer.coffee"
-		output:
-			filename: "framer.js"
-			pathinfo: false
+gulp.task "watch", ["test"], ->
+	gulp.watch(["./*.coffee", "framer/**", "test/tests/**", "!Version.coffee"], ["test"])
 
-		# Uglify is disabled for now because it messes up the
-		# source maps in Safari.
-		plugins: [
-			# new webpack.BannerPlugin("Framer", {}),
-			# new webpack.optimize.DedupePlugin(),
-			# new webpack.optimize.UglifyJsPlugin({
-			# 	mangle: false,
-			# 	compress: {warnings: false}
-			# })
-		]
-
-	return gulp.src(config.entry)
-		.pipe(gulpWebpack(config))
-		.pipe(gulp.dest("build/"))
-
-gulp.task "build-debug", ["version"], ->
-
-	config = _.extend CONFIG,
-		entry: "./framer/Framer.coffee"
-		output:
-			filename: "framer.debug.js"
-			sourceMapFilename: "[file].map?hash=[hash]"
-			pathinfo: true
-		debug: true
-
-	return gulp.src(config.entry)
-		.pipe(gulpWebpack(config))
-		.pipe(gulp.dest("build/"))
-
-gulp.task "build-test", ->
-
-	config = _.extend CONFIG,
-		entry: "./test/tests.coffee"
-		output: {filename: "tests.js"}
-
-	return gulp.src(config.entry)
-		.pipe(gulpWebpack(config))
-		.pipe(gulp.dest("test/phantomjs/"))
-
-gulp.task "test", ["build-debug", "build-test"], ->
+gulp.task "test", ["webpack:tests"], ->
 	return gulp
 		.src("test/phantomjs/index.html")
 		.pipe(phantomjs({
@@ -79,44 +38,16 @@ gulp.task "test", ["build-debug", "build-test"], ->
 			loadImages: false
 		}))
 
-gulp.task "watch", ->
-	gulp.watch(["./*.coffee", "framer/**", "test/tests/**", "!Version.coffee"], ["test"])
-
-gulp.task "watcher", ["version"], ->
-
-	config = _.extend CONFIG,
-		entry: "./framer/Framer.coffee"
-		output:
-			filename: "framer.debug.js"
-			sourceMapFilename: "[file].map?hash=[hash]"
-		debug: true
-		watch: true
-
-	return gulp.src(config.entry)
-		.pipe(gulpWebpack(config))
-		.pipe(gulp.dest("build/"))
-
 gulp.task "version", (callback) ->
-
-	async.series [
-		(cb) -> command("git rev-parse --abbrev-ref HEAD", cb) # branch
-		(cb) -> command("git describe --always --dirty", cb) # hash
-		(cb) -> command("git rev-list --count HEAD", cb) # build
-	], (err, results) ->
-
-		info =
-			branch: results[0]
-			hash: results[1]
-			build: results[2]
-			date: Math.floor(Date.now() / 1000)
+	versionInfo (info) ->
 
 		# If we are on the wercker platform, we need to get the branch
-		# name from the env variables and remove the dirty vrom version.
+		# name from the env variables and remove the dirty from version.
 		if process.env.WERCKER_GIT_BRANCH
 			info.branch = process.env.WERCKER_GIT_BRANCH
 			info.hash = info.hash.replace("-dirty", "")
 
-		gutil.log "Building ", gutil.colors.green("#{info.branch}/#{info.hash} @#{info.build}")
+		log "version", "#{info.branch}/#{info.hash} @#{info.build}"
 
 		task = gulp.src("framer/Version.coffee.template")
 			.pipe(template(info))
@@ -128,25 +59,78 @@ gulp.task "version", (callback) ->
 
 		callback(null, task)
 
-gulp.task "build-coverage", ->
+################################################################################
+# Webpack tasks
 
-	config = _.extend CONFIG,
-		entry: "./build/instrumented/Framer.js"
+gulp.task "webpack:debug", ["version"], (callback) ->
+
+	config = _.extend WEBPACK,
 		output:
-			filename: "framer.debug.js"
+			filename: "build/framer.debug.js"
+			sourceMapFilename: "[file].map?hash=[hash]"
 		debug: true
 
-	return gulp.src(config.entry)
-		.pipe(gulpWebpack(config))
-		.pipe(gulp.dest("build/"))
+	webpackDev "webpack:debug", config, ->
+		command "cp build/framer.debug.* extras/Studio.framer/framer/"
+		callback()
 
-gulp.task "coverage", ["build-coverage", "build-test"], ->
-	return gulp
-		.src("test/phantomjs/index.html")
-		.pipe(phantomjs(
-			# reporter: "landing"
-			phantomjs:
-				hooks: "coverage-capture"
-		))
-		.on "finish", ->
-			console.log "done"
+gulp.task "webpack:release", ["version"], (callback) ->
+
+	config = _.extend WEBPACK,
+		output:
+			filename: "build/framer.js"
+			sourceMapFilename: "[file].map"
+			pathinfo: false
+
+		# Uglify is disabled because it messes up the source maps in Safari.
+		plugins: [
+			new webpack.optimize.DedupePlugin(),
+			# new webpack.optimize.UglifyJsPlugin({
+			# 	mangle: false,
+			# 	compress: {warnings: false}
+			# })
+		]
+
+	webpackDev("webpack:release", config, callback)
+
+gulp.task "webpack:tests", ["webpack:debug"], (callback) ->
+
+	config = _.extend WEBPACK,
+		entry: "./test/tests.coffee"
+		output:
+			filename: "test/phantomjs/tests.js"
+	debug: true
+
+	webpackDev("webpack:tests", config, callback)
+
+
+################################################################################
+# Utilities
+
+log = (task, args...) ->
+	gutil.log "[#{gutil.colors.yellow(task)}]", args...
+
+command = (cmd, cb) ->
+	exec cmd, {cwd: __dirname}, (err, stdout, stderr) ->
+		cb?(null, stdout.split('\n').join(''))
+
+webpackDev = (name, config, callback) ->
+	webpackDev._instances ?= {}
+	webpackDev._instances[name] ?= webpack(_.clone(config))
+	webpackBuilder = webpackDev._instances[name]
+	webpackBuilder.run (err, stats) ->
+		throw new gutil.PluginError("#{name}", err) if (err)
+		log name, gutil.colors.green("All ok")
+		callback()
+
+versionInfo = (callback) ->
+	async.series [
+		(cb) -> command("git rev-parse --abbrev-ref HEAD", cb) # branch
+		(cb) -> command("git describe --always --dirty", cb) # hash
+		(cb) -> command("git rev-list --count HEAD", cb) # build
+	], (err, results) ->
+		callback
+			branch: results[0]
+			hash: results[1]
+			build: results[2]
+			date: Math.floor(Date.now() / 1000)
