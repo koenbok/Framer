@@ -123,9 +123,6 @@ class exports.NavComponent extends Layer
 		@_stack = []
 		@_current = null
 
-		@animationOptions =
-			curve: "spring(600, 62, 0)"
-
 		@background = new Layer
 			name: "background"
 			parent: @

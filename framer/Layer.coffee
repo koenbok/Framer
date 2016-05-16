@@ -1153,7 +1153,7 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## HINT
 
-	_showHint: ->
+	_showHint: (targetLayer) ->
 
 		# If this layer isnt visible we can just exit
 		return if not @visible
@@ -1166,9 +1166,9 @@ class exports.Layer extends BaseClass
 		return if @rotationZ isnt 0
 
 		# If we don't need to show a hint exit but pass to children
-		unless @shouldShowHint()
-			_.invoke(@children, "_showHint")
-			return
+		unless @shouldShowHint(targetLayer)
+			layer._showHint(targetLayer) for layer in @children
+			return null
 
 		# Figure out the frame we want to show the hint in, if any of the
 		# parent layers clip, we need to intersect the rectangle with it.
@@ -1186,8 +1186,22 @@ class exports.Layer extends BaseClass
 		# Tell the children to show their hints
 		_.invoke(@children, "_showHint")
 
-	shouldShowHint: ->
-		return false if @isAnimating is true
+
+	shouldShowHint: (targetLayer) ->
+
+		return false if @isAnimating
+
+		for parent in @ancestors()
+			return false if parent.isAnimating
+
+		if @_draggable
+
+			if @ is targetLayer and @_draggable.isDragging is false
+				return false
+
+			if @_draggable.horizontal is false and @_draggable.vertical is false
+				return false
+
 		return true if @ignoreEvents is false
 		return false
 

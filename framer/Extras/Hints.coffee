@@ -21,7 +21,7 @@ class Hints
 		layer = Framer.CurrentContext.layerForElement(@_target)
 
 		# If this is a layer with interaction, we do not show any hints
-		if layer and layer.shouldShowHint()
+		if layer and layer.shouldShowHint(layer)
 			return
 
 		@showHints()
