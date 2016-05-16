@@ -1220,6 +1220,10 @@ class exports.Layer extends BaseClass
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 1
 
+		if @_draggable
+			layer.backgroundColor = null
+			layer.borderWidth = 8
+
 		animation = layer.animate
 			properties:
 				opacity: 0
