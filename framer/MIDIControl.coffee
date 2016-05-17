@@ -1,8 +1,9 @@
+{_}         = require "./Underscore"
 {BaseClass} = require "./BaseClass"
 {Events}    = require "./Events"
 {MIDIInput} = require "./MIDIInput"
 
-Events.MIDIControlChange = "MIDIControlChange"
+Events.MIDIControlValueChange = "MIDIControlValueChange"
 
 class MIDIControl extends BaseClass
 
@@ -10,37 +11,43 @@ class MIDIControl extends BaseClass
   @define "max", @simpleProperty("max", 127)
   @define "control", @simpleProperty("control", null)
   @define "channel", @simpleProperty("channel", null)
-  @define "source", @simpleProperty("source", null)
+  # Not supported yet, needs MIDIInput that opens all inputs
+  # @define "source", @simpleProperty("source", null)
 
   constructor: (options={}) ->
     super options
 
-    # TODO
-    # - [ ] Listen to raw MIDIInput, do note/control recognition here to clean up code
-    # - [ ] Rething event names
-    # - [ ] Make MIDIInput pass source
-
     MIDIInput.enabled = true
-    MIDIInput.onNoteOn (note, velocity, channel, source) =>
-      return if @source? and @source isnt source
+    MIDIInput.onCommand (timeStamp, data) =>
+      [b1, b2, b3] = data
+
+      # Mask the bytes to get the info we want
+      command = b1 & 0xf0
+      channel = (b1 & 0x0f) + 1 # 1-16
+      data1 = b2 & 0x7f
+      data2 = b3 & 0x7f
+
+      # 0xb0 control change
+      # 0x90 note on
+      # 0x80 note off
+
+      return unless command in [0xb0, 0x90, 0x80]
       return if @channel? and @channel isnt channel
-      return if @control? and @control isnt note
-      @emit(Events.MIDIControlChange, @_modulate(value), {velocity: velocity, channel: channel, source: source})
-    MIDIInput.onNoteOff (note, velocity, channel, source) =>
-      return if @source? and @source isnt source
-      return if @channel? and @channel isnt channel
-      return if @control? and @control isnt note
-      @emit(Events.MIDIControlChange, @_modulate(value), {velocity: velocity, channel: channel, source: source})
-    MIDIInput.onControlChange (control, value, channel, source) =>
-      return if @source? and @source isnt source
-      return if @channel? and @channel isnt channel
-      return if @control? and @control isnt control
-      @emit(Events.MIDIControlChange, @_modulate(value), {channel: channel, source: source})
+      return if @control? and @control isnt data1
+
+      info =
+        channel: channel
+        control: data1
+
+      if command in [0x90, 0x80]
+        info = _.defaults info
+          type: "note"
+
+      @emit(Events.MIDIControlValueChange, @_modulate(data2), info)
 
   _modulate: (value) ->
     Utils.modulate(value, [0, 127], [@min, @max])
 
-  # XXX This is too close to "change:", might be confusing? Use ValueChange?
-  onChange: (cb) -> @on(Events.MIDIControlChange, cb)
+  onValueChange: (cb) -> @on(Events.MIDIControlValueChange, cb)
 
 exports.MIDIControl = MIDIControl
