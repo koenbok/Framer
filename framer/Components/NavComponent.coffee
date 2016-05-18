@@ -27,9 +27,6 @@ class exports.NavComponent extends Layer
 			backgroundColor: "black"
 			visible: false
 
-		@background.onTap =>
-			@back()
-
 		# Screen.onEdgeSwipeLeftEnd (e) =>
 		# 	@back()
 
@@ -58,11 +55,13 @@ class exports.NavComponent extends Layer
 
 		layer.point = Utils.pointZero()
 
-		scroll = ScrollComponent.wrap(layer)
+		scroll = new ScrollComponent
+		scroll.name = "scroll"
 		scroll.size = @size
 		scroll.backgroundColor = @backgroundColor
 		scroll.scrollHorizontal = layer.width > @width
 		scroll.scrollVertical = layer.height > @height
+		layer.parent = scroll.content
 
 		layer[NavComponentLayerScrollKey] = scroll
 
@@ -96,16 +95,17 @@ class exports.NavComponent extends Layer
 
 		@_stack.push({layer:layer, transition:transition})
 
-	dialog: (layer)->
+	dialog: (layer) ->
 		@push(layer, Transitions.dialog, true, false)
 
-	modal: (layer)->
+	modal: (layer) ->
 		@push(layer, Transitions.modal, true, false)
 
-	back: ->
+	back: =>
 		return unless @previous
 		previous = @_stack.pop()
 		previous?.transition.back()
+		@emit("back")
 
 	@define "stack",
 		get: -> _.clone(@_stack)
