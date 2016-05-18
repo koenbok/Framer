@@ -430,7 +430,7 @@ class exports.Layer extends BaseClass
 
 	contentFrame: ->
 		return {x:0, y:0, width:0, height:0} unless @children.length
-		Utils.frameMerge(_.pluck(@children, "frame"))
+		Utils.frameMerge(_.map(@children, "frame"))
 
 	centerFrame: ->
 		# Get the centered frame for its parent
@@ -871,9 +871,10 @@ class exports.Layer extends BaseClass
 		animation
 
 	animations: ->
+
 		# Current running animations on this layer
 		_.filter @_context.animations, (animation) =>
-			animation.options.layer == @
+			animation.options.layer is @
 
 	animatingProperties: ->
 
@@ -891,7 +892,7 @@ class exports.Layer extends BaseClass
 		get: -> @animations().length isnt 0
 
 	animateStop: ->
-		_.invoke(@animations(), "stop")
+		_.invokeMap(@animations(), "stop")
 		@_draggable?.animateStop()
 
 	##############################################################
@@ -1189,7 +1190,7 @@ class exports.Layer extends BaseClass
 		@showHint(frame)
 
 		# Tell the children to show their hints
-		_.invoke(@children, "_showHint")
+		_.invokeMap(@children, "_showHint")
 
 
 	shouldShowHint: (targetLayer) ->

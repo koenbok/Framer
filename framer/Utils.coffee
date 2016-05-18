@@ -41,7 +41,7 @@ Utils.valueOrDefault = (value, defaultValue) ->
 	return value
 
 Utils.arrayNext = (arr, item) ->
-	arr[arr.indexOf(item) + 1] or _.first arr
+	arr[arr.indexOf(item) + 1] or _.head arr
 
 Utils.arrayPrev = (arr, item) ->
 	arr[arr.indexOf(item) - 1] or _.last arr
@@ -152,7 +152,7 @@ Utils.randomImage = (layer, offset=50) ->
 	layer ?= {width:800, height:600}
 	photos = ["1431321346354-f4ebb847aec2", "1444581322113-8d24214367f5", "1423161052587-268d35ba36c1", "1449792893722-936641bb3309", "1450816800445-e6af7bc1d551", "1449247666642-264389f5f5b1", "1422224832140-0e546210efc3", "1431882697221-ccdceda3a7d7", "1458322493962-69c5a4ef7ddf", "1416888183170-a2d302d2dd9a", "1451774274055-572a3d080b4c", "1432071375803-08a3f5fd224f", "1421984533655-fb09cf32c582", "1462726609895-1a4312a128d2", "1415827007927-b636e96fec40", "1433770082169-c9bfaf2c323f", "1434682881908-b43d0467b798", "1415615693107-186d0530528c", "1428190318100-06790c8b2e5a", "1440631374394-b506a0b943fc", "1455383333344-451b6147021b", "1435639752581-e5303efb9c80", "1443013821590-023530afbfad", "1429681601148-75510b2cef43", "1423655156442-ccc11daa4e99", "1441057206919-63d19fac2369", "1460395966576-cf26ecd6ce4c", "1440227537815-f4476b789291", "1440508974790-c862e47993d4", "1462841764092-352b1d22ced3", "1416879595882-3373a0480b5b", "1441443911957-90578cec1616"]
 	photo = Utils.randomChoice(photos)
-	photo = photos[(layer.id + offset) % photos.length] if layer.id
+	photo = photos[(layer.id + offset) % photos.length - 1] if layer.id
 
 	width = Utils.round(layer.width, 0, 100, 100)
 	height = Utils.round(layer.height, 0, 100, 100)
@@ -230,7 +230,7 @@ Utils.inspect = (item, max=5, l=0) ->
 		code = item.toString()["function ".length..].replace(/\n/g, "").replace(/\s+/g, " ")
 		# We limit the size of a function body if it's in a strucutre
 		limit = 50
-		code = "#{_.trimRight(code[..limit])}… }" if code.length > limit and l > 0
+		code = "#{_.trimEnd(code[..limit])}… }" if code.length > limit and l > 0
 		return "<Function #{code}>"
 	if _.isArray(item)
 		return "[...]" if l > max
@@ -477,7 +477,7 @@ Utils.parseFunction = (str) ->
 
 	if _.endsWith str, ")"
 		result.name = str.split("(")[0]
-		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.trimRight(a, ")"))
+		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.trimEnd(a, ")"))
 	else
 		result.name = str
 
@@ -811,8 +811,8 @@ Utils.pointsFromFrame = (frame) ->
 
 Utils.frameFromPoints = (points) ->
 
-	xValues = _.pluck(points, "x")
-	yValues = _.pluck(points, "y")
+	xValues = _.map(points, "x")
+	yValues = _.map(points, "y")
 
 	minX = _.min(xValues)
 	maxX = _.max(xValues)

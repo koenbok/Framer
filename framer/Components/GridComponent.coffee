@@ -96,7 +96,7 @@ class exports.GridComponent extends Layer
 		Utils.labelLayer(cell, "#{row}:#{column}")
 
 	_reset: ->
-		_.invoke(@cells, "destroy")
+		_.invokeMap(@cells, "destroy")
 		@_cells = {}
 
 	# copy: ->

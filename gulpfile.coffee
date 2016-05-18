@@ -25,7 +25,7 @@ WEBPACK =
 ################################################################################
 # Gulp tasks
 
-gulp.task "watch", ["test"], ->
+gulp.task "watch", ["webpack:debug"], ->
 	gulp.watch(["./*.coffee", "framer/**", "test/tests/**", "!Version.coffee"], ["test"])
 
 gulp.task "test", ["webpack:tests"], ->
@@ -65,10 +65,10 @@ gulp.task "version", (callback) ->
 gulp.task "webpack:debug", ["version"], (callback) ->
 
 	config = _.extend WEBPACK,
+		debug: true
 		output:
 			filename: "build/framer.debug.js"
 			sourceMapFilename: "[file].map?hash=[hash]"
-		debug: true
 
 	webpackDev "webpack:debug", config, ->
 		command "cp build/framer.debug.* extras/Studio.framer/framer/"
