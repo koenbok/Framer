@@ -14,6 +14,9 @@ chai.config.showDiff = true
 mocha.setup({ui:"bdd", bail:true, reporter:"dot"})
 mocha.globals(["__import__"])
 
+window.print = (args...) ->
+	console.log "\n»", args.map((obj) -> Utils.inspect(obj)).join(", ")
+
 require "./tests/AlignTest"
 require "./tests/EventEmitterTest"
 require "./tests/UtilsTest"
