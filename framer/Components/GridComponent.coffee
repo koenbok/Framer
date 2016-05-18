@@ -40,7 +40,7 @@ class exports.GridComponent extends Layer
 			@render()
 
 	@define "cellWidth",
-		get: -> (@width - (@spacing.horizontal * (@columns - 1))) / @columns 
+		get: -> (@width - (@spacing.horizontal * (@columns - 1))) / @columns
 
 	@define "cellHeight",
 		get: -> (@height - (@spacing.vertical * (@rows - 1))) / @rows
@@ -75,16 +75,10 @@ class exports.GridComponent extends Layer
 		
 		for row in [@rows-1..0]
 			for column in [@columns-1..0]
-					
-				frame =
-					x: @cellX(column)
-					y: @cellY(row)
-					width: @cellWidth
-					height: @cellHeight
 
 				cell = new Layer
 					parent: @
-					frame: frame
+					frame: @cellFrame(column, row)
 					name: "Cell #{column}:#{row}"
 					
 				@renderCell(cell, row, column)
