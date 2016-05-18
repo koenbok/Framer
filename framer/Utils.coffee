@@ -149,15 +149,25 @@ Utils.randomNumber = (a=0, b=1) ->
 
 Utils.randomImage = (layer, offset=50) ->
 
-	layer ?= {width:800, height:600}
-	photos = ["1431321346354-f4ebb847aec2", "1444581322113-8d24214367f5", "1423161052587-268d35ba36c1", "1449792893722-936641bb3309", "1450816800445-e6af7bc1d551", "1449247666642-264389f5f5b1", "1422224832140-0e546210efc3", "1431882697221-ccdceda3a7d7", "1458322493962-69c5a4ef7ddf", "1416888183170-a2d302d2dd9a", "1451774274055-572a3d080b4c", "1432071375803-08a3f5fd224f", "1421984533655-fb09cf32c582", "1462726609895-1a4312a128d2", "1415827007927-b636e96fec40", "1433770082169-c9bfaf2c323f", "1434682881908-b43d0467b798", "1415615693107-186d0530528c", "1428190318100-06790c8b2e5a", "1440631374394-b506a0b943fc", "1455383333344-451b6147021b", "1435639752581-e5303efb9c80", "1443013821590-023530afbfad", "1429681601148-75510b2cef43", "1423655156442-ccc11daa4e99", "1441057206919-63d19fac2369", "1460395966576-cf26ecd6ce4c", "1440227537815-f4476b789291", "1440508974790-c862e47993d4", "1462841764092-352b1d22ced3", "1416879595882-3373a0480b5b", "1441443911957-90578cec1616"]
+	if _.isNumber(layer)
+		layer = {id: layer}
+
+	photos = ["1417733403748-83bbc7c05140", "1423841265803-dfac59ebf718", "1463560018368-0814042d17b7", "1433689056001-018e493576bc", "1430812411929-de4cf1d1fe73", "1457269449834-928af64c684d", "1443616839562-036bb2afd9a2", "1461535676131-2de1f7054d3f", "1462393582935-1ac76b85dcf1", "1414589530802-cb54ce0575d9", "1422908132590-117a051fc5cd", "1438522014717-d7ce32b9bab9", "1451650804883-52fb86cc5b18", "1462058164249-2dcdcda67ce7", "1456757014009-0614a080ff7f", "1434238255348-4fb0d9caa0a4", "1448071792026-7064a01897e7", "1458681842652-019f4eeda5e5", "1460919920543-d8c45f4bd621", "1447767961238-038617b84a2b", "1449089299624-89ce41e8306c", "1414777410116-81e404502b52", "1433994349623-0a18966ee9c0", "1452567772283-91d67178f409", "1458245229726-a8ba04cb5969", "1422246719650-cb30d19825e3", "1417392639864-2c88dd07f460", "1442328166075-47fe7153c128", "1448467258552-6b3982373a13", "1447023362548-250f3a7b80ed", "1451486242265-24b0c0ef9a51", "1414339372428-797ec111646d"]
 	photo = Utils.randomChoice(photos)
-	photo = photos[(layer.id + offset) % photos.length - 1] if layer.id
+	photo = photos[(layer.id) % photos.length] if layer.id
 
-	width = Utils.round(layer.width, 0, 100, 100)
-	height = Utils.round(layer.height, 0, 100, 100)
+	increment = 100
 
-	return "https://images.unsplash.com/photo-#{photo}?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&w=#{width}&h=#{height}&fit=max"
+	size = Math.max(layer.width, layer.height) or 1024
+	size = Math.ceil(size / increment) * increment
+	size = increment if size < increment
+	size = Utils.devicePixelRatio() * size
+	size = parseInt(size)
+
+	# width = Utils.round(layer.width, 0, 100, 100)
+	# height = Utils.round(layer.height, 0, 100, 100)
+
+	return "https://images.unsplash.com/photo-#{photo}?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&w=#{size}&h=#{size}&fit=max"
 
 Utils.defineEnum = (names = [], offset = 0, geometric = 0) ->
 	# TODO: What is this doing here?
