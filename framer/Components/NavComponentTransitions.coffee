@@ -43,6 +43,7 @@ class NavComponentBackgroundTransition
 	forward: (animate=true) ->
 
 		@background?.placeBehind(@layerB)
+		@background.on(Events.Tap, @navComponent.back)
 
 		@statesB?.animationOptions.animate = animate
 		@statesB?.switchInstant("a")
@@ -54,6 +55,8 @@ class NavComponentBackgroundTransition
 
 	back: (animate=true) ->
 
+		@background?.off(Events.Tap, @navComponent.back)
+
 		@statesB?.animationOptions.animate = animate
 		@statesB?.switch("a")
 
@@ -61,6 +64,7 @@ class NavComponentBackgroundTransition
 		@statesBackground?.switch("a")
 		@statesBackground?.once Events.StateDidSwitch, =>
 			@background?.visible = false
+			@layerB.visible = false
 
 class NavComponentDialogTransition extends NavComponentBackgroundTransition
 
@@ -76,8 +80,15 @@ class NavComponentDialogTransition extends NavComponentBackgroundTransition
 				b:
 					scale: 1
 					opacity: 1
-			@statesB.animationOptions =
-				curve: "spring(800,28,0)"
+
+			@statesB.on Events.StateWillSwitch, (from, to) =>
+				if to is "b"
+					@statesB.animationOptions =
+						curve: "spring(800,28,0)"
+				if to is "a"
+					@statesB.animationOptions =
+						curve: "ease-out"
+						time: 0.15
 
 		if @navComponent.background
 			@background = @navComponent.background
