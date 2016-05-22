@@ -4,6 +4,7 @@ Utils = require "../Utils"
 {LayerStates} = require "../LayerStates"
 
 
+
 class NavComponentTransition
 
 	constructor: (@navComponent, @layerA, @layerB) ->
@@ -23,19 +24,24 @@ class NavComponentTransition
 		@animationOptions =
 			curve: "spring(300,35,0)"
 
-	forward: (animate=true) ->
+	forward: (animate=true, callback) ->
 		options = _.extend(@animationOptions, {animate:animate})
 		@statesA?.switch("a", options)
 		@statesB?.switchInstant("b")
 		@statesB?.switch("a", options)
 		@statesB?.once Events.StateDidSwitch, =>
 			@layerA?.visible = false
+			callback?()
 
-	back: (animate=true) ->
+	back: (animate=true, callback) ->
 		options = _.extend(@animationOptions, {animate:animate})
 		@layerA?.visible = true
 		@statesA?.switch("b", options)
 		@statesB?.switch("b", options)
+		
+		f = Utils.callAfterCount(2, callback)
+		@statesA?.once(Events.StateDidSwitch, f)
+		@statesB?.once(Events.StateDidSwitch, f)
 
 
 class NavComponentBackgroundTransition

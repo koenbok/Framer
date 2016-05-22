@@ -1,10 +1,16 @@
 Utils = require "../Utils"
 
 {Layer} = require "../Layer"
+{Events} = require "../Events"
 {LayerStates} = require "../LayerStates"
 Transitions = require "./NavComponentTransitions"
 
 NavComponentLayerScrollKey = "_navComponentWrapped"
+
+Events.TransitionStart = "transitionstart"
+Events.TransitionEnd = "transitionend"
+Events.Forward = "forward"
+Events.Back = "back"
 
 class exports.NavComponent extends Layer
 
@@ -13,7 +19,7 @@ class exports.NavComponent extends Layer
 		options = _.defaults options,
 			width: Screen.width
 			height: Screen.height
-			backgroundColor: "black"
+			backgroundColor: "white"
 
 		super options
 
@@ -73,7 +79,7 @@ class exports.NavComponent extends Layer
 
 	push: (layer, TransitionType, animate, wrap) ->
 
-		return unless layer
+		throw new Error "NavComponent.push expects a layer" unless layer
 		return if layer is @current
 
 		# Set the default values
@@ -91,21 +97,23 @@ class exports.NavComponent extends Layer
 		wrappedLayer.parent = @
 
 		transition = new TransitionType(@, @_wrappedLayer(@current), wrappedLayer)
-		transition.forward(animate)
-
+		@_runTransition(transition, "forward", animate, @current, layer)
 		@_stack.push({layer:layer, transition:transition})
 
-	dialog: (layer) ->
-		@push(layer, Transitions.dialog, true, false)
+	dialog: (layer, animate) ->
+		@push(layer, Transitions.dialog, animate, false)
 
-	modal: (layer) ->
-		@push(layer, Transitions.modal, true, false)
+	modal: (layer, animate) ->
+		@push(layer, Transitions.modal, animate, false)
 
-	back: =>
+	back: (animate=true) =>
 		return unless @previous
+		#return if @isTransitioning
 		previous = @_stack.pop()
-		previous?.transition.back()
-		@emit("back")
+		@_runTransition(previous?.transition, "back", animate, @current, previous.layer)
+
+	@define "isTransitioning",
+		get: -> @_isTransitioning
 
 	@define "stack",
 		get: -> _.clone(@_stack)
@@ -115,3 +123,14 @@ class exports.NavComponent extends Layer
 
 	@define "previous",
 		get: -> return @_stack[@_stack.length - 2]?.layer
+
+	_runTransition: (transition, direction, animate, from, to) =>
+		
+		@_isTransitioning = true
+		@emit(Events.TransitionStart, from, to, direction)
+		@emit(direction, from, to)
+		
+		transition[direction] animate, =>
+			@_isTransitioning = false
+			@emit(Events.TransitionEnd, from, to, direction)
+			@emit(direction, from, to)
