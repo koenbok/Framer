@@ -43,14 +43,17 @@ bottom = (layer, property, offset=0) ->
 	return parent.height - (2 * borderWidth) - layer.height + offset
 
 # Helper to see if we are dealing with a function or result of a function
-wrapper = (f) ->
-	return (a, b) ->
+wrapper = (f, name) ->
+	align = (a, b) ->
 		return ((l, p) -> f(l, p, a)) if not a? or _.isNumber(a)
 		return f(a, b, 0)
+	align.toInspect = ->
+		return "Align.#{name}"
+	return align
 
 exports.Align =
-	center: wrapper(center)
-	left: wrapper(left)
-	right: wrapper(right)
-	top: wrapper(top)
-	bottom: wrapper(bottom)
+	center: wrapper(center, "center")
+	left: wrapper(left, "left")
+	right: wrapper(right, "right")
+	top: wrapper(top, "top")
+	bottom: wrapper(bottom, "bottom")
