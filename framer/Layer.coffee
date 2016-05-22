@@ -33,7 +33,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 		set: (value) ->
 
-			# console.log "Layer.#{name}.set #{value} current:#{@[name]}"
+			# console.log "#{@constructor.name}.#{name}.set #{value} current:#{@[name]}"
 
 			# Convert the value
 			value = transformer(value, @, name) if transformer
@@ -1192,18 +1192,26 @@ class exports.Layer extends BaseClass
 		# Tell the children to show their hints
 		_.invokeMap(@children, "_showHint")
 
+	willSeemToDoSomething: (targetLayer) ->
+
+		if @ignoreEvents
+			return false
+
+		if @_draggable
+			
+			if @_draggable.isDragging is false and @_draggable.isMoving is false
+				return false
+
+		return true
 
 	shouldShowHint: (targetLayer) ->
 
-		return false if @isAnimating
+		# return false if @isAnimating
 
-		for parent in @ancestors()
-			return false if parent.isAnimating
+		# for parent in @ancestors()
+		# 	return false if parent.isAnimating
 
 		if @_draggable
-
-			if @ is targetLayer and @_draggable.isDragging is false
-				return false
 
 			if @_draggable.horizontal is false and @_draggable.vertical is false
 				return false
@@ -1221,9 +1229,9 @@ class exports.Layer extends BaseClass
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 1
 
-		if @_draggable
-			layer.backgroundColor = null
-			layer.borderWidth = 8
+		# if @_draggable
+		# 	layer.backgroundColor = null
+		# 	layer.borderWidth = 8
 
 		animation = layer.animate
 			properties:
