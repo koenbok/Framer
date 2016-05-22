@@ -292,6 +292,12 @@ Utils.cycle = ->
 # Backwards compatibility
 Utils.toggle = Utils.cycle
 
+Utils.callAfterCount = (total, callback) ->
+	# This calls a function after this method is called total times
+	count = 0
+	return callAfterCount = ->
+		count += 1
+		callback?() if count is total
 
 ######################################################
 # ENVIROMENT FUNCTIONS
