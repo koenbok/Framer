@@ -19,7 +19,7 @@ class exports.NavComponent extends Layer
 		options = _.defaults options,
 			width: Screen.width
 			height: Screen.height
-			backgroundColor: "white"
+			backgroundColor: "black"
 
 		super options
 
