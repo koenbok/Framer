@@ -9,6 +9,7 @@ Framer.Color = (require "./Color").Color
 Framer.Layer = (require "./Layer").Layer
 Framer.BackgroundLayer = (require "./BackgroundLayer").BackgroundLayer
 Framer.VideoLayer = (require "./VideoLayer").VideoLayer
+Framer.SVGLayer = (require "./SVGLayer").SVGLayer
 Framer.Events = (require "./Events").Events
 Framer.Gestures = (require "./Gestures").Gestures
 Framer.Animation = (require "./Animation").Animation
@@ -25,6 +26,7 @@ Framer.SliderComponent = (require "./Components/SliderComponent").SliderComponen
 Framer.DeviceComponent = (require "./Components/DeviceComponent").DeviceComponent
 Framer.GridComponent = (require "./Components/GridComponent").GridComponent
 Framer.NavComponent = (require "./Components/NavComponent").NavComponent
+Framer.CircularProgressComponent = (require "./Components/CircularProgressComponent").CircularProgressComponent
 Framer.DeviceView = Framer.DeviceComponent # Compat
 
 _.extend(window, Framer) if window
