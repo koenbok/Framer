@@ -29,14 +29,12 @@ framer/backup.coffee
 framer/backups
 framer/backups/*
 framer/.*.hash
-framer/images/*
-framer/framer*.js
-framer/framer*.js.map
-
 framer/manifest.txt
 framer/preview.png
 
 
-
-
+app.js
+framer/images/*
+framer/framer*.js
+framer/framer*.js.map
 imported

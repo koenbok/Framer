@@ -55,6 +55,7 @@ class exports.Animation extends BaseClass
 			delay: 0
 			debug: false
 			colorModel: "husl"
+			animate: true
 
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
@@ -139,11 +140,15 @@ class exports.Animation extends BaseClass
 				@_repeatCounter--
 				@start()
 
+		# If animate is false we set everything immediately and skip the actual animation
+		start = @_start
+		start = @_instant if @options.animate is false
+
 		# If we have a delay, we wait a bit for it to start
 		if @options.delay
-			Utils.delay(@options.delay, @_start)
+			Utils.delay(@options.delay, start)
 		else
-			@_start()
+			start()
 
 		return true
 
@@ -176,6 +181,13 @@ class exports.Animation extends BaseClass
 	animatingProperties: ->
 		_.keys(@_stateA)
 
+	_instant: =>
+		@emit("start")
+		@_prepareUpdateValues()
+		@_updateValues(1)
+		@emit("end")
+		@emit("stop")
+
 	_start: =>
 		@options.layer.context.addAnimation(@)
 		@emit("start")
@@ -183,14 +195,8 @@ class exports.Animation extends BaseClass
 
 		# Figure out what kind of values we have so we don't have to do it in
 		# the actual update loop. This saves a lot of frame budget.
+		@_prepareUpdateValues()
 
-		@_valueUpdaters = {}
-	
-		for k, v of @_stateB
-			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
-				@_valueUpdaters[k] = @_updateColorValue
-			else
-				@_valueUpdaters[k] = @_updateNumberValue
 
 	_update: (delta) =>
 		if @_animator.finished()
@@ -200,6 +206,15 @@ class exports.Animation extends BaseClass
 			@emit("stop")
 		else
 			@_updateValues(@_animator.next(delta))
+
+	_prepareUpdateValues: =>
+		@_valueUpdaters = {}
+	
+		for k, v of @_stateB
+			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
+				@_valueUpdaters[k] = @_updateColorValue
+			else
+				@_valueUpdaters[k] = @_updateNumberValue
 
 	_updateValues: (value) =>
 		@_valueUpdaters[k](k, value) for k, v of @_stateB

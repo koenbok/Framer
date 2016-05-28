@@ -63,7 +63,7 @@ class exports.PageComponent extends ScrollComponent
 
 		layers = Utils.frameSortByAbsoluteDistance(point, layers, @originX, @originY)
 
-		return _.first(layers)
+		return _.head(layers)
 
 	snapToPage: (page, animate=true, animationOptions=null) ->
 		@scrollToLayer(page, @originX, @originY, animate, animationOptions)

@@ -902,7 +902,7 @@ describe "Layer", ->
 			inputElements = layer.querySelectorAll("input")
 			inputElements.length.should.equal 1
 
-			inputElement = _.first(inputElements)
+			inputElement = _.head(inputElements)
 			inputElement.getAttribute("id").should.equal "hello"
 
 	describe "Force 2D", ->

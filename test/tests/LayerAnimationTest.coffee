@@ -452,3 +452,25 @@ describe "LayerAnimation", ->
 
 				animation.start()
 				animation._animator.options.time.should.equal 2
+
+		describe "Instant", ->
+
+			it "should not animate if animate is disabled", ->
+
+				animation = new Animation
+					layer: @layer
+					properties: {x: 100}
+					curve: "spring"
+					time: 2
+					animate: false
+
+				calledEvents = []
+
+				["start", "stop", "end"].map (eventName) ->
+					animation.on eventName, ->
+						calledEvents.push(eventName)
+
+				animation.start()
+
+				@layer.x.should.equal 100
+				calledEvents.should.eql(["start", "end", "stop"])

@@ -33,7 +33,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 		set: (value) ->
 
-			# console.log "Layer.#{name}.set #{value} current:#{@[name]}"
+			# console.log "#{@constructor.name}.#{name}.set #{value} current:#{@[name]}"
 
 			# Convert the value
 			value = transformer(value, @, name) if transformer
@@ -95,6 +95,7 @@ class exports.Layer extends BaseClass
 		# Private setting for canceling of click event if wrapped in moved draggable
 		@_cancelClickEventInDragSession = true
 		@_cancelClickEventInDragSessionVelocity = 0.1
+		@_cancelClickEventInDragSessionOffset = 8
 
 		# We have to create the element before we set the defaults
 		@_createElement()
@@ -121,9 +122,15 @@ class exports.Layer extends BaseClass
 		else
 			@parent = options.parent
 
+		# Set some calculated properties
 		# Make sure we set the right index
 		if options.hasOwnProperty("index")
 			@index = options.index
+
+		# x and y always win from point, frame or size
+		for p in ["x", "y", "width", "height"]
+			if options.hasOwnProperty(p)
+				@[p] = options[p]
 
 		@_context.emit("layer:create", @)
 
@@ -231,12 +238,16 @@ class exports.Layer extends BaseClass
 	@define "name",
 		default: ""
 		get: ->
-			@_getPropertyValue "name"
+			name = @_getPropertyValue("name")
+			return name if name
+			# In Framer Studio, we can use the variable name
+			return @__framerInstanceInfo?.name or ""
+
 		set: (value) ->
-			@_setPropertyValue "name", value
+			@_setPropertyValue("name", value)
 			# Set the name attribute of the dom element too
 			# See: https://github.com/koenbok/Framer/issues/63
-			@_element.setAttribute "name", value
+			@_element.setAttribute("name", value)
 
 	##############################################################
 	# Matrices
@@ -419,7 +430,7 @@ class exports.Layer extends BaseClass
 
 	contentFrame: ->
 		return {x:0, y:0, width:0, height:0} unless @children.length
-		Utils.frameMerge(_.pluck(@children, "frame"))
+		Utils.frameMerge(_.map(@children, "frame"))
 
 	centerFrame: ->
 		# Get the centered frame for its parent
@@ -860,9 +871,10 @@ class exports.Layer extends BaseClass
 		animation
 
 	animations: ->
+
 		# Current running animations on this layer
 		_.filter @_context.animations, (animation) =>
-			animation.options.layer == @
+			animation.options.layer is @
 
 	animatingProperties: ->
 
@@ -880,7 +892,7 @@ class exports.Layer extends BaseClass
 		get: -> @animations().length isnt 0
 
 	animateStop: ->
-		_.invoke(@animations(), "stop")
+		_.invokeMap(@animations(), "stop")
 		@_draggable?.animateStop()
 
 	##############################################################
@@ -977,8 +989,12 @@ class exports.Layer extends BaseClass
 			if eventName in [Events.Click,
 				Events.Tap, Events.TapStart, Events.TapEnd,
 				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
-				if @_parentDraggableLayer()
-					velocity = @_parentDraggableLayer()?.draggable.velocity
+				parentDraggableLayer = @_parentDraggableLayer()
+				if parentDraggableLayer
+					offset = parentDraggableLayer.draggable.offset
+					return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
+					return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
+					velocity = parentDraggableLayer.draggable.velocity
 					return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
 					return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
 
@@ -1143,23 +1159,79 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## HINT
 
-	shouldShowHint: ->
+	_showHint: (targetLayer) ->
+
+		# If this layer isnt visible we can just exit
+		return if not @visible
+		return if @opacity is 0
+
+		# We do not support rotated layers
+		return if @rotation isnt 0
+		return if @rotationX isnt 0
+		return if @rotationY isnt 0
+		return if @rotationZ isnt 0
+
+		# If we don't need to show a hint exit but pass to children
+		unless @shouldShowHint(targetLayer)
+			layer._showHint(targetLayer) for layer in @children
+			return null
+
+		# Figure out the frame we want to show the hint in, if any of the
+		# parent layers clip, we need to intersect the rectangle with it.
+		frame = @canvasFrame
+
+		for parent in @ancestors(context=true)
+			if parent.clip
+				 frame = Utils.frameIntersection(frame, parent.canvasFrame)
+			if not frame
+				return
+
+		# Show the actual hint
+		@showHint(frame)
+
+		# Tell the children to show their hints
+		_.invokeMap(@children, "_showHint")
+
+	willSeemToDoSomething: (targetLayer) ->
+
+		if @ignoreEvents
+			return false
+
+		if @_draggable
+			
+			if @_draggable.isDragging is false and @_draggable.isMoving is false
+				return false
+
+		return true
+
+	shouldShowHint: (targetLayer) ->
+
+		# return false if @isAnimating
+
+		# for parent in @ancestors()
+		# 	return false if parent.isAnimating
+
+		if @_draggable
+
+			if @_draggable.horizontal is false and @_draggable.vertical is false
+				return false
+
 		return true if @ignoreEvents is false
 		return false
 
-	showHint: ->
+	showHint: (frame) ->
 
-		if not @shouldShowHint()
-			return _.invoke(@children, "showHint")
-
-		color = new Color(40, 175, 250)
-
+		# Start an animation with a blue rectangle fading out over time
 		layer = new Layer
-			frame: @canvasFrame
-			backgroundColor: new Color(40, 175, 250, 0.4)
-			borderColor: new Color("white").alpha(.5)
+			frame: frame
+			backgroundColor: new Color("9013FE").alpha(.5)
+			borderColor: new Color("460054").alpha(.5)
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 1
+
+		# if @_draggable
+		# 	layer.backgroundColor = null
+		# 	layer.borderWidth = 8
 
 		animation = layer.animate
 			properties:
@@ -1168,8 +1240,6 @@ class exports.Layer extends BaseClass
 
 		animation.onAnimationEnd ->
 			layer.destroy()
-
-		_.invoke(@children, "showHint")
 
 	##############################################################
 	## DESCRIPTOR

@@ -99,15 +99,22 @@ class exports.Context extends BaseClass
 		@_layers = []
 		@_layerCounter = 0
 
-	layerForElement: (element) ->
-		for layer in @_layers
-			return layer if layer._element is element
-		return null
-
 	layerForId: (layerId) ->
 		for layer in @_layers
 			return layer if layer.id is layerId
 		return null
+
+	_layerForElement: (element) ->
+		for layer in @_layers
+			return layer if layer._element is element
+		return null
+
+	layerForElement: (element) ->
+		# Returns the framer layer containing the element
+		return null unless element
+		layer = @_layerForElement(element)
+		return layer if layer
+		return @layerForElement(element.parentNode)
 
 	# Animations
 	@define "animations", get: -> _.clone(@_animations)

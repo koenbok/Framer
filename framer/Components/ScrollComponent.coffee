@@ -306,7 +306,7 @@ class exports.ScrollComponent extends Layer
 		return @closestContentLayerForScrollPoint(scrollPoint, originX, originY)
 
 	closestContentLayerForScrollPoint: (scrollPoint, originX=0, originY=0) ->
-		return _.first(@_contentLayersSortedByDistanceForScrollPoint(scrollPoint, originX, originY))
+		return _.head(@_contentLayersSortedByDistanceForScrollPoint(scrollPoint, originX, originY))
 
 	_scrollPointForLayer: (layer, originX=0, originY=0, clamp=true) ->
 		return Utils.framePointForOrigin(layer, originX, originY)
@@ -387,7 +387,7 @@ class exports.ScrollComponent extends Layer
 
 	copy: ->
 		copy = super
-		contentLayer = _.first(_.without(copy.children, copy.content))
+		contentLayer = _.head(_.without(copy.children, copy.content))
 		copy.setContentLayer(contentLayer)
 		copy.props = @props
 		return copy

@@ -41,7 +41,7 @@ Utils.valueOrDefault = (value, defaultValue) ->
 	return value
 
 Utils.arrayNext = (arr, item) ->
-	arr[arr.indexOf(item) + 1] or _.first arr
+	arr[arr.indexOf(item) + 1] or _.head arr
 
 Utils.arrayPrev = (arr, item) ->
 	arr[arr.indexOf(item) - 1] or _.last arr
@@ -149,14 +149,27 @@ Utils.randomNumber = (a=0, b=1) ->
 
 Utils.randomImage = (layer, offset=50) ->
 
-	layer ?= {width:800, height:600}
-	id = layer.id or Utils.round(Utils.randomNumber(0, 1000))
+	if _.isNumber(layer)
+		layer = {id: layer}
 
-	width = Utils.round(layer.width, 0, 100, 100)
-	height = Utils.round(layer.height, 0, 100, 100)
-	
-	# return "https://source.unsplash.com/category/nature/#{width}x#{height}"
-	return "https://unsplash.it/#{width}/#{height}?image=#{id + offset}"
+	photos = ["1417733403748-83bbc7c05140", "1423841265803-dfac59ebf718", "1463560018368-0814042d17b7", "1433689056001-018e493576bc", "1430812411929-de4cf1d1fe73", "1457269449834-928af64c684d", "1443616839562-036bb2afd9a2", "1461535676131-2de1f7054d3f", "1462393582935-1ac76b85dcf1", "1414589530802-cb54ce0575d9", "1422908132590-117a051fc5cd", "1438522014717-d7ce32b9bab9", "1451650804883-52fb86cc5b18", "1462058164249-2dcdcda67ce7", "1456757014009-0614a080ff7f", "1434238255348-4fb0d9caa0a4", "1448071792026-7064a01897e7", "1458681842652-019f4eeda5e5", "1460919920543-d8c45f4bd621", "1447767961238-038617b84a2b", "1449089299624-89ce41e8306c", "1414777410116-81e404502b52", "1433994349623-0a18966ee9c0", "1452567772283-91d67178f409", "1458245229726-a8ba04cb5969", "1422246719650-cb30d19825e3", "1417392639864-2c88dd07f460", "1442328166075-47fe7153c128", "1448467258552-6b3982373a13", "1447023362548-250f3a7b80ed", "1451486242265-24b0c0ef9a51", "1414339372428-797ec111646d"]
+	photo = Utils.randomChoice(photos)
+	photo = photos[(layer.id) % photos.length] if layer?.id
+
+	increment = 100
+	size = 1024
+
+	if layer
+		size = Math.max(layer.width, layer.height)
+		size = Math.ceil(size / increment) * increment
+		size = increment if size < increment
+		size = Utils.devicePixelRatio() * size
+		size = parseInt(size)
+
+	# width = Utils.round(layer.width, 0, 100, 100)
+	# height = Utils.round(layer.height, 0, 100, 100)
+
+	return "https://images.unsplash.com/photo-#{photo}?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&w=#{size}&h=#{size}&fit=max"
 
 Utils.defineEnum = (names = [], offset = 0, geometric = 0) ->
 	# TODO: What is this doing here?
@@ -229,7 +242,7 @@ Utils.inspect = (item, max=5, l=0) ->
 		code = item.toString()["function ".length..].replace(/\n/g, "").replace(/\s+/g, " ")
 		# We limit the size of a function body if it's in a strucutre
 		limit = 50
-		code = "#{_.trimRight(code[..limit])}… }" if code.length > limit and l > 0
+		code = "#{_.trimEnd(code[..limit])}… }" if code.length > limit and l > 0
 		return "<Function #{code}>"
 	if _.isArray(item)
 		return "[...]" if l > max
@@ -281,6 +294,12 @@ Utils.cycle = ->
 # Backwards compatibility
 Utils.toggle = Utils.cycle
 
+Utils.callAfterCount = (total, callback) ->
+	# This calls a function after this method is called total times
+	count = 0
+	return callAfterCount = ->
+		count += 1
+		callback?() if count is total
 
 ######################################################
 # ENVIROMENT FUNCTIONS
@@ -395,7 +414,7 @@ Utils.pathJoin = ->
 Utils.deviceFont = (os) ->
 
 	# https://github.com/jonathantneal/system-font-css
-	
+
 	if not os
 		os = "macos" if Utils.isMacOS()
 		os = "ios" if Utils.isIOS()
@@ -412,9 +431,9 @@ Utils.deviceFont = (os) ->
 # MATH FUNCTIONS
 
 Utils.round = (value, decimals=0, increment=null, min=null, max=null) ->
-	
+
 	d = Math.pow(10, decimals)
-	
+
 	value = Math.round(value / increment) * increment if increment
 	value = Math.round(value * d) / d
 
@@ -476,7 +495,7 @@ Utils.parseFunction = (str) ->
 
 	if _.endsWith str, ")"
 		result.name = str.split("(")[0]
-		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.trimRight(a, ")"))
+		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.trimEnd(a, ")"))
 	else
 		result.name = str
 
@@ -615,7 +634,7 @@ Utils.loadImage = (url, callback, context) ->
 # Point
 
 Utils.point = (input) ->
-	
+
 	return Utils.pointZero(input) if _.isNumber(input)
 	return Utils.pointZero() unless input
 
@@ -696,7 +715,7 @@ Utils.pointAngle = (pointA, pointB) ->
 # Size
 
 Utils.size = (input) ->
-	
+
 	return Utils.sizeZero(input) if _.isNumber(input)
 	return Utils.sizeZero() unless input
 
@@ -773,7 +792,7 @@ Utils.frameSetMaxY = (frame, value) ->
 	frame.y = if frame.height is 0 then 0 else value - frame.height
 
 Utils.frame = (input) ->
-	
+
 	return Utils.frameZero(input) if _.isNumber(input)
 	return Utils.frameZero() unless input
 
@@ -810,8 +829,8 @@ Utils.pointsFromFrame = (frame) ->
 
 Utils.frameFromPoints = (points) ->
 
-	xValues = _.pluck(points, "x")
-	yValues = _.pluck(points, "y")
+	xValues = _.map(points, "x")
+	yValues = _.map(points, "y")
 
 	minX = _.min(xValues)
 	maxX = _.max(xValues)
@@ -894,6 +913,32 @@ Utils.pointInPolygon = (point, vs) ->
 		j = i++
 	inside
 
+Utils.frameIntersection = (rectA, rect) ->
+
+	x1 = rect.x
+	y1 = rect.y
+
+	x2 = x1 + rect.width
+	y2 = y1 + rect.height
+
+	if rectA.x > x1
+		x1 = rectA.x
+	if rectA.y > y1
+		y1 = rectA.y
+	if rectA.x + rectA.width < x2
+		x2 = rectA.x + rectA.width
+	if rectA.y + rectA.height < y2
+		y2 = rectA.y + rectA.height
+	if x2 <= x1 or y2 <= y1
+		return null
+
+	return rect =
+		x: x1
+		y: y1
+		width: x2 - x1
+		height: y2 - y1
+
+
 Utils.frameCenterPoint = (frame) ->
 	return point =
 		x: Utils.frameGetMidX(frame)
@@ -920,7 +965,7 @@ Utils.rotationNormalizer = ->
 
 
 # Coordinate system
- 
+
 # convert a point from a layer to the context level, with rootContext enabled you can make it cross to the top context
 Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLayer=true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})

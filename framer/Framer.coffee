@@ -9,6 +9,7 @@ Framer.Color = (require "./Color").Color
 Framer.Layer = (require "./Layer").Layer
 Framer.BackgroundLayer = (require "./BackgroundLayer").BackgroundLayer
 Framer.VideoLayer = (require "./VideoLayer").VideoLayer
+Framer.SVGLayer = (require "./SVGLayer").SVGLayer
 Framer.Events = (require "./Events").Events
 Framer.Gestures = (require "./Gestures").Gestures
 Framer.Animation = (require "./Animation").Animation
@@ -24,6 +25,8 @@ Framer.PageComponent = (require "./Components/PageComponent").PageComponent
 Framer.SliderComponent = (require "./Components/SliderComponent").SliderComponent
 Framer.DeviceComponent = (require "./Components/DeviceComponent").DeviceComponent
 Framer.GridComponent = (require "./Components/GridComponent").GridComponent
+Framer.NavComponent = (require "./Components/NavComponent").NavComponent
+Framer.CircularProgressComponent = (require "./Components/CircularProgressComponent").CircularProgressComponent
 Framer.DeviceView = Framer.DeviceComponent # Compat
 
 _.extend(window, Framer) if window
@@ -56,11 +59,16 @@ Defaults = (require "./Defaults").Defaults
 Defaults.setup()
 Framer.resetDefaults = Defaults.reset
 
+# Create the default context
 Framer.DefaultContext = new Framer.Context(name:"Default")
 Framer.DefaultContext.backgroundColor = "white"
 Framer.CurrentContext = Framer.DefaultContext
 
 window.Canvas = new (require "./Canvas").Canvas
+
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
-Framer.Extras.ErrorDisplay.enable() if not Utils.isFramerStudio()
 Framer.Extras.TouchEmulator.enable() if not Utils.isTouch()
+Framer.Extras.Hints.enable() if not Utils.isFramerStudio()
+Framer.Extras.ErrorDisplay.enable() if not Utils.isFramerStudio()
+Framer.Extras.TouchEmulator.enable() if not Utils.isFramerStudio()
+Framer.Extras.Preloader.enable() if not Utils.isFramerStudio()

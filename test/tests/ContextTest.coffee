@@ -174,7 +174,7 @@ describe "Context", ->
 				layerD = new Layer
 
 				context.layers.should.eql [layerA, layerB, layerC, layerD]
-				_.invoke(context.layers, "destroy")
+				_.invokeMap(context.layers, "destroy")
 				context.layers.should.eql []
 
 		it "should list root layers", ->
