@@ -1,6 +1,6 @@
-
-
-
+if not Utils.isFramerStudio()
+	Framer.Extras.Preloader.enable()
+	Framer.Extras.Hints.enable()
 
 nav = new NavComponent
 
@@ -13,59 +13,16 @@ grid = new GridComponent
 nav.push(grid)
 
 grid.renderCell = (layer) ->
-	layer.image = Utils.randomImage(layer)
+	layer.image = Utils.randomImage(layer) + "?date=#{Date.now()}"
 
-# 	layer.onClick ->
-# 		
-# 		large = new Layer
-# 			size: Utils.frameInset(nav, 80)
-# 			image: @image
-# 					
-# 		large.onTap ->
-# 			nav.back()
-# 		
-# 		nav.modal(large)
-
-
-
-
-	
-# photo = new Layer
-# 	width: 1400
-# 	height: 933
-# 	image: "images/photo.jpg"
-# 
-# photo.draggable.enabled = true
-
-cover = new Layer
-	size: Screen
-	backgroundColor: Color.grey(0, 1)
-
-progress = new CircularProgressComponent
-	parent: cover
-	point: Align.center()
-
-
-progress.strokeWidth = 1
-# progress.railsColor = Color.grey(1, 1)
-# progress.progressColor = Color.grey(0, 0.5)
-
-imageLayers = _.filter Framer.CurrentContext.layers, (layer) ->
-	layer.image
-
-counter = 0
-
-for imageLayer in imageLayers
-	Utils.loadImage imageLayer.image, ->
-		counter += 1
-		progress.setProgress counter / imageLayers.length
+	layer.onClick ->
 		
+		large = new Layer
+			size: Utils.frameInset(nav, 80)
+			image: @image
+					
+		large.onTap ->
+			nav.back()
 		
-		
-		if counter is imageLayers.length
-			cover.destroy()
-# 			cover.animate
-# 				properties:
-# 					opacity: 0
-# 				time: 0.4
-# 				delay: 1.3
+		nav.modal(large)
+
