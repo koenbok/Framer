@@ -59,16 +59,16 @@ class exports.CircularProgressComponent extends SVGLayer
 			@circle.setAttribute("stroke-dasharray", strokeDashArray)
 			@circle.setAttribute("stroke-dashoffset", strokeDashOffset)
 
-	setProgress: (value, animated=true, animationOptions) ->
+	setProgress: (value, animated=true, animationOptions={}) ->
 		return @progress = value unless animated
 
-		# Use dynamic time relative to the delta in progress. Below is
-		# the maximum time to travel from 0 to 1.
-		maxTime = 0.25
+		# If no time was given we use a dynamic time based on the relative distance
+		# to animate based on the progress delta. The full circle time is 0.3 by default.
+		dynamicTime = Math.abs(@progress - value) * 0.3
 
-		animationOptions ?=
+		animationOptions = _.defaults animationOptions,
 			curve: "linear"
-			time: Math.abs(@progress - value) * maxTime
+			time: dynamicTime
 
 		animationOptions = _.extend animationOptions,
 			properties:
