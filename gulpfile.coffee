@@ -81,14 +81,12 @@ gulp.task "webpack:release", ["version"], (callback) ->
 			filename: "build/framer.js"
 			sourceMapFilename: "[file].map"
 			pathinfo: false
-
-		# Uglify is disabled because it messes up the source maps in Safari.
 		plugins: [
 			new webpack.optimize.DedupePlugin(),
-			# new webpack.optimize.UglifyJsPlugin({
-			# 	mangle: false,
-			# 	compress: {warnings: false}
-			# })
+			new webpack.optimize.UglifyJsPlugin({
+				mangle: false
+				compress: {warnings: true}
+			})
 		]
 
 	webpackDev("webpack:release", config, callback)
