@@ -997,7 +997,7 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 		else
 			parent = layer.parent or layer.context
 			node = parent._element
-		return webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y))
+		return Utils.point(webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y)))
 
 	ancestors = layer.ancestors(rootContext)
 	ancestors.reverse()
@@ -1024,7 +1024,7 @@ Utils.convertPoint = (input, layerA, layerB, rootContext=false) ->
 		return Utils.convertPointFromContext(point, layerB, rootContext)
 	else if layerA? and rootContext and webkitConvertPointFromPageToNode?
 		node = layerA.context._element
-		return webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y))
+		return Utils.point(webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y)))
 	else
 		return point
 
