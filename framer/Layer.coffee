@@ -477,26 +477,30 @@ class exports.Layer extends BaseClass
 	# 		return @_parentOrContext().screenOriginY()
 	# 	return @originY
 
-	canvasScaleX: ->
-		scale = @scale * @scaleX
+	canvasScaleX: (self=true) ->
+		scale = 1
+		scale = @scale * @scaleX if self
 		for parent in @ancestors(context=true)
 			scale = scale * parent.scale * parent.scaleX
 		return scale
 
-	canvasScaleY: ->
-		scale = @scale * @scaleY
+	canvasScaleY: (self=true) ->
+		scale = 1
+		scale = @scale * @scaleY if self
 		for parent in @ancestors(context=true)
 			scale = scale * parent.scale * parent.scaleY
 		return scale
 
-	screenScaleX: ->
-		scale = @scale * @scaleX
+	screenScaleX: (self=true) ->
+		scale = 1
+		scale = @scale * @scaleX if self
 		for parent in @ancestors(context=false)
 			scale = scale * parent.scale * parent.scaleX
 		return scale
 
-	screenScaleY: ->
-		scale = @scale * @scaleY
+	screenScaleY: (self=true) ->
+		scale = 1
+		scale = @scale * @scaleY if self
 		for parent in @ancestors(context=false)
 			scale = scale * parent.scale * parent.scaleY
 		return scale
