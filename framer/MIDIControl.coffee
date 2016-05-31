@@ -11,14 +11,14 @@ class MIDIControl extends BaseClass
 	@define "max", @simpleProperty("max", 127)
 	@define "control", @simpleProperty("control", null)
 	@define "channel", @simpleProperty("channel", null)
-	# Not supported yet, needs MIDIInput that opens all inputs
-	# @define "source", @simpleProperty("source", null)
+	@define "source", @simpleProperty("source", null)
 
 	constructor: (options={}) ->
 		super options
 
 		MIDIInput.enabled = true
-		MIDIInput.onCommand (timeStamp, data) =>
+		MIDIInput.onCommand (source, timeStamp, data) =>
+
 			[b1, b2, b3] = data
 
 			# Mask the bytes to get the info we want
@@ -32,10 +32,12 @@ class MIDIControl extends BaseClass
 			# 0x80 note off
 
 			return unless command in [0xb0, 0x90, 0x80]
+			return if @source? and @source isnt source
 			return if @channel? and @channel isnt channel
 			return if @control? and @control isnt data1
 
 			info =
+				source: source
 				channel: channel
 				control: data1
 
