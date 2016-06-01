@@ -22,6 +22,15 @@ class exports.Animator
 	finished: ->
 		throw Error "Not implemented"
 
+	values: (delta=1/60)->
+
+		values = []
+
+		while not @finished()
+			values.push(@next(delta))
+
+		return values
+
 
 	# start: -> Framer.Loop.on("update", )
 	# stop: -> AnimationLoop.remove @

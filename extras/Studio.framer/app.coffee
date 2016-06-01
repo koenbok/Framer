@@ -1,28 +1,19 @@
-if not Utils.isFramerStudio()
-	Framer.Extras.Preloader.enable()
-	Framer.Extras.Hints.enable()
+rk4 = new Framer.SpringRK4Animator
+	friction: 5
+	tension: 90
 
-nav = new NavComponent
+values = rk4.values(1/60*2)
 
-grid = new GridComponent
-	width: Screen.width * 2
-	height: Screen.height * 2
-	rows: 10
-	columns: 10
+# Draw a stupid graph
 
-nav.push(grid)
+graph = new Layer
+	point: Align.center
 
-grid.renderCell = (layer) ->
-	layer.image = Utils.randomImage(layer) + "?date=#{Date.now()}"
-
-	layer.onClick ->
+for index, value of values
+	new Layer
+		parent: graph
+		size: 6
+		borderRadius: 6
+		x: parseInt(index) * (graph.width / values.length)
+		y: value * (graph.height / 2)
 		
-		large = new Layer
-			size: Utils.frameInset(nav, 80)
-			image: @image
-					
-		large.onTap ->
-			nav.back()
-		
-		nav.modal(large)
-
