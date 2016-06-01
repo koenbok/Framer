@@ -76,9 +76,15 @@ class exports.GridComponent extends Layer
 		for row in [@rows-1..0]
 			for column in [@columns-1..0]
 
+				frame = @cellFrame(column, row)
+				# frame.x = Math.floor(frame.x)
+				# frame.y = Math.floor(frame.y)
+				# frame.width = Math.ceil(frame.width)
+				# frame.height = Math.ceil(frame.height)
+
 				cell = new Layer
 					parent: @
-					frame: @cellFrame(column, row)
+					frame: frame
 					name: "Cell #{column}:#{row}"
 					
 				@renderCell(cell, row, column)
@@ -86,7 +92,8 @@ class exports.GridComponent extends Layer
 				@_cells["#{column}:#{row}"] = cell
 
 	_defaultRenderCell: (cell, column, row) ->
-		cell.backgroundColor = Utils.randomColor()
+		fraction = ((column / @columns) + (row / @rows) / 2)
+		cell.backgroundColor = Color.mix("blue", "purple", fraction, true, "rgb")
 		Utils.labelLayer(cell, "#{row}:#{column}")
 
 	_reset: ->

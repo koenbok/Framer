@@ -618,7 +618,8 @@ stringToObject = (color) ->
 cssNames =
 	aliceblue:"f0f8ff"
 	antiquewhite:"faebd7"
-	aqua:"0ff",aquamarine:"7fffd4"
+	aqua:"0ff"
+	aquamarine:"7fffd4"
 	azure:"f0ffff"
 	beige:"f5f5dc"
 	bisque:"ffe4c4"
