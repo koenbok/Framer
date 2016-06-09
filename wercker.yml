@@ -1,4 +1,4 @@
-box: nolimitid/node-phantom
+box: tippiq/docker-wercker-build-nodejs
 
 build:
     steps:
