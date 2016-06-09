@@ -42,7 +42,7 @@ class MIDIControl extends BaseClass
 				control: data1
 
 			if command in [0x90, 0x80]
-				info = _.defaults info
+				info = _.defaults info,
 					type: "note"
 
 			@emit(Events.MIDIControlValueChange, @_modulate(data2), info)
