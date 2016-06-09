@@ -20,7 +20,7 @@ build:
 deploy:
     steps:
         - install-packages:
-            packages: zip
+            packages: make zip
         - script:
             name: builds.framerjs.com
             code: |
