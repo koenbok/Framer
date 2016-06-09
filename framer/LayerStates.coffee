@@ -118,12 +118,12 @@ class exports.LayerStates extends BaseClass
 		@_animation.once "stop", =>
 
 			for k, v of properties
-				@layer[k] = v if v not in animatablePropertyKeys
+				# @layer[k] = v if v not in animatablePropertyKeys
+				@layer[k] = v unless _.isNumber(v) or Color.isColorObject(v)
 
 			# If we changed the state, we send the event that we did
 			if _.last(@_previousStates) isnt stateName
 				@emit(Events.StateDidSwitch, _.last(@_previousStates), @_currentState, @)
-
 
 
 	switchInstant: (stateName) ->
