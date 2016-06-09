@@ -18,6 +18,9 @@ Framer.Screen = (require "./Screen").Screen
 Framer.Align = (require "./Align").Align
 Framer.MIDIControl = (require "./MIDIControl").MIDIControl
 Framer.print = (require "./Print").print
+Framer.Router = (require "./Router").Router
+Framer.Route = (require "./Route").Route
+Framer.Link = (require "./Link").Link
 
 # Components
 Framer.ScrollComponent = (require "./Components/ScrollComponent").ScrollComponent
