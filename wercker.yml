@@ -1,9 +1,9 @@
-box: nolimitid/node-phantom
+box: aherve/node-phantom
 
 build:
     steps:
         - install-packages:
-            packages: zip
+            packages: make zip
         - script:
             name: load git revisions
             code: |
