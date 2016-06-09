@@ -1,4 +1,4 @@
-box: tippiq/docker-wercker-build-nodejs
+box: aherve/node-phantom
 
 build:
     steps:
