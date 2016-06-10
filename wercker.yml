@@ -1,9 +1,7 @@
-box: aherve/node-phantom
+box: framer/wercker
 
 build:
     steps:
-        - install-packages:
-            packages: make zip
         - script:
             name: load git revisions
             code: |
@@ -19,8 +17,6 @@ build:
 
 deploy:
     steps:
-        - install-packages:
-            packages: make zip
         - script:
             name: builds.framerjs.com
             code: |
