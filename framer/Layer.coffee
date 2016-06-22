@@ -105,16 +105,16 @@ class exports.Layer extends BaseClass
 		layerPropertyIgnore(options, "size", ["width", "height"])
 		layerPropertyIgnore(options, "frame", ["x", "y", "width", "height"])
 
+		# Backwards compatibility for superLayer
+		if not options.parent and options.hasOwnProperty("superLayer")
+			options.parent = options.superLayer
+
 		super Defaults.getDefaults("Layer", options)
 
 		# Add this layer to the current context
 		@_context.addLayer(@)
 
 		@_id = @_context.layerCounter
-
-		# Backwards compatibility for superLayer
-		if not options.parent and options.hasOwnProperty("superLayer")
-			options.parent = options.superLayer
 
 		# Insert the layer into the dom or the parent element
 		if not options.parent
