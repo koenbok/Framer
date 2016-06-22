@@ -53,12 +53,12 @@ class exports.LayerPinchable extends BaseClass
 
 	_centerOrigin: (event) =>
 
-		topInSuperBefore = Utils.convertPoint({}, @layer, @layer.superLayer)
+		topInSuperBefore = Utils.convertPoint({}, @layer, @layer.parent)
 		pinchLocation = Utils.convertPointFromContext(event.touchCenter, @layer, true, true)
 		@layer.originX = pinchLocation.x / @layer.width
 		@layer.originY = pinchLocation.y / @layer.height
 
-		topInSuperAfter = Utils.convertPoint({}, @layer, @layer.superLayer)
+		topInSuperAfter = Utils.convertPoint({}, @layer, @layer.parent)
 		originDelta =
 			x: topInSuperAfter.x - topInSuperBefore.x
 			y: topInSuperAfter.y - topInSuperBefore.y

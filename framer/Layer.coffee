@@ -291,7 +291,7 @@ class exports.Layer extends BaseClass
 	# matrix of layer transforms with perspective applied
 	@define "matrix3d",
 		get: ->
-			parent = @superLayer or @context
+			parent = @parent or @context
 			ppm = Utils.perspectiveMatrix(parent)
 			return new Matrix()
 				.multiply(ppm)
@@ -436,8 +436,8 @@ class exports.Layer extends BaseClass
 		# Get the centered frame for its parent
 		if @parent
 			frame = @frame
-			Utils.frameSetMidX(frame, parseInt((@parent.width  / 2.0) - @superLayer.borderWidth))
-			Utils.frameSetMidY(frame, parseInt((@parent.height / 2.0) - @superLayer.borderWidth))
+			Utils.frameSetMidX(frame, parseInt((@parent.width  / 2.0) - @parent.borderWidth))
+			Utils.frameSetMidY(frame, parseInt((@parent.height / 2.0) - @parent.borderWidth))
 			return frame
 		else
 			frame = @frame
