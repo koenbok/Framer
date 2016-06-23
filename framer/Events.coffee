@@ -40,8 +40,8 @@ Events.AnimationDidEnd = "end"
 Events.Scroll = "scroll"
 
 # Image events
-Events.ImageLoaded = "load"
-Events.ImageLoadError = "error"
+Events.ImageLoaded = "image:load"
+Events.ImageLoadError = "image:error"
 
 # Add all gesture events
 _.extend(Events, Gestures)
