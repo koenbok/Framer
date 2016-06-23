@@ -662,7 +662,17 @@ class exports.Layer extends BaseClass
 			@_setPropertyValue("image", value)
 
 			if value in [null, ""]
+				if @imageLoader?
+					@imageLoader.onload = null
+					@imageLoader.onerror = null
+					@imageLoader.src = null
+
 				@style["background-image"] = null
+
+				if @imageLoader?
+					@emit Events.ImageLoadCancelled, @imageLoader
+					@imageLoader = null
+
 				return
 
 			# Show placeholder image on any browser that doesn't support inline pdf
@@ -681,17 +691,19 @@ class exports.Layer extends BaseClass
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
 
-				loader = new Image()
-				loader.name = imageUrl
-				loader.src = imageUrl
 			if @listeners(Events.ImageLoaded, true) or @listeners(Events.ImageLoadError, true) or @listeners(Events.ImageLoadCancelled, true)
+				@imageLoader = new Image()
+				@imageLoader.name = imageUrl
+				@imageLoader.src = imageUrl
 
-				loader.onload = =>
+				@imageLoader.onload = =>
 					@style["background-image"] = "url('#{imageUrl}')"
-					@emit Events.ImageLoaded, loader
+					@emit Events.ImageLoaded, @imageLoader
+					@imageLoader = null
 
-				loader.onerror = =>
-					@emit Events.ImageLoadError, loader
+				@imageLoader.onerror = =>
+					@emit Events.ImageLoadError, @imageLoader
+					@imageLoader = null
 
 			else
 				@style["background-image"] = "url('#{imageUrl}')"
