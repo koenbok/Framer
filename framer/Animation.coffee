@@ -56,6 +56,7 @@ class exports.Animation extends BaseClass
 			debug: false
 			colorModel: "husl"
 			animate: true
+			looping: false
 
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
@@ -64,12 +65,19 @@ class exports.Animation extends BaseClass
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
+		@_looping = @options.looping
 
 	@define "isAnimating",
 		get: -> @ in @options.layer.context.animations
 
-	start: =>
+	@define "looping",
+		get: -> @_looping
+		set: (value) ->
+			@_looping = value
+			if @_looping and @options?.layer? and !@isAnimating
+				@restart()
 
+	start: =>
 		if @options.layer is null
 			console.error "Animation: missing layer"
 
