@@ -105,16 +105,16 @@ class exports.Layer extends BaseClass
 		layerPropertyIgnore(options, "size", ["width", "height"])
 		layerPropertyIgnore(options, "frame", ["x", "y", "width", "height"])
 
+		# Backwards compatibility for superLayer
+		if not options.hasOwnProperty("parent") and options.hasOwnProperty("superLayer")
+			options.parent = options.superLayer
+			delete options.superLayer
+
 		super Defaults.getDefaults("Layer", options)
 
 		# Add this layer to the current context
 		@_context.addLayer(@)
-
 		@_id = @_context.layerCounter
-
-		# Backwards compatibility for superLayer
-		if not options.parent and options.hasOwnProperty("superLayer")
-			options.parent = options.superLayer
 
 		# Insert the layer into the dom or the parent element
 		if not options.parent
@@ -167,9 +167,9 @@ class exports.Layer extends BaseClass
 
 	# Matrix properties
 	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber,
-		layerPropertyPointTransformer, {depends: ["width", "height", "parent"]})
+		layerPropertyPointTransformer)
 	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber,
-		layerPropertyPointTransformer, {depends: ["width", "height", "parent"]})
+		layerPropertyPointTransformer)
 	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber)
 
 	@define "scaleX", layerProperty(@, "scaleX", "webkitTransform", 1, _.isNumber)
@@ -291,7 +291,7 @@ class exports.Layer extends BaseClass
 	# matrix of layer transforms with perspective applied
 	@define "matrix3d",
 		get: ->
-			parent = @superLayer or @context
+			parent = @parent or @context
 			ppm = Utils.perspectiveMatrix(parent)
 			return new Matrix()
 				.multiply(ppm)
@@ -436,8 +436,8 @@ class exports.Layer extends BaseClass
 		# Get the centered frame for its parent
 		if @parent
 			frame = @frame
-			Utils.frameSetMidX(frame, parseInt((@parent.width  / 2.0) - @superLayer.borderWidth))
-			Utils.frameSetMidY(frame, parseInt((@parent.height / 2.0) - @superLayer.borderWidth))
+			Utils.frameSetMidX(frame, parseInt((@parent.width  / 2.0) - @parent.borderWidth))
+			Utils.frameSetMidY(frame, parseInt((@parent.height / 2.0) - @parent.borderWidth))
 			return frame
 		else
 			frame = @frame
@@ -715,7 +715,7 @@ class exports.Layer extends BaseClass
 				throw Error "Layer.parent needs to be a Layer object"
 
 			# Cancel previous pending insertions
-			Utils.domCompleteCancel @__insertElement
+			Utils.domCompleteCancel(@__insertElement)
 
 			# Remove from previous parent children
 			if @_parent
