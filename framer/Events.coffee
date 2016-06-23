@@ -42,6 +42,7 @@ Events.Scroll = "scroll"
 # Image events
 Events.ImageLoaded = "image:load"
 Events.ImageLoadError = "image:error"
+Events.ImageLoadCancelled = "image:cancelled"
 
 # Add all gesture events
 _.extend(Events, Gestures)

@@ -1075,6 +1075,7 @@ class exports.Layer extends BaseClass
 
 	onImageLoaded: (cb) -> @on(Events.ImageLoaded, cb)
 	onImageLoadError: (cb) -> @on(Events.ImageLoadError, cb)
+	onImageLoadCancelled: (cb) -> @on(Events.ImageLoadCancelled, cb)
 
 	onMove: (cb) -> @on(Events.Move, cb)
 	onDragStart: (cb) -> @on(Events.DragStart, cb)
