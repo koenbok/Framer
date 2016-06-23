@@ -681,10 +681,10 @@ class exports.Layer extends BaseClass
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
 
-			if @_domEventManager.listeners(Events.ImageLoaded)?.length > 0 or @_domEventManager.listeners(Events.ImageLoadError).length > 0
 				loader = new Image()
 				loader.name = imageUrl
 				loader.src = imageUrl
+			if @listeners(Events.ImageLoaded, true) or @listeners(Events.ImageLoadError, true) or @listeners(Events.ImageLoadCancelled, true)
 
 				loader.onload = =>
 					@style["background-image"] = "url('#{imageUrl}')"
