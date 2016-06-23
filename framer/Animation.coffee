@@ -140,13 +140,11 @@ class exports.Animation extends BaseClass
 		# See if we need to repeat this animation
 		# Todo: more repeat behaviours:
 		# 1) add (from end position) 2) reverse (loop between a and b)
-		if @_repeatCounter > 0
-			@once "end", =>
-				for k, v of @_stateA
-					@_target[k] = v
-				@_repeatCounter--
-				@start()
-
+		@once "end", =>
+			if @_repeatCounter > 0 || @looping
+				@restart()
+				if not @looping
+					@_repeatCounter--
 		# If animate is false we set everything immediately and skip the actual animation
 		start = @_start
 		start = @_instant if @options.animate is false
