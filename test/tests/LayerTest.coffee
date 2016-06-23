@@ -138,7 +138,7 @@ describe "Layer", ->
 			layer._element.style.webkitTransformStyle.should.equal "flat"
 
 
-		it "should set local image", (done) ->
+		it "should set local image", ->
 
 			prefix = "../"
 			imagePath = "static/test.png"
@@ -151,11 +151,31 @@ describe "Layer", ->
 			image = layer.props.image
 			layer.props.image.should.equal fullPath
 
+			layer.style["background-image"].indexOf(imagePath).should.not.equal(-1)
+			layer.style["background-image"].indexOf("file://").should.not.equal(-1)
+			layer.style["background-image"].indexOf("?nocache=").should.not.equal(-1)
+
+		it "should set local image when listening to load events", (done) ->
+			prefix = "../"
+			imagePath = "static/test.png"
+			fullPath = prefix + imagePath
+			layer = new Layer
+
 			layer.on Events.ImageLoaded, ->
 				layer.style["background-image"].indexOf(imagePath).should.not.equal(-1)
 				layer.style["background-image"].indexOf("file://").should.not.equal(-1)
 				layer.style["background-image"].indexOf("?nocache=").should.not.equal(-1)
 				done()
+
+			layer.image = fullPath
+			layer.image.should.equal fullPath
+
+			image = layer.props.image
+			layer.props.image.should.equal fullPath
+
+			layer.style["background-image"].indexOf(imagePath).should.equal(-1)
+			layer.style["background-image"].indexOf("file://").should.equal(-1)
+			layer.style["background-image"].indexOf("?nocache=").should.equal(-1)
 
 			#layer.computedStyle()["background-size"].should.equal "cover"
 			#layer.computedStyle()["background-repeat"].should.equal "no-repeat"
