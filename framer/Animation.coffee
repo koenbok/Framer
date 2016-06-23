@@ -61,7 +61,6 @@ class exports.Animation extends BaseClass
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
 		@options.properties = Animation.filterAnimatableProperties(@options.properties)
-
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
@@ -149,7 +148,6 @@ class exports.Animation extends BaseClass
 			Utils.delay(@options.delay, start)
 		else
 			start()
-
 		return true
 
 	stop: (emit=true)->
@@ -166,7 +164,15 @@ class exports.Animation extends BaseClass
 		animation = new Animation options
 		animation
 
-	copy: -> return new Animation(_.clone(@options))
+	reset: ->
+		for k, v of @_stateA
+			@_target[k] = v
+
+	restart: ->
+		@reset()
+		@start()
+
+	copy: -> new Animation(_.clone(@options))
 
 	# A bunch of common aliases to minimize frustration
 	revert: -> 	@reverse()
@@ -209,7 +215,7 @@ class exports.Animation extends BaseClass
 
 	_prepareUpdateValues: =>
 		@_valueUpdaters = {}
-	
+
 		for k, v of @_stateB
 			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
 				@_valueUpdaters[k] = @_updateColorValue
@@ -222,7 +228,7 @@ class exports.Animation extends BaseClass
 
 	_updateNumberValue: (key, value) =>
 		@_target[key] = Utils.mapRange(value, 0, 1, @_stateA[key], @_stateB[key])
-		
+
 	_updateColorValue: (key, value) =>
 		@_target[key] = Color.mix(@_stateA[key], @_stateB[key], value, false, @options.colorModel)
 
