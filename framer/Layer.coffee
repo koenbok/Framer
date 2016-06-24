@@ -106,14 +106,14 @@ class exports.Layer extends BaseClass
 		layerPropertyIgnore(options, "frame", ["x", "y", "width", "height"])
 
 		# Backwards compatibility for superLayer
-		if not options.parent and options.hasOwnProperty("superLayer")
+		if not options.hasOwnProperty("parent") and options.hasOwnProperty("superLayer")
 			options.parent = options.superLayer
+			delete options.superLayer
 
 		super Defaults.getDefaults("Layer", options)
 
 		# Add this layer to the current context
 		@_context.addLayer(@)
-
 		@_id = @_context.layerCounter
 
 		# Insert the layer into the dom or the parent element
@@ -167,9 +167,9 @@ class exports.Layer extends BaseClass
 
 	# Matrix properties
 	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber,
-		layerPropertyPointTransformer, {depends: ["width", "height", "parent"]})
+		layerPropertyPointTransformer, {depends: ["width", "height"]})
 	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber,
-		layerPropertyPointTransformer, {depends: ["width", "height", "parent"]})
+		layerPropertyPointTransformer, {depends: ["width", "height"]})
 	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber)
 
 	@define "scaleX", layerProperty(@, "scaleX", "webkitTransform", 1, _.isNumber)
