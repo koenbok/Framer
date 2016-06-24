@@ -59,7 +59,8 @@ class exports.DeviceComponent extends BaseClass
 
 		_.extend(@, _.defaults(options, defaults))
 
-		window.addEventListener("orientationchange", @_orientationChange, true)
+		if Utils.isMobile()
+			window.addEventListener("resize", @_orientationChange, true)
 
 	_setup: ->
 
@@ -117,10 +118,14 @@ class exports.DeviceComponent extends BaseClass
 		contentScaleFactor = 1 if contentScaleFactor > 1
 
 		if @_shouldRenderFullScreen()
+
+			width = window.innerWidth / contentScaleFactor
+			height = window.innerHeight / contentScaleFactor
+
 			for layer in [@background, @hands, @phone, @viewport, @content, @screen]
 				layer.x = layer.y = 0
-				layer.width = window.innerWidth / contentScaleFactor
-				layer.height = window.innerHeight / contentScaleFactor
+				layer.width = width
+				layer.height = height
 				layer.scale = 1
 
 			@content.scale = contentScaleFactor
