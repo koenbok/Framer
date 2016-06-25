@@ -39,6 +39,8 @@ Events.DeviceFullScreenDidChange
 # 	DeviceContentScaleDidChange: "change:contentScale"
 # 	DeviceFullScreenDidChange: ""
 
+viewportMetaElement = null
+
 class exports.DeviceComponent extends BaseClass
 
 	@define "context", get: -> @_context
@@ -114,16 +116,13 @@ class exports.DeviceComponent extends BaseClass
 		# Todo: pixel align at zoom level 1, 0.5
 
 		contentScaleFactor = @contentScale
-		contentScaleFactor = 1 if contentScaleFactor > 1
 
 		if @_shouldRenderFullScreen()
 			for layer in [@background, @hands, @phone, @viewport, @content, @screen]
 				layer.x = layer.y = 0
-				layer.width = window.innerWidth / contentScaleFactor
-				layer.height = window.innerHeight / contentScaleFactor
+				layer.width = window.innerWidth
+				layer.height = window.innerHeight
 				layer.scale = 1
-
-			@content.scale = contentScaleFactor
 
 		else
 			backgroundOverlap = 100
@@ -146,6 +145,7 @@ class exports.DeviceComponent extends BaseClass
 
 			@content.width  = width
 			@content.height = height
+			@content.scale = contentScaleFactor
 			@screen.center()
 
 			@setHand(@selectedHand) if @selectedHand && @_orientation == 0
@@ -406,10 +406,27 @@ class exports.DeviceComponent extends BaseClass
 				properties: {scale: @_contentScale}
 		else
 			@content.scale = @_contentScale
-
+			
+		@_setViewportScale()
 		@_update()
 
 		@emit("change:contentScale")
+
+	_setViewportScale: ->
+		scale = @contentScale / window.devicePixelRatio
+		viewport = """
+			width=device-width,
+			height=device-height,
+			initial-scale=#{scale},
+			maximum-scale=#{scale},
+			user-scalable=no"""
+		iOS = /iPad|iPhone|iPod/.test(navigator.platform)
+		if (iOS) then viewport += ", shrink-to-fit=no"
+
+		unless viewportMetaElement
+			viewportMetaElement = document.querySelector "meta[name='viewport']"
+
+		viewportMetaElement.content = viewport
 
 
 	###########################################################################
