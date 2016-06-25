@@ -167,9 +167,9 @@ class exports.Layer extends BaseClass
 
 	# Matrix properties
 	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber,
-		layerPropertyPointTransformer)
+		layerPropertyPointTransformer, {depends: ["width", "height"]})
 	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber,
-		layerPropertyPointTransformer)
+		layerPropertyPointTransformer, {depends: ["width", "height"]})
 	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber)
 
 	@define "scaleX", layerProperty(@, "scaleX", "webkitTransform", 1, _.isNumber)
