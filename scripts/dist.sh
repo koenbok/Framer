@@ -18,4 +18,4 @@ cd build/Framer; wget "$GENERATOR_LATEST" -O "generator.tgz"; tar zxf "./generat
 
 # Clean up and zip the result
 find build/Framer -name ".DS_Store" -depth -exec rm {} \;
-cd build; zip -r Framer.zip Framer
+cd build; zip -r -y Framer.zip Framer
