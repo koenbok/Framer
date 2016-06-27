@@ -45,10 +45,10 @@ perf: debug
 # Distribution
 
 dist: release
-	sh scripts/dist.sh
+	scripts/dist.sh
 
 site-build: dist
-	sh scripts/site-build.sh
+	scripts/site-build.sh
 
 site-upload: bootstrap site-build
 	$(BIN)/coffee scripts/site.coffee upload

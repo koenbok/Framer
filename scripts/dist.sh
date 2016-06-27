@@ -4,6 +4,7 @@ GENERATOR_HOST="http://framergenerator-update.s3-website-us-east-1.amazonaws.com
 GENERATOR_LATEST=$GENERATOR_HOST/`curl -s $GENERATOR_HOST/latest.txt`
 
 # Clean up previous builds
+rm -f build/Framer.zip
 rm -Rf build/Framer
 mkdir -p build/Framer
 
