@@ -15,6 +15,7 @@ class exports.BackgroundLayer extends Layer
 		@sendToBack()
 		@layout()
 		@_context.domEventManager.wrap(window).addEventListener("resize", @layout)
+		Framer.Device.on("change:orientation", @layout)
 
 	layout: =>
 		if @parent
