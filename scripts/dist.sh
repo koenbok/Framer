@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 GENERATOR_HOST="http://framergenerator-update.s3-website-us-east-1.amazonaws.com"
 GENERATOR_LATEST=$GENERATOR_HOST/`curl -s $GENERATOR_HOST/latest.txt`
