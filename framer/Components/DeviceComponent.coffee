@@ -59,9 +59,6 @@ class exports.DeviceComponent extends BaseClass
 
 		_.extend(@, _.defaults(options, defaults))
 
-		if Utils.isMobile()
-			window.addEventListener("resize", @_orientationChange, true)
-
 	_setup: ->
 
 		if @_setupDone
@@ -101,6 +98,7 @@ class exports.DeviceComponent extends BaseClass
 		@content.originY = 0
 
 		Framer.CurrentContext.domEventManager.wrap(window).addEventListener("resize", @_update) unless Utils.isMobile()
+		Framer.CurrentContext.domEventManager.wrap(window).addEventListener("resize", @_orientationChange) if Utils.isMobile()
 
 		# This avoids rubber banding on mobile
 		for layer in [@background, @phone, @viewport, @content, @screen]
