@@ -22,7 +22,6 @@ class MIDIInput extends BaseClass
 	_requestResolved: (access) =>
 		@_inputs ?= []
 		access.inputs.forEach (input) =>
-			console.log(input)
 			@_inputs.push input
 			input.onmidimessage = @_onmidimessage(input.id)
 
