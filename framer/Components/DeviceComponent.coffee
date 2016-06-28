@@ -59,8 +59,6 @@ class exports.DeviceComponent extends BaseClass
 
 		_.extend(@, _.defaults(options, defaults))
 
-		window.addEventListener("orientationchange", @_orientationChange, true)
-
 	_setup: ->
 
 		if @_setupDone
@@ -100,6 +98,7 @@ class exports.DeviceComponent extends BaseClass
 		@content.originY = 0
 
 		Framer.CurrentContext.domEventManager.wrap(window).addEventListener("resize", @_update) unless Utils.isMobile()
+		Framer.CurrentContext.domEventManager.wrap(window).addEventListener("resize", @_orientationChange) if Utils.isMobile()
 
 		# This avoids rubber banding on mobile
 		for layer in [@background, @phone, @viewport, @content, @screen]
@@ -117,10 +116,14 @@ class exports.DeviceComponent extends BaseClass
 		contentScaleFactor = 1 if contentScaleFactor > 1
 
 		if @_shouldRenderFullScreen()
+
+			width = window.innerWidth / contentScaleFactor
+			height = window.innerHeight / contentScaleFactor
+
 			for layer in [@background, @hands, @phone, @viewport, @content, @screen]
 				layer.x = layer.y = 0
-				layer.width = window.innerWidth / contentScaleFactor
-				layer.height = window.innerHeight / contentScaleFactor
+				layer.width = width
+				layer.height = height
 				layer.scale = 1
 
 			@content.scale = contentScaleFactor
