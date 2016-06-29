@@ -3,9 +3,9 @@
 {Events} = require "./Events"
 {MIDIInput} = require "./MIDIInput"
 
-Events.MIDIControlValueChange = "MIDIControlValueChange"
+Events.MIDIComponentValueChange = "MIDIComponentValueChange"
 
-class MIDIControl extends BaseClass
+class MIDIComponent extends BaseClass
 
 	@define "min", @simpleProperty("min", 0)
 	@define "max", @simpleProperty("max", 127)
@@ -45,11 +45,11 @@ class MIDIControl extends BaseClass
 				info = _.defaults info,
 					type: "note"
 
-			@emit(Events.MIDIControlValueChange, @_modulate(data2), info)
+			@emit(Events.MIDIComponentValueChange, @_modulate(data2), info)
 
 	_modulate: (value) ->
 		Utils.modulate(value, [0, 127], [@min, @max])
 
-	onValueChange: (cb) -> @on(Events.MIDIControlValueChange, cb)
+	onValueChange: (cb) -> @on(Events.MIDIComponentValueChange, cb)
 
-exports.MIDIControl = MIDIControl
+exports.MIDIComponent = MIDIComponent
