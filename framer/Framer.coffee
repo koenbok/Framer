@@ -16,7 +16,7 @@ Framer.Animation = (require "./Animation").Animation
 Framer.AnimationGroup = (require "./AnimationGroup").AnimationGroup
 Framer.Screen = (require "./Screen").Screen
 Framer.Align = (require "./Align").Align
-Framer.MIDIControl = (require "./MIDIControl").MIDIControl
+Framer.MIDIComponent = (require "./MIDIComponent").MIDIComponent
 Framer.print = (require "./Print").print
 
 # Components
