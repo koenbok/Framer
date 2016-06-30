@@ -106,3 +106,29 @@ describe "ScrollComponent", ->
 		it "should set content clip to true", ->
 			scroll = new ScrollComponent()
 			scroll.content.clip.should.equal true
+
+		it "should set the right content size for added pages by constructor", ->
+
+			# Constructors depend on different things for size, align and parent. Sometimes
+			# these dependencies can get messed up when adding something to a ScrollComponent
+			# this a was a case sent in by one of our users: http://share.framerjs.com/mn3ffub6u81i/
+
+			allImgCont = []
+			imgWrapW = 801
+			imgWrapGut = 200
+			numImg = 2
+
+			page = new PageComponent
+				width: 400, height: 400
+				scrollVertical: false
+				contentInset: {top: 267, right: imgWrapGut}
+
+			for i in [1..numImg]
+				imgWrapper = new Layer 
+					width: page.width - imgWrapGut, height: imgWrapW 
+					borderRadius: 8
+					x: (page.width + 32) * i
+					parent: page.content
+
+			page.contentFrame().width.should.equal 1064
+
