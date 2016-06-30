@@ -22,13 +22,12 @@ class exports.Animator
 	finished: ->
 		throw Error "Not implemented"
 
-	values: (delta=1/60)->
-
+	values: (delta=1/60,limit=100)->
 		values = []
-
-		while not @finished()
+		for i in [0..limit]
 			values.push(@next(delta))
-
+			if @finished()
+				break
 		return values
 
 
