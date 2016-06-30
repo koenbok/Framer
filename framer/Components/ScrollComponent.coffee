@@ -140,7 +140,7 @@ class exports.ScrollComponent extends Layer
 		# call it yourself, but make sure you don't overdo it.
 
 		return unless @content
-		
+
 		contentFrame = @calculateContentFrame()
 		@content.width = contentFrame.width
 		@content.height = contentFrame.height
@@ -228,9 +228,9 @@ class exports.ScrollComponent extends Layer
 			_.clone(@_contentInset)
 		set: (contentInset) ->
 			@_contentInset = Utils.rectZero(Utils.parseRect(contentInset))
-			
+
 			return unless @content
-			
+
 			# If we reset the content inset, we need to reset the content position
 			contentFrame = @calculateContentFrame()
 			contentFrame.x = contentFrame.x + @_contentInset.left
@@ -410,14 +410,19 @@ wrapComponent = (instance, layer, options = {correct:true}) ->
 
 	scroll = instance
 
+	# Do some special case handling for the PageComponent subclass
+	# as this function is outside of the class scope so we can’t simply
+	# override
+	isPageComponent = instance.constructor.name is "PageComponent"
+
 	# If we actually forgot to add a sub layer, so for example if
 	# there is just one layer and we want to make it scrollable we
 	# correct that here.
 
 	if options.correct is true
-		if layer.children.length is 0
+		if layer.children.length is 0 and not isPageComponent
 			wrapper = new Layer
-			wrapper.name = "ScrollComponent"
+			wrapper.name = instance.constructor.name
 			wrapper.frame = layer.frame
 			layer.parent = wrapper
 			layer.x = layer.y = 0
@@ -431,7 +436,9 @@ wrapComponent = (instance, layer, options = {correct:true}) ->
 
 	# Copy over the name, if we don't have it try to use the variable
 	# name from Framer Studio if it was given.
-	if layer.name and layer.name isnt ""
+	if isPageComponent
+		scroll.name = instance.constructor.name
+	else if layer.name and layer.name isnt ""
 		scroll.name = layer.name
 	else if layer.__framerInstanceInfo?.name
 		scroll.name = layer.__framerInstanceInfo.name
@@ -440,15 +447,15 @@ wrapComponent = (instance, layer, options = {correct:true}) ->
 	# background of the wrapper then the content.
 	# Note: I ran into a situation where this had a weird result, maybe
 	# we should revise this in the future.
-	if layer.image
+	if layer.image and not isPageComponent
 		scroll.image = layer.image
 		layer.image = null
 
-	# Set the original layer as the content layer for the scroll
-	if instance.constructor.name is "PageComponent"
-		for l in layer.children
-			scroll.addPage(l)
+	if isPageComponent
+		# Just add the layer as a page
+		scroll.addPage(layer)
 	else
+		# Set the original layer as the content layer for the scroll
 		scroll.setContentLayer(layer)
 
 	# https://github.com/motif/Company/issues/208
