@@ -1,7 +1,7 @@
-{_} = require "./Underscore"
-{BaseClass} = require "./BaseClass"
-{Events} = require "./Events"
-{MIDIInput} = require "./MIDIInput"
+{_} = require "../Underscore"
+{BaseClass} = require "../BaseClass"
+{Events} = require "../Events"
+{MIDIInput} = require "../MIDIInput"
 
 Events.MIDIComponentValueChange = "MIDIComponentValueChange"
 

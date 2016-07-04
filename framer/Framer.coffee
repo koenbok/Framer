@@ -16,7 +16,6 @@ Framer.Animation = (require "./Animation").Animation
 Framer.AnimationGroup = (require "./AnimationGroup").AnimationGroup
 Framer.Screen = (require "./Screen").Screen
 Framer.Align = (require "./Align").Align
-Framer.MIDIComponent = (require "./MIDIComponent").MIDIComponent
 Framer.print = (require "./Print").print
 
 # Components
@@ -27,6 +26,7 @@ Framer.DeviceComponent = (require "./Components/DeviceComponent").DeviceComponen
 Framer.GridComponent = (require "./Components/GridComponent").GridComponent
 Framer.NavComponent = (require "./Components/NavComponent").NavComponent
 Framer.CircularProgressComponent = (require "./Components/CircularProgressComponent").CircularProgressComponent
+Framer.MIDIComponent = (require "./Components/MIDIComponent").MIDIComponent
 Framer.DeviceView = Framer.DeviceComponent # Compat
 
 _.extend(window, Framer) if window
