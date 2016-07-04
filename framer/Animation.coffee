@@ -56,21 +56,28 @@ class exports.Animation extends BaseClass
 			debug: false
 			colorModel: "husl"
 			animate: true
+			looping: false
 
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
 		@options.properties = Animation.filterAnimatableProperties(@options.properties)
-
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
+		@_looping = @options.looping
 
 	@define "isAnimating",
 		get: -> @ in @options.layer.context.animations
 
-	start: =>
+	@define "looping",
+		get: -> @_looping
+		set: (value) ->
+			@_looping = value
+			if @_looping and @options?.layer? and !@isAnimating
+				@restart()
 
+	start: =>
 		if @options.layer is null
 			console.error "Animation: missing layer"
 
@@ -133,13 +140,11 @@ class exports.Animation extends BaseClass
 		# See if we need to repeat this animation
 		# Todo: more repeat behaviours:
 		# 1) add (from end position) 2) reverse (loop between a and b)
-		if @_repeatCounter > 0
-			@once "end", =>
-				for k, v of @_stateA
-					@_target[k] = v
-				@_repeatCounter--
-				@start()
-
+		@once "end", =>
+			if @_repeatCounter > 0 || @looping
+				@restart()
+				if not @looping
+					@_repeatCounter--
 		# If animate is false we set everything immediately and skip the actual animation
 		start = @_start
 		start = @_instant if @options.animate is false
@@ -149,7 +154,6 @@ class exports.Animation extends BaseClass
 			Utils.delay(@options.delay, start)
 		else
 			start()
-
 		return true
 
 	stop: (emit=true)->
@@ -166,7 +170,15 @@ class exports.Animation extends BaseClass
 		animation = new Animation options
 		animation
 
-	copy: -> return new Animation(_.clone(@options))
+	reset: ->
+		for k, v of @_stateA
+			@_target[k] = v
+
+	restart: ->
+		@reset()
+		@start()
+
+	copy: -> new Animation(_.clone(@options))
 
 	# A bunch of common aliases to minimize frustration
 	revert: -> 	@reverse()
@@ -209,7 +221,7 @@ class exports.Animation extends BaseClass
 
 	_prepareUpdateValues: =>
 		@_valueUpdaters = {}
-	
+
 		for k, v of @_stateB
 			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
 				@_valueUpdaters[k] = @_updateColorValue
@@ -222,7 +234,7 @@ class exports.Animation extends BaseClass
 
 	_updateNumberValue: (key, value) =>
 		@_target[key] = Utils.mapRange(value, 0, 1, @_stateA[key], @_stateB[key])
-		
+
 	_updateColorValue: (key, value) =>
 		@_target[key] = Color.mix(@_stateA[key], @_stateB[key], value, false, @options.colorModel)
 
