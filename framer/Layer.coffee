@@ -639,6 +639,10 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## IMAGE
 
+	cleanupImageLoader: ->
+		@imageLoader = null
+
+
 	@define "image",
 		default: ""
 		get: ->
@@ -671,7 +675,7 @@ class exports.Layer extends BaseClass
 
 				if @imageLoader?
 					@emit Events.ImageLoadCancelled, @imageLoader
-					@imageLoader = null
+					@cleanupImageLoader()
 
 				return
 
@@ -699,11 +703,11 @@ class exports.Layer extends BaseClass
 				@imageLoader.onload = =>
 					@style["background-image"] = "url('#{imageUrl}')"
 					@emit Events.ImageLoaded, @imageLoader
-					@imageLoader = null
+					@cleanupImageLoader()
 
 				@imageLoader.onerror = =>
 					@emit Events.ImageLoadError, @imageLoader
-					@imageLoader = null
+					@cleanupImageLoader()
 
 			else
 				@style["background-image"] = "url('#{imageUrl}')"
