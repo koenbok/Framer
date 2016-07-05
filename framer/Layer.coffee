@@ -640,6 +640,8 @@ class exports.Layer extends BaseClass
 	## IMAGE
 
 	cleanupImageLoader: ->
+		@imageEventManager?.removeAllListeners()
+		@imageEventManager = null
 		@imageLoader = null
 
 
@@ -664,11 +666,9 @@ class exports.Layer extends BaseClass
 
 			# Set the property value
 			@_setPropertyValue("image", value)
-
 			if value in [null, ""]
 				if @imageLoader?
-					@imageLoader.onload = null
-					@imageLoader.onerror = null
+					@imageEventManager.removeAllListeners()
 					@imageLoader.src = null
 
 				@style["background-image"] = null
@@ -699,13 +699,13 @@ class exports.Layer extends BaseClass
 				@imageLoader = new Image()
 				@imageLoader.name = imageUrl
 				@imageLoader.src = imageUrl
-
-				@imageLoader.onload = =>
+				@imageEventManager = @_context.domEventManager.wrap(@imageLoader)
+				@imageEventManager.addEventListener "load", =>
 					@style["background-image"] = "url('#{imageUrl}')"
 					@emit Events.ImageLoaded, @imageLoader
 					@cleanupImageLoader()
 
-				@imageLoader.onerror = =>
+				@imageEventManager.addEventListener "error", =>
 					@emit Events.ImageLoadError, @imageLoader
 					@cleanupImageLoader()
 
@@ -1214,7 +1214,7 @@ class exports.Layer extends BaseClass
 			return false
 
 		if @_draggable
-			
+
 			if @_draggable.isDragging is false and @_draggable.isMoving is false
 				return false
 
