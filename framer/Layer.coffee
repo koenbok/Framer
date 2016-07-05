@@ -639,10 +639,10 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## IMAGE
 
-	cleanupImageLoader: ->
-		@imageEventManager?.removeAllListeners()
-		@imageEventManager = null
-		@imageLoader = null
+	_cleanupImageLoader: ->
+		@_imageEventManager?.removeAllListeners()
+		@_imageEventManager = null
+		@_imageLoader = null
 
 
 	@define "image",
@@ -667,15 +667,15 @@ class exports.Layer extends BaseClass
 			# Set the property value
 			@_setPropertyValue("image", value)
 			if value in [null, ""]
-				if @imageLoader?
-					@imageEventManager.removeAllListeners()
-					@imageLoader.src = null
+				if @_imageLoader?
+					@_imageEventManager.removeAllListeners()
+					@_imageLoader.src = null
 
 				@style["background-image"] = null
 
-				if @imageLoader?
-					@emit Events.ImageLoadCancelled, @imageLoader
-					@cleanupImageLoader()
+				if @_imageLoader?
+					@emit Events.ImageLoadCancelled, @_imageLoader
+					@_cleanupImageLoader()
 
 				return
 
@@ -696,18 +696,18 @@ class exports.Layer extends BaseClass
 			# if something is explicitly listening to the load event
 
 			if @listeners(Events.ImageLoaded, true) or @listeners(Events.ImageLoadError, true) or @listeners(Events.ImageLoadCancelled, true)
-				@imageLoader = new Image()
-				@imageLoader.name = imageUrl
-				@imageLoader.src = imageUrl
-				@imageEventManager = @_context.domEventManager.wrap(@imageLoader)
-				@imageEventManager.addEventListener "load", =>
+				@_imageLoader = new Image()
+				@_imageLoader.name = imageUrl
+				@_imageLoader.src = imageUrl
+				@_imageEventManager = @_context.domEventManager.wrap(@_imageLoader)
+				@_imageEventManager.addEventListener "load", =>
 					@style["background-image"] = "url('#{imageUrl}')"
-					@emit Events.ImageLoaded, @imageLoader
-					@cleanupImageLoader()
+					@emit Events.ImageLoaded, @_imageLoader
+					@_cleanupImageLoader()
 
-				@imageEventManager.addEventListener "error", =>
-					@emit Events.ImageLoadError, @imageLoader
-					@cleanupImageLoader()
+				@_imageEventManager.addEventListener "error", =>
+					@emit Events.ImageLoadError, @_imageLoader
+					@_cleanupImageLoader()
 
 			else
 				@style["background-image"] = "url('#{imageUrl}')"
