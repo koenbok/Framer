@@ -80,7 +80,9 @@ describe "Layer", ->
 
 			layer = new Layer
 			layer.x = n
-			layer.style.webkitTransform.should.equal "translate3d(0.000000000000002px, 0px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+			layer.y = 100
+			layer.style.webkitTransform.should.equal "translate3d(0.000000000000002px, 100px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+
 
 		it "should set x, y and z to really small values", ->
 
