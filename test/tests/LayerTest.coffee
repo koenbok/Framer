@@ -180,6 +180,28 @@ describe "Layer", ->
 			#layer.computedStyle()["background-size"].should.equal "cover"
 			#layer.computedStyle()["background-repeat"].should.equal "no-repeat"
 
+		it "should cancel loading when setting image to null", (done) ->
+			prefix = "../"
+			imagePath = "static/test.png"
+			fullPath = prefix + imagePath
+
+			#First set the image directly to something
+			layer = new Layer
+				image: "static/test2.png"
+
+			#Now add event handlers
+			layer.on Events.ImageLoadCancelled, ->
+				layer.style["background-image"].indexOf(imagePath).should.equal(-1)
+				layer.style["background-image"].indexOf("file://").should.equal(-1)
+				layer.style["background-image"].indexOf("?nocache=").should.equal(-1)
+				done()
+
+			#so we preload the next image
+			layer.image = fullPath
+
+			#set the image no null to cancel the loading
+			layer.image = null
+
 		it "should set image", ->
 			imagePath = "../static/test.png"
 			layer = new Layer image:imagePath

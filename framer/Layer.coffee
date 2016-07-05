@@ -639,6 +639,12 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## IMAGE
 
+	_cleanupImageLoader: ->
+		@_imageEventManager?.removeAllListeners()
+		@_imageEventManager = null
+		@_imageLoader = null
+
+
 	@define "image",
 		default: ""
 		get: ->
@@ -660,9 +666,17 @@ class exports.Layer extends BaseClass
 
 			# Set the property value
 			@_setPropertyValue("image", value)
-
 			if value in [null, ""]
+				if @_imageLoader?
+					@_imageEventManager.removeAllListeners()
+					@_imageLoader.src = null
+
 				@style["background-image"] = null
+
+				if @_imageLoader?
+					@emit Events.ImageLoadCancelled, @_imageLoader
+					@_cleanupImageLoader()
+
 				return
 
 			# Show placeholder image on any browser that doesn't support inline pdf
@@ -681,17 +695,19 @@ class exports.Layer extends BaseClass
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
 
-			if @_domEventManager.listeners(Events.ImageLoaded)?.length > 0 or @_domEventManager.listeners(Events.ImageLoadError).length > 0
-				loader = new Image()
-				loader.name = imageUrl
-				loader.src = imageUrl
-
-				loader.onload = =>
+			if @listeners(Events.ImageLoaded, true) or @listeners(Events.ImageLoadError, true) or @listeners(Events.ImageLoadCancelled, true)
+				@_imageLoader = new Image()
+				@_imageLoader.name = imageUrl
+				@_imageLoader.src = imageUrl
+				@_imageEventManager = @_context.domEventManager.wrap(@_imageLoader)
+				@_imageEventManager.addEventListener "load", =>
 					@style["background-image"] = "url('#{imageUrl}')"
-					@emit Events.ImageLoaded, loader
+					@emit Events.ImageLoaded, @_imageLoader
+					@_cleanupImageLoader()
 
-				loader.onerror = =>
-					@emit Events.ImageLoadError, loader
+				@_imageEventManager.addEventListener "error", =>
+					@emit Events.ImageLoadError, @_imageLoader
+					@_cleanupImageLoader()
 
 			else
 				@style["background-image"] = "url('#{imageUrl}')"
@@ -1075,6 +1091,7 @@ class exports.Layer extends BaseClass
 
 	onImageLoaded: (cb) -> @on(Events.ImageLoaded, cb)
 	onImageLoadError: (cb) -> @on(Events.ImageLoadError, cb)
+	onImageLoadCancelled: (cb) -> @on(Events.ImageLoadCancelled, cb)
 
 	onMove: (cb) -> @on(Events.Move, cb)
 	onDragStart: (cb) -> @on(Events.DragStart, cb)
@@ -1197,7 +1214,7 @@ class exports.Layer extends BaseClass
 			return false
 
 		if @_draggable
-			
+
 			if @_draggable.isDragging is false and @_draggable.isMoving is false
 				return false
 
