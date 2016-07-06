@@ -1235,19 +1235,23 @@ class exports.Layer extends BaseClass
 		return true if @ignoreEvents is false
 		return false
 
-	showHint: (frame) ->
+	showHint: (highlightFrame) ->
 
 		# Start an animation with a blue rectangle fading out over time
 		layer = new Layer
-			frame: frame
+			frame: highlightFrame
 			backgroundColor: new Color("9013FE").alpha(.5)
 			borderColor: new Color("460054").alpha(.5)
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
-			borderWidth: 1
+			borderWidth: 2
 
-		# if @_draggable
-		# 	layer.backgroundColor = null
-		# 	layer.borderWidth = 8
+		# Only show outlines for draggables
+		if @_draggable
+			layer.backgroundColor = null
+
+		# Only show outlines if a highlight is fullscreen
+		if Utils.frameInFrame(@context.canvasFrame, highlightFrame)
+			layer.backgroundColor = null
 
 		animation = layer.animate
 			properties:
