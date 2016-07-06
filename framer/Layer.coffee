@@ -1302,6 +1302,14 @@ class exports.Layer extends BaseClass
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 3
 
+		# Only show outlines for draggables
+		if @_draggable
+			layer.backgroundColor = null
+
+		# Only show outlines if a highlight is fullscreen
+		if Utils.frameInFrame(@context.canvasFrame, highlightFrame)
+			layer.backgroundColor = null
+
 		animation = layer.animate
 			properties: {opacity: 0}
 			curve: "ease-out"
