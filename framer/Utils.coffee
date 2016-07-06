@@ -944,6 +944,14 @@ Utils.frameCenterPoint = (frame) ->
 		x: Utils.frameGetMidX(frame)
 		y: Utils.frameGetMidY(frame)
 
+Utils.frameInFrame = (frameA, frameB) ->
+	
+	for point in Utils.pointsFromFrame(frameA)
+		return false unless Utils.pointInFrame(point, frameB)
+
+	return true
+
+
 # Rotation
 
 Utils.rotationNormalizer = ->

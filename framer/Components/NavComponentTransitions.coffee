@@ -12,7 +12,7 @@ class NavComponentTransition
 		if @layerA
 			@statesA = new LayerStates(@layerA)
 			@statesA.add
-				a: {opacity: 0, x: 0 - parseInt(@navComponent.width / 2)}
+				a: {opacity: 0.7, x: 0 - parseInt(@navComponent.width / 2)}
 				b: {opacity: 1, x: 0}
 
 		if @layerB
@@ -118,10 +118,13 @@ class NavComponentModalTransition extends NavComponentBackgroundTransition
 			@statesB = new LayerStates(@layerB)
 			@statesB.add
 				a: 
-					x: Align.center
-					y: @navComponent.height
+					x: 0 - @layerB.width
+					#y: @navComponent.height
 				b:
-					y: Align.bottom
+					x: Align.left
+					#y: Align.top
+
+			
 			@statesB.animationOptions =
 				curve: "spring(300,35,0)"
 
