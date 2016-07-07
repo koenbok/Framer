@@ -90,6 +90,11 @@ exports.LayerStyle =
 
 		return css.join(" ")
 
+	_roundToZero: (num) ->
+		if (-1e-6 < num && num < 1e-6)
+			return 0
+		return num
+
 	webkitTransform: (layer) ->
 
 
@@ -100,24 +105,23 @@ exports.LayerStyle =
 
 		if layer._prefer2d or layer._properties.force2d
 			return exports.LayerStyle.webkitTransformForce2d(layer)
-
 		"
 		translate3d(
-			#{layer._properties.x?.toFixed(20)}px,
-			#{layer._properties.y?.toFixed(20)}px,
-			#{layer._properties.z?.toFixed(20)}px)
+			#{@_roundToZero layer._properties.x}px,
+			#{@_roundToZero layer._properties.y}px,
+			#{@_roundToZero layer._properties.z}px)
 		scale3d(
-			#{(layer._properties.scaleX * layer._properties.scale).toFixed(20)},
-			#{(layer._properties.scaleY * layer._properties.scale).toFixed(20)},
-			#{layer._properties.scaleZ?.toFixed(20)})
-		skew(#{layer._properties.skew?.toFixed(20)}deg,#{layer._properties.skew?.toFixed(20)}deg)
-		skewX(#{layer._properties.skewX?.toFixed(20)}deg)
-		skewY(#{layer._properties.skewY?.toFixed(20)}deg)
-		translateZ(#{layer._properties.originZ?.toFixed(20)}px)
-		rotateX(#{layer._properties.rotationX?.toFixed(20)}deg)
-		rotateY(#{layer._properties.rotationY?.toFixed(20)}deg)
-		rotateZ(#{layer._properties.rotationZ?.toFixed(20)}deg)
-		translateZ(#{-layer._properties.originZ?.toFixed(20)}px)
+			#{@_roundToZero(layer._properties.scaleX * layer._properties.scale)},
+			#{@_roundToZero(layer._properties.scaleY * layer._properties.scale)},
+			#{@_roundToZero layer._properties.scaleZ})
+		skew(#{@_roundToZero layer._properties.skew}deg,#{@_roundToZero layer._properties.skew}deg)
+		skewX(#{@_roundToZero layer._properties.skewX}deg)
+		skewY(#{@_roundToZero layer._properties.skewY}deg)
+		translateZ(#{@_roundToZero layer._properties.originZ}px)
+		rotateX(#{@_roundToZero layer._properties.rotationX}deg)
+		rotateY(#{@_roundToZero layer._properties.rotationY}deg)
+		rotateZ(#{@_roundToZero layer._properties.rotationZ}deg)
+		translateZ(#{@_roundToZero -layer._properties.originZ}px)
 		"
 
 	webkitTransformForce2d: (layer) ->
@@ -131,10 +135,10 @@ exports.LayerStyle =
 			if layer._properties[p] isnt v
 				console.warn "Layer property '#{p}'' will be ignored with force2d enabled"
 
-		css.push "translate(#{layer._properties.x?.toFixed(20)}px,#{layer._properties.y?.toFixed(20)}px)"
-		css.push "scale(#{layer._properties.scale?.toFixed(20)})"
-		css.push "skew(#{layer._properties.skew?.toFixed(20)}deg,#{layer._properties.skew?.toFixed(20)}deg)"
-		css.push "rotate(#{layer._properties.rotationZ?.toFixed(20)}deg)"
+		css.push "translate(#{@_roundToZero layer._properties.x}px,#{@_roundToZero layer._properties.y}px)"
+		css.push "scale(#{@_roundToZero layer._properties.scale})"
+		css.push "skew(#{@_roundToZero layer._properties.skew}deg,#{@_roundToZero layer._properties.skew}deg)"
+		css.push "rotate(#{@_roundToZero layer._properties.rotationZ}deg)"
 
 		return css.join(" ")
 

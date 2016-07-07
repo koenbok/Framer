@@ -81,7 +81,7 @@ describe "Layer", ->
 			layer = new Layer
 			layer.x = n
 			layer.y = 100
-			layer.style.webkitTransform.should.equal "translate3d(0.000000000000002px, 100px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 100px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 
 
 		it "should set x, y and z to really small values", ->
@@ -90,15 +90,15 @@ describe "Layer", ->
 			layer.x = 10
 			layer.y = 10
 			layer.z = 10
-			layer.x = 1e-7
-			layer.y = 1e-8
-			layer.z = 1e-9
-			layer.x.should.equal 1e-7
-			layer.y.should.equal 1e-8
-			layer.z.should.equal 1e-9
+			layer.x = 1e-5
+			layer.y = 1e-6
+			layer.z = 1e-7
+			layer.x.should.equal 1e-5
+			layer.y.should.equal 1e-6
+			layer.z.should.equal 1e-7
 
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
-			layer.style.webkitTransform.should.equal "translate3d(0.0000001px, 0.00000001px, 0.000000001px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+			layer.style.webkitTransform.should.equal "translate3d(0.00001px, 0.000001px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 
 		it "should handle scientific notation in scaleX,Y and Z", ->
 
@@ -116,7 +116,7 @@ describe "Layer", ->
 			layer.scale.should.equal 1e-10
 
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
-			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale3d(0.00000000000000001, 0.000000000000000001, 0.000000001) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale3d(0, 0, 0) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 
 		it "should handle scientific notation in skew", ->
 
@@ -124,15 +124,15 @@ describe "Layer", ->
 			layer.skew = 2
 			layer.skewX = 2
 			layer.skewY = 3
-			layer.skew = 1e-7
-			layer.skewX = 1e-8
-			layer.skewY = 1e-9
-			layer.skew.should.equal 1e-7
-			layer.skewX.should.equal 1e-8
-			layer.skewY.should.equal 1e-9
+			layer.skew = 1e-5
+			layer.skewX = 1e-6
+			layer.skewY = 1e-7
+			layer.skew.should.equal 1e-5
+			layer.skewX.should.equal 1e-6
+			layer.skewY.should.equal 1e-7
 
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
-			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) skew(0.0000001deg, 0.0000001deg) skewX(0.00000001deg) skewY(0.000000001deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) skew(0.00001deg, 0.00001deg) skewX(0.000001deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 
 		it "should set x and y", ->
 
