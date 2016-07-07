@@ -26,7 +26,7 @@ WEBPACK =
 # Gulp tasks
 
 gulp.task "watch", ["webpack:debug"], ->
-	gulp.watch(["./*.coffee", "framer/**", "test/tests/**", "!Version.coffee"], ["test"])
+	gulp.watch(["./*.coffee", "framer/**", "test/tests/**", "!Version.coffee"], ["webpack:debug","test"])
 
 gulp.task "test", ["webpack:tests"], ->
 	return gulp
