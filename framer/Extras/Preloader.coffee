@@ -106,7 +106,7 @@ class Preloader extends BaseClass
 		else
 			@end()
 
-	_handleTimeout: ->
+	_handleTimeout: =>
 		return unless @isLoading
 		console.error "Timeout"
 		@end()
