@@ -48,12 +48,16 @@ class Preloader extends BaseClass
 			return @_mediaLoaded.length is @_media.length
 
 	addImagesFromContext: (context) ->
-		@addImages(_.pluck(context.layers, "image"))
+		_.pluck(context.layers, "image").map @addImage
 
-	addImages: (images) ->
-		for image in images
-			if image and image not in @_media
-				@_media.push(image)
+	addImage: (image) =>
+		if image and image not in @_media
+			@_media.push(image)
+			# We simply count failed images as loaded for now so that we avoid
+			# being in some loading state forever.
+			Utils.loadImage image, (error) =>
+				@_mediaLoaded.push(image)
+				@_handleProgress()
 
 	start: =>
 
@@ -80,13 +84,6 @@ class Preloader extends BaseClass
 		# If we don't need any images to be preloaded we can stop
 		if not @_media.length
 			return @end()
-
-		# Load every image that we know of. We simply count failed images as loaded
-		# for now so that we avoid being in some loading state forever.
-		@_media.map (image) =>
-			Utils.loadImage image, (error) =>
-				@_mediaLoaded.push(image)
-				@_handleProgress()
 
 		# Make sure we always show the prototype after n seconds, even if not
 		# all the images managed to load at all.
