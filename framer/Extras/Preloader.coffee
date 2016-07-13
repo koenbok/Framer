@@ -50,6 +50,9 @@ class Preloader extends BaseClass
 	addImagesFromContext: (context) ->
 		_.pluck(context.layers, "image").map @addImage
 
+	addPlayersFromContext: (context) ->
+		_.pluck(context.layers, "player").map @addPlayer
+
 	addImage: (image) =>
 		if image and image not in @_media
 			@_media.push(image)
@@ -58,6 +61,15 @@ class Preloader extends BaseClass
 			Utils.loadImage image, (error) =>
 				@_mediaLoaded.push(image)
 				@_handleProgress()
+
+	addPlayer: (player) =>
+		if player and player.readyState? and player not in @_media
+			if player.readyState < 3
+				@_media.push(player)
+				# Wait until there is enough data for playback to start
+				Events.wrap(player).addEventListener "canplay", =>
+					@_mediaLoaded.push(player)
+					@_handleProgress()
 
 	start: =>
 
@@ -80,6 +92,8 @@ class Preloader extends BaseClass
 		# By default we take the image from the prototype and the device
 		@addImagesFromContext(Framer.DefaultContext)
 		@addImagesFromContext(Framer.CurrentContext)
+		@addPlayersFromContext(Framer.DefaultContext)
+		@addPlayersFromContext(Framer.CurrentContext)
 
 		# If we don't need any images to be preloaded we can stop
 		if not @_media.length
@@ -108,7 +122,7 @@ class Preloader extends BaseClass
 
 	_handleTimeout: =>
 		return unless @isLoading
-		console.error "Timeout"
+		console.error "Preloader timeout, ending"
 		@end()
 
 exports.enable = ->
