@@ -18,6 +18,7 @@ class Preloader extends BaseClass
 			@cover = new Layer
 				size: 200
 				backgroundColor: "white"
+				opacity: 0
 
 			@progressIndicator = new CircularProgressComponent
 				size: 160
@@ -107,6 +108,9 @@ class Preloader extends BaseClass
 		# If we don't need any images to be preloaded we can stop
 		if not @_media.length
 			return @end()
+
+		# Only now show the cover
+		@cover.opacity = 1
 
 		# Make sure we always show the prototype after n seconds, even if not
 		# all the images managed to load at all.
