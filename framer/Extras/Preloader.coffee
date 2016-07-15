@@ -146,3 +146,7 @@ exports.disable = ->
 	return unless Framer.Preloader
 	Framer.Preloader.end()
 	Framer.Preloader = null
+
+exports.addImage = (url) ->
+	return unless Framer.Preloader
+	Framer.Preloader.addImage url
