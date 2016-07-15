@@ -1,4 +1,5 @@
-[
+window.__imported__ = window.__imported__ || {};
+window.__imported__["Mail@2x/layers.json.js"] = [
 	{
 		"objectId": "2623B1E9-86F6-4698-96F4-C5345662A407",
 		"kind": "artboard",
@@ -100,7 +101,7 @@
 							}
 						},
 						"children": [],
-						"time": 47
+						"time": 45
 					},
 					{
 						"objectId": "36138E4E-C1D7-4B63-9F5C-1133200081CE",
@@ -154,7 +155,7 @@
 							}
 						},
 						"children": [],
-						"time": 42
+						"time": 43
 					},
 					{
 						"objectId": "9DB03ECE-5B52-49BA-8004-A3FA0E9DF6AB",
@@ -181,7 +182,7 @@
 							}
 						},
 						"children": [],
-						"time": 43
+						"time": 42
 					},
 					{
 						"objectId": "19E9017E-EBD7-43B8-A05A-EFC96307EEF7",
@@ -208,10 +209,10 @@
 							}
 						},
 						"children": [],
-						"time": 43
+						"time": 42
 					}
 				],
-				"time": 397
+				"time": 394
 			},
 			{
 				"objectId": "E80CB7D2-9D05-448F-A528-EF6054D97738",
@@ -238,7 +239,7 @@
 					}
 				},
 				"children": [],
-				"time": 60
+				"time": 58
 			},
 			{
 				"objectId": "A4C95AA7-C899-45E1-B5DC-5622E779FD19",
@@ -300,7 +301,7 @@
 				"time": 24
 			}
 		],
-		"time": 572
+		"time": 566
 	},
 	{
 		"objectId": "C3D68655-FA62-45F4-9AAA-46546678E604",
@@ -428,16 +429,16 @@
 									}
 								},
 								"children": [],
-								"time": 15
+								"time": 17
 							}
 						],
-						"time": 30
+						"time": 33
 					}
 				],
-				"time": 76
+				"time": 78
 			}
 		],
-		"time": 92
+		"time": 93
 	},
 	{
 		"objectId": "01E6F436-7809-4CB5-BBAE-44BF612389DB",
@@ -493,10 +494,10 @@
 					}
 				},
 				"children": [],
-				"time": 23
+				"time": 22
 			}
 		],
-		"time": 69
+		"time": 70
 	},
 	{
 		"objectId": "9766BBE4-7F55-4C2F-8241-DAA72CFAECB2",

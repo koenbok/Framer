@@ -1,4 +1,5 @@
-[
+window.__imported__ = window.__imported__ || {};
+window.__imported__["Mail@1x/layers.json.js"] = [
 	{
 		"objectId": "2623B1E9-86F6-4698-96F4-C5345662A407",
 		"kind": "artboard",
@@ -73,7 +74,7 @@
 							}
 						},
 						"children": [],
-						"time": 46
+						"time": 43
 					},
 					{
 						"objectId": "A1336D88-8BCC-4B03-8C3E-6496CBB05B09",
@@ -100,7 +101,7 @@
 							}
 						},
 						"children": [],
-						"time": 47
+						"time": 42
 					},
 					{
 						"objectId": "36138E4E-C1D7-4B63-9F5C-1133200081CE",
@@ -127,7 +128,7 @@
 							}
 						},
 						"children": [],
-						"time": 47
+						"time": 43
 					},
 					{
 						"objectId": "C4B79D8B-5BA0-4C1F-8076-D8D8A419D6BE",
@@ -154,7 +155,7 @@
 							}
 						},
 						"children": [],
-						"time": 42
+						"time": 37
 					},
 					{
 						"objectId": "9DB03ECE-5B52-49BA-8004-A3FA0E9DF6AB",
@@ -181,7 +182,7 @@
 							}
 						},
 						"children": [],
-						"time": 43
+						"time": 37
 					},
 					{
 						"objectId": "19E9017E-EBD7-43B8-A05A-EFC96307EEF7",
@@ -208,10 +209,10 @@
 							}
 						},
 						"children": [],
-						"time": 43
+						"time": 41
 					}
 				],
-				"time": 397
+				"time": 348
 			},
 			{
 				"objectId": "E80CB7D2-9D05-448F-A528-EF6054D97738",
@@ -238,7 +239,7 @@
 					}
 				},
 				"children": [],
-				"time": 60
+				"time": 51
 			},
 			{
 				"objectId": "A4C95AA7-C899-45E1-B5DC-5622E779FD19",
@@ -297,10 +298,10 @@
 					}
 				},
 				"children": [],
-				"time": 24
+				"time": 22
 			}
 		],
-		"time": 572
+		"time": 473
 	},
 	{
 		"objectId": "C3D68655-FA62-45F4-9AAA-46546678E604",
@@ -434,10 +435,10 @@
 						"time": 30
 					}
 				],
-				"time": 76
+				"time": 75
 			}
 		],
-		"time": 92
+		"time": 90
 	},
 	{
 		"objectId": "01E6F436-7809-4CB5-BBAE-44BF612389DB",
@@ -493,10 +494,10 @@
 					}
 				},
 				"children": [],
-				"time": 23
+				"time": 20
 			}
 		],
-		"time": 69
+		"time": 45
 	},
 	{
 		"objectId": "9766BBE4-7F55-4C2F-8241-DAA72CFAECB2",
@@ -522,6 +523,6 @@
 			}
 		},
 		"children": [],
-		"time": 64
+		"time": 33
 	}
 ]

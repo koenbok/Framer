@@ -1,44 +1,46 @@
-scroll = new ScrollComponent
-	name: "MainScroll"
-	height: Framer.Screen.height
-	width: Framer.Screen.width
-	scrollHorizontal: false
-	directionLock: true
-	backgroundColor: 'white'
+# Framer.Extras.Hints.enable()
+# 
+# sketch = Framer.Importer.load("imported/Mail@2x")
+# 
+# nav = new NavComponent
+# nav.push(sketch.inbox)
+# 
+# # On a hamburger tap, we show the menu
+# sketch.hamburger.onTap ->
+# 	nav.modalRight(sketch.menu)
+# 
+# # If we tap on a few rows, show the mail
+# for row in sketch.yesterday.children
+# 	row.onTap -> nav.push(sketch.mail)
+# 
+# # If we tap on the mail, we go back again
+# sketch.mail.onTap -> nav.back()
+# 
+# Set up menu bar (not so interesting)
+# sketch.status.parent = null
+# sketch.status.point = 0
+# sketch.status.bringToFront()
 
-rows = []
 
-for i in [0...4]
-	row = new Layer
-		height: 400
-		width: 400
-		x: 25
-		y: 25 + 425 * i
-		parent: scroll.content
-		backgroundColor: 'white'
-		name: "row#{i}"
-	rows.push(row)
 
-for row in rows
-	storyScroll =  new ScrollComponent
-		name: "StoryScroll"
-		height: 400
-		width: Framer.Screen.width
-		x: 0
-		y: 0
-		parent: row
-		backgroundColor: 'white'
-		scrollVertical: false
-		directionLock: true
-		name: "units#{row.index}"
+card = -> 
+	
+	layer = new Layer
+		size:Screen
+		backgroundColor: Utils.randomColor()
+	
+	layer.html = "Hello"
+	
+	return layer
+	
+a = card()
+b = card()
+c = card()
 
-	# Add story units
-	for i in [0..4]
-		unit = new Layer
-			width: 400
-			height: 400
-			parent: storyScroll.content
-			x: 425 * i
-			backgroundColor: Utils.randomColor()
-			name: "unit#{i}"
-			
+c.frame = Utils.frameInset(c.frame, 100)
+
+nav = new NavComponent
+nav.push(a)
+
+a.onTap -> nav.dialog(c)
+# b.onTap -> nav.modal(c)
