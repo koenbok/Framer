@@ -69,5 +69,5 @@ window.Canvas = new (require "./Canvas").Canvas
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
 Framer.Extras.TouchEmulator.enable() if not Utils.isTouch()
 Framer.Extras.ErrorDisplay.enable() if not Utils.isFramerStudio()
+Framer.Extras.Preloader.enable() if not Utils.isFramerStudio()
 # Framer.Extras.Hints.enable() if not Utils.isFramerStudio()
-# Framer.Extras.Preloader.enable() if not Utils.isFramerStudio()
