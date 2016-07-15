@@ -1002,17 +1002,26 @@ class exports.Layer extends BaseClass
 
 		# If this layer has a parent draggable view and its position moved
 		# while dragging we automatically cancel click events. This is what
-		# you expect when you add a button to a scroll content layer.
+		# you expect when you add a button to a scroll content layer. We only
+		# want to do this if this layer is not draggable itself because that
+		# would break nested ScrollComponents.
 
-		if @_cancelClickEventInDragSession
-			if eventName in [Events.Click,
-				Events.Tap, Events.TapStart, Events.TapEnd,
+		if @_cancelClickEventInDragSession and not @_draggable
+			
+			if eventName in [
+				Events.Click, Events.Tap, Events.TapStart, Events.TapEnd,
 				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
+				
 				parentDraggableLayer = @_parentDraggableLayer()
+				
 				if parentDraggableLayer
+
+					# If we had a reasonable scrolling offset we cancel the click
 					offset = parentDraggableLayer.draggable.offset
 					return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
 					return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
+					
+					# If there is still some velocity (scroll is moving) we cancel the click
 					velocity = parentDraggableLayer.draggable.velocity
 					return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
 					return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity

@@ -1,53 +1,44 @@
-if not Utils.isFramerStudio()
-	Framer.Extras.Preloader.enable()
-	Framer.Extras.Hints.enable()
+scroll = new ScrollComponent
+	name: "MainScroll"
+	height: Framer.Screen.height
+	width: Framer.Screen.width
+	scrollHorizontal: false
+	directionLock: true
+	backgroundColor: 'white'
 
-layer = new Layer
-	size: Screen
+rows = []
 
-layer.onTap (e) ->
-	print Screen
-	print e.point
-	
-	point = Utils.convertPoint(e.point, null, Framer.CurrentContext, true)
-	
-	new Layer
-		midX: point.x
-		midY: point.y
-		
+for i in [0...4]
+	row = new Layer
+		height: 400
+		width: 400
+		x: 25
+		y: 25 + 425 * i
+		parent: scroll.content
+		backgroundColor: 'white'
+		name: "row#{i}"
+	rows.push(row)
 
+for row in rows
+	storyScroll =  new ScrollComponent
+		name: "StoryScroll"
+		height: 400
+		width: Framer.Screen.width
+		x: 0
+		y: 0
+		parent: row
+		backgroundColor: 'white'
+		scrollVertical: false
+		directionLock: true
+		name: "units#{row.index}"
 
-
-
-
-
-
-
-
-
-
-# 
-# nav = new NavComponent
-# 
-# grid = new GridComponent
-# 	width: Screen.width * 2
-# 	height: Screen.height * 2
-# 	rows: 10
-# 	columns: 10
-# 
-# nav.push(grid)
-# 
-# grid.renderCell = (layer) ->
-# 	layer.image = Utils.randomImage(layer) + "?date=#{Date.now()}"
-# 
-# 	layer.onClick ->
-# 		
-# 		large = new Layer
-# 			size: Utils.frameInset(nav, 80)
-# 			image: @image
-# 					
-# 		large.onTap ->
-# 			nav.back()
-# 		
-# 		nav.modal(large)
-# 
+	# Add story units
+	for i in [0..4]
+		unit = new Layer
+			width: 400
+			height: 400
+			parent: storyScroll.content
+			x: 425 * i
+			backgroundColor: Utils.randomColor()
+			name: "unit#{i}"
+			
