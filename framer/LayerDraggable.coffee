@@ -209,12 +209,8 @@ class exports.LayerDraggable extends BaseClass
 			t: Date.now() # We don't use timeStamp because it's different on Chrome/Safari
 
 		point = _.clone(@_point)
-
-		scaleX = (1 / @layer.canvasScaleX() * @layer.scale * @layer.scaleX)
-		scaleY = (1 / @layer.canvasScaleY() * @layer.scale * @layer.scaleY)
-
-		point.x = @_point.x + (event.delta.x * scaleX * @speedX) if @horizontal
-		point.y = @_point.y + (event.delta.y * scaleY * @speedY) if @vertical
+		point.x = @_point.x + (event.delta.x * @speedX * (1 / @layer.screenScaleX(false))) if @horizontal
+		point.y = @_point.y + (event.delta.y * @speedY * (1 / @layer.screenScaleY(false))) if @vertical
 
 		# Save the point for the next update so we have the unrounded, unconstrained value
 		@_point = _.clone(point)

@@ -328,12 +328,15 @@ class exports.GestureInputRecognizer
 
 	_getGestureEvent: (event) ->
 
+		eventPoint = Utils.convertPoint(
+			@_getEventPoint(event), null, Framer.CurrentContext, true)
+
 		_.extend event,
 			time: Date.now() # Current time √
 
-			point: @_getEventPoint(event) # Current point √
-			start: @_getEventPoint(event) # Start point √
-			previous: @_getEventPoint(event) # Previous point √
+			point: eventPoint # Current point √
+			start: eventPoint # Start point √
+			previous: eventPoint # Previous point √
 
 			offset: {x:0, y:0} # Offset since start √
 			offsetTime: 0 # Time since start √
@@ -349,7 +352,7 @@ class exports.GestureInputRecognizer
 			velocity: {x:0, y:0} # Velocity average over the last few events √
 
 			fingers: event.touches?.length or 0 # Number of fingers used √
-			touchCenter: @_getEventPoint(event) # Center between two fingers √
+			touchCenter: eventPoint # Center between two fingers √
 			touchOffset: {x:0, y:0} # Offset between two fingers √
 			touchDistance: 0 # Distance between two fingers √
 			scale: 1 # Scale value from two fingers √
