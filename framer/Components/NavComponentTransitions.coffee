@@ -5,6 +5,27 @@ Utils = require "../Utils"
 
 
 
+
+
+
+
+
+transition =
+	layerA:
+		show: { x: 0 - layerB.width }
+		hide: { x: Align.left }
+	layerB:
+		show: { x: 0 - layerB.width }
+		hide: { x: Align.left }
+	background:
+		show: { opacity: 0 }
+		hide: { opacity: 0.5 }
+
+
+
+
+
+
 class NavComponentTransition
 
 	constructor: (@navComponent, @layerA, @layerB) ->
@@ -112,35 +133,47 @@ class NavComponentDialogTransition extends NavComponentBackgroundTransition
 
 class NavComponentModalTransition extends NavComponentBackgroundTransition
 
-	constructor: (@navComponent, @layerA, @layerB) ->
-		
-		if @layerB
-			@statesB = new LayerStates(@layerB)
-			@statesB.add
-				a: 
-					x: 0 - @layerB.width
-					#y: @navComponent.height
-				b:
-					x: Align.left
-					#y: Align.top
+	getStatesLayerA: (states, navComponent, layerA, layerB, background) ->
+		return false
 
-			
-			@statesB.animationOptions =
-				curve: "spring(300,35,0)"
+	getStatesLayerB: (states, navComponent, layerA, layerB, background) ->
+		states.add
+			a: 
+				x: 0 - layerB.width
+			b: 
+				x: Align.left
+		states.animationOptions =
+			curve: "spring(300,35,0)"
+
+	getStatesBackground: (states, navComponent, layerA, layerB, background) ->
+		states.add
+			a:
+				frame: @navComponent.frame
+				opacity: 0
+				visible: true
+			b:
+				opacity: 0.5
+		states.animationOptions =
+			curve: "ease-out"
+			time: 0.2
+
+	constructor: (@navComponent, @layerA, @layerB) ->
 
 		if @navComponent.background
 			@background = @navComponent.background
 			@statesBackground = new LayerStates(@background)
-			@statesBackground.add
-				a:
-					frame: @navComponent.frame
-					opacity: 0
-					visible: true
-				b:
-					opacity: 0.5
-			@statesBackground.animationOptions =
-				curve: "ease-out"
-				time: 0.2
+			@getStatesBackground(@statesBackground, @navComponent, @layerA, @layerB, @background)
+
+		if @layerB
+			@statesB = new LayerStates(@layerB)
+			@getStatesLayerB(@statesB, @navComponent, @layerA, @layerB, @background)
+
+	_getStates: (name) ->
+		@["getStates#{name}"](@navComponent, @layerA, @layerB, @background)
+
+
+
+
 
 _.extend exports,
 	default: NavComponentTransition

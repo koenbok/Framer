@@ -74,7 +74,7 @@ window.__imported__["Mail2@2x/layers.json.js"] = [
 							}
 						},
 						"children": [],
-						"time": 52
+						"time": 46
 					},
 					{
 						"objectId": "A1336D88-8BCC-4B03-8C3E-6496CBB05B09",
@@ -101,7 +101,7 @@ window.__imported__["Mail2@2x/layers.json.js"] = [
 							}
 						},
 						"children": [],
-						"time": 52
+						"time": 47
 					},
 					{
 						"objectId": "36138E4E-C1D7-4B63-9F5C-1133200081CE",
@@ -128,7 +128,7 @@ window.__imported__["Mail2@2x/layers.json.js"] = [
 							}
 						},
 						"children": [],
-						"time": 58
+						"time": 47
 					},
 					{
 						"objectId": "C4B79D8B-5BA0-4C1F-8076-D8D8A419D6BE",
@@ -155,7 +155,7 @@ window.__imported__["Mail2@2x/layers.json.js"] = [
 							}
 						},
 						"children": [],
-						"time": 48
+						"time": 42
 					},
 					{
 						"objectId": "9DB03ECE-5B52-49BA-8004-A3FA0E9DF6AB",
@@ -182,7 +182,7 @@ window.__imported__["Mail2@2x/layers.json.js"] = [
 							}
 						},
 						"children": [],
-						"time": 50
+						"time": 43
 					},
 					{
 						"objectId": "19E9017E-EBD7-43B8-A05A-EFC96307EEF7",
@@ -209,10 +209,10 @@ window.__imported__["Mail2@2x/layers.json.js"] = [
 							}
 						},
 						"children": [],
-						"time": 49
+						"time": 43
 					}
 				],
-				"time": 456
+				"time": 397
 			},
 			{
 				"objectId": "E80CB7D2-9D05-448F-A528-EF6054D97738",
@@ -239,7 +239,7 @@ window.__imported__["Mail2@2x/layers.json.js"] = [
 					}
 				},
 				"children": [],
-				"time": 65
+				"time": 60
 			},
 			{
 				"objectId": "A4C95AA7-C899-45E1-B5DC-5622E779FD19",
@@ -271,7 +271,7 @@ window.__imported__["Mail2@2x/layers.json.js"] = [
 					}
 				},
 				"children": [],
-				"time": 19
+				"time": 18
 			},
 			{
 				"objectId": "3E9B0338-56AE-4544-989F-0212807AE283",
@@ -301,7 +301,7 @@ window.__imported__["Mail2@2x/layers.json.js"] = [
 				"time": 24
 			}
 		],
-		"time": 638
+		"time": 572
 	},
 	{
 		"objectId": "C3D68655-FA62-45F4-9AAA-46546678E604",
@@ -429,16 +429,16 @@ window.__imported__["Mail2@2x/layers.json.js"] = [
 									}
 								},
 								"children": [],
-								"time": 17
+								"time": 15
 							}
 						],
-						"time": 35
+						"time": 30
 					}
 				],
-				"time": 81
+				"time": 76
 			}
 		],
-		"time": 96
+		"time": 92
 	},
 	{
 		"objectId": "01E6F436-7809-4CB5-BBAE-44BF612389DB",
@@ -497,7 +497,7 @@ window.__imported__["Mail2@2x/layers.json.js"] = [
 				"time": 23
 			}
 		],
-		"time": 70
+		"time": 69
 	},
 	{
 		"objectId": "9766BBE4-7F55-4C2F-8241-DAA72CFAECB2",
@@ -507,7 +507,7 @@ window.__imported__["Mail2@2x/layers.json.js"] = [
 		"layerFrame": {
 			"x": 900,
 			"y": 184,
-			"width": 376,
+			"width": 375,
 			"height": 667
 		},
 		"visible": true,
@@ -518,11 +518,11 @@ window.__imported__["Mail2@2x/layers.json.js"] = [
 			"frame": {
 				"x": 900,
 				"y": 184,
-				"width": 376,
+				"width": 375,
 				"height": 667
 			}
 		},
 		"children": [],
-		"time": 67
+		"time": 64
 	}
 ]
