@@ -87,6 +87,22 @@ describe "LayerStates", ->
 			layer.states.switchInstant('default')
 			layer.html.should.equal "fff"
 
+		it "should not change style when going back to default", ->
+			layer = new Layer
+			layer.style.fontFamily = "Arial"
+			layer.style.fontFamily.should.equal "Arial"
+
+			layer.states.add
+				test: {x: 500}
+
+			layer.states.switchInstant("test")
+			layer.x.should.equal 500
+			layer.style.fontFamily = "Helvetica"
+			layer.style.fontFamily.should.equal "Helvetica"
+
+			layer.states.switchInstant("default")
+			layer.x.should.equal 0
+			layer.style.fontFamily.should.equal "Helvetica"
 
 	describe "Properties", ->
 
