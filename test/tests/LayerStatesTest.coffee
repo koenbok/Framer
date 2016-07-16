@@ -2,6 +2,12 @@ assert = require "assert"
 
 describe "LayerStates", ->
 
+	describe "Deprecation", ->
+
+		it "should support old events", ->
+			Events.StateWillSwitch.should.equal Events.StateSwitchStart
+			Events.StateDidSwitch.should.equal Events.StateSwitchEnd
+
 	describe "Events", ->
 
 		beforeEach ->
@@ -9,27 +15,27 @@ describe "LayerStates", ->
 			@layer.states.add("a", {x:100, y:100})
 			@layer.states.add("b", {x:200, y:200})
 
-		it "should emit willSwitch when switching", (done) ->
+		it "should emit StateWillSwitch when switching", (done) ->
 
 			test = (previous, current, states) =>
-				previous.should.equal 'default'
-				current.should.equal 'a'
-				@layer.states.state.should.equal 'default'
+				previous.should.equal "default"
+				current.should.equal "a"
+				@layer.states.state.should.equal "default"
 				done()
 
-			@layer.states.on 'willSwitch', test
-			@layer.states.switchInstant 'a'
+			@layer.states.on Events.StateWillSwitch, test
+			@layer.states.switchInstant "a"
 
-		it "should emit didSwitch when switching", (done) ->
+		it "should emit StateDidSwitch when switching", (done) ->
 
 			test = (previous, current, states) =>
-				previous.should.equal 'default'
-				current.should.equal 'a'
-				@layer.states.state.should.equal 'a'
+				previous.should.equal "default"
+				current.should.equal "a"
+				@layer.states.state.should.equal "a"
 				done()
 
-			@layer.states.on 'didSwitch', test
-			@layer.states.switchInstant 'a'
+			@layer.states.on Events.StateDidSwitch, test
+			@layer.states.switchInstant "a"
 
 
 	describe "Defaults", ->

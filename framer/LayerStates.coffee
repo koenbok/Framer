@@ -7,8 +7,12 @@
 LayerStatesIgnoredKeys = ["ignoreEvents"]
 
 # Animation events
-Events.StateWillSwitch = "willSwitch"
-Events.StateDidSwitch = "didSwitch"
+Events.StateSwitchStart = "stateswitchstart"
+Events.StateSwitchEnd = "stateswitchend"
+Events.StateSwitchStop = "stateswitchstop"
+
+Events.StateWillSwitch = Events.StateSwitchStart # Deprecated
+Events.StateDidSwitch = Events.StateSwitchEnd # Deprecated
 
 class exports.LayerStates extends BaseClass
 
@@ -60,7 +64,7 @@ class exports.LayerStates extends BaseClass
 		if not @_states.hasOwnProperty(stateName)
 			throw Error "No such state: '#{stateName}'"
 
-		@emit(Events.StateWillSwitch, @_currentState, stateName, @)
+		@emit(Events.StateSwitchStart, @_currentState, stateName, @)
 
 		@_previousStates.push(@_currentState)
 		@_currentState = stateName
@@ -80,7 +84,7 @@ class exports.LayerStates extends BaseClass
 			# Allow dynamic properties as functions
 			if _.isFunction(value)
 				value = value.call(@layer, @layer, propertyName, stateName)
-			
+
 			# Set the new value
 			properties[propertyName] = value
 
@@ -93,7 +97,7 @@ class exports.LayerStates extends BaseClass
 			# We can animate numbers
 			if _.isNumber(v)
 				animatablePropertyKeys.push(k)
-			
+
 			# We can animate colors
 			else if Color.isColorObject(v)
 				animatablePropertyKeys.push(k)
@@ -104,7 +108,8 @@ class exports.LayerStates extends BaseClass
 
 		if instant
 			@layer.props = properties
-			@emit(Events.StateDidSwitch, _.last(@_previousStates), @_currentState, @)
+			@emit(Events.StateSwitchStop, _.last(@_previousStates), @_currentState, @)
+			@emit(Events.StateSwitchEnd, _.last(@_previousStates), @_currentState, @)
 			return
 
 		# If there are, we start the animation here
@@ -121,9 +126,12 @@ class exports.LayerStates extends BaseClass
 				# @layer[k] = v if v not in animatablePropertyKeys
 				@layer[k] = v unless _.isNumber(v) or Color.isColorObject(v)
 
+			# Always throw a stop, so you can figure out if a state transition stopped half way
+			@emit(Events.StateSwitchStop, _.last(@_previousStates), @_currentState, @)
+
 			# If we changed the state, we send the event that we did
 			if _.last(@_previousStates) isnt stateName
-				@emit(Events.StateDidSwitch, _.last(@_previousStates), @_currentState, @)
+				@emit(Events.StateSwitchEnd, _.last(@_previousStates), @_currentState, @)
 
 
 	switchInstant: (stateName) ->
