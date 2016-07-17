@@ -87,3 +87,9 @@ This pushes the layer into the view, optionally using a default push animation o
 ###### .modalBottom(layer : Layer, animate=true : Bool)
 
 ###### .back()
+
+### TODO
+
+- Check transition events
+- Wrapping of NavComponent
+- Hooks for startForward, endForward etc.
