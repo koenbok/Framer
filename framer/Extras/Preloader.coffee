@@ -62,10 +62,10 @@ class Preloader extends BaseClass
 			return @_mediaLoaded.length is @_media.length
 
 	addImagesFromContext: (context) ->
-		_.pluck(context.layers, "image").map @addImage
+		_.pluck(context.layers, "image").map(@addImage)
 
 	addPlayersFromContext: (context) ->
-		_.pluck(context.layers, "player").map @addPlayer
+		_.pluck(context.layers, "player").map(@addPlayer)
 
 	addImage: (image) =>
 		if image and image not in @_media
@@ -137,7 +137,7 @@ class Preloader extends BaseClass
 
 	_handleTimeout: =>
 		return unless @isLoading
-		console.error "Preloader timeout, ending"
+		console.warning("Preloader timeout, ending")
 		@end()
 
 exports.enable = ->
@@ -149,8 +149,8 @@ exports.disable = ->
 	Framer.Preloader = null
 
 exports.addImage = (url) ->
-	Framer.Preloader?.addImage url
+	Framer.Preloader?.addImage(url)
 
 exports.addLogo = (layer) ->
-	Framer.Preloader?.brand.addChild layer
+	Framer.Preloader?.brand.addChild(layer)
 	Framer.Preloader?.brand.style["background-image"] = null
