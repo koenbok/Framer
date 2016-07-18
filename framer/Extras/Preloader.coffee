@@ -38,7 +38,7 @@ class Preloader extends BaseClass
 
 			do layout = =>
 				screen = Framer.Device?.screen
-				scale = screen?.frame.width / screen?.canvasFrame.width 
+				scale = screen?.frame.width / screen?.canvasFrame.width
 				@progressIndicator.scale = scale
 				@brand.scale = scale
 
@@ -143,8 +143,7 @@ class Preloader extends BaseClass
 		@end()
 
 exports.enable = ->
-	return if Framer.Preloader
-	Framer.Preloader = new Preloader()
+	Framer.Preloader ?= new Preloader()
 
 exports.disable = ->
 	return unless Framer.Preloader
@@ -152,5 +151,4 @@ exports.disable = ->
 	Framer.Preloader = null
 
 exports.addImage = (url) ->
-	return unless Framer.Preloader
-	Framer.Preloader.addImage url
+	Framer.Preloader?.addImage url
