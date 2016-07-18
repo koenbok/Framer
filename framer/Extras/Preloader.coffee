@@ -137,7 +137,7 @@ class Preloader extends BaseClass
 
 	_handleTimeout: =>
 		return unless @isLoading
-		console.warning("Preloader timeout, ending")
+		console.warn("Preloader timeout, ending")
 		@end()
 
 exports.enable = ->
