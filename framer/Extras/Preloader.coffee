@@ -87,9 +87,6 @@ class Preloader extends BaseClass
 
 	start: =>
 
-		@_media = []
-		@_mediaLoaded = []
-
 		# A static delay avoids the progress from being shown if the loading
 		# took less then the delay. So if all images were cached then we don't
 		# hope to see a loading screen at all.
