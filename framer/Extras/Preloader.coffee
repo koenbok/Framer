@@ -50,7 +50,7 @@ class Preloader extends BaseClass
 		get: -> @_mediaLoaded.length / @_media.length or 0
 
 	@define "time",
-		get: -> (Date.now() - @_start) / 1000
+		get: -> (Date.now() - @_startTime) / 1000
 
 	@define "isLoading",
 		get: -> @_isLoading
@@ -98,7 +98,7 @@ class Preloader extends BaseClass
 		@_isLoading = true
 		@_media = []
 		@_mediaLoaded = []
-		@_start = Date.now()
+		@_startTime = Date.now()
 
 		@emit("start")
 
