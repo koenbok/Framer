@@ -127,7 +127,7 @@ class Preloader extends BaseClass
 
 	_handleProgress: =>
 		@emit("progress", @progress)
-		@progressIndicator.setProgress(@progress)
+		@progressIndicator.setProgress(@progress, false)
 		@_handleLoaded() if @isReady
 
 	_handleLoaded: ->
