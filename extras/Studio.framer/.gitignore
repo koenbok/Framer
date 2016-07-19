@@ -37,3 +37,6 @@ app.js
 framer/images/*
 framer/framer*.js
 framer/framer*.js.map
+
+.preview.html
+.viewer.html

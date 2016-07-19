@@ -340,6 +340,9 @@ class exports.Context extends BaseClass
 			return unless @_element
 			@_element.style["z-index"] = value
 
+	ancestors: (args...) ->
+		return @_parent?.ancestors(args...) or []
+
 	toInspect: ->
 
 		round = (value) ->

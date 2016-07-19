@@ -1002,8 +1002,10 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 	ancestors = layer.ancestors(rootContext)
 	ancestors.reverse()
 	ancestors.push(layer) if includeLayer
+	
 	for ancestor in ancestors
 		point = ancestor.matrix3d.inverse().point(point)
+
 	return point
 
 # convert a frame from the context level to a layer, with rootContext enabled you can make it start from the top context
