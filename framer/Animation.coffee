@@ -73,7 +73,7 @@ class exports.Animation extends BaseClass
 		get: -> @options.looping
 		set: (value) ->
 			@options.looping = value
-			if (@options?.looping ? false) and @options?.layer? and !@isAnimating
+			if @options?.looping and @options?.layer? and !@isAnimating
 				@restart()
 
 	start: =>
