@@ -65,16 +65,15 @@ class exports.Animation extends BaseClass
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
-		@_looping = @options.looping
 
 	@define "isAnimating",
 		get: -> @ in @options.layer.context.animations
 
 	@define "looping",
-		get: -> @_looping
+		get: -> @options.looping
 		set: (value) ->
-			@_looping = value
-			if @_looping and @options?.layer? and !@isAnimating
+			@options.looping = value
+			if (@options?.looping ? false) and @options?.layer? and !@isAnimating
 				@restart()
 
 	start: =>
