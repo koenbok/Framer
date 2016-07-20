@@ -1,11 +1,11 @@
 {
   "propertyPanelToggleStates" : {
-
+    "Filters" : false
   },
   "deviceOrientation" : 0,
   "sharedPrototype" : 1,
   "contentScale" : 1,
-  "deviceType" : "apple-iphone-6s-gold",
+  "deviceType" : "apple-iphone-6s-silver",
   "selectedHand" : "",
   "updateDelay" : 0.3,
   "deviceScale" : "fit",

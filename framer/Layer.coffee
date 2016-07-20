@@ -144,8 +144,8 @@ class exports.Layer extends BaseClass
 	@define "custom", @simpleProperty("custom", undefined)
 
 	# Css properties
-	@define "width",  layerProperty(@, "width",  "width", 100, _.isNumber)
-	@define "height", layerProperty(@, "height", "height", 100, _.isNumber)
+	@define "width",  layerProperty(@, "width",  "width", 100, _.isNumber, layerPropertyPointTransformer)
+	@define "height", layerProperty(@, "height", "height", 100, _.isNumber, layerPropertyPointTransformer)
 
 	@define "visible", layerProperty(@, "visible", "display", true, _.isBoolean)
 	@define "opacity", layerProperty(@, "opacity", "opacity", 1, _.isNumber)
@@ -355,13 +355,17 @@ class exports.Layer extends BaseClass
 		importable: true
 		exportable: false
 		get: -> Utils.size(@)
-		set: (input) -> @_setGeometryValues(input, ["width", "height"])
+		set: (input) ->
+			input = layerPropertyPointTransformer(input, @, "size")
+			@_setGeometryValues(input, ["width", "height"])
 
 	@define "frame",
 		importable: true
 		exportable: false
 		get: -> Utils.frame(@)
-		set: (input) -> @_setGeometryValues(input, ["x", "y", "width", "height"])
+		set: (input) ->
+			input = layerPropertyPointTransformer(input, @, "frame")
+			@_setGeometryValues(input, ["x", "y", "width", "height"])
 
 
 	@define "minX",
