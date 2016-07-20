@@ -16,6 +16,9 @@ mkdir -p build/Framer/Project/framer
 cp build/framer.js build/Framer/Project/framer/framer.js
 cp build/framer.js.map build/Framer/Project/framer/framer.js.map
 
+# Copy over extra images
+cp -R extras/cursor-images build/Framer/Project/framer/images
+
 # Download the latest generator
 cd build/Framer
 curl "${GENERATOR_LATEST// /%20}" -o "generator.tgz"
