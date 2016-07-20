@@ -330,7 +330,7 @@ class exports.GestureInputRecognizer
 
 		# Convert the point to the current context
 		eventPoint = Utils.convertPointFromContext(
-			@_getEventPoint(event), Framer.CurrentContext, true, false)
+			@_getEventPoint(event), Framer.CurrentContext, true, true)
 
 		_.extend event,
 			time: Date.now() # Current time √
