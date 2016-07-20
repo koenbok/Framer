@@ -1,6 +1,6 @@
 layerA = new Layer
 	backgroundColor: "blue"
-	width: Align.parent
+	width: Align.parent(.8)
 
 layerB = new Layer
 	backgroundColor: "red"

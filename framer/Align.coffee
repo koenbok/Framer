@@ -44,29 +44,30 @@ bottom = (layer, property, offset=0) ->
 	borderWidth ?= 0
 	return pixelRound(parent.height - (2 * borderWidth) - layer.height + offset)
 
-parent = (layer, property) ->
+parent = (layer, property, factor=1) ->
 	parent = Screen
 	parent = layer.parent if layer.parent
-	return parent.size if property is "size"
-	return parent.width if property is "width"
-	return parent.height if property is "height"
-	return parent.frame if property is "frame"
+	size = {width: parent.width * factor, height: parent.height * factor}
+	return size if property is "size"
+	return size.width if property is "width"
+	return size.height if property is "height"
+	return {x: parent.x, y: parent.y, width: size.width, height: size.height} if property is "frame"
 	return 0
 
-children = (layer, property) ->
+children = (layer, property, factor=1) ->
 	frame = layer.contentFrame()
-	console.log(frame)
-	return {width:frame.width, height:frame.height} if property is "size"
-	return frame.width if property is "width"
-	return frame.height if property is "height"
-	return frame if property is "frame"
+	size = {width: frame.width * factor, height: frame.height * factor}
+	return size if property is "size"
+	return size.width if property is "width"
+	return size.height if property is "height"
+	return {x: frame.x, y: frame.y, width: size.width, height: size.height} if property is "frame"
 	return 0
 
 # Helper to see if we are dealing with a function or result of a function
 wrapper = (f, name) ->
 	align = (a, b) ->
 		return ((l, p) -> f(l, p, a)) if not a? or _.isNumber(a)
-		return f(a, b, 0)
+		return f(a, b)
 	align.toInspect = ->
 		return "Align.#{name}"
 	return align
