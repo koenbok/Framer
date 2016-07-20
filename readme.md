@@ -92,3 +92,4 @@ There are also a set of visual and interactive tests for Framer Studio which you
 - [Framer Studio](http://framerjs.com) - Prototyping application for OS X, built on Framer
 - [Latest Builds](http://builds.framerjs.com) - Latest builds of Framer.js
 - [Framer 3 Changes](https://github.com/koenbok/Framer/wiki/Framer-3-Changes) - What's new in Framer 3
+
