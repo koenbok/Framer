@@ -1004,6 +1004,7 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 	ancestors.push(layer) if includeLayer
 	
 	for ancestor in ancestors
+		continue unless ancestor.matrix3d
 		point = ancestor.matrix3d.inverse().point(point)
 
 	return point
