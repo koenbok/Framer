@@ -889,9 +889,15 @@ class exports.Layer extends BaseClass
 		delete properties.options
 		options.properties = Animation.filterAnimatableProperties(properties)
 		options.layer = @
+
 		start = options.start
 		start ?= true
 		delete options.start
+
+		if options.instant
+			options.animate = false
+		delete options.instant
+		
 		animation = new Animation options
 		animation.start() if start
 		animation

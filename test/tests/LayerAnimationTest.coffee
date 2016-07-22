@@ -513,3 +513,22 @@ describe "LayerAnimation", ->
 
 				@layer.x.should.equal 100
 				calledEvents.should.eql(["start", "end", "stop"])
+
+			it "should listen to instant: true to disable animation", ->
+				animation = @layer.animateTo
+					x: 100
+					options:
+						curve: "spring"
+						time: 2
+						instant: true
+
+				calledEvents = []
+
+				["start", "stop", "end"].map (eventName) ->
+					animation.on eventName, ->
+						calledEvents.push(eventName)
+
+				animation.start()
+
+				@layer.x.should.equal 100
+				calledEvents.should.eql(["start", "end", "stop"])
