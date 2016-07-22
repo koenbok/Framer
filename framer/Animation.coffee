@@ -297,7 +297,7 @@ class exports.Animation extends BaseClass
 					@options.curveOptions[k] = value if value
 
 	@isAnimatable = (v) ->
-		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or v == null
+		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v)
 
 	@filterAnimatableProperties = (properties) ->
 		# Function to filter only animatable properties out of a given set
