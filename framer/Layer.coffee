@@ -879,7 +879,7 @@ class exports.Layer extends BaseClass
 	## ANIMATION
 
 	animate: (options) ->
-		console.warn "Layer.animate is deprecated: please use Layer.animateTo instead"
+		# console.warn "Layer.animate is deprecated: please use Layer.animateTo instead"
 		properties = options.properties
 		delete options.properties
 		@animateTo(properties, options)
