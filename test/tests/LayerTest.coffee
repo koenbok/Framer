@@ -1131,9 +1131,9 @@ describe "Layer", ->
 			layer = new Layer
 			layer.draggable.enabled = true
 
-			a1 = layer.animate properties: {x:100}
-			a2 = layer.animate properties: {y:100}
-			a3 = layer.animate properties: {blur:1}
+			a1 = layer.animateTo x:100
+			a2 = layer.animateTo y:100
+			a3 = layer.animateTo blur:1
 
 			a1.isAnimating.should.equal true
 			a2.isAnimating.should.equal true

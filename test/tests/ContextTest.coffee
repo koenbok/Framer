@@ -132,9 +132,8 @@ describe "Context", ->
 
 			context.run ->
 				layer = new Layer
-				animation = layer.animate
-					properties:
-						x: 100
+				animation = layer.animateTo
+					x: 100
 
 			# We should have a click listener
 			context.animations.should.eql [animation]

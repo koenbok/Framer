@@ -878,13 +878,15 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## ANIMATION
 
-	animate: (options) ->
 
+	animateTo: (properties,options={}) ->
+		_.defaults(options,properties.options)
+		delete properties.options
+		options.properties = Animation.filterAnimatableProperties(properties)
+		options.layer = @
 		start = options.start
 		start ?= true
 		delete options.start
-
-		options.layer = @
 		animation = new Animation options
 		animation.start() if start
 		animation

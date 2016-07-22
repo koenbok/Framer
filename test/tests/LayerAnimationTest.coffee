@@ -39,11 +39,27 @@ describe "LayerAnimation", ->
 
 				properties = {}
 				properties[p] = 100
-
-				layer.animate
-					properties: properties
+				options =
 					curve: "linear"
 					time: AnimationTime
+
+				animation = layer.animateTo properties, options
+				animation.options.curve.should.equal "linear"
+				layer.on "end", ->
+					layer[p].should.equal 100
+					done()
+
+			it "should support options key for property #{p}", (done) ->
+				layer = new Layer()
+
+				properties = {}
+				properties[p] = 100
+				properties.options =
+					curve: "linear"
+					time: AnimationTime
+
+				animation = layer.animateTo properties
+				animation.options.curve.should.equal "linear"
 
 				layer.on "end", ->
 					layer[p].should.equal 100
@@ -57,10 +73,10 @@ describe "LayerAnimation", ->
 				properties = {}
 				properties[p] = '+=50'
 
-				layer.animate
-					properties: properties
+				layer.animateTo properties,
 					curve: "linear"
 					time: AnimationTime
+
 
 				layer.on "end", ->
 					layer[p].should.equal 100
@@ -74,24 +90,25 @@ describe "LayerAnimation", ->
 				properties = {}
 				properties[p] = '+=50'
 
-				layer.animate
-					properties: properties
+				layer.animateTo properties,
 					curve: "linear"
 					time: AnimationTime
+
 
 				layer.on "end", ->
 					layer[p].should.equal 100
 					done()
 
+
 		it "should animate dynamic properties", (done) ->
 
 			layer = new Layer()
 
-			layer.animate
-				properties:
-					scale: -> layer.scale + 1
-				curve: "linear"
-				time: AnimationTime
+			layer.animateTo
+				scale: -> layer.scale + 1
+				options:
+					curve: "linear"
+					time: AnimationTime
 
 			layer.on "end", ->
 				layer.scale.should.equal 2
@@ -102,11 +119,11 @@ describe "LayerAnimation", ->
 			color = "red"
 			layer = new Layer()
 
-			layer.animate
-				properties:
-					backgroundColor: color
-				curve: "linear"
-				time: AnimationTime
+			layer.animateTo
+				backgroundColor: color
+				options:
+					curve: "linear"
+					time: AnimationTime
 
 			layer.on "end", ->
 				layer.backgroundColor.toName().should.eql color
@@ -160,9 +177,10 @@ describe "LayerAnimation", ->
 		it "should list running animations", ->
 
 			layer = new Layer()
-			animation = layer.animate
-				properties: {x: 100}
-				time: 0.5
+			animation = layer.animateTo
+				x: 100
+				options:
+					time: 0.5
 
 			(animation in layer.animations()).should.be.true
 			layer.animateStop()
@@ -172,9 +190,10 @@ describe "LayerAnimation", ->
 
 			layer = new Layer()
 
-			animation = layer.animate
-				properties: {x: 100}
-				time: 0.5
+			animation = layer.animateTo
+				x: 100
+				options:
+					time: 0.5
 
 			count = 0
 
@@ -191,9 +210,10 @@ describe "LayerAnimation", ->
 		it "should tell you if animations are running", ->
 
 			layer = new Layer()
-			animation = layer.animate
-				properties: {x: 100}
-				time: 0.5
+			animation = layer.animateTo
+				x: 100
+				options:
+					time: 0.5
 
 			layer.isAnimating.should.equal(true)
 			layer.animateStop()
@@ -313,22 +333,25 @@ describe "LayerAnimation", ->
 
 			layerA = new Layer width:80, height:80
 			layerA.name = "layerA"
-			layerA.animate
-				properties: {y:300}
-				time: 2 * AnimationTime
+			layerA.animateTo
+				y:300
+				options:
+					time: 2 * AnimationTime
 
 			layerB = new Layer width:80, height:80, x:100, backgroundColor:"red"
 			layerB.name = "layerB"
-			layerB.animate
-				properties: {y:300}
-				time: 5 * AnimationTime
+			layerB.animateTo
+				y:300
+				options:
+					time: 5 * AnimationTime
 
 			layerC = new Layer width:80, height:80, x:200, backgroundColor:"orange"
 			layerC.name = "layerC"
-			layerC.animate
-				properties: {y:300}
-				time: 2 * AnimationTime
-				curve: "cubic-bezier"
+			layerC.animateTo
+				y:300
+				options:
+					time: 2 * AnimationTime
+					curve: "cubic-bezier"
 
 			readyLayers = []
 
