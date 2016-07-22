@@ -132,9 +132,8 @@ describe "Context", ->
 
 			context.run ->
 				layer = new Layer
-				animation = layer.animate
-					properties:
-						x: 100
+				animation = layer.animateTo
+					x: 100
 
 			# We should have a click listener
 			context.animations.should.eql [animation]
@@ -163,11 +162,11 @@ describe "Context", ->
 	describe "Layers", ->
 
 		it "should add and remove layers", ->
-			
+
 			context = new Framer.Context(name:"Test")
-			
+
 			context.run ->
-				
+
 				layerA = new Layer
 				layerB = new Layer
 				layerC = new Layer
@@ -178,11 +177,11 @@ describe "Context", ->
 				context.layers.should.eql []
 
 		it "should list root layers", ->
-			
+
 			context = new Framer.Context(name:"Test")
-			
+
 			context.run ->
-				
+
 				layerA = new Layer
 				layerB = new Layer parent:layerA
 
@@ -193,7 +192,7 @@ describe "Context", ->
 		it "should get layers by id", ->
 
 			context = new Framer.Context(name:"Test")
-			
+
 			context.run ->
 				layerA = new Layer
 				context.layerForId(layerA.id).should.equal layerA
@@ -201,7 +200,7 @@ describe "Context", ->
 		it "should get layers by element", ->
 
 			context = new Framer.Context(name:"Test")
-			
+
 			context.run ->
 				layerA = new Layer
 				context.layerForElement(layerA._element).should.equal layerA

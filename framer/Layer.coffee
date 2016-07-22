@@ -879,12 +879,25 @@ class exports.Layer extends BaseClass
 	## ANIMATION
 
 	animate: (options) ->
+		# console.warn "Layer.animate is deprecated: please use Layer.animateTo instead"
+		properties = options.properties
+		delete options.properties
+		@animateTo(properties, options)
+
+	animateTo: (properties,options={}) ->
+		_.defaults(options,properties.options)
+		delete properties.options
+		options.properties = Animation.filterAnimatableProperties(properties)
+		options.layer = @
 
 		start = options.start
 		start ?= true
 		delete options.start
 
-		options.layer = @
+		if options.instant
+			options.animate = false
+		delete options.instant
+		
 		animation = new Animation options
 		animation.start() if start
 		animation
@@ -1007,20 +1020,20 @@ class exports.Layer extends BaseClass
 		# would break nested ScrollComponents.
 
 		if @_cancelClickEventInDragSession and not @_draggable
-			
+
 			if eventName in [
 				Events.Click, Events.Tap, Events.TapStart, Events.TapEnd,
 				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
-				
+
 				parentDraggableLayer = @_parentDraggableLayer()
-				
+
 				if parentDraggableLayer
 
 					# If we had a reasonable scrolling offset we cancel the click
 					offset = parentDraggableLayer.draggable.offset
 					return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
 					return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
-					
+
 					# If there is still some velocity (scroll is moving) we cancel the click
 					velocity = parentDraggableLayer.draggable.velocity
 					return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
