@@ -6,30 +6,32 @@ describe "LayerStates", ->
 
 		beforeEach ->
 			@layer = new Layer()
-			@layer.states.add("a", {x:100, y:100})
-			@layer.states.add("b", {x:200, y:200})
+			@layer.states.a = {x:100, y:100}
+			@layer.states.b = {x:200, y:200}
 
 		it "should emit willSwitch when switching", (done) ->
 
 			test = (previous, current, states) =>
-				previous.should.equal 'default'
+				previous.should.equal 'initial'
 				current.should.equal 'a'
-				@layer.states.state.should.equal 'default'
+				@layer.states.currentName.should.equal 'initial'
+				@layer.states.current.should.equal @layer.states.initial
 				done()
 
 			@layer.states.on 'willSwitch', test
-			@layer.states.switchInstant 'a'
+			@layer.animateTo 'a', instant: true
 
 		it "should emit didSwitch when switching", (done) ->
 
 			test = (previous, current, states) =>
-				previous.should.equal 'default'
+				previous.should.equal 'initial'
 				current.should.equal 'a'
-				@layer.states.state.should.equal 'a'
+				@layer.states.currentName.should.equal 'a'
+				@layer.states.current.should.equal @layer.states.a
 				done()
 
 			@layer.states.on 'didSwitch', test
-			@layer.states.switchInstant 'a'
+			@layer.animateTo 'a', instant: true
 
 
 	describe "Defaults", ->
@@ -37,30 +39,29 @@ describe "LayerStates", ->
 		it "should set defaults", ->
 
 			layer = new Layer
-			layer.states.add "test", {x:123}
-			layer.states.switch "test"
+			layer.states.test = {x:123}
+			animation = layer.animateTo "test"
 
-			layer.states._animation.options.curve.should.equal Framer.Defaults.Animation.curve
+			animation.options.curve.should.equal Framer.Defaults.Animation.curve
 
 			Framer.Defaults.Animation =
 				curve: "spring(1, 2, 3)"
 
 			layer = new Layer
-			layer.states.add "test", {x:456}
-			layer.states.switch "test"
+			layer.states.test = {x:456}
+			animation = layer.animateTo "test"
 
-			layer.states._animation.options.curve.should.equal "spring(1, 2, 3)"
+			animation.options.curve.should.equal "spring(1, 2, 3)"
 
 			Framer.resetDefaults()
 
-		it "should convert string to colors in states", ->
-			layer = new Layer
-			layer.states.add
-				test:
-					backgroundColor:"fff"
-					color: "000"
-			layer.states._states.test.backgroundColor.isEqual(new Color("fff")).should.be.true
-			layer.states._states.test.color.isEqual(new Color("000")).should.be.true
+		# it "should convert string to colors in states", ->
+		# 	layer = new Layer
+		# 	layer.states.test =
+		# 			backgroundColor:"fff"
+		# 			color: "000"
+		# 	layer.states.test.backgroundColor.isEqual(new Color("fff")).should.be.true
+		# 	layer.states.test.color.isEqual(new Color("000")).should.be.true
 
 
 
@@ -69,44 +70,56 @@ describe "LayerStates", ->
 		it "should switch instant", ->
 
 			layer = new Layer
-			layer.states.add
-				stateA: {x:123}
-				stateB: {y:123}
+			layer.states =
+				stateA:
+					x:123
+				stateB:
+					y:123
+					options:
+						instant: true
 
-			layer.states.switchInstant "stateA"
-			layer.states.current.should.equal "stateA"
+			layer.animateTo "stateA",
+				instant: true
+			layer.states.currentName.should.equal "stateA"
 			layer.x.should.equal 123
 
-			layer.states.switchInstant "stateB"
-			layer.states.current.should.equal "stateB"
+			layer.animateTo "stateB"
+			layer.states.currentName.should.equal "stateB"
 			layer.y.should.equal 123
 
 		it "should not change html when using switch instant", ->
 			layer = new Layer
 				html: "fff"
-			layer.states.switchInstant('default')
+			layer.states.stateA = {x: 100}
+			layer.animateTo 'stateA', instant: true
 			layer.html.should.equal "fff"
+
+		it "should not convert html to a color value if used in a state", ->
+			layer = new Layer
+			layer.states.stateA = {x: 100, html: 'aaa'}
+			layer.animateTo 'stateA', instant: true
+			layer.html.should.equal "aaa"
 
 		it "should not change style when going back to default", ->
 			layer = new Layer
 			layer.style.fontFamily = "Arial"
 			layer.style.fontFamily.should.equal "Arial"
 
-			layer.states.add
+			layer.states =
 				test: {x: 500}
 
-			layer.states.switchInstant("test")
+			layer.animateTo "test", instant: true
 			layer.x.should.equal 500
 			layer.style.fontFamily = "Helvetica"
 			layer.style.fontFamily.should.equal "Helvetica"
 
-			layer.states.switchInstant("default")
+			layer.animateTo "initial", instant: true
 			layer.x.should.equal 0
 			layer.style.fontFamily.should.equal "Helvetica"
 
 	describe "Properties", ->
 
-		it "should bring back the 'default' state values when using 'next'", (done) ->
+		it.skip "should bring back the 'default' state values when using 'next'", (done) ->
 
 			layer = new Layer
 			layer.states.add
@@ -139,23 +152,23 @@ describe "LayerStates", ->
 		it "should set scroll property", ->
 
 			layer = new Layer
-			layer.states.add
+			layer.states =
 				stateA: {scroll:true}
 				stateB: {scroll:false}
 
-			layer.states.switchInstant "stateA"
+			layer.animateTo "stateA", instant: true
 			layer.scroll.should.equal true
 
-			layer.states.switchInstant "stateB"
+			layer.animateTo "stateB", instant: true
 			layer.scroll.should.equal false
 
-			layer.states.switchInstant "stateA"
+			layer.animateTo "stateA", instant: true
 			layer.scroll.should.equal true
 
 		it "should set non numeric properties with animation", (done) ->
 
 			layer = new Layer
-			layer.states.add
+			layer.states =
 				stateA: {scroll:true, backgroundColor:"red"}
 
 			layer.scroll.should.equal false
@@ -165,12 +178,12 @@ describe "LayerStates", ->
 				layer.style.backgroundColor.should.equal new Color("red").toString()
 				done()
 
-			layer.states.switch "stateA"
+			layer.animateTo "stateA"
 
 		it "should set non and numeric properties with animation", (done) ->
 
 			layer = new Layer
-			layer.states.add
+			layer.states =
 				stateA: {x:200, backgroundColor:"red"}
 
 			# layer.scroll.should.equal false
@@ -182,20 +195,20 @@ describe "LayerStates", ->
 				layer.style.backgroundColor.should.equal new Color("red").toString()
 				done()
 
-			layer.states.switch "stateA", {curve:"linear", time:0.1}
+			layer.animateTo "stateA", {curve:"linear", time:0.1}
 
 		it "should restore the default state when using non exportable properties", ->
 
 			layer = new Layer
-			layer.states.add
+			layer.states =
 				stateA: {midX:200}
 
 			layer.x.should.equal 0
 
-			layer.states.switchInstant "stateA"
+			layer.animateTo "stateA", instant: true
 			layer.x.should.equal 200 - (layer.width // 2)
 
-			layer.states.switchInstant "default"
+			layer.animateTo "initial", instant: true
 			layer.x.should.equal 0
 
 		it "should set the parent", ->
@@ -203,15 +216,19 @@ describe "LayerStates", ->
 			layerA = new Layer
 			layerB = new Layer
 				parent: layerA
+			layerC = new Layer
 
-			layerB.states.add
-				stateA:
+			layerB.states =
+				noParent:
 					parent: null
+				parentC:
+					parent: layerC
 
 			assert.equal(layerB.parent, layerA)
-
-			layerB.states.switchInstant "stateA"
+			layerB.animateTo "parentC", instant: true
+			assert.equal(layerB.parent, layerC)
+			layerB.animateTo "noParent", instant: true
 			assert.equal(layerB.parent, null)
 
-			layerB.states.switchInstant "default"
+			layerB.animateTo "initial", instant: true
 			# assert.equal(layerB.parent, layerA)
