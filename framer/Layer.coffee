@@ -891,21 +891,45 @@ class exports.Layer extends BaseClass
 		@animateTo(properties, options)
 
 	animateTo: (properties,options={}) ->
+		if typeof properties == 'string'
+			stateName = properties
+			properties = @states[stateName]
+			if not properties?
+				throw Error "No such state: '#{stateName}'"
+			#Switch the state
+			@states.emit(Events.StateWillSwitch, @states.currentName, stateName, @)
+			@states._previousStates.push(@states.currentName)
+			@states._currentName = stateName
+
 		_.defaults(options,properties.options)
 		delete properties.options
-		options.properties = Animation.filterAnimatableProperties(properties)
+		animatableProperties = Animation.filterAnimatableProperties(properties)
+		nonAnimatableKeys = _.difference(_.keys(properties),_.keys(animatableProperties))
+		nonAnimatableProperties = _.pick(_.clone(properties),nonAnimatableKeys)
+		options.properties = animatableProperties
 		options.layer = @
 
 		start = options.start
 		start ?= true
 		delete options.start
-
-		if options.instant
+		console.log animatableProperties,nonAnimatableProperties
+		instant = options.instant ? false
+		if instant
 			options.animate = false
 		delete options.instant
-		
+
 		animation = new Animation options
-		animation.start() if start
+		animationFinished = =>
+			for k, v of nonAnimatableProperties
+				@[k] = v
+			# If we changed the state, we send the event that we did
+			if stateName? and _.last(@_previousStates) isnt stateName
+				@states.emit(Events.StateDidSwitch, _.last(@states._previousStates), @states.currentName, @)
+		animation.once Events.AnimationStop, animationFinished
+		started = animation.start() if start
+		if not started
+			# If the animation didn't start (e.g. because there are no properties to animate), call the finished handler ourselves
+			animationFinished()
 		animation
 
 	animations: ->
