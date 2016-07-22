@@ -1,3 +1,5 @@
+assert = require "assert"
+
 AnimationTime = 0.05
 AnimationProperties = ["x", "y", "midY", "rotation"]
 
@@ -144,6 +146,17 @@ describe "LayerAnimation", ->
 			layer.on "end", ->
 				layer.backgroundColor.toName().should.eql color
 				done()
+
+		it "should not animate non-animatable properties that are set to null", ->
+			layerA = new Layer
+			layerB = new Layer
+				parent: layerA
+			layerB.animateTo
+				parent: null
+				options:
+					instant: true
+			assert.equal(layerB.parent, null)
+
 
 	describe "Basic", ->
 
