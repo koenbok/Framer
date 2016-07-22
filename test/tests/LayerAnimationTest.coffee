@@ -33,6 +33,22 @@ describe "LayerAnimation", ->
 
 		AnimationProperties.map (p) ->
 
+			it "should still support the deprecated API for property #{p}", (done) ->
+
+				layer = new Layer()
+
+				properties = {}
+				properties[p] = 100
+
+				layer.animate
+					properties: properties
+					curve: "linear"
+					time: AnimationTime
+
+				layer.on "end", ->
+					layer[p].should.equal 100
+					done()
+
 			it "should animate property #{p}", (done) ->
 
 				layer = new Layer()
