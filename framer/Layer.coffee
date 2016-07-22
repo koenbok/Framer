@@ -912,7 +912,6 @@ class exports.Layer extends BaseClass
 		start = options.start
 		start ?= true
 		delete options.start
-		console.log animatableProperties,nonAnimatableProperties
 		instant = options.instant ? false
 		if instant
 			options.animate = false
