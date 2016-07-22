@@ -132,6 +132,7 @@ class exports.Layer extends BaseClass
 			if options.hasOwnProperty(p)
 				@[p] = options[p]
 
+		@_states = new LayerStates(@)
 		@_context.emit("layer:create", @)
 
 	##############################################################
@@ -966,7 +967,9 @@ class exports.Layer extends BaseClass
 		enumerable: false
 		exportable: false
 		importable: false
-		get: -> @_states ?= new LayerStates @
+		get: -> @_states
+		set: (states) ->
+			@_states = new LayerStates(@, @_states.initial, states)
 
 	#############################################################################
 	## Draggable, Pinchable
