@@ -94,6 +94,13 @@ describe "LayerStates", ->
 			layer.animateTo 'stateA', instant: true
 			layer.html.should.equal "fff"
 
+		it "should switch non animatable properties", ->
+			layer = new Layer
+			layer.states.stateA = {x: 100, image:"static/test2.png"}
+			layer.animateTo 'stateA', instant: true
+			layer.x.should.equal 100
+			layer.image.should.equal "static/test2.png"
+
 		it "should not convert html to a color value if used in a state", ->
 			layer = new Layer
 			layer.states.stateA = {x: 100, html: 'aaa'}
