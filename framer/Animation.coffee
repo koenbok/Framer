@@ -304,9 +304,8 @@ class exports.Animation extends BaseClass
 		for k, v of properties
 			if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or v == null
 				animatableProperties[k] = v
-			else if _.isString(v)
-				if Color.isColorString(v)
-					animatableProperties[k] = new Color(v)
+			else if Color.isValidColorProperty(k,v)
+				animatableProperties[k] = new Color(v)
 
 
 		return animatableProperties
