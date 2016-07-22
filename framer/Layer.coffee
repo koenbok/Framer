@@ -1009,20 +1009,20 @@ class exports.Layer extends BaseClass
 		# would break nested ScrollComponents.
 
 		if @_cancelClickEventInDragSession and not @_draggable
-			
+
 			if eventName in [
 				Events.Click, Events.Tap, Events.TapStart, Events.TapEnd,
 				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
-				
+
 				parentDraggableLayer = @_parentDraggableLayer()
-				
+
 				if parentDraggableLayer
 
 					# If we had a reasonable scrolling offset we cancel the click
 					offset = parentDraggableLayer.draggable.offset
 					return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
 					return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
-					
+
 					# If there is still some velocity (scroll is moving) we cancel the click
 					velocity = parentDraggableLayer.draggable.velocity
 					return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity

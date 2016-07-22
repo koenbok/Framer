@@ -80,7 +80,7 @@ class exports.LayerStates extends BaseClass
 			# Allow dynamic properties as functions
 			if _.isFunction(value)
 				value = value.call(@layer, @layer, propertyName, stateName)
-			
+
 			# Set the new value
 			properties[propertyName] = value
 
@@ -93,7 +93,7 @@ class exports.LayerStates extends BaseClass
 			# We can animate numbers
 			if _.isNumber(v)
 				animatablePropertyKeys.push(k)
-			
+
 			# We can animate colors
 			else if Color.isColorObject(v)
 				animatablePropertyKeys.push(k)
