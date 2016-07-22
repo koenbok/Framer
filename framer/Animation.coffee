@@ -296,13 +296,16 @@ class exports.Animation extends BaseClass
 					value = parseFloat parsedCurve.args[i]
 					@options.curveOptions[k] = value if value
 
+	@isAnimatable = (v) ->
+		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or v == null
+
 	@filterAnimatableProperties = (properties) ->
 		# Function to filter only animatable properties out of a given set
 		animatableProperties = {}
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or v == null
+			if @isAnimatable(v)
 				animatableProperties[k] = v
 			else if Color.isValidColorProperty(k,v)
 				animatableProperties[k] = new Color(v)
