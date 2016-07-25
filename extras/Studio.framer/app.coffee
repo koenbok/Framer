@@ -28,7 +28,6 @@ class ShareLayer extends Layer
 
 # Sheet
 class ShareComponent
-
 	constructor: (@shareInfo) ->
 		@render()
 		@_startListening()
@@ -42,7 +41,8 @@ class ShareComponent
 		@_renderDownload() if !@shareInfo.local
 		
 		# Evaluate content and set height accordingly
-		@_updateHeight()		
+		@_updateHeight()
+		@_checkCanvasSize()		
 		
 	# Render main sheet
 	_renderSheet: ->
@@ -215,6 +215,9 @@ class ShareComponent
 				color: "#FFF"
 				
 		@_showPointer(@download)
+	
+	_checkCanvasSize: ->
+		if Canvas.width < 1080 then @_closeSheet() else @_openSheet()
 				
 	_startListening: ->
 		# Show regular cursor on sheet
@@ -225,6 +228,11 @@ class ShareComponent
 		# Toggle sheet
 		@close.onClick => @_closeSheet()
 		@framerButton.onClick => @_openSheet()
+		
+		# When the window resizes evaluate if the sheet needs to be hidden
+		Canvas.onResize (event) => @_checkCanvasSize()
+			
+	
 	
 	_showPointer: (layer) ->
 		layer.onMouseOver ->
