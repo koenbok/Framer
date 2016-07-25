@@ -8,7 +8,7 @@
 # Info Fixture
 shareInfo =
 	author: "Jorn van Dijk"
-	twitter: "jornvandijk"
+# 	twitter: "jornvandijk"
 	title: "Android Tabs"
 	description: """
 		Here's a new Framer example. It's a little grid of photos, which you can scroll, click and pinch to zoom. Made to highlight some of our latest 		features: scroll and click separation, pinchable layers, event shortcuts and more.
@@ -40,7 +40,7 @@ class ShareComponent
 	constructor: (@shareInfo) ->
 		@render()
 		@_startListening()
-		
+			
 	render: ->		
 		@_renderSheet()
 		@_renderToggleButtons()
@@ -129,50 +129,65 @@ class ShareComponent
 		@info = new ShareLayer
 			parent: @sheet
 			width: @sheet.width-40
-			y: @cta.maxY
+			y: @cta.maxY + 22
 			x: 20
-			
+
 		@credentials = new ShareLayer
 			parent: @info
-			height: 40
-			y: 22
-
-		@credentialsAvatar = new ShareLayer
-			size: 40
-			parent: @credentials
-			borderRadius: 100
-			image: "http://img.tweetimag.es/i/#{@shareInfo.twitter}_n"
-			
-		credentialsAvatarBorder = new ShareLayer
-			width: @credentialsAvatar.width - 2
-			height: @credentialsAvatar.width - 2
-			point: 1
-			parent: @credentialsAvatar
-			borderRadius: 100
-			style:
-				boxShadow: "0 0 0 1px rgba(0,0,0,.1)"
-			
-		credentialsTitle = new ShareLayer
+			height: 16
+				
+		@credentialsTitle = new ShareLayer
 			parent: @credentials
 			width: @credentials.width - 50
 			height: 18
-			y: 4
-			x: 50
 			html: @shareInfo.title
 			style:
 				fontWeight: "500"
 				lineHeight: "1"
 				
-		@credentialsAuthor = new ShareLayer
-			parent: @credentials
-			width: @credentials.width - 50
-			x: 50
-			height: 18
-			y: credentialsTitle.maxY
-			html: "<a href='http://twitter.com/#{@shareInfo.twitter}' style='text-decoration: none'>#{@shareInfo.author}</a>"
-			style:
-				lineHeight: "1"
-				color: "#808080"
+		# Check what info is available and render layers accordingly
+		showAuthor = (content = @shareInfo.author) =>
+			@credentials.height = 40
+			@credentialsTitle.y = 4
+					
+			@credentialsAuthor = new ShareLayer
+				parent: @credentials
+				width: @credentials.width - 50
+				html: content
+				y: @credentialsTitle.maxY
+				height: 18
+				style:
+					lineHeight: "1"
+					color: "#808080"
+					
+			@_showPointer(@credentialsAuthor)
+		
+		# Check if avatar is available
+		if @shareInfo.twitter
+			@credentials.x = 50
+		
+			@avatar = new ShareLayer
+				size: 40
+				parent: @info
+				borderRadius: 100
+				image: "http://img.tweetimag.es/i/#{@shareInfo.twitter}_n"
+			
+			avatarBorder = new ShareLayer
+				width: @avatar.width - 2
+				height: @avatar.width - 2
+				point: 1
+				parent: @avatar
+				borderRadius: 100
+				style:
+					boxShadow: "0 0 0 1px rgba(0,0,0,.1)"
+			
+			# See if author name is available, otherwise fallback to Twitter handle
+			showAuthor(if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}")
+			
+			@_showPointer(@avatar)
+			
+		if @shareInfo.author and !@shareInfo.twitter
+			showAuthor(@shareInfo.author)
 				
 	_renderDescription: ->
 		@description = new ShareLayer
@@ -200,6 +215,8 @@ class ShareComponent
 				paddingTop: "2px"
 				color: "#FFF"
 				
+		@_showPointer(@download)
+				
 	_startListening: ->
 		# Show regular cursor on sheet
 		@sheet.onMouseOver ->
@@ -209,17 +226,16 @@ class ShareComponent
 		# Toggle sheet
 		@close.onClick => @_closeSheet()
 		@framerButton.onClick => @_openSheet()
-		
-		# Show pointer for interactive elements
-		for l in [@download, @credentialsAuthor, @credentialsAvatar]
-			l.onMouseOver ->
-				l.style =
-					cursor: "pointer"
 	
+	_showPointer: (layer) ->
+		layer.onMouseOver ->
+			@style = 
+				cursor: "pointer"
+				
 	_updateHeight: ->
 		@credentials.height = @credentials.contentFrame().height
 		@info.height = @info.contentFrame().height
-		@sheet.height = @sheet.contentFrame().height + 45
+		@sheet.height = @sheet.contentFrame().height + 25
 				
 	_closeSheet: ->
 		@sheet.visible = false
