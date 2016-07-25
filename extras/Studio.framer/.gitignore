@@ -30,6 +30,7 @@ framer/backups
 framer/backups/*
 framer/.*.hash
 framer/manifest.txt
+framer/metadata.json
 framer/preview.png
 framer/social*.png
 
