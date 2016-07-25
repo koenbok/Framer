@@ -865,6 +865,13 @@ Utils.frameMerge = ->
 
 	frame
 
+Utils.frameInFrame = (frameA, frameB) ->
+	
+	for point in Utils.pointsFromFrame(frameA)
+		return false unless Utils.pointInFrame(point, frameB)
+
+	return true
+
 Utils.framePointForOrigin = (frame, originX, originY) ->
 	frame =
 		x: frame.x + (originX * frame.width)
