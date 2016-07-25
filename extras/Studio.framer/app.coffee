@@ -1,9 +1,9 @@
 # Info Fixture
 Framer.Metadata =
-	author: "Jorn van Dijk"
-	twitter: "jornvandijk"
-	title: "Android Tabs"
-	description: "Here's a new Framer example. It's a little grid of photos, which you can scroll, click and pinch to zoom. Made to highlight some of our latest features: scroll and click separation, pinchable layers, event shortcuts and more."
+	author: "Eelco Lempsink"
+	twitter: "eelco"
+	title: "MIDI Controller"
+	description: "This is pretty niche but actually super cool. Connect a MIDI Controller to your Framer designs and play with it on the fly. http://blog.framerjs.com/posts/midi.html"
 # 	local: true
 	date: "Jun 14 2016"
 
@@ -172,7 +172,7 @@ class ShareComponent
 				size: 40
 				parent: @info
 				borderRadius: 100
-				image: "http://img.tweetimag.es/i/#{@shareInfo.twitter}_n"
+				image: "http://img.tweetimag.es/i/#{@shareInfo.twitter}_o"
 			
 			avatarBorder = new ShareLayer
 				width: @avatar.width - 2
@@ -213,6 +213,7 @@ class ShareComponent
 			html: @shareInfo.description
 			style:
 				lineHeight: "1.5"
+				wordWrap: "break-word"
 		
 		descriptionSize = Utils.textSize(
 			@shareInfo.description, 
