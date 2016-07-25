@@ -50,7 +50,6 @@ Framer.Extras = require "./Extras/Extras"
 Framer.GestureInputRecognizer = new (require "./GestureInputRecognizer").GestureInputRecognizer
 Framer.Version = require "../build/Version"
 Framer.Loop = new Framer.AnimationLoop()
-Utils.domComplete(Framer.Loop.start)
 
 window.Framer = Framer if window
 
@@ -70,4 +69,10 @@ Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
 Framer.Extras.TouchEmulator.enable() if not Utils.isTouch()
 Framer.Extras.ErrorDisplay.enable() if not Utils.isFramerStudio()
 # Framer.Extras.Hints.enable() if not Utils.isFramerStudio()
-# Framer.Extras.Preloader.enable() if not Utils.isFramerStudio()
+
+Utils.domComplete ->
+	if not Utils.isFramerStudio()
+		Framer.Extras.Preloader.enable()
+		Framer.Preloader.once("end", Framer.Loop.start)
+	else
+		Framer.Loop.start()

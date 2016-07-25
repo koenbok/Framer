@@ -17,7 +17,10 @@ cp build/framer.js build/Framer/Project/framer/framer.js
 cp build/framer.js.map build/Framer/Project/framer/framer.js.map
 
 # Copy over extra images
-cp -R extras/cursor-images build/Framer/Project/framer/images
+IMAGES_DIR=build/Framer/Project/framer/images
+mkdir -p "$IMAGES_DIR" 
+cp -R extras/cursor-images/* "$IMAGES_DIR"
+cp -R extras/preloader-images/* "$IMAGES_DIR"
 
 # Download the latest generator
 cd build/Framer

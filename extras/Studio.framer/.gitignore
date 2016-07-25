@@ -23,7 +23,7 @@ Temporary Items
 .apdisk
 
 # Framer specific
-.temp.html
+.*.html
 framer/*.old.*
 framer/backup.coffee
 framer/backups
@@ -31,7 +31,7 @@ framer/backups/*
 framer/.*.hash
 framer/manifest.txt
 framer/preview.png
-
+framer/social*.png
 
 app.js
 framer/images/*
