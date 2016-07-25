@@ -9,7 +9,7 @@ class Preloader extends BaseClass
 		@_mediaLoaded = []
 		@_isLoading = false
 
-		@timeout = 10
+		@timeout = 30
 
 		@context = new Context({parent: Framer.CurrentContext, name: "Preloader"})
 
