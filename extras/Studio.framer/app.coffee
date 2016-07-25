@@ -5,15 +5,6 @@
 # - Add date
 # - Make text selectable
 
-# Info Fixture
-shareInfo =
-	author: "Jorn van Dijk"
-	twitter: "jornvandijk"
-	title: "Android Tabs"
-	description: """
-		Here's a new Framer example. It's a little grid of photos, which you can scroll, click and pinch to zoom. Made to highlight some of our latest 		features: scroll and click separation, pinchable layers, event shortcuts and more.
-		"""
-
 # Setup
 context = new Framer.Context({name: "Sharing"})
 
@@ -233,5 +224,15 @@ class ShareComponent
 		@framerButton.visible = false
 		@framerButton.ignoreEvents = true	
 
-context.run -> 
-	share = new ShareComponent(shareInfo)
+Utils.delay 0, ->
+	context.run ->
+		share = new ShareComponent(Framer.Metadata)
+
+# Info Fixture
+Framer.Metadata =
+	author: "Jorn van Dijk"
+	twitter: "jornvandijk"
+	title: "Android Tabs"
+	description: """
+		Here's a new Framer example. It's a little grid of photos, which you can scroll, click and pinch to zoom. Made to highlight some of our latest 		features: scroll and click separation, pinchable layers, event shortcuts and more.
+		"""
