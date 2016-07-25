@@ -184,12 +184,12 @@ class ShareComponent
 				parent: @avatar
 				borderRadius: 100
 				style:
-					boxShadow: "0 0 0 1px rgba(0,0,0,.1)"
-					
+					boxShadow: "0 0 0 1px rgba(0,0,0,.1)"					
 			@_showPointer(@avatar)
 			
 			# See if author name is available, otherwise fallback to Twitter handle
-			showAuthor(if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}")
+			name = if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}"
+			showAuthor("<a href='http://twitter.com/#{@shareInfo.twitter}' style='text-decoration: none;'>#{name}</a>")
 			
 		# If there's no Twitter handle, but there is an author. Just show author.
 		if @shareInfo.author and !@shareInfo.twitter
@@ -269,7 +269,8 @@ class ShareComponent
 		# When the window resizes evaluate if the sheet needs to be hidden
 		Canvas.onResize => 
 			@_checkCanvasSize() if !@fixed
-			
+	
+	# Show hand cursor		
 	_showPointer: (layer) ->
 		layer.onMouseOver ->
 			@style = 
