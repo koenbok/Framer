@@ -29,6 +29,11 @@ class ShareLayer extends Layer
 # Sheet
 class ShareComponent
 	constructor: (@shareInfo) ->
+		
+		# When this is set to true, the sheet won't hide on resize
+		# This is triggered by a manual open / close action
+		@fixed = false
+		
 		@render()
 		@_startListening()
 			
@@ -226,11 +231,16 @@ class ShareComponent
 				cursor: "default"
 		
 		# Toggle sheet
-		@close.onClick => @_closeSheet()
-		@framerButton.onClick => @_openSheet()
+		@close.onClick => 
+			@_closeSheet()
+			@fixed = true
+		@framerButton.onClick => 
+			@fixed = true
+			@_openSheet()
 		
 		# When the window resizes evaluate if the sheet needs to be hidden
-		Canvas.onResize (event) => @_checkCanvasSize()
+		Canvas.onResize => 
+			@_checkCanvasSize() if !@fixed
 			
 	
 	
