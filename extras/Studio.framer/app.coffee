@@ -26,7 +26,7 @@ class ShareLayer extends Layer
 			backgroundColor: null
 			width: options.parent.width if options.parent
 			style:
-				fontFamily: "Roboto"
+				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 				fontSize: "14px"
 				color: "#111"
 				webkitUserSelect: "text"
@@ -137,13 +137,11 @@ class ShareComponent
 			height: 40
 			y: 22
 
-		@credentialsAvatar = new Layer
+		@credentialsAvatar = new ShareLayer
 			size: 40
 			parent: @credentials
-			backgroundColor: "00AAFF"
 			borderRadius: 100
 			image: "http://img.tweetimag.es/i/#{@shareInfo.twitter}_n"
-			backgroundColor: null
 			
 		credentialsAvatarBorder = new ShareLayer
 			width: @credentialsAvatar.width - 2
