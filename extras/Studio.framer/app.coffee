@@ -6,7 +6,7 @@
 # - Make text selectable
 
 # Info Fixture
-shareInfo =
+Framer.Metadata =
 	author: "Jorn van Dijk"
 # 	twitter: "jornvandijk"
 	title: "Android Tabs"
@@ -249,5 +249,6 @@ class ShareComponent
 		@framerButton.visible = false
 		@framerButton.ignoreEvents = true	
 
-context.run -> 
-	share = new ShareComponent(shareInfo)
+Utils.delay 0, ->
+	context.run ->
+		share = new ShareComponent(Framer.Metadata)

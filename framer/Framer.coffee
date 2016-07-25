@@ -51,6 +51,8 @@ Framer.GestureInputRecognizer = new (require "./GestureInputRecognizer").Gesture
 Framer.Version = require "../build/Version"
 Framer.Loop = new Framer.AnimationLoop()
 
+Framer.Metadata = {}
+
 window.Framer = Framer if window
 
 # Set the defaults
