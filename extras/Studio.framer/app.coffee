@@ -24,6 +24,7 @@ class ShareLayer extends Layer
 				color: "#111"
 				webkitUserSelect: "text"
 				lineHeight: "1"
+				textRendering: "optimizeLegibility"
 		
 		mergedProps = _.merge(defaultProps, options)
 		@props = mergedProps
@@ -73,7 +74,7 @@ class ShareComponent
 			y: 12
 			image: "images/close.png"
 			
-		@framerButton = new Layer
+		@open = new Layer
 			size: 30
 			point: @sheet.point
 			borderRadius: 4
@@ -82,15 +83,15 @@ class ShareComponent
 			style:
 				boxShadow: "0 0 0 1px rgba(0,0,0,.12), 0 1px 3px rgba(0,0,0,.08)"
 				
-		framerButtonLogo = new Layer
-			parent: @framerButton
+		openLogo = new Layer
+			parent: @open
 			width: 10
 			height: 15
 			image: "images/logo-button.png"
 			y: Align.center(1)
 			x: Align.center
 			
-		for l in [@close, @framerButton]
+		for l in [@close, @open]
 			@_showPointer(l)
 	
 	# Render CTA section
@@ -181,18 +182,17 @@ class ShareComponent
 				borderRadius: 100
 				style:
 					boxShadow: "0 0 0 1px rgba(0,0,0,.1)"
+					
+			@_showPointer(@avatar)
 			
 			# See if author name is available, otherwise fallback to Twitter handle
 			showAuthor(if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}")
 			
-			@_showPointer(@avatar)
-		
 		# If there's no Twitter handle, but there is an author. Just show author.
 		if @shareInfo.author and !@shareInfo.twitter
 			showAuthor(@shareInfo.author)
 	
 	_renderDate: ->
-
 		verticalPosition = if @description then @description.maxY else @credentials.maxY
 		
 		@date = new ShareLayer
@@ -213,10 +213,13 @@ class ShareComponent
 			html: @shareInfo.description
 			style:
 				lineHeight: "1.5"
-				
-		descriptionTextSize = Utils.textSize(@shareInfo.description, {fontSize: "14px", fontFamily: "Roboto", lineHeight: "1.5"}, {width: "#{@description.width}"})
 		
-		@description.height = descriptionTextSize.height
+		descriptionSize = Utils.textSize(
+			@shareInfo.description, 
+			{fontSize: "14px", fontFamily: "Roboto", lineHeight: "1.5"}, 
+			{width: "#{@description.width}"}
+		)
+		@description.height = descriptionSize.height
 
 	_renderDownload: ->
 		@download = new ShareLayer
@@ -229,7 +232,7 @@ class ShareComponent
 			style:
 				fontWeight: "500"
 				textAlign: "center"
-				paddingTop: "8px"
+				paddingTop: "9px"
 				color: "#FFF"
 				
 		@_showPointer(@download)
@@ -243,12 +246,12 @@ class ShareComponent
 			@style =
 				cursor: "default"
 		
-		# Toggle sheet
+		# Toggle sheet when clicked on close or open buttons
 		@close.onClick => 
 			@fixed = true
 			@_closeSheet()
 			
-		@framerButton.onClick => 
+		@open.onClick => 
 			@fixed = true
 			@_openSheet()
 		
@@ -264,19 +267,19 @@ class ShareComponent
 	_updateHeight: ->
 		@credentials.height = @credentials.contentFrame().height
 		@info.height = @info.contentFrame().height
-		@sheet.height = @sheet.contentFrame().height + 25
+		@sheet.height = @sheet.contentFrame().height + 21
 				
 	_closeSheet: ->
 		@sheet.visible = false
 		@sheet.ignoreEvents = true
-		@framerButton.visible = true
-		@framerButton.ignoreEvents = false
+		@open.visible = true
+		@open.ignoreEvents = false
 		
 	_openSheet: ->
 		@sheet.visible = true
 		@sheet.ignoreEvents = false
-		@framerButton.visible = false
-		@framerButton.ignoreEvents = true	
+		@open.visible = false
+		@open.ignoreEvents = true	
 
 Utils.delay 0, ->
 	context.run ->
