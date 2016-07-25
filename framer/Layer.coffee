@@ -1206,18 +1206,6 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## HINT
 
-	_visibleFrame: ->
-		
-		# Figure out the frame we want to show the hint in, if any of the
-		# parent layers clip, we need to intersect the rectangle with it.
-		frame = @canvasFrame
-
-		for parent in @ancestors(context=true)
-			if parent.clip
-				 frame = Utils.frameIntersection(frame, parent.canvasFrame)
-
-		return frame
-
 	_showHint: (targetLayer) ->
 
 		# If this layer isnt visible we can just exit
@@ -1235,7 +1223,18 @@ class exports.Layer extends BaseClass
 			layer._showHint(targetLayer) for layer in @children
 			return null
 
-		frame = @_visibleFrame()
+		# Figure out the frame we want to show the hint in, if any of the
+		# parent layers clip, we need to intersect the rectangle with it.
+		frame = @canvasFrame
+
+		return unless frame
+
+		for parent in @ancestors(context=true)
+			if parent.clip
+				parentFrame = parent.canvasFrame
+				if parentFrame
+					frame = Utils.frameIntersection(frame, parent.canvasFrame)
+
 		return unless frame
 
 		# Show the actual hint
