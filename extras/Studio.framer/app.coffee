@@ -35,7 +35,11 @@ class ShareComponent
 		
 		# When this is set to true, the sheet won't hide on resize
 		# This is triggered by a manual open / close action
-		@fixed = false
+		
+		@options =
+			padding: 20
+			width: 250
+			fixed: false
 
 		@render()
 		@_startListening()
@@ -56,9 +60,8 @@ class ShareComponent
 	# Render main sheet
 	_renderSheet: ->
 		@sheet = new Layer
-			width: 250
-			x: 10
-			y: 10
+			width: @options.width
+			point: 10
 			borderRadius: 4
 			backgroundColor: "#FFF"
 			style:
@@ -107,7 +110,7 @@ class ShareComponent
 			width: 16
 			height: 24
 			x: Align.center()
-			y: 25
+			y: 24
 			image: "images/logo.png"
 			
 		ctaSlogan = new ShareLayer
@@ -132,7 +135,7 @@ class ShareComponent
 	_renderInfo: ->
 		@info = new ShareLayer
 			parent: @sheet
-			width: @sheet.width-40
+			width: @sheet.width - (@options.padding * 2)
 			y: @cta.maxY + 22
 			x: 20
 
@@ -256,11 +259,11 @@ class ShareComponent
 		
 		# Toggle sheet when clicked on close or open buttons
 		@close.onClick => 
-			@fixed = true
+			@options.fixed = true
 			@_closeSheet()
 			
 		@open.onClick => 
-			@fixed = true
+			@options.fixed = true
 			@_openSheet()
 		
 		# When the window resizes evaluate if the sheet needs to be hidden
@@ -275,7 +278,7 @@ class ShareComponent
 	_updateHeight: ->
 		@credentials.height = @credentials.contentFrame().height
 		@info.height = @info.contentFrame().height
-		@sheet.height = @sheet.contentFrame().height + 21
+		@sheet.height = @sheet.contentFrame().height + @options.padding
 				
 	_closeSheet: ->
 		@sheet.visible = false
