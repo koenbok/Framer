@@ -42,3 +42,7 @@ exports.disable = ->
 	return unless hints
 	hints.destroy()
 	hints = null
+
+exports.showHints = ->
+	return unless hints
+	Utils.delay 0.5, -> hints.showHints()

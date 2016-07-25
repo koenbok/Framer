@@ -827,6 +827,11 @@ class exports.Layer extends BaseClass
 
 		return parents
 
+	root: (context=false) ->
+		return @ if @parent is null
+		return _.last(@ancestors(context=context))
+
+
 	childrenAbove: (point, originX=0, originY=0) -> _.filter @children, (layer) ->
 		Utils.framePointForOrigin(layer.frame, originX, originY).y < point.y
 	childrenBelow: (point, originX=0, originY=0) -> _.filter @children, (layer) ->
@@ -1201,6 +1206,18 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## HINT
 
+	_visibleFrame: ->
+		
+		# Figure out the frame we want to show the hint in, if any of the
+		# parent layers clip, we need to intersect the rectangle with it.
+		frame = @canvasFrame
+
+		for parent in @ancestors(context=true)
+			if parent.clip
+				 frame = Utils.frameIntersection(frame, parent.canvasFrame)
+
+		return frame
+
 	_showHint: (targetLayer) ->
 
 		# If this layer isnt visible we can just exit
@@ -1218,15 +1235,8 @@ class exports.Layer extends BaseClass
 			layer._showHint(targetLayer) for layer in @children
 			return null
 
-		# Figure out the frame we want to show the hint in, if any of the
-		# parent layers clip, we need to intersect the rectangle with it.
-		frame = @canvasFrame
-
-		for parent in @ancestors(context=true)
-			if parent.clip
-				 frame = Utils.frameIntersection(frame, parent.canvasFrame)
-			if not frame
-				return
+		frame = @_visibleFrame()
+		return unless frame
 
 		# Show the actual hint
 		@showHint(frame)
@@ -1240,7 +1250,6 @@ class exports.Layer extends BaseClass
 			return false
 
 		if @_draggable
-
 			if @_draggable.isDragging is false and @_draggable.isMoving is false
 				return false
 
@@ -1248,37 +1257,55 @@ class exports.Layer extends BaseClass
 
 	shouldShowHint: (targetLayer) ->
 
-		# return false if @isAnimating
+		# Don't show any hints while we are animating
+		return false if @isAnimating
 
-		# for parent in @ancestors()
-		# 	return false if parent.isAnimating
+		for parent in @ancestors()
+			return false if parent.isAnimating
 
+		# Don't show hints if we cannot be dragged
 		if @_draggable
-
 			if @_draggable.horizontal is false and @_draggable.vertical is false
 				return false
 
-		return true if @ignoreEvents is false
+		# Playing around with hiding layers that are covering this one, but
+		# it would be less "correct" as those layers would still respond at clicks
+		# although the hints would imply they wouldn't.
+		
+		# root = @root()
+		# orderedLayers = _.reverse(_.sortBy(@context.layers, "index"))
+
+		# for layer in _.reverse(_.sortBy(@context.layers, "index"))
+		# 	if layer.parent is null
+		# 		if Utils.frameInFrame(@_visibleFrame(), 
+		# 			Utils.frameMerge(layer.frame, layer.contentFrame()))
+		# 			return false
+
+		# Don't show hints if we ignore events
+		if @ignoreEvents is false
+			return true 
+
 		return false
 
-	showHint: (frame) ->
+	showHint: (highlightFrame) ->
 
 		# Start an animation with a blue rectangle fading out over time
 		layer = new Layer
-			frame: frame
+			frame: highlightFrame
 			backgroundColor: new Color("9013FE").alpha(.5)
-			borderColor: new Color("460054").alpha(.5)
+			borderColor: new Color("white").alpha(.8)
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
-			borderWidth: 1
+			borderWidth: 2
 
-		# if @_draggable
-		# 	layer.backgroundColor = null
-		# 	layer.borderWidth = 8
+		# Only show outlines if a highlight is fullscreen
+		if Utils.frameInFrame(@context.canvasFrame, highlightFrame)
+			layer.backgroundColor = null
 
 		animation = layer.animate
 			properties:
 				opacity: 0
-			time: 0.4
+			curve: "ease-out"
+			time: 0.5
 
 		animation.onAnimationEnd ->
 			layer.destroy()
