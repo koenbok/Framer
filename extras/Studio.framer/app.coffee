@@ -1,14 +1,7 @@
-# Todo
-# - Add Logic for partial data
-# - Add responsive logic
-# - Add share buttons
-# - Add date
-# - Make text selectable
-
 # Info Fixture
 Framer.Metadata =
 	author: "Jorn van Dijk"
-# 	twitter: "jornvandijk"
+	twitter: "jornvandijk"
 	title: "Android Tabs"
 	description: """
 		Here's a new Framer example. It's a little grid of photos, which you can scroll, click and pinch to zoom. Made to highlight some of our latest 		features: scroll and click separation, pinchable layers, event shortcuts and more.
