@@ -10,11 +10,27 @@ shareInfo =
 		Here's a new Framer example. It's a little grid of photos, which you can scroll, click and pinch to zoom. Made to highlight some of our latest 		features: scroll and click separation, pinchable layers, event shortcuts and more.
 		"""
 
+class ShareLayer extends Layer
+	constructor: (options) ->
+		super options
+			
+		defaultProps =
+			backgroundColor: null
+			width: options.parent.width if options.parent
+			style:
+				fontFamily: "Roboto"
+				fontSize: "14px"
+				color: "#111"
+		
+		mergedProps = _.merge(defaultProps, options)
+		@props = mergedProps
+
 # Sheet
 class ShareComponent
 
 	constructor: (@shareInfo) ->
 		@render()
+		@opened = true
 		
 	render: ->
 		@sheet = new Layer
@@ -24,19 +40,62 @@ class ShareComponent
 			borderRadius: 4
 			backgroundColor: "#FFF"
 			style:
-				boxShadow: "0 0 0 1px rgba(0,0,0,.1), 0 1px 1px rgba(0,0,0,.08)"
+				boxShadow: "0 0 0 1px rgba(0,0,0,.12), 0 1px 3px rgba(0,0,0,.08)"
 		
+		@close = new Layer
+			parent: @sheet
+			width: 12
+			height: 12
+			x: 12
+			y: 12
+			image: "images/close.png"
+			
+		@framerButton = new Layer
+			size: 30
+			point: @sheet.point
+			borderRadius: 4
+			backgroundColor: "#FFF"
+			visible: false
+			style:
+				boxShadow: "0 0 0 1px rgba(0,0,0,.12), 0 1px 3px rgba(0,0,0,.08)"
+				
+		@closeLogo = new Layer
+			parent: @framerButton
+			width: 10
+			height: 15
+			image: "images/logo-button.png"
+			y: Align.center(1)
+			x: Align.center
+			
 		@_renderCTA()
 		@info = new ShareInfo(@shareInfo, @sheet, @cta.maxY)
 		
 		# Set height based on children
-		@sheet.height = @sheet.contentFrame().height
+		@sheet.height = @sheet.contentFrame().height + 100
 		
+		@sheet.onMouseOver ->
+			@style =
+				cursor: "default"
+				pointerEvents: "all"
+				
+		@close.onClick => @_closeSheet()
+		@framerButton.onClick => @_openSheet()
+		
+	_closeSheet: ->
+		@sheet.visible = false
+		@sheet.ignoreEvents = true
+		@framerButton.visible = true
+		@framerButton.ignoreEvents = false
+		
+	_openSheet: ->
+		@sheet.visible = true
+		@sheet.ignoreEvents = false
+		@framerButton.visible = false
+		@framerButton.ignoreEvents = true
+						
 	_renderCTA: ->
-		@cta = new Layer
-			width: @sheet.width
+		@cta = new ShareLayer
 			parent: @sheet
-			backgroundColor: null
 			style:
 				borderBottom: "1px solid #E8E8E8"
 			height: 130
@@ -49,46 +108,29 @@ class ShareComponent
 			y: 25
 			image: "images/logo.png"
 			
-		ctaSlogan = new Layer
+		ctaSlogan = new ShareLayer
 			parent: @cta
 			y: ctaLogo.y + 35
-			width: @cta.width
 			height: 30
-			backgroundColor: null
 			html: "Start prototyping today"
 			style:
 				textAlign: "center"
-				color: "#111"
 				fontSize: "18px"
-				fontFamily: "Roboto"
-				fontWeight: "400"
 				
-		ctaLink = new Layer
+		ctaLink = new ShareLayer
 			parent: @cta
 			y: ctaSlogan.y + 24
-			width: @cta.width
 			height: 30
-			backgroundColor: null
 			html: "Try Framer for Free"
 			style:
 				textAlign: "center"
-				color: "#111"
-				fontSize: "14px"
 				color: "#00AAFF"
-				fontFamily: "Roboto"
-				fontWeight: "400"
 			
-
 class ShareInfo
 	constructor: (@info, @shareSheet, @positionY) ->
-		@_validateInfo()
 		@render()
 		 
 	render: ->
-		
-		# Check if an avatar needs to be rendered
-		# Twitter avatar link --> https://pbs.twimg.com/profile_images/2284174872/7df3h38zabcvjylnyfe3_bigger.png
-		
 		shareInfo = new Layer
 			parent: @shareSheet
 			width: @shareSheet.width-40
@@ -99,7 +141,7 @@ class ShareInfo
 		credentials = new Layer
 			parent: shareInfo
 			width: shareInfo.width
-			y: 30
+			y: 22
 			backgroundColor: null
 
 		credentialsAvatar = new Layer
@@ -111,9 +153,11 @@ class ShareInfo
 			backgroundColor: null
 			
 		credentialsAvatarBorder = new Layer
-			size: credentialsAvatar.size
-			point: credentialsAvatar.point
-			parent: credentials
+			width: credentialsAvatar.width - 2
+			height: credentialsAvatar.width - 2
+			x: 1
+			y: 1
+			parent: credentialsAvatar
 			borderRadius: 100
 			backgroundColor: null
 			style:
@@ -122,36 +166,65 @@ class ShareInfo
 		credentialsTitle = new Layer
 			parent: credentials
 			width: credentials.width - 50
-			height: 20
+			height: 18
 			backgroundColor: null
 			y: 4
 			x: 50
 			html: @info.title
 			style:
 				fontFamily: "Roboto"
-				fontSize: "16px"
+				fontSize: "14px"
 				fontWeight: "500"
 				color: "#111"
 				lineHeight: "1"
 				
-		credentialsAuthor = new Layer
-			backgroundColor: "null"
+		credentialsAuthor = new ShareLayer
 			parent: credentials
 			width: credentials.width - 50
 			x: 50
 			height: 18
 			y: credentialsTitle.maxY
-			html: @info.author
+			html: "<a href='http://twitter.com/#{@info.twitter}' style='text-decoration: none'>#{@info.author}</a>"
 			style:
-				fontSize: "14px"
 				lineHeight: "1"
 				color: "#808080"
-			
+		
+		credentialsAuthor.onMouseOver ->
+			@style =
+				cursor: "pointer"
+		
 		credentials.height = credentials.contentFrame().height
 				
+		# Description
+		description = new ShareLayer
+			parent: shareInfo
+			y: credentials.maxY + 10
+			html: @info.description
+			style:
+				lineHeight: "1.5"
+				
+		descriptionTextSize = Utils.textSize(@info.description, {fontSize: "14px", fontFamily: "Roboto", lineHeight: "1.5"}, {width: "#{description.width}"})
 		
-	_validateInfo: ->
+		description.height = descriptionTextSize.height
+		shareInfo.height = shareInfo.contentFrame().height
+		
+		download = new ShareLayer
+			parent: shareInfo
+			y: description.maxY + 20
+			height: 33
+			borderRadius: 3
+			backgroundColor: "00AAFF"
+			html: "Open in Framer"
+			style:
+				fontWeight: "500"
+				textAlign: "center"
+				paddingTop: "2px"
+				color: "#FFF"
+				
+		download.onMouseOver ->
+			@style = 
+				cursor: "pointer"
+			
 
 context.run ->
 	share = new ShareComponent(shareInfo)
-
