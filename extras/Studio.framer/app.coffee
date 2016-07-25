@@ -2,7 +2,7 @@
 Framer.Metadata =
 	author: "Eelco Lempsink"
 	twitter: "eelco"
-	title: "MIDI Controller"
+# 	title: "MIDI Controller"
 	description: "This is pretty niche but actually super cool. Connect a MIDI Controller to your Framer designs and play with it on the fly. http://blog.framerjs.com/posts/midi.html"
 # 	local: true
 	date: "Jun 14 2016"
@@ -142,12 +142,14 @@ class ShareComponent
 		@credentials = new ShareLayer
 			parent: @info
 			height: 16
-				
+
+		fallbackTitle = _.replace(FramerStudioInfo.documentTitle, /\.framer$/, '')
+
 		@credentialsTitle = new ShareLayer
 			parent: @credentials
 			width: @credentials.width - 50
 			height: 18
-			html: @shareInfo.title
+			html: @shareInfo.title or fallbackTitle
 			style:
 				fontWeight: "500"
 				
