@@ -4,7 +4,8 @@ Framer.Metadata =
 	twitter: "jornvandijk"
 	title: "Android Tabs"
 	description: "Here's a new Framer example. It's a little grid of photos, which you can scroll, click and pinch to zoom. Made to highlight some of our latest features: scroll and click separation, pinchable layers, event shortcuts and more."
-	local: true
+# 	local: true
+	date: "Jun 14 2016"
 
 # Setup
 context = new Framer.Context({name: "Sharing"})
@@ -13,15 +14,16 @@ context = new Framer.Context({name: "Sharing"})
 class ShareLayer extends Layer
 	constructor: (options) ->
 		super options
-			
+				
 		defaultProps =
 			backgroundColor: null
-			width: options.parent.width if options.parent
+			width: options.parent.width if options and options.parent
 			style:
 				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 				fontSize: "14px"
 				color: "#111"
 				webkitUserSelect: "text"
+				lineHeight: "1"
 		
 		mergedProps = _.merge(defaultProps, options)
 		@props = mergedProps
@@ -33,7 +35,7 @@ class ShareComponent
 		# When this is set to true, the sheet won't hide on resize
 		# This is triggered by a manual open / close action
 		@fixed = false
-		
+
 		@render()
 		@_startListening()
 			
@@ -43,6 +45,7 @@ class ShareComponent
 		@_renderCTA()
 		@_renderInfo()
 		@_renderDescription() if @shareInfo.description
+		@_renderDate()
 		@_renderDownload() if !@shareInfo.local
 		
 		# Evaluate content and set height accordingly
@@ -96,7 +99,7 @@ class ShareComponent
 			parent: @sheet
 			style:
 				borderBottom: "1px solid #E8E8E8"
-			height: 130
+			height: 125
 			
 		ctaLogo = new Layer
 			parent: @cta
@@ -143,7 +146,6 @@ class ShareComponent
 			html: @shareInfo.title
 			style:
 				fontWeight: "500"
-				lineHeight: "1"
 				
 		# Check what info is available and render layers accordingly
 		showAuthor = (content = @shareInfo.author) =>
@@ -157,7 +159,6 @@ class ShareComponent
 				y: @credentialsTitle.maxY
 				height: 18
 				style:
-					lineHeight: "1"
 					color: "#808080"
 					
 			@_showPointer(@credentialsAuthor)
@@ -189,6 +190,21 @@ class ShareComponent
 		# If there's no Twitter handle, but there is an author. Just show author.
 		if @shareInfo.author and !@shareInfo.twitter
 			showAuthor(@shareInfo.author)
+	
+	_renderDate: ->
+
+		verticalPosition = if @description then @description.maxY else @credentials.maxY
+		
+		@date = new ShareLayer
+			parent: @info
+			html: "Shared on #{@shareInfo.date}"
+			height: 10
+			style:
+				textTransform: "uppercase"
+				fontSize: "11px"
+				color: "#999"
+				letterSpacing: ".2px"
+			y: verticalPosition + 16
 						
 	_renderDescription: ->
 		@description = new ShareLayer
@@ -203,12 +219,9 @@ class ShareComponent
 		@description.height = descriptionTextSize.height
 
 	_renderDownload: ->
-		
-		verticalPosition = if @description then @description.maxY else @credentials.maxY
-		
 		@download = new ShareLayer
 			parent: @info
-			y: verticalPosition + 20
+			y: @date.maxY + 20
 			height: 33
 			borderRadius: 3
 			backgroundColor: "00AAFF"
@@ -216,7 +229,7 @@ class ShareComponent
 			style:
 				fontWeight: "500"
 				textAlign: "center"
-				paddingTop: "2px"
+				paddingTop: "8px"
 				color: "#FFF"
 				
 		@_showPointer(@download)
@@ -232,8 +245,9 @@ class ShareComponent
 		
 		# Toggle sheet
 		@close.onClick => 
-			@_closeSheet()
 			@fixed = true
+			@_closeSheet()
+			
 		@framerButton.onClick => 
 			@fixed = true
 			@_openSheet()
@@ -242,8 +256,6 @@ class ShareComponent
 		Canvas.onResize => 
 			@_checkCanvasSize() if !@fixed
 			
-	
-	
 	_showPointer: (layer) ->
 		layer.onMouseOver ->
 			@style = 
