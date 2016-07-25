@@ -3,9 +3,7 @@ Framer.Metadata =
 	author: "Jorn van Dijk"
 	twitter: "jornvandijk"
 	title: "Android Tabs"
-	description: """
-		Here's a new Framer example. It's a little grid of photos, which you can scroll, click and pinch to zoom. Made to highlight some of our latest 		features: scroll and click separation, pinchable layers, event shortcuts and more.
-		"""
+	description: "Here's a new Framer example. It's a little grid of photos, which you can scroll, click and pinch to zoom. Made to highlight some of our latest features: scroll and click separation, pinchable layers, event shortcuts and more."
 
 # Setup
 context = new Framer.Context({name: "Sharing"})
@@ -39,7 +37,7 @@ class ShareComponent
 		@_renderToggleButtons()
 		@_renderCTA()
 		@_renderInfo()
-		@_renderDescription()
+		@_renderDescription() if @shareInfo.description
 		@_renderDownload()
 		
 		# Evaluate content and set height accordingly
@@ -82,6 +80,9 @@ class ShareComponent
 			image: "images/logo-button.png"
 			y: Align.center(1)
 			x: Align.center
+			
+		for l in [@close, @framerButton]
+			@_showPointer(l)
 	
 	# Render CTA section
 	_renderCTA: ->
@@ -178,10 +179,11 @@ class ShareComponent
 			showAuthor(if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}")
 			
 			@_showPointer(@avatar)
-			
+		
+		# If there's no Twitter handle, but there is an author. Just show author.
 		if @shareInfo.author and !@shareInfo.twitter
 			showAuthor(@shareInfo.author)
-				
+						
 	_renderDescription: ->
 		@description = new ShareLayer
 			parent: @info
@@ -195,9 +197,12 @@ class ShareComponent
 		@description.height = descriptionTextSize.height
 
 	_renderDownload: ->
+		
+		verticalPosition = if @description then @description.maxY else @credentials.maxY
+		
 		@download = new ShareLayer
 			parent: @info
-			y: @description.maxY + 20
+			y: verticalPosition + 20
 			height: 33
 			borderRadius: 3
 			backgroundColor: "00AAFF"
