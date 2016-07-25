@@ -26,7 +26,7 @@ class Preloader extends BaseClass
 				parent: @cover
 
 			@progressIndicator.railsColor = Color.grey(0, 0.1)
-			@progressIndicator.progressColor = Color.grey(0, 0.8)
+			@progressIndicator.progressColor = "rgb(75,169,248)"
 
 			@brand = new Layer
 				width: 96
