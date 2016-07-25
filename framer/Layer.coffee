@@ -1227,15 +1227,11 @@ class exports.Layer extends BaseClass
 		# parent layers clip, we need to intersect the rectangle with it.
 		frame = @canvasFrame
 
-		return unless frame
-
 		for parent in @ancestors(context=true)
 			if parent.clip
-				parentFrame = parent.canvasFrame
-				if parentFrame
-					frame = Utils.frameIntersection(frame, parent.canvasFrame)
-
-		return unless frame
+				 frame = Utils.frameIntersection(frame, parent.canvasFrame)
+			if not frame
+				return
 
 		# Show the actual hint
 		@showHint(frame)
@@ -1257,10 +1253,10 @@ class exports.Layer extends BaseClass
 	shouldShowHint: (targetLayer) ->
 
 		# Don't show any hints while we are animating
-		return false if @isAnimating
+		# return false if @isAnimating
 
-		for parent in @ancestors()
-			return false if parent.isAnimating
+		# for parent in @ancestors()
+		# 	return false if parent.isAnimating
 
 		# Don't show hints if we cannot be dragged
 		if @_draggable
