@@ -151,7 +151,3 @@ exports.disable = ->
 
 exports.addImage = (url) ->
 	Framer.Preloader?.addImage(url)
-
-exports.addLogo = (layer) ->
-	Framer.Preloader?.brand.addChild(layer)
-	Framer.Preloader?.brand.style["background-image"] = null
