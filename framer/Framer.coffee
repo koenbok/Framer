@@ -68,11 +68,10 @@ window.Canvas = new (require "./Canvas").Canvas
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
 Framer.Extras.TouchEmulator.enable() if not Utils.isTouch()
 Framer.Extras.ErrorDisplay.enable() if not Utils.isFramerStudio()
+Framer.Extras.Preloader.enable() if not Utils.isFramerStudio()
 Framer.Extras.Hints.enable()
 
-Utils.domComplete ->
-	if not Utils.isFramerStudio()
-		Framer.Extras.Preloader.enable()
-		Framer.Preloader.once("end", Framer.Loop.start)
-	else
-		Framer.Loop.start()
+if Framer.Preloader?
+	Framer.Preloader.once("end", Framer.Loop.start)
+else
+	Utils.domComplete(Framer.Loop.start)
