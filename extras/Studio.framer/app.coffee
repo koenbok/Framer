@@ -207,17 +207,24 @@ class ShareComponent
 			y: verticalPosition + 16
 						
 	_renderDescription: ->
+		
+		# See if there are any url's in the description and wrap them in anchor tags
+		urlify = (text) ->
+		  urlRegex = /(https?:\/\/[^\s]+)/g
+		  text.replace urlRegex, (url) ->
+		    '<a href="' + url + '">' + url + '</a>'
+		
 		@description = new ShareLayer
 			parent: @info
 			y: @credentials.maxY + 10
-			html: @shareInfo.description
+			html: urlify(@shareInfo.description)
 			style:
 				lineHeight: "1.5"
 				wordWrap: "break-word"
 		
 		descriptionSize = Utils.textSize(
 			@shareInfo.description, 
-			{fontSize: "14px", fontFamily: "Roboto", lineHeight: "1.5"}, 
+			{fontSize: "14px", fontFamily: "Roboto", lineHeight: "1.5", wordWrap: "break-word"}, 
 			{width: "#{@description.width}"}
 		)
 		@description.height = descriptionSize.height
