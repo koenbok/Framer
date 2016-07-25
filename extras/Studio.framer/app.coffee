@@ -4,6 +4,7 @@ Framer.Metadata =
 	twitter: "jornvandijk"
 	title: "Android Tabs"
 	description: "Here's a new Framer example. It's a little grid of photos, which you can scroll, click and pinch to zoom. Made to highlight some of our latest features: scroll and click separation, pinchable layers, event shortcuts and more."
+	local: true
 
 # Setup
 context = new Framer.Context({name: "Sharing"})
@@ -38,7 +39,7 @@ class ShareComponent
 		@_renderCTA()
 		@_renderInfo()
 		@_renderDescription() if @shareInfo.description
-		@_renderDownload()
+		@_renderDownload() if !@shareInfo.local
 		
 		# Evaluate content and set height accordingly
 		@_updateHeight()		
