@@ -76,6 +76,7 @@ class ShareComponent
 
 		# Evaluate content and set height accordingly
 		@_updateHeight()
+		@sheet.minHeight = @sheet.maxHeight
 
 		# Wait until the device screen x position is available
 		Utils.delay .1, =>
@@ -250,12 +251,14 @@ class ShareComponent
 
 			urlified.replace lineBreakRegex, '<br />'
 
-		@description = new ShareLayer
+		@description = new Layer
 			parent: @info
 			y: @credentials.maxY + 10
+			backgroundColor: null
 			style:
 				lineHeight: "1.5"
 				wordWrap: "break-word"
+				color: "#111"
 
 		descriptionStyle =
 			fontSize: "14px"
@@ -264,18 +267,21 @@ class ShareComponent
 			wordWrap: "break-word"
 
 		showFullDescription = =>
-			descriptionSize = Utils.textSize(
+
+			@options.truncated = false
+			@descriptionSize = Utils.textSize(
 				parseDescription(@shareInfo.description),
 				descriptionStyle,
 				{width: "#{@description.width}"}
 			)
 
-			@description.height = descriptionSize.height
+			@description.height = @descriptionSize.height
 			@description.html = parseDescription(@shareInfo.description)
 
 			@date.y = @description.maxY + 16
 			@buttons.y = @date.maxY + 20
 			@_updateHeight()
+			@_calculateAvailableSpace()
 
 			@description.onMouseMove =>
 				@description.style =
@@ -283,16 +289,18 @@ class ShareComponent
 
 		if @shareInfo.description.length > @options.maxDescriptionLength
 
+			@options.truncated = true
+
 			truncated = @shareInfo.description.substring(@options.maxDescriptionLength,length).trim()
 			@options.shortDescription = truncated + "…"
 
-			descriptionTruncatedSize = Utils.textSize(
+			@descriptionTruncatedSize = Utils.textSize(
 				parseDescription(@options.shortDescription),
 				descriptionStyle,
 				{width: "#{@description.width}"}
 			)
 
-			@description.height = descriptionTruncatedSize.height
+			@description.height = @descriptionTruncatedSize.height
 			@description.html = parseDescription(@options.shortDescription)
 
 			@_showPointer(@description)
@@ -352,7 +360,7 @@ class ShareComponent
 			height: 11
 			point: Align.center()
 
-	_calculateAvailableSpace: ->
+	_calculateAvailableSpace: =>
 		device = Framer.Device
 		threshold = @options.minAvailableSpaceFullScreen
 		availableSpace = Canvas.width
@@ -370,18 +378,24 @@ class ShareComponent
 			@_openSheet()
 
 		# If verticalSpace is less then sheet height, make sheet scrollable
-		if Canvas.height < @sheet.maxHeight
-			@sheet.height = Canvas.height - 20
-			@sheet.style.overflow = "scroll"
+		canvasHeight = Canvas.height - 20
 
-			if @buttons
-				@buttons.height = 53
-			else
-				@date.height = 30
+		if canvasHeight < @sheet.maxHeight and canvasHeight > @sheet.minHeight
+			@sheet.height = canvasHeight
+			# @sheet.style.overflow = "scroll"
 
-		if Canvas.height > @sheet.maxHeight
+			# Make the description scrollable
+			verticalSpace = @sheet.height - @cta.height - @credentials.height - @buttons.height - @date.height - 95
+
+			@description.height = verticalSpace
+			@description.style.overflow = "scroll"
+
+			@date.y = @description.maxY + 20
+			@buttons.y = @date.maxY + 20
+
+		if canvasHeight > @sheet.maxHeight
 			@sheet.height = @sheet.maxHeight
-			@sheet.style.overflow = "visible"
+			@description.style.overflow = "visible"
 
 	_startListening: ->
 		@_calculateAvailableSpace()
@@ -402,7 +416,7 @@ class ShareComponent
 
 		# When the window resizes evaluate if the sheet needs to be hidden
 		Canvas.onResize =>
-			@_calculateAvailableSpace() if !@fixed
+			@_calculateAvailableSpace() if !@options.fixed
 
 	# Show hand cursor
 	_showPointer: (layer) ->
