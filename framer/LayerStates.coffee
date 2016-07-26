@@ -6,10 +6,6 @@
 
 LayerStatesIgnoredKeys = ["ignoreEvents"]
 
-# Animation events
-Events.StateWillSwitch = "willSwitch"
-Events.StateDidSwitch = "didSwitch"
-
 class exports.LayerStates extends BaseClass
 
 

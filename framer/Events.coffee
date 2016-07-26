@@ -42,6 +42,10 @@ Events.AnimationDidStart = "start"
 Events.AnimationDidStop = "stop"
 Events.AnimationDidEnd = "end"
 
+# State events
+Events.StateWillSwitch = "willSwitch"
+Events.StateDidSwitch = "didSwitch"
+
 # Scroll events
 Events.Scroll = "scroll"
 
