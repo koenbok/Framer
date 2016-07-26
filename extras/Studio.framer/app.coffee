@@ -30,19 +30,18 @@ class ShareLayer extends Layer
 				lineHeight: "1"
 				textRendering: "optimizeLegibility"
 
-		mergedProps = _.merge(defaultProps, options)
-		@props = mergedProps
+		@props = _.merge(defaultProps, options)
 
 # Sheet
 class ShareComponent
 	constructor: (@shareInfo) ->
 
-		# When fixed is set to true, the sheet won't hide on resize
-		# This is triggered by a manual open / close action
+		# When fixed is set to true, the sheet won't hide on resize.
+		# This is triggered by a manual open / close action.
 		@options =
 			padding: 20
 			width: 250
-			hideWidth: 820
+			minWidth: 820
 			fixed: false
 
 		@render()
@@ -190,11 +189,11 @@ class ShareComponent
 					boxShadow: "0 0 0 1px rgba(0,0,0,.1)"
 			@_showPointer(@avatar)
 
-			# See if author name is available, otherwise fallback to Twitter handle
+			# If author name isn't available, fallback to Twitter handle
 			name = if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}"
 			showAuthor("<a href='http://twitter.com/#{@shareInfo.twitter}' style='text-decoration: none;'>#{name}</a>")
 
-		# If there's no Twitter handle, but there is an author. Just show author.
+		# If there's no twitter handle, show plain author name
 		if @shareInfo.author and !@shareInfo.twitter
 			showAuthor(@shareInfo.author)
 
@@ -257,7 +256,7 @@ class ShareComponent
 		@_showPointer(@download)
 
 	_checkCanvasSize: ->
-		if Canvas.width < @options.hideWidth then @_closeSheet() else @_openSheet()
+		if Canvas.width < @options.minWidth then @_closeSheet() else @_openSheet()
 
 	_startListening: ->
 		# Show regular cursor on sheet
