@@ -11,7 +11,7 @@ Utils = require "./Utils"
 {Matrix} = require "./Matrix"
 {Animation} = require "./Animation"
 {LayerStyle} = require "./LayerStyle"
-{LayerStates} = require "./LayerStates"
+{LayerStateMachine} = require "./LayerStateMachine"
 {LayerDraggable} = require "./LayerDraggable"
 {LayerPinchable} = require "./LayerPinchable"
 {Gestures} = require "./Gestures"
@@ -132,7 +132,7 @@ class exports.Layer extends BaseClass
 			if options.hasOwnProperty(p)
 				@[p] = options[p]
 
-		@_states = new LayerStates(@)
+		@_stateMachine = new LayerStateMachine(@)
 		@_context.emit("layer:create", @)
 
 	##############################################################
@@ -990,9 +990,10 @@ class exports.Layer extends BaseClass
 		enumerable: false
 		exportable: false
 		importable: false
-		get: -> @_states
+		get: -> @_stateMachine.states
 		set: (states) ->
-			@_states = new LayerStates(@, @_states.initial, states)
+			for name,state of states
+				@_stateMachine.states[name] = state
 
 	#############################################################################
 	## Draggable, Pinchable
