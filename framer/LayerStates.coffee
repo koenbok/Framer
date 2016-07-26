@@ -6,43 +6,23 @@
 
 LayerStatesIgnoredKeys = ["ignoreEvents"]
 
-class exports.LayerStates extends BaseClass
+readOnlyProperty = (object, name, enumerable, getter) ->
+	Object.defineProperty object, name,
+		configurable: true
+		enumerable: enumerable
+		get: getter
+		set: ->
+			throw new Error "You can't override special state '#{name}'"
 
+class exports.LayerStates
+	constructor: (stateMachine) ->
+		readOnlyProperty @, "initial", true, -> stateMachine.initial
+		readOnlyProperty @, "previous", false, -> stateMachine.previous
+		readOnlyProperty @, "current", false, -> stateMachine.current
+		readOnlyProperty @, "previousName", false, -> stateMachine.previousName
+		readOnlyProperty @, "currentName", false, -> stateMachine.currentName
 
-	constructor: (layer,initial, states={}) ->
-		@_previousStates = []
-		for stateName,value of states
-			@[stateName] = value
-		@_layer = layer
-		initial ?= layer.props
-		@_currentName = 'initial'
-		@_initial = LayerStates.filterStateProperties(initial)
-		super
-
-	@define "initial",
-		enumerable: false
-		exportable: false
-		importable: false
-		get: -> @_initial
-
-	@define "current",
-		enumerable: false
-		exportable: false
-		importable: false
-		get: -> @[@_currentName]
-
-	@define "currentName",
-		enumerable: false
-		exportable: false
-		importable: false
-		get: -> @_currentName
-
-	emit: (args...) ->
-		super
-		# Also emit this to the layer with self as argument
-		@_layer.emit args...
-
-	@filterStateProperties = (properties) ->
+	@filterStateProperties: (properties) ->
 
 		stateProperties = {}
 
