@@ -382,7 +382,6 @@ class ShareComponent
 
 		if canvasHeight < @sheet.maxHeight and canvasHeight > @sheet.minHeight
 			@sheet.height = canvasHeight
-			# @sheet.style.overflow = "scroll"
 
 			# Make the description scrollable
 			verticalSpace = @sheet.height - @cta.height - @credentials.height - @buttons.height - @date.height - 95
@@ -442,12 +441,7 @@ class ShareComponent
 		@open.visible = false
 		@open.ignoreEvents = true
 
-Utils.delay 0, ->
-	context.run ->
-		share = new ShareComponent(Framer.Metadata)
-
-
-# Info Fixture
+# Activate Module
 Framer.Metadata =
 	author: "Eelco Lempsink"
 	twitter: "eelco"
@@ -461,3 +455,7 @@ Framer.Metadata =
 	"""
 	date: "Jun 14 2016"
 	local: false
+
+Utils.delay 0, ->
+	context.run ->
+		share = new ShareComponent(Framer.Metadata)
