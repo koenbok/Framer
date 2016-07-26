@@ -41,7 +41,7 @@ class ShareComponent
 		@options =
 			padding: 20
 			width: 250
-			minWidth: 820
+			minAvailableSpace: 50
 			fixed: false
 
 		@render()
@@ -58,7 +58,7 @@ class ShareComponent
 
 		# Evaluate content and set height accordingly
 		@_updateHeight()
-		@_checkCanvasSize()
+		@_calculateAvailableSpace()
 
 	# Render main sheet
 	_renderSheet: ->
@@ -255,10 +255,22 @@ class ShareComponent
 
 		@_showPointer(@download)
 
-	_checkCanvasSize: ->
-		if Canvas.width < @options.minWidth then @_closeSheet() else @_openSheet()
+	_calculateAvailableSpace: ->
+
+		# Check if hand is visible
+		if Framer.Device.selectedHand isnt ""
+			availableSpace = Framer.Device.hands.screenFrame.x
+		else
+			availableSpace = Framer.Device.phone.screenFrame.x
+
+		if availableSpace < @options.minAvailableSpace
+			@_closeSheet()
+		else
+			@_openSheet()
 
 	_startListening: ->
+		@_calculateAvailableSpace()
+
 		# Show regular cursor on sheet
 		@sheet.onMouseOver ->
 			@style =
@@ -275,7 +287,7 @@ class ShareComponent
 
 		# When the window resizes evaluate if the sheet needs to be hidden
 		Canvas.onResize =>
-			@_checkCanvasSize() if !@fixed
+			@_calculateAvailableSpace() if !@fixed
 
 	# Show hand cursor
 	_showPointer: (layer) ->
