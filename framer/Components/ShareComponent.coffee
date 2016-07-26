@@ -69,7 +69,7 @@ class ShareComponent
 		@_renderInfo()
 		@_renderDescription() if @shareInfo.description
 		@_renderDate()
-		@_renderButtons() if !@shareInfo.openInFramerURL
+		@_renderButtons() if @shareInfo.openInFramerURL
 
 		# Evaluate content and set height accordingly
 		@_updateHeight()
