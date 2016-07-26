@@ -1008,6 +1008,12 @@ class exports.Layer extends BaseClass
 			for name,state of states
 				@_stateMachine.states[name] = state
 
+	@define "stateNames",
+		enumerable: false
+		exportable: false
+		importable: false
+		get: -> @_stateMachine.stateNames
+
 	#############################################################################
 	## Draggable, Pinchable
 
