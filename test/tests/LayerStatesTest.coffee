@@ -129,32 +129,29 @@ describe "LayerStates", ->
 		it "should bring back the 'initial' state values when using 'animateToNext'", (done) ->
 
 			layer = new Layer
-			layer.states.add
-				stateA: {x:100, rotation: 90}
-				stateB: {x:200, rotation: 180}
-			layer.states.animationOptions =
-				curve: "linear"
-				time: 0.05
+			layer.states =
+				stateA: {x:100, rotation: 90, options: time: 0.05}
+				stateB: {x:200, rotation: 180, options: time: 0.05}
 
 			layer.x.should.equal 0
 
 			ready = (animation, layer) ->
-				switch layer.states.current
+				switch layer.states.currentName
 					when "stateA"
 						layer.x.should.equal 100
 						layer.rotation.should.equal 90
-						layer.states.next()
+						layer.animateToNext()
 					when "stateB"
 						layer.x.should.equal 200
 						layer.rotation.should.equal 180
-						layer.states.next()
-					when "default"
+						layer.animateToNext()
+					when "initial"
 						layer.x.should.equal 0
 						layer.rotation.should.equal 0
 						done()
 
 			layer.on "end", ready
-			layer.states.next()
+			layer.animateToNext()
 
 		it "should set scroll property", ->
 
