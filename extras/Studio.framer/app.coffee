@@ -1,16 +1,3 @@
-# Info Fixture
-Framer.Metadata =
-	author: "Eelco Lempsink"
-	twitter: "eelco"
-	title: "MIDI Controller"
-	description: """
-		This is pretty niche but actually super cool.
-
-		Connect a MIDI Controller to your Framer designs and play with it on the fly. http://blog.framerjs.com/posts/midi.html
-	"""
-	# local: true
-	date: "Jun 14 2016"
-
 # Setup
 context = new Framer.Context({name: "Sharing"})
 
@@ -32,6 +19,7 @@ class ShareLayer extends Layer
 
 		@props = _.merge(defaultProps, options)
 
+# Button layer with default behaviour
 class Button extends ShareLayer
 	constructor: (options) ->
 		super options
@@ -79,7 +67,10 @@ class ShareComponent
 
 		# Evaluate content and set height accordingly
 		@_updateHeight()
-		@_calculateAvailableSpace()
+
+		# Wait until the device screen x position is available
+		Utils.delay .1, =>
+			@_calculateAvailableSpace()
 
 	# Render main sheet
 	_renderSheet: ->
@@ -329,8 +320,6 @@ class ShareComponent
 			@_openSheet()
 
 		# If verticalSpace is less then sheet height, make sheet scrollable
-
-
 		if Canvas.height < @sheet.maxHeight
 			@sheet.height = Canvas.height - 20
 			@sheet.style.overflow = "scroll"
@@ -338,7 +327,6 @@ class ShareComponent
 			if @buttons
 				@buttons.height = 53
 			else
-				console.log "hallo"
 				@date.height = 30
 
 		if Canvas.height > @sheet.maxHeight
@@ -393,3 +381,19 @@ class ShareComponent
 Utils.delay 0, ->
 	context.run ->
 		share = new ShareComponent(Framer.Metadata)
+
+
+# Info Fixture
+Framer.Metadata =
+	author: "Eelco Lempsink"
+	twitter: "eelco"
+	title: "MIDI Controller"
+	description: """
+		Our goal with Framer has always been to build a full service design tool. So while it’s been possible to view working prototypes on a mobile browser, the experience has been less than seamless.
+
+		Then, our community came to the rescue. Both Frameless by Jay Stakelon and Frames by Rafael Conde set a new standard for mobile viewing of prototypes. Inspired by their work and your feedback, we are now launching an iOS app that fully rounds out your design experience.
+
+		Framer for iOS features live preview, offline use and intuitive sharing features that are protected by secure links. Paired with Framer for Mac, you now have access to a full mobile prototyping toolkit.
+	"""
+	# local: true
+	date: "Jun 14 2016"
