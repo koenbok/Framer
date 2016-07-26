@@ -935,6 +935,10 @@ class exports.Layer extends BaseClass
 			animationFinished()
 		animation
 
+	switchTo: (properties,options={}) ->
+		options = _.defaults({instant:true},options)
+		@animateTo(properties,options)
+
 	animateToNext: (stateNames=[],options) ->
 		if not Array.isArray(stateNames)
 			if not options? and typeof stateNames is 'object'

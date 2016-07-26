@@ -70,8 +70,7 @@ describe "LayerStates", ->
 					options:
 						instant: true
 
-			layer.animateTo "stateA",
-				instant: true
+			layer.switchTo "stateA"
 			layer.states.currentName.should.equal "stateA"
 			layer.x.should.equal 123
 
