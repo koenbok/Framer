@@ -69,7 +69,7 @@ class ShareComponent
 		@_renderInfo()
 		@_renderDescription() if @shareInfo.description
 		@_renderDate()
-		@_renderButtons() if !@shareInfo.local
+		@_renderButtons() if !@shareInfo.openInFramerURL
 
 		# Evaluate content and set height accordingly
 		@_updateHeight()
@@ -315,7 +315,7 @@ class ShareComponent
 			y: @date.maxY + 20
 
 		@buttonDownload = new Button
-			url: "#"
+			url: @shareInfo.openInFramerURL
 			html: "Open in Framer"
 			color: "#FFF"
 			parent: @buttons
