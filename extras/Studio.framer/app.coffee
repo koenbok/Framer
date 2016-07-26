@@ -200,7 +200,12 @@ class ShareComponent
 				size: 40
 				parent: @info
 				borderRadius: 100
-				image: "http://img.tweetimag.es/i/#{@shareInfo.twitter}_o"
+
+			@avatar.onImageLoadError =>
+				@credentials.x = 0
+				@avatar.destroy()
+
+			@avatar.image = "http://tweetimag.es/i/#{@shareInfo.twitter}_o"
 
 			avatarBorder = new ShareLayer
 				size: @avatar.width - 2
