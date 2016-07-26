@@ -18,7 +18,7 @@ describe "LayerStates", ->
 				@layer.states.current.should.equal @layer.states.initial
 				done()
 
-			@layer.states.on 'willSwitch', test
+			@layer.on Events.StateWillSwitch, test
 			@layer.animateTo 'a', instant: true
 
 		it "should emit didSwitch when switching", (done) ->
@@ -30,7 +30,7 @@ describe "LayerStates", ->
 				@layer.states.current.should.equal @layer.states.a
 				done()
 
-			@layer.states.on 'didSwitch', test
+			@layer.on Events.StateDidSwitch, test
 			@layer.animateTo 'a', instant: true
 
 
@@ -180,7 +180,7 @@ describe "LayerStates", ->
 
 			layer.scroll.should.equal false
 
-			layer.states.on Events.StateDidSwitch, ->
+			layer.on Events.StateDidSwitch, ->
 				layer.scroll.should.equal true
 				layer.style.backgroundColor.should.equal new Color("red").toString()
 				done()
@@ -196,7 +196,7 @@ describe "LayerStates", ->
 			# layer.scroll.should.equal false
 			layer.x.should.equal 0
 
-			layer.states.on Events.StateDidSwitch, ->
+			layer.on Events.StateDidSwitch, ->
 				# layer.scroll.should.equal true
 				layer.x.should.equal 200
 				layer.style.backgroundColor.should.equal new Color("red").toString()
