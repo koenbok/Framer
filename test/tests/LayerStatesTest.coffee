@@ -56,16 +56,6 @@ describe "LayerStates", ->
 
 			Framer.resetDefaults()
 
-		it.skip "should convert string to colors in states", ->
-			layer = new Layer
-			layer.states.test =
-					backgroundColor:"fff"
-					color: "000"
-			layer.states.test.backgroundColor.isEqual(new Color("fff")).should.be.true
-			layer.states.test.color.isEqual(new Color("000")).should.be.true
-
-
-
 	describe "Switch", ->
 
 		it "should switch instant", ->
