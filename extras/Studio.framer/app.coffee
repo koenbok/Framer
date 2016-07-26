@@ -60,6 +60,7 @@ class ShareComponent
 			minAvailableSpace: 300
 			minAvailableSpaceFullScreen: 500
 			fixed: false
+			maxDescriptionLength: 135
 
 		@render()
 		@_startListening()
@@ -247,17 +248,55 @@ class ShareComponent
 		@description = new ShareLayer
 			parent: @info
 			y: @credentials.maxY + 10
-			html: parseDescription(@shareInfo.description)
 			style:
 				lineHeight: "1.5"
 				wordWrap: "break-word"
 
-		descriptionSize = Utils.textSize(
-			parseDescription(@shareInfo.description),
-			{fontSize: "14px", fontFamily: "Roboto", lineHeight: "1.5", wordWrap: "break-word"},
-			{width: "#{@description.width}"}
-		)
-		@description.height = descriptionSize.height
+		descriptionStyle =
+			fontSize: "14px"
+			fontFamily: "Roboto"
+			lineHeight: "1.5"
+			wordWrap: "break-word"
+
+		showFullDescription = =>
+			descriptionSize = Utils.textSize(
+				parseDescription(@shareInfo.description),
+				descriptionStyle,
+				{width: "#{@description.width}"}
+			)
+
+			@description.height = descriptionSize.height
+			@description.html = parseDescription(@shareInfo.description)
+
+			@date.y = @description.maxY + 16
+			@buttons.y = @date.maxY + 20
+			@_updateHeight()
+
+			@description.onMouseMove =>
+				@description.style =
+					cursor: "default"
+
+		if @shareInfo.description.length > @options.maxDescriptionLength
+
+			truncated = @shareInfo.description.substring(@options.maxDescriptionLength,length).trim()
+			@options.shortDescription = truncated + "..."
+
+			descriptionTruncatedSize = Utils.textSize(
+				parseDescription(@options.shortDescription),
+				descriptionStyle,
+				{width: "#{@description.width}"}
+			)
+
+			@description.height = descriptionTruncatedSize.height
+			@description.html = parseDescription(@options.shortDescription)
+
+			@_showPointer(@description)
+			@description.onClick -> showFullDescription()
+
+		else
+			@description.height = descriptionSize.height
+			@description.html = parseDescription(@shareInfo.description)
+
 
 	_renderButtons: ->
 		@buttons = new ShareLayer
@@ -320,7 +359,7 @@ class ShareComponent
 			availableSpace = Screen.canvasFrame.x
 
 		# Open or close sheet beased on available space
-		if availableSpace < threshold
+		if availableSpace < threshold and !@options.fixed
 			@_closeSheet()
 		else
 			@_openSheet()
