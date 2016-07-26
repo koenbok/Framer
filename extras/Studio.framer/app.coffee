@@ -127,19 +127,19 @@ class ShareComponent
 			parent: @sheet
 			style:
 				borderBottom: "1px solid #E8E8E8"
-			height: 125
+			height: 118
 
 		ctaLogo = new Layer
 			parent: @cta
 			width: 16
 			height: 24
 			x: Align.center()
-			y: 24
+			y: 20
 			image: "images/logo.png"
 
 		ctaSlogan = new ShareLayer
 			parent: @cta
-			y: ctaLogo.y + 35
+			y: ctaLogo.y + 36
 			height: 30
 			html: "Made with Framer"
 			style:
