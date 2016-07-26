@@ -2,7 +2,7 @@
 Framer.Metadata =
 	author: "Eelco Lempsink"
 	twitter: "eelco"
-# 	title: "MIDI Controller"
+	title: "MIDI Controller"
 	description: """
 		This is pretty niche but actually super cool.
 
@@ -10,6 +10,8 @@ Framer.Metadata =
 	"""
 	# local: true
 	date: "Jun 14 2016"
+
+Canvas.backgroundColor = "red"
 
 # Setup
 context = new Framer.Context({name: "Sharing"})
@@ -28,7 +30,7 @@ class ShareLayer extends Layer
 				color: "#111"
 				webkitUserSelect: "text"
 				lineHeight: "1"
-				textRendering: "optimizeLegibility"
+				webkitFontSmoothing: "antialiased";
 
 		@props = _.merge(defaultProps, options)
 
@@ -41,7 +43,9 @@ class ShareComponent
 		@options =
 			padding: 20
 			width: 250
-			minAvailableSpace: 50
+			minAvailableSpaceHand: 75
+			minAvailableSpaceDevice: 300
+			minAvailableSpaceFullScreen: 500
 			fixed: false
 
 		@render()
@@ -211,7 +215,6 @@ class ShareComponent
 				color: "#999"
 				letterSpacing: ".2px"
 
-
 	_renderDescription: ->
 
 		# See if there are any url's in the description and wrap them in anchor tags. Make sure linebreaks are wrapped in <br/ >'s.'
@@ -256,14 +259,27 @@ class ShareComponent
 		@_showPointer(@download)
 
 	_calculateAvailableSpace: ->
+		device = Framer.Device
+		threshold = @options.minAvailableSpaceFullScreen
+		availableSpace = Canvas.width
 
-		# Check if hand is visible
-		if Framer.Device.selectedHand isnt ""
-			availableSpace = Framer.Device.hands.screenFrame.x
-		else
-			availableSpace = Framer.Device.phone.screenFrame.x
+		console.log device
 
-		if availableSpace < @options.minAvailableSpace
+		# When device is selected, us the device's
+		# position to calculate available space
+		if device.deviceType isnt "fullscreen"
+
+			# Check if hand is visible
+			if device.handsImageLayer.image isnt ""
+				threshold = @options.minAvailableSpaceHand
+				availableSpace = device.hands.screenFrame.x
+				console.log availableSpace
+			else
+				availableSpace = device.phone.screenFrame.x
+				threshold = @options.minAvailableSpaceDevice
+
+		# Open or close sheet beased on available space
+		if availableSpace < threshold
 			@_closeSheet()
 		else
 			@_openSheet()
