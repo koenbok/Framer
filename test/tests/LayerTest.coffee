@@ -1144,3 +1144,17 @@ describe "Layer", ->
 			a1.isAnimating.should.equal false
 			a2.isAnimating.should.equal false
 			a3.isAnimating.should.equal true
+
+
+	describe "Point conversion", ->
+
+		it "should correctly convert points to Screen", ->
+
+			point =
+				x: 200
+				y: 300
+
+			layer = new Layer point: point
+			screenPoint = layer.convertPointToScreen()
+			screenPoint.x.should.equal point.x
+			screenPoint.y.should.equal point.y
