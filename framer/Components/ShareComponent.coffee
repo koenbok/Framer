@@ -96,7 +96,9 @@ class ShareComponent
 			parent: @sheet
 			size: 12
 			point: 12
-			image: "images/close.png"
+			backgroundColor: null
+			style:
+				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAZdJREFUSA2tlt9OgzAUh6UkRrLMCfgnwWwPoXcmBk32Crvfo+1+76A3Jt4SX8Bk8VYBkagJAc+P7CyMUWiHvYCepv2+0p42GNPpdFQUxdV4PH5eLBY/B/9QZrPZYRiGN6ZpvgjAiXm+Wq3u5/P5UV8+4FEU3RH3Isuya4GZU/BpGMZxXwnD8zy3ifflOM6TGQRB5vv+WxzHHiR4I0a7ztfU4bZtPyyXy28TkL4SGRzsUtBH0gbfEuwj6YLvCHQkKvBGgYpEFQ6WgYes4FwgdZFdSOXJZPKYpmmOPOdU5GyRMVoFGFSVEDQRQuTUPEKed8ExfpNFCJoKpzDN+pLgQ+qD057SISrzvGlMtU1UA1kdy7KeedkF9cFgUMj6V9s7v4A3lPbghAamBP+lpRqqnvhWAcN5Q7Esruu+6lwrUkEdzhvKe6IqaRTI4Ly2OpIdQRdcV7IlUIXrSDYCXbiqpBTsC1eRGH3hLMG7eq3w3WV6nndLwanq3VIF1uv17EqS5Ezg14I6fnCe1wfpxvj1wa1LE363LCv4A+knGKYRZVX+AAAAAElFTkSuQmCC')"
 
 		@open = new Layer
 			size: 30
@@ -111,7 +113,9 @@ class ShareComponent
 			parent: @open
 			width: 10
 			height: 15
-			image: "images/logo-button.png"
+			backgroundColor: null
+			style:
+				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAeCAYAAAAsEj5rAAAABGdBTUEAALGPC/xhBQAAANRJREFUSA2t1dENgjAQBuA7wqsuoEs5hi5Bu4RsoQs4jiygvtceCgRoubZ3f0JI2t5HAy3FtnMGABp/qQRJ0UR7UBMdQS10BmqgK1CKBkEJGgVL0U2wBGXBXBQPN+eoiAsi2OcJDTeu4gYM/f6xzfHeb9OhKXhPBqk6Bc0CU9BskEOLwC20GIyhIjCEisElWlODRv5LCuru8bF+gfFnSrtP2qYVXHcGEK3GLMn4vUNFdPooSugE0nwV0DmogK5BIRoGhSiVx3N5Gzi/kv7qcWTZQ2hivjMmakz6/b3iAAAAAElFTkSuQmCC')"
 			y: Align.center(1)
 			x: Align.center
 
@@ -132,7 +136,9 @@ class ShareComponent
 			height: 24
 			x: Align.center()
 			y: 20
-			image: "images/logo.png"
+			backgroundColor: null
+			style:
+				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAwCAYAAABwrHhvAAAABGdBTUEAALGPC/xhBQAAAShJREFUWAnF2MsNwjAMBmCngiPMgdiGMWAJ0iXoGB2APRALsACcAImAoaLqO3Fi21LU0+98iSKlrSkuzgLA/jNUyuCsmogvQBPxB2ghGgANRAcgjegFSCIGAVKIUYAEYhLAjfACcCK8AVyIIAAHIhiQGkECpESQAakQZlU+HDajVgYmP23mlp6nJqvcC9x+XT71AOiIQWTVQqIfVEQyAHUnkgIoiOSAUAQLIATBBvBFsAJ8EOyAKYQIYAwhBhhCiAL6EOKANiL6OsaG1MKrfHY+3nNwjv5/oFhGvdRkcFhYMCanriI29zsDioj6ECohagDupQKiCVBAdAHCiH6AIGIYIIQYBwggpgHMCD8AI8IfwIQIAzAhsG147W4WtteoL+vwSdsJRETWGylMpVP7hSF+AAAAAElFTkSuQmCC')"
 
 		ctaSlogan = new ShareLayer
 			parent: @cta
@@ -335,10 +341,12 @@ class ShareComponent
 
 		@buttonFacebookIcon = new Layer
 			parent: @buttonFacebook
-			image: "images/icon-facebook.png"
 			width: 7
 			height: 14
 			point: Align.center()
+			backgroundColor: null
+			style:
+				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAcCAYAAABRVo5BAAAABGdBTUEAALGPC/xhBQAAAO1JREFUOBFjZMABWltbJX///l0GlDYAYg1GRkZxIP3n////P4E0EyOQwABNTU05QAVtQMyLIQkVwNDY3Nzs9vfv3524NMDEmWAMED1z5kyuf//+zUEWw8VG0fjq1SsnoPNkcSlGFmdB5gA16SHzQWxgoPxnZma2UVNTOxkWFvYXJo+uUQwmAaOBhn2tqak5BuPDaBSnAhXJwySQaB4kNpyJohEoqgCXIcAgWyNjQ0PDfwKGY0gDA+w5uo0YirAJAMPiLFkagTaeIUsjExMTeTaCNGIkcmyBBRTDUEeWU0EBNqoRW7KBio0GDi0CBwAHJ0YrwGtXbwAAAABJRU5ErkJggg==')"
 
 		@buttonTwitter = new Button
 			url: "http://www.twitter.com"
@@ -352,10 +360,13 @@ class ShareComponent
 
 		@buttonTwitterIcon = new Layer
 			parent: @buttonTwitter
-			image: "images/icon-twitter.png"
 			width: 14
 			height: 11
 			point: Align.center()
+			backgroundColor: null
+			style:
+				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAWCAYAAADTlvzyAAAABGdBTUEAALGPC/xhBQAAAr5JREFUSA2tlUloU1EUhpuhITFCAnUTR1zVgsQUF1pw4UbETUAq7tTiogUDKkiJSUjaTBvdFCliF5KVazdKigu3BYsjlEIcIOKEEgewTVoz+J2HCa8378UOuXC494z/O+e8e4+lZ4srk8kcq1arVywWyxChvI1Go8g573Q6p8Lh8IdmeOyO1uv1vZamYDN7MpnMABDB16r6A1qGLlut1gIfFOfsHhgYOK4BplKpq6APut3uS+Pj40uqsxGPzyg+M0Y6VQbYS4CHsfc3v+w5RueXl5efEuiw6qDy6XR6P5lNqXIT/hW2c4Dle3t7FzRA0N+JMYp+FE8mJydz1HyXSQCxOwe5zPSK3E+Gw9CFaDRa0AAB2a0zEtkIdS/Qo9tGGQN2Vmff8QjQfX6gQCKRmBNDrYe5XM5ZLBY/w3tNvF/g+BDdPM7zlUplGtDTJrZrxD6fzzE2NvanKbTLoVQqbaesN8k021QoewCAgMjK5bKi6syurKxI6VuAWkkR7iTgGRSPO7tvXEs1tum9tAwdDscXeuZHYdMru3Be9Xg8JX0cLUPu3lcyzOsV3TjT90V9/ySmBqgdrNbr7K2nSGRdWM/UGC1AftsFl8t1BINpvuytarhJ/p7q1wIUBY/tJzbpZVX4La4CSbT9hGsABYDsluhn/xbBJM4NqKHGaQPkPsqo+aUabpB/NDExcdfIpw0wHo+/ttlshzC+A72Bfhs5dpB9t9vtF830HechD/g+7uctnINmAfRyKvMNOknvZPoYLkNAgPbUarVreIzSz3VNBYA+0o4TVGjREOmf0MI0GMT4J7yDtzQIQBB+iH29r04d+xleq1gkEvnRCUx08rStks0Iu4ycA5DMO9n+tyoYzDJU07FYrO2CmzmvKWk2m/XTs1MAymQ4CO2AvGQgr73cUaH38LN9fX0PQqHQRn+onr9RuQfzn9jjeAAAAABJRU5ErkJggg==')"
+
 
 	_calculateAvailableSpace: =>
 		device = Framer.Device
