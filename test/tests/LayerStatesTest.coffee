@@ -56,6 +56,28 @@ describe "LayerStates", ->
 
 			Framer.resetDefaults()
 
+	describe "Adding", ->
+		describe "when setting multiple states", ->
+			it "should override existing states", ->
+				layer = new Layer
+				layer.states.test = x: 100
+				layer.states =
+					stateA: x:200
+					stateB: scale: 0.5
+				assert.deepEqual layer.stateNames, ['initial','stateA','stateB']
+
+			it "should reset the previous and current states", ->
+				layer = new Layer
+				layer.states.test = x: 100
+				layer.switchTo 'test'
+				layer.states =
+					stateA: x:200
+					stateB: scale: 0.5
+				assert.equal layer.states.previousName, null
+				layer.states.currentName.should.equal 'initial'
+
+
+
 
 	describe "Switch", ->
 

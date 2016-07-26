@@ -1010,6 +1010,7 @@ class exports.Layer extends BaseClass
 		importable: false
 		get: -> @_stateMachine.states
 		set: (states) ->
+			@_stateMachine.reset()
 			for name,state of states
 				@_stateMachine.states[name] = state
 
