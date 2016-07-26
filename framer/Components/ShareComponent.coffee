@@ -231,11 +231,14 @@ class ShareComponent
 	_renderDate: ->
 		verticalPosition = if @description then @description.maxY else @credentials.maxY
 
+		date = new Date(@shareInfo.date)
+		months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
 		@date = new ShareLayer
 			parent: @info
 			height: 10
 			y: verticalPosition + 16
-			html: "Shared on #{@shareInfo.date}"
+			html: "Shared on #{date.getDate()} #{months[date.getMonth()]} #{date.getFullYear()}"
 			style:
 				textTransform: "uppercase"
 				fontSize: "11px"
