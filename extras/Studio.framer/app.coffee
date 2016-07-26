@@ -37,19 +37,20 @@ class Button extends ShareLayer
 		super options
 
 		defaultProps =
+			height: 33
 			style:
 				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 				fontWeight: "500"
-				color: "#FFF"
 				webkitUserSelect: "text"
 				borderRadius: 3
 				textAlign: "center"
 				paddingTop: "9px"
 			width: options.parent.width if options and options.parent
-			html: "<a href='#{options.url}' style='text-decoration: none; color: #{options.labelColor}'>#{options.label}</a>"
 
 		@props = _.merge(defaultProps, options)
 
+		@onMouseOver -> @style.cursor = "pointer"
+		@onClick -> window.open(options.url)
 
 # Sheet
 class ShareComponent
@@ -268,14 +269,48 @@ class ShareComponent
 
 		@buttonDownload = new Button
 			url: "#"
-			label: "Open in Framer"
-			labelColor: "#FFF"
+			html: "Open in Framer"
+			color: "#FFF"
 			parent: @buttons
-			height: 33
+			width: 139
 			borderRadius: 3
 			backgroundColor: "00AAFF"
 
-		@_showPointer(@buttons)
+		@buttonFacebook = new Button
+			url: "http://www.facebook.com"
+			parent: @buttons
+			borderWidth: 1
+			borderColor: "#D5D5D5"
+			width: 33
+			x: @buttonDownload.maxX + 6
+			style:
+				borderRadius: "3px 0 0 3px"
+
+		@buttonFacebookIcon = new Layer
+			parent: @buttonFacebook
+			image: "images/icon-facebook.png"
+			width: 7
+			height: 14
+			point: Align.center()
+			opacity: .8
+
+		@buttonTwitter = new Button
+			url: "http://www.twitter.com"
+			parent: @buttons
+			borderWidth: 1
+			borderColor: "#D5D5D5"
+			width: 33
+			x: @buttonFacebook.maxX - 1
+			style:
+				borderRadius: "0 3px 3px 0"
+
+		@buttonTwitterIcon = new Layer
+			parent: @buttonTwitter
+			image: "images/icon-twitter.png"
+			width: 15
+			height: 12
+			point: Align.center()
+			opacity: .8
 
 	_calculateAvailableSpace: ->
 		device = Framer.Device
@@ -302,8 +337,6 @@ class ShareComponent
 			@_openSheet()
 
 		# If verticalSpace is less then sheet height, make sheet scrollable
-		console.log @sheet.height, Canvas.height
-
 		@sheet.height = Canvas.height - 20
 		@sheet.style.overflow = "scroll"
 
