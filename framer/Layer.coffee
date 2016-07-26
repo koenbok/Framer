@@ -934,8 +934,18 @@ class exports.Layer extends BaseClass
 			animationFinished()
 		animation
 
-	animations: ->
+	animateToNext: (stateNames=[],options) ->
+		if not Array.isArray(stateNames)
+			if not options? and typeof stateNames is 'object'
+				options = stateNames
+				stateNames = []
+			else
+				stateNames = Utils.arrayFromArguments arguments
+				options = {}
+		nextState = @_stateMachine.next(stateNames)
+		@animateTo nextState, options
 
+	animations: ->
 		# Current running animations on this layer
 		_.filter @_context.animations, (animation) =>
 			animation.options.layer is @
