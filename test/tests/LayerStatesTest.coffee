@@ -107,7 +107,7 @@ describe "LayerStates", ->
 			layer.animateTo 'stateA', instant: true
 			layer.html.should.equal "aaa"
 
-		it "should not change style when going back to default", ->
+		it "should not change style when going back to initial", ->
 			layer = new Layer
 			layer.style.fontFamily = "Arial"
 			layer.style.fontFamily.should.equal "Arial"
@@ -126,7 +126,7 @@ describe "LayerStates", ->
 
 	describe "Properties", ->
 
-		it.skip "should bring back the 'default' state values when using 'next'", (done) ->
+		it "should bring back the 'initial' state values when using 'animateToNext'", (done) ->
 
 			layer = new Layer
 			layer.states.add
@@ -204,7 +204,7 @@ describe "LayerStates", ->
 
 			layer.animateTo "stateA", {curve:"linear", time:0.1}
 
-		it "should restore the default state when using non exportable properties", ->
+		it "should restore the initial state when using non exportable properties", ->
 
 			layer = new Layer
 			layer.states =
