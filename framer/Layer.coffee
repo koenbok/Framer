@@ -907,9 +907,9 @@ class exports.Layer extends BaseClass
 
 		_.defaults(options,properties.options)
 		delete properties.options
+
 		animatableProperties = Animation.filterAnimatableProperties(properties)
-		nonAnimatableKeys = _.difference(_.keys(properties),_.keys(animatableProperties))
-		nonAnimatableProperties = _.pick(_.clone(properties),nonAnimatableKeys)
+		nonAnimatableProperties = _.omit(_.clone(properties),_.keys(animatableProperties))
 		options.properties = animatableProperties
 		options.layer = @
 
