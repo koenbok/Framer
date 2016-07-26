@@ -1,4 +1,5 @@
 assert = require "assert"
+{expect} = require "chai"
 
 describe "LayerStates", ->
 
@@ -236,3 +237,69 @@ describe "LayerStates", ->
 
 			layerB.animateTo "initial", instant: true
 			# assert.equal(layerB.parent, layerA)
+
+		it "should set the current and previous states when switching", ->
+			layer = new Layer
+			layer.states =
+				first: x: 100, options: instant: true
+				second: y: 200, options: instant: true
+
+			assert.equal(layer.states.previous, null)
+			assert.equal(layer.states.current, layer.states.initial)
+			layer.animateTo('first')
+			assert.equal(layer.states.previous, layer.states.initial)
+			layer.states.current.should.equal layer.states.first
+			layer.x.should.equal 100
+			layer.animateTo('second')
+			assert.equal(layer.states.previous, layer.states.first)
+			layer.states.current.should.equal layer.states.second
+			layer.y.should.equal 200
+
+
+		it "should set the initial state when creating a Layer", ->
+			layer = new Layer
+			layer.states.currentName.should.equal 'initial'
+			layer.states.initial.x.should.equal 0
+			assert.deepEqual layer.stateNames, ['initial']
+
+		it "should listen to options provided to animateToNext", ->
+			layer = new Layer
+			layer.states =
+				stateA: x: 300
+				stateB: y: 300
+			animation = layer.animateToNext ['stateA','stateB'],
+				curve: "linear"
+			animation.options.curve.should.equal 'linear'
+
+		it "should correctly switch to next state without using an array animateToNext", ->
+			layer = new Layer
+			layer.states =
+				stateA: x: 300
+				stateB: y: 300
+			layer.animateToNext 'stateA','stateB'
+			layer.states.currentName.should.equal 'stateA'
+			layer.animateToNext 'stateA','stateB'
+			layer.states.currentName.should.equal 'stateB'
+			layer.animateToNext 'stateA','stateB'
+			layer.states.currentName.should.equal 'stateA'
+
+		it "should listen to options provided to animateToNext when no states are provided", ->
+			layer = new Layer
+			layer.states.test = x: 300
+			animation = layer.animateToNext
+				curve: "linear"
+			animation.options.curve.should.equal 'linear'
+
+		it "should throw an error when you try to override a special state", ->
+			layer = new Layer
+			throwing = ->
+				layer.states.initial = x: 300
+			expect(throwing).to.throw(/You can't override special state 'initial'/)
+
+		it "should throw an error when one fo the states is a special state", ->
+			layer = new Layer
+			throwing = ->
+				layer.states =
+					state: y: 10
+					previous: x: 300
+			expect(throwing).to.throw(/You can't override special state 'previous'/)
