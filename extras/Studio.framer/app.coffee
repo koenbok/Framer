@@ -61,8 +61,7 @@ class ShareComponent
 		@options =
 			padding: 20
 			width: 250
-			minAvailableSpaceHand: 30
-			minAvailableSpaceDevice: 300
+			minAvailableSpace: 300
 			minAvailableSpaceFullScreen: 500
 			fixed: false
 
@@ -320,15 +319,8 @@ class ShareComponent
 		# When device is selected, us the device's
 		# position to calculate available space
 		if device.deviceType isnt "fullscreen"
-
-			# Check if hand is visible
-			if device.handsImageLayer.image isnt ""
-				threshold = @options.minAvailableSpaceHand
-				availableSpace = device.hands.screenFrame.x
-			else
-				availableSpace = device.phone.screenFrame.x
-				availableSpace = device.phone.screenFrame.x
-				threshold = @options.minAvailableSpaceDevice
+			threshold = @options.minAvailableSpace
+			availableSpace = Screen.canvasFrame.x
 
 		# Open or close sheet beased on available space
 		if availableSpace < threshold
