@@ -36,4 +36,13 @@ class Canvas extends BaseClass
 	toInspect: ->
 		return "<#{@constructor.name} #{@width}x#{@height}>"
 
+	# Point Conversion
+
+	convertPointToLayer: (point, layer) =>
+		return Utils.convertPointFromContext(point, layer, true, true)
+
+	convertPointToScreen: (point) =>
+		ctx = Framer.CurrentContext.device.context
+		return Utils.convertPointFromContext(point, ctx, true, true)
+
 exports.Canvas = Canvas
