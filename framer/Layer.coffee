@@ -400,16 +400,10 @@ class exports.Layer extends BaseClass
 		get: -> Utils.frameGetMaxY @
 		set: (value) -> Utils.frameSetMaxY @, value
 
-	convertPointFromScreen: (point) ->
-		return Utils.convertPointFromContext(point, @, false)
-
-	convertPointFromCanvas: (point) ->
-		return Utils.convertPointFromContext(point, @, true)
-
-	convertPointToScreen: (point) ->
+	convertPointToScreen: (point) =>
 		return Utils.convertPointToContext(point, @, false)
 
-	convertPointToCanvas: (point) ->
+	convertPointToCanvas: (point) =>
 		return Utils.convertPointToContext(point, @, true)
 
 	convertPointToLayer: (point, layer) =>
