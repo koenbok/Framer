@@ -3,8 +3,12 @@ Framer.Metadata =
 	author: "Eelco Lempsink"
 	twitter: "eelco"
 # 	title: "MIDI Controller"
-	description: "This is pretty niche but actually super cool. Connect a MIDI Controller to your Framer designs and play with it on the fly. http://blog.framerjs.com/posts/midi.html"
-# 	local: true
+	description: """
+		This is pretty niche but actually super cool.
+
+		Connect a MIDI Controller to your Framer designs and play with it on the fly. http://blog.framerjs.com/posts/midi.html
+	"""
+	# local: true
 	date: "Jun 14 2016"
 
 # Setup
@@ -14,7 +18,7 @@ context = new Framer.Context({name: "Sharing"})
 class ShareLayer extends Layer
 	constructor: (options) ->
 		super options
-				
+
 		defaultProps =
 			backgroundColor: null
 			width: options.parent.width if options and options.parent
@@ -25,26 +29,26 @@ class ShareLayer extends Layer
 				webkitUserSelect: "text"
 				lineHeight: "1"
 				textRendering: "optimizeLegibility"
-		
+
 		mergedProps = _.merge(defaultProps, options)
 		@props = mergedProps
 
 # Sheet
 class ShareComponent
 	constructor: (@shareInfo) ->
-		
-		# When this is set to true, the sheet won't hide on resize
+
+		# When fixed is set to true, the sheet won't hide on resize
 		# This is triggered by a manual open / close action
-		
 		@options =
 			padding: 20
 			width: 250
+			hideWidth: 820
 			fixed: false
 
 		@render()
 		@_startListening()
-			
-	render: ->		
+
+	render: ->
 		@_renderSheet()
 		@_renderToggleButtons()
 		@_renderCTA()
@@ -52,11 +56,11 @@ class ShareComponent
 		@_renderDescription() if @shareInfo.description
 		@_renderDate()
 		@_renderDownload() if !@shareInfo.local
-		
+
 		# Evaluate content and set height accordingly
 		@_updateHeight()
-		@_checkCanvasSize()		
-		
+		@_checkCanvasSize()
+
 	# Render main sheet
 	_renderSheet: ->
 		@sheet = new Layer
@@ -66,17 +70,15 @@ class ShareComponent
 			backgroundColor: "#FFF"
 			style:
 				boxShadow: "0 0 0 1px rgba(0,0,0,.12), 0 1px 3px rgba(0,0,0,.08)"
-	
+
 	# Render buttons to open / close sheet
 	_renderToggleButtons: ->
 		@close = new Layer
 			parent: @sheet
-			width: 12
-			height: 12
-			x: 12
-			y: 12
+			size: 12
+			point: 12
 			image: "images/close.png"
-			
+
 		@open = new Layer
 			size: 30
 			point: @sheet.point
@@ -85,7 +87,7 @@ class ShareComponent
 			visible: false
 			style:
 				boxShadow: "0 0 0 1px rgba(0,0,0,.12), 0 1px 3px rgba(0,0,0,.08)"
-				
+
 		openLogo = new Layer
 			parent: @open
 			width: 10
@@ -93,10 +95,10 @@ class ShareComponent
 			image: "images/logo-button.png"
 			y: Align.center(1)
 			x: Align.center
-			
+
 		for l in [@close, @open]
 			@_showPointer(l)
-	
+
 	# Render CTA section
 	_renderCTA: ->
 		@cta = new ShareLayer
@@ -104,7 +106,7 @@ class ShareComponent
 			style:
 				borderBottom: "1px solid #E8E8E8"
 			height: 125
-			
+
 		ctaLogo = new Layer
 			parent: @cta
 			width: 16
@@ -112,7 +114,7 @@ class ShareComponent
 			x: Align.center()
 			y: 24
 			image: "images/logo.png"
-			
+
 		ctaSlogan = new ShareLayer
 			parent: @cta
 			y: ctaLogo.y + 35
@@ -121,7 +123,7 @@ class ShareComponent
 			style:
 				textAlign: "center"
 				fontSize: "18px"
-				
+
 		ctaLink = new ShareLayer
 			parent: @cta
 			y: ctaSlogan.y + 24
@@ -130,7 +132,7 @@ class ShareComponent
 			style:
 				textAlign: "center"
 				color: "#00AAFF"
-				
+
 	# Render info section
 	_renderInfo: ->
 		@info = new ShareLayer
@@ -152,12 +154,12 @@ class ShareComponent
 			html: @shareInfo.title or fallbackTitle
 			style:
 				fontWeight: "500"
-				
+
 		# Check what info is available and render layers accordingly
 		showAuthor = (content = @shareInfo.author) =>
 			@credentials.height = 40
 			@credentialsTitle.y = 4
-					
+
 			@credentialsAuthor = new ShareLayer
 				parent: @credentials
 				width: @credentials.width - 50
@@ -166,70 +168,74 @@ class ShareComponent
 				height: 18
 				style:
 					color: "#808080"
-					
+
 			@_showPointer(@credentialsAuthor)
-		
+
 		# Check if avatar is available
 		if @shareInfo.twitter
 			@credentials.x = 50
-		
+
 			@avatar = new ShareLayer
 				size: 40
 				parent: @info
 				borderRadius: 100
 				image: "http://img.tweetimag.es/i/#{@shareInfo.twitter}_o"
-			
+
 			avatarBorder = new ShareLayer
-				width: @avatar.width - 2
-				height: @avatar.width - 2
+				size: @avatar.width - 2
 				point: 1
 				parent: @avatar
 				borderRadius: 100
 				style:
-					boxShadow: "0 0 0 1px rgba(0,0,0,.1)"					
+					boxShadow: "0 0 0 1px rgba(0,0,0,.1)"
 			@_showPointer(@avatar)
-			
+
 			# See if author name is available, otherwise fallback to Twitter handle
 			name = if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}"
 			showAuthor("<a href='http://twitter.com/#{@shareInfo.twitter}' style='text-decoration: none;'>#{name}</a>")
-			
+
 		# If there's no Twitter handle, but there is an author. Just show author.
 		if @shareInfo.author and !@shareInfo.twitter
 			showAuthor(@shareInfo.author)
-	
+
 	_renderDate: ->
 		verticalPosition = if @description then @description.maxY else @credentials.maxY
-		
+
 		@date = new ShareLayer
 			parent: @info
-			html: "Shared on #{@shareInfo.date}"
 			height: 10
+			y: verticalPosition + 16
+			html: "Shared on #{@shareInfo.date}"
 			style:
 				textTransform: "uppercase"
 				fontSize: "11px"
 				color: "#999"
 				letterSpacing: ".2px"
-			y: verticalPosition + 16
-						
+
+
 	_renderDescription: ->
-		
-		# See if there are any url's in the description and wrap them in anchor tags
-		urlify = (text) ->
-		  urlRegex = /(https?:\/\/[^\s]+)/g
-		  text.replace urlRegex, (url) ->
-		    '<a href="' + url + '">' + url + '</a>'
-		
+
+		# See if there are any url's in the description and wrap them in anchor tags. Make sure linebreaks are wrapped in <br/ >'s.'
+		parseDescription = (text) ->
+			urlRegex = /(https?:\/\/[^\s]+)/g
+			lineBreakRegex = /(?:\r\n|\r|\n)/g
+
+			urlified = text.replace urlRegex, (url) ->
+				'<a href="' + url + '">' + url + '</a>'
+
+			urlified.replace lineBreakRegex, '<br />'
+
 		@description = new ShareLayer
 			parent: @info
 			y: @credentials.maxY + 10
-			html: urlify(@shareInfo.description)
+			html: parseDescription(@shareInfo.description)
 			style:
 				lineHeight: "1.5"
 				wordWrap: "break-word"
-		
+
 		descriptionSize = Utils.textSize(
-			@shareInfo.description, 
-			{fontSize: "14px", fontFamily: "Roboto", lineHeight: "1.5", wordWrap: "break-word"}, 
+			parseDescription(@shareInfo.description),
+			{fontSize: "14px", fontFamily: "Roboto", lineHeight: "1.5", wordWrap: "break-word"},
 			{width: "#{@description.width}"}
 		)
 		@description.height = descriptionSize.height
@@ -247,53 +253,53 @@ class ShareComponent
 				textAlign: "center"
 				paddingTop: "9px"
 				color: "#FFF"
-				
+
 		@_showPointer(@download)
-	
+
 	_checkCanvasSize: ->
-		if Canvas.width < 1080 then @_closeSheet() else @_openSheet()
-				
+		if Canvas.width < @options.hideWidth then @_closeSheet() else @_openSheet()
+
 	_startListening: ->
 		# Show regular cursor on sheet
 		@sheet.onMouseOver ->
 			@style =
 				cursor: "default"
-		
+
 		# Toggle sheet when clicked on close or open buttons
-		@close.onClick => 
+		@close.onClick =>
 			@options.fixed = true
 			@_closeSheet()
-			
-		@open.onClick => 
+
+		@open.onClick =>
 			@options.fixed = true
 			@_openSheet()
-		
+
 		# When the window resizes evaluate if the sheet needs to be hidden
-		Canvas.onResize => 
+		Canvas.onResize =>
 			@_checkCanvasSize() if !@fixed
-	
-	# Show hand cursor		
+
+	# Show hand cursor
 	_showPointer: (layer) ->
 		layer.onMouseOver ->
-			@style = 
+			@style =
 				cursor: "pointer"
-				
+
 	_updateHeight: ->
 		@credentials.height = @credentials.contentFrame().height
 		@info.height = @info.contentFrame().height
 		@sheet.height = @sheet.contentFrame().height + @options.padding
-				
+
 	_closeSheet: ->
 		@sheet.visible = false
 		@sheet.ignoreEvents = true
 		@open.visible = true
 		@open.ignoreEvents = false
-		
+
 	_openSheet: ->
 		@sheet.visible = true
 		@sheet.ignoreEvents = false
 		@open.visible = false
-		@open.ignoreEvents = true	
+		@open.ignoreEvents = true
 
 Utils.delay 0, ->
 	context.run ->
