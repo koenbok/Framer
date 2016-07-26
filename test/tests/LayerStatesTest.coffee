@@ -56,6 +56,7 @@ describe "LayerStates", ->
 
 			Framer.resetDefaults()
 
+
 	describe "Switch", ->
 
 		it "should switch instant", ->
@@ -293,3 +294,12 @@ describe "LayerStates", ->
 					state: y: 10
 					previous: x: 300
 			expect(throwing).to.throw(/You can't override special state 'previous'/)
+
+	describe "Options", ->
+		it "should listen to layer.options", ->
+			layer = new Layer
+			layer.options =
+				time: 4
+			animation = layer.animateTo
+				x: 100
+			animation.options.time.should.equal 4
