@@ -16,6 +16,8 @@ class ShareLayer extends Layer
 				webkitUserSelect: "text"
 				lineHeight: "1"
 				webkitFontSmoothing: "antialiased";
+				webkitUserSelect: "text"
+				userSelect: "text"
 
 		@props = _.merge(defaultProps, options)
 
@@ -37,10 +39,16 @@ class Button extends ShareLayer
 
 		@props = _.merge(defaultProps, options)
 
-		@onMouseOver -> @style.cursor = "pointer"
+		@onMouseOver ->
+			@style.cursor = "pointer"
+			@opacity = .9
+
+		@onMouseOut ->
+			@opacity = 1
+
 		@onClick -> window.open(options.url)
 
-# Sheet
+# Share component
 class ShareComponent
 	constructor: (@shareInfo) ->
 
@@ -282,7 +290,6 @@ class ShareComponent
 			width: 7
 			height: 14
 			point: Align.center()
-			opacity: .8
 
 		@buttonTwitter = new Button
 			url: "http://www.twitter.com"
@@ -297,10 +304,9 @@ class ShareComponent
 		@buttonTwitterIcon = new Layer
 			parent: @buttonTwitter
 			image: "images/icon-twitter.png"
-			width: 15
-			height: 12
+			width: 14
+			height: 11
 			point: Align.center()
-			opacity: .8
 
 	_calculateAvailableSpace: ->
 		device = Framer.Device
@@ -395,5 +401,5 @@ Framer.Metadata =
 
 		Framer for iOS features live preview, offline use and intuitive sharing features that are protected by secure links. Paired with Framer for Mac, you now have access to a full mobile prototyping toolkit.
 	"""
-	# local: true
 	date: "Jun 14 2016"
+	local: false
