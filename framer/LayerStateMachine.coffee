@@ -9,11 +9,9 @@
 class exports.LayerStateMachine extends BaseClass
 	constructor: (layer) ->
 		super
-		@_previousNames = []
 		@_layer = layer
-		@currentName = 'initial'
 		@initial = LayerStates.filterStateProperties(layer.props)
-		@states = new LayerStates(@)
+		@reset()
 
 	@define "current",
 		get: -> @states[@currentName]
@@ -40,6 +38,11 @@ class exports.LayerStateMachine extends BaseClass
 		if not states.length
 			states = @stateNames
 		Utils.arrayNext(states, @currentName)
+
+	reset: ->
+		@states = new LayerStates(@)
+		@_previousNames = []
+		@currentName = 'initial'
 
 	emit: (args...) ->
 			super
