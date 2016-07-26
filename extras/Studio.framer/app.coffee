@@ -140,7 +140,7 @@ class ShareComponent
 			parent: @cta
 			y: ctaLogo.y + 35
 			height: 30
-			html: "Start prototyping today"
+			html: "Made with Framer"
 			style:
 				textAlign: "center"
 				fontSize: "18px"
@@ -149,7 +149,7 @@ class ShareComponent
 			parent: @cta
 			y: ctaSlogan.y + 24
 			height: 30
-			html: "Try Framer for Free"
+			html: "Try it for free now"
 			style:
 				textAlign: "center"
 				color: "#00AAFF"
