@@ -925,9 +925,8 @@ class exports.Layer extends BaseClass
 		animationFinished = =>
 			for k, v of nonAnimatableProperties
 				@[k] = v
-			# If we changed the state, we send the event that we did
-			if stateName? and _.last(@_previousStates) isnt stateName
-				@states.emit(Events.StateDidSwitch, _.last(@states._previousStates), @states.currentName, @)
+			options.completion?()
+
 		animation.once Events.AnimationStop, animationFinished
 		started = animation.start() if start
 		if not started
