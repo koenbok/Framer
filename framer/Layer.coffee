@@ -132,6 +132,7 @@ class exports.Layer extends BaseClass
 			if options.hasOwnProperty(p)
 				@[p] = options[p]
 
+		@options = {}
 		@_stateMachine = new LayerStateMachine(@)
 		@_context.emit("layer:create", @)
 
@@ -905,7 +906,7 @@ class exports.Layer extends BaseClass
 			stateName = properties
 			return @animateToState stateName, options
 
-		_.defaults(options,properties.options)
+		_.defaults(options,properties.options,@options)
 		delete properties.options
 
 		animatableProperties = Animation.filterAnimatableProperties(properties)
@@ -1298,7 +1299,7 @@ class exports.Layer extends BaseClass
 
 		# Don't show any hints while we are animating
 		if @isAnimating
-			return false 
+			return false
 
 		for parent in @ancestors()
 			return false if parent.isAnimating
