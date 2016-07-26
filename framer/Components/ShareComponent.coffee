@@ -269,14 +269,15 @@ class ShareComponent
 			lineHeight: "1.5"
 			wordWrap: "break-word"
 
+		@descriptionSize = Utils.textSize(
+			parseDescription(@shareInfo.description),
+			descriptionStyle,
+			{width: "#{@description.width}"}
+		)
+
 		showFullDescription = =>
 
 			@options.truncated = false
-			@descriptionSize = Utils.textSize(
-				parseDescription(@shareInfo.description),
-				descriptionStyle,
-				{width: "#{@description.width}"}
-			)
 
 			@description.height = @descriptionSize.height
 			@description.html = parseDescription(@shareInfo.description)
@@ -290,7 +291,7 @@ class ShareComponent
 				@description.style =
 					cursor: "default"
 
-		if @shareInfo.description?.length > @options.maxDescriptionLength
+		if @shareInfo.description.length > @options.maxDescriptionLength
 
 			@options.truncated = true
 
@@ -310,7 +311,7 @@ class ShareComponent
 			@description.onClick -> showFullDescription()
 
 		else
-			@description.height = descriptionSize.height
+			@description.height = @descriptionSize.height
 			@description.html = parseDescription(@shareInfo.description)
 
 
