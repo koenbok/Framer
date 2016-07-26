@@ -290,7 +290,7 @@ class ShareComponent
 				@description.style =
 					cursor: "default"
 
-		if @shareInfo.description.length > @options.maxDescriptionLength
+		if @shareInfo.description?.length > @options.maxDescriptionLength
 
 			@options.truncated = true
 
@@ -388,7 +388,7 @@ class ShareComponent
 		# If verticalSpace is less then sheet height, make sheet scrollable
 		canvasHeight = Canvas.height - 20
 
-		if canvasHeight < @sheet.maxHeight and canvasHeight > @sheet.minHeight
+		if @description and canvasHeight < @sheet.maxHeight and canvasHeight > @sheet.minHeight
 			@sheet.height = canvasHeight
 
 			# Make the description scrollable
@@ -400,7 +400,7 @@ class ShareComponent
 			@date.y = @description.maxY + 20
 			@buttons.y = @date.maxY + 20
 
-		if canvasHeight > @sheet.maxHeight
+		if @description and canvasHeight > @sheet.maxHeight
 			@sheet.height = @sheet.maxHeight
 			@description.style.overflow = "visible"
 
