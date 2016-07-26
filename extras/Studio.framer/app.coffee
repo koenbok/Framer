@@ -279,7 +279,7 @@ class ShareComponent
 		if @shareInfo.description.length > @options.maxDescriptionLength
 
 			truncated = @shareInfo.description.substring(@options.maxDescriptionLength,length).trim()
-			@options.shortDescription = truncated + "..."
+			@options.shortDescription = truncated + "…"
 
 			descriptionTruncatedSize = Utils.textSize(
 				parseDescription(@options.shortDescription),
