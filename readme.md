@@ -25,22 +25,22 @@ imageLayer.center()
 ```
 ###### Add states
 ```javascript  
-imageLayer.states.add({
+imageLayer.states = {
 	second: {y:100, scale:0.6, rotationZ:100},
 	third:  {y:300, scale:1.3},
-	fourth:	{y:200, scale:0.9, rotationZ:200},
-})
+	fourth:	{y:200, scale:0.9, rotationZ:200}
+}
 ```
 ###### Set default animation options
 ```javascript
-imageLayer.states.animationOptions = {
+imageLayer.options = {
 	curve: "spring(500,12,0)"
 }
 ```
 ###### Toggle states on click
 ```javascript
 imageLayer.onClick(function(event) {
-	imageLayer.states.next()
+	imageLayer.animateToNext()
 })
 ```
 #### Features
