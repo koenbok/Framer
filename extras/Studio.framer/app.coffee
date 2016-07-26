@@ -337,12 +337,21 @@ class ShareComponent
 			@_openSheet()
 
 		# If verticalSpace is less then sheet height, make sheet scrollable
-		@sheet.height = Canvas.height - 20
-		@sheet.style.overflow = "scroll"
 
-		if @sheet.height > @sheet.maxHeight
+
+		if Canvas.height < @sheet.maxHeight
+			@sheet.height = Canvas.height - 20
+			@sheet.style.overflow = "scroll"
+
+			if @buttons
+				@buttons.height = 53
+			else
+				console.log "hallo"
+				@date.height = 30
+
+		if Canvas.height > @sheet.maxHeight
 			@sheet.height = @sheet.maxHeight
-			@buttons.height = 53
+			@sheet.style.overflow = "visible"
 
 	_startListening: ->
 		@_calculateAvailableSpace()
