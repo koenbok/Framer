@@ -1148,7 +1148,7 @@ describe "Layer", ->
 
 	describe "Point conversion", ->
 
-		it "should correctly convert points to Screen", ->
+		it "should correctly convert points from layer to Screen", ->
 
 			point =
 				x: 200
@@ -1158,3 +1158,20 @@ describe "Layer", ->
 			screenPoint = layer.convertPointToScreen()
 			screenPoint.x.should.equal point.x
 			screenPoint.y.should.equal point.y
+
+		it "should correctly convert points from Screen to layer", ->
+
+			point =
+				x: 300
+				y: 200
+
+			layer = new Layer point: point
+			layerPoint = Screen.convertPointToLayer({}, layer)
+			layerPoint.x.should.equal -point.x
+			layerPoint.y.should.equal -point.y
+
+
+
+
+
+
