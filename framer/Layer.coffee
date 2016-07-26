@@ -890,16 +890,20 @@ class exports.Layer extends BaseClass
 		delete options.properties
 		@animateTo(properties, options)
 
+	animateToState: (stateName, options={}) ->
+		properties = @_stateMachine.switchTo stateName
+		finished = options.completion
+		options.completion = =>
+			# If we changed the state, we send the event that we did
+			if @_stateMachine.previousName isnt stateName
+				@_stateMachine.emit(Events.StateDidSwitch, @_stateMachine.previousName, @_stateMachine.currentName, @)
+			finished?()
+		@animateTo properties, options
+
 	animateTo: (properties,options={}) ->
 		if typeof properties == 'string'
 			stateName = properties
-			properties = @states[stateName]
-			if not properties?
-				throw Error "No such state: '#{stateName}'"
-			#Switch the state
-			@states.emit(Events.StateWillSwitch, @states.currentName, stateName, @)
-			@states._previousStates.push(@states.currentName)
-			@states._currentName = stateName
+			return @animateToState stateName, options
 
 		_.defaults(options,properties.options)
 		delete properties.options
