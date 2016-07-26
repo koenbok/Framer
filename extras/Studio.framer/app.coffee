@@ -11,8 +11,6 @@ Framer.Metadata =
 	# local: true
 	date: "Jun 14 2016"
 
-Canvas.backgroundColor = "red"
-
 # Setup
 context = new Framer.Context({name: "Sharing"})
 
@@ -34,6 +32,25 @@ class ShareLayer extends Layer
 
 		@props = _.merge(defaultProps, options)
 
+class Button extends ShareLayer
+	constructor: (options) ->
+		super options
+
+		defaultProps =
+			style:
+				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
+				fontWeight: "500"
+				color: "#FFF"
+				webkitUserSelect: "text"
+				borderRadius: 3
+				textAlign: "center"
+				paddingTop: "9px"
+			width: options.parent.width if options and options.parent
+			html: "<a href='#{options.url}' style='text-decoration: none; color: #{options.labelColor}'>#{options.label}</a>"
+
+		@props = _.merge(defaultProps, options)
+
+
 # Sheet
 class ShareComponent
 	constructor: (@shareInfo) ->
@@ -43,7 +60,7 @@ class ShareComponent
 		@options =
 			padding: 20
 			width: 250
-			minAvailableSpaceHand: 75
+			minAvailableSpaceHand: 30
 			minAvailableSpaceDevice: 300
 			minAvailableSpaceFullScreen: 500
 			fixed: false
@@ -58,7 +75,7 @@ class ShareComponent
 		@_renderInfo()
 		@_renderDescription() if @shareInfo.description
 		@_renderDate()
-		@_renderDownload() if !@shareInfo.local
+		@_renderButtons() if !@shareInfo.local
 
 		# Evaluate content and set height accordingly
 		@_updateHeight()
@@ -68,6 +85,7 @@ class ShareComponent
 	_renderSheet: ->
 		@sheet = new Layer
 			width: @options.width
+			clip: true
 			point: 10
 			borderRadius: 4
 			backgroundColor: "#FFF"
@@ -242,28 +260,27 @@ class ShareComponent
 		)
 		@description.height = descriptionSize.height
 
-	_renderDownload: ->
-		@download = new ShareLayer
+	_renderButtons: ->
+		@buttons = new ShareLayer
+			height: 33
 			parent: @info
 			y: @date.maxY + 20
+
+		@buttonDownload = new Button
+			url: "#"
+			label: "Open in Framer"
+			labelColor: "#FFF"
+			parent: @buttons
 			height: 33
 			borderRadius: 3
 			backgroundColor: "00AAFF"
-			html: "Open in Framer"
-			style:
-				fontWeight: "500"
-				textAlign: "center"
-				paddingTop: "9px"
-				color: "#FFF"
 
-		@_showPointer(@download)
+		@_showPointer(@buttons)
 
 	_calculateAvailableSpace: ->
 		device = Framer.Device
 		threshold = @options.minAvailableSpaceFullScreen
 		availableSpace = Canvas.width
-
-		console.log device
 
 		# When device is selected, us the device's
 		# position to calculate available space
@@ -273,8 +290,8 @@ class ShareComponent
 			if device.handsImageLayer.image isnt ""
 				threshold = @options.minAvailableSpaceHand
 				availableSpace = device.hands.screenFrame.x
-				console.log availableSpace
 			else
+				availableSpace = device.phone.screenFrame.x
 				availableSpace = device.phone.screenFrame.x
 				threshold = @options.minAvailableSpaceDevice
 
@@ -283,6 +300,16 @@ class ShareComponent
 			@_closeSheet()
 		else
 			@_openSheet()
+
+		# If verticalSpace is less then sheet height, make sheet scrollable
+		console.log @sheet.height, Canvas.height
+
+		@sheet.height = Canvas.height - 20
+		@sheet.style.overflow = "scroll"
+
+		if @sheet.height > @sheet.maxHeight
+			@sheet.height = @sheet.maxHeight
+			@buttons.height = 53
 
 	_startListening: ->
 		@_calculateAvailableSpace()
@@ -315,6 +342,7 @@ class ShareComponent
 		@credentials.height = @credentials.contentFrame().height
 		@info.height = @info.contentFrame().height
 		@sheet.height = @sheet.contentFrame().height + @options.padding
+		@sheet.maxHeight = @sheet.height
 
 	_closeSheet: ->
 		@sheet.visible = false
