@@ -64,8 +64,7 @@ class ShareComponent
 			maxDescriptionLength: 145
 
 		@_checkData()
-		@render()
-		@_startListening()
+		@render() if !Utils.isMobile()
 
 	render: ->
 		@_renderSheet()
@@ -83,6 +82,8 @@ class ShareComponent
 		# Wait until the device screen x position is available
 		Utils.delay .1, =>
 			@_calculateAvailableSpace()
+
+		@_startListening()
 
 	_checkData: ->
 
