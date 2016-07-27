@@ -1170,8 +1170,32 @@ describe "Layer", ->
 			layerPoint.x.should.equal -point.x
 			layerPoint.y.should.equal -point.y
 
+		it "should correctly convert points from layer to layer", ->
 
+			layerBOffset =
+				x: 200
+				y: 400
 
+			layerA = new Layer
+			layerB = new Layer point: layerBOffset
 
+			layerAToLayerBPoint = layerA.convertPointToLayer({}, layerB)
+			layerAToLayerBPoint.x.should.equal -layerBOffset.x
+			layerAToLayerBPoint.y.should.equal -layerBOffset.y
 
+		it "should correctly convert points when layers are nested", ->
 
+			layerBOffset = 
+				x: 0
+				y: 200
+
+			layerA = new Layer
+			layerB = new Layer
+				parent: layerA
+				point: layerBOffset
+				rotation: 90
+				originX: 0
+				originY: 0
+
+			layerAToLayerBPoint = layerA.convertPointToLayer({}, layerB)
+			layerAToLayerBPoint.x.should.equal -layerBOffset.y
