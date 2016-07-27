@@ -1144,3 +1144,58 @@ describe "Layer", ->
 			a1.isAnimating.should.equal false
 			a2.isAnimating.should.equal false
 			a3.isAnimating.should.equal true
+
+
+	describe "Point conversion", ->
+
+		it "should correctly convert points from layer to Screen", ->
+
+			point =
+				x: 200
+				y: 300
+
+			layer = new Layer point: point
+			screenPoint = layer.convertPointToScreen()
+			screenPoint.x.should.equal point.x
+			screenPoint.y.should.equal point.y
+
+		it "should correctly convert points from Screen to layer", ->
+
+			point =
+				x: 300
+				y: 200
+
+			layer = new Layer point: point
+			layerPoint = Screen.convertPointToLayer({}, layer)
+			layerPoint.x.should.equal -point.x
+			layerPoint.y.should.equal -point.y
+
+		it "should correctly convert points from layer to layer", ->
+
+			layerBOffset =
+				x: 200
+				y: 400
+
+			layerA = new Layer
+			layerB = new Layer point: layerBOffset
+
+			layerAToLayerBPoint = layerA.convertPointToLayer({}, layerB)
+			layerAToLayerBPoint.x.should.equal -layerBOffset.x
+			layerAToLayerBPoint.y.should.equal -layerBOffset.y
+
+		it "should correctly convert points when layers are nested", ->
+
+			layerBOffset = 
+				x: 0
+				y: 200
+
+			layerA = new Layer
+			layerB = new Layer
+				parent: layerA
+				point: layerBOffset
+				rotation: 90
+				originX: 0
+				originY: 0
+
+			layerAToLayerBPoint = layerA.convertPointToLayer({}, layerB)
+			layerAToLayerBPoint.x.should.equal -layerBOffset.y

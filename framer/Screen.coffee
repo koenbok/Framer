@@ -24,6 +24,15 @@ class ScreenClass extends BaseClass
 	toInspect: ->
 		return "<Screen #{Utils.roundWhole(@width)}x#{Utils.roundWhole(@height)}>"
 
+	# Point Conversion
+
+	convertPointToLayer: (point, layer) ->
+		return Utils.convertPointFromContext(point, layer, false, true)
+
+	convertPointToCanvas: (point) ->
+		ctx = Framer.Device.context
+		return Utils.convertPointToContext(point, ctx, true, false)
+
 	# Edge Swipe
 
 	onEdgeSwipe:(cb) -> @on(Events.EdgeSwipe, cb)
