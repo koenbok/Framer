@@ -3,7 +3,7 @@ Framer.Extras.ShareInfo.enable()
 # Activate Module
 Framer.Metadata =
 # 	author: "Eelco Lempsink"
-	twitter: "@eelco"
+	twitter: "@benjamindenboer"
 	title: "MIDI Controller"
 	description: """
 		Our goal with Framer has always been to build a full service design tool. So while it’s been possible to view working prototypes on a mobile browser, the experience has been less than seamless.
