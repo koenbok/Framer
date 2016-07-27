@@ -340,7 +340,7 @@ class ShareComponent
 			backgroundColor: "00AAFF"
 
 		@buttonFacebook = new Button
-			url: "http://www.facebook.com"
+			url: "https://www.facebook.com/sharer/sharer.php?u=#{window.location.href}"
 			parent: @buttons
 			borderWidth: 1
 			borderColor: "#D5D5D5"
@@ -359,7 +359,9 @@ class ShareComponent
 				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAcCAYAAABRVo5BAAAABGdBTUEAALGPC/xhBQAAAO1JREFUOBFjZMABWltbJX///l0GlDYAYg1GRkZxIP3n////P4E0EyOQwABNTU05QAVtQMyLIQkVwNDY3Nzs9vfv3524NMDEmWAMED1z5kyuf//+zUEWw8VG0fjq1SsnoPNkcSlGFmdB5gA16SHzQWxgoPxnZma2UVNTOxkWFvYXJo+uUQwmAaOBhn2tqak5BuPDaBSnAhXJwySQaB4kNpyJohEoqgCXIcAgWyNjQ0PDfwKGY0gDA+w5uo0YirAJAMPiLFkagTaeIUsjExMTeTaCNGIkcmyBBRTDUEeWU0EBNqoRW7KBio0GDi0CBwAHJ0YrwGtXbwAAAABJRU5ErkJggg==')"
 
 		@buttonTwitter = new Button
-			url: "http://www.twitter.com"
+			url: """
+				https://twitter.com/home?status=Check%20out%20my%20design%20made%20in%20%40framerjs%20%E2%80%94%20#{window.location.href}
+			"""
 			parent: @buttons
 			borderWidth: 1
 			borderColor: "#D5D5D5"
