@@ -59,6 +59,7 @@ class ShareComponent
 			fixed: false
 			maxDescriptionLength: 135
 
+		@_checkData()
 		@render()
 		@_startListening()
 
@@ -78,6 +79,11 @@ class ShareComponent
 		# Wait until the device screen x position is available
 		Utils.delay .1, =>
 			@_calculateAvailableSpace()
+
+	_checkData: ->
+		# Twitter handle
+		if @shareInfo.twitter.charAt(0) is "@"
+			@shareInfo.twitter = @shareInfo.twitter.substring(1)
 
 	# Render main sheet
 	_renderSheet: ->
