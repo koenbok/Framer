@@ -81,9 +81,16 @@ class ShareComponent
 			@_calculateAvailableSpace()
 
 	_checkData: ->
+
 		# Twitter handle
-		if @shareInfo.twitter.charAt(0) is "@"
+		if @shareInfo.twitter and @shareInfo.twitter.charAt(0) is "@"
 			@shareInfo.twitter = @shareInfo.twitter.substring(1)
+
+		# Truncate title if too long
+		if @shareInfo.twitter and @shareInfo.title.length > 26
+			@shareInfo.title = @shareInfo.title.substr(0, 25).trim() + "&hellip;"
+		else if @shareInfo.title.length > 34
+			@shareInfo.title = @shareInfo.title.substr(0, 33).trim() + "&hellip;"
 
 	# Render main sheet
 	_renderSheet: ->
@@ -180,11 +187,12 @@ class ShareComponent
 
 		@credentialsTitle = new ShareLayer
 			parent: @credentials
-			width: @credentials.width - 50
 			height: 18
 			html: @shareInfo.title or fallbackTitle
 			style:
 				fontWeight: "500"
+
+		@credentialsTitle.width = @credentials - 50 if @shareInfo.twitter
 
 		# Check what info is available and render layers accordingly
 		showAuthor = (content = @shareInfo.author) =>
@@ -193,13 +201,13 @@ class ShareComponent
 
 			@credentialsAuthor = new ShareLayer
 				parent: @credentials
-				width: @credentials.width - 50
 				html: content
 				y: @credentialsTitle.maxY
 				height: 18
 				style:
 					color: "#808080"
 
+			@credentialsAuthor.width = @credentials - 50 if @shareInfo.twitter
 			@_showPointer(@credentialsAuthor)
 
 		# Check if avatar is available
