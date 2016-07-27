@@ -27,12 +27,6 @@ body {
 	-webkit-user-select: none;
 }
 
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) { 
-	.framerLayer {
-		image-rendering: pixelated;
-	}
-}
-
 .framerLayer input,
 .framerLayer textarea,
 .framerLayer select,
@@ -51,4 +45,20 @@ body {
 
 """
 
-Utils.domComplete -> Utils.insertCSS(FramerCSS)
+# We only apply this to Safari as Chrome actually pixelates this at 1x,
+# meaning that all images get really ugly on 2x screens. But for now
+# this doesn't work on Safari, only tech preview.
+
+# https://github.com/motif/company/issues/1642
+
+# FramerCSSSafari = """
+# @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) { 
+# 	.framerLayer {
+# 		image-rendering: pixelated;
+# 	}
+# }
+# """
+
+Utils.domComplete ->
+	Utils.insertCSS(FramerCSS)
+	# Utils.insertCSS(FramerCSSSafari) if Utils.isSafari()
