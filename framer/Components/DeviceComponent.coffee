@@ -305,18 +305,20 @@ class exports.DeviceComponent extends BaseClass
 		# We want to get these image from our public resources server
 		resourceUrl = "//resources.framerjs.com/static/DeviceResources"
 
-		# If we're running Framer Studio and have local files, we'd like to use those
+		# If we're running Framer Studio and have local files, we'd like to use those.
+		# For now we always use jp2 inside framer stusio
 		if Utils.isFramerStudio() and window.FramerStudioInfo
-
 			if @_device.minStudioVersion and Utils.framerStudioVersion() >= @_device.minStudioVersion or !@_device.minStudioVersion
-
 				if @_device.maxStudioVersion and Utils.framerStudioVersion() <= @_device.maxStudioVersion or !@_device.maxStudioVersion
-
 					resourceUrl = window.FramerStudioInfo.deviceImagesUrl
+					return "#{resourceUrl}/#{name.replace(".png", ".jp2")}"
 
-		# We'd like to use jp2 if possible, or check if we don't for this specific device
-		if Utils.isJP2Supported() and @_device.deviceImageJP2 is true
-			return "#{resourceUrl}/#{name.replace(".png", ".jp2")}"
+		# We'd like to use jp2/webp if possible, or check if we don't for this specific device
+		if @_device.deviceImageCompression is true
+			if Utils.isWebPSupported()
+				return "#{resourceUrl}/#{name.replace(".png", ".webp")}"
+			if Utils.isJP2Supported()
+				return "#{resourceUrl}/#{name.replace(".png", ".jp2")}"
 
 		return "#{resourceUrl}/#{name}"
 
@@ -561,10 +563,12 @@ class exports.DeviceComponent extends BaseClass
 		# If we're running Framer Studio and have local files, we'd like to use those
 		if Utils.isFramerStudio() and window.FramerStudioInfo and Utils.framerStudioVersion() >= newDeviceMinVersion
 			resourceUrl = window.FramerStudioInfo.deviceImagesUrl
+			return "#{resourceUrl}/#{hand}.png"
 
-		# We'd like to use jp2 if possible, or check if we don't for this specific device
-		# if Utils.isJP2Supported() and @_device.deviceImageJP2 is true
-		# 	return "#{resourceUrl}/#{hand}.jp2"
+		if Utils.isWebPSupported()
+			return "#{resourceUrl}/#{hand}.webp"
+		if Utils.isJP2Supported()
+			return "#{resourceUrl}/#{hand}.jp2"
 
 		return "#{resourceUrl}/#{hand}.png"
 
@@ -581,7 +585,7 @@ oldDeviceMaxVersion = 52
 iPadAir2BaseDevice =
 	deviceImageWidth: 1856
 	deviceImageHeight: 2608
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 1536
 	screenHeight: 2048
 	deviceType: "tablet"
@@ -590,7 +594,7 @@ iPadAir2BaseDevice =
 iPadMini4BaseDevice =
 	deviceImageWidth: 1936
 	deviceImageHeight: 2688
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 1536
 	screenHeight: 2048
 	deviceType: "tablet"
@@ -599,7 +603,7 @@ iPadMini4BaseDevice =
 iPadProBaseDevice =
 	deviceImageWidth: 2448
 	deviceImageHeight: 3432
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 2048
 	screenHeight: 2732
 	deviceType: "tablet"
@@ -608,7 +612,7 @@ iPadProBaseDevice =
 iPhone6BaseDevice =
 	deviceImageWidth: 874
 	deviceImageHeight: 1792
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 750
 	screenHeight: 1334
 	deviceType: "phone"
@@ -624,7 +628,7 @@ iPhone6BaseDevice =
 iPhone6PlusBaseDevice =
 	deviceImageWidth: 1452
 	deviceImageHeight: 2968
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 1242
 	screenHeight: 2208
 	deviceType: "phone"
@@ -640,7 +644,7 @@ iPhone6PlusBaseDevice =
 iPhone5BaseDevice =
 	deviceImageWidth: 768
 	deviceImageHeight: 1612
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
@@ -658,7 +662,7 @@ iPhone5BaseDevice =
 iPhone5CBaseDevice =
 	deviceImageWidth: 776
 	deviceImageHeight: 1620
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
@@ -676,7 +680,7 @@ iPhone5CBaseDevice =
 Nexus4BaseDevice =
 	deviceImageWidth: 860
 	deviceImageHeight: 1668
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 768
 	screenHeight: 1280
 	deviceType: "phone"
@@ -694,7 +698,7 @@ Nexus4BaseDevice =
 Nexus5BaseDevice =
 	deviceImageWidth: 1204
 	deviceImageHeight: 2432
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
@@ -712,7 +716,7 @@ Nexus5BaseDevice =
 Nexus6BaseDevice =
 	deviceImageWidth: 1576
 	deviceImageHeight: 3220
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 1440
 	screenHeight: 2560
 	deviceType: "phone"
@@ -730,7 +734,7 @@ Nexus6BaseDevice =
 Nexus9BaseDevice =
 	deviceImageWidth: 1896
 	deviceImageHeight: 2648
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 1536
 	screenHeight: 2048
 	deviceType: "tablet"
@@ -739,7 +743,7 @@ Nexus9BaseDevice =
 HTCa9BaseDevice =
 	deviceImageWidth: 1252
 	deviceImageHeight: 2592
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
@@ -757,7 +761,7 @@ HTCa9BaseDevice =
 HTCm8BaseDevice =
 	deviceImageWidth: 1232
 	deviceImageHeight: 2572
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
@@ -775,7 +779,7 @@ HTCm8BaseDevice =
 MSFTLumia950BaseDevice =
 	deviceImageWidth: 1660
 	deviceImageHeight: 3292
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 1440
 	screenHeight: 2560
 	deviceType: "phone"
@@ -793,7 +797,7 @@ MSFTLumia950BaseDevice =
 SamsungGalaxyNote5BaseDevice =
 	deviceImageWidth: 1572
 	deviceImageHeight: 3140
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 1440
 	screenHeight: 2560
 	deviceType: "phone"
@@ -811,7 +815,7 @@ SamsungGalaxyNote5BaseDevice =
 AppleWatch42Device =
 	deviceImageWidth: 512
 	deviceImageHeight: 990
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 312
 	screenHeight: 390
 	minStudioVersion: newDeviceMinVersion
@@ -819,7 +823,7 @@ AppleWatch42Device =
 AppleWatch38Device =
 	deviceImageWidth: 472
 	deviceImageHeight: 772
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 272
 	screenHeight: 340
 	minStudioVersion: newDeviceMinVersion
@@ -827,7 +831,7 @@ AppleWatch38Device =
 AppleWatch38BlackLeatherDevice =
 	deviceImageWidth: 472
 	deviceImageHeight: 796
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 272
 	screenHeight: 340
 	minStudioVersion: newDeviceMinVersion
@@ -838,7 +842,7 @@ AppleWatch38BlackLeatherDevice =
 old_iPhone6BaseDevice =
 	deviceImageWidth: 870
 	deviceImageHeight: 1738
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 750
 	screenHeight: 1334
 	deviceType: "phone"
@@ -847,14 +851,14 @@ old_iPhone6BaseDevice =
 old_iPhone6BaseDeviceHand = _.extend {}, old_iPhone6BaseDevice,
 	deviceImageWidth: 1988
 	deviceImageHeight: 2368
-	deviceImageJP2: true
+	deviceImageCompression: true
 	paddingOffset: -150
 	maxStudioVersion: oldDeviceMaxVersion
 
 old_iPhone6PlusBaseDevice =
 	deviceImageWidth: 1460
 	deviceImageHeight: 2900
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 1242
 	screenHeight: 2208
 	deviceType: "phone"
@@ -863,14 +867,14 @@ old_iPhone6PlusBaseDevice =
 old_iPhone6PlusBaseDeviceHand = _.extend {}, old_iPhone6PlusBaseDevice,
 	deviceImageWidth: 3128
 	deviceImageHeight: 3487
-	deviceImageJP2: true
+	deviceImageCompression: true
 	paddingOffset: -150
 	maxStudioVersion: oldDeviceMaxVersion
 
 old_iPhone5BaseDevice =
 	deviceImageWidth: 780
 	deviceImageHeight: 1608
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
@@ -879,14 +883,14 @@ old_iPhone5BaseDevice =
 old_iPhone5BaseDeviceHand = _.extend {}, old_iPhone5BaseDevice,
 	deviceImageWidth: 1884
 	deviceImageHeight: 2234
-	deviceImageJP2: true
+	deviceImageCompression: true
 	paddingOffset: -200
 	maxStudioVersion: oldDeviceMaxVersion
 
 old_iPhone5CBaseDevice =
 	deviceImageWidth: 776
 	deviceImageHeight: 1612
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 640
 	screenHeight: 1136
 	deviceType: "phone"
@@ -895,14 +899,14 @@ old_iPhone5CBaseDevice =
 old_iPhone5CBaseDeviceHand = _.extend {}, old_iPhone5CBaseDevice,
 	deviceImageWidth: 1894
 	deviceImageHeight: 2244
-	deviceImageJP2: true
+	deviceImageCompression: true
 	paddingOffset: -200
 	maxStudioVersion: oldDeviceMaxVersion
 
 old_iPadMiniBaseDevice =
 	deviceImageWidth: 872
 	deviceImageHeight: 1292
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 768
 	screenHeight: 1024
 	deviceType: "tablet"
@@ -911,14 +915,14 @@ old_iPadMiniBaseDevice =
 old_iPadMiniBaseDeviceHand = _.extend {}, old_iPadMiniBaseDevice,
 	deviceImageWidth: 1380
 	deviceImageHeight: 2072
-	deviceImageJP2: true
+	deviceImageCompression: true
 	paddingOffset: -120
 	maxStudioVersion: oldDeviceMaxVersion
 
 old_iPadAirBaseDevice =
 	deviceImageWidth: 1769
 	deviceImageHeight: 2509
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 1536
 	screenHeight: 2048
 	deviceType: "tablet"
@@ -927,14 +931,14 @@ old_iPadAirBaseDevice =
 old_iPadAirBaseDeviceHand = _.extend {}, old_iPadAirBaseDevice,
 	deviceImageWidth: 4744
 	deviceImageHeight: 4101
-	deviceImageJP2: true
+	deviceImageCompression: true
 	paddingOffset: -120
 	maxStudioVersion: oldDeviceMaxVersion
 
 old_Nexus5BaseDevice =
 	deviceImageWidth: 1208
 	deviceImageHeight: 2440
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 1080
 	screenHeight: 1920
 	deviceType: "phone"
@@ -943,14 +947,14 @@ old_Nexus5BaseDevice =
 old_Nexus5BaseDeviceHand = _.extend {}, old_Nexus5BaseDevice, # 2692 × 2996
 	deviceImageWidth: 2692
 	deviceImageHeight: 2996
-	deviceImageJP2: true
+	deviceImageCompression: true
 	paddingOffset: -120
 	maxStudioVersion: oldDeviceMaxVersion
 
 old_Nexus9BaseDevice =
 	deviceImageWidth: 1733
 	deviceImageHeight: 2575
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 1536
 	screenHeight: 2048
 	deviceType: "tablet"
@@ -959,7 +963,7 @@ old_Nexus9BaseDevice =
 old_AppleWatch42Device =
 	deviceImageWidth: 552
 	deviceImageHeight: 938
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 312
 	screenHeight: 390
 	maxStudioVersion: oldDeviceMaxVersion
@@ -967,7 +971,7 @@ old_AppleWatch42Device =
 old_AppleWatch38Device =
 	deviceImageWidth: 508
 	deviceImageHeight: 900
-	deviceImageJP2: true
+	deviceImageCompression: true
 	screenWidth: 272
 	screenHeight: 340
 	maxStudioVersion: oldDeviceMaxVersion
@@ -1088,7 +1092,7 @@ Devices =
 		screenHeight: 600
 		deviceImageWidth: 1136
 		deviceImageHeight: 760
-		deviceImageJP2: true
+		deviceImageCompression: true
 		backgroundColor: "white"
 	"desktop-safari-1280-800":
 		deviceType: "browser"
@@ -1097,7 +1101,7 @@ Devices =
 		screenHeight: 800
 		deviceImageWidth: 1392
 		deviceImageHeight: 960
-		deviceImageJP2: true
+		deviceImageCompression: true
 		backgroundColor: "white"
 	"desktop-safari-1440-900":
 		deviceType: "browser"
@@ -1106,7 +1110,7 @@ Devices =
 		screenHeight: 900
 		deviceImageWidth: 1552
 		deviceImageHeight: 1060
-		deviceImageJP2: true
+		deviceImageCompression: true
 		backgroundColor: "white"
 
 	# OLD DEVICES

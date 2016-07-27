@@ -2,14 +2,23 @@
 import os
 import sys
 
+"""
+
+brew install imagemagick --with-jp2
+brew install webp
+
+"""
+
 path = os.path.join("extras", "DeviceResources")
-quality = 25
+jp2_quality = 16
+webp_quality = 90
 
 os.chdir(path)
+os.system("rm *.jp2")
+os.system("rm *.webp")
 
 for fileName in os.listdir("."):
 	if fileName.endswith(".png"):
-		os.system("sips -s format jp2 %s -s formatOptions %s --out %s" % (fileName, quality, fileName.replace(".png", ".jp2")))
-
-
-# sips -s format jp2 iphone-6-gold-hand.png -s formatOptions 25 --out iphone-6-gold-hand.jp2
+		print fileName
+		os.system("sips -s format jp2 %s -s formatOptions %s --out %s" % (fileName, jp2_quality, fileName.replace(".png", ".jp2")))
+		os.system("cwebp -q %s '%s' -o '%s'" % (webp_quality, fileName, fileName.replace(".png", ".webp")))

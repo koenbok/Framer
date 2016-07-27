@@ -52,3 +52,11 @@ site-build: dist
 
 site-upload: bootstrap site-build
 	$(BIN)/coffee scripts/site.coffee upload
+
+# Resources
+
+resources-optimize:
+	python scripts/resources-optimize.py
+
+resources-upload:
+	cd extras/resources.framerjs.com; cactus deploy

@@ -392,7 +392,10 @@ Utils.devicePixelRatio = ->
 	window.devicePixelRatio
 
 Utils.isJP2Supported = ->
-	Utils.isWebKit() and not Utils.isChrome()
+	return Utils.isWebKit() and not Utils.isChrome()
+
+Utils.isWebPSupported = ->
+	return Utils.isChrome()
 
 Utils.deviceType = ->
 
