@@ -284,15 +284,23 @@ class ShareComponent
 
 		# See if there are any url's in the description and wrap them in anchor tags. Make sure linebreaks are wrapped in <br/ >'s.'
 		parseDescription = (text) ->
-			urlRegex = /(https?:\/\/[^\s]+)/g
+			urlRegex = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi
+			httpRegex = /^((http|https):\/\/)/
 			lineBreakRegex = /(?:\r\n|\r|\n)/g
 
 			urlified = text.replace urlRegex, (url) ->
-				'<a href="' + url + '">' + url + '</a>'
+
+				if !httpRegex.test(url)
+					href = "//#{url}"
+				else
+					href = url
+
+				"<a href='#{href}' style='-webkit-user-select: auto' target='_blank'>#{url}</a>"
 
 			urlified.replace lineBreakRegex, '<br />'
 
 		@description = new Layer
+			ignoreEvents: false
 			parent: @info
 			y: @credentials.maxY + 10
 			backgroundColor: null
@@ -315,6 +323,14 @@ class ShareComponent
 			{width: "#{@description.width}"}
 		)
 
+		descriptionClickRegister = (e) ->
+			@descriptionStartX = e.x
+			@descriptionStartY = e.y
+
+		descriptionClickCompare = (e) ->
+			if @descriptionStartX is e.x and @descriptionStartY is e.y
+				showFullDescription()
+
 		showFullDescription = =>
 
 			@options.truncated = false
@@ -332,6 +348,9 @@ class ShareComponent
 			@description.onMouseMove =>
 				@description.style =
 					cursor: "default"
+
+			@description.off Events.TapStart, descriptionClickRegister
+			@description.off Events.TapEnd, descriptionClickCompare
 
 		if @shareInfo.description.length > @options.maxDescriptionLength
 
@@ -351,18 +370,11 @@ class ShareComponent
 
 			@_showPointer(@description)
 
-			mouseStartX = 0
-			mouseStartY = 0
-
 			# Selecting text also triggers a click event to counter this
 			# we compare the TapStart and TapEnd positions
-			@description.onTapStart (event) ->
-				mouseStartX = event.x
-				mouseStartY = event.y
+			@description.on Events.TapStart, descriptionClickRegister
+			@description.on Events.TapEnd, descriptionClickCompare
 
-			@description.onTapEnd (event) ->
-				if mouseStartX is event.x and mouseStartY is event.y
-					showFullDescription()
 		else
 			@description.height = @descriptionSize.height
 			@description.html = parseDescription(@shareInfo.description)
