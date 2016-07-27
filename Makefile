@@ -2,33 +2,41 @@
 
 BIN = $(CURDIR)/node_modules/.bin
 
-.DEFAULT_GOAL := watch
 .PHONY: watch test debug release
+
+default: lazy_bootstrap lazy_build test
 
 # Utilities
 
 bootstrap:
 	npm install
 
+lazy_bootstrap: ; @test -d ./node_modules || make bootstrap
+
 unbootstrap:
 	rm -Rf node_modules
 
+
+
 clean:
 	rm -rf build
+	rm -Rf node_modules
 
 
 # Building and testing
 
-watch: bootstrap
+watch: lazy_bootstrap
 	$(BIN)/gulp watch
 
-test: bootstrap
-	$(BIN)/gulp test
-
-debug: bootstrap
+build: lazy_bootstrap
 	$(BIN)/gulp webpack:debug
 
-release: bootstrap
+lazy_build: ; @test -f ./build/framer.debug.js || make build
+
+test: lazy_build
+	$(BIN)/gulp test
+
+release: lazy_bootstrap
 	$(BIN)/gulp webpack:release
 
 
