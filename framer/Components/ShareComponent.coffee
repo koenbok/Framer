@@ -87,10 +87,13 @@ class ShareComponent
 			@shareInfo.twitter = @shareInfo.twitter.substring(1)
 
 		# Truncate title if too long
+		truncate = (str, n) ->
+			str.substr(0, n-1).trim() + "&hellip;"
+
 		if @shareInfo.twitter and @shareInfo.title.length > 26
-			@shareInfo.title = @shareInfo.title.substr(0, 25).trim() + "&hellip;"
+			@shareInfo.title = truncate(@shareInfo.title, 26)
 		else if @shareInfo.title.length > 34
-			@shareInfo.title = @shareInfo.title.substr(0, 33).trim() + "&hellip;"
+			@shareInfo.title = truncate(@shareInfo.title, 34)
 
 	# Render main sheet
 	_renderSheet: ->
@@ -299,8 +302,10 @@ class ShareComponent
 			@description.height = @descriptionSize.height
 			@description.html = parseDescription(@shareInfo.description)
 
-			@date.y = @description.maxY + 16
-			@buttons.y = @date.maxY + 20
+			if @shareInfo.openInFramerURL
+				@date.y = @description.maxY + 16
+				@buttons.y = @date.maxY + 20
+
 			@_updateHeight()
 			@_calculateAvailableSpace()
 
@@ -330,7 +335,6 @@ class ShareComponent
 		else
 			@description.height = @descriptionSize.height
 			@description.html = parseDescription(@shareInfo.description)
-
 
 	_renderButtons: ->
 		@buttons = new ShareLayer
@@ -412,13 +416,21 @@ class ShareComponent
 			@sheet.height = canvasHeight
 
 			# Make the description scrollable
-			verticalSpace = @sheet.height - @cta.height - @credentials.height - @buttons.height - @date.height - 95
+			verticalSpace = @sheet.height - @cta.height - @credentials.height
+
+			if @shareInfo.openInFramerURL
+				verticalSpace -= @buttons.height
+				verticalSpace -= @date.height
+				verticalSpace -= 95
+			else
+				verticalSpace -= 36
 
 			@description.height = verticalSpace
 			@description.style.overflow = "scroll"
 
-			@date.y = @description.maxY + 20
-			@buttons.y = @date.maxY + 20
+			if @shareInfo.openInFramerURL
+				@date.y = @description.maxY + 20
+				@buttons.y = @date.maxY + 20
 
 		if @description and canvasHeight > @sheet.maxHeight
 			@sheet.height = @sheet.maxHeight
