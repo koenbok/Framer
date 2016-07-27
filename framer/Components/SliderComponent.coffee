@@ -157,9 +157,11 @@ class exports.SliderComponent extends Layer
 	@define "knobSize",
 		get: -> @_knobSize
 		set: (value) ->
+			isRound = @knob.borderRadius * 2 is @_knobSize
 			@_knobSize = value
 			@knob.width = @_knobSize
 			@knob.height = @_knobSize
+			@knob.borderRadius = @_knobSize / 2 if isRound
 			@_updateFrame()
 
 	@define "hitArea",
