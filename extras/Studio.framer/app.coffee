@@ -2,7 +2,7 @@ Framer.Extras.ShareInfo.enable()
 
 # Activate Module
 Framer.Metadata =
-# 	author: "Eelco Lempsink"
+	author: "Eelco Lempsink"
 	twitter: "@fverloop"
 	title: "Here's a long af title is long seri"
 	description: """

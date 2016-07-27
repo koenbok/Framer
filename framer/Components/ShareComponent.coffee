@@ -6,15 +6,13 @@ class ShareLayer extends Layer
 		defaultProps =
 			backgroundColor: null
 			width: options.parent.width if options and options.parent
+			ignoreEvents: false
 			style:
 				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 				fontSize: "14px"
 				color: "#111"
-				webkitUserSelect: "text"
 				lineHeight: "1"
 				webkitFontSmoothing: "antialiased";
-				webkitUserSelect: "text"
-				userSelect: "text"
 
 		@props = _.merge(defaultProps, options)
 
@@ -25,6 +23,7 @@ class Button extends ShareLayer
 
 		defaultProps =
 			height: 33
+			ignoreEvents: false
 			style:
 				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 				fontWeight: "500"
@@ -48,7 +47,7 @@ class Button extends ShareLayer
 			@opacity = 1
 			@states.switch('default')
 
-		@onClick -> window.open(options.url)
+		@onClick -> window.open(options.url, "_blank")
 
 # Share component
 class ShareComponent
@@ -170,14 +169,20 @@ class ShareComponent
 				textAlign: "center"
 				fontSize: "18px"
 
-		ctaLink = new ShareLayer
+		@_enableUserSelect(ctaSlogan)
+
+		ctaLink = new Button
+			url: "http://www.framerjs.com"
 			parent: @cta
 			y: ctaSlogan.y + 24
-			height: 30
+			height: 16
+			width: 120
+			x: Align.center()
 			html: "Try it for free now"
 			style:
 				textAlign: "center"
 				color: "#00AAFF"
+				padding: 0;
 
 	# Render info section
 	_renderInfo: ->
@@ -200,6 +205,7 @@ class ShareComponent
 			style:
 				fontWeight: "500"
 
+		@_enableUserSelect(@credentialsTitle)
 		@credentialsTitle.width = @credentials - 50 if @shareInfo.twitter
 
 		# Check what info is available and render layers accordingly
@@ -215,6 +221,7 @@ class ShareComponent
 				style:
 					color: "#808080"
 
+			@_enableUserSelect(@credentialsAuthor)
 			@credentialsAuthor.width = @credentials - 50 if @shareInfo.twitter
 			@_showPointer(@credentialsAuthor)
 
@@ -244,7 +251,7 @@ class ShareComponent
 
 			# If author name isn't available, fallback to Twitter handle
 			name = if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}"
-			showAuthor("<a href='http://twitter.com/#{@shareInfo.twitter}' style='text-decoration: none;'>#{name}</a>")
+			showAuthor("<a href='http://twitter.com/#{@shareInfo.twitter}' style='text-decoration: none; -webkit-user-select: auto;' target='_blank'>#{name}</a>")
 
 		# If there's no twitter handle, show plain author name
 		if @shareInfo.author and !@shareInfo.twitter
@@ -267,6 +274,12 @@ class ShareComponent
 				color: "#999"
 				letterSpacing: ".2px"
 
+	_enableUserSelect: (layer) ->
+
+		if !layer.html then layer.html = ""
+		layer._elementHTML.style["-webkit-user-select"] = "auto"
+		layer._elementHTML.style["cursor"] = "auto"
+
 	_renderDescription: ->
 
 		# See if there are any url's in the description and wrap them in anchor tags. Make sure linebreaks are wrapped in <br/ >'s.'
@@ -287,6 +300,8 @@ class ShareComponent
 				lineHeight: "1.5"
 				wordWrap: "break-word"
 				color: "#111"
+
+		@_enableUserSelect(@description)
 
 		descriptionStyle =
 			fontSize: "14px"
@@ -335,8 +350,19 @@ class ShareComponent
 			@description.html = parseDescription(@options.shortDescription)
 
 			@_showPointer(@description)
-			@description.onClick -> showFullDescription()
 
+			mouseStartX = 0
+			mouseStartY = 0
+
+			# Selecting text also triggers a click event to counter this
+			# we compare the TapStart and TapEnd positions
+			@description.onTapStart (event) ->
+				mouseStartX = event.x
+				mouseStartY = event.y
+
+			@description.onTapEnd (event) ->
+				if mouseStartX is event.x and mouseStartY is event.y
+					showFullDescription()
 		else
 			@description.height = @descriptionSize.height
 			@description.html = parseDescription(@shareInfo.description)
