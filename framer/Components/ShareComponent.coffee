@@ -36,12 +36,17 @@ class Button extends ShareLayer
 
 		@props = _.merge(defaultProps, options)
 
+		@states.add hover: opacity: .8
+		@states.animationOptions =
+			time: .3
+
 		@onMouseOver ->
 			@style.cursor = "pointer"
-			@opacity = .9
+			@states.switch('hover')
 
 		@onMouseOut ->
 			@opacity = 1
+			@states.switch('default')
 
 		@onClick -> window.open(options.url)
 
@@ -57,7 +62,7 @@ class ShareComponent
 			minAvailableSpace: 300
 			minAvailableSpaceFullScreen: 500
 			fixed: false
-			maxDescriptionLength: 135
+			maxDescriptionLength: 145
 
 		@_checkData()
 		@render()
