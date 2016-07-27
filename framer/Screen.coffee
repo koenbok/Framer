@@ -26,11 +26,11 @@ class ScreenClass extends BaseClass
 
 	# Point Conversion
 
-	convertPointToLayer: (point, layer) =>
+	convertPointToLayer: (point, layer) ->
 		return Utils.convertPointFromContext(point, layer, false, true)
 
-	convertPointToCanvas: (point) =>
-		ctx = Framer.CurrentContext.device.context
+	convertPointToCanvas: (point) ->
+		ctx = Framer.Device.context
 		return Utils.convertPointToContext(point, ctx, true, false)
 
 	# Edge Swipe
