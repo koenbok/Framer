@@ -172,7 +172,7 @@ class ShareComponent
 		@_enableUserSelect(ctaSlogan)
 
 		ctaLink = new Button
-			url: "http://www.framerjs.com"
+			url: "http://framerjs.com/?utm_source=share.framerjs.com&utm_medium=banner&utm_campaign=product"
 			parent: @cta
 			y: ctaSlogan.y + 24
 			height: 16
@@ -349,6 +349,7 @@ class ShareComponent
 				@description.style =
 					cursor: "default"
 
+			# Remove events when description is shown to make links clickable
 			@description.off Events.TapStart, descriptionClickRegister
 			@description.off Events.TapEnd, descriptionClickCompare
 
