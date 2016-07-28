@@ -54,8 +54,6 @@ class Preloader extends BaseClass
 
 			Canvas.onResize(layout)
 
-			@start()
-
 	@define "progress",
 		get: -> @_mediaLoaded.length / @_media.length or 0
 
