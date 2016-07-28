@@ -239,7 +239,7 @@ class ShareComponent
 				@credentials.x = 0
 				@avatar.destroy()
 
-			@avatar.image = "http://tweetimag.es/i/#{@shareInfo.twitter}_o"
+			@avatar.image = "https://twitter.com/#{@shareInfo.twitter}/profile_image?size=bigger"
 
 			avatarBorder = new ShareLayer
 				size: @avatar.width - 2
