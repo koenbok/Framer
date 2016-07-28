@@ -60,7 +60,6 @@ class ShareComponent
 			width: 250
 			minAvailableSpace: 300
 			minAvailableSpaceFullScreen: 500
-			fixed: false
 			maxDescriptionLength: 145
 
 		@_checkData()
@@ -92,13 +91,14 @@ class ShareComponent
 			@shareInfo.twitter = @shareInfo.twitter.substring(1)
 
 		# Truncate title if too long
-		truncate = (str, n) ->
-			str.substr(0, n-1).trim() + "&hellip;"
+		if @shareInfo.title
+			truncate = (str, n) ->
+				str.substr(0, n-1).trim() + "&hellip;"
 
-		if @shareInfo.twitter and @shareInfo.title?.length > 26
-			@shareInfo.title = truncate(@shareInfo.title, 26)
-		else if @shareInfo.title?.length > 34
-			@shareInfo.title = truncate(@shareInfo.title, 34)
+			if @shareInfo.twitter and @shareInfo.title.length > 26
+				@shareInfo.title = truncate(@shareInfo.title, 26)
+			else if @shareInfo.title.length > 34
+				@shareInfo.title = truncate(@shareInfo.title, 34)
 
 	# Render main sheet
 	_renderSheet: ->
@@ -113,14 +113,6 @@ class ShareComponent
 
 	# Render buttons to open / close sheet
 	_renderToggleButtons: ->
-		@close = new Layer
-			parent: @sheet
-			size: 12
-			point: 12
-			backgroundColor: null
-			style:
-				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAZdJREFUSA2tlt9OgzAUh6UkRrLMCfgnwWwPoXcmBk32Crvfo+1+76A3Jt4SX8Bk8VYBkagJAc+P7CyMUWiHvYCepv2+0p42GNPpdFQUxdV4PH5eLBY/B/9QZrPZYRiGN6ZpvgjAiXm+Wq3u5/P5UV8+4FEU3RH3Isuya4GZU/BpGMZxXwnD8zy3ifflOM6TGQRB5vv+WxzHHiR4I0a7ztfU4bZtPyyXy28TkL4SGRzsUtBH0gbfEuwj6YLvCHQkKvBGgYpEFQ6WgYes4FwgdZFdSOXJZPKYpmmOPOdU5GyRMVoFGFSVEDQRQuTUPEKed8ExfpNFCJoKpzDN+pLgQ+qD057SISrzvGlMtU1UA1kdy7KeedkF9cFgUMj6V9s7v4A3lPbghAamBP+lpRqqnvhWAcN5Q7Esruu+6lwrUkEdzhvKe6IqaRTI4Ly2OpIdQRdcV7IlUIXrSDYCXbiqpBTsC1eRGH3hLMG7eq3w3WV6nndLwanq3VIF1uv17EqS5Ezg14I6fnCe1wfpxvj1wa1LE363LCv4A+knGKYRZVX+AAAAAElFTkSuQmCC')"
-
 		@open = new Layer
 			size: 30
 			point: @sheet.point
@@ -140,8 +132,7 @@ class ShareComponent
 			y: Align.center(1)
 			x: Align.center
 
-		for l in [@close, @open]
-			@_showPointer(l)
+		@_showPointer(@open)
 
 	# Render CTA section
 	_renderCTA: ->
@@ -449,7 +440,7 @@ class ShareComponent
 			availableSpace = Screen.canvasFrame.x
 
 		# Open or close sheet beased on available space
-		if availableSpace < threshold and !@options.fixed
+		if availableSpace < threshold
 			@_closeSheet()
 		else
 			@_openSheet()
@@ -494,18 +485,12 @@ class ShareComponent
 		@sheet.onTouchEnd (event) -> event.stopPropagation()
 		@sheet.onTouchMove (event) -> event.stopPropagation()
 
-		# Toggle sheet when clicked on close or open buttons
-		@close.onClick =>
-			@options.fixed = true
-			@_closeSheet()
-
 		@open.onClick =>
-			@options.fixed = true
 			@_openSheet()
 
 		# When the window resizes evaluate if the sheet needs to be hidden
 		Canvas.onResize =>
-			@_calculateAvailableSpace() if !@options.fixed
+			@_calculateAvailableSpace()
 
 	# Show hand cursor
 	_showPointer: (layer) ->
