@@ -1199,3 +1199,27 @@ describe "Layer", ->
 
 			layerAToLayerBPoint = layerA.convertPointToLayer({}, layerB)
 			layerAToLayerBPoint.x.should.equal -layerBOffset.y
+
+		it "should correctly convert points between multiple layers and transforms", ->
+
+			layerA = new Layer
+				x: 275
+
+			layerB = new Layer
+				y: 400
+				x: 400
+				scale: 2
+				parent: layerA
+
+			layerC = new Layer
+				x: -200
+				y: 100
+				rotation: 180
+				originX: 0
+				originY: 0
+				parent: layerB
+
+			screenToLayerCPoint = Screen.convertPointToLayer(null, layerC)
+
+			point.x.should.equal 112.5
+			point.y.should.equal 275
