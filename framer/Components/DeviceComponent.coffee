@@ -305,6 +305,10 @@ class exports.DeviceComponent extends BaseClass
 		# We want to get these image from our public resources server
 		resourceUrl = "//resources.framerjs.com/static/DeviceResources"
 
+		# If we are running a local copy of Framer from the drive, get the resource online
+		if Utils.isFileUrl(window.location.href)
+			resourceUrl = "http://#{resourceUrl}"
+
 		# If we're running Framer Studio and have local files, we'd like to use those.
 		# For now we always use jp2 inside framer stusio
 		if Utils.isFramerStudio() and window.FramerStudioInfo
@@ -559,6 +563,10 @@ class exports.DeviceComponent extends BaseClass
 
 		# We want to get these image from our public resources server
 		resourceUrl = "//resources.framerjs.com/static/DeviceResources"
+
+		# If we are running a local copy of Framer from the drive, get the resource online
+		if Utils.isFileUrl(window.location.href)
+			resourceUrl = "http://#{resourceUrl}"
 
 		# If we're running Framer Studio and have local files, we'd like to use those
 		if Utils.isFramerStudio() and window.FramerStudioInfo and Utils.framerStudioVersion() >= newDeviceMinVersion
