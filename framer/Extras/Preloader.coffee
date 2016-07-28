@@ -27,6 +27,13 @@ class Preloader extends BaseClass
 				backgroundColor: "white"
 				opacity: 0
 
+			@cover.onTouchStart (event) ->
+				event.stopPropagation()
+			@cover.onTouchEnd (event) ->
+				event.stopPropagation()
+			@cover.onTouchMove (event) ->
+				event.stopPropagation()
+
 			@progressIndicator = new CircularProgressComponent
 				size: 160
 				point: Align.center
