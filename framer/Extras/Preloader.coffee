@@ -54,8 +54,11 @@ class Preloader extends BaseClass
 			@brand.style["background-image"] = "url('framer/images/preloader-icon.png')"
 
 			do layout = =>
-				screen = Framer.Device?.screen
-				scale = screen?.frame.width / screen?.canvasFrame.width
+				if Utils.isMobile()
+					scale = 2
+				else
+					screen = Framer.Device?.screen
+					scale = screen?.frame.width / screen?.canvasFrame.width
 				@progressIndicator.scale = scale
 				@brand.scale = scale
 
