@@ -20,19 +20,25 @@ class Preloader extends BaseClass
 
 		@context = new Context({parent: parentContext, name: "Preloader"})
 
+		@hintBlocker = new Context({name: "Hint Blocker"})
+		@hintBlocker.index = 15000 # Above hints, below share info
+		@hintBlocker.run =>
+			blocker = new Layer
+				size : Canvas
+				backgroundColor : null
+			blocker.onTouchStart (event) ->
+				event.stopPropagation()
+			blocker.onTouchEnd (event) ->
+				event.stopPropagation()
+			blocker.onTouchMove (event) ->
+				event.stopPropagation()
+
 		@context.run =>
 
 			@cover = new Layer
 				frame: @context
 				backgroundColor: "white"
 				opacity: 0
-
-			@cover.onTouchStart (event) ->
-				event.stopPropagation()
-			@cover.onTouchEnd (event) ->
-				event.stopPropagation()
-			@cover.onTouchMove (event) ->
-				event.stopPropagation()
 
 			@progressIndicator = new CircularProgressComponent
 				size: 160
@@ -141,7 +147,8 @@ class Preloader extends BaseClass
 		return unless @isLoading
 		@emit("end")
 		@_isLoading = false
-		@context.destroy()
+		@context?.destroy()
+		@hintBlocker?.destroy()
 
 	_handleProgress: =>
 		@emit("progress", @progress)

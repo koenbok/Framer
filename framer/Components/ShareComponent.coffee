@@ -485,7 +485,8 @@ class ShareComponent
 		@sheet.onTouchEnd (event) -> event.stopPropagation()
 		@sheet.onTouchMove (event) -> event.stopPropagation()
 
-		@open.onClick =>
+		@open.onClick (event) =>
+			event.stopPropagation()
 			@_openSheet()
 
 		# When the window resizes evaluate if the sheet needs to be hidden
