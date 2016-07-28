@@ -237,16 +237,14 @@ class exports.GestureInputRecognizer
 		@_dispatchEvent("swipe#{direction}start", event)
 
 		swipeEdge = @_edgeForSwipeDirection(direction)
-		maxX = Utils.frameGetMaxX(Screen.canvasFrame)
-		maxY = Utils.frameGetMaxY(Screen.canvasFrame)
 
-		if swipeEdge is "top" and 0 < event.start.y - Screen.canvasFrame.y < GestureInputEdgeSwipeDistance
+		if swipeEdge is "top" and 0 < event.start.y < GestureInputEdgeSwipeDistance
 			@edgeswipedirectionstart(event)
-		if swipeEdge is "right" and maxX - GestureInputEdgeSwipeDistance < event.start.x < maxX
+		if swipeEdge is "right" and Screen.width - GestureInputEdgeSwipeDistance < event.start.x < Screen.width
 			@edgeswipedirectionstart(event)
-		if swipeEdge is "bottom" and maxY - GestureInputEdgeSwipeDistance < event.start.y < maxY
+		if swipeEdge is "bottom" and Screen.height - GestureInputEdgeSwipeDistance < event.start.y < Screen.height
 			@edgeswipedirectionstart(event)
-		if swipeEdge is "left" and 0 < event.start.x - Screen.canvasFrame.x < GestureInputEdgeSwipeDistance
+		if swipeEdge is "left" and 0 < event.start.x < GestureInputEdgeSwipeDistance
 			@edgeswipedirectionstart(event)
 
 	swipedirection: (event) =>
