@@ -427,7 +427,10 @@ class exports.Layer extends BaseClass
 
 	contentFrame: ->
 		return {x:0, y:0, width:0, height:0} unless @children.length
-		Utils.frameMerge(_.map(@children, "frame"))
+		return Utils.frameMerge(_.map(@children, "frame"))
+
+	totalFrame: ->
+		return Utils.frameMerge(@frame, @contentFrame())
 
 	centerFrame: ->
 		# Get the centered frame for its parent
@@ -1263,6 +1266,24 @@ class exports.Layer extends BaseClass
 		# Don't show hints if there is a draggable that cannot be dragged.
 		if @_draggable and @_draggable.horizontal is false and @_draggable.vertical is false
 			return false
+
+		# Don't show hint if this layer is invisible
+		return false if @opacity is 0
+
+		# See if this layer is visible and not covered by another layer
+		# We don't do this for now because, trying to figure this out will
+		# introduce another class of edge cases, and it is easier to understand
+		# the default logic than some magic logic written by me to try and figure
+		# out what is covered and what not.
+
+		# rootLayer = @root()
+
+		# rootLayers = _.filter @context.layers, (layer) ->
+		# 	return layer.parent is null and layer.index < rootLayer.index
+
+		# for layer in rootLayers
+		# 	if Utils.frameInFrame(@screenFrame, layer.totalFrame())
+		# 		return false
 
 		# If we don't ignore events on this layer, make sure the layer is listening to
 		# an interactive event so there is a decent change something is happening after
