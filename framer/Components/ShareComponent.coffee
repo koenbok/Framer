@@ -95,9 +95,9 @@ class ShareComponent
 		truncate = (str, n) ->
 			str.substr(0, n-1).trim() + "&hellip;"
 
-		if @shareInfo.twitter and @shareInfo.title.length > 26
+		if @shareInfo.twitter and @shareInfo.title?.length > 26
 			@shareInfo.title = truncate(@shareInfo.title, 26)
-		else if @shareInfo.title.length > 34
+		else if @shareInfo.title?.length > 34
 			@shareInfo.title = truncate(@shareInfo.title, 34)
 
 	# Render main sheet
@@ -488,6 +488,11 @@ class ShareComponent
 		@sheet.onMouseOver ->
 			@style =
 				cursor: "default"
+
+		# Disable events propagating up to block unintented interactions
+		@sheet.onTouchStart (event) -> event.stopPropagation()
+		@sheet.onTouchEnd (event) -> event.stopPropagation()
+		@sheet.onTouchMove (event) -> event.stopPropagation()
 
 		# Toggle sheet when clicked on close or open buttons
 		@close.onClick =>
