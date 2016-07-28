@@ -15,7 +15,7 @@ class Preloader extends BaseClass
 
 	setupContext: ->
 
-		parentContext = Framer.Device?.context
+		parentContext = Framer.Device?.content
 		parentContext ?= Framer.CurrentContext
 
 		@context = new Context({parent: parentContext, name: "Preloader"})
