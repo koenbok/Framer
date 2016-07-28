@@ -11,7 +11,14 @@ class Preloader extends BaseClass
 
 		@timeout = 30
 
-		@context = new Context({parent: Framer.CurrentContext, name: "Preloader"})
+		@start()
+
+	setupContext: ->
+
+		parentContext = Framer.Device?.context
+		parentContext ?= Framer.CurrentContext
+
+		@context = new Context({parent: parentContext, name: "Preloader"})
 
 		@context.run =>
 
@@ -27,6 +34,7 @@ class Preloader extends BaseClass
 
 			@progressIndicator.railsColor = Color.grey(0, 0.1)
 			@progressIndicator.progressColor = "rgb(75,169,248)"
+			@progressIndicator.setProgress(@progress, false)
 
 			@brand = new Layer
 				width: 96
@@ -97,6 +105,8 @@ class Preloader extends BaseClass
 
 		return if @isLoading
 
+		@setupContext()
+
 		@_isLoading = true
 		@_startTime = Date.now()
 
@@ -127,7 +137,7 @@ class Preloader extends BaseClass
 
 	_handleProgress: =>
 		@emit("progress", @progress)
-		@progressIndicator.setProgress(@progress, false)
+		@progressIndicator?.setProgress(@progress, false)
 		@_handleLoaded() if @isReady
 
 	_handleLoaded: ->
