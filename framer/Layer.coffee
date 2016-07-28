@@ -1275,6 +1275,10 @@ class exports.Layer extends BaseClass
 
 	showHint: (highlightFrame) ->
 
+		# Don't show anything if this element covers the entire screen
+		# if Utils.frameInFrame(@context.canvasFrame, highlightFrame)
+		#	return
+
 		# Start an animation with a rectangle fading out over time
 		layer = new Layer
 			frame: Utils.frameInset(highlightFrame, -1)
@@ -1282,11 +1286,6 @@ class exports.Layer extends BaseClass
 			borderColor: new Color("9013FE").alpha(.8)
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 3
-
-		# Only show outlines if a highlight is fullscreen
-		# if Utils.frameInFrame(@context.canvasFrame, highlightFrame)
-		# 	layer.backgroundColor = null
-		# 	layer.borderColor = new Color("9013FE").alpha(.5)
 
 		animation = layer.animate
 			properties: {opacity: 0}
