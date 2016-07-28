@@ -6,15 +6,13 @@ class ShareLayer extends Layer
 		defaultProps =
 			backgroundColor: null
 			width: options.parent.width if options and options.parent
+			ignoreEvents: false
 			style:
 				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 				fontSize: "14px"
 				color: "#111"
-				webkitUserSelect: "text"
 				lineHeight: "1"
 				webkitFontSmoothing: "antialiased";
-				webkitUserSelect: "text"
-				userSelect: "text"
 
 		@props = _.merge(defaultProps, options)
 
@@ -25,6 +23,7 @@ class Button extends ShareLayer
 
 		defaultProps =
 			height: 33
+			ignoreEvents: false
 			style:
 				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 				fontWeight: "500"
@@ -36,14 +35,19 @@ class Button extends ShareLayer
 
 		@props = _.merge(defaultProps, options)
 
+		@states.add hover: opacity: .8
+		@states.animationOptions =
+			time: .3
+
 		@onMouseOver ->
 			@style.cursor = "pointer"
-			@opacity = .9
+			@states.switch('hover')
 
 		@onMouseOut ->
 			@opacity = 1
+			@states.switch('default')
 
-		@onClick -> window.open(options.url)
+		@onClick -> window.open(options.url, "_blank")
 
 # Share component
 class ShareComponent
@@ -57,10 +61,10 @@ class ShareComponent
 			minAvailableSpace: 300
 			minAvailableSpaceFullScreen: 500
 			fixed: false
-			maxDescriptionLength: 135
+			maxDescriptionLength: 145
 
-		@render()
-		@_startListening()
+		@_checkData()
+		@render() if !Utils.isMobile()
 
 	render: ->
 		@_renderSheet()
@@ -68,7 +72,7 @@ class ShareComponent
 		@_renderCTA()
 		@_renderInfo()
 		@_renderDescription() if @shareInfo.description
-		@_renderDate()
+		@_renderDate() if @shareInfo.openInFramerURL and @shareInfo.date
 		@_renderButtons() if @shareInfo.openInFramerURL
 
 		# Evaluate content and set height accordingly
@@ -78,6 +82,23 @@ class ShareComponent
 		# Wait until the device screen x position is available
 		Utils.delay .1, =>
 			@_calculateAvailableSpace()
+
+		@_startListening()
+
+	_checkData: ->
+
+		# Twitter handle
+		if @shareInfo.twitter and @shareInfo.twitter.charAt(0) is "@"
+			@shareInfo.twitter = @shareInfo.twitter.substring(1)
+
+		# Truncate title if too long
+		truncate = (str, n) ->
+			str.substr(0, n-1).trim() + "&hellip;"
+
+		if @shareInfo.twitter and @shareInfo.title.length > 26
+			@shareInfo.title = truncate(@shareInfo.title, 26)
+		else if @shareInfo.title.length > 34
+			@shareInfo.title = truncate(@shareInfo.title, 34)
 
 	# Render main sheet
 	_renderSheet: ->
@@ -149,14 +170,20 @@ class ShareComponent
 				textAlign: "center"
 				fontSize: "18px"
 
-		ctaLink = new ShareLayer
+		@_enableUserSelect(ctaSlogan)
+
+		ctaLink = new Button
+			url: "http://framerjs.com/?utm_source=share.framerjs.com&utm_medium=banner&utm_campaign=product"
 			parent: @cta
 			y: ctaSlogan.y + 24
-			height: 30
+			height: 16
+			width: 120
+			x: Align.center()
 			html: "Try it for free now"
 			style:
 				textAlign: "center"
 				color: "#00AAFF"
+				padding: 0;
 
 	# Render info section
 	_renderInfo: ->
@@ -174,11 +201,13 @@ class ShareComponent
 
 		@credentialsTitle = new ShareLayer
 			parent: @credentials
-			width: @credentials.width - 50
 			height: 18
 			html: @shareInfo.title or fallbackTitle
 			style:
 				fontWeight: "500"
+
+		@_enableUserSelect(@credentialsTitle)
+		@credentialsTitle.width = @credentials - 50 if @shareInfo.twitter
 
 		# Check what info is available and render layers accordingly
 		showAuthor = (content = @shareInfo.author) =>
@@ -187,13 +216,14 @@ class ShareComponent
 
 			@credentialsAuthor = new ShareLayer
 				parent: @credentials
-				width: @credentials.width - 50
 				html: content
 				y: @credentialsTitle.maxY
 				height: 18
 				style:
 					color: "#808080"
 
+			@_enableUserSelect(@credentialsAuthor)
+			@credentialsAuthor.width = @credentials - 50 if @shareInfo.twitter
 			@_showPointer(@credentialsAuthor)
 
 		# Check if avatar is available
@@ -222,7 +252,7 @@ class ShareComponent
 
 			# If author name isn't available, fallback to Twitter handle
 			name = if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}"
-			showAuthor("<a href='http://twitter.com/#{@shareInfo.twitter}' style='text-decoration: none;'>#{name}</a>")
+			showAuthor("<a href='http://twitter.com/#{@shareInfo.twitter}' style='text-decoration: none; -webkit-user-select: auto;' target='_blank'>#{name}</a>")
 
 		# If there's no twitter handle, show plain author name
 		if @shareInfo.author and !@shareInfo.twitter
@@ -245,19 +275,33 @@ class ShareComponent
 				color: "#999"
 				letterSpacing: ".2px"
 
+	_enableUserSelect: (layer) ->
+
+		if !layer.html then layer.html = ""
+		layer._elementHTML.style["-webkit-user-select"] = "auto"
+		layer._elementHTML.style["cursor"] = "auto"
+
 	_renderDescription: ->
 
 		# See if there are any url's in the description and wrap them in anchor tags. Make sure linebreaks are wrapped in <br/ >'s.'
 		parseDescription = (text) ->
-			urlRegex = /(https?:\/\/[^\s]+)/g
+			urlRegex = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi
+			httpRegex = /^((http|https):\/\/)/
 			lineBreakRegex = /(?:\r\n|\r|\n)/g
 
 			urlified = text.replace urlRegex, (url) ->
-				'<a href="' + url + '">' + url + '</a>'
+
+				if !httpRegex.test(url)
+					href = "//#{url}"
+				else
+					href = url
+
+				"<a href='#{href}' style='-webkit-user-select: auto' target='_blank'>#{url}</a>"
 
 			urlified.replace lineBreakRegex, '<br />'
 
 		@description = new Layer
+			ignoreEvents: false
 			parent: @info
 			y: @credentials.maxY + 10
 			backgroundColor: null
@@ -265,6 +309,8 @@ class ShareComponent
 				lineHeight: "1.5"
 				wordWrap: "break-word"
 				color: "#111"
+
+		@_enableUserSelect(@description)
 
 		descriptionStyle =
 			fontSize: "14px"
@@ -278,6 +324,14 @@ class ShareComponent
 			{width: "#{@description.width}"}
 		)
 
+		descriptionClickRegister = (e) ->
+			@descriptionStartX = e.x
+			@descriptionStartY = e.y
+
+		descriptionClickCompare = (e) ->
+			if @descriptionStartX is e.x and @descriptionStartY is e.y
+				showFullDescription()
+
 		showFullDescription = =>
 
 			@options.truncated = false
@@ -285,14 +339,20 @@ class ShareComponent
 			@description.height = @descriptionSize.height
 			@description.html = parseDescription(@shareInfo.description)
 
-			@date.y = @description.maxY + 16
-			@buttons.y = @date.maxY + 20
+			if @shareInfo.openInFramerURL
+				@date.y = @description.maxY + 16
+				@buttons.y = @date.maxY + 20
+
 			@_updateHeight()
 			@_calculateAvailableSpace()
 
 			@description.onMouseMove =>
 				@description.style =
 					cursor: "default"
+
+			# Remove events when description is shown to make links clickable
+			@description.off Events.TapStart, descriptionClickRegister
+			@description.off Events.TapEnd, descriptionClickCompare
 
 		if @shareInfo.description.length > @options.maxDescriptionLength
 
@@ -311,12 +371,15 @@ class ShareComponent
 			@description.html = parseDescription(@options.shortDescription)
 
 			@_showPointer(@description)
-			@description.onClick -> showFullDescription()
+
+			# Selecting text also triggers a click event to counter this
+			# we compare the TapStart and TapEnd positions
+			@description.on Events.TapStart, descriptionClickRegister
+			@description.on Events.TapEnd, descriptionClickCompare
 
 		else
 			@description.height = @descriptionSize.height
 			@description.html = parseDescription(@shareInfo.description)
-
 
 	_renderButtons: ->
 		@buttons = new ShareLayer
@@ -334,7 +397,7 @@ class ShareComponent
 			backgroundColor: "00AAFF"
 
 		@buttonFacebook = new Button
-			url: "http://www.facebook.com"
+			url: "https://www.facebook.com/sharer/sharer.php?u=#{window.location.href}"
 			parent: @buttons
 			borderWidth: 1
 			borderColor: "#D5D5D5"
@@ -353,7 +416,9 @@ class ShareComponent
 				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAcCAYAAABRVo5BAAAABGdBTUEAALGPC/xhBQAAAO1JREFUOBFjZMABWltbJX///l0GlDYAYg1GRkZxIP3n////P4E0EyOQwABNTU05QAVtQMyLIQkVwNDY3Nzs9vfv3524NMDEmWAMED1z5kyuf//+zUEWw8VG0fjq1SsnoPNkcSlGFmdB5gA16SHzQWxgoPxnZma2UVNTOxkWFvYXJo+uUQwmAaOBhn2tqak5BuPDaBSnAhXJwySQaB4kNpyJohEoqgCXIcAgWyNjQ0PDfwKGY0gDA+w5uo0YirAJAMPiLFkagTaeIUsjExMTeTaCNGIkcmyBBRTDUEeWU0EBNqoRW7KBio0GDi0CBwAHJ0YrwGtXbwAAAABJRU5ErkJggg==')"
 
 		@buttonTwitter = new Button
-			url: "http://www.twitter.com"
+			url: """
+				https://twitter.com/home?status=Check%20out%20my%20design%20made%20in%20%40framerjs%20%E2%80%94%20#{window.location.href}
+			"""
 			parent: @buttons
 			borderWidth: 1
 			borderColor: "#D5D5D5"
@@ -396,13 +461,21 @@ class ShareComponent
 			@sheet.height = canvasHeight
 
 			# Make the description scrollable
-			verticalSpace = @sheet.height - @cta.height - @credentials.height - @buttons.height - @date.height - 95
+			verticalSpace = @sheet.height - @cta.height - @credentials.height
+
+			if @shareInfo.openInFramerURL
+				verticalSpace -= @buttons.height
+				verticalSpace -= @date.height
+				verticalSpace -= 95
+			else
+				verticalSpace -= 36
 
 			@description.height = verticalSpace
 			@description.style.overflow = "scroll"
 
-			@date.y = @description.maxY + 20
-			@buttons.y = @date.maxY + 20
+			if @shareInfo.openInFramerURL
+				@date.y = @description.maxY + 20
+				@buttons.y = @date.maxY + 20
 
 		if @description and canvasHeight > @sheet.maxHeight
 			@sheet.height = @sheet.maxHeight

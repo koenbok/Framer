@@ -60,4 +60,16 @@ Events.wrap = (element) ->
 Events.isGesture = (eventName) ->
 	return eventName in Gestures
 
+interactiveEvents = _.values(Gestures).concat([
+	Events.TouchStart,
+	Events.TouchEnd,
+	Events.MouseUp,
+	Events.MouseDown,
+	Events.MouseWheel,
+	Events.DoubleClick
+])
+
+Events.isInteractive = (eventName) ->
+	return eventName in interactiveEvents
+
 exports.Events = Events

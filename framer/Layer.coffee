@@ -427,7 +427,10 @@ class exports.Layer extends BaseClass
 
 	contentFrame: ->
 		return {x:0, y:0, width:0, height:0} unless @children.length
-		Utils.frameMerge(_.map(@children, "frame"))
+		return Utils.frameMerge(_.map(@children, "frame"))
+
+	totalFrame: ->
+		return Utils.frameMerge(@frame, @contentFrame())
 
 	centerFrame: ->
 		# Get the centered frame for its parent
@@ -1247,55 +1250,66 @@ class exports.Layer extends BaseClass
 
 		return true
 
-	shouldShowHint: (targetLayer) ->
+	shouldShowHint: ->
+
+		# Don't show hints if the layer is not interactive
+		if @ignoreEvents is true
+			return false
 
 		# Don't show any hints while we are animating
-		# return false if @isAnimating
+		if @isAnimating
+			return false 
 
-		# for parent in @ancestors()
-		# 	return false if parent.isAnimating
+		for parent in @ancestors()
+			return false if parent.isAnimating
 
-		# Don't show hints if we cannot be dragged
-		if @_draggable
-			if @_draggable.horizontal is false and @_draggable.vertical is false
-				return false
+		# Don't show hints if there is a draggable that cannot be dragged.
+		if @_draggable and @_draggable.horizontal is false and @_draggable.vertical is false
+			return false
 
-		# Playing around with hiding layers that are covering this one, but
-		# it would be less "correct" as those layers would still respond at clicks
-		# although the hints would imply they wouldn't.
-		
-		# root = @root()
-		# orderedLayers = _.reverse(_.sortBy(@context.layers, "index"))
+		# Don't show hint if this layer is invisible
+		return false if @opacity is 0
 
-		# for layer in _.reverse(_.sortBy(@context.layers, "index"))
-		# 	if layer.parent is null
-		# 		if Utils.frameInFrame(@_visibleFrame(), 
-		# 			Utils.frameMerge(layer.frame, layer.contentFrame()))
-		# 			return false
+		# See if this layer is visible and not covered by another layer
+		# We don't do this for now because, trying to figure this out will
+		# introduce another class of edge cases, and it is easier to understand
+		# the default logic than some magic logic written by me to try and figure
+		# out what is covered and what not.
 
-		# Don't show hints if we ignore events
-		if @ignoreEvents is false
-			return true 
+		# rootLayer = @root()
+
+		# rootLayers = _.filter @context.layers, (layer) ->
+		# 	return layer.parent is null and layer.index < rootLayer.index
+
+		# for layer in rootLayers
+		# 	if Utils.frameInFrame(@screenFrame, layer.totalFrame())
+		# 		return false
+
+		# If we don't ignore events on this layer, make sure the layer is listening to
+		# an interactive event so there is a decent change something is happening after
+		# we click it.
+
+		for eventName in @listenerEvents()
+			return true if Events.isInteractive(eventName)
 
 		return false
 
 	showHint: (highlightFrame) ->
 
-		# Start an animation with a blue rectangle fading out over time
-		layer = new Layer
-			frame: highlightFrame
-			backgroundColor: new Color("9013FE").alpha(.5)
-			borderColor: new Color("white").alpha(.8)
-			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
-			borderWidth: 2
+		# Don't show anything if this element covers the entire screen
+		# if Utils.frameInFrame(@context.canvasFrame, highlightFrame)
+		#	return
 
-		# Only show outlines if a highlight is fullscreen
-		if Utils.frameInFrame(@context.canvasFrame, highlightFrame)
-			layer.backgroundColor = null
+		# Start an animation with a rectangle fading out over time
+		layer = new Layer
+			frame: Utils.frameInset(highlightFrame, -1)
+			backgroundColor: null
+			borderColor: new Color("9013FE").alpha(.8)
+			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
+			borderWidth: 3
 
 		animation = layer.animate
-			properties:
-				opacity: 0
+			properties: {opacity: 0}
 			curve: "ease-out"
 			time: 0.5
 

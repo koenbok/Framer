@@ -10,7 +10,7 @@ class ShareInfo extends BaseClass
 
 		Utils.delay 0, =>
 			@context.run ->
-				share = new ShareComponent(Framer.Metadata)
+				share = new ShareComponent(Framer.Info)
 
 	destroy: ->
 		@context.destroy()

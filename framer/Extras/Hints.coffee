@@ -18,6 +18,7 @@ class Hints
 
 	_handleUp: (event) =>
 
+		# See what layer we actually tapped
 		layer = Framer.CurrentContext.layerForElement(@_target)
 
 		# If this is a layer with interaction, we do not show any hints
