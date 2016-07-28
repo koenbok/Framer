@@ -81,8 +81,8 @@ class Preloader extends BaseClass
 		if player and player.readyState? and player not in @_media
 			if player.readyState < 3
 				@_media.push(player)
-				# Wait until there is enough data for playback to start
-				Events.wrap(player).addEventListener "canplay", =>
+				# Wait until there is enough data for playback to start playing smoothly
+				Events.wrap(player).addEventListener "canplaythrough", =>
 					@_mediaLoaded.push(player)
 					@_handleProgress()
 
