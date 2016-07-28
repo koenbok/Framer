@@ -7,6 +7,7 @@ class ShareInfo extends BaseClass
 	constructor: (options={}) ->
 
 		@context = new Framer.Context({name: "Sharing"})
+		@context.index = 20000
 
 		Utils.delay 0, =>
 			@context.run ->

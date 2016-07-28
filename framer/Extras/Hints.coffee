@@ -3,7 +3,7 @@ class Hints
 	constructor: ->
 
 		@_context = new Framer.Context(name:"Hints")
-		@_context._element.style.zIndex = 1000000
+		@_context.index = 10000
 
 		@_context.run =>
 			if Utils.isTouch()
