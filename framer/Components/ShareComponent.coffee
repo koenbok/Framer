@@ -8,7 +8,8 @@ class ShareLayer extends Layer
 			width: options.parent.width if options and options.parent
 			ignoreEvents: false
 			style:
-				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
+				fontFamily: "-apple-system, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
+				textAlign: "left"
 				fontSize: "14px"
 				color: "#111"
 				lineHeight: "1"
@@ -25,7 +26,6 @@ class Button extends ShareLayer
 			height: 33
 			ignoreEvents: false
 			style:
-				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 				fontWeight: "500"
 				webkitUserSelect: "text"
 				borderRadius: 3
@@ -267,7 +267,6 @@ class ShareComponent
 				letterSpacing: ".2px"
 
 	_enableUserSelect: (layer) ->
-
 		if !layer.html then layer.html = ""
 		layer._elementHTML.style["-webkit-user-select"] = "auto"
 		layer._elementHTML.style["cursor"] = "auto"
@@ -291,21 +290,17 @@ class ShareComponent
 
 			urlified.replace lineBreakRegex, '<br />'
 
-		@description = new Layer
-			ignoreEvents: false
+		@description = new ShareLayer
 			parent: @info
 			y: @credentials.maxY + 10
-			backgroundColor: null
 			style:
 				lineHeight: "1.5"
 				wordWrap: "break-word"
 				color: "#111"
 
-		@_enableUserSelect(@description)
-
 		descriptionStyle =
 			fontSize: "14px"
-			fontFamily: "Roboto"
+			fontFamily: "-apple-system, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 			lineHeight: "1.5"
 			wordWrap: "break-word"
 
@@ -315,18 +310,8 @@ class ShareComponent
 			{width: "#{@description.width}"}
 		)
 
-		descriptionClickRegister = (e) ->
-			@descriptionStartX = e.x
-			@descriptionStartY = e.y
-
-		descriptionClickCompare = (e) ->
-			if @descriptionStartX is e.x and @descriptionStartY is e.y
-				showFullDescription()
-
 		showFullDescription = =>
-
 			@options.truncated = false
-
 			@description.height = @descriptionSize.height
 			@description.html = parseDescription(@shareInfo.description)
 
@@ -336,15 +321,11 @@ class ShareComponent
 
 			@_updateHeight()
 			@_calculateAvailableSpace()
+			@_enableUserSelect(@description)
 
-			@description.onMouseMove =>
-				@description.style =
-					cursor: "default"
 
-			# Remove events when description is shown to make links clickable
-			@description.off Events.TapStart, descriptionClickRegister
-			@description.off Events.TapEnd, descriptionClickCompare
 
+		# Truncate if description is too long
 		if @shareInfo.description.length > @options.maxDescriptionLength
 
 			@options.truncated = true
@@ -361,16 +342,13 @@ class ShareComponent
 			@description.height = @descriptionTruncatedSize.height
 			@description.html = parseDescription(@options.shortDescription)
 
+			@description.once(Events.TapEnd, showFullDescription)
 			@_showPointer(@description)
-
-			# Selecting text also triggers a click event to counter this
-			# we compare the TapStart and TapEnd positions
-			@description.on Events.TapStart, descriptionClickRegister
-			@description.on Events.TapEnd, descriptionClickCompare
 
 		else
 			@description.height = @descriptionSize.height
 			@description.html = parseDescription(@shareInfo.description)
+			@_enableUserSelect(@description)
 
 	_renderButtons: ->
 		@buttons = new ShareLayer
@@ -428,22 +406,24 @@ class ShareComponent
 				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAWCAYAAADTlvzyAAAABGdBTUEAALGPC/xhBQAAAr5JREFUSA2tlUloU1EUhpuhITFCAnUTR1zVgsQUF1pw4UbETUAq7tTiogUDKkiJSUjaTBvdFCliF5KVazdKigu3BYsjlEIcIOKEEgewTVoz+J2HCa8378UOuXC494z/O+e8e4+lZ4srk8kcq1arVywWyxChvI1Go8g573Q6p8Lh8IdmeOyO1uv1vZamYDN7MpnMABDB16r6A1qGLlut1gIfFOfsHhgYOK4BplKpq6APut3uS+Pj40uqsxGPzyg+M0Y6VQbYS4CHsfc3v+w5RueXl5efEuiw6qDy6XR6P5lNqXIT/hW2c4Dle3t7FzRA0N+JMYp+FE8mJydz1HyXSQCxOwe5zPSK3E+Gw9CFaDRa0AAB2a0zEtkIdS/Qo9tGGQN2Vmff8QjQfX6gQCKRmBNDrYe5XM5ZLBY/w3tNvF/g+BDdPM7zlUplGtDTJrZrxD6fzzE2NvanKbTLoVQqbaesN8k021QoewCAgMjK5bKi6syurKxI6VuAWkkR7iTgGRSPO7tvXEs1tum9tAwdDscXeuZHYdMru3Be9Xg8JX0cLUPu3lcyzOsV3TjT90V9/ySmBqgdrNbr7K2nSGRdWM/UGC1AftsFl8t1BINpvuytarhJ/p7q1wIUBY/tJzbpZVX4La4CSbT9hGsABYDsluhn/xbBJM4NqKHGaQPkPsqo+aUabpB/NDExcdfIpw0wHo+/ttlshzC+A72Bfhs5dpB9t9vtF830HechD/g+7uctnINmAfRyKvMNOknvZPoYLkNAgPbUarVreIzSz3VNBYA+0o4TVGjREOmf0MI0GMT4J7yDtzQIQBB+iH29r04d+xleq1gkEvnRCUx08rStks0Iu4ycA5DMO9n+tyoYzDJU07FYrO2CmzmvKWk2m/XTs1MAymQ4CO2AvGQgr73cUaH38LN9fX0PQqHQRn+onr9RuQfzn9jjeAAAAABJRU5ErkJggg==')"
 
 
+	_openIfEnoughSpace: =>
+		# Open or close sheet based on available space
+		if @availableSpace < @threshold
+			'close'
+			@_closeSheet()
+		else
+			@_openSheet()
+
 	_calculateAvailableSpace: =>
 		device = Framer.Device
-		threshold = @options.minAvailableSpaceFullScreen
-		availableSpace = Canvas.width
+		@threshold = @options.minAvailableSpaceFullScreen
+		@availableSpace = Canvas.width
 
 		# When device is selected, us the device's
 		# position to calculate available space
 		if device.deviceType isnt "fullscreen"
-			threshold = @options.minAvailableSpace
-			availableSpace = Screen.canvasFrame.x
-
-		# Open or close sheet beased on available space
-		if availableSpace < threshold
-			@_closeSheet()
-		else
-			@_openSheet()
+			@threshold = @options.minAvailableSpace
+			@availableSpace = Screen.canvasFrame.x
 
 		# If verticalSpace is less then sheet height, make sheet scrollable
 		canvasHeight = Canvas.height - 20
@@ -492,6 +472,7 @@ class ShareComponent
 		# When the window resizes evaluate if the sheet needs to be hidden
 		Canvas.onResize =>
 			@_calculateAvailableSpace()
+			@_openIfEnoughSpace()
 
 	# Show hand cursor
 	_showPointer: (layer) ->
