@@ -323,6 +323,8 @@ class ShareComponent
 			@_calculateAvailableSpace()
 			@_enableUserSelect(@description)
 
+
+
 		# Truncate if description is too long
 		if @shareInfo.description.length > @options.maxDescriptionLength
 
@@ -340,7 +342,7 @@ class ShareComponent
 			@description.height = @descriptionTruncatedSize.height
 			@description.html = parseDescription(@options.shortDescription)
 
-			@description.onTapEnd -> showFullDescription()
+			@description.once(Events.TapEnd, showFullDescription)
 			@_showPointer(@description)
 
 		else
