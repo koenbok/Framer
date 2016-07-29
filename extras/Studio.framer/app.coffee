@@ -12,4 +12,3 @@ Framer.Info =
 
 		Framer for iOS features live preview, offline use and intuitive sharing features that are protected by secure links. Paired with Framer for Mac, you now have access to a full mobile prototyping toolkit.
 	"""
-	date: "Jun 14 2016"

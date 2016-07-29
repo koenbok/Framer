@@ -8,7 +8,7 @@ class ShareLayer extends Layer
 			width: options.parent.width if options and options.parent
 			ignoreEvents: false
 			style:
-				fontFamily: "-apple-system, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
+				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 				textAlign: "left"
 				fontSize: "14px"
 				color: "#111"
@@ -300,7 +300,7 @@ class ShareComponent
 
 		descriptionStyle =
 			fontSize: "14px"
-			fontFamily: "-apple-system, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
+			fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 			lineHeight: "1.5"
 			wordWrap: "break-word"
 
@@ -386,7 +386,6 @@ class ShareComponent
 
 		@buttonTwitter = new Button
 			url: """
-				https://twitter.com/home?status=Check%20out%20my%20design%20made%20in%20%40framerjs%20%E2%80%94%20#{window.location.href}
 			"""
 			parent: @buttons
 			borderWidth: 1
