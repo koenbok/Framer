@@ -1,3 +1,4 @@
+{_} = require "../Underscore"
 {BaseClass} = require "../BaseClass"
 {Context} = require "../Context"
 {ShareComponent} = require "../Components/ShareComponent"
@@ -8,9 +9,15 @@ class ShareInfo extends BaseClass
 
 		@context = new Framer.Context({name: "Sharing"})
 
-		Utils.delay 0, =>
+		run = =>
 			@context.run ->
 				share = new ShareComponent(Framer.Info)
+
+		# When enabled before specifying Framer.Info
+		if _.isEmpty(Framer.Info)
+ 			Utils.delay 0, run
+		else
+			run()
 
 	destroy: ->
 		@context.destroy()
