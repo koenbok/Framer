@@ -1,3 +1,5 @@
+{_} = require "../Underscore"
+
 # Insert Roboto font
 css = """
 	@font-face {
@@ -40,6 +42,9 @@ class Button extends ShareLayer
 	constructor: (options) ->
 		super options
 
+		options = _.defaults options,
+			newWindow: true
+
 		defaultProps =
 			height: 33
 			ignoreEvents: false
@@ -65,7 +70,11 @@ class Button extends ShareLayer
 			@opacity = 1
 			@states.switch('default')
 
-		@onClick -> window.open(options.url, "_blank")
+		@onClick ->
+			if options.newWindow
+				window.open(options.url)
+			else
+				window.location = options.url
 
 # Share component
 class ShareComponent
@@ -390,8 +399,9 @@ class ShareComponent
 			parent: @info
 			y: verticalPosition + 16
 
-		@buttonDownload = new Button
+		@buttonOpen = new Button
 			url: @shareInfo.openInFramerURL
+			newWindow: false
 			html: "Open in Framer"
 			color: "#FFF"
 			parent: @buttons
@@ -405,7 +415,7 @@ class ShareComponent
 			borderWidth: 1
 			borderColor: "#D5D5D5"
 			width: 33
-			x: @buttonDownload.maxX + 6
+			x: @buttonOpen.maxX + 6
 			style:
 				borderRadius: "3px 0 0 3px"
 
