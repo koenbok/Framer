@@ -348,8 +348,8 @@ class ShareComponent
 			@description.html = parseDescription(@shareInfo.description)
 
 			if @shareInfo.openInFramerURL
-				@date.y = @description.maxY + 16
-				@buttons.y = @date.maxY + 20
+				@date?.y = @description.maxY + 16
+				@buttons.y = (if @date then @date else @description).maxY + 16
 
 			@_updateHeight()
 			@_calculateAvailableSpace()
@@ -383,10 +383,12 @@ class ShareComponent
 			@_enableUserSelect(@description)
 
 	_renderButtons: ->
+		verticalPosition = if @date then @date.maxY else (if @descripion then @description.maxY else @credentials.maxY)
+
 		@buttons = new ShareLayer
 			height: 33
 			parent: @info
-			y: @date.maxY + 20
+			y: verticalPosition + 16
 
 		@buttonDownload = new Button
 			url: @shareInfo.openInFramerURL
