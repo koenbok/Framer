@@ -8,7 +8,8 @@ class ShareLayer extends Layer
 			width: options.parent.width if options and options.parent
 			ignoreEvents: false
 			style:
-				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
+				fontFamily: "-apple-system, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
+				textAlign: "left"
 				fontSize: "14px"
 				color: "#111"
 				lineHeight: "1"
@@ -25,7 +26,7 @@ class Button extends ShareLayer
 			height: 33
 			ignoreEvents: false
 			style:
-				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
+				fontFamily: "-apple-system, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 				fontWeight: "500"
 				webkitUserSelect: "text"
 				borderRadius: 3
@@ -305,7 +306,7 @@ class ShareComponent
 
 		descriptionStyle =
 			fontSize: "14px"
-			fontFamily: "Roboto"
+			fontFamily: "-apple-system, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 			lineHeight: "1.5"
 			wordWrap: "break-word"
 
