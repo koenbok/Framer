@@ -314,7 +314,7 @@ class ShareComponent
 			urlified = text.replace urlRegex, (url) ->
 
 				if !httpRegex.test(url)
-					href = "//#{url}"
+					href = "http://#{url}"
 				else
 					href = url
 
@@ -388,7 +388,7 @@ class ShareComponent
 			parent: @info
 			y: @date.maxY + 20
 
-		@buttonDownload = new Button
+		@buttonOpen = new Button
 			url: @shareInfo.openInFramerURL
 			html: "Open in Framer"
 			color: "#FFF"
@@ -396,6 +396,7 @@ class ShareComponent
 			width: 139
 			borderRadius: 3
 			backgroundColor: "00AAFF"
+		@buttonOpen.onClick -> window.open(options.url)
 
 		@buttonFacebook = new Button
 			url: "https://www.facebook.com/sharer/sharer.php?u=#{window.location.href}"
@@ -403,7 +404,7 @@ class ShareComponent
 			borderWidth: 1
 			borderColor: "#D5D5D5"
 			width: 33
-			x: @buttonDownload.maxX + 6
+			x: @buttonOpen.maxX + 6
 			style:
 				borderRadius: "3px 0 0 3px"
 
