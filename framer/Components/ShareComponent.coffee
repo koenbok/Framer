@@ -1,3 +1,21 @@
+# Insert Roboto font
+css = """
+	@font-face {
+		font-family: "Roboto";
+		font-style: normal;
+		font-weight: 400;
+		src: local("Roboto"), local("Roboto-Regular"), url("//fonts.gstatic.com/s/roboto/v15/zN7GBFwfMP4uA6AR0HCoLQ.ttf") format("truetype");
+	}
+	@font-face {
+		font-family: "Roboto";
+		font-style: normal;
+		font-weight: 500;
+		src: local("Roboto Medium"), local("Roboto-Medium"), url("//fonts.gstatic.com/s/roboto/v15/RxZJdnzeo3R5zSexge8UUaCWcynf_cDxXwCLxiixG1c.ttf") format("truetype");
+	}
+"""
+
+Utils.insertCSS(css)
+
 # Share layer with default behaviour
 class ShareLayer extends Layer
 	constructor: (options) ->
@@ -8,7 +26,7 @@ class ShareLayer extends Layer
 			width: options.parent.width if options and options.parent
 			ignoreEvents: false
 			style:
-				fontFamily: "-apple-system, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
+				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 				textAlign: "left"
 				fontSize: "14px"
 				color: "#111"
@@ -81,6 +99,7 @@ class ShareComponent
 		# Wait until the device screen x position is available
 		Utils.delay .1, =>
 			@_calculateAvailableSpace()
+			@_openIfEnoughSpace()
 
 		@_startListening()
 
@@ -108,13 +127,15 @@ class ShareComponent
 			point: 10
 			borderRadius: 4
 			backgroundColor: "#FFF"
+			visible: false
 			style:
 				boxShadow: "0 0 0 1px rgba(0,0,0,.12), 0 1px 3px rgba(0,0,0,.08)"
 
 	# Render buttons to open / close sheet
 	_renderToggleButtons: ->
 		@open = new Layer
-			size: 30
+			height: 30
+			width: 144
 			point: @sheet.point
 			borderRadius: 4
 			backgroundColor: "#FFF"
@@ -130,7 +151,18 @@ class ShareComponent
 			style:
 				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAeCAYAAAAsEj5rAAAABGdBTUEAALGPC/xhBQAAANRJREFUSA2t1dENgjAQBuA7wqsuoEs5hi5Bu4RsoQs4jiygvtceCgRoubZ3f0JI2t5HAy3FtnMGABp/qQRJ0UR7UBMdQS10BmqgK1CKBkEJGgVL0U2wBGXBXBQPN+eoiAsi2OcJDTeu4gYM/f6xzfHeb9OhKXhPBqk6Bc0CU9BskEOLwC20GIyhIjCEisElWlODRv5LCuru8bF+gfFnSrtP2qYVXHcGEK3GLMn4vUNFdPooSugE0nwV0DmogK5BIRoGhSiVx3N5Gzi/kv7qcWTZQ2hivjMmakz6/b3iAAAAAElFTkSuQmCC')"
 			y: Align.center(1)
-			x: Align.center
+			x: 10
+
+		openLabel = new ShareLayer
+			parent: @open
+			width: @open - 40
+			height: 14
+			x: 30
+			y: Align.center()
+			html: "Made with Framer"
+			style:
+				fontWeight: "500"
+				fontSize: "13px"
 
 		@_showPointer(@open)
 
@@ -300,7 +332,7 @@ class ShareComponent
 
 		descriptionStyle =
 			fontSize: "14px"
-			fontFamily: "-apple-system, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
+			fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
 			lineHeight: "1.5"
 			wordWrap: "break-word"
 
@@ -386,7 +418,7 @@ class ShareComponent
 
 		@buttonTwitter = new Button
 			url: """
-				https://twitter.com/home?status=Check%20out%20my%20design%20made%20in%20%40framerjs%20%E2%80%94%20#{window.location.href}
+				https://twitter.com/home?status=Check%20out%20this%20prototype%20made%20in%20%40framerjs%20%E2%80%94%20#{window.location.href}
 			"""
 			parent: @buttons
 			borderWidth: 1
