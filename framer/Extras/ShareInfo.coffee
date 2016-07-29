@@ -3,6 +3,8 @@
 {Context} = require "../Context"
 {ShareComponent} = require "../Components/ShareComponent"
 
+ShareInfoDisabled = false
+
 class ShareInfo extends BaseClass
 
 	constructor: (options={}) ->
@@ -24,9 +26,11 @@ class ShareInfo extends BaseClass
 		@context.destroy()
 
 exports.enable = ->
+	return if ShareInfoDisabled
 	Framer.ShareInfo ?= new ShareInfo()
 
-exports.disable = ->
+exports.disable = (force = true) ->
+	ShareInfoDisabled = force
 	return unless Framer.ShareInfo
 	Framer.ShareInfo.destroy()
 	Framer.ShareInfo = null
