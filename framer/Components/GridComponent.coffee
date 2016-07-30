@@ -93,8 +93,10 @@ class exports.GridComponent extends Layer
 
 	_defaultRenderCell: (cell, column, row) ->
 		fraction = ((column / @columns) + (row / @rows) / 2)
-		cell.backgroundColor = Color.mix("blue", "purple", fraction, true, "rgb")
+		cell.backgroundColor = "#28affa"
+		cell.hueRotate = column * 20 + (row % @columns) * (20 / (@columns + 1))
 		Utils.labelLayer(cell, "#{row}:#{column}")
+		cell.style.fontSize = "30px"
 
 	_reset: ->
 		_.invokeMap(@cells, "destroy")
