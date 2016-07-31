@@ -56,17 +56,17 @@ class exports.Animation extends BaseClass
 		@_repeatCounter = @options.repeat
 
 	@define "isAnimating",
-		get: -> @ in @options.layer.context.animations
+		get: -> @ in @layer.context.animations
 
 	@define "looping",
 		get: -> @options.looping
 		set: (value) ->
 			@options?.looping = value
-			if @options?.looping and @options?.layer? and !@isAnimating
+			if @options?.looping and @layer? and !@isAnimating
 				@restart()
 
 	start: =>
-		if @options.layer is null
+		if @layer is null
 			console.error "Animation: missing layer"
 
 		AnimatorClass = @_animatorClass()
@@ -76,15 +76,15 @@ class exports.Animation extends BaseClass
 
 		@_animator = new AnimatorClass @options.curveOptions
 
-		@_target = @options.layer
+		@_target = @layer
 		@_stateA = @_currentState()
 		@_stateB = {}
 
-		for k, v of @options.properties
+		for k, v of @properties
 
 			# Evaluate function properties
 			if _.isFunction(v)
-				v = v(@options.layer, k)
+				v = v(@layer, k)
 
 			# Evaluate relative properties
 			else if isRelativeProperty(v)
@@ -148,16 +148,17 @@ class exports.Animation extends BaseClass
 		if @_delayTimer?
 			Framer.CurrentContext.removeTimer(@_delayTimer)
 			@_delayTimer = null
-		@options.layer.context.removeAnimation(@)
+		@layer.context.removeAnimation(@)
 
 		@emit("stop") if emit
 		Framer.Loop.off("update", @_update)
 
 	reverse: ->
 		# TODO: Add some tests
-		options = _.clone(@options)
-		options.properties = @_originalState
-		animation = new Animation options
+		properties = _.clone(@_originalState)
+		properties.options = _.clone(@options)
+		properties.layer = @layer
+		animation = new Animation properties
 		animation
 
 	reset: ->
@@ -168,7 +169,11 @@ class exports.Animation extends BaseClass
 		@reset()
 		@start()
 
-	copy: -> new Animation(_.clone(@options))
+	copy: ->
+		properties = _.clone(@properties)
+		properties.options = _.clone(@options)
+		properties.layer = @layer
+		new Animation(properties)
 
 	# A bunch of common aliases to minimize frustration
 	revert: -> 	@reverse()
@@ -178,7 +183,7 @@ class exports.Animation extends BaseClass
 	emit: (event) ->
 		super
 		# Also emit this to the layer with self as argument
-		@options.layer.emit(event, @)
+		@layer.emit(event, @)
 
 	animatingProperties: ->
 		_.keys(@_stateA)
@@ -191,7 +196,7 @@ class exports.Animation extends BaseClass
 		@emit("stop")
 
 	_start: =>
-		@options.layer.context.addAnimation(@)
+		@layer.context.addAnimation(@)
 		@emit("start")
 		Framer.Loop.on("update", @_update)
 
@@ -229,7 +234,7 @@ class exports.Animation extends BaseClass
 		@_target[key] = Color.mix(@_stateA[key], @_stateB[key], value, false, @options.colorModel)
 
 	_currentState: ->
-		return _.pick(@options.layer, _.keys(@options.properties))
+		return _.pick(@layer, _.keys(@properties))
 
 	_animatorClass: ->
 
@@ -303,7 +308,7 @@ class exports.Animation extends BaseClass
 		return animatableProperties
 
 	toInspect: ->
-		return "<#{@constructor.name} id:#{@id} isAnimating:#{@isAnimating} [#{_.keys(@options.properties)}]>"
+		return "<#{@constructor.name} id:#{@id} isAnimating:#{@isAnimating} [#{_.keys(@properties)}]>"
 
 
 	##############################################################

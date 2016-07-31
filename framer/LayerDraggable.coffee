@@ -145,7 +145,7 @@ class exports.LayerDraggable extends BaseClass
 
 		# Stop any animations influencing the position, but no others.
 		for animation in @layer.animations()
-			properties = animation.options.properties
+			properties = animation.properties
 			if properties.hasOwnProperty("x") or properties.hasOwnProperty("y")
 				animation.stop()
 

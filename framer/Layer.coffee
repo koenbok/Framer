@@ -902,17 +902,15 @@ class exports.Layer extends BaseClass
 		@animateTo properties, options
 
 	animateTo: (properties,options={}) ->
+
 		if typeof properties == 'string'
 			stateName = properties
 			return @animateToState stateName, options
-
 		_.defaults(options,properties.options,@options)
 		delete properties.options
 
 		animatableProperties = Animation.filterAnimatableProperties(properties)
 		nonAnimatableProperties = _.omit(_.clone(properties),_.keys(animatableProperties))
-		options.properties = animatableProperties
-		options.layer = @
 
 		start = options.start
 		start ?= true
@@ -921,8 +919,10 @@ class exports.Layer extends BaseClass
 		if instant
 			options.animate = false
 		delete options.instant
+		parameters = animatableProperties
+		parameters.layer = @
 
-		animation = new Animation options
+		animation = new Animation parameters, options
 		animationFinished = =>
 			for k, v of nonAnimatableProperties
 				@[k] = v
@@ -953,7 +953,7 @@ class exports.Layer extends BaseClass
 	animations: ->
 		# Current running animations on this layer
 		_.filter @_context.animations, (animation) =>
-			animation.options.layer is @
+			animation.layer is @
 
 	animatingProperties: ->
 

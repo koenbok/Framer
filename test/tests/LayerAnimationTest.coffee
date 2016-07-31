@@ -14,7 +14,7 @@ describe "LayerAnimation", ->
 
 			animation = new Animation
 				layer: new Layer()
-				properties: {x:50}
+				x:50
 
 			animation.options.curve.should.equal "spring(1,2,3)"
 
@@ -26,7 +26,7 @@ describe "LayerAnimation", ->
 
 			animation = new Animation
 				layer: new Layer()
-				properties: {x:50}
+				x:50
 
 			animation.options.curve.should.equal "ease"
 			animation.options.time.should.equal 1
@@ -166,9 +166,10 @@ describe "LayerAnimation", ->
 
 			animation = new Animation
 				layer: layer
-				properties: {x:50}
-				curve: "linear"
-				time: 0.5
+				x:50
+				options:
+					curve: "linear"
+					time: 0.5
 
 			animation.start()
 
@@ -183,15 +184,17 @@ describe "LayerAnimation", ->
 
 			animationA = new Animation
 				layer: layer
-				properties: {x:50}
-				curve: "linear"
-				time: 0.5
+				x:50
+				options:
+					curve: "linear"
+					time: 0.5
 
 			animationB = new Animation
 				layer: layer
-				properties: {x:50}
-				curve: "linear"
-				time: 0.5
+				x:50
+				options:
+					curve: "linear"
+					time: 0.5
 
 			stopped = false
 			animationA.on "stop", -> stopped = true
@@ -257,9 +260,10 @@ describe "LayerAnimation", ->
 
 			animation = new Animation
 				layer: layer
-				properties: {x:50}
-				curve: "linear"
-				time: AnimationTime
+				x:50
+				options:
+					curve: "linear"
+					time: AnimationTime
 
 			count = 0
 
@@ -278,9 +282,10 @@ describe "LayerAnimation", ->
 
 			animation = new Animation
 				layer: layer
-				properties: {x:50}
-				curve: "linear"
-				time: AnimationTime
+				x:50
+				options:
+					curve: "linear"
+					time: AnimationTime
 
 			count = 0
 			test = -> count++; done() if count == 2
@@ -297,9 +302,10 @@ describe "LayerAnimation", ->
 
 			animation = new Animation
 				layer: layer
-				properties: {x:50}
-				curve: "linear"
-				time: AnimationTime * 2
+				x:50
+				options:
+					curve: "linear"
+					time: AnimationTime * 2
 
 			count = 0
 			test = -> count++; done() if count == 2
@@ -320,10 +326,11 @@ describe "LayerAnimation", ->
 
 			animation = new Animation
 				layer: layer
-				properties: {x:50}
-				curve: "linear"
-				time: AnimationTime
-				delay: AnimationTime
+				x:50
+				options:
+					curve: "linear"
+					time: AnimationTime
+					delay: AnimationTime
 
 			animation.start()
 
@@ -358,10 +365,11 @@ describe "LayerAnimation", ->
 
 			animation = new Animation
 				layer: layer
-				properties: {x: -> layer.x + 100}
-				curve: "linear"
-				time: AnimationTime
-				repeat: 5
+				x: -> layer.x + 100
+				options:
+					curve: "linear"
+					time: AnimationTime
+					repeat: 5
 
 			animation.start()
 
@@ -430,11 +438,12 @@ describe "LayerAnimation", ->
 				it "should create animation with bezier curve defined by values array and time in curveOptions", ->
 					animation = new Animation
 						layer: @layer
-						properties: { x: 100 }
-						curve: 'cubic-bezier'
-						curveOptions:
-							time: 2
-							values: [0, 0, 0.58, 1]
+						x: 100
+						options:
+							curve: 'cubic-bezier'
+							curveOptions:
+								time: 2
+								values: [0, 0, 0.58, 1]
 
 					animation.start()
 					animation._animator.options.time.should.equal 2
@@ -443,11 +452,12 @@ describe "LayerAnimation", ->
 				it "should create animation with bezier curve defined by named bezier curve in values and time in curveOptions", ->
 					animation = new Animation
 						layer: @layer
-						properties: { x: 100 }
-						curve: 'cubic-bezier'
-						curveOptions:
-							time: 2
-							values: 'ease-out'
+						x: 100
+						options:
+							curve: 'cubic-bezier'
+							curveOptions:
+								time: 2
+								values: 'ease-out'
 
 					animation.start()
 					animation._animator.options.time.should.equal 2
@@ -456,9 +466,10 @@ describe "LayerAnimation", ->
 				it "should create animation with named bezier curve", ->
 					animation = new Animation
 						layer: @layer
-						properties: { x: 100 }
-						curve: 'cubic-bezier'
-						curveOptions: 'ease-out'
+						x: 100
+						options:
+							curve: 'cubic-bezier'
+							curveOptions: 'ease-out'
 
 					animation.start()
 					animation._animator.options.time.should.equal 1
@@ -467,10 +478,11 @@ describe "LayerAnimation", ->
 				it "should create animation with named bezier curve and time", ->
 					animation = new Animation
 						layer: @layer
-						properties: { x: 100 }
-						time: 2
-						curve: 'cubic-bezier'
-						curveOptions: 'ease-out'
+						x: 100
+						options:
+							time: 2
+							curve: 'cubic-bezier'
+							curveOptions: 'ease-out'
 
 					animation.start()
 					animation._animator.options.time.should.equal 2
@@ -479,9 +491,10 @@ describe "LayerAnimation", ->
 				it "should create animation with bezier curve function passed in as a string and time", ->
 					animation = new Animation
 						layer: @layer
-						properties: { x: 100 }
-						time: 2
-						curve: 'cubic-bezier(0, 0, 0.58, 1)'
+						x: 100
+						options:
+							time: 2
+							curve: 'cubic-bezier(0, 0, 0.58, 1)'
 
 					animation.start()
 					animation._animator.options.time.should.equal 2
@@ -490,10 +503,11 @@ describe "LayerAnimation", ->
 				it "should create animation with bezier curve defined by an array and time", ->
 					animation = new Animation
 						layer: @layer
-						properties: { x: 100 }
-						time: 2
-						curve: 'cubic-bezier'
-						curveOptions: [0, 0, 0.58, 1]
+						x: 100
+						options:
+							time: 2
+							curve: 'cubic-bezier'
+							curveOptions: [0, 0, 0.58, 1]
 
 					animation.start()
 					animation._animator.options.time.should.equal 2
@@ -504,9 +518,10 @@ describe "LayerAnimation", ->
 			it "should create linear animation with time defined outside of curveOptions", ->
 				animation = new Animation
 					layer: @layer
-					properties: { x: 100 }
-					curve: 'linear'
-					time: 2
+					x: 100
+					options:
+						curve: 'linear'
+						time: 2
 
 				animation.start()
 				animation._animator.options.time.should.equal 2
@@ -514,10 +529,11 @@ describe "LayerAnimation", ->
 			it "should create linear animation with time defined inside curveOptions", ->
 				animation = new Animation
 					layer: @layer
-					properties: { x: 100 }
-					curve: 'linear'
-					curveOptions:
-						time: 2
+					x: 100
+					options:
+						curve: 'linear'
+						curveOptions:
+							time: 2
 
 				animation.start()
 				animation._animator.options.time.should.equal 2
@@ -528,10 +544,11 @@ describe "LayerAnimation", ->
 
 				animation = new Animation
 					layer: @layer
-					properties: {x: 100}
-					curve: "spring"
-					time: 2
-					animate: false
+					x: 100
+					options:
+						curve: "spring"
+						time: 2
+						animate: false
 
 				calledEvents = []
 
