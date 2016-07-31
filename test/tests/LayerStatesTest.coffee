@@ -96,7 +96,7 @@ describe "LayerStates", ->
 			layer.states.currentName.should.equal "stateA"
 			layer.x.should.equal 123
 
-			layer.animateTo "stateB"
+			layer.switchTo "stateB"
 			layer.states.currentName.should.equal "stateB"
 			layer.y.should.equal 123
 
