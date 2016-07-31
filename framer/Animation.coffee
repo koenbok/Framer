@@ -39,29 +39,18 @@ evaluateRelativeProperty = (target, k, v) ->
 # is not compatible and causes problems.
 class exports.Animation extends BaseClass
 
-	constructor: (options={}) ->
+	constructor: (parameters={},options={}) ->
+		_.defaults(options, parameters.options)
 
-		options = Defaults.getDefaults "Animation", options
+		delete parameters.options
+		@options = _.cloneDeep Defaults.getDefaults "Animation", options
+		super parameters
+		@layer = parameters.layer ? null
+		@properties = Animation.filterAnimatableProperties(parameters)
 
-		super options
-
-		@options = _.clone _.defaults options,
-			layer: null
-			properties: {}
-			curve: "linear"
-			curveOptions: {}
-			time: 1
-			repeat: 0
-			delay: 0
-			debug: false
-			colorModel: "husl"
-			animate: true
-			looping: false
-
-		if options.origin
+		if parameters.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
-		@options.properties = Animation.filterAnimatableProperties(@options.properties)
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat

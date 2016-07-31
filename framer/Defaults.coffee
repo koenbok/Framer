@@ -15,7 +15,14 @@ Originals =
 	Animation:
 		# curve: "spring(400,40,0)" # Or, the Cemre-Curve
 		curve: "ease"
+		curveOptions: {}
 		time: 1
+		repeat: 0
+		delay: 0
+		debug: false
+		colorModel: "husl"
+		animate: true
+		looping: false
 	Context:
 		perspective: 0
 		perspectiveOriginX: 0.5
