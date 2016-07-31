@@ -87,8 +87,7 @@ exports.Defaults =
 		options = _.clone options
 
 		# Always start with the originals
-		defaults = _.clone Originals[className]
-
+		defaults = _.cloneDeep Originals[className]
 		# Copy over the user defined options
 		for k, v of Framer.Defaults[className]
 			defaults[k] = if _.isFunction(v) then v() else v
@@ -114,4 +113,4 @@ exports.Defaults =
 		exports.Defaults.reset()
 
 	reset: ->
-		window.Framer.Defaults = _.clone Originals
+		window.Framer.Defaults = _.cloneDeep Originals
