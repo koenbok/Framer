@@ -11,7 +11,7 @@ describe "Layer", ->
 
 	describe "Defaults", ->
 
-		it "should reset nested defaults defaults", ->
+		it "should reset nested defaults", ->
 			Framer.Defaults.DeviceComponent.animationOptions.curve = "spring"
 			Framer.resetDefaults()
 			Framer.Defaults.DeviceComponent.animationOptions.curve.should.equal "ease-in-out"
