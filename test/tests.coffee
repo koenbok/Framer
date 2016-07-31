@@ -1,8 +1,14 @@
 window.chai = require("chai")
 
-# We don't want to update all the tests if we change these
-Framer.Defaults.Layer.width = 100
-Framer.Defaults.Layer.height = 100
+
+previousReset = Framer.resetDefaults
+
+Framer.resetDefaults = ->
+	previousReset()
+	# We don't want to update all the tests if we change these
+	Framer.Defaults.Layer.width = 100
+	Framer.Defaults.Layer.height = 100
+Framer.resetDefaults()
 
 window.console.debug = (v) ->
 window.console.warn = (v) ->
