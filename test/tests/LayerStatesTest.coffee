@@ -163,7 +163,7 @@ describe "LayerStates", ->
 						layer.rotation.should.equal 0
 						done()
 
-			layer.on "end", ready
+			layer.on Events.AnimationEnd, ready
 			layer.animateToNext()
 
 		it "should set scroll property", ->
