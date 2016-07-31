@@ -157,7 +157,7 @@ describe "LayerStates", ->
 					when "stateB"
 						layer.x.should.equal 200
 						layer.rotation.should.equal 180
-						layer.animateToNext()
+						layer.animateToNext(time: 0.05)
 					when "initial"
 						layer.x.should.equal 0
 						layer.rotation.should.equal 0
