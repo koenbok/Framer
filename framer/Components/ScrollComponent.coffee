@@ -434,14 +434,14 @@ wrapComponent = (instance, layer, options = {correct:true}) ->
 	scroll.parent = layer.parent
 	scroll.index = layer.index
 
-	# Copy over the name, if we don't have it try to use the variable
-	# name from Framer Studio if it was given.
+	# Copy over the name
 	if isPageComponent
 		scroll.name = instance.constructor.name
 	else if layer.name and layer.name isnt ""
 		scroll.name = layer.name
 	else if layer.__framerInstanceInfo?.name
-		scroll.name = layer.__framerInstanceInfo.name
+		scroll.__framerInstanceInfo ?= {}
+		scroll.__framerInstanceInfo?.name = layer.__framerInstanceInfo.name
 
 	# If we have an image set, it makes way more sense to add it to the
 	# background of the wrapper then the content.

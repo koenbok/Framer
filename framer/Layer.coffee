@@ -239,9 +239,7 @@ class exports.Layer extends BaseClass
 		default: ""
 		get: ->
 			name = @_getPropertyValue("name")
-			return name if name
-			# In Framer Studio, we can use the variable name
-			return @__framerInstanceInfo?.name or ""
+			return name or ""
 
 		set: (value) ->
 			@_setPropertyValue("name", value)
@@ -1322,6 +1320,7 @@ class exports.Layer extends BaseClass
 	toInspect: (constructor) ->
 		constructor ?= @constructor.name
 		name = if @name then "name:#{@name} " else ""
-		return "<#{constructor} id:#{@id} #{name}
+		variablename = @__framerInstanceInfo?.name or ""
+		return "<#{constructor} #{variablename} id:#{@id} #{name}
 			(#{Utils.roundWhole(@x)},#{Utils.roundWhole(@y)})
 			#{Utils.roundWhole(@width)}x#{Utils.roundWhole(@height)}>"
