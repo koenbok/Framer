@@ -416,10 +416,24 @@ class ShareComponent
 			style:
 				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAcCAYAAABRVo5BAAAABGdBTUEAALGPC/xhBQAAAO1JREFUOBFjZMABWltbJX///l0GlDYAYg1GRkZxIP3n////P4E0EyOQwABNTU05QAVtQMyLIQkVwNDY3Nzs9vfv3524NMDEmWAMED1z5kyuf//+zUEWw8VG0fjq1SsnoPNkcSlGFmdB5gA16SHzQWxgoPxnZma2UVNTOxkWFvYXJo+uUQwmAaOBhn2tqak5BuPDaBSnAhXJwySQaB4kNpyJohEoqgCXIcAgWyNjQ0PDfwKGY0gDA+w5uo0YirAJAMPiLFkagTaeIUsjExMTeTaCNGIkcmyBBRTDUEeWU0EBNqoRW7KBio0GDi0CBwAHJ0YrwGtXbwAAAABJRU5ErkJggg==')"
 
+		# Generate tweet
+
+		tweet = ""
+		if @shareInfo.twitter or @shareInfo.author
+			tweet += "A prototype by "
+
+			if @shareInfo.twitter
+				tweet += "@" + @shareInfo.twitter
+			else if @shareInfo.author
+				tweet += @shareInfo.author
+
+			tweet += ". "
+
+		tweet += "Design without limitations in @framerjs — #{window.location.href}"
+		tweet = encodeURIComponent(tweet)
+
 		@buttonTwitter = new Button
-			url: """
-				https://twitter.com/home?status=Check%20out%20this%20prototype%20made%20in%20%40framerjs%20%E2%80%94%20#{window.location.href}
-			"""
+			url: "https://twitter.com/home?status=#{tweet}"
 			parent: @buttons
 			borderWidth: 1
 			borderColor: "#D5D5D5"
