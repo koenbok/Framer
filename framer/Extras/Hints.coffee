@@ -7,11 +7,11 @@ class Hints
 
 		@_context.run =>
 			if Utils.isTouch()
-				Events.wrap(document).addEventListener("touchstart", @_handleDown)
-				Events.wrap(document).addEventListener("touchend", @_handleUp)
+				Events.wrap(document).addEventListener("touchstart", @_handleDown, capture=true)
+				Events.wrap(document).addEventListener("touchend", @_handleUp, capture=true)
 			else
-				Events.wrap(document).addEventListener("mousedown", @_handleDown)
-				Events.wrap(document).addEventListener("mouseup", @_handleUp)
+				Events.wrap(document).addEventListener("mousedown", @_handleDown, capture=true)
+				Events.wrap(document).addEventListener("mouseup", @_handleUp, capture=true)
 
 	_handleDown: (event) =>
 		@_target = event.target
@@ -22,7 +22,7 @@ class Hints
 		layer = Framer.CurrentContext.layerForElement(@_target)
 
 		# If this is a layer with interaction, we do not show any hints
-		if layer and layer.willSeemToDoSomething(layer)
+		if layer and layer.willSeemToDoSomething()
 			return
 
 		@showHints()

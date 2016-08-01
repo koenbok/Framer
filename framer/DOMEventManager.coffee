@@ -11,11 +11,11 @@ class DOMEventManagerElement extends EventEmitter
 
 	addListener: (eventName, listener, capture=false) ->
 		super(eventName, listener)
-		@element.addEventListener(eventName, listener, false)
+		@element.addEventListener(eventName, listener, capture)
 
-	removeListener: (eventName, listener) ->
+	removeListener: (eventName, listener, capture=false) ->
 		super(eventName, listener)
-		@element.removeEventListener(eventName, listener, false)
+		@element.removeEventListener(eventName, listener, capture)
 
 	# Keep the DOM API working
 	addEventListener: @::addListener
