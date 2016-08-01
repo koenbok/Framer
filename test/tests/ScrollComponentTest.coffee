@@ -107,6 +107,23 @@ describe "ScrollComponent", ->
 			scroll = new ScrollComponent()
 			scroll.content.clip.should.equal true
 
+		it "should copy over __framerInstanceInfo", ->
+			aap = new Layer
+			aap.__framerInstanceInfo = {name: "aap"}
+			bla = new Layer
+				parent: aap
+			scroll = ScrollComponent.wrap(aap)
+			scroll.__framerInstanceInfo.name.should.equal "aap"
+
+		it "should not copy over framerInstanceInfo to name", ->
+			aap = new Layer
+			aap.__framerInstanceInfo = {name: "aap"}
+			bla = new Layer
+				parent: aap
+			scroll = ScrollComponent.wrap(aap)
+			scroll.name.should.not.equal "aap"
+
+
 		it "should set the right content size for added pages by constructor", ->
 
 			# Constructors depend on different things for size, align and parent. Sometimes
