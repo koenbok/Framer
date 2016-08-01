@@ -636,7 +636,9 @@ class exports.Layer extends BaseClass
 		return layer
 
 	copySingle: ->
-		return new @constructor(@props)
+		copy = new @constructor(@props)
+		copy.style = @style
+		copy
 
 	##############################################################
 	## IMAGE

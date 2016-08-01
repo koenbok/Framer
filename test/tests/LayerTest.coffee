@@ -1156,6 +1156,17 @@ describe "Layer", ->
 			copy.width.should.equal 100
 			copy.height.should.equal 100
 
+		it "copied Layer should also copy styles", ->
+			layer = new Layer
+				style:
+					"font-family" : "-apple-system"
+					"font-size" : "1.2em"
+					"text-align" : "right"
+
+			copy = layer.copy()
+			copy.style["font-family"].should.equal "-apple-system"
+			copy.style["font-size"].should.equal "1.2em"
+			copy.style["text-align"].should.equal "right"
 
 	describe "Draggable", ->
 
