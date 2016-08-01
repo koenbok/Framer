@@ -11,22 +11,36 @@ describe "Layer", ->
 
 	describe "Defaults", ->
 
-		it "should set defaults", ->
+		it "should reset nested defaults", ->
+			Framer.Defaults.DeviceComponent.animationOptions.curve = "spring"
+			Framer.resetDefaults()
+			Framer.Defaults.DeviceComponent.animationOptions.curve.should.equal "ease-in-out"
 
+		it "should reset width and height to their previous values", ->
+			previousWidth = Framer.Defaults.Layer.width
+			previousHeight = Framer.Defaults.Layer.height
+			Framer.Defaults.Layer.width = 123
+			Framer.Defaults.Layer.height = 123
+			Framer.resetDefaults()
+			Framer.Defaults.Layer.width.should.equal previousWidth
+			Framer.Defaults.Layer.height.should.equal previousHeight
+
+		it "should set defaults", ->
+			width = Utils.randomNumber(0,400)
+			height = Utils.randomNumber(0,400)
 			Framer.Defaults =
 				Layer:
-					width: 200
-					height: 200
+					width: width
+					height: height
 
 			layer = new Layer()
 
-			layer.width.should.equal 200
-			layer.height.should.equal 200
+			layer.width.should.equal width
+			layer.height.should.equal height
 
 			Framer.resetDefaults()
 
 			layer = new Layer()
-
 			layer.width.should.equal 100
 			layer.height.should.equal 100
 
