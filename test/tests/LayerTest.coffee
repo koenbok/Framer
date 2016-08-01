@@ -146,6 +146,16 @@ describe "Layer", ->
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
 			layer.style.webkitTransform.should.equal "translate3d(100px, 50px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 
+		it "should handle midX and midY when width and height are 0", ->
+			box = new Layer
+				midX:200
+				midY:300
+				width: 0
+				height: 0
+
+			box.x.should.equal 200
+			box.y.should.equal 300
+
 		it "should set scale", ->
 
 			layer = new Layer
