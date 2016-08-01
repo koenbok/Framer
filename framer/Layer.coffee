@@ -894,17 +894,20 @@ class exports.Layer extends BaseClass
 	animateToState: (stateName, options={}) ->
 		properties = @_stateMachine.switchTo stateName
 		if @_stateMachine.previousName is @_stateMachine.currentName
+			shouldChange = false
+			for property,value of properties
+				if @[property] != value
+					shouldChange = true
+					break
+			if not shouldChange
 				return null
 		finished = options.completion
 		options.completion = =>
-			# If we changed the state, we send the event that we did
-			if @_stateMachine.previousName isnt stateName
-				@_stateMachine.emit(Events.StateDidSwitch, @_stateMachine.previousName, @_stateMachine.currentName, @)
+			@_stateMachine.emit(Events.StateDidSwitch, @_stateMachine.previousName, @_stateMachine.currentName, @)
 			finished?()
 		@animateTo properties, options
 
 	animateTo: (properties,options={}) ->
-
 		if typeof properties == 'string'
 			stateName = properties
 			return @animateToState stateName, options

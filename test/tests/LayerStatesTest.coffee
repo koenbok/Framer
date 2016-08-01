@@ -144,6 +144,16 @@ describe "LayerStates", ->
 			animation = layer.animateTo 'stateA', time: 0.05
 			assert.equal(animation,null)
 
+		it "should change to a state when the properties defined are not the current", (done) ->
+			layer = new Layer
+			layer.states.stateA = {x: 100}
+			layer.switchTo 'stateA'
+			layer.x = 150
+			layer.onStateDidSwitch ->
+				layer.x.should.equal 100
+				done()
+			animation = layer.animateTo 'stateA', time: 0.05
+
 	describe "Properties", ->
 
 		it "should bring back the 'initial' state values when using 'animateToNext'", (done) ->
