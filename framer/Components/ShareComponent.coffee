@@ -417,19 +417,18 @@ class ShareComponent
 				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAcCAYAAABRVo5BAAAABGdBTUEAALGPC/xhBQAAAO1JREFUOBFjZMABWltbJX///l0GlDYAYg1GRkZxIP3n////P4E0EyOQwABNTU05QAVtQMyLIQkVwNDY3Nzs9vfv3524NMDEmWAMED1z5kyuf//+zUEWw8VG0fjq1SsnoPNkcSlGFmdB5gA16SHzQWxgoPxnZma2UVNTOxkWFvYXJo+uUQwmAaOBhn2tqak5BuPDaBSnAhXJwySQaB4kNpyJohEoqgCXIcAgWyNjQ0PDfwKGY0gDA+w5uo0YirAJAMPiLFkagTaeIUsjExMTeTaCNGIkcmyBBRTDUEeWU0EBNqoRW7KBio0GDi0CBwAHJ0YrwGtXbwAAAABJRU5ErkJggg==')"
 
 		# Generate tweet
-
 		tweet = ""
 		if @shareInfo.twitter or @shareInfo.author
-			tweet += "A prototype by "
+
 
 			if @shareInfo.twitter
-				tweet += "@" + @shareInfo.twitter
+				tweet += "A prototype by @#{@shareInfo.twitter}. Design without limitations in @framerjs — "
 			else if @shareInfo.author
-				tweet += @shareInfo.author
+				tweet += "A prototype by @#{@shareInfo.author}. Design without limitations in @framerjs — "
+			else
+				tweet += "A @framerjs prototype by @#{@shareInfo.author}. Design without limitations — "
 
-			tweet += ". "
-
-		tweet += "Design without limitations in @framerjs — #{window.location.href}"
+		tweet += window.location.href
 		tweet = encodeURIComponent(tweet)
 
 		@buttonTwitter = new Button
