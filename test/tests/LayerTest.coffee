@@ -450,6 +450,11 @@ describe "Layer", ->
 			layer.rotation.should.equal(100)
 			layer.rotationZ.should.equal(100)
 
+		it "should only set name when explicitly set", ->
+			layer = new Layer
+			layer.__framerInstanceInfo = {name:"aap"}
+			layer.name.should.equal ""
+
 
 
 	describe "Filter Properties", ->

@@ -239,9 +239,7 @@ class exports.Layer extends BaseClass
 		default: ""
 		get: ->
 			name = @_getPropertyValue("name")
-			return name if name
-			# In Framer Studio, we can use the variable name
-			return @__framerInstanceInfo?.name or ""
+			return name or ""
 
 		set: (value) ->
 			@_setPropertyValue("name", value)
