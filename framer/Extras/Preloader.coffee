@@ -33,42 +33,7 @@ class Preloader extends BaseClass
 			blocker.onTouchMove (event) ->
 				event.stopPropagation()
 
-		@context.run =>
-
-			@cover = new Layer
-				frame: @context
-				backgroundColor: "white"
-				opacity: 0
-
-			@progressIndicator = new CircularProgressComponent
-				size: 160
-				point: Align.center
-				parent: @cover
-
-			@progressIndicator.railsColor = Color.grey(0, 0.1)
-			@progressIndicator.progressColor = "rgb(75,169,248)"
-			@progressIndicator.setProgress(@progress, false)
-
-			@brand = new Layer
-				width: 96
-				height: 96
-				point: Align.center
-				parent: @cover
-				backgroundColor: null
-
-			# Set directly via style, to avoid inclusion in the preloader list
-			@brand.style["background-image"] = "url('framer/images/preloader-icon.png')"
-
-			do layout = =>
-				if Utils.isMobile()
-					scale = 2
-				else
-					screen = Framer.Device?.screen
-					scale = screen?.frame.width / screen?.canvasFrame.width
-				@progressIndicator.scale = scale
-				@brand.scale = scale
-
-			Canvas.onResize(layout)
+		@context.run(@_setupContext)
 
 	@define "progress",
 		get: -> @_mediaLoaded.length / @_media.length or 0
@@ -83,6 +48,11 @@ class Preloader extends BaseClass
 		get: ->
 			return false if not @isLoading
 			return @_mediaLoaded.length is @_media.length
+
+	setLogo: (url) =>
+		@_logo = url
+		# Set directly via style, to avoid inclusion in the preloader list
+		@brand.style["background-image"] = "url('#{url}')" if @brand
 
 	addImagesFromContext: (context) ->
 		_.pluck(context.layers, "image").map(@addImage)
@@ -166,6 +136,50 @@ class Preloader extends BaseClass
 		console.warn("Preloader timeout, ending")
 		@end()
 
+	_setupContext: =>
+
+		console.log "_setupContext"
+
+		@cover = new Layer
+			frame: @context
+			backgroundColor: "white"
+			opacity: 0
+
+		@progressIndicator = new CircularProgressComponent
+			size: 160
+			point: Align.center
+			parent: @cover
+
+		@progressIndicator.railsColor = Color.grey(0, 0.1)
+		@progressIndicator.progressColor = "rgb(75,169,248)"
+		@progressIndicator.setProgress(@progress, false)
+
+		@brand = new Layer
+			width: 96
+			height: 96
+			point: Align.center
+			parent: @cover
+			backgroundColor: null
+
+		if @_logo
+			@setLogo(@_logo)
+		else
+			# Use the online logo, make sure we don't use the file:// protocol
+			logoUrl = "//resources.framerjs.com/static/images/preloader/framer-logo.png"
+			logoUrl = "http:" + logoUrl if _.startsWith(window.location.href, "file://")
+			@setLogo(logoUrl)
+
+		do layout = =>
+			if Utils.isMobile()
+				scale = 2
+			else
+				screen = Framer.Device?.screen
+				scale = screen?.frame.width / screen?.canvasFrame.width
+			@progressIndicator.scale = scale
+			@brand.scale = scale
+
+		Canvas.onResize(layout)
+
 exports.enable = ->
 	Framer.Preloader ?= new Preloader()
 
@@ -176,3 +190,6 @@ exports.disable = ->
 
 exports.addImage = (url) ->
 	Framer.Preloader?.addImage(url)
+
+exports.setLogo = (url) ->
+	Framer.Preloader?.setLogo(url)
