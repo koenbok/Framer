@@ -86,7 +86,7 @@ class exports.SliderComponent extends Layer
 		@on("change:borderRadius", @_setRadius)
 		@knob.on("change:size", @_updateKnob)
 		@knob.on("change:frame", @_updateFill)
-		@knob.on("change:frame", @_updateValue)
+		@knob.on("change:frame", @_knobDidMove)
 
 		@sliderOverlay.on(Events.TapStart, @_touchStart)
 		@sliderOverlay.on(Events.TapEnd, @_touchEnd)
@@ -136,17 +136,23 @@ class exports.SliderComponent extends Layer
 				width: @width
 				height: @height
 
+		@hitArea = @hitArea
+
 		if @width > @height
 			@fill.height = @height
+			@knob.midX = @pointForValue(@value)
 			@knob.centerY()
 		else
 			@fill.width = @width
+			@knob.midY = @pointForValue(@value)
 			@knob.centerX()
 
 		if @width > @height
 			@knob.draggable.speedY = 0
+			@knob.draggable.speedX = 1
 		else
 			@knob.draggable.speedX = 0
+			@knob.draggable.speedY = 1
 
 		@sliderOverlay.center()
 
@@ -157,9 +163,11 @@ class exports.SliderComponent extends Layer
 	@define "knobSize",
 		get: -> @_knobSize
 		set: (value) ->
+			isRound = @knob.borderRadius * 2 is @_knobSize
 			@_knobSize = value
 			@knob.width = @_knobSize
 			@knob.height = @_knobSize
+			@knob.borderRadius = @_knobSize / 2 if isRound
 			@_updateFrame()
 
 	@define "hitArea",
@@ -183,13 +191,10 @@ class exports.SliderComponent extends Layer
 		set: (value) -> @_max = value
 
 	@define "value",
-		get: ->
-			if @width > @height
-				@valueForPoint(@knob.midX)
-			else
-				@valueForPoint(@knob.midY)
-
+		get: -> return @_value
 		set: (value) ->
+
+			@_value = Utils.clamp(value, @min, @max)
 
 			if @width > @height
 				@knob.midX = @pointForValue(value)
@@ -199,10 +204,16 @@ class exports.SliderComponent extends Layer
 			@_updateFill()
 			@_updateValue()
 
+	_knobDidMove: =>
+
+		if @width > @height
+			@value = @valueForPoint(@knob.midX)
+		else
+			@value = @valueForPoint(@knob.midY)
+
 	_updateValue: =>
 		
-		if @_lastUpdatedValue is @value
-			return
+		return if @_lastUpdatedValue is @value
 
 		@_lastUpdatedValue = @value
 		@emit("change:value", @value)
