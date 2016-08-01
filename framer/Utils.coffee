@@ -772,9 +772,9 @@ Utils.frameGetMinX = (frame) -> frame.x
 Utils.frameSetMinX = (frame, value) -> frame.x = value
 
 Utils.frameGetMidX = (frame) ->
-	if frame.width is 0 then 0 else frame.x + (frame.width / 2.0)
+	if frame.width is 0 then frame.x else frame.x + (frame.width / 2.0)
 Utils.frameSetMidX = (frame, value) ->
-	frame.x = if frame.width is 0 then 0 else value - (frame.width / 2.0)
+	frame.x = if frame.width is 0 then value else value - (frame.width / 2.0)
 
 Utils.frameGetMaxX = (frame) ->
 	if frame.width is 0 then 0 else frame.x + frame.width
@@ -785,9 +785,9 @@ Utils.frameGetMinY = (frame) -> frame.y
 Utils.frameSetMinY = (frame, value) -> frame.y = value
 
 Utils.frameGetMidY = (frame) ->
-	if frame.height is 0 then 0 else frame.y + (frame.height / 2.0)
+	if frame.height is 0 then frame.y else frame.y + (frame.height / 2.0)
 Utils.frameSetMidY = (frame, value) ->
-	frame.y = if frame.height is 0 then 0 else value - (frame.height / 2.0)
+	frame.y = if frame.height is 0 then value else value - (frame.height / 2.0)
 
 Utils.frameGetMaxY = (frame) ->
 	if frame.height is 0 then 0 else frame.y + frame.height
