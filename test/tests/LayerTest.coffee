@@ -455,6 +455,10 @@ describe "Layer", ->
 			layer.__framerInstanceInfo = {name:"aap"}
 			layer.name.should.equal ""
 
+		it "it should show the variable name in toInspect()", ->
+			layer = new Layer
+			layer.__framerInstanceInfo = {name:"aap"}
+			layer.toInspect().should.equal "<Layer aap id:89  (0,0) 100x100>"
 
 
 	describe "Filter Properties", ->
