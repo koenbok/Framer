@@ -107,13 +107,13 @@ describe "ScrollComponent", ->
 			scroll = new ScrollComponent()
 			scroll.content.clip.should.equal true
 
-		it "should copy over __framerInstanceInfo", ->
+		it "should set the name of the constructor to __framerInstanceInfo", ->
 			aap = new Layer
 			aap.__framerInstanceInfo = {name: "aap"}
 			bla = new Layer
 				parent: aap
 			scroll = ScrollComponent.wrap(aap)
-			scroll.__framerInstanceInfo.name.should.equal "aap"
+			scroll.__framerInstanceInfo.name.should.equal "ScrollComponent"
 
 		it "should not copy over framerInstanceInfo to name", ->
 			aap = new Layer
@@ -121,7 +121,7 @@ describe "ScrollComponent", ->
 			bla = new Layer
 				parent: aap
 			scroll = ScrollComponent.wrap(aap)
-			scroll.name.should.not.equal "aap"
+			scroll.name.should.equal ""
 
 
 		it "should set the right content size for added pages by constructor", ->
@@ -141,11 +141,10 @@ describe "ScrollComponent", ->
 				contentInset: {top: 267, right: imgWrapGut}
 
 			for i in [1..numImg]
-				imgWrapper = new Layer 
-					width: page.width - imgWrapGut, height: imgWrapW 
+				imgWrapper = new Layer
+					width: page.width - imgWrapGut, height: imgWrapW
 					borderRadius: 8
 					x: (page.width + 32) * i
 					parent: page.content
 
 			page.contentFrame().width.should.equal 1064
-

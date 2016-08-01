@@ -422,7 +422,6 @@ wrapComponent = (instance, layer, options = {correct:true}) ->
 	if options.correct is true
 		if layer.children.length is 0 and not isPageComponent
 			wrapper = new Layer
-			wrapper.name = instance.constructor.name
 			wrapper.frame = layer.frame
 			layer.parent = wrapper
 			layer.x = layer.y = 0
@@ -434,14 +433,10 @@ wrapComponent = (instance, layer, options = {correct:true}) ->
 	scroll.parent = layer.parent
 	scroll.index = layer.index
 
-	# Copy over the name
-	if isPageComponent
-		scroll.name = instance.constructor.name
-	else if layer.name and layer.name isnt ""
+	if layer.name? and not isPageComponent
 		scroll.name = layer.name
-	else if layer.__framerInstanceInfo?.name
-		scroll.__framerInstanceInfo ?= {}
-		scroll.__framerInstanceInfo?.name = layer.__framerInstanceInfo.name
+	scroll.__framerInstanceInfo ?= {}
+	scroll.__framerInstanceInfo?.name = instance.constructor.name
 
 	# If we have an image set, it makes way more sense to add it to the
 	# background of the wrapper then the content.
