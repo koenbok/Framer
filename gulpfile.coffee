@@ -25,8 +25,8 @@ WEBPACK =
 ################################################################################
 # Gulp tasks
 
-gulp.task "watch", ["webpack:debug"], ->
-	gulp.watch(["./*.coffee", "framer/**", "test/tests/**", "!Version.coffee"], ["webpack:debug","test"])
+gulp.task "watch", ["test"], ->
+	gulp.watch(["./*.coffee", "framer/**", "test/tests/**", "!Version.coffee"], ["test"])
 
 gulp.task "test", ["webpack:tests"], ->
 	return gulp
@@ -91,7 +91,7 @@ gulp.task "webpack:release", ["version"], (callback) ->
 
 	webpackDev("webpack:release", config, callback)
 
-gulp.task "webpack:tests", (callback) ->
+gulp.task "webpack:tests", ["webpack:debug"],(callback) ->
 
 	config = _.extend WEBPACK,
 		entry: "./test/tests.coffee"
