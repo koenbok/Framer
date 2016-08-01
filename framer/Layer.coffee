@@ -893,6 +893,8 @@ class exports.Layer extends BaseClass
 
 	animateToState: (stateName, options={}) ->
 		properties = @_stateMachine.switchTo stateName
+		if @_stateMachine.previousName is @_stateMachine.currentName
+				return null
 		finished = options.completion
 		options.completion = =>
 			# If we changed the state, we send the event that we did

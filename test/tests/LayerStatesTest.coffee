@@ -137,6 +137,13 @@ describe "LayerStates", ->
 			layer.x.should.equal 0
 			layer.style.fontFamily.should.equal "Helvetica"
 
+		it "should be a no-op to change to the current state", ->
+			layer = new Layer
+			layer.states.stateA = {x: 100}
+			layer.switchTo 'stateA'
+			animation = layer.animateTo 'stateA', time: 0.05
+			assert.equal(animation,null)
+
 	describe "Properties", ->
 
 		it "should bring back the 'initial' state values when using 'animateToNext'", (done) ->
