@@ -7,8 +7,8 @@ Todo: make it work in a parent layer
 class exports.BackgroundLayer extends Layer
 
 	constructor: (options={}) ->
-
 		options.backgroundColor ?= "#fff"
+		console.warn "BackgroundLayer is deprecated, please use\n\nScreen.backgroundColor = \"#{options.backgroundColor}\"\n\ninstead."
 
 		super options
 
