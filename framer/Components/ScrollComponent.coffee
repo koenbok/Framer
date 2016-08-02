@@ -109,7 +109,11 @@ class exports.ScrollComponent extends Layer
 		# Sets the content layer if you happen to want to replace the default one
 		# yourself. Sets some sane defaults too.
 
-		@_content.destroy() if @content
+		if @content
+			@_onAnimationStop()
+			@content.off(Events.AnimationStart, @_onAnimationStart)
+			@content.off(Events.AnimationStop, @_onAnimationStop)
+			@_content.destroy()
 
 		@_content = layer
 		@_content.parent = @
@@ -126,6 +130,9 @@ class exports.ScrollComponent extends Layer
 		@updateContent()
 
 		@scrollPoint = {x:0, y:0}
+
+		@content.on(Events.AnimationStart, @_onAnimationStart)
+		@content.on(Events.AnimationStop, @_onAnimationStop)
 
 		return @_content
 
@@ -307,6 +314,14 @@ class exports.ScrollComponent extends Layer
 
 	closestContentLayerForScrollPoint: (scrollPoint, originX=0, originY=0) ->
 		return _.head(@_contentLayersSortedByDistanceForScrollPoint(scrollPoint, originX, originY))
+
+	_onAnimationStart: (event) =>
+		@content.on("change:frame", @_onAnimationStep)
+
+	_onAnimationStep: (event) =>
+		@content.emit(Events.Move, @content.point)
+	_onAnimationStop: =>
+		@content.off("change:frame", @_onAnimationStep)
 
 	_scrollPointForLayer: (layer, originX=0, originY=0, clamp=true) ->
 		return Utils.framePointForOrigin(layer, originX, originY)
