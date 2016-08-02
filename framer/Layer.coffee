@@ -1212,12 +1212,6 @@ class exports.Layer extends BaseClass
 		return if not @visible
 		return if @opacity is 0
 
-		# We do not support rotated layers
-		return if @rotation isnt 0
-		return if @rotationX isnt 0
-		return if @rotationY isnt 0
-		return if @rotationZ isnt 0
-
 		# If we don't need to show a hint exit but pass to children
 		unless @shouldShowHint(targetLayer)
 			layer._showHint(targetLayer) for layer in @children
