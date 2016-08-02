@@ -71,6 +71,18 @@ describe "ScrollComponent", ->
 			scroll.content.x.should.equal -75
 			scroll.content.y.should.equal 0
 
+		it "should fire move events", (done) ->
+			scroll = new ScrollComponent size: 200
+			new Layer
+				width: 400
+				height: 400
+				parent: scroll.content
+			scroll.mouseWheelEnabled = true
+			scroll.on Events.Move, (event) ->
+				event.x.should.equal -75
+				event.y.should.equal -150
+				done()
+			scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
 
 	describe "wrap", ->
 

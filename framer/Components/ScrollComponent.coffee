@@ -383,6 +383,7 @@ class exports.ScrollComponent extends Layer
 
 		@content.point = point
 
+		@content.emit(Events.Move, point)
 		@emit(Events.Scroll, event)
 		@_onMouseWheelEnd(event)
 
