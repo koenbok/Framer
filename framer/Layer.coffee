@@ -1237,7 +1237,7 @@ class exports.Layer extends BaseClass
 		@showHint(frame)
 
 		# Tell the children to show their hints
-		_.invoke(@children, "_showHint")
+		_.invokeMap(@children, "_showHint")
 
 	willSeemToDoSomething: ->
 
