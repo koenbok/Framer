@@ -65,7 +65,7 @@ class Button extends ShareLayer
 			@opacity = 1
 			@states.switch('default')
 
-		@onClick -> window.open(options.url, "_blank")
+		@onClick -> window.open(options.url, "Share", "width=560,height=714")
 
 # Share component
 class ShareComponent
@@ -112,7 +112,8 @@ class ShareComponent
 		# Truncate title if too long
 		if @shareInfo.title
 			truncate = (str, n) ->
-				str.substr(0, n-1).trim() + "&hellip;"
+				truncatedString = str
+				truncatedString.substr(0, n-1).trim() + "&hellip;"
 
 			if @shareInfo.twitter and @shareInfo.title.length > 26
 				@shareInfo.title = truncate(@shareInfo.title, 26)
@@ -355,8 +356,6 @@ class ShareComponent
 			@_calculateAvailableSpace()
 			@_enableUserSelect(@description)
 
-
-
 		# Truncate if description is too long
 		if @shareInfo.description.length > @options.maxDescriptionLength
 
@@ -418,9 +417,8 @@ class ShareComponent
 
 		# Generate tweet
 		tweet = ""
+
 		if @shareInfo.twitter or @shareInfo.author
-
-
 			if @shareInfo.twitter
 				tweet += "A prototype by @#{@shareInfo.twitter}. Design without limitations in @framerjs — "
 			else if @shareInfo.author
