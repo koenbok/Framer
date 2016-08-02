@@ -1,8 +1,5 @@
 #!/bin/bash
-DEVMATE_FEED="https://updates.devmate.com/co.motif.framer.generator.xml"
-
-# GENERATOR_HOST="http://framergenerator-update.s3-website-us-east-1.amazonaws.com"
-# GENERATOR_LATEST=$GENERATOR_HOST/`curl -s $GENERATOR_HOST/latest.txt`
+DEVMATE_LATEST="https://dl.devmate.com/co.motif.framer.generator/FramerGenerator.zip"
 
 # Clean up previous builds
 rm -f build/Framer.zip
@@ -25,10 +22,8 @@ cp -R extras/preloader-images/* "$IMAGES_DIR"
 
 # Download the latest generator
 cd build/Framer
-curl --silent --location $DEVMATE_FEED --output devmate.xml
-xmllint --xpath "string(//item[1]/enclosure/@url)" devmate.xml | xargs curl --location --output generator.zip
+curl --location $DEVMATE_LATEST --output generator.zip
 unzip "./generator.zip"
-rm "./devmate.xml"
 rm "./generator.zip"
 cd -
 

@@ -18,11 +18,6 @@ build:
 deploy:
     steps:
         - script:
-            name: install-packages
-            code: |
-              apt-get update
-              apt-get install -y libxml2-utils
-        - script:
             name: builds.framerjs.com
             code: |
                 npm rebuild
