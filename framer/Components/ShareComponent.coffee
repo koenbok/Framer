@@ -79,14 +79,19 @@ class ShareComponent
 			minAvailableSpace: 300
 			minAvailableSpaceFullScreen: 500
 			maxDescriptionLength: 145
+			id: window.location.pathname.replace(/\//g, "")
+
+		# See if a state is set
+		@state = localStorage.getItem("framerShareSheetState-#{@options.id}")
+		@options.fixed = if !@state then false else true
 
 		@_checkData()
 		@render() if !Utils.isMobile()
 
 	render: ->
 		@_renderSheet()
-		@_renderToggleButtons()
 		@_renderCTA()
+		@_renderToggleButtons()
 		@_renderInfo()
 		@_renderDescription() if @shareInfo.description
 		@_renderDate() if @shareInfo.openInFramerURL and @shareInfo.date
@@ -99,7 +104,13 @@ class ShareComponent
 		# Wait until the device screen x position is available
 		Utils.delay .1, =>
 			@_calculateAvailableSpace()
-			@_openIfEnoughSpace()
+
+			if @state is "open"
+				@_openSheet()
+			else if @state is "closed"
+				@_closeSheet()
+			else
+				@_openIfEnoughSpace()
 
 		@_startListening()
 
@@ -122,9 +133,10 @@ class ShareComponent
 
 	# Render main sheet
 	_renderSheet: ->
-		@sheet = new Layer
+		@sheet = new ShareLayer
 			width: @options.width
 			clip: true
+			ignoreEvents: false
 			point: 10
 			borderRadius: 4
 			backgroundColor: "#FFF"
@@ -165,6 +177,17 @@ class ShareComponent
 				fontWeight: "500"
 				fontSize: "13px"
 
+		@close = new Layer
+			parent: @cta
+			ignoreEvents: false
+			size: 12
+			point: 12
+			backgroundColor: null
+			style:
+				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAZdJREFUSA2tlt9OgzAUh6UkRrLMCfgnwWwPoXcmBk32Crvfo+1+76A3Jt4SX8Bk8VYBkagJAc+P7CyMUWiHvYCepv2+0p42GNPpdFQUxdV4PH5eLBY/B/9QZrPZYRiGN6ZpvgjAiXm+Wq3u5/P5UV8+4FEU3RH3Isuya4GZU/BpGMZxXwnD8zy3ifflOM6TGQRB5vv+WxzHHiR4I0a7ztfU4bZtPyyXy28TkL4SGRzsUtBH0gbfEuwj6YLvCHQkKvBGgYpEFQ6WgYes4FwgdZFdSOXJZPKYpmmOPOdU5GyRMVoFGFSVEDQRQuTUPEKed8ExfpNFCJoKpzDN+pLgQ+qD057SISrzvGlMtU1UA1kdy7KeedkF9cFgUMj6V9s7v4A3lPbghAamBP+lpRqqnvhWAcN5Q7Esruu+6lwrUkEdzhvKe6IqaRTI4Ly2OpIdQRdcV7IlUIXrSDYCXbiqpBTsC1eRGH3hLMG7eq3w3WV6nndLwanq3VIF1uv17EqS5Ezg14I6fnCe1wfpxvj1wa1LE363LCv4A+knGKYRZVX+AAAAAElFTkSuQmCC')"
+
+		@_enableUserSelect(@close)
+		@_showPointer(@close)
 		@_showPointer(@open)
 
 	# Render CTA section
@@ -451,8 +474,7 @@ class ShareComponent
 
 	_openIfEnoughSpace: =>
 		# Open or close sheet based on available space
-		if @availableSpace < @threshold
-			'close'
+		if @availableSpace < @threshold and !@options.fixed
 			@_closeSheet()
 		else
 			@_openSheet()
@@ -503,8 +525,14 @@ class ShareComponent
 			@style =
 				cursor: "default"
 
+		@close.onClick =>
+			@_closeSheet()
+			@options.fixed = true
+			localStorage.setItem("framerShareSheetState-#{@options.id}", 'closed')
 		@open.onClick =>
 			@_openSheet()
+			@options.fixed = true
+			localStorage.setItem("framerShareSheetState-#{@options.id}", 'open')
 
 		# When the window resizes evaluate if the sheet needs to be hidden
 		Canvas.onResize =>
