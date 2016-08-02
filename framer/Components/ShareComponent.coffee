@@ -89,6 +89,9 @@ class ShareComponent
 		# Get the project id from the url
 		projectId = window.location.pathname.replace(/\//g, "")
 
+		# Set the window title
+		document.title = @shareInfo.title
+
 		# When fixed is set to true, the sheet won't hide on resize.
 		# This is triggered by a manual open / close action.
 		@options =
