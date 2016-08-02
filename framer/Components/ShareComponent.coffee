@@ -537,7 +537,7 @@ class ShareComponent
 		# When the window resizes evaluate if the sheet needs to be hidden
 		Canvas.onResize =>
 			@_calculateAvailableSpace()
-			@_openIfEnoughSpace()
+			@_openIfEnoughSpace() if !@options.fixed
 
 	# Show hand cursor
 	_showPointer: (layer) ->
