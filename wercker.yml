@@ -3,6 +3,11 @@ box: framer/wercker
 build:
     steps:
         - script:
+            name: install-packages
+            code: |
+              apt-get update
+              apt-get install -y xmllint
+        - script:
             name: load git revisions
             code: |
                 git remote set-url origin https://github.com/$WERCKER_GIT_OWNER/$WERCKER_GIT_REPOSITORY.git
