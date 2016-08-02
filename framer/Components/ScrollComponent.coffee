@@ -357,6 +357,15 @@ class exports.ScrollComponent extends Layer
 			@off(Events.MouseWheel, @_onMouseWheel)
 
 	_onMouseWheel: (event) =>
+		deltaX = 0
+		deltaY = 0
+		if @scrollHorizontal
+			deltaX = event.wheelDeltaX
+		if @scrollVertical
+			deltaY = event.wheelDeltaY
+
+		if deltaX == 0 and deltaY == 0
+			return
 
 		if not @_mouseWheelScrolling
 			@_mouseWheelScrolling = true
@@ -367,9 +376,10 @@ class exports.ScrollComponent extends Layer
 		{minX, maxX, minY, maxY} = @content.draggable._calculateConstraints(
 			@content.draggable.constraints)
 
+
 		point =
-			x: Utils.clamp(@content.x + (event.wheelDeltaX * @mouseWheelSpeedMultiplier), minX, maxX)
-			y: Utils.clamp(@content.y + (event.wheelDeltaY * @mouseWheelSpeedMultiplier), minY, maxY)
+			x: Utils.clamp(@content.x + (deltaX * @mouseWheelSpeedMultiplier), minX, maxX)
+			y: Utils.clamp(@content.y + (deltaY * @mouseWheelSpeedMultiplier), minY, maxY)
 
 		@content.point = point
 

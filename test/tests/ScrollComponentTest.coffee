@@ -35,6 +35,43 @@ describe "ScrollComponent", ->
 		copy = instance.copy()
 		copy.scrollHorizontal.should.be.false
 
+	describe "scolling with mousEvents", ->
+		it "should work", ->
+			scroll = new ScrollComponent size: 200
+			new Layer
+				width: 400
+				height: 400
+				parent: scroll.content
+			scroll.mouseWheelEnabled = true
+			scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
+			scroll.content.x.should.equal -75
+			scroll.content.y.should.equal -150
+
+		it "should respect scrollHorizontal = false", ->
+			scroll = new ScrollComponent size: 200
+			new Layer
+				width: 400
+				height: 400
+				parent: scroll.content
+			scroll.mouseWheelEnabled = true
+			scroll.scrollHorizontal = false
+			scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
+			scroll.content.x.should.equal 0
+			scroll.content.y.should.equal -150
+
+		it "should respect scrollVertial = false", ->
+			scroll = new ScrollComponent size: 200
+			new Layer
+				width: 400
+				height: 400
+				parent: scroll.content
+			scroll.mouseWheelEnabled = true
+			scroll.scrollVertical = false
+			scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
+			scroll.content.x.should.equal -75
+			scroll.content.y.should.equal 0
+
+
 	describe "wrap", ->
 
 		it "should use the wrapped layer as content layer when there are children", ->
