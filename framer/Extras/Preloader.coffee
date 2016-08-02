@@ -138,8 +138,6 @@ class Preloader extends BaseClass
 
 	_setupContext: =>
 
-		console.log "_setupContext"
-
 		@cover = new Layer
 			frame: @context
 			backgroundColor: "white"
