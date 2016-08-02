@@ -25,7 +25,7 @@ class ShareLayer extends Layer
 
 		defaultProps =
 			backgroundColor: null
-			width: options.parent.width if options and options.parent
+			width: options.parent.width if options and options.parent # This is not correct
 			ignoreEvents: false
 			style:
 				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
@@ -33,7 +33,7 @@ class ShareLayer extends Layer
 				fontSize: "14px"
 				color: "#111"
 				lineHeight: "1"
-				webkitFontSmoothing: "antialiased";
+				webkitFontSmoothing: "antialiased"
 
 		@props = _.merge(defaultProps, options)
 
@@ -54,7 +54,7 @@ class Button extends ShareLayer
 				borderRadius: 3
 				textAlign: "center"
 				paddingTop: "9px"
-			width: options.parent.width if options and options.parent
+			width: options.parent.width if options and options.parent  # This is not correct
 
 		@props = _.merge(defaultProps, options)
 
@@ -64,7 +64,7 @@ class Button extends ShareLayer
 
 		@onMouseOver ->
 			@style.cursor = "pointer"
-			@states.switch('hover')
+			@states.switch('hover') # Why mix ' and " (everywhere)
 
 		@onMouseOut ->
 			@opacity = 1
@@ -74,7 +74,11 @@ class Button extends ShareLayer
 
 # Share component
 class ShareComponent
+
 	constructor: (@shareInfo) ->
+
+		# Get the project id from the url
+		projectId = window.location.pathname.replace(/\//g, "")
 
 		# When fixed is set to true, the sheet won't hide on resize.
 		# This is triggered by a manual open / close action.
@@ -84,14 +88,14 @@ class ShareComponent
 			minAvailableSpace: 300
 			minAvailableSpaceFullScreen: 500
 			maxDescriptionLength: 145
-			id: window.location.pathname.replace(/\//g, "")
+			id: projectId
 
 		# See if a state is set
 		@state = localStorage.getItem("framerShareSheetState-#{@options.id}")
 		@options.fixed = if !@state then false else true
 
 		@_checkData()
-		@render() if !Utils.isMobile()
+		@render() unless Utils.isMobile()
 
 	render: ->
 		@_renderSheet()
@@ -121,15 +125,21 @@ class ShareComponent
 
 	_checkData: ->
 
-		# Twitter handle
-		if @shareInfo.twitter and @shareInfo.twitter.charAt(0) is "@"
-			@shareInfo.twitter = @shareInfo.twitter.substring(1)
+		# Remove leading @ from the Twitter handle
+		if _.startsWith(@shareInfo.twitter, "@")
+			@shareInfo.twitter[1..]
 
 		# Truncate title if too long
 		if @shareInfo.title
+
+			# Flo: put this on top as a utility method
 			truncate = (str, n) ->
 				truncatedString = str
 				truncatedString.substr(0, n-1).trim() + "&hellip;"
+
+			# Flo: turn this into variables with sensible names
+			a = 26
+			b = 34
 
 			if @shareInfo.twitter and @shareInfo.title.length > 26
 				@shareInfo.title = truncate(@shareInfo.title, 26)
@@ -197,6 +207,7 @@ class ShareComponent
 
 	# Render CTA section
 	_renderCTA: ->
+
 		@cta = new ShareLayer
 			parent: @sheet
 			style:
@@ -249,6 +260,7 @@ class ShareComponent
 			parent: @info
 			height: 16
 
+		# If we miss a title from the json metadata, we fallback to the document url
 		fallbackTitle = _.replace(FramerStudioInfo.documentTitle, /\.framer$/, '')
 
 		@credentialsTitle = new ShareLayer
@@ -311,6 +323,7 @@ class ShareComponent
 			showAuthor(@shareInfo.author)
 
 	_renderDate: ->
+
 		verticalPosition = if @description then @description.maxY else @credentials.maxY
 
 		date = new Date(@shareInfo.date)
@@ -328,13 +341,13 @@ class ShareComponent
 				letterSpacing: ".2px"
 
 	_enableUserSelect: (layer) ->
-		if !layer.html then layer.html = ""
+		layer.html = "" unless layer.html 
 		layer._elementHTML.style["-webkit-user-select"] = "auto"
 		layer._elementHTML.style["cursor"] = "auto"
 
 	_renderDescription: ->
 
-		# See if there are any url's in the description and wrap them in anchor tags. Make sure linebreaks are wrapped in <br/ >'s.'
+		# See if there are any urls in the description and wrap them in anchor tags. Make sure linebreaks are wrapped in <br/ >'s.'
 		parseDescription = (text) ->
 			urlRegex = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi
 			httpRegex = /^((http|https):\/\/)/
@@ -342,14 +355,12 @@ class ShareComponent
 
 			urlified = text.replace urlRegex, (url) ->
 
-				if !httpRegex.test(url)
-					href = "//#{url}"
-				else
-					href = url
+				# Flo: try to use not/unless instead of !
+				href = url
+				href = "//#{url}" if not httpRegex.test(url)
+				return "<a href='#{href}' style='-webkit-user-select: auto' target='_blank'>#{url}</a>"
 
-				"<a href='#{href}' style='-webkit-user-select: auto' target='_blank'>#{url}</a>"
-
-			urlified.replace lineBreakRegex, '<br />'
+			urlified.replace(lineBreakRegex, "<br />")
 
 		@description = new ShareLayer
 			parent: @info
@@ -412,6 +423,8 @@ class ShareComponent
 			@_enableUserSelect(@description)
 
 	_renderButtons: ->
+
+		# Flo: too complex; simplify
 		verticalPosition = if @date then @date.maxY else (if @descripion then @description.maxY else @credentials.maxY)
 
 		@buttons = new ShareLayer
@@ -490,6 +503,9 @@ class ShareComponent
 			@_openSheet()
 
 	_calculateAvailableSpace: =>
+
+		# Flo can any of the numbers below (20, 95) be turned into variables with sensible names?
+
 		device = Framer.Device
 		@threshold = @options.minAvailableSpaceFullScreen
 		@availableSpace = Canvas.width
@@ -538,7 +554,7 @@ class ShareComponent
 		@close.onClick =>
 			@_closeSheet()
 			@options.fixed = true
-			localStorage.setItem("framerShareSheetState-#{@options.id}", 'closed')
+			localStorage.setItem("framerShareSheetState-#{@options.id}", 'closed') # Flo: ' "
 
 		# Disable events propagating up to block unintented interactions
 		@sheet.onTouchStart (event) -> event.stopPropagation()
@@ -549,12 +565,12 @@ class ShareComponent
 			event.stopPropagation()
 			@_openSheet()
 			@options.fixed = true
-			localStorage.setItem("framerShareSheetState-#{@options.id}", 'open')
+			localStorage.setItem("framerShareSheetState-#{@options.id}", 'open') # Ahem
 
 		# When the window resizes evaluate if the sheet needs to be hidden
 		Canvas.onResize =>
 			@_calculateAvailableSpace()
-			@_openIfEnoughSpace() if !@options.fixed
+			@_openIfEnoughSpace() unless @options.fixed
 
 	# Show hand cursor
 	_showPointer: (layer) ->
