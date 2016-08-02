@@ -34,55 +34,78 @@ describe "ScrollComponent", ->
 
 		copy = instance.copy()
 		copy.scrollHorizontal.should.be.false
+	describe "Events", ->
+		describe "scolling with mousEvents", ->
+			it "should work", ->
+				scroll = new ScrollComponent size: 200
+				new Layer
+					width: 400
+					height: 400
+					parent: scroll.content
+				scroll.mouseWheelEnabled = true
+				scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
+				scroll.content.x.should.equal -75
+				scroll.content.y.should.equal -150
 
-	describe "scolling with mousEvents", ->
-		it "should work", ->
-			scroll = new ScrollComponent size: 200
-			new Layer
-				width: 400
-				height: 400
-				parent: scroll.content
-			scroll.mouseWheelEnabled = true
-			scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
-			scroll.content.x.should.equal -75
-			scroll.content.y.should.equal -150
+			it "should respect scrollHorizontal = false", ->
+				scroll = new ScrollComponent size: 200
+				new Layer
+					width: 400
+					height: 400
+					parent: scroll.content
+				scroll.mouseWheelEnabled = true
+				scroll.scrollHorizontal = false
+				scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
+				scroll.content.x.should.equal 0
+				scroll.content.y.should.equal -150
 
-		it "should respect scrollHorizontal = false", ->
-			scroll = new ScrollComponent size: 200
-			new Layer
-				width: 400
-				height: 400
-				parent: scroll.content
-			scroll.mouseWheelEnabled = true
-			scroll.scrollHorizontal = false
-			scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
-			scroll.content.x.should.equal 0
-			scroll.content.y.should.equal -150
+			it "should respect scrollVertial = false", ->
+				scroll = new ScrollComponent size: 200
+				new Layer
+					width: 400
+					height: 400
+					parent: scroll.content
+				scroll.mouseWheelEnabled = true
+				scroll.scrollVertical = false
+				scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
+				scroll.content.x.should.equal -75
+				scroll.content.y.should.equal 0
 
-		it "should respect scrollVertial = false", ->
-			scroll = new ScrollComponent size: 200
-			new Layer
-				width: 400
-				height: 400
-				parent: scroll.content
-			scroll.mouseWheelEnabled = true
-			scroll.scrollVertical = false
-			scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
-			scroll.content.x.should.equal -75
-			scroll.content.y.should.equal 0
+			it "should fire move events", (done) ->
+				scroll = new ScrollComponent size: 200
+				new Layer
+					width: 400
+					height: 400
+					parent: scroll.content
+				scroll.mouseWheelEnabled = true
+				scroll.on Events.Move, (event) ->
+					event.x.should.equal -75
+					event.y.should.equal -150
+					done()
+				scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
 
-		it "should fire move events", (done) ->
-			scroll = new ScrollComponent size: 200
-			new Layer
-				width: 400
-				height: 400
-				parent: scroll.content
-			scroll.mouseWheelEnabled = true
-			scroll.on Events.Move, (event) ->
-				event.x.should.equal -75
-				event.y.should.equal -150
-				done()
-			scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
+		describe "PageComponent", ->
+			it "should fire scroll events", (done) ->
+				page = new PageComponent
+					width: 100
+					height: 100
+				page.addPage(new Layer)
+				page.addPage(new Layer)
+				page.once Events.Scroll, ->
+					done()
+				page.snapToNextPage()
+
+		it "should fire move events when moving a layer programmatically", (done) ->
+			scroll = new ScrollComponent
+				width: 20
+				height: 20
+			layer = new Layer parent: scroll.content
+			doneCalled = false
+			scroll.on Events.Move, ->
+				done() if not doneCalled
+				doneCalled = true
+			scroll.scrollToPoint({x: 50, y: 50})
+
 
 	describe "wrap", ->
 
