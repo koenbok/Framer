@@ -320,6 +320,8 @@ class exports.ScrollComponent extends Layer
 
 	_onAnimationStep: (event) =>
 		@content.emit(Events.Move, @content.point)
+		@emit(Events.Scroll, event)
+
 	_onAnimationStop: =>
 		@content.off("change:frame", @_onAnimationStep)
 
