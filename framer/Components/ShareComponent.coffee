@@ -59,19 +59,27 @@ class Button extends ShareLayer
 
 		@props = _.merge(defaultProps, options)
 
-		@states.add hover: opacity: .8
+		@states.add
+			hover: opacity: .8
+			full: opacity: 1
 		@states.animationOptions =
 			time: .3
 
 		@onMouseOver ->
 			@style.cursor = "pointer"
 			@states.switch("hover")
+			@animate
+				properties:
+					opacity: .8
 
 		@onMouseOut ->
-			@opacity = 1
-			@states.switch("default")
+			@states.switch("full")
 
-		@onClick -> window.open(options.url, "Share", "width=560,height=714")
+		@onClick ->
+			if options.shareButton
+				window.open(options.url, "Share", "width=560,height=714")
+			else
+				window.open(options.url, "_blank")
 
 # Share component
 class ShareComponent
@@ -291,7 +299,8 @@ class ShareComponent
 		if @shareInfo.twitter
 			@credentials.x = 50
 
-			@avatar = new ShareLayer
+			@avatar = new Button
+				url: "https://twitter.com/#{@shareInfo.twitter}"
 				size: 40
 				parent: @info
 				borderRadius: 100
@@ -309,7 +318,6 @@ class ShareComponent
 				borderRadius: 100
 				style:
 					boxShadow: "0 0 0 1px rgba(0,0,0,.1)"
-			@_showPointer(@avatar)
 
 			# If author name isn't available, fallback to Twitter handle
 			name = if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}"
@@ -440,6 +448,7 @@ class ShareComponent
 			backgroundColor: "00AAFF"
 
 		@buttonFacebook = new Button
+			shareButton: true
 			url: "https://www.facebook.com/sharer/sharer.php?u=#{window.location.href}"
 			parent: @buttons
 			borderWidth: 1
@@ -473,6 +482,7 @@ class ShareComponent
 		tweet = encodeURIComponent(tweet)
 
 		@buttonTwitter = new Button
+			shareButton: true
 			url: "https://twitter.com/home?status=#{tweet}"
 			parent: @buttons
 			borderWidth: 1
