@@ -1,3 +1,4 @@
+Framer.Extras.ShareInfo.enable()
 
 # Activate Module
 Framer.Info =

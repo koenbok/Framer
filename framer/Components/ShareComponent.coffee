@@ -25,7 +25,6 @@ class ShareLayer extends Layer
 
 		defaultProps =
 			backgroundColor: null
-			width: options.parent.width if options and options.parent # This is not correct
 			ignoreEvents: false
 			style:
 				fontFamily: "Roboto, Helvetica Neue, Helvetica, Arial, sans-serif"
@@ -34,6 +33,10 @@ class ShareLayer extends Layer
 				color: "#111"
 				lineHeight: "1"
 				webkitFontSmoothing: "antialiased"
+
+		# If a parent is set, use the parents' width
+		if options.parent
+			defaultProps.width = options.parent.width
 
 		@props = _.merge(defaultProps, options)
 
@@ -47,14 +50,12 @@ class Button extends ShareLayer
 
 		defaultProps =
 			height: 33
-			ignoreEvents: false
 			style:
 				fontWeight: "500"
 				webkitUserSelect: "text"
 				borderRadius: 3
 				textAlign: "center"
 				paddingTop: "9px"
-			width: options.parent.width if options and options.parent  # This is not correct
 
 		@props = _.merge(defaultProps, options)
 
@@ -64,11 +65,11 @@ class Button extends ShareLayer
 
 		@onMouseOver ->
 			@style.cursor = "pointer"
-			@states.switch('hover') # Why mix ' and " (everywhere)
+			@states.switch("hover")
 
 		@onMouseOut ->
 			@opacity = 1
-			@states.switch('default')
+			@states.switch("default")
 
 		@onClick -> window.open(options.url, "Share", "width=560,height=714")
 
@@ -92,7 +93,7 @@ class ShareComponent
 
 		# See if a state is set
 		@state = localStorage.getItem("framerShareSheetState-#{@options.id}")
-		@options.fixed = if !@state then false else true
+		@options.fixed = if not @state then false else true
 
 		@_checkData()
 		@render() unless Utils.isMobile()
@@ -124,6 +125,9 @@ class ShareComponent
 		@_startListening()
 
 	_checkData: ->
+		truncate = (str, n) ->
+			truncatedString = str
+			truncatedString.substr(0, n-1).trim() + "&hellip;"
 
 		# Remove leading @ from the Twitter handle
 		if _.startsWith(@shareInfo.twitter, "@")
@@ -131,20 +135,13 @@ class ShareComponent
 
 		# Truncate title if too long
 		if @shareInfo.title
+			maxLengthWithAvatar = 26
+			maxLength = 34
 
-			# Flo: put this on top as a utility method
-			truncate = (str, n) ->
-				truncatedString = str
-				truncatedString.substr(0, n-1).trim() + "&hellip;"
-
-			# Flo: turn this into variables with sensible names
-			a = 26
-			b = 34
-
-			if @shareInfo.twitter and @shareInfo.title.length > 26
-				@shareInfo.title = truncate(@shareInfo.title, 26)
-			else if @shareInfo.title.length > 34
-				@shareInfo.title = truncate(@shareInfo.title, 34)
+			if @shareInfo.twitter and @shareInfo.title.length > maxLengthWithAvatar
+				@shareInfo.title = truncate(@shareInfo.title, maxLengthWithAvatar)
+			else if @shareInfo.title.length > maxLength
+				@shareInfo.title = truncate(@shareInfo.title, maxLength)
 
 	# Render main sheet
 	_renderSheet: ->
@@ -261,7 +258,7 @@ class ShareComponent
 			height: 16
 
 		# If we miss a title from the json metadata, we fallback to the document url
-		fallbackTitle = _.replace(FramerStudioInfo.documentTitle, /\.framer$/, '')
+		fallbackTitle = _.replace(FramerStudioInfo.documentTitle, /\.framer$/, "")
 
 		@credentialsTitle = new ShareLayer
 			parent: @credentials
@@ -319,7 +316,7 @@ class ShareComponent
 			showAuthor("<a href='http://twitter.com/#{@shareInfo.twitter}' style='text-decoration: none; -webkit-user-select: auto;' target='_blank'>#{name}</a>")
 
 		# If there's no twitter handle, show plain author name
-		if @shareInfo.author and !@shareInfo.twitter
+		if @shareInfo.author and not @shareInfo.twitter
 			showAuthor(@shareInfo.author)
 
 	_renderDate: ->
@@ -341,7 +338,7 @@ class ShareComponent
 				letterSpacing: ".2px"
 
 	_enableUserSelect: (layer) ->
-		layer.html = "" unless layer.html 
+		layer.html = "" unless layer.html
 		layer._elementHTML.style["-webkit-user-select"] = "auto"
 		layer._elementHTML.style["cursor"] = "auto"
 
@@ -354,8 +351,6 @@ class ShareComponent
 			lineBreakRegex = /(?:\r\n|\r|\n)/g
 
 			urlified = text.replace urlRegex, (url) ->
-
-				# Flo: try to use not/unless instead of !
 				href = url
 				href = "//#{url}" if not httpRegex.test(url)
 				return "<a href='#{href}' style='-webkit-user-select: auto' target='_blank'>#{url}</a>"
@@ -395,8 +390,6 @@ class ShareComponent
 			@_calculateAvailableSpace()
 			@_enableUserSelect(@description)
 
-
-
 		# Truncate if description is too long
 		if @shareInfo.description.length > @options.maxDescriptionLength
 
@@ -424,8 +417,12 @@ class ShareComponent
 
 	_renderButtons: ->
 
-		# Flo: too complex; simplify
-		verticalPosition = if @date then @date.maxY else (if @descripion then @description.maxY else @credentials.maxY)
+		if @date
+			verticalPosition = @date.maxY
+		else if @descripion
+			verticalPosition = @descripion.maxY
+		else
+			verticalPosition = @credentials.maxY
 
 		@buttons = new ShareLayer
 			height: 33
@@ -497,15 +494,12 @@ class ShareComponent
 
 	_openIfEnoughSpace: =>
 		# Open or close sheet based on available space
-		if @availableSpace < @threshold and !@options.fixed
+		if @availableSpace < @threshold and not @options.fixed
 			@_closeSheet()
 		else
 			@_openSheet()
 
 	_calculateAvailableSpace: =>
-
-		# Flo can any of the numbers below (20, 95) be turned into variables with sensible names?
-
 		device = Framer.Device
 		@threshold = @options.minAvailableSpaceFullScreen
 		@availableSpace = Canvas.width
@@ -517,7 +511,7 @@ class ShareComponent
 			@availableSpace = Screen.canvasFrame.x
 
 		# If verticalSpace is less then sheet height, make sheet scrollable
-		canvasHeight = Canvas.height - 20
+		canvasHeight = Canvas.height - @options.padding
 
 		if @description and canvasHeight < @sheet.maxHeight and canvasHeight > @sheet.minHeight
 			@sheet.height = canvasHeight
@@ -536,8 +530,8 @@ class ShareComponent
 			@description.style.overflow = "scroll"
 
 			if @shareInfo.openInFramerURL
-				@date.y = @description.maxY + 20
-				@buttons.y = @date.maxY + 20
+				@date.y = @description.maxY + @options.padding
+				@buttons.y = @date.maxY + @options.padding
 
 		if @description and canvasHeight > @sheet.maxHeight
 			@sheet.height = @sheet.maxHeight
@@ -554,7 +548,7 @@ class ShareComponent
 		@close.onClick =>
 			@_closeSheet()
 			@options.fixed = true
-			localStorage.setItem("framerShareSheetState-#{@options.id}", 'closed') # Flo: ' "
+			localStorage.setItem("framerShareSheetState-#{@options.id}", "closed")
 
 		# Disable events propagating up to block unintented interactions
 		@sheet.onTouchStart (event) -> event.stopPropagation()
@@ -565,7 +559,7 @@ class ShareComponent
 			event.stopPropagation()
 			@_openSheet()
 			@options.fixed = true
-			localStorage.setItem("framerShareSheetState-#{@options.id}", 'open') # Ahem
+			localStorage.setItem("framerShareSheetState-#{@options.id}", "open")
 
 		# When the window resizes evaluate if the sheet needs to be hidden
 		Canvas.onResize =>
