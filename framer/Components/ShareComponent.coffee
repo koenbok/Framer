@@ -499,7 +499,11 @@ class ShareComponent
 		else
 			@_openSheet()
 
-	_calculateAvailableSpace: =>
+	_calculateAvailableSpace: _.debounce ->
+		@__calculateAvailableSpace()
+	, 100, {maxWait: 100}
+
+	__calculateAvailableSpace: =>
 		device = Framer.Device
 		@threshold = @options.minAvailableSpaceFullScreen
 		@availableSpace = Canvas.width
