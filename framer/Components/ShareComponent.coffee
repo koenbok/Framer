@@ -486,7 +486,7 @@ class ShareComponent
 			if @shareInfo.twitter
 				tweet += "A prototype by @#{@shareInfo.twitter}. Design without limitations in @framerjs — "
 			else if @shareInfo.author
-				tweet += "A prototype by @#{@shareInfo.author}. Design without limitations in @framerjs — "
+				tweet += "A prototype by #{@shareInfo.author}. Design without limitations in @framerjs — "
 			else
 				tweet += "A @framerjs prototype by @#{@shareInfo.author}. Design without limitations — "
 
