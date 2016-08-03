@@ -143,6 +143,7 @@ class exports.Context extends BaseClass
 		@_timers.push(timer)
 
 	removeTimer: (timer) ->
+		window.clearTimeout(timer)
 		@_timers = _.without(@_timers, timer)
 
 	resetTimers: ->
