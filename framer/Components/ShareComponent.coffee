@@ -404,6 +404,7 @@ class ShareComponent
 		)
 
 		showFullDescription = =>
+			@options.truncatedDescription = false
 			@description.height = @descriptionSize.height
 			@description.html = parseDescription(@shareInfo.description)
 
@@ -417,6 +418,7 @@ class ShareComponent
 
 		# Truncate if description is too long
 		if @shareInfo.description.length > @options.maxDescriptionLength
+			@options.truncatedDescription = true
 			@options.shortDescription = _.truncate(@shareInfo.description, {"length": @options.maxDescriptionLength, "separator": " "})
 
 			@descriptionTruncatedSize = Utils.textSize(
@@ -562,7 +564,19 @@ class ShareComponent
 
 		if @description and canvasHeight > @sheet.maxHeight
 			@sheet.height = @sheet.maxHeight
+
+			if @options.truncatedDescription
+ 				@description.height = @descriptionTruncatedSize.height
+			else
+				@description.height = @descriptionSize.height
+
 			@description.style.overflow = "visible"
+
+			if @shareInfo.openInFramerURL
+				@date.y = @description.maxY + 14
+				@buttons.y = @date.maxY + 14
+
+
 
 	_startListening: ->
 		@_calculateAvailableSpace()
