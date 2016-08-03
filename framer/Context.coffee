@@ -31,7 +31,11 @@ these at any time.
 
 ###
 
+Contexts = []
+
 class exports.Context extends BaseClass
+
+	@all = -> return _.clone(Contexts)
 
 	@define "parent",
 		get: -> @_parent
@@ -62,6 +66,8 @@ class exports.Context extends BaseClass
 		else
 			@index = @id
 
+		Contexts.push(@)
+
 	reset: ->
 
 		@_createDOMEventManager()
@@ -77,6 +83,7 @@ class exports.Context extends BaseClass
 	destroy: ->
 		@reset()
 		@_destroyRootElement()
+		_.remove(Contexts, @)
 
 	##############################################################
 	# Collections
