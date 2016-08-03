@@ -135,23 +135,18 @@ class ShareComponent
 
 		@_startListening()
 
-	_truncateCredential: (str, words) ->
+	_truncateCredential: (str) ->
 		maxLength = 36
 		maxLengthWithAvatar = 25
 
 		str = _.escape(str)
 
-		if words
-			separator = " "
-		else
-			separator = ""
-
 		# If an avatar is shown
 		if @shareInfo.twitter isnt undefined and str.length > maxLengthWithAvatar
-			str = _.truncate(str, {"length": maxLengthWithAvatar, "separator": separator})
+			str = _.truncate(str, {"length": maxLengthWithAvatar})
 
 		else if str.length > maxLength
-			str = _.truncate(str, {"length": maxLength, "separator": separator})
+			str = _.truncate(str, {"length": maxLength})
 
 		return str
 
@@ -163,7 +158,7 @@ class ShareComponent
 
 		# Truncate title if too long
 		if @shareInfo.title
-			@shareInfo.title = @_truncateCredential(@shareInfo.title, true)
+			@shareInfo.title = @_truncateCredential(@shareInfo.title)
 
 	# Render main sheet
 	_renderSheet: ->
@@ -418,8 +413,7 @@ class ShareComponent
 
 		# Truncate if description is too long
 		if @shareInfo.description.length > @options.maxDescriptionLength
-			truncated = @shareInfo.description.substring(@options.maxDescriptionLength,length).trim()
-			@options.shortDescription = truncated + "…"
+			@options.shortDescription = _.truncate(@shareInfo.description, {"length": @options.maxDescriptionLength, "separator": " "})
 
 			@descriptionTruncatedSize = Utils.textSize(
 				parseDescription(@options.shortDescription),
