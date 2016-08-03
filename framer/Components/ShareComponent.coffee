@@ -138,17 +138,20 @@ class ShareComponent
 		@_startListening()
 
 	_truncateCredential: (str, title) ->
-		maxLength = 36
-		maxLengthWithAvatar = 25
-		maxLengthWithAvatar = 34 if title
+		maxLength = 33
+		maxLength = 35 if title
+		maxLengthWithAvatar = 27
+		maxLengthWithAvatar = 28 if title
 
 		str = _.escape(str)
 
 		# If an avatar is shown
-		if @shareInfo.twitter isnt undefined and str.length > maxLengthWithAvatar
+		if @shareInfo.twitter and str.length > maxLengthWithAvatar
+			print 'hallo'
 			str = _.truncate(str, {"length": maxLengthWithAvatar})
 
 		else if str.length > maxLength
+			print 'DOEI'
 			str = _.truncate(str, {"length": maxLength})
 
 		return str
@@ -157,7 +160,7 @@ class ShareComponent
 
 		# Remove leading @ from the Twitter handle
 		if _.startsWith(@shareInfo.twitter, "@")
-			@shareInfo.twitter[1..]
+			@shareInfo.twitter = _.trimStart(@shareInfo.twitter, "@")
 
 		# Truncate title if too long
 		if @shareInfo.title
@@ -286,6 +289,7 @@ class ShareComponent
 			html: @shareInfo.title or fallbackTitle
 			style:
 				fontWeight: "500"
+				overflow: "hidden"
 
 		@_enableUserSelect(@credentialsTitle)
 		@credentialsTitle.width = @credentials - 50 if @shareInfo.twitter
@@ -302,6 +306,7 @@ class ShareComponent
 				height: 18
 				style:
 					color: "#808080"
+					overflow: "hidden"
 
 			@_enableUserSelect(@credentialsAuthor)
 			@credentialsAuthor.width = @credentials - 50 if @shareInfo.twitter
@@ -335,11 +340,13 @@ class ShareComponent
 			name = if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}"
 			name = @_truncateCredential(name)
 
+			print name
+
 			showAuthor("<a href='http://twitter.com/#{@shareInfo.twitter}' style='text-decoration: none; -webkit-user-select: auto;' target='_blank'>#{name}</a>")
 
 		# If there's no twitter handle, show plain author name
 		if @shareInfo.author and not @shareInfo.twitter
-			showAuthor(@shareInfo.author)
+			showAuthor(@_truncateCredential(@shareInfo.author))
 
 	_renderDate: ->
 
