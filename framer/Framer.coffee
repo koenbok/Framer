@@ -61,9 +61,11 @@ Defaults = (require "./Defaults").Defaults
 Defaults.setup()
 Framer.resetDefaults = Defaults.reset
 
-# Create the default context
+# Create the default context, set it to invisble by default so
+# the preloader can pick it up if it needs to.
 Framer.DefaultContext = new Framer.Context(name:"Default")
 Framer.DefaultContext.backgroundColor = "white"
+Framer.DefaultContext.visible = false
 Framer.CurrentContext = Framer.DefaultContext
 
 window.Canvas = new (require "./Canvas").Canvas
@@ -74,10 +76,10 @@ Framer.Extras.ErrorDisplay.enable() if not Utils.isFramerStudio()
 Framer.Extras.Preloader.enable() if not Utils.isFramerStudio()
 Framer.Extras.Hints.enable() if not Utils.isFramerStudio()
 
-startAfterPreloader = ->
-	Utils.domComplete(Framer.Loop.start)
+# If there is no preloader around, we show the default context
+# This _won't_ avoid a flickr of the device if you use the preloader
+# from your code directly, unfortunately. But at this point, that is an
+# action in the future, so we can't know wether that will happen or not.
+Framer.DefaultContext.visible = true unless Framer.Preloader
 
-if Framer.Preloader?
-	Framer.Preloader.once("end", startAfterPreloader)
-else
-	startAfterPreloader()
+Utils.domComplete(Framer.Loop.start)

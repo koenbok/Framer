@@ -93,6 +93,13 @@ class exports.Context extends BaseClass
 	@define "layerCounter", get: -> @_layerCounter
 	@define "rootLayers", get: -> _.filter @_layers, (layer) -> layer.parent is null
 
+	@define "visible",
+		get: -> @_visible or true
+		set: (value) ->
+			return if value is @_visible
+			@_element?.style.visibility = if value then "visible" else "hidden"
+			@_visible = value
+
 	addLayer: (layer) ->
 		return if layer in @_layers
 		@_layerCounter++

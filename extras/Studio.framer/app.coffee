@@ -1,13 +1,7 @@
-Framer.Info =
-	title: "Bolt Inbox"
-	author: "Floris Verloop"
-	twitter: "fverloop"
+# Framer.Extras.Preloader.enable()
 
-Framer.Extras.ShareInfo.enable()
-Framer.Extras.Hints.enable()
+grid = new GridComponent
+	size: Screen
 
-
-layer = new Layer
-	point: Align.center
-
-layer.onClick ->
+grid.renderCell = (layer) ->
+	layer.image = Utils.randomImage(layer) + "?cache=#{Date.now()}"
