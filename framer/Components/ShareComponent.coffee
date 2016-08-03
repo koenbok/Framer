@@ -360,13 +360,16 @@ class ShareComponent
 			urlRegex = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi
 			httpRegex = /^((http|https):\/\/)/
 			lineBreakRegex = /(?:\r\n|\r|\n)/g
+			removeAllTagsExceptBreaks = /<(?!br\s*\/?)[^>]+>/g
+
+			text = _.escape(text)
+			text = _.trimEnd(text)
+			text = text.replace(lineBreakRegex, "<br>")
 
 			urlified = text.replace urlRegex, (url) ->
 				href = url
 				href = "//#{url}" if not httpRegex.test(url)
 				return "<a href='#{href}' style='-webkit-user-select: auto' target='_blank'>#{url}</a>"
-
-			urlified.replace(lineBreakRegex, "<br />")
 
 		@description = new ShareLayer
 			parent: @info
