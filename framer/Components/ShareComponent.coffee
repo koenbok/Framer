@@ -352,7 +352,7 @@ class ShareComponent
 		@date = new ShareLayer
 			parent: @info
 			height: 10
-			y: verticalPosition + 16
+			y: verticalPosition + 12
 			html: "Shared on #{date.getDate()} #{months[date.getMonth()]} #{date.getFullYear()}"
 			style:
 				textTransform: "uppercase"
