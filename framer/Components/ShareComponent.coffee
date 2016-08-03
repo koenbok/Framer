@@ -135,9 +135,10 @@ class ShareComponent
 
 		@_startListening()
 
-	_truncateCredential: (str) ->
+	_truncateCredential: (str, title) ->
 		maxLength = 36
 		maxLengthWithAvatar = 25
+		maxLengthWithAvatar = 34 if title
 
 		str = _.escape(str)
 
@@ -158,7 +159,7 @@ class ShareComponent
 
 		# Truncate title if too long
 		if @shareInfo.title
-			@shareInfo.title = @_truncateCredential(@shareInfo.title)
+			@shareInfo.title = @_truncateCredential(@shareInfo.title, true)
 
 	# Render main sheet
 	_renderSheet: ->
