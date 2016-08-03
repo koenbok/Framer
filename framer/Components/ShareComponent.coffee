@@ -137,24 +137,21 @@ class ShareComponent
 
 		@_startListening()
 
-	_truncateCredential: (str, title) ->
-		maxLength = 33
-		maxLength = 35 if title
-		maxLengthWithAvatar = 27
-		maxLengthWithAvatar = 28 if title
+	_truncateCredential: (str) ->
+		maxLength = 32
+		maxLengthWithAvatar = 26
 
 		str = _.escape(str)
 
 		# If an avatar is shown
 		if @shareInfo.twitter and str.length > maxLengthWithAvatar
-			print 'hallo'
 			str = _.truncate(str, {"length": maxLengthWithAvatar})
 
 		else if str.length > maxLength
-			print 'DOEI'
 			str = _.truncate(str, {"length": maxLength})
 
 		return str
+
 
 	_checkData: ->
 
@@ -164,7 +161,7 @@ class ShareComponent
 
 		# Truncate title if too long
 		if @shareInfo.title
-			@shareInfo.title = @_truncateCredential(@shareInfo.title, true)
+			@shareInfo.title = @_truncateCredential(@shareInfo.title)
 
 	# Render main sheet
 	_renderSheet: ->
@@ -215,8 +212,8 @@ class ShareComponent
 		@close = new Layer
 			parent: @cta
 			ignoreEvents: false
-			size: 12
-			point: 12
+			size: 9
+			point: 8
 			backgroundColor: null
 			style:
 				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAZdJREFUSA2tlt9OgzAUh6UkRrLMCfgnwWwPoXcmBk32Crvfo+1+76A3Jt4SX8Bk8VYBkagJAc+P7CyMUWiHvYCepv2+0p42GNPpdFQUxdV4PH5eLBY/B/9QZrPZYRiGN6ZpvgjAiXm+Wq3u5/P5UV8+4FEU3RH3Isuya4GZU/BpGMZxXwnD8zy3ifflOM6TGQRB5vv+WxzHHiR4I0a7ztfU4bZtPyyXy28TkL4SGRzsUtBH0gbfEuwj6YLvCHQkKvBGgYpEFQ6WgYes4FwgdZFdSOXJZPKYpmmOPOdU5GyRMVoFGFSVEDQRQuTUPEKed8ExfpNFCJoKpzDN+pLgQ+qD057SISrzvGlMtU1UA1kdy7KeedkF9cFgUMj6V9s7v4A3lPbghAamBP+lpRqqnvhWAcN5Q7Esruu+6lwrUkEdzhvKe6IqaRTI4Ly2OpIdQRdcV7IlUIXrSDYCXbiqpBTsC1eRGH3hLMG7eq3w3WV6nndLwanq3VIF1uv17EqS5Ezg14I6fnCe1wfpxvj1wa1LE363LCv4A+knGKYRZVX+AAAAAElFTkSuQmCC')"
@@ -306,7 +303,6 @@ class ShareComponent
 				height: 18
 				style:
 					color: "#808080"
-					overflow: "hidden"
 
 			@_enableUserSelect(@credentialsAuthor)
 			@credentialsAuthor.width = @credentials - 50 if @shareInfo.twitter
@@ -339,8 +335,6 @@ class ShareComponent
 			# If author name isn't available, fallback to Twitter handle
 			name = if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}"
 			name = @_truncateCredential(name)
-
-			print name
 
 			showAuthor("<a href='http://twitter.com/#{@shareInfo.twitter}' style='text-decoration: none; -webkit-user-select: auto;' target='_blank'>#{name}</a>")
 
