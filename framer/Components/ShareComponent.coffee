@@ -135,10 +135,27 @@ class ShareComponent
 
 		@_startListening()
 
+	_truncateCredential: (str, words) ->
+		maxLength = 36
+		maxLengthWithAvatar = 25
+
+		str = _.escape(str)
+
+		if words
+			separator = " "
+		else
+			separator = ""
+
+		# If an avatar is shown
+		if @shareInfo.twitter isnt undefined and str.length > maxLengthWithAvatar
+			str = _.truncate(str, {"length": maxLengthWithAvatar, "separator": separator})
+
+		else if str.length > maxLength
+			str = _.truncate(str, {"length": maxLength, "separator": separator})
+
+		return str
+
 	_checkData: ->
-		truncate = (str, n) ->
-			truncatedString = str
-			truncatedString.substr(0, n-1).trim() + "&hellip;"
 
 		# Remove leading @ from the Twitter handle
 		if _.startsWith(@shareInfo.twitter, "@")
@@ -146,13 +163,7 @@ class ShareComponent
 
 		# Truncate title if too long
 		if @shareInfo.title
-			maxLengthWithAvatar = 26
-			maxLength = 34
-
-			if @shareInfo.twitter and @shareInfo.title.length > maxLengthWithAvatar
-				@shareInfo.title = truncate(@shareInfo.title, maxLengthWithAvatar)
-			else if @shareInfo.title.length > maxLength
-				@shareInfo.title = truncate(@shareInfo.title, maxLength)
+			@shareInfo.title = @_truncateCredential(@shareInfo.title, true)
 
 	# Render main sheet
 	_renderSheet: ->
@@ -324,6 +335,8 @@ class ShareComponent
 
 			# If author name isn't available, fallback to Twitter handle
 			name = if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}"
+			name = @_truncateCredential(name)
+
 			showAuthor("<a href='http://twitter.com/#{@shareInfo.twitter}' style='text-decoration: none; -webkit-user-select: auto;' target='_blank'>#{name}</a>")
 
 		# If there's no twitter handle, show plain author name
@@ -392,7 +405,6 @@ class ShareComponent
 		)
 
 		showFullDescription = =>
-			@options.truncated = false
 			@description.height = @descriptionSize.height
 			@description.html = parseDescription(@shareInfo.description)
 
@@ -406,9 +418,6 @@ class ShareComponent
 
 		# Truncate if description is too long
 		if @shareInfo.description.length > @options.maxDescriptionLength
-
-			@options.truncated = true
-
 			truncated = @shareInfo.description.substring(@options.maxDescriptionLength,length).trim()
 			@options.shortDescription = truncated + "…"
 
