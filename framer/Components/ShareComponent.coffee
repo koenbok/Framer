@@ -84,7 +84,9 @@ class Button extends ShareLayer
 # Share component
 class ShareComponent
 
-	constructor: (@shareInfo) ->
+	constructor: (shareInfo) ->
+
+		@shareInfo = _.clone(shareInfo)
 
 		# Get the project id from the url
 		projectId = window.location.pathname.replace(/\//g, "")

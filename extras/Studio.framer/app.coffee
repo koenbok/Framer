@@ -1,11 +1,13 @@
-Framer.Extras.Preloader.enable()
-Framer.Extras.Hints.enable()
+Framer.Info =
+	title: "Hallo ik ben een gore flo dddddddddssssss"
+	description: "<ul>"
+	author: "Floris Verloop"
+	twitter: ""
+
+
+
+print Framer.Info
+
 Framer.Extras.ShareInfo.enable()
 
-
-for i in [0..10]
-	layer = new Layer
-		y: i * 210
-	
-	layer.image = Utils.randomImage() + "?cache=" + Date.now()
-	layer.onClick ->
+print Framer.Info
