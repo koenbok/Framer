@@ -14,9 +14,11 @@ class Hints
 				Events.wrap(document).addEventListener("mouseup", @_handleUp, capture=true)
 
 	_handleDown: (event) =>
+		return if @_isPreloading()
 		@_target = event.target
 
 	_handleUp: (event) =>
+		return if @_isPreloading()
 
 		# See what layer we actually tapped
 		layer = Framer.CurrentContext.layerForElement(@_target)
@@ -26,6 +28,9 @@ class Hints
 			return
 
 		@showHints()
+
+	_isPreloading: ->
+		return Framer.Preloader?.isLoading is true
 
 	showHints: ->
 		context = Framer.CurrentContext

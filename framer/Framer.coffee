@@ -74,7 +74,10 @@ Framer.Extras.ErrorDisplay.enable() if not Utils.isFramerStudio()
 Framer.Extras.Preloader.enable() if not Utils.isFramerStudio()
 Framer.Extras.Hints.enable() if not Utils.isFramerStudio()
 
-if Framer.Preloader?
-	Framer.Preloader.once("end", Framer.Loop.start)
-else
+startAfterPreloader = ->
 	Utils.domComplete(Framer.Loop.start)
+
+if Framer.Preloader?
+	Framer.Preloader.once("end", startAfterPreloader)
+else
+	startAfterPreloader()
