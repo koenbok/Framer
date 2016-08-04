@@ -139,7 +139,7 @@ class ShareComponent
 
 	_truncateCredential: (str) ->
 		maxLength = 32
-		maxLengthWithAvatar = 25
+		maxLengthWithAvatar = 23
 
 		str = _.escape(str)
 
