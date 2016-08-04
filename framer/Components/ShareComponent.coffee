@@ -139,7 +139,7 @@ class ShareComponent
 
 	_truncateCredential: (str) ->
 		maxLength = 32
-		maxLengthWithAvatar = 26
+		maxLengthWithAvatar = 25
 
 		str = _.escape(str)
 
@@ -270,7 +270,7 @@ class ShareComponent
 		@info = new ShareLayer
 			parent: @sheet
 			width: @sheet.width - (@options.padding * 2)
-			y: @cta.maxY + 22
+			y: @cta.maxY + 20
 			x: 20
 
 		@credentials = new ShareLayer
@@ -287,6 +287,8 @@ class ShareComponent
 			style:
 				fontWeight: "500"
 				overflow: "hidden"
+				whiteSpace: "nowrap"
+				lineHeight: "1.3"
 
 		@_enableUserSelect(@credentialsTitle)
 		@credentialsTitle.width = @credentials - 50 if @shareInfo.twitter
@@ -294,7 +296,7 @@ class ShareComponent
 		# Check what info is available and render layers accordingly
 		showAuthor = (content = @shareInfo.author) =>
 			@credentials.height = 40
-			@credentialsTitle.y = 4
+			@credentialsTitle.y = 3
 
 			@credentialsAuthor = new ShareLayer
 				parent: @credentials
@@ -303,6 +305,9 @@ class ShareComponent
 				height: 18
 				style:
 					color: "#808080"
+					overflow: "hidden"
+					whiteSpace: "nowrap"
+					lineHeight: "1.3"
 
 			@_enableUserSelect(@credentialsAuthor)
 			@credentialsAuthor.width = @credentials - 50 if @shareInfo.twitter
@@ -337,6 +342,9 @@ class ShareComponent
 			name = @_truncateCredential(name)
 
 			showAuthor("<a href='http://twitter.com/#{@shareInfo.twitter}' style='text-decoration: none; -webkit-user-select: auto;' target='_blank'>#{name}</a>")
+
+			@credentialsTitle.width = 155
+			@credentialsAuthor?.width = 155
 
 		# If there's no twitter handle, show plain author name
 		if @shareInfo.author and not @shareInfo.twitter
