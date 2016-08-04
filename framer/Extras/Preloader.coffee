@@ -147,11 +147,13 @@ class Preloader extends BaseClass
 		@progressIndicator.setProgress(@progress, false)
 
 		@brand = new Layer
-			width: 96
-			height: 96
-			point: Align.center
+			size: 96
 			parent: @cover
 			backgroundColor: null
+		
+		if not Utils.isFramerStudio()
+			@brand.style =
+				backgroundSize: "50%"
 
 		# We display it a tad larger on mobile
 		if Utils.isMobile()
@@ -169,7 +171,8 @@ class Preloader extends BaseClass
 		do layout = =>
 			@cover.frame = Canvas
 			@progressIndicator.point = Align.center
-			@brand.point = Align.center
+			@brand.x = Align.center
+			@brand.y = Align.center(2)
 
 		Canvas.onResize(layout)
 

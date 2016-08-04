@@ -1,4 +1,4 @@
-Framer.Extras.Hints.disable()
+# Framer.Extras.Hints.disable()
 
 Framer.Info =
 	title: ""
@@ -12,6 +12,6 @@ grid = new GridComponent
 	size: Screen
 
 grid.renderCell = (layer) ->
-	layer.image = Utils.randomImage(layer)
+	layer.image = Utils.randomImage(layer) + "cache=#{Date.now()}"
 	
 	layer.onTap ->
