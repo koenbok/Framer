@@ -75,7 +75,7 @@ class Button extends ShareLayer
 		@onMouseOut ->
 			@states.switch("full")
 
-		@onClick ->
+		@onTap ->
 			if options.shareButton
 				window.open(options.url, "Share", "width=560,height=714")
 			else
@@ -409,8 +409,8 @@ class ShareComponent
 			@description.html = parseDescription(@shareInfo.description)
 
 			if @shareInfo.openInFramerURL
-				@date?.y = @description.maxY + 16
-				@buttons.y = (if @date then @date else @description).maxY + 16
+				@date?.y = @description.maxY + 12
+				@buttons.y = (if @date then @date else @description).maxY + 18
 
 			@_updateHeight()
 			@_calculateAvailableSpace()
@@ -559,8 +559,8 @@ class ShareComponent
 			@description.style.overflow = "scroll"
 
 			if @shareInfo.openInFramerURL
-				@date.y = @description.maxY + @options.padding
-				@buttons.y = @date.maxY + @options.padding
+				@date.y = @description.maxY + 12
+				@buttons.y = @date.maxY + 18
 
 		if @description and canvasHeight > @sheet.maxHeight
 			@sheet.height = @sheet.maxHeight
@@ -573,9 +573,8 @@ class ShareComponent
 			@description.style.overflow = "visible"
 
 			if @shareInfo.openInFramerURL
-				@date.y = @description.maxY + 14
-				@buttons.y = @date.maxY + 14
-
+				@date.y = @description.maxY + 12
+				@buttons.y = @date.maxY + 18
 
 
 	_startListening: ->
