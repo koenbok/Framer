@@ -1,7 +1,9 @@
-# Framer.Extras.Preloader.enable()
+Screen.backgroundColor = "black"
 
-grid = new GridComponent
-	size: Screen
+Framer.Extras.Preloader.enable()
 
-grid.renderCell = (layer) ->
-	layer.image = Utils.randomImage(layer) + "?cache=#{Date.now()}"
+# grid = new GridComponent
+# 	size: Screen
+# 
+# grid.renderCell = (layer) ->
+# 	layer.image = Utils.randomImage(layer) #+ "?cache=#{Date.now()}"

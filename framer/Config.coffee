@@ -3,7 +3,6 @@ Utils = require "./Utils"
 FramerCSS = """
 body {
 	margin: 0;
-	background-color: white;
 }
 
 .framerContext {
