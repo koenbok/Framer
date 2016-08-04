@@ -10,12 +10,13 @@ class DOMEventManagerElement extends EventEmitter
 	constructor: (@element) ->
 
 	addListener: (eventName, listener, capture=false) ->
+		listener.capture = capture # Make sure we store capture too
 		super(eventName, listener)
 		@element.addEventListener(eventName, listener, capture)
 
 	removeListener: (eventName, listener, capture=false) ->
 		super(eventName, listener)
-		@element.removeEventListener(eventName, listener, capture)
+		@element.removeEventListener(eventName, listener, listener.capture)
 
 	# Keep the DOM API working
 	addEventListener: @::addListener

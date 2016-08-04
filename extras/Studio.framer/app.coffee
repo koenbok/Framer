@@ -1,19 +1,17 @@
-# Project Info
-# This info is presented in a widget when you share.
-# http://framerjs.com/docs/#info.info
+Framer.Extras.Hints.disable()
 
 Framer.Info =
-	title: "Test Prototype"
-	author: "Floris Verloop"
-	twitter: "fverloop"
-	description: "I wonder if we should make Framer.Extras.Preloader.enable() a public feature then, ‘cause people will pretty much never be able to make that preloader show? I wonder if we should make Framer.Extras.Preloader.enable() a public feature then, ‘cause people will pretty much never be able to make that preloader show?"
+	title: ""
+	author: "Koen Bok"
+	twitter: ""
+	description: ""
 
-Screen.backgroundColor = "black"
-
-Framer.Extras.Preloader.enable()
+# Framer.Extras.Preloader.enable()
 
 grid = new GridComponent
 	size: Screen
 
 grid.renderCell = (layer) ->
-	layer.image = Utils.randomImage(layer) #+ "?cache=#{Date.now()}"
+	layer.image = Utils.randomImage(layer)
+	
+	layer.onTap ->
