@@ -6,7 +6,7 @@
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
 
 # Thumbnails
 ._*
@@ -23,12 +23,21 @@ Temporary Items
 .apdisk
 
 # Framer specific
-.temp.html
+.*.html
 framer/*.old.*
 framer/backup.coffee
 framer/backups
 framer/backups/*
 framer/.*.hash
-framer/framer.generated.js
-framer/framer.modules.js
+framer/manifest.txt
+framer/metadata.json
+framer/preview.png
+framer/social*.png
+
+app.js
 framer/images/*
+framer/framer*.js
+framer/framer*.js.map
+
+.preview.html
+.viewer.html

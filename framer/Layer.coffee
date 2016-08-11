@@ -33,10 +33,10 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 		set: (value) ->
 
-			# console.log "Layer.#{name}.set #{value} current:#{@[name]}"
+			# console.log "#{@constructor.name}.#{name}.set #{value} current:#{@[name]}"
 
-			if transformer
-				value = transformer(value)
+			# Convert the value
+			value = transformer(value, @, name) if transformer
 
 			# Return unless we get a new value
 			return if value is @_properties[name]
@@ -45,6 +45,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 				layerValueTypeError(name, value)
 
 			@_properties[name] = value
+
 			if cssProperty != null
 				@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
@@ -57,9 +58,29 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 	result = _.extend(result, options)
 
+layerPropertyPointTransformer = (value, layer, property) ->
+	if _.isFunction(value)
+		value = value(layer, property)
+
+	return value
+
+layerPropertyIgnore = (options, propertyName, properties) ->
+	return options unless options.hasOwnProperty(propertyName)
+
+	for p in properties
+		if options.hasOwnProperty(p)
+			delete options[propertyName]
+			return options
+
+	return options
+
 class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
+
+		# Make sure we never call the constructor twice
+		throw Error("Layer.constructor #{@toInspect()} called twice") if @__constructed
+		@__constructed = true
 
 		# Set needed private variables
 		@_properties = {}
@@ -74,25 +95,26 @@ class exports.Layer extends BaseClass
 		# Private setting for canceling of click event if wrapped in moved draggable
 		@_cancelClickEventInDragSession = true
 		@_cancelClickEventInDragSessionVelocity = 0.1
+		@_cancelClickEventInDragSessionOffset = 8
 
 		# We have to create the element before we set the defaults
 		@_createElement()
 
-		if options.hasOwnProperty "frame"
-			options = _.extend(options, options.frame)
+		# Sanitize calculated property setters so direct properties always win
+		layerPropertyIgnore(options, "point", ["x", "y"])
+		layerPropertyIgnore(options, "size", ["width", "height"])
+		layerPropertyIgnore(options, "frame", ["x", "y", "width", "height"])
 
-		options = Defaults.getDefaults "Layer", options
+		# Backwards compatibility for superLayer
+		if not options.hasOwnProperty("parent") and options.hasOwnProperty("superLayer")
+			options.parent = options.superLayer
+			delete options.superLayer
 
-		super options
+		super Defaults.getDefaults("Layer", options)
 
 		# Add this layer to the current context
 		@_context.addLayer(@)
-
 		@_id = @_context.layerCounter
-
-		# Backwards compatibility for superLayer
-		if not options.parent and options.hasOwnProperty("superLayer")
-			options.parent = options.superLayer
 
 		# Insert the layer into the dom or the parent element
 		if not options.parent
@@ -100,9 +122,15 @@ class exports.Layer extends BaseClass
 		else
 			@parent = options.parent
 
-		# If an index was set, we would like to use that one
+		# Set some calculated properties
+		# Make sure we set the right index
 		if options.hasOwnProperty("index")
 			@index = options.index
+
+		# x and y always win from point, frame or size
+		for p in ["x", "y", "width", "height"]
+			if options.hasOwnProperty(p)
+				@[p] = options[p]
 
 		@_context.emit("layer:create", @)
 
@@ -138,8 +166,10 @@ class exports.Layer extends BaseClass
 	@define "ignoreEvents", layerProperty(@, "ignoreEvents", "pointerEvents", true, _.isBoolean)
 
 	# Matrix properties
-	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber)
-	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber)
+	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber,
+		layerPropertyPointTransformer, {depends: ["width", "height"]})
+	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber,
+		layerPropertyPointTransformer, {depends: ["width", "height"]})
 	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber)
 
 	@define "scaleX", layerProperty(@, "scaleX", "webkitTransform", 1, _.isNumber)
@@ -208,12 +238,14 @@ class exports.Layer extends BaseClass
 	@define "name",
 		default: ""
 		get: ->
-			@_getPropertyValue "name"
+			name = @_getPropertyValue("name")
+			return name or ""
+
 		set: (value) ->
-			@_setPropertyValue "name", value
+			@_setPropertyValue("name", value)
 			# Set the name attribute of the dom element too
 			# See: https://github.com/koenbok/Framer/issues/63
-			@_element.setAttribute "name", value
+			@_element.setAttribute("name", value)
 
 	##############################################################
 	# Matrices
@@ -257,7 +289,7 @@ class exports.Layer extends BaseClass
 	# matrix of layer transforms with perspective applied
 	@define "matrix3d",
 		get: ->
-			parent = @superLayer or @context
+			parent = @parent or @context
 			ppm = Utils.perspectiveMatrix(parent)
 			return new Matrix()
 				.multiply(ppm)
@@ -294,28 +326,41 @@ class exports.Layer extends BaseClass
 	##############################################################
 	# Geometry
 
+	_setGeometryValues: (input, keys) ->
+
+		# If this is a number, we set everything to that number
+		if _.isNumber(input)
+			for k in keys
+				@[k] = input
+		else
+			# If there is nothing to work with we exit
+			return unless input
+
+			# Set every numeric value for eacht key
+			for k in keys
+				@[k] = input[k] if _.isNumber(input[k])
+
 	@define "point",
-		get: -> _.pick(@, ["x", "y"])
-		set: (point) ->
-			return if not point
-			point = {x: point, y: point} if _.isNumber(point)
-			for k in ["x", "y"]
-				@[k] = point[k] if point.hasOwnProperty(k)
+		importable: true
+		exportable: false
+		depends: ["width", "height", "size", "parent"]
+		get: -> Utils.point(@)
+		set: (input) ->
+			input = layerPropertyPointTransformer(input, @, "point")
+			@_setGeometryValues(input, ["x", "y"])
 
 	@define "size",
-		get: -> _.pick(@, ["width", "height"])
-		set: (size) ->
-			return if not size
-			size = {width: size, height: size} if _.isNumber(size)
-			for k in ["width", "height"]
-				@[k] = size[k] if size.hasOwnProperty(k)
+		importable: true
+		exportable: false
+		get: -> Utils.size(@)
+		set: (input) -> @_setGeometryValues(input, ["width", "height"])
 
 	@define "frame",
-		get: -> _.pick(@, ["x", "y", "width", "height"])
-		set: (frame) ->
-			return if not frame
-			for k in ["x", "y", "width", "height"]
-				@[k] = frame[k] if frame.hasOwnProperty(k)
+		importable: true
+		exportable: false
+		get: -> Utils.frame(@)
+		set: (input) -> @_setGeometryValues(input, ["x", "y", "width", "height"])
+
 
 	@define "minX",
 		importable: true
@@ -353,17 +398,14 @@ class exports.Layer extends BaseClass
 		get: -> Utils.frameGetMaxY @
 		set: (value) -> Utils.frameSetMaxY @, value
 
-	convertPointFromScreen: (point) ->
-		return Utils.convertPointFromContext(point, @, false)
-
-	convertPointFromCanvas: (point) ->
-		return Utils.convertPointFromContext(point, @, true)
-
-	convertPointToScreen: (point) ->
+	convertPointToScreen: (point) =>
 		return Utils.convertPointToContext(point, @, false)
 
-	convertPointToCanvas: (point) ->
+	convertPointToCanvas: (point) =>
 		return Utils.convertPointToContext(point, @, true)
+
+	convertPointToLayer: (point, layer) =>
+		return Utils.convertPoint(point, @, layer, true)
 
 	@define "canvasFrame",
 		importable: true
@@ -383,14 +425,17 @@ class exports.Layer extends BaseClass
 
 	contentFrame: ->
 		return {x:0, y:0, width:0, height:0} unless @children.length
-		Utils.frameMerge(_.pluck(@children, "frame"))
+		return Utils.frameMerge(_.map(@children, "frame"))
+
+	totalFrame: ->
+		return Utils.frameMerge(@frame, @contentFrame())
 
 	centerFrame: ->
 		# Get the centered frame for its parent
 		if @parent
 			frame = @frame
-			Utils.frameSetMidX(frame, parseInt((@parent.width  / 2.0) - @superLayer.borderWidth))
-			Utils.frameSetMidY(frame, parseInt((@parent.height / 2.0) - @superLayer.borderWidth))
+			Utils.frameSetMidX(frame, parseInt((@parent.width  / 2.0) - @parent.borderWidth))
+			Utils.frameSetMidY(frame, parseInt((@parent.height / 2.0) - @parent.borderWidth))
 			return frame
 		else
 			frame = @frame
@@ -430,26 +475,30 @@ class exports.Layer extends BaseClass
 	# 		return @_parentOrContext().screenOriginY()
 	# 	return @originY
 
-	canvasScaleX: ->
-		scale = @scale * @scaleX
+	canvasScaleX: (self=true) ->
+		scale = 1
+		scale = @scale * @scaleX if self
 		for parent in @ancestors(context=true)
 			scale = scale * parent.scale * parent.scaleX
 		return scale
 
-	canvasScaleY: ->
-		scale = @scale * @scaleY
+	canvasScaleY: (self=true) ->
+		scale = 1
+		scale = @scale * @scaleY if self
 		for parent in @ancestors(context=true)
 			scale = scale * parent.scale * parent.scaleY
 		return scale
 
-	screenScaleX: ->
-		scale = @scale * @scaleX
+	screenScaleX: (self=true) ->
+		scale = 1
+		scale = @scale * @scaleX if self
 		for parent in @ancestors(context=false)
 			scale = scale * parent.scale * parent.scaleX
 		return scale
 
-	screenScaleY: ->
-		scale = @scale * @scaleY
+	screenScaleY: (self=true) ->
+		scale = 1
+		scale = @scale * @scaleY if self
 		for parent in @ancestors(context=false)
 			scale = scale * parent.scale * parent.scaleY
 		return scale
@@ -578,22 +627,27 @@ class exports.Layer extends BaseClass
 
 	copy: ->
 
-		# Todo: what about events, states, etc.
-
 		layer = @copySingle()
 
 		for child in @children
 			copiedChild = child.copy()
 			copiedChild.parent = layer
 
-		layer
+		return layer
 
 	copySingle: ->
 		copy = new @constructor(@props)
-		return copy
+		copy.style = @style
+		copy
 
 	##############################################################
 	## IMAGE
+
+	_cleanupImageLoader: ->
+		@_imageEventManager?.removeAllListeners()
+		@_imageEventManager = null
+		@_imageLoader = null
+
 
 	@define "image",
 		default: ""
@@ -609,16 +663,29 @@ class exports.Layer extends BaseClass
 			if currentValue == value
 				return @emit "load"
 
-			# Unset the background color only if it’s the default color 
+			# Unset the background color only if it’s the default color
 			defaults = Defaults.getDefaults "Layer", {}
 			if @backgroundColor?.isEqual(defaults.backgroundColor)
 				@backgroundColor = null
 
 			# Set the property value
 			@_setPropertyValue("image", value)
-
 			if value in [null, ""]
+				if @_imageLoader?
+					@_imageEventManager.removeAllListeners()
+					@_imageLoader.src = null
+
 				@style["background-image"] = null
+
+				if @_imageLoader?
+					@emit Events.ImageLoadCancelled, @_imageLoader
+					@_cleanupImageLoader()
+
+				return
+
+			# Show placeholder image on any browser that doesn't support inline pdf
+			if _.endsWith(value.toLowerCase?(), ".pdf") and (not Utils.isWebKit() or Utils.isChrome())
+				@style["background-image"] = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAVlJREFUaAXtlwEOwiAMRdF4Cr3/0fQaSre9ZFSYLCrQpSSG/FLW9v92agghXJdP3KZlCp/J2up+WiUuzMt6zNukzPDYvALCsKme1/maV8BnQHqw9/IZ6KmAz0BP9ontMwATPXafgR6s65g+A5qRlrhmBu6FhG6LXf9/+JU/YclROkVWEs/8r9FLrChb2apSqVqWZgKmtRKz9/f+CdPxoVl8CAWylcWKUQZGwfhjB3OOHcw5djDn2MH6fBNLC42yaEnyoTXB2V36+lPlz+zN9x6HKfxrZwZ/HUbf5/lJviMpoBPWBWWxFJCtLNqplItIWuvPffx5Dphz7GB9vonNv4X2zICWuMTM3p7Gv/b5iVLmFaiZgb3M/Ns/Ud68AvIGkJ6ir8xh8wrQrzAve9Jjo2PzCsC8z4Aw0WP5DPRgXcf07wHNSEvsM9CS7VIsn4ESMy3sPgMtWN6K8QKfubDo2UqVogAAAABJRU5ErkJggg==')"
 				return
 
 			imageUrl = value
@@ -632,18 +699,19 @@ class exports.Layer extends BaseClass
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
 
-			if @_domEventManager.listeners(Events.ImageLoaded) or @_domEventManager.listeners(Events.ImageLoadError)
-
-				loader = new Image()
-				loader.name = imageUrl
-				loader.src = imageUrl
-
-				loader.onload = =>
+			if @listeners(Events.ImageLoaded, true) or @listeners(Events.ImageLoadError, true) or @listeners(Events.ImageLoadCancelled, true)
+				@_imageLoader = new Image()
+				@_imageLoader.name = imageUrl
+				@_imageLoader.src = imageUrl
+				@_imageEventManager = @_context.domEventManager.wrap(@_imageLoader)
+				@_imageEventManager.addEventListener "load", =>
 					@style["background-image"] = "url('#{imageUrl}')"
-					@emit Events.ImageLoaded, loader
+					@emit Events.ImageLoaded, @_imageLoader
+					@_cleanupImageLoader()
 
-				loader.onerror = =>
-					@emit Events.ImageLoadError, loader
+				@_imageEventManager.addEventListener "error", =>
+					@emit Events.ImageLoadError, @_imageLoader
+					@_cleanupImageLoader()
 
 			else
 				@style["background-image"] = "url('#{imageUrl}')"
@@ -666,7 +734,7 @@ class exports.Layer extends BaseClass
 				throw Error "Layer.parent needs to be a Layer object"
 
 			# Cancel previous pending insertions
-			Utils.domCompleteCancel @__insertElement
+			Utils.domCompleteCancel(@__insertElement)
 
 			# Remove from previous parent children
 			if @_parent
@@ -759,6 +827,11 @@ class exports.Layer extends BaseClass
 
 		return parents
 
+	root: (context=false) ->
+		return @ if @parent is null
+		return _.last(@ancestors(context=context))
+
+
 	childrenAbove: (point, originX=0, originY=0) -> _.filter @children, (layer) ->
 		Utils.framePointForOrigin(layer.frame, originX, originY).y < point.y
 	childrenBelow: (point, originX=0, originY=0) -> _.filter @children, (layer) ->
@@ -811,20 +884,34 @@ class exports.Layer extends BaseClass
 	## ANIMATION
 
 	animate: (options) ->
+		# console.warn "Layer.animate is deprecated: please use Layer.animateTo instead"
+		properties = options.properties
+		delete options.properties
+		@animateTo(properties, options)
+
+	animateTo: (properties,options={}) ->
+		_.defaults(options, properties.options)
+		delete properties.options
+		options.properties = Animation.filterAnimatableProperties(properties)
+		options.layer = @
 
 		start = options.start
 		start ?= true
 		delete options.start
 
-		options.layer = @
+		if options.instant
+			options.animate = false
+		delete options.instant
+
 		animation = new Animation options
 		animation.start() if start
 		animation
 
 	animations: ->
+
 		# Current running animations on this layer
 		_.filter @_context.animations, (animation) =>
-			animation.options.layer == @
+			animation.options.layer is @
 
 	animatingProperties: ->
 
@@ -842,7 +929,7 @@ class exports.Layer extends BaseClass
 		get: -> @animations().length isnt 0
 
 	animateStop: ->
-		_.invoke(@animations(), "stop")
+		_.invokeMap(@animations(), "stop")
 		@_draggable?.animateStop()
 
 	##############################################################
@@ -933,14 +1020,27 @@ class exports.Layer extends BaseClass
 
 		# If this layer has a parent draggable view and its position moved
 		# while dragging we automatically cancel click events. This is what
-		# you expect when you add a button to a scroll content layer.
+		# you expect when you add a button to a scroll content layer. We only
+		# want to do this if this layer is not draggable itself because that
+		# would break nested ScrollComponents.
 
-		if @_cancelClickEventInDragSession
-			if eventName in [Events.Click,
-				Events.Tap, Events.TapStart, Events.TapEnd,
+		if @_cancelClickEventInDragSession and not @_draggable
+
+			if eventName in [
+				Events.Click, Events.Tap, Events.TapStart, Events.TapEnd,
 				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
-				if @_parentDraggableLayer()
-					velocity = @_parentDraggableLayer()?.draggable.velocity
+
+				parentDraggableLayer = @_parentDraggableLayer()
+
+				if parentDraggableLayer
+
+					# If we had a reasonable scrolling offset we cancel the click
+					offset = parentDraggableLayer.draggable.offset
+					return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
+					return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
+
+					# If there is still some velocity (scroll is moving) we cancel the click
+					velocity = parentDraggableLayer.draggable.velocity
 					return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
 					return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
 
@@ -1022,6 +1122,7 @@ class exports.Layer extends BaseClass
 
 	onImageLoaded: (cb) -> @on(Events.ImageLoaded, cb)
 	onImageLoadError: (cb) -> @on(Events.ImageLoadError, cb)
+	onImageLoadCancelled: (cb) -> @on(Events.ImageLoadCancelled, cb)
 
 	onMove: (cb) -> @on(Events.Move, cb)
 	onDragStart: (cb) -> @on(Events.DragStart, cb)
@@ -1101,16 +1202,121 @@ class exports.Layer extends BaseClass
 	onRotateStart:(cb) -> @on(Events.RotateStart, cb)
 	onRotateEnd:(cb) -> @on(Events.RotateEnd, cb)
 
+
+	##############################################################
+	## HINT
+
+	_showHint: (targetLayer) ->
+
+		# If this layer isnt visible we can just exit
+		return if not @visible
+		return if @opacity is 0
+
+		# If we don't need to show a hint exit but pass to children
+		unless @shouldShowHint(targetLayer)
+			layer._showHint(targetLayer) for layer in @children
+			return null
+
+		# Figure out the frame we want to show the hint in, if any of the
+		# parent layers clip, we need to intersect the rectangle with it.
+		frame = @canvasFrame
+
+		for parent in @ancestors(context=true)
+			if parent.clip
+				 frame = Utils.frameIntersection(frame, parent.canvasFrame)
+			if not frame
+				return
+
+		# Show the actual hint
+		@showHint(frame)
+
+		# Tell the children to show their hints
+		_.invokeMap(@children, "_showHint")
+
+	willSeemToDoSomething: ->
+
+		if @ignoreEvents
+			return false
+
+		if @_draggable
+			if @_draggable.isDragging is false and @_draggable.isMoving is false
+				return false
+
+		return true
+
+	shouldShowHint: ->
+
+		# Don't show hints if the layer is not interactive
+		if @ignoreEvents is true
+			return false
+
+		# Don't show any hints while we are animating
+		if @isAnimating
+			return false
+
+		for parent in @ancestors()
+			return false if parent.isAnimating
+
+		# Don't show hints if there is a draggable that cannot be dragged.
+		if @_draggable and @_draggable.horizontal is false and @_draggable.vertical is false
+			return false
+
+		# Don't show hint if this layer is invisible
+		return false if @opacity is 0
+
+		# See if this layer is visible and not covered by another layer
+		# We don't do this for now because, trying to figure this out will
+		# introduce another class of edge cases, and it is easier to understand
+		# the default logic than some magic logic written by me to try and figure
+		# out what is covered and what not.
+
+		# rootLayer = @root()
+
+		# rootLayers = _.filter @context.layers, (layer) ->
+		# 	return layer.parent is null and layer.index < rootLayer.index
+
+		# for layer in rootLayers
+		# 	if Utils.frameInFrame(@screenFrame, layer.totalFrame())
+		# 		return false
+
+		# If we don't ignore events on this layer, make sure the layer is listening to
+		# an interactive event so there is a decent change something is happening after
+		# we click it.
+
+		for eventName in @listenerEvents()
+			return true if Events.isInteractive(eventName)
+
+		return false
+
+	showHint: (highlightFrame) ->
+
+		# Don't show anything if this element covers the entire screen
+		# if Utils.frameInFrame(@context.canvasFrame, highlightFrame)
+		#	return
+
+		# Start an animation with a rectangle fading out over time
+		layer = new Layer
+			frame: Utils.frameInset(highlightFrame, -1)
+			backgroundColor: null
+			borderColor: new Color("9013FE").alpha(.8)
+			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
+			borderWidth: 3
+
+		animation = layer.animate
+			properties: {opacity: 0}
+			curve: "ease-out"
+			time: 0.5
+
+		animation.onAnimationEnd ->
+			layer.destroy()
+
 	##############################################################
 	## DESCRIPTOR
 
-	toInspect: ->
-
-		round = (value) ->
-			if parseInt(value) == value
-				return parseInt(value)
-			return Utils.round(value, 1)
-
-		if @name
-			return "<#{@constructor.name} id:#{@id} name:#{@name} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}>"
-		return "<#{@constructor.name} id:#{@id} (#{round(@x)},#{round(@y)}) #{round(@width)}x#{round(@height)}>"
+	toInspect: (constructor) ->
+		constructor ?= @constructor.name
+		name = if @name then "name:#{@name} " else ""
+		variablename = @__framerInstanceInfo?.name or ""
+		return "<#{constructor} #{variablename} id:#{@id} #{name}
+			(#{Utils.roundWhole(@x)},#{Utils.roundWhole(@y)})
+			#{Utils.roundWhole(@width)}x#{Utils.roundWhole(@height)}>"

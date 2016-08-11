@@ -1,9 +1,7 @@
-box: nolimitid/node-phantom
+box: framer/wercker
 
 build:
     steps:
-        - install-packages:
-            packages: zip
         - script:
             name: load git revisions
             code: |
@@ -15,7 +13,7 @@ build:
         - script:
             name: release build
             code: |
-                make dist
+                make release
 
 deploy:
     steps:
@@ -23,5 +21,4 @@ deploy:
             name: builds.framerjs.com
             code: |
                 npm rebuild
-                make site%build
-                make site%upload
+                make site-upload

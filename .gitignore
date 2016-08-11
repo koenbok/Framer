@@ -10,23 +10,12 @@ lib
 .deploy
 *.pyc
 npm-debug.log
-extras/Studio.framer/app.coffee
-extras/Studio.framer/framer/config.json
-extras/Studio.framer/framer/.bowerrc
-extras/Studio.framer/framer/init.js
-extras/Studio.framer/Icon
-extras/Studio.framer/imported
-extras/Studio.framer/app.js
 test/phantomjs/tests.js
 test/phantomjs/tests.js.map
 framer/**/*.js
 framer/**/*.js.map
 test/tests/**/*.js
 test/tests/**/*.js.map
-extras/Perf.framer/**/*.js
-extras/Perf.framer/**/*.js.map
-gulpfile.js
-gulpfile.js.map
 
 # Discard version changes
 framer/Version.coffee
@@ -62,8 +51,8 @@ _cache
 _steps
 _builds
 _projects
-extras/DevServer.framer/app.coffee
-extras/DevServer.framer/framer/config.json
-imported
-cursor-active.png
-cursor-active@2x.png
+
+# Ed
+.idea
+Icon
+/extras/resources.framerjs.com/static/DeviceResources

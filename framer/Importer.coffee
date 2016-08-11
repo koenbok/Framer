@@ -137,7 +137,7 @@ class exports.Importer
 
 		# Layer names cannot start with a number
 		if startsWithNumber(layerInfo.name)
-			throw new Error("(#{layerInfo.name}) Layer or Artboard names can not start with a number")
+			throw new Error("Layer or Artboard names can not start with a number: '#{layerInfo.name}'")
 
 		# We can create the layer here
 		layer = new LayerClass(layerInfo)

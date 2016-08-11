@@ -40,8 +40,9 @@ Events.AnimationDidEnd = "end"
 Events.Scroll = "scroll"
 
 # Image events
-Events.ImageLoaded = "load"
-Events.ImageLoadError = "error"
+Events.ImageLoaded = "imageload"
+Events.ImageLoadError = "imageerror"
+Events.ImageLoadCancelled = "imagecancelled"
 
 # Add all gesture events
 _.extend(Events, Gestures)
@@ -58,5 +59,17 @@ Events.wrap = (element) ->
 
 Events.isGesture = (eventName) ->
 	return eventName in Gestures
+
+interactiveEvents = _.values(Gestures).concat([
+	Events.TouchStart,
+	Events.TouchEnd,
+	Events.MouseUp,
+	Events.MouseDown,
+	Events.MouseWheel,
+	Events.DoubleClick
+])
+
+Events.isInteractive = (eventName) ->
+	return eventName in interactiveEvents
 
 exports.Events = Events

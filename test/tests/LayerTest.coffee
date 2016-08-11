@@ -11,22 +11,36 @@ describe "Layer", ->
 
 	describe "Defaults", ->
 
-		it "should set defaults", ->
+		it "should reset nested defaults", ->
+			Framer.Defaults.DeviceComponent.animationOptions.curve = "spring"
+			Framer.resetDefaults()
+			Framer.Defaults.DeviceComponent.animationOptions.curve.should.equal "ease-in-out"
 
+		it "should reset width and height to their previous values", ->
+			previousWidth = Framer.Defaults.Layer.width
+			previousHeight = Framer.Defaults.Layer.height
+			Framer.Defaults.Layer.width = 123
+			Framer.Defaults.Layer.height = 123
+			Framer.resetDefaults()
+			Framer.Defaults.Layer.width.should.equal previousWidth
+			Framer.Defaults.Layer.height.should.equal previousHeight
+
+		it "should set defaults", ->
+			width = Utils.randomNumber(0,400)
+			height = Utils.randomNumber(0,400)
 			Framer.Defaults =
 				Layer:
-					width: 200
-					height: 200
+					width: width
+					height: height
 
 			layer = new Layer()
 
-			layer.width.should.equal 200
-			layer.height.should.equal 200
+			layer.width.should.equal width
+			layer.height.should.equal height
 
 			Framer.resetDefaults()
 
 			layer = new Layer()
-
 			layer.width.should.equal 100
 			layer.height.should.equal 100
 
@@ -73,6 +87,67 @@ describe "Layer", ->
 			layer.width.should.equal 200
 			layer.style.width.should.equal "200px"
 
+		it "should set x not to scientific notation", ->
+
+			n = 0.000000000000002
+			n.toString().should.equal("2e-15")
+
+			layer = new Layer
+			layer.x = n
+			layer.y = 100
+			layer.style.webkitTransform.should.equal "translate3d(0px, 100px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+
+
+		it "should set x, y and z to really small values", ->
+
+			layer = new Layer
+			layer.x = 10
+			layer.y = 10
+			layer.z = 10
+			layer.x = 1e-5
+			layer.y = 1e-6
+			layer.z = 1e-7
+			layer.x.should.equal 1e-5
+			layer.y.should.equal 1e-6
+			layer.z.should.equal 1e-7
+
+			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
+			layer.style.webkitTransform.should.equal "translate3d(0.00001px, 0.000001px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+
+		it "should handle scientific notation in scaleX,Y and Z", ->
+
+			layer = new Layer
+			layer.scaleX = 2
+			layer.scaleY = 2
+			layer.scaleZ = 3
+			layer.scaleX = 1e-7
+			layer.scaleY = 1e-8
+			layer.scaleZ = 1e-9
+			layer.scale = 1e-10
+			layer.scaleX.should.equal 1e-7
+			layer.scaleY.should.equal 1e-8
+			layer.scaleZ.should.equal 1e-9
+			layer.scale.should.equal 1e-10
+
+			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale3d(0, 0, 0) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+
+		it "should handle scientific notation in skew", ->
+
+			layer = new Layer
+			layer.skew = 2
+			layer.skewX = 2
+			layer.skewY = 3
+			layer.skew = 1e-5
+			layer.skewX = 1e-6
+			layer.skewY = 1e-7
+			layer.skew.should.equal 1e-5
+			layer.skewX.should.equal 1e-6
+			layer.skewY.should.equal 1e-7
+
+			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
+			layer.style.webkitTransform.should.equal "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) skew(0.00001deg, 0.00001deg) skewX(0.000001deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+
 		it "should set x and y", ->
 
 			layer = new Layer
@@ -84,6 +159,16 @@ describe "Layer", ->
 
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
 			layer.style.webkitTransform.should.equal "translate3d(100px, 50px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
+
+		it "should handle midX and midY when width and height are 0", ->
+			box = new Layer
+				midX:200
+				midY:300
+				width: 0
+				height: 0
+
+			box.x.should.equal 200
+			box.y.should.equal 300
 
 		it "should set scale", ->
 
@@ -129,7 +214,7 @@ describe "Layer", ->
 			layer._element.style.webkitTransformStyle.should.equal "flat"
 
 
-		it "should set local image", (done) ->
+		it "should set local image", ->
 
 			prefix = "../"
 			imagePath = "static/test.png"
@@ -142,14 +227,56 @@ describe "Layer", ->
 			image = layer.props.image
 			layer.props.image.should.equal fullPath
 
+			layer.style["background-image"].indexOf(imagePath).should.not.equal(-1)
+			layer.style["background-image"].indexOf("file://").should.not.equal(-1)
+			layer.style["background-image"].indexOf("?nocache=").should.not.equal(-1)
+
+		it "should set local image when listening to load events", (done) ->
+			prefix = "../"
+			imagePath = "static/test.png"
+			fullPath = prefix + imagePath
+			layer = new Layer
+
 			layer.on Events.ImageLoaded, ->
 				layer.style["background-image"].indexOf(imagePath).should.not.equal(-1)
 				layer.style["background-image"].indexOf("file://").should.not.equal(-1)
 				layer.style["background-image"].indexOf("?nocache=").should.not.equal(-1)
 				done()
 
+			layer.image = fullPath
+			layer.image.should.equal fullPath
+
+			image = layer.props.image
+			layer.props.image.should.equal fullPath
+
+			layer.style["background-image"].indexOf(imagePath).should.equal(-1)
+			layer.style["background-image"].indexOf("file://").should.equal(-1)
+			layer.style["background-image"].indexOf("?nocache=").should.equal(-1)
+
 			#layer.computedStyle()["background-size"].should.equal "cover"
 			#layer.computedStyle()["background-repeat"].should.equal "no-repeat"
+
+		it "should cancel loading when setting image to null", (done) ->
+			prefix = "../"
+			imagePath = "static/test.png"
+			fullPath = prefix + imagePath
+
+			#First set the image directly to something
+			layer = new Layer
+				image: "static/test2.png"
+
+			#Now add event handlers
+			layer.on Events.ImageLoadCancelled, ->
+				layer.style["background-image"].indexOf(imagePath).should.equal(-1)
+				layer.style["background-image"].indexOf("file://").should.equal(-1)
+				layer.style["background-image"].indexOf("?nocache=").should.equal(-1)
+				done()
+
+			#so we preload the next image
+			layer.image = fullPath
+
+			#set the image no null to cancel the loading
+			layer.image = null
 
 		it "should set image", ->
 			imagePath = "../static/test.png"
@@ -347,6 +474,15 @@ describe "Layer", ->
 			layer.rotation.should.equal(100)
 			layer.rotationZ.should.equal(100)
 
+		it "should only set name when explicitly set", ->
+			layer = new Layer
+			layer.__framerInstanceInfo = {name:"aap"}
+			layer.name.should.equal ""
+
+		it "it should show the variable name in toInspect()", ->
+			layer = new Layer
+			layer.__framerInstanceInfo = {name:"aap"}
+			(_.startsWith layer.toInspect(), "<Layer aap id:").should.be.true
 
 
 	describe "Filter Properties", ->
@@ -389,7 +525,7 @@ describe "Layer", ->
 			layer.shadowBlur.should.equal 10
 			layer.shadowSpread.should.equal 10
 
-			layer.style.boxShadow.should.equal "rgb(0, 0, 0) 10px 10px 10px 10px"
+			layer.style.boxShadow.should.equal "rgba(123, 123, 123, 0.496094) 10px 10px 10px 10px"
 
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = "red"
@@ -893,7 +1029,7 @@ describe "Layer", ->
 			inputElements = layer.querySelectorAll("input")
 			inputElements.length.should.equal 1
 
-			inputElement = _.first(inputElements)
+			inputElement = _.head(inputElements)
 			inputElement.getAttribute("id").should.equal "hello"
 
 	describe "Force 2D", ->
@@ -1020,6 +1156,17 @@ describe "Layer", ->
 			copy.width.should.equal 100
 			copy.height.should.equal 100
 
+		it "copied Layer should also copy styles", ->
+			layer = new Layer
+				style:
+					"font-family" : "-apple-system"
+					"font-size" : "1.2em"
+					"text-align" : "right"
+
+			copy = layer.copy()
+			copy.style["font-family"].should.equal "-apple-system"
+			copy.style["font-size"].should.equal "1.2em"
+			copy.style["text-align"].should.equal "right"
 
 	describe "Draggable", ->
 
@@ -1028,9 +1175,9 @@ describe "Layer", ->
 			layer = new Layer
 			layer.draggable.enabled = true
 
-			a1 = layer.animate properties: {x:100}
-			a2 = layer.animate properties: {y:100}
-			a3 = layer.animate properties: {blur:1}
+			a1 = layer.animateTo x:100
+			a2 = layer.animateTo y:100
+			a3 = layer.animateTo blur:1
 
 			a1.isAnimating.should.equal true
 			a2.isAnimating.should.equal true
@@ -1041,3 +1188,98 @@ describe "Layer", ->
 			a1.isAnimating.should.equal false
 			a2.isAnimating.should.equal false
 			a3.isAnimating.should.equal true
+
+
+	describe "Point conversion", ->
+
+		it "should correctly convert points from layer to Screen", ->
+
+			point =
+				x: 200
+				y: 300
+
+			layer = new Layer point: point
+			screenPoint = layer.convertPointToScreen()
+			screenPoint.x.should.equal point.x
+			screenPoint.y.should.equal point.y
+
+		it "should correctly convert points from Screen to layer", ->
+
+			point =
+				x: 300
+				y: 200
+
+			layer = new Layer point: point
+			layerPoint = Screen.convertPointToLayer({}, layer)
+			layerPoint.x.should.equal -point.x
+			layerPoint.y.should.equal -point.y
+
+		it "should correctly convert points from layer to layer", ->
+
+			layerBOffset =
+				x: 200
+				y: 400
+
+			layerA = new Layer
+			layerB = new Layer point: layerBOffset
+
+			layerAToLayerBPoint = layerA.convertPointToLayer({}, layerB)
+			layerAToLayerBPoint.x.should.equal -layerBOffset.x
+			layerAToLayerBPoint.y.should.equal -layerBOffset.y
+
+		it "should correctly convert points when layers are nested", ->
+
+			layerBOffset = 
+				x: 0
+				y: 200
+
+			layerA = new Layer
+			layerB = new Layer
+				parent: layerA
+				point: layerBOffset
+				rotation: 90
+				originX: 0
+				originY: 0
+
+			layerAToLayerBPoint = layerA.convertPointToLayer({}, layerB)
+			layerAToLayerBPoint.x.should.equal -layerBOffset.y
+
+		it "should correctly convert points between multiple layers and transforms", ->
+
+			layerA = new Layer
+				x: 275
+
+			layerB = new Layer
+				y: 400
+				x: 400
+				scale: 2
+				parent: layerA
+
+			layerC = new Layer
+				x: -200
+				y: 100
+				rotation: 180
+				originX: 0
+				originY: 0
+				parent: layerB
+
+			screenToLayerCPoint = Screen.convertPointToLayer(null, layerC)
+
+			screenToLayerCPoint.x.should.equal 112.5
+			screenToLayerCPoint.y.should.equal 275
+
+		it "should correctly convert points from the Canvas to a layer", ->
+
+			layerA = new Layer
+				scale: 2
+
+			layerB = new Layer
+				parent: layerA
+				originY: 1
+				rotation: 90
+
+			canvasToLayerBPoint = Canvas.convertPointToLayer({}, layerB)
+
+			canvasToLayerBPoint.x.should.equal -25
+			canvasToLayerBPoint.y.should.equal 125
+

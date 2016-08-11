@@ -1,9 +1,5 @@
 {_} = require "./Underscore"
 
-# Before we do anything else, we need to patch touch events
-if window.ontouchstart is undefined
-	window.ontouchstart = null
-
 Framer = {}
 
 # Root level modules
@@ -13,6 +9,7 @@ Framer.Color = (require "./Color").Color
 Framer.Layer = (require "./Layer").Layer
 Framer.BackgroundLayer = (require "./BackgroundLayer").BackgroundLayer
 Framer.VideoLayer = (require "./VideoLayer").VideoLayer
+Framer.SVGLayer = (require "./SVGLayer").SVGLayer
 Framer.Events = (require "./Events").Events
 Framer.Gestures = (require "./Gestures").Gestures
 Framer.Animation = (require "./Animation").Animation
@@ -20,6 +17,7 @@ Framer.AnimationGroup = (require "./AnimationGroup").AnimationGroup
 Framer.Screen = (require "./Screen").Screen
 Framer.Path = (require "./Path").Path
 Framer.Canvas = (require "./Canvas").Canvas
+Framer.Align = (require "./Align").Align
 Framer.print = (require "./Print").print
 
 # Components
@@ -27,9 +25,13 @@ Framer.ScrollComponent = (require "./Components/ScrollComponent").ScrollComponen
 Framer.PageComponent = (require "./Components/PageComponent").PageComponent
 Framer.SliderComponent = (require "./Components/SliderComponent").SliderComponent
 Framer.DeviceComponent = (require "./Components/DeviceComponent").DeviceComponent
+Framer.GridComponent = (require "./Components/GridComponent").GridComponent
+Framer.NavComponent = (require "./Components/NavComponent").NavComponent
+Framer.CircularProgressComponent = (require "./Components/CircularProgressComponent").CircularProgressComponent
+Framer.MIDIComponent = (require "./Components/MIDIComponent").MIDIComponent
 Framer.DeviceView = Framer.DeviceComponent # Compat
 
-_.extend window, Framer if window
+_.extend(window, Framer) if window
 
 # Framer level modules
 Framer.Context = (require "./Context").Context
@@ -50,7 +52,9 @@ Framer.Extras = require "./Extras/Extras"
 Framer.GestureInputRecognizer = new (require "./GestureInputRecognizer").GestureInputRecognizer
 Framer.Version = require "../build/Version"
 Framer.Loop = new Framer.AnimationLoop()
-Utils.domComplete(Framer.Loop.start)
+
+# Metadata
+Framer.Info = {}
 
 window.Framer = Framer if window
 
@@ -59,9 +63,20 @@ Defaults = (require "./Defaults").Defaults
 Defaults.setup()
 Framer.resetDefaults = Defaults.reset
 
+# Create the default context
 Framer.DefaultContext = new Framer.Context(name:"Default")
 Framer.DefaultContext.backgroundColor = "white"
 Framer.CurrentContext = Framer.DefaultContext
 
+window.Canvas = new (require "./Canvas").Canvas
+
 Framer.Extras.MobileScrollFix.enable() if Utils.isMobile()
 Framer.Extras.TouchEmulator.enable() if not Utils.isTouch()
+Framer.Extras.ErrorDisplay.enable() if not Utils.isFramerStudio()
+Framer.Extras.Preloader.enable() if not Utils.isFramerStudio()
+Framer.Extras.Hints.enable() if not Utils.isFramerStudio()
+
+if Framer.Preloader?
+	Framer.Preloader.once("end", Framer.Loop.start)
+else
+	Utils.domComplete(Framer.Loop.start)

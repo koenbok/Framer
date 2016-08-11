@@ -1,3 +1,5 @@
+assert = require "assert"
+
 describe "LayerStates", ->
 
 	describe "Events", ->
@@ -51,6 +53,15 @@ describe "LayerStates", ->
 
 			Framer.resetDefaults()
 
+		it "should convert string to colors in states", ->
+			layer = new Layer
+			layer.states.add
+				test:
+					backgroundColor:"fff"
+					color: "000"
+			layer.states._states.test.backgroundColor.isEqual(new Color("fff")).should.be.true
+			layer.states._states.test.color.isEqual(new Color("000")).should.be.true
+
 
 
 	describe "Switch", ->
@@ -70,6 +81,28 @@ describe "LayerStates", ->
 			layer.states.current.should.equal "stateB"
 			layer.y.should.equal 123
 
+		it "should not change html when using switch instant", ->
+			layer = new Layer
+				html: "fff"
+			layer.states.switchInstant('default')
+			layer.html.should.equal "fff"
+
+		it "should not change style when going back to default", ->
+			layer = new Layer
+			layer.style.fontFamily = "Arial"
+			layer.style.fontFamily.should.equal "Arial"
+
+			layer.states.add
+				test: {x: 500}
+
+			layer.states.switchInstant("test")
+			layer.x.should.equal 500
+			layer.style.fontFamily = "Helvetica"
+			layer.style.fontFamily.should.equal "Helvetica"
+
+			layer.states.switchInstant("default")
+			layer.x.should.equal 0
+			layer.style.fontFamily.should.equal "Helvetica"
 
 	describe "Properties", ->
 
@@ -164,3 +197,21 @@ describe "LayerStates", ->
 
 			layer.states.switchInstant "default"
 			layer.x.should.equal 0
+
+		it "should set the parent", ->
+
+			layerA = new Layer
+			layerB = new Layer
+				parent: layerA
+
+			layerB.states.add
+				stateA:
+					parent: null
+
+			assert.equal(layerB.parent, layerA)
+
+			layerB.states.switchInstant "stateA"
+			assert.equal(layerB.parent, null)
+
+			layerB.states.switchInstant "default"
+			# assert.equal(layerB.parent, layerA)

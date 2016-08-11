@@ -1,18 +1,76 @@
 
 describe "ScrollComponent", ->
 
+	it "should have the right size", ->
+
+		scroll = new ScrollComponent
+			size: 300
+
+		scroll.frame.should.eql {x:0, y:0, width:300, height:300}
+		scroll.content.frame.should.eql {x:0, y:0, width:300, height:300}
+
+	it "should have the right content frame with align", ->
+
+		scroll = new ScrollComponent
+			size: 300
+
+		layer = new Layer
+			parent: scroll.content
+			size: 100
+			point: Align.center
+
+		scroll.content.frame.should.eql {x:0, y:0, width:300, height:300}
+		layer.frame.should.eql {x:100, y:100, width:100, height:100}
+
 	it "should apply constructor options", ->
 
-		instance = new ScrollComponent (scrollHorizontal: false)
+		instance = new ScrollComponent(scrollHorizontal: false)
 		instance.scrollHorizontal.should.be.false
 
 	it "should keep scrollHorizontal value on copy", ->
 
-		instance = new ScrollComponent (scrollHorizontal: false)
+		instance = new ScrollComponent(scrollHorizontal: false)
 		instance.scrollHorizontal.should.be.false
 
 		copy = instance.copy()
 		copy.scrollHorizontal.should.be.false
+
+	describe "scolling with mousEvents", ->
+		it "should work", ->
+			scroll = new ScrollComponent size: 200
+			new Layer
+				width: 400
+				height: 400
+				parent: scroll.content
+			scroll.mouseWheelEnabled = true
+			scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
+			scroll.content.x.should.equal -75
+			scroll.content.y.should.equal -150
+
+		it "should respect scrollHorizontal = false", ->
+			scroll = new ScrollComponent size: 200
+			new Layer
+				width: 400
+				height: 400
+				parent: scroll.content
+			scroll.mouseWheelEnabled = true
+			scroll.scrollHorizontal = false
+			scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
+			scroll.content.x.should.equal 0
+			scroll.content.y.should.equal -150
+
+		it "should respect scrollVertial = false", ->
+			scroll = new ScrollComponent size: 200
+			new Layer
+				width: 400
+				height: 400
+				parent: scroll.content
+			scroll.mouseWheelEnabled = true
+			scroll.scrollVertical = false
+			scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
+			scroll.content.x.should.equal -75
+			scroll.content.y.should.equal 0
+
 
 	describe "wrap", ->
 
@@ -85,3 +143,45 @@ describe "ScrollComponent", ->
 		it "should set content clip to true", ->
 			scroll = new ScrollComponent()
 			scroll.content.clip.should.equal true
+
+		it "should set the name of the constructor to __framerInstanceInfo", ->
+			aap = new Layer
+			aap.__framerInstanceInfo = {name: "aap"}
+			bla = new Layer
+				parent: aap
+			scroll = ScrollComponent.wrap(aap)
+			scroll.__framerInstanceInfo.name.should.equal "ScrollComponent"
+
+		it "should not copy over framerInstanceInfo to name", ->
+			aap = new Layer
+			aap.__framerInstanceInfo = {name: "aap"}
+			bla = new Layer
+				parent: aap
+			scroll = ScrollComponent.wrap(aap)
+			scroll.name.should.equal ""
+
+
+		it "should set the right content size for added pages by constructor", ->
+
+			# Constructors depend on different things for size, align and parent. Sometimes
+			# these dependencies can get messed up when adding something to a ScrollComponent
+			# this a was a case sent in by one of our users: http://share.framerjs.com/mn3ffub6u81i/
+
+			allImgCont = []
+			imgWrapW = 801
+			imgWrapGut = 200
+			numImg = 2
+
+			page = new PageComponent
+				width: 400, height: 400
+				scrollVertical: false
+				contentInset: {top: 267, right: imgWrapGut}
+
+			for i in [1..numImg]
+				imgWrapper = new Layer
+					width: page.width - imgWrapGut, height: imgWrapW
+					borderRadius: 8
+					x: (page.width + 32) * i
+					parent: page.content
+
+			page.contentFrame().width.should.equal 1064

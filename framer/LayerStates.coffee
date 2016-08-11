@@ -57,12 +57,6 @@ class exports.LayerStates extends BaseClass
 		# Switches to a specific state. If animationOptions are
 		# given use those, otherwise the default options.
 
-		# We actually do want to allow this. A state can be set to something
-		# that does not equal the property values for that state.
-
-		# if stateName is @_currentState
-		# 	return
-
 		if not @_states.hasOwnProperty(stateName)
 			throw Error "No such state: '#{stateName}'"
 
@@ -84,7 +78,8 @@ class exports.LayerStates extends BaseClass
 				continue
 
 			# Allow dynamic properties as functions
-			value = value.call(@layer, @layer, stateName) if _.isFunction(value)
+			if _.isFunction(value)
+				value = value.call(@layer, @layer, propertyName, stateName)
 
 			# Set the new value
 			properties[propertyName] = value
@@ -94,40 +89,44 @@ class exports.LayerStates extends BaseClass
 		animatablePropertyKeys = []
 
 		for k, v of properties
+
+			# We can animate numbers
 			if _.isNumber(v)
 				animatablePropertyKeys.push(k)
+
+			# We can animate colors
 			else if Color.isColorObject(v)
 				animatablePropertyKeys.push(k)
-			else if v == null
-				animatablePropertyKeys.push(k)
 
+		# If we don't have any animatable properties, we always switch instant
 		if animatablePropertyKeys.length == 0
 			instant = true
 
-		if instant is true
-			# We want to switch immediately without animation
+		if instant
 			@layer.props = properties
-			@emit Events.StateDidSwitch, _.last(@_previousStates), @_currentState, @
+			@emit(Events.StateDidSwitch, _.last(@_previousStates), @_currentState, @)
+			return
 
-		else
-			# Start the animation and update the state when finished
-			animationOptions ?= @animationOptions
-			animationOptions.properties = properties
+		# If there are, we start the animation here
+		animationOptions ?= @animationOptions
 
-			@_animation?.stop()
-			@_animation = @layer.animate animationOptions
-			@_animation.once "stop", =>
+		@_animation?.stop()
+		@_animation = @layer.animateTo(properties,animationOptions)
 
-				# Set all the values for keys that we couldn't animate
-				for k, v of properties
-					@layer[k] = v unless _.isNumber(v) or Color.isColorObject(v)
+		# Once the animation is done, we set all the keys that we could not animate
+		@_animation.once "stop", =>
 
-				@emit(Events.StateDidSwitch, _.last(@_previousStates), @_currentState, @) unless _.last(@_previousStates) is stateName
+			for k, v of properties
+				# @layer[k] = v if v not in animatablePropertyKeys
+				@layer[k] = v unless _.isNumber(v) or Color.isColorObject(v)
 
+			# If we changed the state, we send the event that we did
+			if _.last(@_previousStates) isnt stateName
+				@emit(Events.StateDidSwitch, _.last(@_previousStates), @_currentState, @)
 
 
 	switchInstant: (stateName) ->
-		@switch stateName, null, true
+		@switch(stateName, null, true)
 
 	@define "state", get: -> @_currentState
 	@define "current", get: -> @_currentState
@@ -139,7 +138,7 @@ class exports.LayerStates extends BaseClass
 
 	animatingKeys: ->
 
-		# Get a list of all the propeties controlled by states
+		# Get a list of all the properties controlled by states
 
 		keys = []
 
@@ -179,9 +178,30 @@ class exports.LayerStates extends BaseClass
 		# TODO: Maybe we want to support advanced data structures like objects in the future too.
 		for k, v of properties
 
-			if _.isString(v) && Color.isColorString(v)
+			if @_isValidColor(k, v)
 				stateProperties[k] = new Color(v)
-			else if _.isNumber(v) or _.isFunction(v) or _.isBoolean(v) or _.isString(v) or Color.isColorObject(v) or v == null
+				continue
+
+			if @_isValidProperty(k, v)
 				stateProperties[k] = v
 
 		return stateProperties
+
+	@_isValidColor: (k, v) ->
+
+		# We check if the property name ends with color, because we don't want
+		# to convert every string that looks like a Color, like the html property containing "add"
+		if _.endsWith(k.toLowerCase(), "color") and _.isString(v) and Color.isColorString(v)
+			return true
+
+		return false
+
+	@_isValidProperty: (k, v) ->
+		return true if _.isNumber(v)
+		return true if _.isFunction(v)
+		return true if _.isBoolean(v)
+		return true if _.isString(v)
+		return true if Color.isColorObject(v)
+		return true if v is null
+		return true if v?.constructor?.name is "Layer"
+		return false

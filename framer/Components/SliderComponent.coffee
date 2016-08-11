@@ -30,12 +30,18 @@ class Knob extends Layer
 class exports.SliderComponent extends Layer
 
 	constructor: (options={}) ->
-		options.backgroundColor ?= "#ccc"
-		options.borderRadius ?= 50
-		options.clip ?= false
-		options.width ?= 300
-		options.height ?= 10
-		options.value ?= 0
+
+		_.defaults options,
+			backgroundColor: "#ccc"
+			borderRadius: 50
+			clip: false
+			width: 300
+			height: 10
+			value: 0
+			knobSize: 30
+
+		# Set some sensible default for the hit area
+		options.hitArea ?= options.knobSize
 
 		@knob = new Knob
 			backgroundColor: "#fff"
@@ -48,31 +54,20 @@ class exports.SliderComponent extends Layer
 			width: 0, force2d: true
 			name: "fill"
 
-		@knobOverlay = new Layer
-			backgroundColor: null
-			name: "knobOverlay"
-
 		@sliderOverlay = new Layer
 			backgroundColor: null
 			name: "sliderOverlay"
 
 		super options
 
-		@knobSize = options.knobSize or 30
-		@knob.parent = @fill.parent = @knobOverlay.parent = @sliderOverlay.parent = @
+		@knobSize = options.knobSize
+		@knob.parent = @fill.parent = @sliderOverlay.parent = @
 
 		# Set fill initially
 		if @width > @height
 			@fill.height = @height
 		else
 			@fill.width = @width
-
-		# Link knobOverlay to knob
-		@knobOverlay.on Events.Move, ->
-			if @width > @height
-				@knob.x = @x
-			else
-				@knob.y = @y
 
 		@fill.borderRadius = @sliderOverlay.borderRadius = @borderRadius
 
@@ -82,41 +77,19 @@ class exports.SliderComponent extends Layer
 		@knob.draggable.momentumOptions = {friction: 5, tolerance: 0.25}
 		@knob.draggable.bounce = false
 		@knob.borderRadius = @knobSize / 2
-		@knobOverlay.borderRadius = (@knob.borderRadius * 2) + (@hitArea / 4)
-
-		# If hitArea isn't defined, remove the overlays
-		if not @hitArea
-			@knobOverlay.destroy()
-			@sliderOverlay.destroy()
 
 		@_updateFrame()
 		@_updateKnob()
 		@_updateFill()
 
-		@on("change:size", @_updateFrame)
+		@on("change:frame", @_updateFrame)
 		@on("change:borderRadius", @_setRadius)
-		@knob.on("change:borderRadius", @_setOverlayRadius)
-
-		# Check for vertical sliders
-		if @width > @height
-			@knob.draggable.speedY = 0
-			@knob.on("change:x", @_updateFill)
-		else
-			@knob.draggable.speedX = 0
-			@knob.on("change:y", @_updateFill)
-
 		@knob.on("change:size", @_updateKnob)
+		@knob.on("change:frame", @_updateFill)
+		@knob.on("change:frame", @_knobDidMove)
 
-		@knob.on Events.Move, =>
-			@_updateFrame()
-			@_updateValue()
-
-		# On click/touch of the slider, update the value
-		# @on(Events.TouchStart, @_touchDown)
-
-		@on(Events.TapStart, @_touchStart)
-		@on(Events.Pan, @_touchMove)
-		@on(Events.TapEnd, @_touchEnd)
+		@sliderOverlay.on(Events.TapStart, @_touchStart)
+		@sliderOverlay.on(Events.TapEnd, @_touchEnd)
 
 	_touchStart: (event) =>
 		event.preventDefault()
@@ -132,29 +105,22 @@ class exports.SliderComponent extends Layer
 		@knob.draggable._touchStart(event)
 		@_updateValue()
 
-	_touchMove: (event) =>
-		if event.target is @_element
-			@knob.draggable._touchMove(event)
-
 	_touchEnd: (event) =>
-		if event.target is @_element
-			@knob.draggable._touchEnd(event)
+		@_updateValue()
 
 	_updateFill: =>
 		if @width > @height
-			@fill.width = @knobOverlay.midX = @knob.midX
+			@fill.width = @knob.midX
 		else
-			@fill.height = @knobOverlay.midY = @knob.midY
+			@fill.height = @knob.midY
 
 	_updateKnob: =>
 		if @width > @height
-			@knob.midX = @knobOverlay.midX = @fill.width
+			@knob.midX = @fill.width
 			@knob.centerY()
-
 		else
-			@knob.midY = @knobOverlay.midX = @fill.height
+			@knob.midY = @fill.height
 			@knob.centerX()
-			@knobOverlay.midY = @knob.midY
 
 	_updateFrame: =>
 		@knob.draggable.constraints =
@@ -170,14 +136,23 @@ class exports.SliderComponent extends Layer
 				width: @width
 				height: @height
 
+		@hitArea = @hitArea
+
 		if @width > @height
 			@fill.height = @height
+			@knob.midX = @pointForValue(@value)
 			@knob.centerY()
-			@knobOverlay.centerY()
 		else
 			@fill.width = @width
+			@knob.midY = @pointForValue(@value)
 			@knob.centerX()
-			@knobOverlay.centerX()
+
+		if @width > @height
+			@knob.draggable.speedY = 0
+			@knob.draggable.speedX = 1
+		else
+			@knob.draggable.speedX = 0
+			@knob.draggable.speedY = 1
 
 		@sliderOverlay.center()
 
@@ -185,31 +160,27 @@ class exports.SliderComponent extends Layer
 		radius = @borderRadius
 		@fill.style.borderRadius = "#{radius}px 0 0 #{radius}px"
 
-	_setOverlayRadius: =>
-		@knobOverlay.borderRadius = (@knob.borderRadius * 2) + (@hitArea / 4)
-
 	@define "knobSize",
 		get: -> @_knobSize
 		set: (value) ->
+			isRound = @knob.borderRadius * 2 is @_knobSize
 			@_knobSize = value
 			@knob.width = @_knobSize
 			@knob.height = @_knobSize
+			@knob.borderRadius = @_knobSize / 2 if isRound
 			@_updateFrame()
 
 	@define "hitArea",
-		get: -> @_hitArea
-
+		get: ->
+			@_hitArea
 		set: (value) ->
-
 			@_hitArea = value
-
-			@knobOverlay.props =
-				width: @knobSize or 30 + @_hitArea
-				height:	@knobSize or 30 + @_hitArea
-
-			@sliderOverlay.props =
-				width: @width + @_hitArea
-				height:	@height + @_hitArea
+			if @width > @height			
+				@sliderOverlay.width = @width + @hitArea
+				@sliderOverlay.height = @hitArea
+			else
+				@sliderOverlay.width = @hitArea
+				@sliderOverlay.height = @height + @hitArea
 
 	@define "min",
 		get: -> @_min or 0
@@ -220,13 +191,11 @@ class exports.SliderComponent extends Layer
 		set: (value) -> @_max = value
 
 	@define "value",
-		get: ->
-			if @width > @height
-				@valueForPoint(@knob.midX)
-			else
-				@valueForPoint(@knob.midY)
-
+		get: -> return @_value
 		set: (value) ->
+
+			@_value = Utils.clamp(value, @min, @max)
+
 			if @width > @height
 				@knob.midX = @pointForValue(value)
 			else
@@ -235,7 +204,18 @@ class exports.SliderComponent extends Layer
 			@_updateFill()
 			@_updateValue()
 
+	_knobDidMove: =>
+
+		if @width > @height
+			@value = @valueForPoint(@knob.midX)
+		else
+			@value = @valueForPoint(@knob.midY)
+
 	_updateValue: =>
+		
+		return if @_lastUpdatedValue is @value
+
+		@_lastUpdatedValue = @value
 		@emit("change:value", @value)
 		@emit(Events.SliderValueChange, @value)
 
@@ -266,10 +246,8 @@ class exports.SliderComponent extends Layer
 	animateToValue: (value, animationOptions={curve:"spring(300,25,0)"}) ->
 		if @width > @height
 			animationOptions.properties = {x: @pointForValue(value) - (@knob.width/2)}
-			@knob.on("change:x", @_updateValue)
 		else
 			animationOptions.properties = {y: @pointForValue(value) - (@knob.height/2)}
-			@knob.on("change:y", @_updateValue)
 
 		@knob.animate(animationOptions)
 

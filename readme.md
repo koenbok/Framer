@@ -11,7 +11,7 @@ Framer.js allows you to define animations and interactions, complete with filter
 
 ## Get Started
 
-- [Download] (http://framerjs.com/assets/static/downloads/Framer.zip) (Framer.js & Framer Generator)
+- [Download] (https://builds.framerjs.com/latest/Framer.zip) (Framer.js & Framer Generator)
 - Open **index.html** in a WebKit browser and you'll see an image animate on click
 - Edit the **app.js** to add interactions and animations (see example code below)
 
@@ -39,7 +39,7 @@ imageLayer.states.animationOptions = {
 ```
 ###### Toggle states on click
 ```javascript
-imageLayer.on(Events.Click, function() {
+imageLayer.onClick(function(event) {
 	imageLayer.states.next()
 })
 ```
@@ -69,16 +69,16 @@ You can safely move things around in Sketch or Photoshop and re-import. Generato
 Check the [wanted features wiki page](https://github.com/koenbok/Framer/wiki/Contributing:-Wanted-Features) for ideas to work on.
 
 ##### Building
+
 - Download or clone the code
 - Make sure you have node and npm >= 2 installed
-- Run `make build` to build the latest version
-- Run `make watcher` to rebuild the latest version on changes
+- Run `make dist` to build the latest version
+- Run `make` to rebuild the latest version on changes
 
 ##### Testing
 
 - Run `make test` to run the unit tests in phantomjs
-- Run `make watch` to rerun the unit tests on changes
-- Run `make coverage` to generate a test coverage report
+- Run `make` to retest the latest version on changes
 
 There are also a set of visual and interactive tests for Framer Studio which you can find in test/studio.
 

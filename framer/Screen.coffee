@@ -2,50 +2,36 @@
 
 class ScreenClass extends BaseClass
 
-	@define "width",  get: -> Framer.CurrentContext.width
-	@define "height", get: -> Framer.CurrentContext.height
-	@define "size", get: -> Framer.CurrentContext.size
-	@define "frame", get: -> Framer.CurrentContext.frame
-	@define "canvasFrame", get: -> Framer.CurrentContext.canvasFrame
+	@define "width",  get: ->
+		return @device.screenSize.width if @device
+		return Canvas.width
+	@define "height", get: ->
+		return @device.screenSize.height if @device
+		return Canvas.height
+	@define "canvasFrame", get: ->
+		return @device.context.canvasFrame if @device
+		return @frame
+	
+	@define "size", get: -> Utils.size(@)
+	@define "frame", get: -> Utils.frame(@)
+	@define "device", get: -> Framer.CurrentContext.device
 
-	@define "backgroundColor",
-		importable: false
-		exportable: false
-		get: -> Framer.Device.screen.backgroundColor
-		set: (value) ->
-			Framer.Device.screen.backgroundColor = value
-
-	@define "perspective",
-		importable: false
-		exportable: false
-		get: -> Framer.CurrentContext.perspective
-		set: (value) ->
-			Framer.CurrentContext.perspective = value
-
-	@define "perspectiveOriginX",
-		importable: false
-		exportable: false
-		get: -> Framer.CurrentContext.perspectiveOriginX
-		set: (value) ->
-			Framer.CurrentContext.perspectiveOriginX = value
-
-	@define "perspectiveOriginY",
-		importable: false
-		exportable: false
-		get: -> Framer.CurrentContext.perspectiveOriginY
-		set: (value) ->
-			Framer.CurrentContext.perspectiveOriginY = value
-
-	# Todo: maybe resize based on parent layer
+	@define "backgroundColor", @proxyProperty("device.screen.backgroundColor")
+	@define "perspective", @proxyProperty("device.context.perspective")
+	@define "perspectiveOriginX", @proxyProperty("device.context.perspectiveOriginX")
+	@define "perspectiveOriginY", @proxyProperty("device.context.perspectiveOriginY")
 
 	toInspect: ->
+		return "<Screen #{Utils.roundWhole(@width)}x#{Utils.roundWhole(@height)}>"
 
-		round = (value) ->
-			if parseInt(value) == value
-				return parseInt(value)
-			return Utils.round(value, 1)
+	# Point Conversion
 
-		return "<Screen #{round(@width)}x#{round(@height)}>"
+	convertPointToLayer: (point, layer) ->
+		return Utils.convertPointFromContext(point, layer, false, true)
+
+	convertPointToCanvas: (point) ->
+		ctx = Framer.Device.context
+		return Utils.convertPointToContext(point, ctx, true, false)
 
 	# Edge Swipe
 
