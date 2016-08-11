@@ -4,10 +4,11 @@ layer = new Layer
 	backgroundColor: '#cbf'
 	borderRadius: 25
 
-layer.animate
-	time: 4
+layer.animateTo
 	path: Path.fromString('M0,108.613281 C0,108.613281 21.515625,1.42108547e-14 86.7773438,0 C152.039062,0 102.847656,160.578125 172.316406,160.578125 C241.785156,160.578125 282.722656,4.80859375 282.722656,4.80859375')
-	debug: true
+	options:
+		time: 4
+		debug: true
 	
 layer2 = new Layer
 	x: 100, y: 300
@@ -24,10 +25,11 @@ complexPath = Path.curve(
   .vlineTo(400)
   .arc(to: { x: 700, y: 700 }, rx: 200, ry: 250)
   
-layer2.animate
-	time: 4
+layer2.animateTo
 	path: complexPath
-	debug: true
+	options:
+		time: 4
+		debug: true
   	
 point1 = { x: 200, y: 100 }
 point2 = { x: 400, y: 220 }
@@ -39,7 +41,8 @@ layer3 = new Layer
 	backgroundColor: '#cef'
 	borderRadius: 25
 
-layer3.animate
+layer3.animateTo
 	path: Path.thru([point1, point2, point3], curviness: -10)
-	time: 2
-	debug: true
+	options:
+		time: 2
+		debug: true

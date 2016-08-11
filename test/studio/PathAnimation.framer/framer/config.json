@@ -1,4 +1,7 @@
 {
+  "propertyPanelToggleStates" : {
+
+  },
   "deviceOrientation" : 0,
   "sharedPrototype" : 0,
   "contentScale" : 1,
@@ -6,5 +9,8 @@
   "selectedHand" : "",
   "updateDelay" : 0.3,
   "deviceScale" : 1,
+  "foldedCodeRanges" : [
+
+  ],
   "orientation" : 0
 }

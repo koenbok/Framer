@@ -154,6 +154,8 @@
 	
 	Framer.DefaultContext.backgroundColor = "white";
 	
+	Framer.DefaultContext.visible = false;
+	
 	Framer.CurrentContext = Framer.DefaultContext;
 	
 	window.Canvas = new (__webpack_require__(40)).Canvas;
@@ -178,11 +180,11 @@
 	  Framer.Extras.Hints.enable();
 	}
 	
-	if (Framer.Preloader != null) {
-	  Framer.Preloader.once("end", Framer.Loop.start);
-	} else {
-	  Utils.domComplete(Framer.Loop.start);
+	if (!Framer.Preloader) {
+	  Framer.DefaultContext.visible = true;
 	}
+	
+	Utils.domComplete(Framer.Loop.start);
 
 
 /***/ },
@@ -23199,7 +23201,7 @@
 	      start = this._instant;
 	    }
 	    if (this.options.delay) {
-	      Utils.delay(this.options.delay, start);
+	      this._delayTimer = Utils.delay(this.options.delay, start);
 	    } else {
 	      start();
 	    }
@@ -23210,6 +23212,10 @@
 	    var animation;
 	    if (emit == null) {
 	      emit = true;
+	    }
+	    if (this._delayTimer != null) {
+	      Framer.CurrentContext.removeTimer(this._delayTimer);
+	      this._delayTimer = null;
 	    }
 	    this.options.layer.context.removeAnimation(this);
 	    if (emit) {
@@ -26970,7 +26976,7 @@
 /* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var BaseClass, Config, DOMEventManager, Defaults, Utils, _,
+	var BaseClass, Config, Contexts, DOMEventManager, Defaults, Utils, _,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty,
 	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
@@ -27011,8 +27017,14 @@
 	these at any time.
 	 */
 	
+	Contexts = [];
+	
 	exports.Context = (function(superClass) {
 	  extend(Context, superClass);
+	
+	  Context.all = function() {
+	    return _.clone(Contexts);
+	  };
 	
 	  Context.define("parent", {
 	    get: function() {
@@ -27046,6 +27058,7 @@
 	    } else {
 	      this.index = this.id;
 	    }
+	    Contexts.push(this);
 	  }
 	
 	  Context.prototype.reset = function() {
@@ -27060,7 +27073,8 @@
 	
 	  Context.prototype.destroy = function() {
 	    this.reset();
-	    return this._destroyRootElement();
+	    this._destroyRootElement();
+	    return _.remove(Contexts, this);
 	  };
 	
 	  Context.define("layers", {
@@ -27080,6 +27094,22 @@
 	      return _.filter(this._layers, function(layer) {
 	        return layer.parent === null;
 	      });
+	    }
+	  });
+	
+	  Context.define("visible", {
+	    get: function() {
+	      return this._visible || true;
+	    },
+	    set: function(value) {
+	      var ref;
+	      if (value === this._visible) {
+	        return;
+	      }
+	      if ((ref = this._element) != null) {
+	        ref.style.visibility = value ? "visible" : "hidden";
+	      }
+	      return this._visible = value;
 	    }
 	  });
 	
@@ -27182,6 +27212,7 @@
 	  };
 	
 	  Context.prototype.removeTimer = function(timer) {
+	    window.clearTimeout(timer);
 	    return this._timers = _.without(this._timers, timer);
 	  };
 	
@@ -27499,6 +27530,7 @@
 	    if (capture == null) {
 	      capture = false;
 	    }
+	    listener.capture = capture;
 	    DOMEventManagerElement.__super__.addListener.call(this, eventName, listener);
 	    return this.element.addEventListener(eventName, listener, capture);
 	  };
@@ -27508,7 +27540,7 @@
 	      capture = false;
 	    }
 	    DOMEventManagerElement.__super__.removeListener.call(this, eventName, listener);
-	    return this.element.removeEventListener(eventName, listener, capture);
+	    return this.element.removeEventListener(eventName, listener, listener.capture);
 	  };
 	
 	  DOMEventManagerElement.prototype.addEventListener = DOMEventManagerElement.prototype.addListener;
@@ -31897,10 +31929,12 @@
 
 /***/ },
 /* 62 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	var Hints, hints,
+	var Context, Hints, hints,
 	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+	
+	Context = __webpack_require__(43).Context;
 	
 	Hints = (function() {
 	  function Hints() {
@@ -31925,16 +31959,42 @@
 	  }
 	
 	  Hints.prototype._handleDown = function(event) {
+	    if (this._isPreloading()) {
+	      return;
+	    }
 	    return this._target = event.target;
 	  };
 	
 	  Hints.prototype._handleUp = function(event) {
-	    var layer;
+	    var context, i, layer, len, ref;
+	    if (this._isPreloading()) {
+	      return;
+	    }
 	    layer = Framer.CurrentContext.layerForElement(this._target);
+	    if (!layer) {
+	      ref = Context.all();
+	      for (i = 0, len = ref.length; i < len; i++) {
+	        context = ref[i];
+	        if (context === Framer.DefaultContext) {
+	          continue;
+	        }
+	        if (context === Framer.CurrentContext) {
+	          continue;
+	        }
+	        if (context.layerForElement(this._target)) {
+	          return;
+	        }
+	      }
+	    }
 	    if (layer && layer.willSeemToDoSomething()) {
 	      return;
 	    }
 	    return this.showHints();
+	  };
+	
+	  Hints.prototype._isPreloading = function() {
+	    var ref;
+	    return ((ref = Framer.Preloader) != null ? ref.isLoading : void 0) === true;
 	  };
 	
 	  Hints.prototype.showHints = function() {
@@ -32003,6 +32063,7 @@
 	    this._setupContext = bind(this._setupContext, this);
 	    this._handleTimeout = bind(this._handleTimeout, this);
 	    this._handleProgress = bind(this._handleProgress, this);
+	    this._end = bind(this._end, this);
 	    this.end = bind(this.end, this);
 	    this._start = bind(this._start, this);
 	    this.start = bind(this.start, this);
@@ -32017,37 +32078,9 @@
 	  }
 	
 	  Preloader.prototype.setupContext = function() {
-	    var parentContext, ref;
-	    parentContext = (ref = Framer.Device) != null ? ref.content : void 0;
-	    if (parentContext == null) {
-	      parentContext = Framer.CurrentContext;
-	    }
 	    this.context = new Context({
-	      parent: parentContext,
 	      name: "Preloader"
 	    });
-	    this.hintBlocker = new Context({
-	      name: "Hint Blocker"
-	    });
-	    this.hintBlocker.index = 15000;
-	    this.hintBlocker.run((function(_this) {
-	      return function() {
-	        var blocker;
-	        blocker = new Layer({
-	          size: Canvas,
-	          backgroundColor: null
-	        });
-	        blocker.onTouchStart(function(event) {
-	          return event.stopPropagation();
-	        });
-	        blocker.onTouchEnd(function(event) {
-	          return event.stopPropagation();
-	        });
-	        return blocker.onTouchMove(function(event) {
-	          return event.stopPropagation();
-	        });
-	      };
-	    })(this));
 	    return this.context.run(this._setupContext);
 	  };
 	
@@ -32120,17 +32153,22 @@
 	  };
 	
 	  Preloader.prototype.start = function() {
+	    if (this.isLoading) {
+	      return;
+	    }
+	    this._isLoading = true;
+	    this._startTime = Date.now();
+	    this.emit("start");
+	    this.setupContext();
 	    return Utils.delay(0.2, this._start);
 	  };
 	
 	  Preloader.prototype._start = function() {
-	    if (this.isLoading) {
-	      return;
-	    }
-	    this.setupContext();
-	    this._isLoading = true;
-	    this._startTime = Date.now();
-	    this.emit("start");
+	    Utils.delay(0.2, (function(_this) {
+	      return function() {
+	        return _this.cover.visible = true;
+	      };
+	    })(this));
 	    this.addImagesFromContext(Framer.DefaultContext);
 	    this.addImagesFromContext(Framer.CurrentContext);
 	    this.addPlayersFromContext(Framer.DefaultContext);
@@ -32138,21 +32176,40 @@
 	    if (!this._media.length) {
 	      return this.end();
 	    }
-	    this.cover.opacity = 1;
 	    return Utils.delay(this.timeout, this._handleTimeout);
 	  };
 	
 	  Preloader.prototype.end = function() {
-	    var ref, ref1;
 	    if (!this.isLoading) {
 	      return;
 	    }
-	    this.emit("end");
-	    this._isLoading = false;
-	    if ((ref = this.context) != null) {
-	      ref.destroy();
+	    return this._end();
+	  };
+	
+	  Preloader.prototype._end = function() {
+	    var finalize, ref, ref1;
+	    Framer.DefaultContext.visible = true;
+	    finalize = (function(_this) {
+	      return function() {
+	        var ref;
+	        _this.emit("end");
+	        _this._isLoading = false;
+	        return (ref = _this.context) != null ? ref.destroy() : void 0;
+	      };
+	    })(this);
+	    if ((ref = this.cover) != null ? ref.visible : void 0) {
+	      if ((ref1 = this.cover) != null) {
+	        ref1.animate({
+	          properties: {
+	            opacity: 0
+	          },
+	          time: 0.13
+	        });
+	      }
+	      return this.cover.onAnimationDidEnd(finalize);
+	    } else {
+	      return finalize();
 	    }
-	    return (ref1 = this.hintBlocker) != null ? ref1.destroy() : void 0;
 	  };
 	
 	  Preloader.prototype._handleProgress = function() {
@@ -32168,7 +32225,7 @@
 	
 	  Preloader.prototype._handleLoaded = function() {
 	    if (this.time > 0.5) {
-	      return Utils.delay(0.5, this.end);
+	      return Utils.delay(0.2, this.end);
 	    } else {
 	      return this.end();
 	    }
@@ -32185,9 +32242,9 @@
 	  Preloader.prototype._setupContext = function() {
 	    var layout, logoUrl;
 	    this.cover = new Layer({
-	      frame: this.context,
+	      frame: Canvas,
 	      backgroundColor: "white",
-	      opacity: 0
+	      visible: false
 	    });
 	    this.progressIndicator = new CircularProgressComponent({
 	      size: 160,
@@ -32198,12 +32255,19 @@
 	    this.progressIndicator.progressColor = "rgb(75,169,248)";
 	    this.progressIndicator.setProgress(this.progress, false);
 	    this.brand = new Layer({
-	      width: 96,
-	      height: 96,
-	      point: Align.center,
+	      size: 96,
 	      parent: this.cover,
 	      backgroundColor: null
 	    });
+	    if (!Utils.isFramerStudio()) {
+	      this.brand.style = {
+	        backgroundSize: "50%"
+	      };
+	    }
+	    if (Utils.isMobile()) {
+	      this.progressIndicator.scale = 1.25;
+	      this.brand.scale = 1.25;
+	    }
 	    if (this._logo) {
 	      this.setLogo(this._logo);
 	    } else {
@@ -32215,15 +32279,10 @@
 	    }
 	    (layout = (function(_this) {
 	      return function() {
-	        var ref, scale, screen;
-	        if (Utils.isMobile()) {
-	          scale = 2;
-	        } else {
-	          screen = (ref = Framer.Device) != null ? ref.screen : void 0;
-	          scale = (screen != null ? screen.frame.width : void 0) / (screen != null ? screen.canvasFrame.width : void 0);
-	        }
-	        _this.progressIndicator.scale = scale;
-	        return _this.brand.scale = scale;
+	        _this.cover.frame = Canvas;
+	        _this.progressIndicator.point = Align.center;
+	        _this.brand.x = Align.center;
+	        return _this.brand.y = Align.center(2);
 	      };
 	    })(this))();
 	    return Canvas.onResize(layout);
@@ -32241,7 +32300,7 @@
 	  if (!Framer.Preloader) {
 	    return;
 	  }
-	  Framer.Preloader.end();
+	  Framer.Preloader._end();
 	  return Framer.Preloader = null;
 	};
 	
@@ -32415,7 +32474,7 @@
 	    this.onMouseOut(function() {
 	      return this.states["switch"]("full");
 	    });
-	    this.onClick(function() {
+	    this.onTap(function() {
 	      if (options.shareButton) {
 	        return window.open(options.url, "Share", "width=560,height=714");
 	      } else {
@@ -32430,10 +32489,10 @@
 	
 	ShareComponent = (function() {
 	  function ShareComponent(shareInfo) {
-	    var projectId;
-	    this.shareInfo = shareInfo;
 	    this.__calculateAvailableSpace = bind(this.__calculateAvailableSpace, this);
 	    this._openIfEnoughSpace = bind(this._openIfEnoughSpace, this);
+	    var projectId;
+	    this.shareInfo = _.clone(shareInfo);
 	    projectId = window.location.pathname.replace(/\//g, "");
 	    document.title = this.shareInfo.title;
 	    this.options = {
@@ -32483,24 +32542,29 @@
 	    return this._startListening();
 	  };
 	
+	  ShareComponent.prototype._truncateCredential = function(str) {
+	    var maxLength, maxLengthWithAvatar;
+	    maxLength = 32;
+	    maxLengthWithAvatar = 23;
+	    str = _.escape(str);
+	    if (this.shareInfo.twitter && str.length > maxLengthWithAvatar) {
+	      str = _.truncate(str, {
+	        "length": maxLengthWithAvatar
+	      });
+	    } else if (str.length > maxLength) {
+	      str = _.truncate(str, {
+	        "length": maxLength
+	      });
+	    }
+	    return str;
+	  };
+	
 	  ShareComponent.prototype._checkData = function() {
-	    var maxLength, maxLengthWithAvatar, truncate;
-	    truncate = function(str, n) {
-	      var truncatedString;
-	      truncatedString = str;
-	      return truncatedString.substr(0, n - 1).trim() + "&hellip;";
-	    };
 	    if (_.startsWith(this.shareInfo.twitter, "@")) {
-	      this.shareInfo.twitter.slice(1);
+	      this.shareInfo.twitter = _.trimStart(this.shareInfo.twitter, "@");
 	    }
 	    if (this.shareInfo.title) {
-	      maxLengthWithAvatar = 26;
-	      maxLength = 34;
-	      if (this.shareInfo.twitter && this.shareInfo.title.length > maxLengthWithAvatar) {
-	        return this.shareInfo.title = truncate(this.shareInfo.title, maxLengthWithAvatar);
-	      } else if (this.shareInfo.title.length > maxLength) {
-	        return this.shareInfo.title = truncate(this.shareInfo.title, maxLength);
-	      }
+	      return this.shareInfo.title = this._truncateCredential(this.shareInfo.title);
 	    }
 	  };
 	
@@ -32558,11 +32622,11 @@
 	    this.close = new Layer({
 	      parent: this.cta,
 	      ignoreEvents: false,
-	      size: 12,
-	      point: 12,
+	      size: 9,
+	      point: 6,
 	      backgroundColor: null,
 	      style: {
-	        backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAZdJREFUSA2tlt9OgzAUh6UkRrLMCfgnwWwPoXcmBk32Crvfo+1+76A3Jt4SX8Bk8VYBkagJAc+P7CyMUWiHvYCepv2+0p42GNPpdFQUxdV4PH5eLBY/B/9QZrPZYRiGN6ZpvgjAiXm+Wq3u5/P5UV8+4FEU3RH3Isuya4GZU/BpGMZxXwnD8zy3ifflOM6TGQRB5vv+WxzHHiR4I0a7ztfU4bZtPyyXy28TkL4SGRzsUtBH0gbfEuwj6YLvCHQkKvBGgYpEFQ6WgYes4FwgdZFdSOXJZPKYpmmOPOdU5GyRMVoFGFSVEDQRQuTUPEKed8ExfpNFCJoKpzDN+pLgQ+qD057SISrzvGlMtU1UA1kdy7KeedkF9cFgUMj6V9s7v4A3lPbghAamBP+lpRqqnvhWAcN5Q7Esruu+6lwrUkEdzhvKe6IqaRTI4Ly2OpIdQRdcV7IlUIXrSDYCXbiqpBTsC1eRGH3hLMG7eq3w3WV6nndLwanq3VIF1uv17EqS5Ezg14I6fnCe1wfpxvj1wa1LE363LCv4A+knGKYRZVX+AAAAAElFTkSuQmCC')"
+	        backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAABGdBTUEAALGPC/xhBQAAAQxJREFUOBGt09sKgzAMBuB4Qr3Xe0Xf/4kUFXwB0QsFZdvfkWzWahEMuNm1/UjSznl9gh4I9wFDEQIty0J1XdO2bVYbRbRtS9M0yVqB+r5XE1VVXWJAmqahYRgIezgEyrKMoiiieZ7pDGNkHEcKgoDyPGeHBPI8j8qyPMV0pCgKCsNQIOezYHdq6BEyQmbIELjruqoczkRHoB0g/Liuq2o8YyjjCjmFMPGfGcbATJlgDiE9+g5/nygHmznQQ9/3eXj4NkJ6Y22nCfUA6QjKwWPDdpAJwRGjpKurscvoDOFm2O6ZZNR1nfWIdQz/TQ6BkiRRN/XqiLGJsTiOKU1TdswXUmZvvEhGN/YYl74B52DXxksJUvAAAAAASUVORK5CYII=')"
 	      }
 	    });
 	    this._enableUserSelect(this.close);
@@ -32618,11 +32682,11 @@
 	  };
 	
 	  ShareComponent.prototype._renderInfo = function() {
-	    var avatarBorder, fallbackTitle, name, showAuthor;
+	    var avatarBorder, fallbackTitle, name, ref, showAuthor;
 	    this.info = new ShareLayer({
 	      parent: this.sheet,
 	      width: this.sheet.width - (this.options.padding * 2),
-	      y: this.cta.maxY + 22,
+	      y: this.cta.maxY + 20,
 	      x: 20
 	    });
 	    this.credentials = new ShareLayer({
@@ -32635,7 +32699,10 @@
 	      height: 18,
 	      html: this.shareInfo.title || fallbackTitle,
 	      style: {
-	        fontWeight: "500"
+	        fontWeight: "500",
+	        overflow: "hidden",
+	        whiteSpace: "nowrap",
+	        lineHeight: "1.3"
 	      }
 	    });
 	    this._enableUserSelect(this.credentialsTitle);
@@ -32648,14 +32715,17 @@
 	          content = _this.shareInfo.author;
 	        }
 	        _this.credentials.height = 40;
-	        _this.credentialsTitle.y = 4;
+	        _this.credentialsTitle.y = 3;
 	        _this.credentialsAuthor = new ShareLayer({
 	          parent: _this.credentials,
 	          html: content,
 	          y: _this.credentialsTitle.maxY,
 	          height: 18,
 	          style: {
-	            color: "#808080"
+	            color: "#808080",
+	            overflow: "hidden",
+	            whiteSpace: "nowrap",
+	            lineHeight: "1.3"
 	          }
 	        });
 	        _this._enableUserSelect(_this.credentialsAuthor);
@@ -32690,10 +32760,15 @@
 	        }
 	      });
 	      name = this.shareInfo.author ? this.shareInfo.author : "@" + this.shareInfo.twitter;
+	      name = this._truncateCredential(name);
 	      showAuthor("<a href='http://twitter.com/" + this.shareInfo.twitter + "' style='text-decoration: none; -webkit-user-select: auto;' target='_blank'>" + name + "</a>");
+	      this.credentialsTitle.width = 155;
+	      if ((ref = this.credentialsAuthor) != null) {
+	        ref.width = 155;
+	      }
 	    }
 	    if (this.shareInfo.author && !this.shareInfo.twitter) {
-	      return showAuthor(this.shareInfo.author);
+	      return showAuthor(this._truncateCredential(this.shareInfo.author));
 	    }
 	  };
 	
@@ -32705,7 +32780,7 @@
 	    return this.date = new ShareLayer({
 	      parent: this.info,
 	      height: 10,
-	      y: verticalPosition + 16,
+	      y: verticalPosition + 12,
 	      html: "Shared on " + (date.getDate()) + " " + months[date.getMonth()] + " " + (date.getFullYear()),
 	      style: {
 	        textTransform: "uppercase",
@@ -32725,13 +32800,17 @@
 	  };
 	
 	  ShareComponent.prototype._renderDescription = function() {
-	    var descriptionStyle, parseDescription, showFullDescription, truncated;
+	    var descriptionStyle, parseDescription, showFullDescription;
 	    parseDescription = function(text) {
-	      var httpRegex, lineBreakRegex, urlRegex, urlified;
+	      var httpRegex, lineBreakRegex, removeAllTagsExceptBreaks, urlRegex, urlified;
 	      urlRegex = /[-a-zA-Z0-9@:%_\+.~#?&\/\/=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)?/gi;
 	      httpRegex = /^((http|https):\/\/)/;
 	      lineBreakRegex = /(?:\r\n|\r|\n)/g;
-	      urlified = text.replace(urlRegex, function(url) {
+	      removeAllTagsExceptBreaks = /<(?!br\s*\/?)[^>]+>/g;
+	      text = _.escape(text);
+	      text = _.trimEnd(text);
+	      text = text.replace(lineBreakRegex, "<br>");
+	      return urlified = text.replace(urlRegex, function(url) {
 	        var href;
 	        href = url;
 	        if (!httpRegex.test(url)) {
@@ -32739,7 +32818,6 @@
 	        }
 	        return "<a href='" + href + "' style='-webkit-user-select: auto' target='_blank'>" + url + "</a>";
 	      });
-	      return urlified.replace(lineBreakRegex, "<br />");
 	    };
 	    this.description = new ShareLayer({
 	      parent: this.info,
@@ -32762,14 +32840,14 @@
 	    showFullDescription = (function(_this) {
 	      return function() {
 	        var ref;
-	        _this.options.truncated = false;
+	        _this.options.truncatedDescription = false;
 	        _this.description.height = _this.descriptionSize.height;
 	        _this.description.html = parseDescription(_this.shareInfo.description);
 	        if (_this.shareInfo.openInFramerURL) {
 	          if ((ref = _this.date) != null) {
-	            ref.y = _this.description.maxY + 16;
+	            ref.y = _this.description.maxY + 12;
 	          }
-	          _this.buttons.y = (_this.date ? _this.date : _this.description).maxY + 16;
+	          _this.buttons.y = (_this.date ? _this.date : _this.description).maxY + 18;
 	        }
 	        _this._updateHeight();
 	        _this._calculateAvailableSpace();
@@ -32777,9 +32855,11 @@
 	      };
 	    })(this);
 	    if (this.shareInfo.description.length > this.options.maxDescriptionLength) {
-	      this.options.truncated = true;
-	      truncated = this.shareInfo.description.substring(this.options.maxDescriptionLength, length).trim();
-	      this.options.shortDescription = truncated + "…";
+	      this.options.truncatedDescription = true;
+	      this.options.shortDescription = _.truncate(this.shareInfo.description, {
+	        "length": this.options.maxDescriptionLength,
+	        "separator": " "
+	      });
 	      this.descriptionTruncatedSize = Utils.textSize(parseDescription(this.options.shortDescription), descriptionStyle, {
 	        width: "" + this.description.width
 	      });
@@ -32845,7 +32925,7 @@
 	      if (this.shareInfo.twitter) {
 	        tweet += "A prototype by @" + this.shareInfo.twitter + ". Design without limitations in @framerjs — ";
 	      } else if (this.shareInfo.author) {
-	        tweet += "A prototype by @" + this.shareInfo.author + ". Design without limitations in @framerjs — ";
+	        tweet += "A prototype by " + this.shareInfo.author + ". Design without limitations in @framerjs — ";
 	      } else {
 	        tweet += "A @framerjs prototype by @" + this.shareInfo.author + ". Design without limitations — ";
 	      }
@@ -32913,13 +32993,22 @@
 	      this.description.height = verticalSpace;
 	      this.description.style.overflow = "scroll";
 	      if (this.shareInfo.openInFramerURL) {
-	        this.date.y = this.description.maxY + this.options.padding;
-	        this.buttons.y = this.date.maxY + this.options.padding;
+	        this.date.y = this.description.maxY + 12;
+	        this.buttons.y = this.date.maxY + 18;
 	      }
 	    }
 	    if (this.description && canvasHeight > this.sheet.maxHeight) {
 	      this.sheet.height = this.sheet.maxHeight;
-	      return this.description.style.overflow = "visible";
+	      if (this.options.truncatedDescription) {
+	        this.description.height = this.descriptionTruncatedSize.height;
+	      } else {
+	        this.description.height = this.descriptionSize.height;
+	      }
+	      this.description.style.overflow = "visible";
+	      if (this.shareInfo.openInFramerURL) {
+	        this.date.y = this.description.maxY + 12;
+	        return this.buttons.y = this.date.maxY + 18;
+	      }
 	    }
 	  };
 	
@@ -33682,17 +33771,17 @@
 /* 67 */
 /***/ function(module, exports) {
 
-	exports.date = 1470896219;
+	exports.date = 1470897250;
 	
 	exports.branch = "tisho/animation-paths";
 	
-	exports.hash = "e77fd8d-dirty";
+	exports.hash = "e6b9505-dirty";
 	
-	exports.build = 1643;
+	exports.build = 2105;
 	
 	exports.version = exports.branch + "/" + exports.hash;
 
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=framer.debug.js.map?hash=446e40be415e7ef3888c
+//# sourceMappingURL=framer.debug.js.map?hash=dd866d39ba9791c7e236

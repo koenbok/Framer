@@ -889,7 +889,7 @@ class exports.Layer extends BaseClass
 		delete options.properties
 		@animateTo(properties, options)
 
-	animateTo: (properties,options={}) ->
+	animateTo: (properties, options={}) ->
 		_.defaults(options, properties.options)
 		delete properties.options
 		options.properties = Animation.filterAnimatableProperties(properties)
