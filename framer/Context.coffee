@@ -31,7 +31,11 @@ these at any time.
 
 ###
 
+Contexts = []
+
 class exports.Context extends BaseClass
+
+	@all = -> return _.clone(Contexts)
 
 	@define "parent",
 		get: -> @_parent
@@ -62,6 +66,8 @@ class exports.Context extends BaseClass
 		else
 			@index = @id
 
+		Contexts.push(@)
+
 	reset: ->
 
 		@_createDOMEventManager()
@@ -77,6 +83,7 @@ class exports.Context extends BaseClass
 	destroy: ->
 		@reset()
 		@_destroyRootElement()
+		_.remove(Contexts, @)
 
 	##############################################################
 	# Collections
@@ -85,6 +92,13 @@ class exports.Context extends BaseClass
 	@define "layers", get: -> _.clone(@_layers)
 	@define "layerCounter", get: -> @_layerCounter
 	@define "rootLayers", get: -> _.filter @_layers, (layer) -> layer.parent is null
+
+	@define "visible",
+		get: -> @_visible or true
+		set: (value) ->
+			return if value is @_visible
+			@_element?.style.visibility = if value then "visible" else "hidden"
+			@_visible = value
 
 	addLayer: (layer) ->
 		return if layer in @_layers
@@ -143,6 +157,7 @@ class exports.Context extends BaseClass
 		@_timers.push(timer)
 
 	removeTimer: (timer) ->
+		window.clearTimeout(timer)
 		@_timers = _.without(@_timers, timer)
 
 	resetTimers: ->

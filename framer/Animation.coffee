@@ -192,13 +192,15 @@ class exports.Animation extends BaseClass
 
 		# If we have a delay, we wait a bit for it to start
 		if @options.delay
-			Utils.delay(@options.delay, start)
+			@_delayTimer = Utils.delay(@options.delay, start)
 		else
 			start()
 		return true
 
 	stop: (emit=true)->
-
+		if @_delayTimer?
+			Framer.CurrentContext.removeTimer(@_delayTimer)
+			@_delayTimer = null
 		@options.layer.context.removeAnimation(@)
 
 		@emit("stop") if emit

@@ -14,25 +14,7 @@ class Preloader extends BaseClass
 		@start()
 
 	setupContext: ->
-
-		parentContext = Framer.Device?.content
-		parentContext ?= Framer.CurrentContext
-
-		@context = new Context({parent: parentContext, name: "Preloader"})
-
-		@hintBlocker = new Context({name: "Hint Blocker"})
-		@hintBlocker.index = 15000 # Above hints, below share info
-		@hintBlocker.run =>
-			blocker = new Layer
-				size : Canvas
-				backgroundColor : null
-			blocker.onTouchStart (event) ->
-				event.stopPropagation()
-			blocker.onTouchEnd (event) ->
-				event.stopPropagation()
-			blocker.onTouchMove (event) ->
-				event.stopPropagation()
-
+		@context = new Context({name: "Preloader"})
 		@context.run(@_setupContext)
 
 	@define "progress",
@@ -79,22 +61,23 @@ class Preloader extends BaseClass
 					@_handleProgress()
 
 	start: =>
-
-		# A static delay avoids the progress from being shown if the loading
-		# took less then the delay. So if all images were cached then we don't
-		# hope to see a loading screen at all.
-		Utils.delay(0.2, @_start)
-
-	_start: =>
-
 		return if @isLoading
-
-		@setupContext()
 
 		@_isLoading = true
 		@_startTime = Date.now()
 
 		@emit("start")
+		@setupContext()
+
+		# We need a little delay for the contexts to build up so we can
+		# actually find the images in it.
+		Utils.delay(0.2, @_start)
+
+	_start: =>
+
+		# Another bit of delay to find out if the images are already cached
+		# so we avoid a mini flickr of the progress indicator.
+		Utils.delay 0.2, => @cover.visible = true
 
 		# By default we take the image from the prototype and the device
 		@addImagesFromContext(Framer.DefaultContext)
@@ -106,19 +89,30 @@ class Preloader extends BaseClass
 		if not @_media.length
 			return @end()
 
-		# Only now show the cover
-		@cover.opacity = 1
-
 		# Make sure we always show the prototype after n seconds, even if not
 		# all the images managed to load at all.
 		Utils.delay(@timeout, @_handleTimeout)
 
 	end: =>
 		return unless @isLoading
-		@emit("end")
-		@_isLoading = false
-		@context?.destroy()
-		@hintBlocker?.destroy()
+		@_end()
+
+	_end: =>
+
+		Framer.DefaultContext.visible = true
+
+		finalize = =>
+			@emit("end")
+			@_isLoading = false
+			@context?.destroy()
+		
+		if @cover?.visible
+			@cover?.animate
+				properties: {opacity: 0}
+				time: 0.13
+			@cover.onAnimationDidEnd(finalize)
+		else
+			finalize()
 
 	_handleProgress: =>
 		@emit("progress", @progress)
@@ -127,7 +121,7 @@ class Preloader extends BaseClass
 
 	_handleLoaded: ->
 		if @time > 0.5
-			Utils.delay(0.5, @end)
+			Utils.delay(0.2, @end)
 		else
 			@end()
 
@@ -139,9 +133,9 @@ class Preloader extends BaseClass
 	_setupContext: =>
 
 		@cover = new Layer
-			frame: @context
+			frame: Canvas
 			backgroundColor: "white"
-			opacity: 0
+			visible: false
 
 		@progressIndicator = new CircularProgressComponent
 			size: 160
@@ -153,11 +147,18 @@ class Preloader extends BaseClass
 		@progressIndicator.setProgress(@progress, false)
 
 		@brand = new Layer
-			width: 96
-			height: 96
-			point: Align.center
+			size: 96
 			parent: @cover
 			backgroundColor: null
+		
+		if not Utils.isFramerStudio()
+			@brand.style =
+				backgroundSize: "50%"
+
+		# We display it a tad larger on mobile
+		if Utils.isMobile()
+			@progressIndicator.scale = 1.25
+			@brand.scale = 1.25
 
 		if @_logo
 			@setLogo(@_logo)
@@ -168,13 +169,10 @@ class Preloader extends BaseClass
 			@setLogo(logoUrl)
 
 		do layout = =>
-			if Utils.isMobile()
-				scale = 2
-			else
-				screen = Framer.Device?.screen
-				scale = screen?.frame.width / screen?.canvasFrame.width
-			@progressIndicator.scale = scale
-			@brand.scale = scale
+			@cover.frame = Canvas
+			@progressIndicator.point = Align.center
+			@brand.x = Align.center
+			@brand.y = Align.center(2)
 
 		Canvas.onResize(layout)
 
@@ -183,7 +181,7 @@ exports.enable = ->
 
 exports.disable = ->
 	return unless Framer.Preloader
-	Framer.Preloader.end()
+	Framer.Preloader._end()
 	Framer.Preloader = null
 
 exports.addImage = (url) ->

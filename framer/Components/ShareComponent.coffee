@@ -75,7 +75,7 @@ class Button extends ShareLayer
 		@onMouseOut ->
 			@states.switch("full")
 
-		@onClick ->
+		@onTap ->
 			if options.shareButton
 				window.open(options.url, "Share", "width=560,height=714")
 			else
@@ -84,7 +84,9 @@ class Button extends ShareLayer
 # Share component
 class ShareComponent
 
-	constructor: (@shareInfo) ->
+	constructor: (shareInfo) ->
+
+		@shareInfo = _.clone(shareInfo)
 
 		# Get the project id from the url
 		projectId = window.location.pathname.replace(/\//g, "")
@@ -135,24 +137,31 @@ class ShareComponent
 
 		@_startListening()
 
+	_truncateCredential: (str) ->
+		maxLength = 32
+		maxLengthWithAvatar = 23
+
+		str = _.escape(str)
+
+		# If an avatar is shown
+		if @shareInfo.twitter and str.length > maxLengthWithAvatar
+			str = _.truncate(str, {"length": maxLengthWithAvatar})
+
+		else if str.length > maxLength
+			str = _.truncate(str, {"length": maxLength})
+
+		return str
+
+
 	_checkData: ->
-		truncate = (str, n) ->
-			truncatedString = str
-			truncatedString.substr(0, n-1).trim() + "&hellip;"
 
 		# Remove leading @ from the Twitter handle
 		if _.startsWith(@shareInfo.twitter, "@")
-			@shareInfo.twitter[1..]
+			@shareInfo.twitter = _.trimStart(@shareInfo.twitter, "@")
 
 		# Truncate title if too long
 		if @shareInfo.title
-			maxLengthWithAvatar = 26
-			maxLength = 34
-
-			if @shareInfo.twitter and @shareInfo.title.length > maxLengthWithAvatar
-				@shareInfo.title = truncate(@shareInfo.title, maxLengthWithAvatar)
-			else if @shareInfo.title.length > maxLength
-				@shareInfo.title = truncate(@shareInfo.title, maxLength)
+			@shareInfo.title = @_truncateCredential(@shareInfo.title)
 
 	# Render main sheet
 	_renderSheet: ->
@@ -203,11 +212,11 @@ class ShareComponent
 		@close = new Layer
 			parent: @cta
 			ignoreEvents: false
-			size: 12
-			point: 12
+			size: 9
+			point: 6
 			backgroundColor: null
 			style:
-				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAZdJREFUSA2tlt9OgzAUh6UkRrLMCfgnwWwPoXcmBk32Crvfo+1+76A3Jt4SX8Bk8VYBkagJAc+P7CyMUWiHvYCepv2+0p42GNPpdFQUxdV4PH5eLBY/B/9QZrPZYRiGN6ZpvgjAiXm+Wq3u5/P5UV8+4FEU3RH3Isuya4GZU/BpGMZxXwnD8zy3ifflOM6TGQRB5vv+WxzHHiR4I0a7ztfU4bZtPyyXy28TkL4SGRzsUtBH0gbfEuwj6YLvCHQkKvBGgYpEFQ6WgYes4FwgdZFdSOXJZPKYpmmOPOdU5GyRMVoFGFSVEDQRQuTUPEKed8ExfpNFCJoKpzDN+pLgQ+qD057SISrzvGlMtU1UA1kdy7KeedkF9cFgUMj6V9s7v4A3lPbghAamBP+lpRqqnvhWAcN5Q7Esruu+6lwrUkEdzhvKe6IqaRTI4Ly2OpIdQRdcV7IlUIXrSDYCXbiqpBTsC1eRGH3hLMG7eq3w3WV6nndLwanq3VIF1uv17EqS5Ezg14I6fnCe1wfpxvj1wa1LE363LCv4A+knGKYRZVX+AAAAAElFTkSuQmCC')"
+				backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAABGdBTUEAALGPC/xhBQAAAQxJREFUOBGt09sKgzAMBuB4Qr3Xe0Xf/4kUFXwB0QsFZdvfkWzWahEMuNm1/UjSznl9gh4I9wFDEQIty0J1XdO2bVYbRbRtS9M0yVqB+r5XE1VVXWJAmqahYRgIezgEyrKMoiiieZ7pDGNkHEcKgoDyPGeHBPI8j8qyPMV0pCgKCsNQIOezYHdq6BEyQmbIELjruqoczkRHoB0g/Liuq2o8YyjjCjmFMPGfGcbATJlgDiE9+g5/nygHmznQQ9/3eXj4NkJ6Y22nCfUA6QjKwWPDdpAJwRGjpKurscvoDOFm2O6ZZNR1nfWIdQz/TQ6BkiRRN/XqiLGJsTiOKU1TdswXUmZvvEhGN/YYl74B52DXxksJUvAAAAAASUVORK5CYII=')"
 
 		@_enableUserSelect(@close)
 		@_showPointer(@close)
@@ -261,7 +270,7 @@ class ShareComponent
 		@info = new ShareLayer
 			parent: @sheet
 			width: @sheet.width - (@options.padding * 2)
-			y: @cta.maxY + 22
+			y: @cta.maxY + 20
 			x: 20
 
 		@credentials = new ShareLayer
@@ -277,6 +286,9 @@ class ShareComponent
 			html: @shareInfo.title or fallbackTitle
 			style:
 				fontWeight: "500"
+				overflow: "hidden"
+				whiteSpace: "nowrap"
+				lineHeight: "1.3"
 
 		@_enableUserSelect(@credentialsTitle)
 		@credentialsTitle.width = @credentials - 50 if @shareInfo.twitter
@@ -284,7 +296,7 @@ class ShareComponent
 		# Check what info is available and render layers accordingly
 		showAuthor = (content = @shareInfo.author) =>
 			@credentials.height = 40
-			@credentialsTitle.y = 4
+			@credentialsTitle.y = 3
 
 			@credentialsAuthor = new ShareLayer
 				parent: @credentials
@@ -293,6 +305,9 @@ class ShareComponent
 				height: 18
 				style:
 					color: "#808080"
+					overflow: "hidden"
+					whiteSpace: "nowrap"
+					lineHeight: "1.3"
 
 			@_enableUserSelect(@credentialsAuthor)
 			@credentialsAuthor.width = @credentials - 50 if @shareInfo.twitter
@@ -324,11 +339,16 @@ class ShareComponent
 
 			# If author name isn't available, fallback to Twitter handle
 			name = if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}"
+			name = @_truncateCredential(name)
+
 			showAuthor("<a href='http://twitter.com/#{@shareInfo.twitter}' style='text-decoration: none; -webkit-user-select: auto;' target='_blank'>#{name}</a>")
+
+			@credentialsTitle.width = 155
+			@credentialsAuthor?.width = 155
 
 		# If there's no twitter handle, show plain author name
 		if @shareInfo.author and not @shareInfo.twitter
-			showAuthor(@shareInfo.author)
+			showAuthor(@_truncateCredential(@shareInfo.author))
 
 	_renderDate: ->
 
@@ -340,7 +360,7 @@ class ShareComponent
 		@date = new ShareLayer
 			parent: @info
 			height: 10
-			y: verticalPosition + 16
+			y: verticalPosition + 12
 			html: "Shared on #{date.getDate()} #{months[date.getMonth()]} #{date.getFullYear()}"
 			style:
 				textTransform: "uppercase"
@@ -360,13 +380,16 @@ class ShareComponent
 			urlRegex = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi
 			httpRegex = /^((http|https):\/\/)/
 			lineBreakRegex = /(?:\r\n|\r|\n)/g
+			removeAllTagsExceptBreaks = /<(?!br\s*\/?)[^>]+>/g
+
+			text = _.escape(text)
+			text = _.trimEnd(text)
+			text = text.replace(lineBreakRegex, "<br>")
 
 			urlified = text.replace urlRegex, (url) ->
 				href = url
 				href = "//#{url}" if not httpRegex.test(url)
 				return "<a href='#{href}' style='-webkit-user-select: auto' target='_blank'>#{url}</a>"
-
-			urlified.replace(lineBreakRegex, "<br />")
 
 		@description = new ShareLayer
 			parent: @info
@@ -389,13 +412,13 @@ class ShareComponent
 		)
 
 		showFullDescription = =>
-			@options.truncated = false
+			@options.truncatedDescription = false
 			@description.height = @descriptionSize.height
 			@description.html = parseDescription(@shareInfo.description)
 
 			if @shareInfo.openInFramerURL
-				@date?.y = @description.maxY + 16
-				@buttons.y = (if @date then @date else @description).maxY + 16
+				@date?.y = @description.maxY + 12
+				@buttons.y = (if @date then @date else @description).maxY + 18
 
 			@_updateHeight()
 			@_calculateAvailableSpace()
@@ -403,11 +426,8 @@ class ShareComponent
 
 		# Truncate if description is too long
 		if @shareInfo.description.length > @options.maxDescriptionLength
-
-			@options.truncated = true
-
-			truncated = @shareInfo.description.substring(@options.maxDescriptionLength,length).trim()
-			@options.shortDescription = truncated + "…"
+			@options.truncatedDescription = true
+			@options.shortDescription = _.truncate(@shareInfo.description, {"length": @options.maxDescriptionLength, "separator": " "})
 
 			@descriptionTruncatedSize = Utils.textSize(
 				parseDescription(@options.shortDescription),
@@ -477,7 +497,7 @@ class ShareComponent
 			if @shareInfo.twitter
 				tweet += "A prototype by @#{@shareInfo.twitter}. Design without limitations in @framerjs — "
 			else if @shareInfo.author
-				tweet += "A prototype by @#{@shareInfo.author}. Design without limitations in @framerjs — "
+				tweet += "A prototype by #{@shareInfo.author}. Design without limitations in @framerjs — "
 			else
 				tweet += "A @framerjs prototype by @#{@shareInfo.author}. Design without limitations — "
 
@@ -547,12 +567,23 @@ class ShareComponent
 			@description.style.overflow = "scroll"
 
 			if @shareInfo.openInFramerURL
-				@date.y = @description.maxY + @options.padding
-				@buttons.y = @date.maxY + @options.padding
+				@date.y = @description.maxY + 12
+				@buttons.y = @date.maxY + 18
 
 		if @description and canvasHeight > @sheet.maxHeight
 			@sheet.height = @sheet.maxHeight
+
+			if @options.truncatedDescription
+ 				@description.height = @descriptionTruncatedSize.height
+			else
+				@description.height = @descriptionSize.height
+
 			@description.style.overflow = "visible"
+
+			if @shareInfo.openInFramerURL
+				@date.y = @description.maxY + 12
+				@buttons.y = @date.maxY + 18
+
 
 	_startListening: ->
 		@_calculateAvailableSpace()

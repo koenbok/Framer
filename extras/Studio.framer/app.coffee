@@ -1,14 +1,17 @@
-Framer.Extras.ShareInfo.enable()
+# Framer.Extras.Hints.disable()
 
-# Activate Module
 Framer.Info =
-	author: "Eelco Lempsink"
-	twitter: "@fverloop"
-	title: "Here's a long af title is long seri"
-	description: """
-		Our goal with Framer has always been to build a full service design tool. So while it’s been possible to view working prototypes on a mobile browser, the experience has been less than seamless.
+	title: ""
+	author: "Koen Bok"
+	twitter: ""
+	description: ""
 
-		Then, our community came to the rescue. Both Frameless by Jay Stakelon and Frames by Rafael Conde set a new standard for mobile viewing of prototypes. Inspired by their work and your feedback, we are now launching an iOS app that fully rounds out your design experience framerjs.com.
+# Framer.Extras.Preloader.enable()
 
-		Framer for iOS features live preview, offline use and intuitive sharing features that are protected by secure links. Paired with Framer for Mac, you now have access to a full mobile prototyping toolkit.
-	"""
+grid = new GridComponent
+	size: Screen
+
+grid.renderCell = (layer) ->
+	layer.image = Utils.randomImage(layer) + "cache=#{Date.now()}"
+	
+	layer.onTap ->

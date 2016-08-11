@@ -334,6 +334,23 @@ describe "LayerAnimation", ->
 					layer.x.should.be.within(30, 50)
 					done()
 
+		it "should stop when stopped before delay ends", (done) ->
+			layer = new Layer()
+			animation = new Animation
+				layer: layer
+				properties: {x:50}
+				curve: "linear"
+				time: 0.5
+				delay: 0.3
+
+			animation.start()
+			animation.stop()
+			Utils.delay 0.3, ->
+				layer.x.should.equal 0
+				Utils.delay 0.5, ->
+					layer.x.should.equal 0
+					done()
+
 	describe "Repeat", ->
 
 		it "should start repeatedly", (done) ->
