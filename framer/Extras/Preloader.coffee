@@ -116,7 +116,7 @@ class Preloader extends BaseClass
 
 	_handleProgress: =>
 		@emit("progress", @progress)
-		@progressIndicator?.setProgress(@progress, false)
+		@progressIndicator?.setProgress(@progress)
 		@_handleLoaded() if @isReady
 
 	_handleLoaded: ->
@@ -144,7 +144,7 @@ class Preloader extends BaseClass
 
 		@progressIndicator.railsColor = Color.grey(0, 0.1)
 		@progressIndicator.progressColor = "rgb(75,169,248)"
-		@progressIndicator.setProgress(@progress, false)
+		@progressIndicator.setProgress(@progress)
 
 		@brand = new Layer
 			size: 96
