@@ -150,9 +150,7 @@ class Preloader extends BaseClass
 			size: 96
 			parent: @cover
 			backgroundColor: null
-		
-		if not Utils.isFramerStudio()
-			@brand.style =
+			style:
 				backgroundSize: "50%"
 
 		# We display it a tad larger on mobile
