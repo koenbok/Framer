@@ -229,6 +229,10 @@ class exports.DeviceComponent extends BaseClass
 	###########################################################################
 	# DEVICE TYPE
 
+	customDevice: (deviceProps) =>
+		Devices["custom"] = _.defaults deviceProps, Devices["custom"]
+		@deviceType = "custom"
+
 	@define "deviceType",
 		get: ->
 			@_deviceType
