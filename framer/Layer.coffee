@@ -946,7 +946,7 @@ class exports.Layer extends BaseClass
 		options = _.defaults({instant:true},options)
 		@animate properties, options
 
-	animateToNext: (stateNames=[],options) ->
+	animateToNextState: (stateNames=[],options) ->
 		if not Array.isArray(stateNames)
 			if not options? and typeof stateNames is 'object'
 				options = stateNames

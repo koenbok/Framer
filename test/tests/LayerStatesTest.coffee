@@ -156,7 +156,7 @@ describe "LayerStates", ->
 
 	describe "Properties", ->
 
-		it "should bring back the 'initial' state values when using 'animateToNext'", (done) ->
+		it "should bring back the 'initial' state values when using 'animateToNextState'", (done) ->
 
 			layer = new Layer
 			layer.states =
@@ -170,18 +170,18 @@ describe "LayerStates", ->
 					when "stateA"
 						layer.x.should.equal 100
 						layer.rotation.should.equal 90
-						layer.animateToNext()
+						layer.animateToNextState()
 					when "stateB"
 						layer.x.should.equal 200
 						layer.rotation.should.equal 180
-						layer.animateToNext(time: 0.05)
+						layer.animateToNextState(time: 0.05)
 					when "initial"
 						layer.x.should.equal 0
 						layer.rotation.should.equal 0
 						done()
 
 			layer.on Events.AnimationEnd, ready
-			layer.animateToNext()
+			layer.animateToNextState()
 
 		it "should set scroll property", ->
 
@@ -291,31 +291,31 @@ describe "LayerStates", ->
 			layer.states.initial.x.should.equal 0
 			assert.deepEqual layer.stateNames, ['initial']
 
-		it "should listen to options provided to animateToNext", ->
+		it "should listen to options provided to animateToNextState", ->
 			layer = new Layer
 			layer.states =
 				stateA: x: 300
 				stateB: y: 300
-			animation = layer.animateToNext ['stateA','stateB'],
+			animation = layer.animateToNextState ['stateA','stateB'],
 				curve: "linear"
 			animation.options.curve.should.equal 'linear'
 
-		it "should correctly switch to next state without using an array animateToNext", ->
+		it "should correctly switch to next state without using an array animateToNextState", ->
 			layer = new Layer
 			layer.states =
 				stateA: x: 300
 				stateB: y: 300
-			layer.animateToNext 'stateA','stateB'
+			layer.animateToNextState 'stateA','stateB'
 			layer.states.currentName.should.equal 'stateA'
-			layer.animateToNext 'stateA','stateB'
+			layer.animateToNextState 'stateA','stateB'
 			layer.states.currentName.should.equal 'stateB'
-			layer.animateToNext 'stateA','stateB'
+			layer.animateToNextState 'stateA','stateB'
 			layer.states.currentName.should.equal 'stateA'
 
-		it "should listen to options provided to animateToNext when no states are provided", ->
+		it "should listen to options provided to animateToNextState when no states are provided", ->
 			layer = new Layer
 			layer.states.test = x: 300
-			animation = layer.animateToNext
+			animation = layer.animateToNextState
 				curve: "linear"
 			animation.options.curve.should.equal 'linear'
 
