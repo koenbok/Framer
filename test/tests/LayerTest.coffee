@@ -1175,9 +1175,9 @@ describe "Layer", ->
 			layer = new Layer
 			layer.draggable.enabled = true
 
-			a1 = layer.animateTo x:100
-			a2 = layer.animateTo y:100
-			a3 = layer.animateTo blur:1
+			a1 = layer.animate x:100
+			a2 = layer.animate y:100
+			a3 = layer.animate blur:1
 
 			a1.isAnimating.should.equal true
 			a2.isAnimating.should.equal true
@@ -1229,7 +1229,7 @@ describe "Layer", ->
 
 		it "should correctly convert points when layers are nested", ->
 
-			layerBOffset = 
+			layerBOffset =
 				x: 0
 				y: 200
 
@@ -1282,4 +1282,3 @@ describe "Layer", ->
 
 			canvasToLayerBPoint.x.should.equal -25
 			canvasToLayerBPoint.y.should.equal 125
-

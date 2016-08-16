@@ -905,9 +905,9 @@ class exports.Layer extends BaseClass
 		options.completion = =>
 			@_stateMachine.emit(Events.StateDidSwitch, @_stateMachine.previousName, @_stateMachine.currentName, @)
 			finished?()
-		@animateTo properties, options
+		@animate properties, options
 
-	animateTo: (properties,options={}) ->
+	animate: (properties,options={}) ->
 		if typeof properties == 'string'
 			stateName = properties
 			return @animateToState stateName, options
@@ -942,7 +942,7 @@ class exports.Layer extends BaseClass
 
 	switchTo: (properties,options={}) ->
 		options = _.defaults({instant:true},options)
-		@animateTo(properties,options)
+		@animate properties, options
 
 	animateToNext: (stateNames=[],options) ->
 		if not Array.isArray(stateNames)
@@ -953,7 +953,7 @@ class exports.Layer extends BaseClass
 				stateNames = Utils.arrayFromArguments arguments
 				options = {}
 		nextState = @_stateMachine.next(stateNames)
-		@animateTo nextState, options
+		@animate nextState, options
 
 	animations: ->
 		# Current running animations on this layer

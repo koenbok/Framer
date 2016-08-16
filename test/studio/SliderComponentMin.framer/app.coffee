@@ -47,16 +47,16 @@ valueLayer.options = curve: "spring(300,30,0)"
 
 # Visualize output
 sliderA.knob.on Events.DragStart, ->
-	valueLayer.animateTo "scaleUp"
+	valueLayer.animate "scaleUp"
 
 # Test proper output
 sliderA.on "change:value", ->
 	valueLayer.html = Math.round(this.value)
-	valueLayer.animateTo "fade25" if this.value is 0
-	valueLayer.animateTo "fade50" if this.value >= 25
-	valueLayer.animateTo "fade75" if this.value >= 50
-	valueLayer.animateTo "nofade" if this.value >= 75
+	valueLayer.animate "fade25" if this.value is 0
+	valueLayer.animate "fade50" if this.value >= 25
+	valueLayer.animate "fade75" if this.value >= 50
+	valueLayer.animate "nofade" if this.value >= 75
 
 # Return after DragEnd
 sliderA.knob.on Events.DragAnimationEnd, ->
-	valueLayer.animateTo "scaleDown"
+	valueLayer.animate "scaleDown"

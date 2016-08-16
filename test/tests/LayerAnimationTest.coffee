@@ -61,7 +61,7 @@ describe "LayerAnimation", ->
 					curve: "linear"
 					time: AnimationTime
 
-				animation = layer.animateTo properties, options
+				animation = layer.animate properties, options
 				animation.options.curve.should.equal "linear"
 				layer.on "end", ->
 					layer[p].should.equal 100
@@ -76,7 +76,7 @@ describe "LayerAnimation", ->
 					curve: "linear"
 					time: AnimationTime
 
-				animation = layer.animateTo properties
+				animation = layer.animate properties
 				animation.options.curve.should.equal "linear"
 
 				layer.on "end", ->
@@ -91,7 +91,7 @@ describe "LayerAnimation", ->
 				properties = {}
 				properties[p] = '+=50'
 
-				layer.animateTo properties,
+				layer.animate properties,
 					curve: "linear"
 					time: AnimationTime
 
@@ -108,7 +108,7 @@ describe "LayerAnimation", ->
 				properties = {}
 				properties[p] = '+=50'
 
-				layer.animateTo properties,
+				layer.animate properties,
 					curve: "linear"
 					time: AnimationTime
 
@@ -122,7 +122,7 @@ describe "LayerAnimation", ->
 
 			layer = new Layer()
 
-			layer.animateTo
+			layer.animate
 				scale: -> layer.scale + 1
 				options:
 					curve: "linear"
@@ -137,7 +137,7 @@ describe "LayerAnimation", ->
 			color = "red"
 			layer = new Layer()
 
-			layer.animateTo
+			layer.animate
 				backgroundColor: color
 				options:
 					curve: "linear"
@@ -151,7 +151,7 @@ describe "LayerAnimation", ->
 			layerA = new Layer
 			layerB = new Layer
 				parent: layerA
-			layerB.animateTo
+			layerB.animate
 				parent: null
 				options:
 					instant: true
@@ -209,7 +209,7 @@ describe "LayerAnimation", ->
 		it "should list running animations", ->
 
 			layer = new Layer()
-			animation = layer.animateTo
+			animation = layer.animate
 				x: 100
 				options:
 					time: 0.5
@@ -222,7 +222,7 @@ describe "LayerAnimation", ->
 
 			layer = new Layer()
 
-			animation = layer.animateTo
+			animation = layer.animate
 				x: 100
 				options:
 					time: 0.5
@@ -242,7 +242,7 @@ describe "LayerAnimation", ->
 		it "should tell you if animations are running", ->
 
 			layer = new Layer()
-			animation = layer.animateTo
+			animation = layer.animate
 				x: 100
 				options:
 					time: 0.5
@@ -387,21 +387,21 @@ describe "LayerAnimation", ->
 
 			layerA = new Layer width:80, height:80
 			layerA.name = "layerA"
-			layerA.animateTo
+			layerA.animate
 				y:300
 				options:
 					time: 2 * AnimationTime
 
 			layerB = new Layer width:80, height:80, x:100, backgroundColor:"red"
 			layerB.name = "layerB"
-			layerB.animateTo
+			layerB.animate
 				y:300
 				options:
 					time: 5 * AnimationTime
 
 			layerC = new Layer width:80, height:80, x:200, backgroundColor:"orange"
 			layerC.name = "layerC"
-			layerC.animateTo
+			layerC.animate
 				y:300
 				options:
 					time: 2 * AnimationTime
@@ -562,7 +562,7 @@ describe "LayerAnimation", ->
 				calledEvents.should.eql(["start", "end", "stop"])
 
 			it "should listen to instant: true to disable animation", ->
-				animation = @layer.animateTo
+				animation = @layer.animate
 					x: 100
 					options:
 						curve: "spring"
