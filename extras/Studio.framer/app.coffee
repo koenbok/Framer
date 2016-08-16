@@ -1,17 +1,18 @@
-# Framer.Extras.Hints.disable()
 
-Framer.Info =
-	title: ""
-	author: "Koen Bok"
-	twitter: ""
-	description: ""
+# Define custom device
+Framer.DeviceView.Devices["a"] =
+	"deviceType": "tablet"
+	"screenWidth": 720
+	"screenHeight": 1000
+	"deviceImage": "http://f.cl.ly/items/001L0v3c1f120t0p2z24/custom.png"
+	"deviceImageWidth": 800
+	"deviceImageHeight": 1214
 
-# Framer.Extras.Preloader.enable()
+# Set custom device
+Framer.Device.deviceType = "a"
 
-grid = new GridComponent
-	size: Screen
+layerA = new Layer
+	backgroundColor: "white"
 
-grid.renderCell = (layer) ->
-	layer.image = Utils.randomImage(layer) + "cache=#{Date.now()}"
-	
-	layer.onTap ->
+Screen.backgroundColor = "28affa"
+
