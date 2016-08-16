@@ -885,12 +885,6 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## ANIMATION
 
-	animate: (options) ->
-		# console.warn "Layer.animate is deprecated: please use Layer.animateTo instead"
-		properties = options.properties
-		delete options.properties
-		@animateTo(properties, options)
-
 	animateToState: (stateName, options={}) ->
 		properties = @_stateMachine.switchTo stateName
 		if @_stateMachine.previousName is @_stateMachine.currentName
@@ -911,6 +905,14 @@ class exports.Layer extends BaseClass
 		if typeof properties == 'string'
 			stateName = properties
 			return @animateToState stateName, options
+
+		#Support the old properties syntax
+		if properties.properties?
+			# console.warn "Using Layer.animate with 'properties' key is deprecated: please use 'options' key to provide animation options instead"
+			options = properties
+			properties = options.properties
+			delete options.properties
+
 		_.defaults(options,properties.options,@options)
 		delete properties.options
 
