@@ -69,13 +69,7 @@ class exports.Animation extends BaseClass
 		if @layer is null
 			console.error "Animation: missing layer"
 
-		AnimatorClass = @_animatorClass()
-
-		if @options.debug
-			console.log "Animation.start #{AnimatorClass.name}", @options.curveOptions
-
-		@_animator = new AnimatorClass @options.curveOptions
-
+		@_animator = @_createAnimator()
 		@_target = @layer
 		@_stateA = @_currentState()
 		@_stateB = {}
@@ -235,6 +229,14 @@ class exports.Animation extends BaseClass
 
 	_currentState: ->
 		return _.pick(@layer, _.keys(@properties))
+
+	_createAnimator: ->
+		AnimatorClass = @_animatorClass()
+
+		if @options.debug
+			console.log "Animation.start #{AnimatorClass.name}", @options.curveOptions
+
+		return new AnimatorClass @options.curveOptions
 
 	_animatorClass: ->
 
