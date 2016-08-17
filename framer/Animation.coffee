@@ -33,10 +33,6 @@ evaluateRelativeProperty = (target, k, v) ->
 	return target[k] + (sign + 1) * number if sign
 	return +number
 
-# _runningAnimations = []
-
-# Todo: this would normally be BaseClass but the properties keyword
-# is not compatible and causes problems.
 class exports.Animation extends BaseClass
 
 	constructor: (parameters={},options={}) ->
