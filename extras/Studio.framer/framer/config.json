@@ -2,16 +2,16 @@
   "propertyPanelToggleStates" : {
     "Filters" : false
   },
-  "deviceOrientation" : 90,
+  "deviceOrientation" : 0,
   "sharedPrototype" : 1,
   "contentScale" : 1,
-  "deviceType" : "apple-iphone-5s-silver",
+  "deviceType" : "custom",
   "selectedHand" : "iphone-hands-1",
   "updateDelay" : 0.3,
   "deviceScale" : "fit",
   "foldedCodeRanges" : [
 
   ],
-  "orientation" : 90,
+  "orientation" : 0,
   "fullScreen" : false
 }

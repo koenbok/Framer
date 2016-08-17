@@ -59,6 +59,11 @@ class exports.DeviceComponent extends BaseClass
 
 		_.extend(@, _.defaults(options, defaults))
 
+		@Type =
+			Tablet: "tablet"
+			Phone: "phone"
+			Browser: "browser"
+
 	_setup: ->
 
 		if @_setupDone
@@ -229,8 +234,8 @@ class exports.DeviceComponent extends BaseClass
 	###########################################################################
 	# DEVICE TYPE
 
-	customDevice: (deviceProps) =>
-		Devices["custom"] = _.defaults deviceProps, Devices["custom"]
+	customize: (deviceProps) =>
+		Devices.custom = _.defaults deviceProps, Devices.custom
 		@deviceType = "custom"
 
 	@define "deviceType",
