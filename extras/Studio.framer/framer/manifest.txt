@@ -1,13 +1,6 @@
 app.coffee
 app.js
-framer/backups/backup-1450436737.coffee
-framer/backups/backup-1453366089.coffee
-framer/backups/backup-1453383083.coffee
-framer/backups/backup-1453715211.coffee
-framer/backups/backup-1461856068.coffee
-framer/backups/backup-2016-07-12 22.19.54.coffee
-framer/backups/backup-2016-07-12 22.22.54.coffee
-framer/backups/backup-2016-07-12 22.23.54.coffee
+framer/backups/backup-2016-08-19 11.36.46.coffee
 framer/coffee-script.js
 framer/config.json
 framer/framer.debug.js
@@ -17,45 +10,22 @@ framer/framer.init.js
 framer/framer.js
 framer/framer.js.map
 framer/framer.modules.js
-framer/images/background.png
 framer/images/cursor-active.png
 framer/images/cursor-active@2x.png
 framer/images/cursor.png
 framer/images/cursor@2x.png
 framer/images/icon-120.png
 framer/images/icon-152.png
+framer/images/icon-180.png
+framer/images/icon-192.png
 framer/images/icon-76.png
-framer/images/icon-arrow.png
-framer/images/icon-arrow@2x.png
-framer/images/icon-close.png
-framer/images/icon-close@2x.png
-framer/images/icon-framer.png
-framer/images/icon-framer@2x.png
-framer/images/icon-share.png
-framer/images/icon-share@2x.png
 framer/manifest.txt
-framer/mirror.css
 framer/preview.png
 framer/style.css
 framer/version
 images/framer-icon.png
-imported/Scrollable/images/Battery-544BDD49-EFF6-4158-8D1F-7F22F648708B.png
-imported/Scrollable/images/content-E7175CC5-2887-41E1-A3AE-2E7535CC161D.png
-imported/Scrollable/images/images-E5D25ECB-085B-44ED-BE58-D679D5AE736D.png
-imported/Scrollable/images/navBar-210B5F3E-EDDA-45FE-A169-7E30A1029393.png
-imported/Scrollable/images/navBarContent-5FCE65B7-8C86-443D-90AD-1106EED6649D.png
-imported/Scrollable/images/screen-3AF655BB-EF71-4027-ADEE-02DBFE5B89F7.png
-imported/Scrollable/images/statusBar-BF9BC5FB-E545-4218-840C-47BF6EE9A2D1.png
-imported/Scrollable/layers.json
-imported/Scrollable/layers.json.js
-imported/scrollToDelete/images/content-36424452-3B6A-4A23-AA43-1ABC9FB87A84.png
-imported/scrollToDelete/images/iconAlbums-5E358598-E973-4248-B288-BE3F2F2C02C1.png
-imported/scrollToDelete/images/iconPhotos-F79F21BE-BF0C-42B6-99E2-9DAB0FA42D53.png
-imported/scrollToDelete/images/iconShared-63CB48BD-ED6A-4CF2-809E-50E593D17396.png
-imported/scrollToDelete/images/navBar-EA2E254D-4F05-45F5-B120-33C145CE7923.png
-imported/scrollToDelete/images/screen-467D259F-657A-4BEC-B60C-B8649B3A5542.png
-imported/scrollToDelete/images/statusBar-A86820BD-4D5F-44EF-AEBB-21FEEF30391A.png
-imported/scrollToDelete/images/tabBar-C7F707CA-04FE-4EE4-995E-06B68173F067.png
-imported/scrollToDelete/layers.json
-imported/scrollToDelete/layers.json.js
+images/photo.jpg
+imported/test@2x/images/Layer-main-ndeymdbd.png
+imported/test@2x/layers.json
+imported/test@2x/layers.json.js
 index.html
