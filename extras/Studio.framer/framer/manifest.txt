@@ -1,6 +1,26 @@
 app.coffee
 app.js
-framer/backups/backup-2016-08-19 11.36.46.coffee
+framer/backups/backup-2016-08-19 14.02.38.coffee
+framer/backups/backup-2016-08-19 14.03.38.coffee
+framer/backups/backup-2016-08-19 14.35.38.coffee
+framer/backups/backup-2016-08-19 14.36.38.coffee
+framer/backups/backup-2016-08-19 14.52.38.coffee
+framer/backups/backup-2016-08-19 14.53.38.coffee
+framer/backups/backup-2016-08-19 14.55.38.coffee
+framer/backups/backup-2016-08-19 14.56.38.coffee
+framer/backups/backup-2016-08-19 14.57.38.coffee
+framer/backups/backup-2016-08-19 15.10.38.coffee
+framer/backups/backup-2016-08-19 15.12.38.coffee
+framer/backups/backup-2016-08-19 15.13.38.coffee
+framer/backups/backup-2016-08-19 15.16.38.coffee
+framer/backups/backup-2016-08-19 15.17.38.coffee
+framer/backups/backup-2016-08-19 15.18.38.coffee
+framer/backups/backup-2016-08-19 15.21.38.coffee
+framer/backups/backup-2016-08-19 15.24.38.coffee
+framer/backups/backup-2016-08-19 15.27.38.coffee
+framer/backups/backup-2016-08-19 15.28.38.coffee
+framer/backups/backup-2016-08-19 15.37.38.coffee
+framer/backups/backup-2016-08-19 15.43.38.coffee
 framer/coffee-script.js
 framer/config.json
 framer/framer.debug.js
@@ -23,8 +43,32 @@ framer/manifest.txt
 framer/preview.png
 framer/style.css
 framer/version
+images/banner.png
 images/framer-icon.png
 images/photo.jpg
+imported/label@1x/images/Layer-appBar-rty5mtld.png
+imported/label@1x/images/Layer-description-ruy1ntfe.png
+imported/label@1x/images/Layer-iconBack-q0q4rjk2.png
+imported/label@1x/images/Layer-iconBattery-meu0m0ne.png
+imported/label@1x/images/Layer-iconComments-mta2ndqz.png
+imported/label@1x/images/Layer-iconDate-mdkxrem2.png
+imported/label@1x/images/Layer-iconLabel-q0uxm0fb.png
+imported/label@1x/images/Layer-iconMore-nejentcz.png
+imported/label@1x/images/Layer-iconPeople-mkzcqjex.png
+imported/label@1x/images/Layer-iconReception-mzkyqkfe.png
+imported/label@1x/images/Layer-iconWifi-mzixrdgy.png
+imported/label@1x/images/Layer-mask-rui5ndlb.png
+imported/label@1x/images/Layer-navBar-mddgmkjg.png
+imported/label@1x/images/Layer-rowDate-qkmynem0.png
+imported/label@1x/images/Layer-rowLabel-qjm0rthc.png
+imported/label@1x/images/Layer-rowPeople-rjmzndgz.png
+imported/label@1x/images/Layer-screen-ruqynuu3.png
+imported/label@1x/images/Layer-separator-ntbfmde5.png
+imported/label@1x/images/Layer-statusBar-otg3rdze.png
+imported/label@1x/images/Layer-statusBarContent-nezcmjc2.png
+imported/label@1x/images/Layer-title-rjg2qtzd.png
+imported/label@1x/layers.json
+imported/label@1x/layers.json.js
 imported/test@2x/images/Layer-main-ndeymdbd.png
 imported/test@2x/layers.json
 imported/test@2x/layers.json.js

@@ -1,4 +1,5 @@
 {Layer} = require "./Layer"
+{Events} = require "./Events"
 
 class exports.TextLayer extends Layer
 	constructor: (options={}) ->
@@ -6,7 +7,7 @@ class exports.TextLayer extends Layer
 		options.width ?= 300
 		options.backgroundColor ?= "transparent"
 		options.html ?= "Type Something"
-		options.color ?= "#808080"
+		options.color ?= "#888"
 
 		super options
 
@@ -36,20 +37,21 @@ class exports.TextLayer extends Layer
 		if not @lineHeight
 			@_setStyle(@fontFamily, @fontSize, @fontWeight, 1.25)
 
-
 		# Reset width and height
 		if @autoWidth and not @autoHeight
 			@_setSize(true, false)
+
 		if @autoHeight and not @autoWidth
 			@_setSize(false, true)
+
 		if @autoWidth and @autoHeight
 			@_setSize(true, true)
 
 	_setStyle: (fontFamily, fontSize, fontWeight, lineHeight, letterSpacing, textAlign) =>
 		@style =
 			fontFamily: fontFamily
-			fontWeight: "#{fontWeight}"
 			fontSize: "#{fontSize}px"
+			fontWeight: "#{fontWeight}"
 			lineHeight: "#{lineHeight}"
 			letterSpacing: "#{letterSpacing}px"
 			textAlign: textAlign
@@ -70,10 +72,14 @@ class exports.TextLayer extends Layer
 
 		if width and not height
 			@width = Utils.textSize(@text, currentStyle).width
+
 		if height and not width
 			@height = Utils.textSize(@text, currentStyle, constraints).height
+
 		if width and height
 			@size = Utils.textSize(@text, currentStyle)
+
+		@emit("change:size")
 
 	@define "text",
 		get: -> @html

@@ -12,10 +12,10 @@ class exports.InputLayer extends TextLayer
 	constructor: (options={}) ->
 
 		_.defaults options,
-			backgroundColor: "#fff"
+			backgroundColor: "#FFF"
 			width: 500
 			height: 100
-			color: "#aaa"
+			color: "#AAA"
 
 		super options
 
@@ -36,6 +36,9 @@ class exports.InputLayer extends TextLayer
 		@input.style.width = "#{@width - 64}px"
 		@input.style.height = "#{@height}px"
 		@input.style.cursor = "auto"
+
+		# Set placeholder color
+		document.styleSheets[0].addRule("::-webkit-input-placeholder", "color: #{@color}")
 
 		# Input text spacing
 		@input.style.marginLeft = "32px"
