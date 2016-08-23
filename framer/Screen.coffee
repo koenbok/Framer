@@ -11,7 +11,8 @@ class ScreenClass extends BaseClass
 	@define "canvasFrame", get: ->
 		return @device.context.canvasFrame if @device
 		return @frame
-	
+	@define "midX", get: -> Utils.frameGetMidX @
+	@define "midY", get: -> Utils.frameGetMidY @
 	@define "size", get: -> Utils.size(@)
 	@define "frame", get: -> Utils.frame(@)
 	@define "device", get: -> Framer.CurrentContext.device
