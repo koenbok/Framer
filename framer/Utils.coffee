@@ -41,7 +41,7 @@ Utils.valueOrDefault = (value, defaultValue) ->
 	return value
 
 Utils.arrayNext = (arr, item) ->
-	arr[arr.indexOf(item) + 1] or _.first arr
+	arr[arr.indexOf(item) + 1] or _.head arr
 
 Utils.arrayPrev = (arr, item) ->
 	arr[arr.indexOf(item) - 1] or _.last arr
@@ -147,7 +147,32 @@ Utils.randomNumber = (a=0, b=1) ->
 	# Return a random number between a and b
 	Utils.mapRange Math.random(), 0, 1, a, b
 
+Utils.randomImage = (layer, offset=50) ->
+
+	if _.isNumber(layer)
+		layer = {id: layer}
+
+	photos = ["1417733403748-83bbc7c05140", "1423841265803-dfac59ebf718", "1463560018368-0814042d17b7", "1433689056001-018e493576bc", "1430812411929-de4cf1d1fe73", "1457269449834-928af64c684d", "1443616839562-036bb2afd9a2", "1461535676131-2de1f7054d3f", "1462393582935-1ac76b85dcf1", "1414589530802-cb54ce0575d9", "1422908132590-117a051fc5cd", "1438522014717-d7ce32b9bab9", "1451650804883-52fb86cc5b18", "1462058164249-2dcdcda67ce7", "1456757014009-0614a080ff7f", "1434238255348-4fb0d9caa0a4", "1448071792026-7064a01897e7", "1458681842652-019f4eeda5e5", "1460919920543-d8c45f4bd621", "1447767961238-038617b84a2b", "1449089299624-89ce41e8306c", "1414777410116-81e404502b52", "1433994349623-0a18966ee9c0", "1452567772283-91d67178f409", "1458245229726-a8ba04cb5969", "1422246719650-cb30d19825e3", "1417392639864-2c88dd07f460", "1442328166075-47fe7153c128", "1448467258552-6b3982373a13", "1447023362548-250f3a7b80ed", "1451486242265-24b0c0ef9a51", "1414339372428-797ec111646d"]
+	photo = Utils.randomChoice(photos)
+	photo = photos[(layer.id) % photos.length] if layer?.id
+
+	increment = 100
+	size = 1024
+
+	if layer
+		size = Math.max(layer.width, layer.height)
+		size = Math.ceil(size / increment) * increment
+		size = increment if size < increment
+		size = Utils.devicePixelRatio() * size
+		size = parseInt(size)
+
+	# width = Utils.round(layer.width, 0, 100, 100)
+	# height = Utils.round(layer.height, 0, 100, 100)
+
+	return "https://images.unsplash.com/photo-#{photo}?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&w=#{size}&h=#{size}&fit=max"
+
 Utils.defineEnum = (names = [], offset = 0, geometric = 0) ->
+	# TODO: What is this doing here?
 	Enum = {}
 	for name, i in names
 		j = i
@@ -217,7 +242,7 @@ Utils.inspect = (item, max=5, l=0) ->
 		code = item.toString()["function ".length..].replace(/\n/g, "").replace(/\s+/g, " ")
 		# We limit the size of a function body if it's in a strucutre
 		limit = 50
-		code = "#{_.trimRight(code[..limit])}… }" if code.length > limit and l > 0
+		code = "#{_.trimEnd(code[..limit])}… }" if code.length > limit and l > 0
 		return "<Function #{code}>"
 	if _.isArray(item)
 		return "[...]" if l > max
@@ -289,6 +314,12 @@ Utils.cycle = ->
 # Backwards compatibility
 Utils.toggle = Utils.cycle
 
+Utils.callAfterCount = (total, callback) ->
+	# This calls a function after this method is called total times
+	count = 0
+	return callAfterCount = ->
+		count += 1
+		callback?() if count is total
 
 ######################################################
 # ENVIROMENT FUNCTIONS
@@ -304,14 +335,24 @@ Utils.webkitVersion = ->
 	version
 
 Utils.isChrome = ->
-	(/chrome/).test(navigator.userAgent.toLowerCase())
+	return /Chrome/.test(navigator.userAgent) and /Google Inc/.test(navigator.vendor)
 
 Utils.isSafari = ->
-	(/safari/).test(navigator.userAgent.toLowerCase())
+	return /Safari/.test(navigator.userAgent) and /Apple Computer/.test(navigator.vendor)
+
+Utils.isAndroid = ->
+	return /(android)/i.test(navigator.userAgent)
+
+Utils.isIOS = ->
+	return /(iPhone|iPod|iPad)/i.test(navigator.platform)
+
+Utils.isMacOS = ->
+	return /Mac/.test(navigator.platform)
+
+Utils.isWindows = ->
+	return /Win/.test(navigator.platform)
 
 Utils.isTouch = ->
-	# This needs to be a little more extensive because we
-	# patch ontouchstart to fake Hammer
 	window.ontouchstart is null and
 	window.ontouchmove is null and
 	window.ontouchend is null
@@ -371,7 +412,10 @@ Utils.devicePixelRatio = ->
 	window.devicePixelRatio
 
 Utils.isJP2Supported = ->
-	Utils.isWebKit() and not Utils.isChrome()
+	return Utils.isWebKit() and not Utils.isChrome()
+
+Utils.isWebPSupported = ->
+	return Utils.isChrome()
 
 Utils.deviceType = ->
 
@@ -390,12 +434,40 @@ Utils.deviceType = ->
 Utils.pathJoin = ->
 	Utils.arrayFromArguments(arguments).join("/")
 
+Utils.deviceFont = (os) ->
+
+	# https://github.com/jonathantneal/system-font-css
+
+	if not os
+		os = "macos" if Utils.isMacOS()
+		os = "ios" if Utils.isIOS()
+		os = "android" if Utils.isAndroid()
+		os = "windows" if Utils.isWindows()
+
+	return "-apple-system, SF UI Text, Helvetica Neue" if os is "macos"
+	return "-apple-system, SF UI Text, Helvetica Neue" if os is "ios"
+	return "Roboto, Helvetica Neue" if os is "android"
+	return "Segoe UI" if os is "windows"
+	return "Helvetica"
+
 ######################################################
 # MATH FUNCTIONS
 
-Utils.round = (value, decimals=0) ->
-	d = Math.pow 10, decimals
-	Math.round(value * d) / d
+Utils.round = (value, decimals=0, increment=null, min=null, max=null) ->
+
+	d = Math.pow(10, decimals)
+
+	value = Math.round(value / increment) * increment if increment
+	value = Math.round(value * d) / d
+
+	return min if min and value < min
+	return max if max and value > max
+	return value
+
+Utils.roundWhole = (value, decimals=1) ->
+	# Return integer if whole value, else include decimals
+	return parseInt(value) if parseInt(value) is value
+	return Utils.round(value, decimals)
 
 Utils.clamp = (value, a, b) ->
 
@@ -446,7 +518,7 @@ Utils.parseFunction = (str) ->
 
 	if _.endsWith str, ")"
 		result.name = str.split("(")[0]
-		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.trimRight(a, ")"))
+		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.trimEnd(a, ")"))
 	else
 		result.name = str
 
@@ -584,6 +656,21 @@ Utils.loadImage = (url, callback, context) ->
 
 # Point
 
+Utils.point = (input) ->
+
+	return Utils.pointZero(input) if _.isNumber(input)
+	return Utils.pointZero() unless input
+
+	result = Utils.pointZero()
+
+	for k in ["x", "y"]
+		result[k] = input[k] if _.isNumber(input[k])
+
+	return result
+
+Utils.pointZero = (n=0) ->
+	return {x:n, y:n}
+
 Utils.pointDivide = (point, fraction) ->
 	return point =
 		x: point.x / fraction
@@ -598,9 +685,6 @@ Utils.pointSubtract = (pointA, pointB) ->
 	return point =
 		x: pointA.x - pointB.x
 		y: pointA.y - pointB.y
-
-Utils.pointZero = (args={}) ->
-	return _.defaults(args, {x:0, y:0})
 
 Utils.pointMin = ->
 	points = Utils.arrayFromArguments arguments
@@ -653,8 +737,20 @@ Utils.pointAngle = (pointA, pointB) ->
 
 # Size
 
-Utils.sizeZero = (args={}) ->
-	return _.defaults(args, {width:0, height:0})
+Utils.size = (input) ->
+
+	return Utils.sizeZero(input) if _.isNumber(input)
+	return Utils.sizeZero() unless input
+
+	result = Utils.sizeZero()
+
+	for k in ["width", "height"]
+		result[k] = input[k] if _.isNumber(input[k])
+
+	return result
+
+Utils.sizeZero = (n=0)->
+	return {width:n, height:n}
 
 Utils.sizeMin = ->
 	sizes = Utils.arrayFromArguments arguments
@@ -683,6 +779,8 @@ Utils.parseRect = (args) ->
 		return args[0]
 	if _.isObject(args)
 		return args
+	if _.isNumber(args)
+		return {top:args, right:args, bottom:args, left:args}
 
 	return {}
 
@@ -694,9 +792,9 @@ Utils.frameGetMinX = (frame) -> frame.x
 Utils.frameSetMinX = (frame, value) -> frame.x = value
 
 Utils.frameGetMidX = (frame) ->
-	if frame.width is 0 then 0 else frame.x + (frame.width / 2.0)
+	if frame.width is 0 then frame.x else frame.x + (frame.width / 2.0)
 Utils.frameSetMidX = (frame, value) ->
-	frame.x = if frame.width is 0 then 0 else value - (frame.width / 2.0)
+	frame.x = if frame.width is 0 then value else value - (frame.width / 2.0)
 
 Utils.frameGetMaxX = (frame) ->
 	if frame.width is 0 then 0 else frame.x + frame.width
@@ -707,17 +805,29 @@ Utils.frameGetMinY = (frame) -> frame.y
 Utils.frameSetMinY = (frame, value) -> frame.y = value
 
 Utils.frameGetMidY = (frame) ->
-	if frame.height is 0 then 0 else frame.y + (frame.height / 2.0)
+	if frame.height is 0 then frame.y else frame.y + (frame.height / 2.0)
 Utils.frameSetMidY = (frame, value) ->
-	frame.y = if frame.height is 0 then 0 else value - (frame.height / 2.0)
+	frame.y = if frame.height is 0 then value else value - (frame.height / 2.0)
 
 Utils.frameGetMaxY = (frame) ->
 	if frame.height is 0 then 0 else frame.y + frame.height
 Utils.frameSetMaxY = (frame, value) ->
 	frame.y = if frame.height is 0 then 0 else value - frame.height
 
-Utils.frameZero = (args={}) ->
-	return _.defaults(args, {top:0, right:0, bottom:0, left:0})
+Utils.frame = (input) ->
+
+	return Utils.frameZero(input) if _.isNumber(input)
+	return Utils.frameZero() unless input
+
+	result = Utils.frameZero()
+
+	for k in ["x", "y", "width", "height"]
+		result[k] = input[k] if _.isNumber(input[k])
+
+	return result
+
+Utils.frameZero = (n=0) ->
+	return {x:n, y:n}
 
 Utils.frameSize = (frame) ->
 	size =
@@ -742,8 +852,8 @@ Utils.pointsFromFrame = (frame) ->
 
 Utils.frameFromPoints = (points) ->
 
-	xValues = _.pluck(points, "x")
-	yValues = _.pluck(points, "y")
+	xValues = _.map(points, "x")
+	yValues = _.map(points, "y")
 
 	minX = _.min(xValues)
 	maxX = _.max(xValues)
@@ -778,6 +888,13 @@ Utils.frameMerge = ->
 
 	frame
 
+Utils.frameInFrame = (frameA, frameB) ->
+	
+	for point in Utils.pointsFromFrame(frameA)
+		return false unless Utils.pointInFrame(point, frameB)
+
+	return true
+
 Utils.framePointForOrigin = (frame, originX, originY) ->
 	frame =
 		x: frame.x + (originX * frame.width)
@@ -789,6 +906,8 @@ Utils.frameInset = (frame, inset) ->
 
 	if _.isNumber(inset)
 		inset = {top:inset, right:inset, bottom:inset, left:inset}
+
+	frame = Utils.frame(frame)
 
 	frame =
 		x: frame.x + inset.left
@@ -824,6 +943,32 @@ Utils.pointInPolygon = (point, vs) ->
 		j = i++
 	inside
 
+Utils.frameIntersection = (rectA, rect) ->
+
+	x1 = rect.x
+	y1 = rect.y
+
+	x2 = x1 + rect.width
+	y2 = y1 + rect.height
+
+	if rectA.x > x1
+		x1 = rectA.x
+	if rectA.y > y1
+		y1 = rectA.y
+	if rectA.x + rectA.width < x2
+		x2 = rectA.x + rectA.width
+	if rectA.y + rectA.height < y2
+		y2 = rectA.y + rectA.height
+	if x2 <= x1 or y2 <= y1
+		return null
+
+	return rect =
+		x: x1
+		y: y1
+		width: x2 - x1
+		height: y2 - y1
+
+
 Utils.frameCenterPoint = (frame) ->
 	return point =
 		x: Utils.frameGetMidX(frame)
@@ -850,7 +995,7 @@ Utils.rotationNormalizer = ->
 
 
 # Coordinate system
- 
+
 # convert a point from a layer to the context level, with rootContext enabled you can make it cross to the top context
 Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLayer=true) ->
 	point = _.defaults(point, {x:0, y:0, z:0})
@@ -873,12 +1018,25 @@ Utils.convertFrameToContext = (frame = {}, layer, rootContext=false, includeLaye
 
 # convert a point from the context level to a layer, with rootContext enabled you can make it cross from the top context
 Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLayer=true) ->
+
 	point = _.defaults(point, {x:0, y:0, z:0})
+
+	if rootContext and webkitConvertPointFromPageToNode?
+		if includeLayer
+			node = layer._element
+		else
+			parent = layer.parent or layer.context
+			node = parent._element
+		return Utils.point(webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y)))
+
 	ancestors = layer.ancestors(rootContext)
 	ancestors.reverse()
 	ancestors.push(layer) if includeLayer
+	
 	for ancestor in ancestors
+		continue unless ancestor.matrix3d
 		point = ancestor.matrix3d.inverse().point(point)
+
 	return point
 
 # convert a frame from the context level to a layer, with rootContext enabled you can make it start from the top context
@@ -895,8 +1053,13 @@ Utils.convertPoint = (input, layerA, layerB, rootContext=false) ->
 	# Convert a point between two layer coordinate systems
 	point = _.defaults(input, {x:0, y:0, z:0})
 	point = Utils.convertPointToContext(point, layerA, rootContext) if layerA
-	return point unless layerB
-	return Utils.convertPointFromContext(point, layerB, rootContext)
+	if layerB?
+		return Utils.convertPointFromContext(point, layerB, rootContext)
+	else if layerA? and rootContext and webkitConvertPointFromPageToNode?
+		node = layerA.context._element
+		return Utils.point(webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y)))
+	else
+		return point
 
 # get the bounding frame of a layer, either at the canvas (rootcontext) or screen level
 Utils.boundingFrame = (layer, rootContext=true) ->

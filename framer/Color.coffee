@@ -1,3 +1,4 @@
+{_} = require "./Underscore"
 {BaseClass} = require "./BaseClass"
 libhusl		= require "husl"
 
@@ -67,7 +68,7 @@ class exports.Color extends BaseClass
 				g: Math.round(@_g)
 				b: Math.round(@_b)
 				a: @_a
-		return @_rgb
+		return _.clone(@_rgb)
 
 	toRgbString: ->
 		if @_a == 1 then "rgb(#{Utils.round(@_r, 0)}, #{Utils.round(@_g, 0)}, #{Utils.round(@_b, 0)})"
@@ -80,7 +81,7 @@ class exports.Color extends BaseClass
 				s: @s
 				l: @l
 				a: @a
-		return @_hsl
+		return _.clone(@_hsl)
 
 	toHusl: ->
 		if @_husl == undefined
@@ -88,7 +89,7 @@ class exports.Color extends BaseClass
 			husl = c.lch.husl c.luv.lch c.xyz.luv c.rgb.xyz([@r/255, @g/255, @b/255])
 			@_husl = { h: husl[0], s: husl[1], l: husl[2] }
 
-		return @_husl
+		return _.clone(@_husl)
 
 	toHslString: ->
 		if @_hslString == undefined
@@ -152,15 +153,21 @@ class exports.Color extends BaseClass
 	toString: ->
 		return @toRgbString()
 
-	transparent: ->
+	alpha: (alpha = 1) ->
 		result = new Color
 			r: @r
 			g: @g
 			b: @b
-			a: 0
+			a: alpha
+
+	transparent: ->
+		@alpha(0)
 
 	mix: (colorB, fraction, limit = false, model) ->
 		return Color.mix(@, colorB, fraction, limit, model)
+
+	copy: ->
+		return new Color(@)
 
 	isEqual: (colorB) ->
 		return Color.equal(@, colorB)
@@ -252,6 +259,12 @@ class exports.Color extends BaseClass
 	@random: (alpha = 1.0) ->
 		c = -> parseInt(Math.random() * 255)
 		return new Color "rgba(#{c()}, #{c()}, #{c()}, #{alpha})"
+
+	@grey: (g = 0.5, alpha = 1) ->
+		g = parseInt(g * 255)
+		return new Color "rgba(#{g}, #{g}, #{g}, #{alpha})"
+
+	@gray: (args...) -> @grey(args...)
 
 	@toColor: (color) -> return new Color(color)
 	@validColorValue: (color) -> return color instanceof Color or color == null
@@ -605,7 +618,8 @@ stringToObject = (color) ->
 cssNames =
 	aliceblue:"f0f8ff"
 	antiquewhite:"faebd7"
-	aqua:"0ff",aquamarine:"7fffd4"
+	aqua:"0ff"
+	aquamarine:"7fffd4"
 	azure:"f0ffff"
 	beige:"f5f5dc"
 	bisque:"ffe4c4"

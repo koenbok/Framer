@@ -1,12 +1,12 @@
 {BaseClass} = require "./BaseClass"
 {Events} = require "./Events"
 
-class CanvasClass extends BaseClass
+class Canvas extends BaseClass
 
 	@define "width",  get: -> window.innerWidth
 	@define "height", get: -> window.innerHeight
-	@define "size", get: -> {width:@width, height:@height}
-	@define "frame", get: -> {x:0, y:0, width:@width, height:@height}
+	@define "size", get: -> Utils.size(@)
+	@define "frame", get: -> Utils.frame(@)
 
 	@define "backgroundColor",
 		importable: false
@@ -20,16 +20,29 @@ class CanvasClass extends BaseClass
 		get: -> Framer.Device.background.image
 		set: (value) -> Framer.Device.background.image = value
 
-	addListener: (eventName, listener) =>
-		if eventName is "resize"
-			Events.wrap(window).addEventListener "resize", =>
-				@emit("resize")
-
-		super(eventName, listener)
-
-	on: @::addListener
+	constructor: (options={})->
+		super options
+		Events.wrap(window).addEventListener("resize", @_handleResize)
 
 	onResize: (cb) -> @on("resize", cb)
 
-# We use this as a singleton
-exports.Canvas = new CanvasClass
+	_handleResize: (event) =>
+		@emit("resize")
+		@emit("change:width")
+		@emit("change:height")
+		@emit("change:size")
+		@emit("change:frame")
+
+	toInspect: ->
+		return "<#{@constructor.name} #{@width}x#{@height}>"
+
+	# Point Conversion
+
+	convertPointToLayer: (point, layer) ->
+		return Utils.convertPointFromContext(point, layer, true, true)
+
+	convertPointToScreen: (point) ->
+		ctx = Framer.Device.context
+		return Utils.convertPointFromContext(point, ctx, true, true)
+
+exports.Canvas = Canvas

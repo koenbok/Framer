@@ -55,12 +55,13 @@ class exports.Animation extends BaseClass
 			delay: 0
 			debug: false
 			colorModel: "husl"
+			animate: true
+			looping: false
 
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
 		@options.properties = Animation.filterAnimatableProperties(@options.properties)
-
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
@@ -68,8 +69,14 @@ class exports.Animation extends BaseClass
 	@define "isAnimating",
 		get: -> @ in @options.layer.context.animations
 
-	start: =>
+	@define "looping",
+		get: -> @options.looping
+		set: (value) ->
+			@options?.looping = value
+			if @options?.looping and @options?.layer? and !@isAnimating
+				@restart()
 
+	start: =>
 		if @options.layer is null
 			console.error "Animation: missing layer"
 
@@ -88,7 +95,7 @@ class exports.Animation extends BaseClass
 
 			# Evaluate function properties
 			if _.isFunction(v)
-				v = v()
+				v = v(@options.layer, k)
 
 			# Evaluate relative properties
 			else if isRelativeProperty(v)
@@ -132,23 +139,26 @@ class exports.Animation extends BaseClass
 		# See if we need to repeat this animation
 		# Todo: more repeat behaviours:
 		# 1) add (from end position) 2) reverse (loop between a and b)
-		if @_repeatCounter > 0
-			@once "end", =>
-				for k, v of @_stateA
-					@_target[k] = v
-				@_repeatCounter--
-				@start()
+		@once "end", =>
+			if @_repeatCounter > 0 || @looping
+				@restart()
+				if not @looping
+					@_repeatCounter--
+		# If animate is false we set everything immediately and skip the actual animation
+		start = @_start
+		start = @_instant if @options.animate is false
 
 		# If we have a delay, we wait a bit for it to start
 		if @options.delay
-			Utils.delay(@options.delay, @_start)
+			@_delayTimer = Utils.delay(@options.delay, start)
 		else
-			@_start()
-
+			start()
 		return true
 
 	stop: (emit=true)->
-
+		if @_delayTimer?
+			Framer.CurrentContext.removeTimer(@_delayTimer)
+			@_delayTimer = null
 		@options.layer.context.removeAnimation(@)
 
 		@emit("stop") if emit
@@ -161,7 +171,15 @@ class exports.Animation extends BaseClass
 		animation = new Animation options
 		animation
 
-	copy: -> return new Animation(_.clone(@options))
+	reset: ->
+		for k, v of @_stateA
+			@_target[k] = v
+
+	restart: ->
+		@reset()
+		@start()
+
+	copy: -> new Animation(_.clone(@options))
 
 	# A bunch of common aliases to minimize frustration
 	revert: -> 	@reverse()
@@ -176,33 +194,53 @@ class exports.Animation extends BaseClass
 	animatingProperties: ->
 		_.keys(@_stateA)
 
+	_instant: =>
+		@emit("start")
+		@_prepareUpdateValues()
+		@_updateValues(1)
+		@emit("end")
+		@emit("stop")
+
 	_start: =>
 		@options.layer.context.addAnimation(@)
 		@emit("start")
 		Framer.Loop.on("update", @_update)
 
+		# Figure out what kind of values we have so we don't have to do it in
+		# the actual update loop. This saves a lot of frame budget.
+		@_prepareUpdateValues()
+
+
 	_update: (delta) =>
 		if @_animator.finished()
-			@_updateValue(1)
+			@_updateValues(1)
 			@stop(emit=false)
 			@emit("end")
 			@emit("stop")
 		else
-			@_updateValue(@_animator.next(delta))
+			@_updateValues(@_animator.next(delta))
 
-	_updateValue: (value) =>
+	_prepareUpdateValues: =>
+		@_valueUpdaters = {}
 
 		for k, v of @_stateB
-
 			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
-				@_target[k] = Color.mix(@_stateA[k], @_stateB[k], value, false, @options.colorModel)
+				@_valueUpdaters[k] = @_updateColorValue
 			else
-				@_target[k] = Utils.mapRange(value, 0, 1, @_stateA[k], @_stateB[k])
+				@_valueUpdaters[k] = @_updateNumberValue
 
-		return
+	_updateValues: (value) =>
+		@_valueUpdaters[k](k, value) for k, v of @_stateB
+		return null
+
+	_updateNumberValue: (key, value) =>
+		@_target[key] = Utils.mapRange(value, 0, 1, @_stateA[key], @_stateB[key])
+
+	_updateColorValue: (key, value) =>
+		@_target[key] = Color.mix(@_stateA[key], @_stateB[key], value, false, @options.colorModel)
 
 	_currentState: ->
-		_.pick @options.layer, _.keys(@options.properties)
+		return _.pick(@options.layer, _.keys(@options.properties))
 
 	_animatorClass: ->
 

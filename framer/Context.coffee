@@ -31,7 +31,11 @@ these at any time.
 
 ###
 
+Contexts = []
+
 class exports.Context extends BaseClass
+
+	@all = -> return _.clone(Contexts)
 
 	@define "parent",
 		get: -> @_parent
@@ -57,6 +61,13 @@ class exports.Context extends BaseClass
 
 		@reset()
 
+		if options.hasOwnProperty("index")
+			@index = options.index
+		else
+			@index = @id
+
+		Contexts.push(@)
+
 	reset: ->
 
 		@_createDOMEventManager()
@@ -69,9 +80,10 @@ class exports.Context extends BaseClass
 
 		@emit("reset", @)
 
-	# destroy: ->
-	# 	@reset()
-
+	destroy: ->
+		@reset()
+		@_destroyRootElement()
+		_.remove(Contexts, @)
 
 	##############################################################
 	# Collections
@@ -79,6 +91,14 @@ class exports.Context extends BaseClass
 	# Layers
 	@define "layers", get: -> _.clone(@_layers)
 	@define "layerCounter", get: -> @_layerCounter
+	@define "rootLayers", get: -> _.filter @_layers, (layer) -> layer.parent is null
+
+	@define "visible",
+		get: -> @_visible or true
+		set: (value) ->
+			return if value is @_visible
+			@_element?.style.visibility = if value then "visible" else "hidden"
+			@_visible = value
 
 	addLayer: (layer) ->
 		return if layer in @_layers
@@ -93,6 +113,22 @@ class exports.Context extends BaseClass
 		@_layers = []
 		@_layerCounter = 0
 
+	layerForId: (layerId) ->
+		for layer in @_layers
+			return layer if layer.id is layerId
+		return null
+
+	_layerForElement: (element) ->
+		for layer in @_layers
+			return layer if layer._element is element
+		return null
+
+	layerForElement: (element) ->
+		# Returns the framer layer containing the element
+		return null unless element
+		layer = @_layerForElement(element)
+		return layer if layer
+		return @layerForElement(element.parentNode)
 
 	# Animations
 	@define "animations", get: -> _.clone(@_animations)
@@ -121,6 +157,7 @@ class exports.Context extends BaseClass
 		@_timers.push(timer)
 
 	removeTimer: (timer) ->
+		window.clearTimeout(timer)
 		@_timers = _.without(@_timers, timer)
 
 	resetTimers: ->
@@ -311,6 +348,15 @@ class exports.Context extends BaseClass
 			if _.isNumber(value)
 				@_perspectiveOriginY = value
 				@_updatePerspective()
+
+	@define "index",
+		get: -> @_element?.style["z-index"] or 0 or 0
+		set: (value) ->
+			return unless @_element
+			@_element.style["z-index"] = value
+
+	ancestors: (args...) ->
+		return @_parent?.ancestors(args...) or []
 
 	toInspect: ->
 

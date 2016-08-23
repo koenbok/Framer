@@ -12,16 +12,12 @@ GestureInputMinimumFingerDistance = 30
 
 {DOMEventManager} = require "./DOMEventManager"
 
-TouchStart = ["touchstart", "mousedown"]
-TouchMove = ["touchmove", "mousemove"]
-TouchEnd = ["touchend", "mouseup"]
-
 class exports.GestureInputRecognizer
 
 	constructor: ->
 		@em = new DOMEventManager()
-
-		TouchStart.map (e) => @em.wrap(window).addEventListener(e, @touchstart)
+		@em.wrap(window).addEventListener("mousedown", @startMouse)
+		@em.wrap(window).addEventListener("touchstart", @startTouch)
 
 	destroy: ->
 		@em.removeAllListeners()
@@ -30,13 +26,23 @@ class exports.GestureInputRecognizer
 		window.clearTimeout(@session.pressTimer)
 		@session = null
 
+	startMouse: (event) =>
+		return if @session
+		@em.wrap(window).addEventListener("mousemove", @touchmove)
+		@em.wrap(window).addEventListener("mouseup", @touchend)
+		@touchstart(event)
+
+	startTouch: (event) =>
+		return if @session
+		@em.wrap(window).addEventListener("touchmove", @touchmove)
+		@em.wrap(window).addEventListener("touchend", @touchend)
+		@touchstart(event)
+
 	touchstart: (event) =>
 
 		# Only fire if we are not already in a session
 		return if @session
 
-		TouchMove.map (e) => @em.wrap(window).addEventListener(e, @touchmove)
-		TouchEnd.map (e) => @em.wrap(window).addEventListener(e, @touchend)
 		@em.wrap(window).addEventListener("webkitmouseforcechanged", @_updateMacForce)
 
 		@session =
@@ -74,8 +80,11 @@ class exports.GestureInputRecognizer
 			else
 				return unless (event.touches.length == event.changedTouches.length)
 
-		TouchMove.map (e) => @em.wrap(window).removeEventListener(e, @touchmove)
-		TouchEnd.map (e) => @em.wrap(window).removeEventListener(e, @touchend)
+		@em.wrap(window).removeEventListener("mousemove", @touchmove)
+		@em.wrap(window).removeEventListener("mouseup", @touchend)
+		@em.wrap(window).removeEventListener("touchmove", @touchmove)
+		@em.wrap(window).removeEventListener("touchend", @touchend)
+
 		@em.wrap(window).addEventListener("webkitmouseforcechanged", @_updateMacForce)
 
 		event = @_getGestureEvent(event)
@@ -117,7 +126,7 @@ class exports.GestureInputRecognizer
 	# ForceTap
 
 	_updateTouchForce: =>
-		return unless @session?.lastEvent?.touches.length
+		return unless @session?.lastEvent?.touches?.length
 		@session.force = @session.lastEvent.touches[0].force or 0
 		event = @_getGestureEvent(@session.lastEvent)
 		@forcetapchange(event)
@@ -228,16 +237,14 @@ class exports.GestureInputRecognizer
 		@_dispatchEvent("swipe#{direction}start", event)
 
 		swipeEdge = @_edgeForSwipeDirection(direction)
-		maxX = Utils.frameGetMaxX(Screen.canvasFrame)
-		maxY = Utils.frameGetMaxY(Screen.canvasFrame)
 
-		if swipeEdge is "top" and 0 < event.start.y - Screen.canvasFrame.y < GestureInputEdgeSwipeDistance
+		if swipeEdge is "top" and 0 < event.start.y < GestureInputEdgeSwipeDistance
 			@edgeswipedirectionstart(event)
-		if swipeEdge is "right" and maxX - GestureInputEdgeSwipeDistance < event.start.x < maxX
+		if swipeEdge is "right" and Screen.width - GestureInputEdgeSwipeDistance < event.start.x < Screen.width
 			@edgeswipedirectionstart(event)
-		if swipeEdge is "bottom" and maxY - GestureInputEdgeSwipeDistance < event.start.y < maxY
+		if swipeEdge is "bottom" and Screen.height - GestureInputEdgeSwipeDistance < event.start.y < Screen.height
 			@edgeswipedirectionstart(event)
-		if swipeEdge is "left" and 0 < event.start.x - Screen.canvasFrame.x < GestureInputEdgeSwipeDistance
+		if swipeEdge is "left" and 0 < event.start.x < GestureInputEdgeSwipeDistance
 			@edgeswipedirectionstart(event)
 
 	swipedirection: (event) =>
@@ -274,7 +281,6 @@ class exports.GestureInputRecognizer
 	# Utilities
 
 	_process: (event) =>
-
 		return unless @session
 
 		@session.events.push(event)
@@ -320,12 +326,16 @@ class exports.GestureInputRecognizer
 
 	_getGestureEvent: (event) ->
 
+		# Convert the point to the current context
+		eventPoint = Utils.convertPointFromContext(
+			@_getEventPoint(event), Framer.CurrentContext, true, true)
+
 		_.extend event,
 			time: Date.now() # Current time √
 
-			point: @_getEventPoint(event) # Current point √
-			start: @_getEventPoint(event) # Start point √
-			previous: @_getEventPoint(event) # Previous point √
+			point: eventPoint # Current point √
+			start: eventPoint # Start point √
+			previous: eventPoint # Previous point √
 
 			offset: {x:0, y:0} # Offset since start √
 			offsetTime: 0 # Time since start √
@@ -341,7 +351,7 @@ class exports.GestureInputRecognizer
 			velocity: {x:0, y:0} # Velocity average over the last few events √
 
 			fingers: event.touches?.length or 0 # Number of fingers used √
-			touchCenter: @_getEventPoint(event) # Center between two fingers √
+			touchCenter: eventPoint # Center between two fingers √
 			touchOffset: {x:0, y:0} # Offset between two fingers √
 			touchDistance: 0 # Distance between two fingers √
 			scale: 1 # Scale value from two fingers √

@@ -6,11 +6,12 @@ Utils = require "./Utils"
 
 Originals =
 	Layer:
-		backgroundColor: "rgba(0, 124, 255, 0.5)"
+		backgroundColor: "rgba(123,123,123,0.5)"
 		color: "white"
-		shadowColor: "black"
-		width: 100
-		height: 100
+		shadowColor: "rgba(123,123,123,0.5)"
+		borderColor: "rgba(123,123,123,0.5)"
+		width: 200
+		height: 200
 	Animation:
 		# curve: "spring(400,40,0)" # Or, the Cemre-Curve
 		curve: "ease"
@@ -66,6 +67,15 @@ Originals =
 			tension: 500
 			friction: 10
 			tolerance: 1
+	GridComponent:
+		rows: 3
+		columns: 3
+		spacing: 0
+		backgroundColor: "transparent"
+	ScrollComponent:
+		clip: true
+		mouseWheelEnabled: false
+		backgroundColor: null
 
 exports.Defaults =
 
@@ -74,9 +84,10 @@ exports.Defaults =
 		return {} unless Originals.hasOwnProperty(className)
 		return {} unless Framer.Defaults.hasOwnProperty(className)
 
-		# Always start with the originals
-		defaults = _.clone Originals[className]
+		options = _.clone options
 
+		# Always start with the originals
+		defaults = _.cloneDeep Originals[className]
 		# Copy over the user defined options
 		for k, v of Framer.Defaults[className]
 			defaults[k] = if _.isFunction(v) then v() else v
@@ -102,4 +113,4 @@ exports.Defaults =
 		exports.Defaults.reset()
 
 	reset: ->
-		window.Framer.Defaults = _.clone Originals
+		window.Framer.Defaults = _.cloneDeep Originals

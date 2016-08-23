@@ -1,87 +1,70 @@
-pwd = $(CURDIR)
-bin = $(pwd)/node_modules/.bin
-coffee = "$(bin)/coffee"
-githash = `git rev-parse --short HEAD`
-gulp = "$(bin)/gulp"
+# Configuration
 
-all: build
+BIN = $(CURDIR)/node_modules/.bin
+
+.PHONY: watch test debug release
+
+default: lazy_bootstrap lazy_build test
+
+# Utilities
 
 bootstrap:
 	npm install
 
+lazy_bootstrap: ; @test -d ./node_modules || make bootstrap
+
 unbootstrap:
 	rm -Rf node_modules
 
+
+
 clean:
 	rm -rf build
+	rm -Rf node_modules
 
-build: bootstrap clean
-	mkdir -p build
-	$(gulp) build-release
 
-debug: bootstrap clean
-	mkdir -p build
-	$(gulp) build-debug
+# Building and testing
 
-watch: bootstrap
-	$(gulp) watch
+watch: lazy_bootstrap
+	$(BIN)/gulp watch
 
-dev: bootstrap
-	open -a "Framer Studio Beta" "extras/DevServer.framer"
-	$(bin)/coffee scripts/devserver.coffee
+build: lazy_bootstrap
+	$(BIN)/gulp webpack:debug
 
-test: bootstrap
-	$(gulp) test
+lazy_build: ; @test -f ./build/framer.debug.js || make build
 
-coverage: bootstrap
-	$(bin)/coffeeCoverage ./framer ./build/instrumented
-	$(gulp) coverage
-	cp ./test/coverage-template/* ./build/coverage
-	open ./build/coverage/jscoverage.html
+test: lazy_build
+	$(BIN)/gulp test
+
+release: lazy_bootstrap
+	$(BIN)/gulp webpack:release
+
+
+# Framer Studio
 
 studio:
-	open -a "Framer Studio" extras/Studio.framer
+	open -a "Framer Beta" extras/Studio.framer
+	make watch
 
-perf:
-	open -a "Framer Studio" extras/Perf.framer
+perf: debug
+	open -a "Framer Beta" extras/Perf.framer
 
-# Building and uploading the site
 
-dist: build
-	mkdir -p build/Framer
-	cp -R extras/templates/Project build/Framer/Project
-	rm -Rf build/Framer/Project/framer
-	mkdir -p build/Framer/Project/framer
-	cp build/framer.js build/Framer/Project/framer/framer.js
-	cp build/framer.js.map build/Framer/Project/framer/framer.js.map
-	find build/Framer -name ".DS_Store" -depth -exec rm {} \;
-	cd build; zip -r Framer.zip Framer
+# Distribution
 
-site%build:
-	mkdir -p build/builds.framerjs.com
-	$(coffee) scripts/site-deploy.coffee build
-	cp -R extras/builds.framerjs.com/static build/builds.framerjs.com/static
-	mkdir -p build/builds.framerjs.com/latest
-	cp build/*.js build/builds.framerjs.com/latest
-	cp build/*.map build/builds.framerjs.com/latest
-	cp build/*.zip build/builds.framerjs.com/latest
-	cp -R build/builds.framerjs.com/latest build/builds.framerjs.com/$(githash)
+dist: release
+	scripts/dist.sh
 
-site%upload:
-	make site:build
-	$(coffee) scripts/site-deploy.coffee upload
+site-build: dist
+	scripts/site-build.sh
 
-deploy:
-	make site:build
-	make site:upload
+site-upload: bootstrap site-build
+	$(BIN)/coffee scripts/site.coffee upload
 
-resources%optimize:
-	python scripts/optimize.py
+# Resources
 
-resources%upload:
+resources-optimize:
+	python scripts/resources-optimize.py
+
+resources-upload:
 	cd extras/resources.framerjs.com; cactus deploy
-
-lint:
-	./node_modules/.bin/coffeelint -f coffeelint.json -r framer
-
-.PHONY: all build test clean perf watch

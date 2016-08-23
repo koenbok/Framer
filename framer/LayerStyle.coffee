@@ -2,6 +2,12 @@ filterFormat = (value, unit) ->
 	"#{Utils.round value, 2}#{unit}"
 	# "#{value}#{unit}"
 
+roundToZero = (num) ->
+	if (-1e-6 < num && num < 1e-6)
+		return 0
+	return num
+
+
 # TODO: Ideally these should be read out from the layer defined properties
 _WebkitProperties = [
 	["blur", "blur", 0, "px"],
@@ -23,6 +29,7 @@ _Force2DProperties =
 	"skewY": 0
 	"rotationX": 0
 	"rotationY": 0
+
 
 exports.LayerStyle =
 
@@ -91,8 +98,6 @@ exports.LayerStyle =
 		return css.join(" ")
 
 	webkitTransform: (layer) ->
-
-
 		# We have a special rendering path for layers that prefer 2d rendering.
 		# This definitely decreases performance, but is handy in complex drawing
 		# scenarios with rounded corners and shadows where gpu drawing gets weird
@@ -100,24 +105,23 @@ exports.LayerStyle =
 
 		if layer._prefer2d or layer._properties.force2d
 			return exports.LayerStyle.webkitTransformForce2d(layer)
-
 		"
 		translate3d(
-			#{layer._properties.x}px,
-			#{layer._properties.y}px,
-			#{layer._properties.z}px)
+			#{roundToZero(layer._properties.x)}px,
+			#{roundToZero(layer._properties.y)}px,
+			#{roundToZero(layer._properties.z)}px)
 		scale3d(
-			#{layer._properties.scaleX * layer._properties.scale},
-			#{layer._properties.scaleY * layer._properties.scale},
-			#{layer._properties.scaleZ})
-		skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg)
-		skewX(#{layer._properties.skewX}deg)
-		skewY(#{layer._properties.skewY}deg)
-		translateZ(#{layer._properties.originZ}px)
-		rotateX(#{layer._properties.rotationX}deg)
-		rotateY(#{layer._properties.rotationY}deg)
-		rotateZ(#{layer._properties.rotationZ}deg)
-		translateZ(#{-layer._properties.originZ}px)
+			#{roundToZero(layer._properties.scaleX * layer._properties.scale)},
+			#{roundToZero(layer._properties.scaleY * layer._properties.scale)},
+			#{roundToZero(layer._properties.scaleZ)})
+		skew(#{roundToZero(layer._properties.skew)}deg,#{roundToZero(layer._properties.skew)}deg)
+		skewX(#{roundToZero(layer._properties.skewX)}deg)
+		skewY(#{roundToZero(layer._properties.skewY)}deg)
+		translateZ(#{roundToZero(layer._properties.originZ)}px)
+		rotateX(#{roundToZero(layer._properties.rotationX)}deg)
+		rotateY(#{roundToZero(layer._properties.rotationY)}deg)
+		rotateZ(#{roundToZero(layer._properties.rotationZ)}deg)
+		translateZ(#{roundToZero(-layer._properties.originZ)}px)
 		"
 
 	webkitTransformForce2d: (layer) ->
@@ -131,10 +135,10 @@ exports.LayerStyle =
 			if layer._properties[p] isnt v
 				console.warn "Layer property '#{p}'' will be ignored with force2d enabled"
 
-		css.push "translate(#{layer._properties.x}px,#{layer._properties.y}px)"
-		css.push "scale(#{layer._properties.scale})"
-		css.push "skew(#{layer._properties.skew}deg,#{layer._properties.skew}deg)"
-		css.push "rotate(#{layer._properties.rotationZ}deg)"
+		css.push "translate(#{roundToZero(layer._properties.x)}px,#{roundToZero(layer._properties.y)}px)"
+		css.push "scale(#{roundToZero(layer._properties.scale)})"
+		css.push "skew(#{roundToZero(layer._properties.skew)}deg,#{roundToZero(layer._properties.skew)}deg)"
+		css.push "rotate(#{roundToZero(layer._properties.rotationZ)}deg)"
 
 		return css.join(" ")
 

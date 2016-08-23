@@ -407,6 +407,12 @@ describe "Utils", ->
 			g[varName] = new Layer
 			Utils.inspect(_.keys(g)).should.equal("[\"123\"]")
 
+		it "should work with align", ->
+			options =
+				x: Align.center
+				y: Align.center
+			Utils.inspect(options).should.equal("{x:Align.center, y:Align.center}")
+
 	describe "keyPath", ->
 
 		it "should get with single", ->

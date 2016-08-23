@@ -19,6 +19,11 @@ Events.DragAnimationStart 	 = "draganimationstart"
 Events.DragAnimationEnd   	 = "draganimationend"
 Events.DirectionLockStart    = "directionlockstart"
 
+# Special cases
+Events.DragSessionStart      = "dragsessionstart"
+Events.DragSessionMove       = "dragsessionmove"
+Events.DragSessionEnd        = "dragsessionend"
+
 # Add deprecated aliases
 Events.DragAnimationDidStart = Events.DragAnimationStart
 Events.DragAnimationDidEnd = Events.DragAnimationEnd
@@ -101,13 +106,16 @@ class exports.LayerDraggable extends BaseClass
 
 	attach: ->
 		@layer.on(Gestures.TapStart, @touchStart)
-		@layer.on(Gestures.Pan, @_touchMove)
-		@layer.on(Gestures.TapEnd, @_touchEnd)
+		# @layer.on(Gestures.Pan, @_touchMove)
+		# @layer.on(Gestures.TapEnd, @_touchEnd)
+
+
+
 		@layer.on("change:x", @_updateLayerPosition)
 		@layer.on("change:y", @_updateLayerPosition)
 
 	remove: ->
-		@layer.off(Gestures.PanStart, @touchStart)
+		@layer.off(Gestures.TapStart, @touchStart)
 		@layer.off(Gestures.Pan, @_touchMove)
 		@layer.off(Gestures.PanEnd, @_touchEnd)
 
@@ -127,6 +135,9 @@ class exports.LayerDraggable extends BaseClass
 		@_point = @layer.point
 
 	_touchStart: (event) =>
+
+		Events.wrap(document).addEventListener(Gestures.Pan, @_touchMove)
+		Events.wrap(document).addEventListener(Gestures.TapEnd, @_touchEnd)
 
 		# Only reset isMoving if this was not animating when we were clicking
 		# so we can use it to detect a click versus a drag.
@@ -176,6 +187,8 @@ class exports.LayerDraggable extends BaseClass
 		@_point = @_correctedLayerStartPoint
 		@_ignoreUpdateLayerPosition = false
 
+		@emit(Events.DragSessionStart, event)
+
 	_touchMove: (event) =>
 
 		return unless @enabled
@@ -196,12 +209,8 @@ class exports.LayerDraggable extends BaseClass
 			t: Date.now() # We don't use timeStamp because it's different on Chrome/Safari
 
 		point = _.clone(@_point)
-
-		scaleX = (1 / @layer.canvasScaleX() * @layer.scale * @layer.scaleX)
-		scaleY = (1 / @layer.canvasScaleY() * @layer.scale * @layer.scaleY)
-
-		point.x = @_point.x + (event.delta.x * scaleX * @speedX) if @horizontal
-		point.y = @_point.y + (event.delta.y * scaleY * @speedY) if @vertical
+		point.x = @_point.x + (event.delta.x * @speedX * (1 / @layer.screenScaleX(false))) if @horizontal
+		point.y = @_point.y + (event.delta.y * @speedY * (1 / @layer.screenScaleY(false))) if @vertical
 
 		# Save the point for the next update so we have the unrounded, unconstrained value
 		@_point = _.clone(point)
@@ -249,7 +258,12 @@ class exports.LayerDraggable extends BaseClass
 			@emit(Events.Move, @layer.point)
 			@emit(Events.DragDidMove, event)
 
+		@emit(Events.DragSessionMove, event)
+
 	_touchEnd: (event) =>
+
+		Events.wrap(document).removeEventListener(Gestures.Pan, @_touchMove)
+		Events.wrap(document).removeEventListener(Gestures.TapEnd, @_touchEnd)
 
 		event.stopPropagation() if @propagateEvents is false
 
@@ -258,6 +272,7 @@ class exports.LayerDraggable extends BaseClass
 		# be canceled by the user's animation (if the user animates x and/or y).
 		@_startSimulation()
 
+		@emit(Events.DragSessionEnd, event)
 		@emit(Events.DragEnd, event) if @_isDragging
 
 		# Set _isDragging after DragEnd is fired, so that calls to calculateVelocity()

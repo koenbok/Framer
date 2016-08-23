@@ -203,5 +203,5 @@ describe "BaseClass", ->
 			testPropA: 'a'
 			testPropB: true
 
-		instance.props.testPropA.should.equal "a"
-		instance.props.testPropB.should.equal "value"
+		instance.testPropA.should.equal "a"
+		instance.testPropB.should.equal "value"

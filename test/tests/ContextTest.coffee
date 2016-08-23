@@ -132,9 +132,8 @@ describe "Context", ->
 
 			context.run ->
 				layer = new Layer
-				animation = layer.animate
-					properties:
-						x: 100
+				animation = layer.animateTo
+					x: 100
 
 			# We should have a click listener
 			context.animations.should.eql [animation]
@@ -158,6 +157,54 @@ describe "Context", ->
 			context.timers.should.eql [timer]
 			context.freeze()
 			context.timers.should.eql []
+
+
+	describe "Layers", ->
+
+		it "should add and remove layers", ->
+
+			context = new Framer.Context(name:"Test")
+
+			context.run ->
+
+				layerA = new Layer
+				layerB = new Layer
+				layerC = new Layer
+				layerD = new Layer
+
+				context.layers.should.eql [layerA, layerB, layerC, layerD]
+				_.invokeMap(context.layers, "destroy")
+				context.layers.should.eql []
+
+		it "should list root layers", ->
+
+			context = new Framer.Context(name:"Test")
+
+			context.run ->
+
+				layerA = new Layer
+				layerB = new Layer parent:layerA
+
+				context.rootLayers.should.eql [layerA]
+				layerB.parent = null
+				context.rootLayers.should.eql [layerA, layerB]
+
+		it "should get layers by id", ->
+
+			context = new Framer.Context(name:"Test")
+
+			context.run ->
+				layerA = new Layer
+				context.layerForId(layerA.id).should.equal layerA
+
+		it "should get layers by element", ->
+
+			context = new Framer.Context(name:"Test")
+
+			context.run ->
+				layerA = new Layer
+				context.layerForElement(layerA._element).should.equal layerA
+
 
 
 	describe "Events", ->
