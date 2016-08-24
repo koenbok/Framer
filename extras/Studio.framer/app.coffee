@@ -1,17 +1,12 @@
-# Framer.Extras.Hints.disable()
 
-Framer.Info =
-	title: ""
-	author: "Koen Bok"
-	twitter: ""
-	description: ""
 
-# Framer.Extras.Preloader.enable()
+Device.customize
+	deviceType: Device.Type.Tablet
+	screenWidth: 720
+	screenHeight: 1024
+	deviceImage: "http://f.cl.ly/items/001L0v3c1f120t0p2z24/custom.png"
+	deviceImageWidth: 800
+	deviceImageHeight: 1214
 
-grid = new GridComponent
-	size: Screen
+Screen.backgroundColor = "28affa"
 
-grid.renderCell = (layer) ->
-	layer.image = Utils.randomImage(layer) + "cache=#{Date.now()}"
-	
-	layer.onTap ->

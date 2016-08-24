@@ -59,6 +59,11 @@ class exports.DeviceComponent extends BaseClass
 
 		_.extend(@, _.defaults(options, defaults))
 
+		@Type =
+			Tablet: "tablet"
+			Phone: "phone"
+			Browser: "browser"
+
 	_setup: ->
 
 		if @_setupDone
@@ -229,12 +234,16 @@ class exports.DeviceComponent extends BaseClass
 	###########################################################################
 	# DEVICE TYPE
 
+	customize: (deviceProps) =>
+		Devices.custom = _.defaults deviceProps, Devices.custom
+		@deviceType = "custom"
+
 	@define "deviceType",
 		get: ->
 			@_deviceType
 		set: (deviceType) ->
 
-			if deviceType is @_deviceType
+			if deviceType is @_deviceType and deviceType isnt "custom"
 				return
 
 			device = null
@@ -263,6 +272,8 @@ class exports.DeviceComponent extends BaseClass
 			@_updateDeviceImage()
 			@_update()
 			@emit("change:deviceType")
+
+			@viewport.point = @_viewportOrientationOffset()
 
 			if shouldZoomToFit
 				@deviceScale = "fit"
@@ -459,24 +470,7 @@ class exports.DeviceComponent extends BaseClass
 			rotationZ: -@_orientation
 			scale: @_calculatePhoneScale()
 
-		[width, height] = @_getOrientationDimensions(@_device.screenWidth, @_device.screenHeight)
-
-		@content.width = width
-		@content.height = height
-
-		offset = (@screen.width - width) / 2
-		offset *= -1 if @_orientation == -90
-
-		[x, y] = [0, 0]
-
-		if @isLandscape
-			x = offset
-			y = offset
-
-		contentProperties =
-			rotationZ: @_orientation
-			x: x
-			y: y
+		contentProperties = @_viewportOrientationOffset()
 
 		@hands.animateStop()
 		@viewport.animateStop()
@@ -498,6 +492,27 @@ class exports.DeviceComponent extends BaseClass
 		@handsImageLayer.image = "" if @_orientation != 0
 
 		@emit("change:orientation", @_orientation)
+
+	_viewportOrientationOffset: =>
+
+		[width, height] = @_getOrientationDimensions(@_device.screenWidth, @_device.screenHeight)
+
+		@content.width = width
+		@content.height = height
+
+		offset = (@screen.width - width) / 2
+		offset *= -1 if @_orientation == -90
+
+		[x, y] = [0, 0]
+
+		if @isLandscape
+			x = offset
+			y = offset
+
+		return contentProperties =
+			rotationZ: @_orientation
+			x: x
+			y: y
 
 	_orientationChange: =>
 		@_orientation = window.orientation
@@ -990,6 +1005,14 @@ Devices =
 		name: "Fullscreen"
 		deviceType: "desktop"
 		backgroundColor: "white"
+
+	"custom":
+		name: "Custom"
+		deviceImageWidth: 874
+		deviceImageHeight: 1792
+		screenWidth: 750
+		screenHeight: 1334
+		deviceType: "phone"
 
 	# iPad Air
 	"apple-ipad-air-2-silver": _.clone(iPadAir2BaseDevice)
