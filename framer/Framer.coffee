@@ -27,6 +27,7 @@ Framer.GridComponent = (require "./Components/GridComponent").GridComponent
 Framer.NavComponent = (require "./Components/NavComponent").NavComponent
 Framer.CircularProgressComponent = (require "./Components/CircularProgressComponent").CircularProgressComponent
 Framer.MIDIComponent = (require "./Components/MIDIComponent").MIDIComponent
+Framer.WindowComponent = (require "./Components/WindowComponent").WindowComponent
 Framer.DeviceView = Framer.DeviceComponent # Compat
 
 _.extend(window, Framer) if window
