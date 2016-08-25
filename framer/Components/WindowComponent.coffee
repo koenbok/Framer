@@ -136,24 +136,10 @@ class exports.WindowComponent extends Layer
 	
 		for resizingIndex in [0...9]
 			continue if resizingIndex is 4
-			
-			name = ""
-
-			left = resizingIndex % 3 is 0
-			right = (resizingIndex - 2) % 3 is 0
-			top = resizingIndex < 3
-			bottom = resizingIndex > 5
-
-			name = "top" if top
-			name = "bottom" if bottom
-			name += " " if name.length
-			name += "left" if left
-			name += "right" if right
-			name += " handle"
 
 			resizeLayer = new Layer
 				parent: @
-				name: name
+				name: ".resizingHandle"
 				backgroundColor: null
 			resizeLayer.resizingIndex = resizingIndex
 			cursorIndex = resizingIndex
