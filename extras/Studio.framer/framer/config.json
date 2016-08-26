@@ -6,7 +6,7 @@
   "sharedPrototype" : 1,
   "contentScale" : 1,
   "deviceType" : "custom",
-  "selectedHand" : "iphone-hands-1",
+  "selectedHand" : "",
   "updateDelay" : 0.3,
   "deviceScale" : "fit",
   "foldedCodeRanges" : [
