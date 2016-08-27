@@ -25,6 +25,9 @@ class exports.TextLayer extends Layer
 			if currentDevice.indexOf("google") > -1
 				@_setStyle("Roboto, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
 
+			if currentDevice.indexOf("microsoft") > -1
+				@_setStyle("Segoe UI, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
+
 			# Else: macOS
 			else
 				@_setStyle("-apple-system, SF UI Text, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
