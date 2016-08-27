@@ -2,6 +2,7 @@
 {Events} = require "./Events"
 
 class exports.TextLayer extends Layer
+
 	constructor: (options={}) ->
 
 		options.width ?= 300

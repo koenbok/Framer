@@ -1,3 +1,5 @@
+Utils = require "./Utils"
+
 {Layer} = require "./Layer"
 {TextLayer} = require "./TextLayer"
 {Events} = require "./Events"
@@ -15,36 +17,41 @@ class exports.InputLayer extends TextLayer
 			backgroundColor: "#FFF"
 			width: 500
 			height: 100
-			color: "#AAA"
 
 		super options
 
-		if not @multiLine
-			@input = document.createElement("input")
-		else
-			@input = document.createElement("textarea")
+		# Layer containing input element
+		@input = new Layer
+			backgroundColor: "transparent"
+			x: 30
+			width: @width - 60
+			parent: @
 
-		@_element.appendChild(@input)
+		if not @multiLine
+			@_inputElement = document.createElement("input")
+		else
+			@_inputElement = document.createElement("textarea")
+			@input.y = 30
+
+		# The id serves to differentiate multiple input elements from one another.
+		# To allow styling the placeholder colors of seperate elements.
+		@_id = Utils.round(Utils.randomNumber(0, 100))
+		@_inputElement.className = "input" + @_id
+
+		# Append element
+		@input._element.appendChild(@_inputElement)
 
 		# Match TextLayer defaults and type properties
-		@input.style.fontFamily = @fontFamily
-		@input.style.fontSize = @fontSize
-		@input.style.lineHeight = @lineHeight
-		@input.style.fontWeight = @fontWeight
-		@input.style.outline = "none"
-		@input.style.backgroundColor = "transparent"
-		@input.style.width = "#{@width - 64}px"
-		@input.style.height = "#{@height}px"
-		@input.style.cursor = "auto"
-
-		# Set placeholder color
-		document.styleSheets[0].addRule("::-webkit-input-placeholder", "color: #{@color}")
-
-		# Input text spacing
-		@input.style.marginLeft = "32px"
-
-		if @multiLine
-			@input.style.marginTop = "32px"
+		@_inputElement.style.fontFamily = @fontFamily
+		@_inputElement.style.fontSize = @fontSize
+		@_inputElement.style.lineHeight = @lineHeight
+		@_inputElement.style.fontWeight = @fontWeight
+		@_inputElement.style.color = @color
+		@_inputElement.style.outline = "none"
+		@_inputElement.style.backgroundColor = "transparent"
+		@_inputElement.style.width = "#{@width - 64}px"
+		@_inputElement.style.height = "#{@height}px"
+		@_inputElement.style.cursor = "auto"
 
 		# If text has been defined, use that, otherwise default to placeholder
 		@_setPlaceholder()
@@ -56,10 +63,10 @@ class exports.InputLayer extends TextLayer
 		@_isFocused = false
 
 		# Default focus interaction
-		@input.onfocus = (e) =>
+		@_inputElement.onfocus = (e) =>
 
-			@input.style.color = "#000"
-			@input.value = ""
+			@_inputElement.style.color = "#000"
+			@_inputElement.value = ""
 
 			# Emit focus event
 			@emit(Events.InputFocus, event)
@@ -67,10 +74,10 @@ class exports.InputLayer extends TextLayer
 			@_isFocused = true
 
 
-		@input.onkeyup = (e) =>
+		@_inputElement.onkeyup = (e) =>
 
 			# Check last character
-			lastCharacter = @input.value.substr(@input.value.length - 1)
+			lastCharacter = @_inputElement.value.substr(@_inputElement.value.length - 1)
 
 			# Exclude enter, shift, caps lock, control, alt, command etc.
 			unless e.which in [13, 16, 17, 18, 20, 91, 93]
@@ -90,21 +97,26 @@ class exports.InputLayer extends TextLayer
 				@_setPlaceholder()
 
 	_setPlaceholder: =>
-		@input.placeholder =
+		@_inputElement.placeholder =
 			if @text isnt "" and @text isnt "Type Something" then @text else "Placeholder"
 
 		unless @_isFocused
-			@input.style.color =
+			@_inputElement.style.color =
 				if @color? then @color else "#aaa"
 
+			@_setPlaceholderColor(@_id, @color)
+
+	_setPlaceholderColor: (id, color) ->
+		document.styleSheets[0].addRule(".input#{id}::-webkit-input-placeholder", "color: #{color}")
+
 	@define "value",
-		get: -> @input.value
+		get: -> @_inputElement.value
 
 	@define "focusColor",
-		get: -> @input.style.color
+		get: -> @_inputElement.style.color
 		set: (value) ->
 			@onInputFocus ->
-				@input.style.color = value
+				@_inputElement.style.color = value
 
 	@define "multiLine", @simpleProperty("multiLine", false)
 
