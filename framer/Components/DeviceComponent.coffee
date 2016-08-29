@@ -59,6 +59,11 @@ class exports.DeviceComponent extends BaseClass
 
 		_.extend(@, _.defaults(options, defaults))
 
+		@Type =
+			Tablet: "tablet"
+			Phone: "phone"
+			Browser: "browser"
+
 	_setup: ->
 
 		if @_setupDone
@@ -229,12 +234,16 @@ class exports.DeviceComponent extends BaseClass
 	###########################################################################
 	# DEVICE TYPE
 
+	customize: (deviceProps) =>
+		Devices.custom = _.defaults deviceProps, Devices.custom
+		@deviceType = "custom"
+
 	@define "deviceType",
 		get: ->
 			@_deviceType
 		set: (deviceType) ->
 
-			if deviceType is @_deviceType
+			if deviceType is @_deviceType and deviceType isnt "custom"
 				return
 
 			device = null
@@ -263,6 +272,8 @@ class exports.DeviceComponent extends BaseClass
 			@_updateDeviceImage()
 			@_update()
 			@emit("change:deviceType")
+
+			@viewport.point = @_viewportOrientationOffset()
 
 			if shouldZoomToFit
 				@deviceScale = "fit"
@@ -459,24 +470,7 @@ class exports.DeviceComponent extends BaseClass
 			rotationZ: -@_orientation
 			scale: @_calculatePhoneScale()
 
-		[width, height] = @_getOrientationDimensions(@_device.screenWidth, @_device.screenHeight)
-
-		@content.width = width
-		@content.height = height
-
-		offset = (@screen.width - width) / 2
-		offset *= -1 if @_orientation == -90
-
-		[x, y] = [0, 0]
-
-		if @isLandscape
-			x = offset
-			y = offset
-
-		contentProperties =
-			rotationZ: @_orientation
-			x: x
-			y: y
+		contentProperties = @_viewportOrientationOffset()
 
 		@hands.animateStop()
 		@viewport.animateStop()
@@ -498,6 +492,27 @@ class exports.DeviceComponent extends BaseClass
 		@handsImageLayer.image = "" if @_orientation != 0
 
 		@emit("change:orientation", @_orientation)
+
+	_viewportOrientationOffset: =>
+
+		[width, height] = @_getOrientationDimensions(@_device.screenWidth, @_device.screenHeight)
+
+		@content.width = width
+		@content.height = height
+
+		offset = (@screen.width - width) / 2
+		offset *= -1 if @_orientation == -90
+
+		[x, y] = [0, 0]
+
+		if @isLandscape
+			x = offset
+			y = offset
+
+		return contentProperties =
+			rotationZ: @_orientation
+			x: x
+			y: y
 
 	_orientationChange: =>
 		@_orientation = window.orientation
@@ -844,6 +859,54 @@ AppleWatch38BlackLeatherDevice =
 	screenHeight: 340
 	minStudioVersion: newDeviceMinVersion
 
+AppleMacBook =
+	deviceImageWidth: 3084
+	deviceImageHeight: 1860
+	deviceImageCompression: true
+	screenWidth: 2304
+	screenHeight: 1440
+	minStudioVersion: newDeviceMinVersion
+
+AppleMacBookAir =
+	deviceImageWidth: 2000
+	deviceImageHeight: 1220
+	deviceImageCompression: true
+	screenWidth: 1440
+	screenHeight: 900
+	minStudioVersion: newDeviceMinVersion
+
+AppleMacBookPro =
+	deviceImageWidth: 3820
+	deviceImageHeight: 2320
+	deviceImageCompression: true
+	screenWidth: 2880
+	screenHeight: 1800
+	minStudioVersion: newDeviceMinVersion
+
+AppleIMac =
+	deviceImageWidth: 2800
+	deviceImageHeight: 2940
+	deviceImageCompression: true
+	screenWidth: 2560
+	screenHeight: 1440
+	minStudioVersion: newDeviceMinVersion
+
+DellXPS =
+	deviceImageWidth: 5200
+	deviceImageHeight: 3040
+	deviceImageCompression: true
+	screenWidth: 3840
+	screenHeight: 2160
+	minStudioVersion: newDeviceMinVersion
+
+SonyW85OC =
+	deviceImageWidth: 1320
+	deviceImageHeight: 860
+	deviceImageCompression: true
+	screenWidth: 1280
+	screenHeight: 720
+	minStudioVersion: newDeviceMinVersion
+
 ###########################################################################
 # OLD DEVICE CONFIGURATIONS
 
@@ -991,6 +1054,14 @@ Devices =
 		deviceType: "desktop"
 		backgroundColor: "white"
 
+	"custom":
+		name: "Custom"
+		deviceImageWidth: 874
+		deviceImageHeight: 1792
+		screenWidth: 750
+		screenHeight: 1334
+		deviceType: "phone"
+
 	# iPad Air
 	"apple-ipad-air-2-silver": _.clone(iPadAir2BaseDevice)
 	"apple-ipad-air-2-gold": _.clone(iPadAir2BaseDevice)
@@ -1092,7 +1163,19 @@ Devices =
 	"samsung-galaxy-note-5-silver-titanium": _.clone(SamsungGalaxyNote5BaseDevice)
 	"samsung-galaxy-note-5-white": _.clone(SamsungGalaxyNote5BaseDevice)
 
-	# Desktop Browser
+	# Notebooks
+	"apple-macbook": _.clone(AppleMacBook)
+	"apple-macbook-air": _.clone(AppleMacBookAir)
+	"apple-macbook-pro": _.clone(AppleMacBookPro)
+	"dell-xps": _.clone(DellXPS)
+
+	# Desktops
+	"apple-imac": _.clone(AppleIMac)
+
+	# TV
+	"sony-w85Oc": _.clone(SonyW85OC)
+
+	# OLD DEVICES
 	"desktop-safari-1024-600":
 		deviceType: "browser"
 		name: "Desktop Safari 1024 x 600"
@@ -1120,8 +1203,6 @@ Devices =
 		deviceImageHeight: 1060
 		deviceImageCompression: true
 		backgroundColor: "white"
-
-	# OLD DEVICES
 
 	# iPhone 6
 	"iphone-6-spacegray": _.clone(old_iPhone6BaseDevice)

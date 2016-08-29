@@ -224,8 +224,10 @@ touchEmulator = null
 exports.enable = ->
 	return if Utils.isTouch()
 	touchEmulator ?= new TouchEmulator()
+	Events.enableEmulatedTouchEvents(true)
 
 exports.disable = ->
 	return unless touchEmulator
 	touchEmulator.destroy()
 	touchEmulator = null
+	Events.enableEmulatedTouchEvents(false)

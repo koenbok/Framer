@@ -114,15 +114,6 @@ class exports.PageComponent extends ScrollComponent
 		else
 			@updateContent()
 
-	setContentLayer: (contentLayer) ->
-		if @content
-			@_onAnimationStop()
-			@content.off(Events.AnimationStart, @_onAnimationStart)
-			@content.off(Events.AnimationStop, @_onAnimationStop)
-		super contentLayer
-		@content.on(Events.AnimationStart, @_onAnimationStart)
-		@content.on(Events.AnimationStop, @_onAnimationStop)
-
 	horizontalPageIndex: (page) ->
 		(_.sortBy(@content.children, (l) -> l.x)).indexOf(page)
 
@@ -139,19 +130,6 @@ class exports.PageComponent extends ScrollComponent
 		if currentPage not in [_.last(@_previousPages), undefined]
 			@_previousPages.push(currentPage)
 			@emit("change:currentPage", {old:@previousPage, new:currentPage})
-
-	_onAnimationStart: =>
-		@_isMoving = true
-		@_isAnimating = true
-		@content.on("change:frame", @_onAnimationStep)
-
-	_onAnimationStep: =>
-		@emit(Events.Move, @content.point)
-
-	_onAnimationStop: =>
-		@_isMoving = false
-		@_isAnimating = false
-		@content.off("change:frame", @_onAnimationStep)
 
 	_scrollEnd: =>
 
