@@ -147,10 +147,10 @@ describe "LayerAnimation", ->
 
 		it "should automatically compute the target position when the path option is specified", (done) ->
 			target = x: 100, y: 200
-			layer = new Layer()
+			layer = new Layer(width: 100, height: 100)
 
 			layer.animateTo
-				path: Path.arc(to: target)
+				path: "M 50 50 A 100 200 0 0 1 100 200"
 				options:
 					time: AnimationTime
 

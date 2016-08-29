@@ -10,7 +10,7 @@ Utils = require "./Utils"
 {BezierCurveAnimator} = require "./Animators/BezierCurveAnimator"
 {SpringRK4Animator} = require "./Animators/SpringRK4Animator"
 {SpringDHOAnimator} = require "./Animators/SpringDHOAnimator"
-{Path} = require "./Path"
+{SVGPathProxy} = require "./SVGPathProxy"
 
 AnimatorClasses =
 	"linear": LinearAnimator
@@ -101,7 +101,7 @@ class exports.Animation extends BaseClass
 			looping: false
 
 		if options.properties.path
-			@options.path = path = options.properties.path.forLayer(options.layer)
+			@options.path = path = new SVGPathProxy(options.properties.path)
 			@options.properties.x = options.layer.x + path.end.x - path.start.x
 			@options.properties.y = options.layer.y + path.end.y - path.start.x
 			delete options.properties.path
@@ -303,7 +303,7 @@ class exports.Animation extends BaseClass
 
 	_updatePositionAlongPath: (key, value) =>
 		{ path } = @options
-		position = path.pointAtLength(path.length * value)
+		position = path.getPointAtLength(path.length * value)
 		position.x += @_stateA.x - path.start.x
 		position.y += @_stateA.y - path.start.y
 

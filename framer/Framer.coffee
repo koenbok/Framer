@@ -16,6 +16,7 @@ Framer.Animation = (require "./Animation").Animation
 Framer.AnimationGroup = (require "./AnimationGroup").AnimationGroup
 Framer.Screen = (require "./Screen").Screen
 Framer.Path = (require "./Path").Path
+Framer.SVGPathProxy = (require "./SVGPathProxy").SVGPathProxy
 Framer.Canvas = (require "./Canvas").Canvas
 Framer.Align = (require "./Align").Align
 Framer.print = (require "./Print").print

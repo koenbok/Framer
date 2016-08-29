@@ -1110,6 +1110,7 @@ Utils.SVG = do ->
 
 	createElement = (name, attributes) ->
 		el = document.createElementNS(svgNS, name)
+
 		for key, value of attributes
 			el.setAttribute(key, value)
 
