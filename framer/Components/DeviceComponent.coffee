@@ -859,6 +859,46 @@ AppleWatch38BlackLeatherDevice =
 	screenHeight: 340
 	minStudioVersion: newDeviceMinVersion
 
+AppleMacBook =
+	deviceImageWidth: 3084
+	deviceImageHeight: 1860
+	deviceImageCompression: true
+	screenWidth: 2304
+	screenHeight: 1440
+	minStudioVersion: newDeviceMinVersion
+
+AppleMacBookAir =
+	deviceImageWidth: 2000
+	deviceImageHeight: 1220
+	deviceImageCompression: true
+	screenWidth: 1440
+	screenHeight: 900
+	minStudioVersion: newDeviceMinVersion
+
+AppleMacBookPro =
+	deviceImageWidth: 3820
+	deviceImageHeight: 2320
+	deviceImageCompression: true
+	screenWidth: 2880
+	screenHeight: 1800
+	minStudioVersion: newDeviceMinVersion
+
+AppleIMac =
+	deviceImageWidth: 2800
+	deviceImageHeight: 2940
+	deviceImageCompression: true
+	screenWidth: 2560
+	screenHeight: 1440
+	minStudioVersion: newDeviceMinVersion
+
+DellXPS =
+	deviceImageWidth: 5200
+	deviceImageHeight: 3040
+	deviceImageCompression: true
+	screenWidth: 3840
+	screenHeight: 2160
+	minStudioVersion: newDeviceMinVersion
+
 ###########################################################################
 # OLD DEVICE CONFIGURATIONS
 
@@ -1115,7 +1155,16 @@ Devices =
 	"samsung-galaxy-note-5-silver-titanium": _.clone(SamsungGalaxyNote5BaseDevice)
 	"samsung-galaxy-note-5-white": _.clone(SamsungGalaxyNote5BaseDevice)
 
-	# Desktop Browser
+	# Notebooks
+	"apple-macbook": _.clone(AppleMacBook)
+	"apple-macbook-air": _.clone(AppleMacBookAir)
+	"apple-macbook-pro": _.clone(AppleMacBookPro)
+	"dell-xps": _.clone(DellXPS)
+
+	# Desktops
+	"apple-imac": _.clone(AppleIMac)
+
+	# OLD DEVICES
 	"desktop-safari-1024-600":
 		deviceType: "browser"
 		name: "Desktop Safari 1024 x 600"
@@ -1143,8 +1192,6 @@ Devices =
 		deviceImageHeight: 1060
 		deviceImageCompression: true
 		backgroundColor: "white"
-
-	# OLD DEVICES
 
 	# iPhone 6
 	"iphone-6-spacegray": _.clone(old_iPhone6BaseDevice)
