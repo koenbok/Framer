@@ -8,6 +8,7 @@ Events.EnterKey  = "EnterKey"
 Events.BackSpaceKey  = "BackSpaceKey"
 Events.InputValueChange = "InputValueChange"
 Events.InputFocus = "InputFocus"
+Events.InputBlur = "InputBlur"
 
 class exports.InputLayer extends TextLayer
 
@@ -73,6 +74,10 @@ class exports.InputLayer extends TextLayer
 
 			@_isFocused = true
 
+		# On blur event
+		@_inputElement.onblur = (e) =>
+			# Emit blur event
+			@emit(Events.InputBlur, event)
 
 		@_inputElement.onkeyup = (e) =>
 
@@ -124,3 +129,4 @@ class exports.InputLayer extends TextLayer
 	onBackSpaceKey: (cb) -> @on(Events.BackSpaceKey, cb)
 	onInputChange: (cb) -> @on(Events.InputValueChange, cb)
 	onInputFocus: (cb) -> @on(Events.InputFocus, cb)
+	onInputBlur: (cb) -> @on(Events.InputBlur, cb)
