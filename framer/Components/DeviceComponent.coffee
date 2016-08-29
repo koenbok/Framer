@@ -899,6 +899,14 @@ DellXPS =
 	screenHeight: 2160
 	minStudioVersion: newDeviceMinVersion
 
+SonyW85OC =
+	deviceImageWidth: 1320
+	deviceImageHeight: 860
+	deviceImageCompression: true
+	screenWidth: 1280
+	screenHeight: 720
+	minStudioVersion: newDeviceMinVersion
+
 ###########################################################################
 # OLD DEVICE CONFIGURATIONS
 
@@ -1163,6 +1171,9 @@ Devices =
 
 	# Desktops
 	"apple-imac": _.clone(AppleIMac)
+
+	# TV
+	"sony-w85Oc": _.clone(SonyW85OC)
 
 	# OLD DEVICES
 	"desktop-safari-1024-600":
