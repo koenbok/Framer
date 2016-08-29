@@ -16,33 +16,10 @@ layer.animateTo
 # 	backgroundColor: '#cdf'
 # 	borderRadius: 25
 # 	
-# complexPath = Path.curve(
-# 	to: { x: 400, y: 400}, 
-# 	control1: { x: 200, y: 100 }, 
-# 	control2: { x: 300, y: 200})
-#   .curve(to: { x: 500, y: 500 }, control1: { x: 650, y: 350 }) # a curve with just one control point is quadratic, instead of cubic
-#   .lineTo(x: 600, y: 500)
-#   .vlineTo(400)
-#   .arc(to: { x: 700, y: 700 }, rx: 200, ry: 250)
+# complexPath = "M62.9 14.9c-25-7.74-56.6 4.8-60.4 24.3-3.73 19.6 21.6 35 39.6 37.6 42.8 6.2 72.9-53.4 116-58.9 65-18.2 191 101 215 28.8 5-16.7-7-49.1-34-44-34 11.5-31 46.5-14 69.3 9.38 12.6 24.2 20.6 39.8 22.9 91.4 9.05 102-98.9 176-86.7 18.8 3.81 33 17.3 36.7 34.6 2.01 10.2.124 21.1-5.18 30.1"
 #   
 # layer2.animateTo
 # 	path: complexPath
 # 	options:
 # 		time: 4
-# 		debug: true
-#   	
-# point1 = { x: 200, y: 100 }
-# point2 = { x: 400, y: 220 }
-# point3 = { x: 400, y: 380 }
-# 
-# layer3 = new Layer
-# 	x: 100, y: 100
-# 	width: 50, height: 50
-# 	backgroundColor: '#cef'
-# 	borderRadius: 25
-# 
-# layer3.animateTo
-# 	path: Path.thru([point1, point2, point3], curviness: 5)
-# 	options:
-# 		time: 2
 # 		debug: true

@@ -74,7 +74,7 @@
 	
 	Framer.Screen = (__webpack_require__(5)).Screen;
 	
-	Framer.Path = (__webpack_require__(25)).Path;
+	Framer.SVGPathProxy = (__webpack_require__(25)).SVGPathProxy;
 	
 	Framer.Canvas = (__webpack_require__(40)).Canvas;
 	
@@ -18584,6 +18584,18 @@
 	    }
 	  });
 	
+	  ScreenClass.define("midX", {
+	    get: function() {
+	      return Utils.frameGetMidX(this);
+	    }
+	  });
+	
+	  ScreenClass.define("midY", {
+	    get: function() {
+	      return Utils.frameGetMidY(this);
+	    }
+	  });
+	
 	  ScreenClass.define("size", {
 	    get: function() {
 	      return Utils.size(this);
@@ -22614,12 +22626,6 @@
 	
 	Events = {};
 	
-	Events.TouchStart = "touchstart";
-	
-	Events.TouchEnd = "touchend";
-	
-	Events.TouchMove = "touchmove";
-	
 	Events.MouseUp = "mouseup";
 	
 	Events.MouseDown = "mousedown";
@@ -22636,10 +22642,25 @@
 	
 	Events.MouseDoubleClick = "dblclick";
 	
+	Events.enableEmulatedTouchEvents = function(enable) {
+	  if (enable == null) {
+	    enable = true;
+	  }
+	  if (enable) {
+	    Events.TouchStart = Events.MouseDown;
+	    Events.TouchEnd = Events.MouseUp;
+	    return Events.TouchMove = Events.MouseMove;
+	  } else {
+	    Events.TouchStart = "touchstart";
+	    Events.TouchEnd = "touchend";
+	    return Events.TouchMove = "touchmove";
+	  }
+	};
+	
+	Events.enableEmulatedTouchEvents(false);
+	
 	if (!Utils.isTouch()) {
-	  Events.TouchStart = Events.MouseDown;
-	  Events.TouchEnd = Events.MouseUp;
-	  Events.TouchMove = Events.MouseMove;
+	  Events.enableEmulatedTouchEvents();
 	}
 	
 	Events.Click = Events.TouchEnd;
@@ -22967,7 +22988,7 @@
 /* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var AnimatorClassBezierPresets, AnimatorClasses, BaseClass, BezierCurveAnimator, Config, Defaults, LinearAnimator, Path, SpringDHOAnimator, SpringRK4Animator, Utils, _, createDebugLayerForPath, evaluateRelativeProperty, isRelativeProperty, numberRE, positionDebugLayerInFrontOfLayer, relativePropertyRE,
+	var AnimatorClassBezierPresets, AnimatorClasses, BaseClass, BezierCurveAnimator, Config, Defaults, LinearAnimator, SVGPathProxy, SpringDHOAnimator, SpringRK4Animator, Utils, _, createDebugLayerForPath, evaluateRelativeProperty, isRelativeProperty, numberRE, positionDebugLayerInFrontOfLayer, relativePropertyRE,
 	  slice = [].slice,
 	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -22992,7 +23013,7 @@
 	
 	SpringDHOAnimator = __webpack_require__(24).SpringDHOAnimator;
 	
-	Path = __webpack_require__(25).Path;
+	SVGPathProxy = __webpack_require__(25).SVGPathProxy;
 	
 	AnimatorClasses = {
 	  "linear": LinearAnimator,
@@ -23102,7 +23123,7 @@
 	      looping: false
 	    }));
 	    if (options.properties.path) {
-	      this.options.path = path = options.properties.path.forLayer(options.layer);
+	      this.options.path = path = new SVGPathProxy(options.properties.path);
 	      this.options.properties.x = options.layer.x + path.end.x - path.start.x;
 	      this.options.properties.y = options.layer.y + path.end.y - path.start.x;
 	      delete options.properties.path;
@@ -23356,7 +23377,7 @@
 	  Animation.prototype._updatePositionAlongPath = function(key, value) {
 	    var angle, path, position;
 	    path = this.options.path;
-	    position = path.pointAtLength(path.length * value);
+	    position = path.getPointAtLength(path.length * value);
 	    position.x += this._stateA.x - path.start.x;
 	    position.y += this._stateA.y - path.start.y;
 	    if (this._debugLayer) {
@@ -23452,12 +23473,10 @@
 	    animatableProperties = {};
 	    for (k in properties) {
 	      v = properties[k];
-	      if (_.isNumber(v) || _.isFunction(v) || isRelativeProperty(v) || Color.isColorObject(v) || (k === 'path' && _.isObject(v)) || v === null) {
+	      if (_.isNumber(v) || _.isFunction(v) || isRelativeProperty(v) || Color.isColorObject(v) || k === 'path' || v === null) {
 	        animatableProperties[k] = v;
 	      } else if (_.isString(v)) {
-	        if (k === 'path') {
-	          animatableProperties[k] = Path.fromString(v);
-	        } else if (Color.isColorString(v)) {
+	        if (Color.isColorString(v)) {
 	          animatableProperties[k] = new Color(v);
 	        }
 	      }
@@ -23615,28 +23634,7 @@
 	  "ease": [.25, .1, .25, 1],
 	  "ease-in": [.42, 0, 1, 1],
 	  "ease-out": [0, 0, .58, 1],
-	  "ease-in-out": [.42, 0, .58, 1],
-	  "ease-in-quad": [0.26, 0, 0.6, 0.2],
-	  "ease-out-quad": [0.4, 0.8, 0.74, 1],
-	  "ease-in-out-quad": [0.48, 0.04, 0.52, 0.96],
-	  "ease-in-cubic": [0.32, 0, 0.66, -0.02],
-	  "ease-out-cubic": [0.34, 1.02, 0.68, 1],
-	  "ease-in-out-cubic": [0.62, -0.04, 0.38, 1.04],
-	  "ease-in-quart": [0.46, 0, 0.74, -0.04],
-	  "ease-out-quart": [0.26, 1.04, 0.54, 1],
-	  "ease-in-out-quart": [0.7, -0.1, 0.3, 1.1],
-	  "ease-in-quint": [0.52, 0, 0.78, -0.1],
-	  "ease-out-quint": [0.22, 1.1, 0.48, 1],
-	  "ease-in-out-quint": [0.76, -0.14, 0.24, 1.14],
-	  "ease-in-sine": [0.32, 0, 0.6, 0.36],
-	  "ease-out-sine": [0.4, 0.64, 0.68, 1],
-	  "ease-in-out-sine": [0.36, 0, 0.64, 1],
-	  "ease-in-expo": [0.62, 0.02, 0.84, -0.08],
-	  "ease-out-expo": [0.16, 1.08, 0.38, 0.98],
-	  "ease-in-out-expo": [0.84, -0.12, 0.16, 1.12],
-	  "ease-in-circ": [0.54, 0, 1, 0.44],
-	  "ease-out-circ": [0, 0.56, 0.46, 1],
-	  "ease-in-out-circ": [0.88, 0.14, 0.12, 0.86]
+	  "ease-in-out": [.42, 0, .58, 1]
 	};
 	
 	exports.BezierCurveAnimator = (function(superClass) {
@@ -23922,7 +23920,6 @@
 	      mass: 0.2,
 	      time: null
 	    });
-	    console.log("SpringDHOAnimator.options", this.options, options);
 	    this._time = 0;
 	    this._value = 0;
 	    return this._velocity = this.options.velocity;
@@ -23956,324 +23953,40 @@
 /* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Layer, Path, Utils, _, catmullRom2Bezier, j, len, method, ref,
+	var SVG,
 	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 	
-	_ = __webpack_require__(1)._;
+	SVG = __webpack_require__(4).SVG;
 	
-	Utils = __webpack_require__(4);
-	
-	Layer = __webpack_require__(13).Layer;
-	
-	catmullRom2Bezier = function(points, closed, tension) {
-	  var c1x, c1y, c2x, c2y, d, i, j, l, p, ref, t, x, y, zero;
-	  if (closed == null) {
-	    closed = false;
+	exports.SVGPathProxy = (function() {
+	  function SVGPathProxy(string) {
+	    this._node = SVG.createElement('path', {
+	      d: string,
+	      fill: 'transparent'
+	    });
+	    this.length = this.getTotalLength();
+	    this.start = this.getPointAtLength(0);
+	    this.end = this.getPointAtLength(this.length);
 	  }
-	  if (tension == null) {
-	    tension = 0.5;
-	  }
-	  d = [];
-	  l = points.length;
-	  i = 0;
-	  zero = {
-	    x: 0,
-	    y: 0
-	  };
-	  for (i = j = 0, ref = l - !closed; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
-	    p = [points[i - 1] || zero, points[i] || zero, points[i + 1] || zero, points[i + 2] || zero];
-	    if (closed) {
-	      if (i === 0) {
-	        p[0] = points[l - 1];
-	      } else if (i === l - 2) {
-	        p[3] = points[0];
-	      } else if (i === l - 1) {
-	        p[2] = points[0];
-	        p[3] = points[1];
-	      }
-	    } else {
-	      if (i === l - 2) {
-	        p[3] = p[2];
-	      } else if (i === 0) {
-	        p[0] = points[i];
-	      }
-	    }
-	    t = (tension - 1) * 2;
-	    c1x = p[1].x - (p[2].x - p[0].x) / (6 / t);
-	    c1y = p[1].y - (p[2].y - p[0].y) / (6 / t);
-	    c2x = p[2].x + (p[3].x - p[1].x) / (6 / t);
-	    c2y = p[2].y + (p[3].y - p[1].y) / (6 / t);
-	    x = p[2].x;
-	    y = p[2].y;
-	    d.push([
-	      {
-	        x: c1x,
-	        y: c1y
-	      }, {
-	        x: c2x,
-	        y: c2y
-	      }, {
-	        x: x,
-	        y: y
-	      }
-	    ]);
-	  }
-	  return d;
-	};
 	
-	Path = function(init) {
-	  var arc, closePath, curve, curveTo, elementForDebugRepresentation, end, forLayer, functor, getTotalLength, hasOrigin, hlineTo, instructionToString, instructions, length, lineTo, moveTo, node, originOrZero, plus, point, pointAtLength, points, push, qcurveTo, smoothCurveTo, smoothqCurveTo, start, thru, toString, unshift, vlineTo;
-	  instructions = init || [];
-	  functor = function(f, args) {
-	    if (typeof f === 'function') {
-	      return f(instructions);
-	    } else {
-	      return f;
-	    }
+	  SVGPathProxy.prototype.getPointAtLength = function(length) {
+	    return this._node.getPointAtLength(length);
 	  };
-	  instructionToString = function(arg) {
-	    var command, params;
-	    command = arg.command, params = arg.params;
-	    return command + " " + (params.join(' '));
+	
+	  SVGPathProxy.prototype.getTotalLength = function() {
+	    return this._node.getTotalLength();
 	  };
-	  point = function(arg, arg1) {
-	    var command, params, prev_x, prev_y;
-	    command = arg.command, params = arg.params;
-	    prev_x = arg1[0], prev_y = arg1[1];
-	    switch (command) {
-	      case 'M':
-	        return [params[0], params[1]];
-	      case 'L':
-	        return [params[0], params[1]];
-	      case 'H':
-	        return [params[0], prev_y];
-	      case 'V':
-	        return [prev_x, params[0]];
-	      case 'Z':
-	        return null;
-	      case 'C':
-	        return [params[4], params[5]];
-	      case 'S':
-	        return [params[2], params[3]];
-	      case 'Q':
-	        return [params[2], params[3]];
-	      case 'T':
-	        return [params[0], params[1]];
-	      case 'A':
-	        return [params[5], params[6]];
-	    }
-	  };
-	  push = function(arr, el) {
-	    var copy;
-	    copy = arr.slice(0, arr.length);
-	    copy.push(el);
-	    return copy;
-	  };
-	  unshift = function(arr, el) {
-	    var copy;
-	    copy = arr.slice(0, arr.length);
-	    copy.unshift(el);
-	    return copy;
-	  };
-	  plus = function(instruction) {
-	    return Path(push(instructions, instruction));
-	  };
-	  moveTo = function(arg) {
-	    var x, y;
-	    x = arg.x, y = arg.y;
-	    return plus({
-	      command: 'M',
-	      params: [x, y]
-	    });
-	  };
-	  lineTo = function(arg) {
-	    var x, y;
-	    x = arg.x, y = arg.y;
-	    return plus({
-	      command: 'L',
-	      params: [x, y]
-	    });
-	  };
-	  hlineTo = function(x) {
-	    return plus({
-	      command: 'H',
-	      params: [x]
-	    });
-	  };
-	  vlineTo = function(y) {
-	    return plus({
-	      command: 'V',
-	      params: [y]
-	    });
-	  };
-	  closePath = function() {
-	    return plus({
-	      command: 'Z',
-	      params: []
-	    });
-	  };
-	  curve = function(arg) {
-	    var control, control1, control2, p, to;
-	    to = arg.to, control = arg.control, control1 = arg.control1, control2 = arg.control2;
-	    p = Path(instructions);
-	    if (control) {
-	      control1 = control;
-	    }
-	    if (control1 && !control2) {
-	      p = p.qcurveTo(to, {
-	        control: control1
-	      });
-	    }
-	    if (control1 && control2) {
-	      p = p.curveTo(to, {
-	        control1: control1,
-	        control2: control2
-	      });
-	    }
-	    return p;
-	  };
-	  curveTo = function(to, arg) {
-	    var control1, control2;
-	    control1 = arg.control1, control2 = arg.control2;
-	    return plus({
-	      command: 'C',
-	      params: [control1.x, control1.y, control2.x, control2.y, to.x, to.y]
-	    });
-	  };
-	  smoothCurveTo = function(to, arg) {
-	    var control;
-	    control = arg.control;
-	    return plus({
-	      command: 'S',
-	      params: [control.x, control.y, to.x, to.y]
-	    });
-	  };
-	  qcurveTo = function(to, arg) {
-	    var control;
-	    control = arg.control;
-	    return plus({
-	      command: 'Q',
-	      params: [control.x, control.y, to.x, to.y]
-	    });
-	  };
-	  smoothqCurveTo = function(arg) {
-	    var x, y;
-	    x = arg.x, y = arg.y;
-	    return plus({
-	      command: 'T',
-	      params: [x, y]
-	    });
-	  };
-	  originOrZero = function(instructions) {
-	    var ref;
-	    if (((ref = instructions[0]) != null ? ref.command : void 0) === 'M') {
-	      return {
-	        x: instructions[0].params[0],
-	        y: instructions[0].params[1]
-	      };
-	    } else {
-	      return {
-	        x: 0,
-	        y: 0
-	      };
-	    }
-	  };
-	  arc = function(arg) {
-	    var largeArc, rx, ry, sweep, to, xrot;
-	    to = arg.to, rx = arg.rx, ry = arg.ry, xrot = arg.xrot, largeArc = arg.largeArc, sweep = arg.sweep;
-	    if (xrot == null) {
-	      xrot = 0;
-	    }
-	    if (rx == null) {
-	      rx = function(instructions) {
-	        var o;
-	        o = originOrZero(instructions);
-	        return to.x - o.x;
-	      };
-	    }
-	    if (ry == null) {
-	      ry = function(instructions) {
-	        var o;
-	        o = originOrZero(instructions);
-	        return to.y - o.y;
-	      };
-	    }
-	    if (largeArc == null) {
-	      largeArc = 0;
-	    }
-	    largeArc = largeArc ? 1 : 0;
-	    if (sweep == null) {
-	      sweep = 1;
-	    }
-	    sweep = sweep ? 1 : 0;
-	    return plus({
-	      command: 'A',
-	      params: [rx, ry, xrot, largeArc, sweep, to.x, to.y]
-	    });
-	  };
-	  thru = function(points, arg) {
-	    var b, beziers, closed, curviness, j, len, p, tension;
-	    curviness = (arg != null ? arg : {}).curviness;
-	    if (curviness == null) {
-	      curviness = 5;
-	    }
-	    tension = 1 - curviness / 10;
-	    closed = false;
-	    beziers = catmullRom2Bezier(points, closed, tension);
-	    p = Path(instructions).moveTo(points[0]);
-	    for (j = 0, len = beziers.length; j < len; j++) {
-	      b = beziers[j];
-	      p = p.curveTo(b[2], {
-	        control1: b[0],
-	        control2: b[1]
-	      });
-	    }
-	    return p;
-	  };
-	  toString = function() {
-	    var evaluate;
-	    evaluate = function(instruction, i) {
-	      return {
-	        command: instruction.command,
-	        params: instruction.params.map(functor)
-	      };
-	    };
-	    return instructions.map(evaluate).map(instructionToString).join(' ');
-	  };
-	  points = function() {
-	    var fn, instruction, j, len, prev, ps;
-	    ps = [];
-	    prev = [0, 0];
-	    fn = function() {
-	      var p;
-	      p = point(instruction, prev);
-	      prev = p;
-	      if (p) {
-	        return ps.push(p);
-	      }
-	    };
-	    for (j = 0, len = instructions.length; j < len; j++) {
-	      instruction = instructions[j];
-	      fn();
-	    }
-	    return ps;
-	  };
-	  pointAtLength = function(length) {
-	    return node.getPointAtLength(length);
-	  };
-	  getTotalLength = function() {
-	    return node.getTotalLength();
-	  };
-	  elementForDebugRepresentation = function() {
+	
+	  SVGPathProxy.prototype.elementForDebugRepresentation = function() {
 	    var addx, addy, animatedPath, c1, c1x, c1y, c2, c2x, c2y, conn, conn2, connector, controlMarker, debugPath, element, elements, group, i, j, k, len, lx, ly, m, marker, mx, my, olx, oly, ref, ref1, relativeSegmentTypes, segment, segments;
-	    group = Utils.SVG.createElement('g');
-	    marker = Utils.SVG.createElement('circle', {
+	    group = SVG.createElement('g');
+	    marker = SVG.createElement('circle', {
 	      r: 2,
 	      cx: 0,
 	      cy: 0,
 	      fill: 'red'
 	    });
-	    controlMarker = Utils.SVG.createElement('circle', {
+	    controlMarker = SVG.createElement('circle', {
 	      r: 2,
 	      cx: 0,
 	      cy: 0,
@@ -24281,14 +23994,14 @@
 	      stroke: '#aaa',
 	      'stroke-width': '1px'
 	    });
-	    connector = Utils.SVG.createElement('path', {
-	      d: "M0,0",
+	    connector = SVG.createElement('path', {
+	      d: 'M0,0',
 	      fill: 'transparent',
 	      stroke: 'rgba(0, 0, 0, 0.25)',
 	      'stroke-width': '1px',
 	      'stroke-dasharray': '4 4'
 	    });
-	    debugPath = node.cloneNode();
+	    debugPath = this._node.cloneNode();
 	    lx = 0;
 	    ly = 0;
 	    segments = debugPath.pathSegList;
@@ -24305,7 +24018,7 @@
 	      }
 	      olx = lx;
 	      oly = ly;
-	      if (segment.x || segment.y) {
+	      if ((segment.x != null) || (segment.y != null)) {
 	        m = marker.cloneNode();
 	        mx = addx + (typeof segment.x === 'undefined' ? lx : segment.x);
 	        my = addy + (typeof segment.y === 'undefined' ? ly : segment.y);
@@ -24316,7 +24029,7 @@
 	        ly = my;
 	        elements.push(m);
 	      }
-	      if (segment.x1) {
+	      if (segment.x1 != null) {
 	        c1 = controlMarker.cloneNode();
 	        c1x = addx + segment.x1;
 	        c1y = addy + segment.y1;
@@ -24328,14 +24041,14 @@
 	        conn.setAttribute('class', 'debug-connector');
 	        elements.push(c1);
 	        elements.push(conn);
-	        if (!segment.x2) {
+	        if (segment.x2 == null) {
 	          conn2 = connector.cloneNode();
 	          conn2.setAttribute('d', "M" + mx + "," + my + " L" + c1x + "," + c1y);
 	          conn2.setAttribute('class', 'debug-connector');
 	          elements.push(conn2);
 	        }
 	      }
-	      if (segment.x2) {
+	      if (segment.x2 != null) {
 	        c2 = controlMarker.cloneNode();
 	        c2x = addx + segment.x2;
 	        c2y = addy + segment.y2;
@@ -24353,158 +24066,24 @@
 	      element = elements[k];
 	      group.appendChild(element);
 	    }
-	    debugPath.setAttribute('stroke', 'rgba(255, 0, 0, 0.75)');
+	    debugPath.setAttribute('stroke', 'rgba(0, 0, 0, 0.1)');
 	    debugPath.setAttribute('stroke-width', 1);
 	    debugPath.setAttribute('fill', 'transparent');
 	    debugPath.setAttribute('class', 'debug-path');
 	    animatedPath = debugPath.cloneNode();
 	    animatedPath.setAttribute('class', 'animated-path');
-	    animatedPath.setAttribute('stroke', 'transparent');
-	    animatedPath.setAttribute('stroke-dasharray', getTotalLength());
-	    animatedPath.setAttribute('stroke-dashoffset', getTotalLength());
+	    animatedPath.setAttribute('stroke', 'rgba(255, 0, 0, 0.75)');
+	    animatedPath.setAttribute('stroke-dasharray', this.length);
+	    animatedPath.setAttribute('stroke-dashoffset', this.length);
 	    animatedPath.setAttribute('fill', 'transparent');
 	    group.appendChild(animatedPath);
 	    group.appendChild(debugPath);
 	    return group;
 	  };
-	  hasOrigin = function() {
-	    return indexOf.call(_.pluck(instructions, 'command'), 'M') >= 0;
-	  };
-	  forLayer = function(layer) {
-	    var x, y;
-	    x = layer.x + layer.originX * layer.width;
-	    y = layer.y + layer.originY * layer.height;
-	    if (!hasOrigin()) {
-	      return Path(unshift(instructions, {
-	        command: 'M',
-	        params: [x, y]
-	      }));
-	    }
-	    return Path(instructions);
-	  };
-	  node = null;
-	  length = null;
-	  start = null;
-	  end = null;
-	  if (hasOrigin()) {
-	    node = Utils.SVG.createElement('path', {
-	      d: toString(),
-	      fill: 'transparent'
-	    });
-	    length = getTotalLength();
-	    start = pointAtLength(0);
-	    end = pointAtLength(length);
-	  }
-	  return {
-	    moveTo: moveTo,
-	    lineTo: lineTo,
-	    hlineTo: hlineTo,
-	    vlineTo: vlineTo,
-	    closePath: closePath,
-	    curve: curve,
-	    curveTo: curveTo,
-	    smoothCurveTo: smoothCurveTo,
-	    qcurveTo: qcurveTo,
-	    smoothqCurveTo: smoothqCurveTo,
-	    arc: arc,
-	    thru: thru,
-	    pointAtLength: pointAtLength,
-	    elementForDebugRepresentation: elementForDebugRepresentation,
-	    start: start,
-	    end: end,
-	    length: length,
-	    node: node,
-	    forLayer: forLayer,
-	    toString: toString,
-	    points: points,
-	    instructions: instructions
-	  };
-	};
 	
-	ref = ['curve', 'arc', 'thru', 'moveTo'];
-	for (j = 0, len = ref.length; j < len; j++) {
-	  method = ref[j];
-	  Path[method] = (function(m) {
-	    return function() {
-	      return Path()[m].apply(this, arguments);
-	    };
-	  })(method);
-	}
-	
-	Path.stringToInstructions = function(path) {
-	  var instructions, length, segment;
-	  segment = /([astvzqmhlc])([^astvzqmhlc]*)/ig;
-	  length = {
-	    a: 7,
-	    c: 6,
-	    h: 1,
-	    l: 2,
-	    m: 2,
-	    q: 4,
-	    s: 4,
-	    t: 2,
-	    v: 1,
-	    z: 0
-	  };
-	  instructions = [];
-	  path.replace(segment, function(p, command, args) {
-	    var type;
-	    type = command.toLowerCase();
-	    args = args.match(/-?[.0-9]+(?:e[-+]?\d+)?/ig);
-	    if (args) {
-	      args = args.map(Number);
-	    } else {
-	      args = [];
-	    }
-	    if (type === 'm' && args.length > 2) {
-	      instructions.push({
-	        command: command,
-	        params: args.splice(0, 2)
-	      });
-	      type = 'l';
-	      command = command === 'm' ? 'l' : 'L';
-	    }
-	    while (true) {
-	      if (args.length === length[type]) {
-	        return instructions.push({
-	          command: command,
-	          params: args
-	        });
-	      }
-	      if (args.length < length[type]) {
-	        throw new Error('Malformed path data');
-	      }
-	      instructions.push({
-	        command: command,
-	        params: args.splice(0, length[type])
-	      });
-	    }
-	  });
-	  return instructions;
-	};
-	
-	Path.fromString = function(path) {
-	  return Path(Path.stringToInstructions(path));
-	};
-	
-	Path.loadPath = function(url) {
-	  var data, parser, path, ref1, svg;
-	  data = Utils.domLoadDataSync(url);
-	  parser = new DOMParser();
-	  svg = parser.parseFromString(data, 'image/svg+xml');
-	  path = (ref1 = svg.getElementsByTagName('path')) != null ? ref1[0] : void 0;
-	  if (!path) {
-	    console.error("Path: no <path> elements found in file loaded from URL: '" + url + "'");
-	    return null;
-	  }
-	  if (path) {
-	    return Path.fromString(path.getAttribute('d'));
-	  }
-	};
-	
-	_.extend(exports, {
-	  Path: Path
-	});
+	  return SVGPathProxy;
+
+	})();
 
 
 /***/ },
@@ -27700,6 +27279,9 @@
 	      options = {};
 	    }
 	    this._onMouseWheel = bind(this._onMouseWheel, this);
+	    this._onAnimationStop = bind(this._onAnimationStop, this);
+	    this._onAnimationStep = bind(this._onAnimationStep, this);
+	    this._onAnimationStart = bind(this._onAnimationStart, this);
 	    this.updateContent = bind(this.updateContent, this);
 	    ScrollComponent.__super__.constructor.call(this, Defaults.getDefaults("ScrollComponent", options));
 	    this._contentInset = options.contentInset || Utils.rectZero();
@@ -27727,6 +27309,9 @@
 	
 	  ScrollComponent.prototype.setContentLayer = function(layer) {
 	    if (this.content) {
+	      this._onAnimationStop();
+	      this.content.off(Events.AnimationStart, this._onAnimationStart);
+	      this.content.off(Events.AnimationStop, this._onAnimationStop);
 	      this._content.destroy();
 	    }
 	    this._content = layer;
@@ -27743,6 +27328,8 @@
 	      x: 0,
 	      y: 0
 	    };
+	    this.content.on(Events.AnimationStart, this._onAnimationStart);
+	    this.content.on(Events.AnimationStop, this._onAnimationStop);
 	    return this._content;
 	  };
 	
@@ -28050,6 +27637,19 @@
 	    return _.head(this._contentLayersSortedByDistanceForScrollPoint(scrollPoint, originX, originY));
 	  };
 	
+	  ScrollComponent.prototype._onAnimationStart = function(event) {
+	    return this.content.on("change:frame", this._onAnimationStep);
+	  };
+	
+	  ScrollComponent.prototype._onAnimationStep = function(event) {
+	    this.content.emit(Events.Move, this.content.point);
+	    return this.emit(Events.Scroll, event);
+	  };
+	
+	  ScrollComponent.prototype._onAnimationStop = function() {
+	    return this.content.off("change:frame", this._onAnimationStep);
+	  };
+	
 	  ScrollComponent.prototype._scrollPointForLayer = function(layer, originX, originY, clamp) {
 	    if (originX == null) {
 	      originX = 0;
@@ -28161,6 +27761,7 @@
 	      y: Utils.clamp(this.content.y + (deltaY * this.mouseWheelSpeedMultiplier), minY, maxY)
 	    };
 	    this.content.point = point;
+	    this.content.emit(Events.Move, point);
 	    this.emit(Events.Scroll, event);
 	    return this._onMouseWheelEnd(event);
 	  };
@@ -28278,9 +27879,6 @@
 	  function PageComponent() {
 	    this._resetHistory = bind(this._resetHistory, this);
 	    this._scrollEnd = bind(this._scrollEnd, this);
-	    this._onAnimationStop = bind(this._onAnimationStop, this);
-	    this._onAnimationStep = bind(this._onAnimationStep, this);
-	    this._onAnimationStart = bind(this._onAnimationStart, this);
 	    this._scrollMove = bind(this._scrollMove, this);
 	    this._scrollStart = bind(this._scrollStart, this);
 	    PageComponent.__super__.constructor.apply(this, arguments);
@@ -28428,17 +28026,6 @@
 	    }
 	  };
 	
-	  PageComponent.prototype.setContentLayer = function(contentLayer) {
-	    if (this.content) {
-	      this._onAnimationStop();
-	      this.content.off(Events.AnimationStart, this._onAnimationStart);
-	      this.content.off(Events.AnimationStop, this._onAnimationStop);
-	    }
-	    PageComponent.__super__.setContentLayer.call(this, contentLayer);
-	    this.content.on(Events.AnimationStart, this._onAnimationStart);
-	    return this.content.on(Events.AnimationStop, this._onAnimationStop);
-	  };
-	
 	  PageComponent.prototype.horizontalPageIndex = function(page) {
 	    return (_.sortBy(this.content.children, function(l) {
 	      return l.x;
@@ -28465,22 +28052,6 @@
 	        "new": currentPage
 	      });
 	    }
-	  };
-	
-	  PageComponent.prototype._onAnimationStart = function() {
-	    this._isMoving = true;
-	    this._isAnimating = true;
-	    return this.content.on("change:frame", this._onAnimationStep);
-	  };
-	
-	  PageComponent.prototype._onAnimationStep = function() {
-	    return this.emit(Events.Move, this.content.point);
-	  };
-	
-	  PageComponent.prototype._onAnimationStop = function() {
-	    this._isMoving = false;
-	    this._isAnimating = false;
-	    return this.content.off("change:frame", this._onAnimationStep);
 	  };
 	
 	  PageComponent.prototype._scrollEnd = function() {
@@ -28852,7 +28423,7 @@
 /* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var AppleWatch38BlackLeatherDevice, AppleWatch38Device, AppleWatch42Device, BaseClass, BuiltInDevices, Defaults, Devices, Events, HTCa9BaseDevice, HTCm8BaseDevice, Layer, MSFTLumia950BaseDevice, Nexus4BaseDevice, Nexus5BaseDevice, Nexus6BaseDevice, Nexus9BaseDevice, SamsungGalaxyNote5BaseDevice, Utils, _, iPadAir2BaseDevice, iPadMini4BaseDevice, iPadProBaseDevice, iPhone5BaseDevice, iPhone5CBaseDevice, iPhone6BaseDevice, iPhone6PlusBaseDevice, newDeviceMinVersion, oldDeviceMaxVersion, old_AppleWatch38Device, old_AppleWatch42Device, old_Nexus5BaseDevice, old_Nexus5BaseDeviceHand, old_Nexus9BaseDevice, old_iPadAirBaseDevice, old_iPadAirBaseDeviceHand, old_iPadMiniBaseDevice, old_iPadMiniBaseDeviceHand, old_iPhone5BaseDevice, old_iPhone5BaseDeviceHand, old_iPhone5CBaseDevice, old_iPhone5CBaseDeviceHand, old_iPhone6BaseDevice, old_iPhone6BaseDeviceHand, old_iPhone6PlusBaseDevice, old_iPhone6PlusBaseDeviceHand,
+	var AppleIMac, AppleMacBook, AppleMacBookAir, AppleMacBookPro, AppleWatch38BlackLeatherDevice, AppleWatch38Device, AppleWatch42Device, BaseClass, BuiltInDevices, Defaults, DellXPS, Devices, Events, HTCa9BaseDevice, HTCm8BaseDevice, Layer, MSFTLumia950BaseDevice, Nexus4BaseDevice, Nexus5BaseDevice, Nexus6BaseDevice, Nexus9BaseDevice, SamsungGalaxyNote5BaseDevice, SonyW85OC, Utils, _, iPadAir2BaseDevice, iPadMini4BaseDevice, iPadProBaseDevice, iPhone5BaseDevice, iPhone5CBaseDevice, iPhone6BaseDevice, iPhone6PlusBaseDevice, newDeviceMinVersion, oldDeviceMaxVersion, old_AppleWatch38Device, old_AppleWatch42Device, old_Nexus5BaseDevice, old_Nexus5BaseDeviceHand, old_Nexus9BaseDevice, old_iPadAirBaseDevice, old_iPadAirBaseDeviceHand, old_iPadMiniBaseDevice, old_iPadMiniBaseDeviceHand, old_iPhone5BaseDevice, old_iPhone5BaseDeviceHand, old_iPhone5CBaseDevice, old_iPhone5CBaseDeviceHand, old_iPhone6BaseDevice, old_iPhone6BaseDeviceHand, old_iPhone6PlusBaseDevice, old_iPhone6PlusBaseDeviceHand,
 	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty,
@@ -28911,7 +28482,9 @@
 	      options = {};
 	    }
 	    this._orientationChange = bind(this._orientationChange, this);
+	    this._viewportOrientationOffset = bind(this._viewportOrientationOffset, this);
 	    this._updateDeviceImage = bind(this._updateDeviceImage, this);
+	    this.customize = bind(this.customize, this);
 	    this._update = bind(this._update, this);
 	    defaults = Defaults.getDefaults("DeviceComponent", options);
 	    if (Framer.Defaults.hasOwnProperty("DeviceView")) {
@@ -28921,6 +28494,11 @@
 	    this.animationOptions = defaults.animationOptions;
 	    this.deviceType = defaults.deviceType;
 	    _.extend(this, _.defaults(options, defaults));
+	    this.Type = {
+	      Tablet: "tablet",
+	      Phone: "phone",
+	      Browser: "browser"
+	    };
 	  }
 	
 	  DeviceComponent.prototype._setup = function() {
@@ -29098,13 +28676,18 @@
 	    }
 	  });
 	
+	  DeviceComponent.prototype.customize = function(deviceProps) {
+	    Devices.custom = _.defaults(deviceProps, Devices.custom);
+	    return this.deviceType = "custom";
+	  };
+	
 	  DeviceComponent.define("deviceType", {
 	    get: function() {
 	      return this._deviceType;
 	    },
 	    set: function(deviceType) {
 	      var device, i, key, lDevicetype, lKey, len, ref, shouldZoomToFit;
-	      if (deviceType === this._deviceType) {
+	      if (deviceType === this._deviceType && deviceType !== "custom") {
 	        return;
 	      }
 	      device = null;
@@ -29136,6 +28719,7 @@
 	      this._updateDeviceImage();
 	      this._update();
 	      this.emit("change:deviceType");
+	      this.viewport.point = this._viewportOrientationOffset();
 	      if (shouldZoomToFit) {
 	        return this.deviceScale = "fit";
 	      }
@@ -29312,7 +28896,7 @@
 	  });
 	
 	  DeviceComponent.prototype.setOrientation = function(orientation, animate) {
-	    var animation, contentProperties, height, offset, phoneProperties, ref, ref1, width, x, y;
+	    var animation, contentProperties, phoneProperties;
 	    if (animate == null) {
 	      animate = false;
 	    }
@@ -29340,23 +28924,7 @@
 	      rotationZ: -this._orientation,
 	      scale: this._calculatePhoneScale()
 	    };
-	    ref = this._getOrientationDimensions(this._device.screenWidth, this._device.screenHeight), width = ref[0], height = ref[1];
-	    this.content.width = width;
-	    this.content.height = height;
-	    offset = (this.screen.width - width) / 2;
-	    if (this._orientation === -90) {
-	      offset *= -1;
-	    }
-	    ref1 = [0, 0], x = ref1[0], y = ref1[1];
-	    if (this.isLandscape) {
-	      x = offset;
-	      y = offset;
-	    }
-	    contentProperties = {
-	      rotationZ: this._orientation,
-	      x: x,
-	      y: y
-	    };
+	    contentProperties = this._viewportOrientationOffset();
 	    this.hands.animateStop();
 	    this.viewport.animateStop();
 	    if (animate) {
@@ -29380,6 +28948,27 @@
 	      this.handsImageLayer.image = "";
 	    }
 	    return this.emit("change:orientation", this._orientation);
+	  };
+	
+	  DeviceComponent.prototype._viewportOrientationOffset = function() {
+	    var contentProperties, height, offset, ref, ref1, width, x, y;
+	    ref = this._getOrientationDimensions(this._device.screenWidth, this._device.screenHeight), width = ref[0], height = ref[1];
+	    this.content.width = width;
+	    this.content.height = height;
+	    offset = (this.screen.width - width) / 2;
+	    if (this._orientation === -90) {
+	      offset *= -1;
+	    }
+	    ref1 = [0, 0], x = ref1[0], y = ref1[1];
+	    if (this.isLandscape) {
+	      x = offset;
+	      y = offset;
+	    }
+	    return contentProperties = {
+	      rotationZ: this._orientation,
+	      x: x,
+	      y: y
+	    };
 	  };
 	
 	  DeviceComponent.prototype._orientationChange = function() {
@@ -29825,6 +29414,60 @@
 	  minStudioVersion: newDeviceMinVersion
 	};
 	
+	AppleMacBook = {
+	  deviceImageWidth: 3084,
+	  deviceImageHeight: 1860,
+	  deviceImageCompression: true,
+	  screenWidth: 2304,
+	  screenHeight: 1440,
+	  minStudioVersion: newDeviceMinVersion
+	};
+	
+	AppleMacBookAir = {
+	  deviceImageWidth: 2000,
+	  deviceImageHeight: 1220,
+	  deviceImageCompression: true,
+	  screenWidth: 1440,
+	  screenHeight: 900,
+	  minStudioVersion: newDeviceMinVersion
+	};
+	
+	AppleMacBookPro = {
+	  deviceImageWidth: 3820,
+	  deviceImageHeight: 2320,
+	  deviceImageCompression: true,
+	  screenWidth: 2880,
+	  screenHeight: 1800,
+	  minStudioVersion: newDeviceMinVersion
+	};
+	
+	AppleIMac = {
+	  deviceImageWidth: 2800,
+	  deviceImageHeight: 2940,
+	  deviceImageCompression: true,
+	  screenWidth: 2560,
+	  screenHeight: 1440,
+	  minStudioVersion: newDeviceMinVersion
+	};
+	
+	DellXPS = {
+	  deviceImageWidth: 5200,
+	  deviceImageHeight: 3040,
+	  deviceImageCompression: true,
+	  screenWidth: 3840,
+	  screenHeight: 2160,
+	  minStudioVersion: newDeviceMinVersion
+	};
+	
+	SonyW85OC = {
+	  deviceImageWidth: 1320,
+	  deviceImageHeight: 860,
+	  deviceImageCompression: true,
+	  screenWidth: 1280,
+	  screenHeight: 720,
+	  minStudioVersion: newDeviceMinVersion
+	};
+	
 	old_iPhone6BaseDevice = {
 	  deviceImageWidth: 870,
 	  deviceImageHeight: 1738,
@@ -29985,6 +29628,14 @@
 	    deviceType: "desktop",
 	    backgroundColor: "white"
 	  },
+	  "custom": {
+	    name: "Custom",
+	    deviceImageWidth: 874,
+	    deviceImageHeight: 1792,
+	    screenWidth: 750,
+	    screenHeight: 1334,
+	    deviceType: "phone"
+	  },
 	  "apple-ipad-air-2-silver": _.clone(iPadAir2BaseDevice),
 	  "apple-ipad-air-2-gold": _.clone(iPadAir2BaseDevice),
 	  "apple-ipad-air-2-space-gray": _.clone(iPadAir2BaseDevice),
@@ -30056,6 +29707,12 @@
 	  "samsung-galaxy-note-5-pink": _.clone(SamsungGalaxyNote5BaseDevice),
 	  "samsung-galaxy-note-5-silver-titanium": _.clone(SamsungGalaxyNote5BaseDevice),
 	  "samsung-galaxy-note-5-white": _.clone(SamsungGalaxyNote5BaseDevice),
+	  "apple-macbook": _.clone(AppleMacBook),
+	  "apple-macbook-air": _.clone(AppleMacBookAir),
+	  "apple-macbook-pro": _.clone(AppleMacBookPro),
+	  "dell-xps": _.clone(DellXPS),
+	  "apple-imac": _.clone(AppleIMac),
+	  "sony-w85Oc": _.clone(SonyW85OC),
 	  "desktop-safari-1024-600": {
 	    deviceType: "browser",
 	    name: "Desktop Safari 1024 x 600",
@@ -31682,7 +31339,10 @@
 	  if (Utils.isTouch()) {
 	    return;
 	  }
-	  return touchEmulator != null ? touchEmulator : touchEmulator = new TouchEmulator();
+	  if (touchEmulator == null) {
+	    touchEmulator = new TouchEmulator();
+	  }
+	  return Events.enableEmulatedTouchEvents(true);
 	};
 	
 	exports.disable = function() {
@@ -31690,7 +31350,8 @@
 	    return;
 	  }
 	  touchEmulator.destroy();
-	  return touchEmulator = null;
+	  touchEmulator = null;
+	  return Events.enableEmulatedTouchEvents(false);
 	};
 
 
@@ -32201,8 +31862,11 @@
 	    return this._end();
 	  };
 	
-	  Preloader.prototype._end = function() {
+	  Preloader.prototype._end = function(animated) {
 	    var finalize, ref, ref1;
+	    if (animated == null) {
+	      animated = true;
+	    }
 	    Framer.DefaultContext.visible = true;
 	    finalize = (function(_this) {
 	      return function() {
@@ -32212,7 +31876,7 @@
 	        return (ref = _this.context) != null ? ref.destroy() : void 0;
 	      };
 	    })(this);
-	    if ((ref = this.cover) != null ? ref.visible : void 0) {
+	    if (((ref = this.cover) != null ? ref.visible : void 0) && animated) {
 	      if ((ref1 = this.cover) != null) {
 	        ref1.animate({
 	          properties: {
@@ -32231,7 +31895,7 @@
 	    var ref;
 	    this.emit("progress", this.progress);
 	    if ((ref = this.progressIndicator) != null) {
-	      ref.setProgress(this.progress, false);
+	      ref.setProgress(this.progress);
 	    }
 	    if (this.isReady) {
 	      return this._handleLoaded();
@@ -32268,17 +31932,15 @@
 	    });
 	    this.progressIndicator.railsColor = Color.grey(0, 0.1);
 	    this.progressIndicator.progressColor = "rgb(75,169,248)";
-	    this.progressIndicator.setProgress(this.progress, false);
+	    this.progressIndicator.setProgress(this.progress);
 	    this.brand = new Layer({
 	      size: 96,
 	      parent: this.cover,
-	      backgroundColor: null
-	    });
-	    if (!Utils.isFramerStudio()) {
-	      this.brand.style = {
+	      backgroundColor: null,
+	      style: {
 	        backgroundSize: "50%"
-	      };
-	    }
+	      }
+	    });
 	    if (Utils.isMobile()) {
 	      this.progressIndicator.scale = 1.25;
 	      this.brand.scale = 1.25;
@@ -32315,7 +31977,7 @@
 	  if (!Framer.Preloader) {
 	    return;
 	  }
-	  Framer.Preloader._end();
+	  Framer.Preloader._end(false);
 	  return Framer.Preloader = null;
 	};
 	
@@ -33786,17 +33448,17 @@
 /* 67 */
 /***/ function(module, exports) {
 
-	exports.date = 1472445976;
+	exports.date = 1472508897;
 	
 	exports.branch = "tisho/animation-paths";
 	
-	exports.hash = "8763d8b-dirty";
+	exports.hash = "2bdaa46-dirty";
 	
-	exports.build = 2106;
+	exports.build = 2132;
 	
 	exports.version = exports.branch + "/" + exports.hash;
 
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=framer.debug.js.map?hash=c73ae113a251c5603a67
+//# sourceMappingURL=framer.debug.js.map?hash=eb89870e40fcbad077c6
