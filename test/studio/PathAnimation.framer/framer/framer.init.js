@@ -56,6 +56,29 @@ function showFileLoadingAlert() {
 	showAlert(html)
 }
 
+function showHomeScreenAlert() {
+
+	link = document.createElement("link");
+	link.href = "framer/mirror.css"
+	link.type = "text/css"
+	link.rel = "stylesheet"
+	link.media = "screen"
+
+	document.addEventListener("DOMContentLoaded", function(event) {
+		document.getElementsByTagName("head")[0].appendChild(link)
+	})
+
+	var html = ""
+	html += "<figure class='icon-close' href='javascript:void(0)' onclick='dismissAlert();'></figure>"
+	html += "<section class='wrapper'>"
+	html += "<figure class='icon-framer'></figure><h1>Install Prototype</h1>"
+	html += "<p>Tap <div class='share'><figure class='icon-share'></figure> Share</div>, then choose 'Add to Home Screen'</p> "
+	html += "<section class='arrow'><figure class='icon-arrow'></figure></section>"
+	html += "</section>"
+
+	showAlert(html)
+}
+
 function loadProject() {
 	CoffeeScript.load("app.coffee")
 }
@@ -89,6 +112,10 @@ function init() {
 	if (!isFileLoadingAllowed()) {
 		return showFileLoadingAlert()
 	}
+
+	// if (Utils.isMobile() && !isHomeScreened()) {
+	// 	return showHomeScreenAlert()
+	// }
 
 	loadProject()
 

@@ -10,6 +10,7 @@ Utils = require "./Utils"
 {BezierCurveAnimator} = require "./Animators/BezierCurveAnimator"
 {SpringRK4Animator} = require "./Animators/SpringRK4Animator"
 {SpringDHOAnimator} = require "./Animators/SpringDHOAnimator"
+{Path} = require "./Path"
 
 AnimatorClasses =
 	"linear": LinearAnimator
@@ -38,7 +39,12 @@ createDebugLayerForPath = (path) ->
 	sharedContext = Utils.SVG.getContext()
 	svg = Utils.SVG.createElement('svg', width: '100%', height: '100%')
 
-	debugLayer = new Layer width: 100, height: 100, backgroundColor: 'transparent'
+	debugLayer = new Layer
+		width: 100
+		height: 100
+		backgroundColor: 'transparent'
+		name: 'debug-path'
+
 	debugLayer._element.appendChild(svg)
 	debugLayer.path = path
 
@@ -56,6 +62,16 @@ createDebugLayerForPath = (path) ->
 	debugElementsGroup.setAttribute('transform', "translate(#{-bbox.x + padding}, #{-bbox.y + padding})")
 
 	debugLayer
+
+positionDebugLayerInFrontOfLayer = (debugLayer, layer) ->
+	path = debugLayer.path
+	layerScreenFrame = layer.screenFrame
+	layerOriginX = layerScreenFrame.x + layer.originX * layerScreenFrame.width
+	layerOriginY = layerScreenFrame.y + layer.originY * layerScreenFrame.height
+
+	debugLayer.props =
+		x: layerOriginX - path.start.x + debugLayer.pathOffset.x
+		y: layerOriginY - path.start.y + debugLayer.pathOffset.y
 
 # _runningAnimations = []
 
@@ -79,7 +95,7 @@ class exports.Animation extends BaseClass
 			delay: 0
 			debug: false
 			path: null
-			pathOptions: null
+			autoRotate: true
 			colorModel: "husl"
 			animate: true
 			looping: false
@@ -90,15 +106,9 @@ class exports.Animation extends BaseClass
 			@options.properties.y = options.layer.y + path.end.y - path.start.x
 			delete options.properties.path
 
-			@pathOptions = _.defaults((options.pathOptions || {}), autoRotate: true)
-
 			if @options.debug
 				@_debugLayer = createDebugLayerForPath(path)
-				layerScreenFrame = @options.layer.screenFrame
-				layerOriginX = layerScreenFrame.x + @options.layer.originX * layerScreenFrame.width
-				layerOriginY = layerScreenFrame.y + @options.layer.originY * layerScreenFrame.height
-				@_debugLayer.x = layerOriginX - path.start.x + @_debugLayer.pathOffset.x
-				@_debugLayer.y = layerOriginY - path.start.y + @_debugLayer.pathOffset.y
+				positionDebugLayerInFrontOfLayer(@_debugLayer, @options.layer)
 
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
@@ -276,6 +286,8 @@ class exports.Animation extends BaseClass
 		for k, v of @_stateB
 			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
 				@_valueUpdaters[k] = @_updateColorValue
+			else if @options.path? and k in ['x', 'y']
+				@_valueUpdaters[k] = @_updatePositionAlongPath
 			else
 				@_valueUpdaters[k] = @_updateNumberValue
 
@@ -287,21 +299,24 @@ class exports.Animation extends BaseClass
 	_updateNumberValue: (key, value) =>
 		@_target[key] = Utils.mapRange(value, 0, 1, @_stateA[key], @_stateB[key])
 
-		if @options.path
-			position = @options.path.pointAtLength(@options.path.length * value)
-			position.x += @_stateA.x - @options.path.start.x
-			position.y += @_stateA.y - @options.path.start.y
+		return
 
-			if @_debugLayer
-				@_debugLayer.animatedPath.setAttribute('stroke-dashoffset', @options.path.length * (1 - value))
+	_updatePositionAlongPath: (key, value) =>
+		{ path } = @options
+		position = path.pointAtLength(path.length * value)
+		position.x += @_stateA.x - path.start.x
+		position.y += @_stateA.y - path.start.y
 
-			if @pathOptions.autoRotate
-				angle = Math.atan2(position.y - @_target.y, position.x - @_target.x) * 180 / Math.PI
-				if position.y != @_target.y && position.x != @_target.x
-					@_target.rotationZ = angle
+		if @_debugLayer
+			@_debugLayer.animatedPath.setAttribute('stroke-dashoffset', path.length * (1 - value))
 
-			@_target.x = position.x
-			@_target.y = position.y
+		if @options.autoRotate
+			angle = Math.atan2(position.y - @_target.y, position.x - @_target.x) * 180 / Math.PI
+			if position.y != @_target.y && position.x != @_target.x
+				@_target.rotationZ = angle
+
+		@_target.x = position.x
+		@_target.y = position.y
 
 		return
 
@@ -371,10 +386,17 @@ class exports.Animation extends BaseClass
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			if _.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or k == 'path' or v == null
+			if _.isNumber(v) or
+			_.isFunction(v) or
+			isRelativeProperty(v) or
+			Color.isColorObject(v) or
+			(k == 'path' and _.isObject(v)) or
+			v == null
 				animatableProperties[k] = v
 			else if _.isString(v)
-				if Color.isColorString(v)
+				if k == 'path'
+					animatableProperties[k] = Path.fromString(v)
+				else if Color.isColorString(v)
 					animatableProperties[k] = new Color(v)
 
 

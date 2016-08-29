@@ -58,11 +58,11 @@
 	
 	Framer.Layer = (__webpack_require__(13)).Layer;
 	
-	Framer.BackgroundLayer = (__webpack_require__(35)).BackgroundLayer;
+	Framer.BackgroundLayer = (__webpack_require__(36)).BackgroundLayer;
 	
-	Framer.VideoLayer = (__webpack_require__(36)).VideoLayer;
+	Framer.VideoLayer = (__webpack_require__(37)).VideoLayer;
 	
-	Framer.SVGLayer = (__webpack_require__(37)).SVGLayer;
+	Framer.SVGLayer = (__webpack_require__(38)).SVGLayer;
 	
 	Framer.Events = (__webpack_require__(15)).Events;
 	
@@ -70,11 +70,11 @@
 	
 	Framer.Animation = (__webpack_require__(18)).Animation;
 	
-	Framer.AnimationGroup = (__webpack_require__(38)).AnimationGroup;
+	Framer.AnimationGroup = (__webpack_require__(39)).AnimationGroup;
 	
 	Framer.Screen = (__webpack_require__(5)).Screen;
 	
-	Framer.Path = (__webpack_require__(39)).Path;
+	Framer.Path = (__webpack_require__(25)).Path;
 	
 	Framer.Canvas = (__webpack_require__(40)).Canvas;
 	
@@ -112,7 +112,7 @@
 	
 	Framer.BaseClass = (__webpack_require__(6)).BaseClass;
 	
-	Framer.LayerStyle = (__webpack_require__(25)).LayerStyle;
+	Framer.LayerStyle = (__webpack_require__(26)).LayerStyle;
 	
 	Framer.AnimationLoop = (__webpack_require__(55)).AnimationLoop;
 	
@@ -124,7 +124,7 @@
 	
 	Framer.SpringRK4Animator = (__webpack_require__(22)).SpringRK4Animator;
 	
-	Framer.LayerDraggable = (__webpack_require__(27)).LayerDraggable;
+	Framer.LayerDraggable = (__webpack_require__(28)).LayerDraggable;
 	
 	Framer.Importer = (__webpack_require__(56)).Importer;
 	
@@ -20741,13 +20741,13 @@
 	
 	Animation = __webpack_require__(18).Animation;
 	
-	LayerStyle = __webpack_require__(25).LayerStyle;
+	LayerStyle = __webpack_require__(26).LayerStyle;
 	
-	LayerStates = __webpack_require__(26).LayerStates;
+	LayerStates = __webpack_require__(27).LayerStates;
 	
-	LayerDraggable = __webpack_require__(27).LayerDraggable;
+	LayerDraggable = __webpack_require__(28).LayerDraggable;
 	
-	LayerPinchable = __webpack_require__(34).LayerPinchable;
+	LayerPinchable = __webpack_require__(35).LayerPinchable;
 	
 	Gestures = __webpack_require__(16).Gestures;
 	
@@ -22967,7 +22967,7 @@
 /* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var AnimatorClassBezierPresets, AnimatorClasses, BaseClass, BezierCurveAnimator, Config, Defaults, LinearAnimator, SpringDHOAnimator, SpringRK4Animator, Utils, _, createDebugLayerForPath, evaluateRelativeProperty, isRelativeProperty, numberRE, relativePropertyRE,
+	var AnimatorClassBezierPresets, AnimatorClasses, BaseClass, BezierCurveAnimator, Config, Defaults, LinearAnimator, Path, SpringDHOAnimator, SpringRK4Animator, Utils, _, createDebugLayerForPath, evaluateRelativeProperty, isRelativeProperty, numberRE, positionDebugLayerInFrontOfLayer, relativePropertyRE,
 	  slice = [].slice,
 	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -22991,6 +22991,8 @@
 	SpringRK4Animator = __webpack_require__(22).SpringRK4Animator;
 	
 	SpringDHOAnimator = __webpack_require__(24).SpringDHOAnimator;
+	
+	Path = __webpack_require__(25).Path;
 	
 	AnimatorClasses = {
 	  "linear": LinearAnimator,
@@ -23033,7 +23035,8 @@
 	  debugLayer = new Layer({
 	    width: 100,
 	    height: 100,
-	    backgroundColor: 'transparent'
+	    backgroundColor: 'transparent',
+	    name: 'debug-path'
 	  });
 	  debugLayer._element.appendChild(svg);
 	  debugLayer.path = path;
@@ -23052,15 +23055,28 @@
 	  return debugLayer;
 	};
 	
+	positionDebugLayerInFrontOfLayer = function(debugLayer, layer) {
+	  var layerOriginX, layerOriginY, layerScreenFrame, path;
+	  path = debugLayer.path;
+	  layerScreenFrame = layer.screenFrame;
+	  layerOriginX = layerScreenFrame.x + layer.originX * layerScreenFrame.width;
+	  layerOriginY = layerScreenFrame.y + layer.originY * layerScreenFrame.height;
+	  return debugLayer.props = {
+	    x: layerOriginX - path.start.x + debugLayer.pathOffset.x,
+	    y: layerOriginY - path.start.y + debugLayer.pathOffset.y
+	  };
+	};
+	
 	exports.Animation = (function(superClass) {
 	  extend(Animation, superClass);
 	
 	  function Animation(options) {
-	    var layerOriginX, layerOriginY, layerScreenFrame, path;
+	    var path;
 	    if (options == null) {
 	      options = {};
 	    }
 	    this._updateColorValue = bind(this._updateColorValue, this);
+	    this._updatePositionAlongPath = bind(this._updatePositionAlongPath, this);
 	    this._updateNumberValue = bind(this._updateNumberValue, this);
 	    this._updateValues = bind(this._updateValues, this);
 	    this._prepareUpdateValues = bind(this._prepareUpdateValues, this);
@@ -23080,7 +23096,7 @@
 	      delay: 0,
 	      debug: false,
 	      path: null,
-	      pathOptions: null,
+	      autoRotate: true,
 	      colorModel: "husl",
 	      animate: true,
 	      looping: false
@@ -23090,16 +23106,9 @@
 	      this.options.properties.x = options.layer.x + path.end.x - path.start.x;
 	      this.options.properties.y = options.layer.y + path.end.y - path.start.x;
 	      delete options.properties.path;
-	      this.pathOptions = _.defaults(options.pathOptions || {}, {
-	        autoRotate: true
-	      });
 	      if (this.options.debug) {
 	        this._debugLayer = createDebugLayerForPath(path);
-	        layerScreenFrame = this.options.layer.screenFrame;
-	        layerOriginX = layerScreenFrame.x + this.options.layer.originX * layerScreenFrame.width;
-	        layerOriginY = layerScreenFrame.y + this.options.layer.originY * layerScreenFrame.height;
-	        this._debugLayer.x = layerOriginX - path.start.x + this._debugLayer.pathOffset.x;
-	        this._debugLayer.y = layerOriginY - path.start.y + this._debugLayer.pathOffset.y;
+	        positionDebugLayerInFrontOfLayer(this._debugLayer, this.options.layer);
 	      }
 	    }
 	    if (options.origin) {
@@ -23321,6 +23330,8 @@
 	      v = ref[k];
 	      if (Color.isColorObject(v) || Color.isColorObject(this._stateA[k])) {
 	        results.push(this._valueUpdaters[k] = this._updateColorValue);
+	      } else if ((this.options.path != null) && (k === 'x' || k === 'y')) {
+	        results.push(this._valueUpdaters[k] = this._updatePositionAlongPath);
 	      } else {
 	        results.push(this._valueUpdaters[k] = this._updateNumberValue);
 	      }
@@ -23339,24 +23350,26 @@
 	  };
 	
 	  Animation.prototype._updateNumberValue = function(key, value) {
-	    var angle, position;
 	    this._target[key] = Utils.mapRange(value, 0, 1, this._stateA[key], this._stateB[key]);
-	    if (this.options.path) {
-	      position = this.options.path.pointAtLength(this.options.path.length * value);
-	      position.x += this._stateA.x - this.options.path.start.x;
-	      position.y += this._stateA.y - this.options.path.start.y;
-	      if (this._debugLayer) {
-	        this._debugLayer.animatedPath.setAttribute('stroke-dashoffset', this.options.path.length * (1 - value));
-	      }
-	      if (this.pathOptions.autoRotate) {
-	        angle = Math.atan2(position.y - this._target.y, position.x - this._target.x) * 180 / Math.PI;
-	        if (position.y !== this._target.y && position.x !== this._target.x) {
-	          this._target.rotationZ = angle;
-	        }
-	      }
-	      this._target.x = position.x;
-	      this._target.y = position.y;
+	  };
+	
+	  Animation.prototype._updatePositionAlongPath = function(key, value) {
+	    var angle, path, position;
+	    path = this.options.path;
+	    position = path.pointAtLength(path.length * value);
+	    position.x += this._stateA.x - path.start.x;
+	    position.y += this._stateA.y - path.start.y;
+	    if (this._debugLayer) {
+	      this._debugLayer.animatedPath.setAttribute('stroke-dashoffset', path.length * (1 - value));
 	    }
+	    if (this.options.autoRotate) {
+	      angle = Math.atan2(position.y - this._target.y, position.x - this._target.x) * 180 / Math.PI;
+	      if (position.y !== this._target.y && position.x !== this._target.x) {
+	        this._target.rotationZ = angle;
+	      }
+	    }
+	    this._target.x = position.x;
+	    this._target.y = position.y;
 	  };
 	
 	  Animation.prototype._updateColorValue = function(key, value) {
@@ -23439,10 +23452,12 @@
 	    animatableProperties = {};
 	    for (k in properties) {
 	      v = properties[k];
-	      if (_.isNumber(v) || _.isFunction(v) || isRelativeProperty(v) || Color.isColorObject(v) || k === 'path' || v === null) {
+	      if (_.isNumber(v) || _.isFunction(v) || isRelativeProperty(v) || Color.isColorObject(v) || (k === 'path' && _.isObject(v)) || v === null) {
 	        animatableProperties[k] = v;
 	      } else if (_.isString(v)) {
-	        if (Color.isColorString(v)) {
+	        if (k === 'path') {
+	          animatableProperties[k] = Path.fromString(v);
+	        } else if (Color.isColorString(v)) {
 	          animatableProperties[k] = new Color(v);
 	        }
 	      }
@@ -23939,6 +23954,561 @@
 
 /***/ },
 /* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Layer, Path, Utils, _, catmullRom2Bezier, j, len, method, ref,
+	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+	
+	_ = __webpack_require__(1)._;
+	
+	Utils = __webpack_require__(4);
+	
+	Layer = __webpack_require__(13).Layer;
+	
+	catmullRom2Bezier = function(points, closed, tension) {
+	  var c1x, c1y, c2x, c2y, d, i, j, l, p, ref, t, x, y, zero;
+	  if (closed == null) {
+	    closed = false;
+	  }
+	  if (tension == null) {
+	    tension = 0.5;
+	  }
+	  d = [];
+	  l = points.length;
+	  i = 0;
+	  zero = {
+	    x: 0,
+	    y: 0
+	  };
+	  for (i = j = 0, ref = l - !closed; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
+	    p = [points[i - 1] || zero, points[i] || zero, points[i + 1] || zero, points[i + 2] || zero];
+	    if (closed) {
+	      if (i === 0) {
+	        p[0] = points[l - 1];
+	      } else if (i === l - 2) {
+	        p[3] = points[0];
+	      } else if (i === l - 1) {
+	        p[2] = points[0];
+	        p[3] = points[1];
+	      }
+	    } else {
+	      if (i === l - 2) {
+	        p[3] = p[2];
+	      } else if (i === 0) {
+	        p[0] = points[i];
+	      }
+	    }
+	    t = (tension - 1) * 2;
+	    c1x = p[1].x - (p[2].x - p[0].x) / (6 / t);
+	    c1y = p[1].y - (p[2].y - p[0].y) / (6 / t);
+	    c2x = p[2].x + (p[3].x - p[1].x) / (6 / t);
+	    c2y = p[2].y + (p[3].y - p[1].y) / (6 / t);
+	    x = p[2].x;
+	    y = p[2].y;
+	    d.push([
+	      {
+	        x: c1x,
+	        y: c1y
+	      }, {
+	        x: c2x,
+	        y: c2y
+	      }, {
+	        x: x,
+	        y: y
+	      }
+	    ]);
+	  }
+	  return d;
+	};
+	
+	Path = function(init) {
+	  var arc, closePath, curve, curveTo, elementForDebugRepresentation, end, forLayer, functor, getTotalLength, hasOrigin, hlineTo, instructionToString, instructions, length, lineTo, moveTo, node, originOrZero, plus, point, pointAtLength, points, push, qcurveTo, smoothCurveTo, smoothqCurveTo, start, thru, toString, unshift, vlineTo;
+	  instructions = init || [];
+	  functor = function(f, args) {
+	    if (typeof f === 'function') {
+	      return f(instructions);
+	    } else {
+	      return f;
+	    }
+	  };
+	  instructionToString = function(arg) {
+	    var command, params;
+	    command = arg.command, params = arg.params;
+	    return command + " " + (params.join(' '));
+	  };
+	  point = function(arg, arg1) {
+	    var command, params, prev_x, prev_y;
+	    command = arg.command, params = arg.params;
+	    prev_x = arg1[0], prev_y = arg1[1];
+	    switch (command) {
+	      case 'M':
+	        return [params[0], params[1]];
+	      case 'L':
+	        return [params[0], params[1]];
+	      case 'H':
+	        return [params[0], prev_y];
+	      case 'V':
+	        return [prev_x, params[0]];
+	      case 'Z':
+	        return null;
+	      case 'C':
+	        return [params[4], params[5]];
+	      case 'S':
+	        return [params[2], params[3]];
+	      case 'Q':
+	        return [params[2], params[3]];
+	      case 'T':
+	        return [params[0], params[1]];
+	      case 'A':
+	        return [params[5], params[6]];
+	    }
+	  };
+	  push = function(arr, el) {
+	    var copy;
+	    copy = arr.slice(0, arr.length);
+	    copy.push(el);
+	    return copy;
+	  };
+	  unshift = function(arr, el) {
+	    var copy;
+	    copy = arr.slice(0, arr.length);
+	    copy.unshift(el);
+	    return copy;
+	  };
+	  plus = function(instruction) {
+	    return Path(push(instructions, instruction));
+	  };
+	  moveTo = function(arg) {
+	    var x, y;
+	    x = arg.x, y = arg.y;
+	    return plus({
+	      command: 'M',
+	      params: [x, y]
+	    });
+	  };
+	  lineTo = function(arg) {
+	    var x, y;
+	    x = arg.x, y = arg.y;
+	    return plus({
+	      command: 'L',
+	      params: [x, y]
+	    });
+	  };
+	  hlineTo = function(x) {
+	    return plus({
+	      command: 'H',
+	      params: [x]
+	    });
+	  };
+	  vlineTo = function(y) {
+	    return plus({
+	      command: 'V',
+	      params: [y]
+	    });
+	  };
+	  closePath = function() {
+	    return plus({
+	      command: 'Z',
+	      params: []
+	    });
+	  };
+	  curve = function(arg) {
+	    var control, control1, control2, p, to;
+	    to = arg.to, control = arg.control, control1 = arg.control1, control2 = arg.control2;
+	    p = Path(instructions);
+	    if (control) {
+	      control1 = control;
+	    }
+	    if (control1 && !control2) {
+	      p = p.qcurveTo(to, {
+	        control: control1
+	      });
+	    }
+	    if (control1 && control2) {
+	      p = p.curveTo(to, {
+	        control1: control1,
+	        control2: control2
+	      });
+	    }
+	    return p;
+	  };
+	  curveTo = function(to, arg) {
+	    var control1, control2;
+	    control1 = arg.control1, control2 = arg.control2;
+	    return plus({
+	      command: 'C',
+	      params: [control1.x, control1.y, control2.x, control2.y, to.x, to.y]
+	    });
+	  };
+	  smoothCurveTo = function(to, arg) {
+	    var control;
+	    control = arg.control;
+	    return plus({
+	      command: 'S',
+	      params: [control.x, control.y, to.x, to.y]
+	    });
+	  };
+	  qcurveTo = function(to, arg) {
+	    var control;
+	    control = arg.control;
+	    return plus({
+	      command: 'Q',
+	      params: [control.x, control.y, to.x, to.y]
+	    });
+	  };
+	  smoothqCurveTo = function(arg) {
+	    var x, y;
+	    x = arg.x, y = arg.y;
+	    return plus({
+	      command: 'T',
+	      params: [x, y]
+	    });
+	  };
+	  originOrZero = function(instructions) {
+	    var ref;
+	    if (((ref = instructions[0]) != null ? ref.command : void 0) === 'M') {
+	      return {
+	        x: instructions[0].params[0],
+	        y: instructions[0].params[1]
+	      };
+	    } else {
+	      return {
+	        x: 0,
+	        y: 0
+	      };
+	    }
+	  };
+	  arc = function(arg) {
+	    var largeArc, rx, ry, sweep, to, xrot;
+	    to = arg.to, rx = arg.rx, ry = arg.ry, xrot = arg.xrot, largeArc = arg.largeArc, sweep = arg.sweep;
+	    if (xrot == null) {
+	      xrot = 0;
+	    }
+	    if (rx == null) {
+	      rx = function(instructions) {
+	        var o;
+	        o = originOrZero(instructions);
+	        return to.x - o.x;
+	      };
+	    }
+	    if (ry == null) {
+	      ry = function(instructions) {
+	        var o;
+	        o = originOrZero(instructions);
+	        return to.y - o.y;
+	      };
+	    }
+	    if (largeArc == null) {
+	      largeArc = 0;
+	    }
+	    largeArc = largeArc ? 1 : 0;
+	    if (sweep == null) {
+	      sweep = 1;
+	    }
+	    sweep = sweep ? 1 : 0;
+	    return plus({
+	      command: 'A',
+	      params: [rx, ry, xrot, largeArc, sweep, to.x, to.y]
+	    });
+	  };
+	  thru = function(points, arg) {
+	    var b, beziers, closed, curviness, j, len, p, tension;
+	    curviness = (arg != null ? arg : {}).curviness;
+	    if (curviness == null) {
+	      curviness = 5;
+	    }
+	    tension = 1 - curviness / 10;
+	    closed = false;
+	    beziers = catmullRom2Bezier(points, closed, tension);
+	    p = Path(instructions).moveTo(points[0]);
+	    for (j = 0, len = beziers.length; j < len; j++) {
+	      b = beziers[j];
+	      p = p.curveTo(b[2], {
+	        control1: b[0],
+	        control2: b[1]
+	      });
+	    }
+	    return p;
+	  };
+	  toString = function() {
+	    var evaluate;
+	    evaluate = function(instruction, i) {
+	      return {
+	        command: instruction.command,
+	        params: instruction.params.map(functor)
+	      };
+	    };
+	    return instructions.map(evaluate).map(instructionToString).join(' ');
+	  };
+	  points = function() {
+	    var fn, instruction, j, len, prev, ps;
+	    ps = [];
+	    prev = [0, 0];
+	    fn = function() {
+	      var p;
+	      p = point(instruction, prev);
+	      prev = p;
+	      if (p) {
+	        return ps.push(p);
+	      }
+	    };
+	    for (j = 0, len = instructions.length; j < len; j++) {
+	      instruction = instructions[j];
+	      fn();
+	    }
+	    return ps;
+	  };
+	  pointAtLength = function(length) {
+	    return node.getPointAtLength(length);
+	  };
+	  getTotalLength = function() {
+	    return node.getTotalLength();
+	  };
+	  elementForDebugRepresentation = function() {
+	    var addx, addy, animatedPath, c1, c1x, c1y, c2, c2x, c2y, conn, conn2, connector, controlMarker, debugPath, element, elements, group, i, j, k, len, lx, ly, m, marker, mx, my, olx, oly, ref, ref1, relativeSegmentTypes, segment, segments;
+	    group = Utils.SVG.createElement('g');
+	    marker = Utils.SVG.createElement('circle', {
+	      r: 2,
+	      cx: 0,
+	      cy: 0,
+	      fill: 'red'
+	    });
+	    controlMarker = Utils.SVG.createElement('circle', {
+	      r: 2,
+	      cx: 0,
+	      cy: 0,
+	      fill: 'white',
+	      stroke: '#aaa',
+	      'stroke-width': '1px'
+	    });
+	    connector = Utils.SVG.createElement('path', {
+	      d: "M0,0",
+	      fill: 'transparent',
+	      stroke: 'rgba(0, 0, 0, 0.25)',
+	      'stroke-width': '1px',
+	      'stroke-dasharray': '4 4'
+	    });
+	    debugPath = node.cloneNode();
+	    lx = 0;
+	    ly = 0;
+	    segments = debugPath.pathSegList;
+	    relativeSegmentTypes = [SVGPathSeg.PATHSEG_MOVETO_REL, SVGPathSeg.PATHSEG_LINETO_REL, SVGPathSeg.PATHSEG_CURVETO_CUBIC_REL, SVGPathSeg.PATHSEG_CURVETO_QUADRATIC_REL, SVGPathSeg.PATHSEG_CURVETO_CUBIC_SMOOTH_REL, SVGPathSeg.PATHSEG_CURVETO_QUADRATIC_SMOOTH_REL, SVGPathSeg.PATHSEG_ARC_REL, SVGPathSeg.PATHSEG_LINETO_HORIZONTAL_REL, SVGPathSeg.PATHSEG_LINETO_VERTICAL_REL];
+	    elements = [];
+	    for (i = j = 0, ref = segments.numberOfItems; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
+	      segment = segments.getItem(i);
+	      if (ref1 = segment.pathSegType, indexOf.call(relativeSegmentTypes, ref1) >= 0) {
+	        addx = lx;
+	        addy = ly;
+	      } else {
+	        addx = 0;
+	        addy = 0;
+	      }
+	      olx = lx;
+	      oly = ly;
+	      if (segment.x || segment.y) {
+	        m = marker.cloneNode();
+	        mx = addx + (typeof segment.x === 'undefined' ? lx : segment.x);
+	        my = addy + (typeof segment.y === 'undefined' ? ly : segment.y);
+	        m.setAttribute('cx', mx);
+	        m.setAttribute('cy', my);
+	        m.setAttribute('class', 'debug-marker');
+	        lx = mx;
+	        ly = my;
+	        elements.push(m);
+	      }
+	      if (segment.x1) {
+	        c1 = controlMarker.cloneNode();
+	        c1x = addx + segment.x1;
+	        c1y = addy + segment.y1;
+	        c1.setAttribute('cx', c1x);
+	        c1.setAttribute('cy', c1y);
+	        c1.setAttribute('class', 'debug-control-marker');
+	        conn = connector.cloneNode();
+	        conn.setAttribute('d', "M" + olx + "," + oly + " L" + c1x + "," + c1y);
+	        conn.setAttribute('class', 'debug-connector');
+	        elements.push(c1);
+	        elements.push(conn);
+	        if (!segment.x2) {
+	          conn2 = connector.cloneNode();
+	          conn2.setAttribute('d', "M" + mx + "," + my + " L" + c1x + "," + c1y);
+	          conn2.setAttribute('class', 'debug-connector');
+	          elements.push(conn2);
+	        }
+	      }
+	      if (segment.x2) {
+	        c2 = controlMarker.cloneNode();
+	        c2x = addx + segment.x2;
+	        c2y = addy + segment.y2;
+	        c2.setAttribute('cx', c2x);
+	        c2.setAttribute('cy', c2y);
+	        c2.setAttribute('class', 'debug-control-marker');
+	        conn = connector.cloneNode();
+	        conn.setAttribute('d', "M" + mx + "," + my + " L" + c2x + "," + c2y);
+	        conn.setAttribute('class', 'debug-connector');
+	        elements.push(conn);
+	        elements.push(c2);
+	      }
+	    }
+	    for (k = 0, len = elements.length; k < len; k++) {
+	      element = elements[k];
+	      group.appendChild(element);
+	    }
+	    debugPath.setAttribute('stroke', 'rgba(255, 0, 0, 0.75)');
+	    debugPath.setAttribute('stroke-width', 1);
+	    debugPath.setAttribute('fill', 'transparent');
+	    debugPath.setAttribute('class', 'debug-path');
+	    animatedPath = debugPath.cloneNode();
+	    animatedPath.setAttribute('class', 'animated-path');
+	    animatedPath.setAttribute('stroke', 'transparent');
+	    animatedPath.setAttribute('stroke-dasharray', getTotalLength());
+	    animatedPath.setAttribute('stroke-dashoffset', getTotalLength());
+	    animatedPath.setAttribute('fill', 'transparent');
+	    group.appendChild(animatedPath);
+	    group.appendChild(debugPath);
+	    return group;
+	  };
+	  hasOrigin = function() {
+	    return indexOf.call(_.pluck(instructions, 'command'), 'M') >= 0;
+	  };
+	  forLayer = function(layer) {
+	    var x, y;
+	    x = layer.x + layer.originX * layer.width;
+	    y = layer.y + layer.originY * layer.height;
+	    if (!hasOrigin()) {
+	      return Path(unshift(instructions, {
+	        command: 'M',
+	        params: [x, y]
+	      }));
+	    }
+	    return Path(instructions);
+	  };
+	  node = null;
+	  length = null;
+	  start = null;
+	  end = null;
+	  if (hasOrigin()) {
+	    node = Utils.SVG.createElement('path', {
+	      d: toString(),
+	      fill: 'transparent'
+	    });
+	    length = getTotalLength();
+	    start = pointAtLength(0);
+	    end = pointAtLength(length);
+	  }
+	  return {
+	    moveTo: moveTo,
+	    lineTo: lineTo,
+	    hlineTo: hlineTo,
+	    vlineTo: vlineTo,
+	    closePath: closePath,
+	    curve: curve,
+	    curveTo: curveTo,
+	    smoothCurveTo: smoothCurveTo,
+	    qcurveTo: qcurveTo,
+	    smoothqCurveTo: smoothqCurveTo,
+	    arc: arc,
+	    thru: thru,
+	    pointAtLength: pointAtLength,
+	    elementForDebugRepresentation: elementForDebugRepresentation,
+	    start: start,
+	    end: end,
+	    length: length,
+	    node: node,
+	    forLayer: forLayer,
+	    toString: toString,
+	    points: points,
+	    instructions: instructions
+	  };
+	};
+	
+	ref = ['curve', 'arc', 'thru', 'moveTo'];
+	for (j = 0, len = ref.length; j < len; j++) {
+	  method = ref[j];
+	  Path[method] = (function(m) {
+	    return function() {
+	      return Path()[m].apply(this, arguments);
+	    };
+	  })(method);
+	}
+	
+	Path.stringToInstructions = function(path) {
+	  var instructions, length, segment;
+	  segment = /([astvzqmhlc])([^astvzqmhlc]*)/ig;
+	  length = {
+	    a: 7,
+	    c: 6,
+	    h: 1,
+	    l: 2,
+	    m: 2,
+	    q: 4,
+	    s: 4,
+	    t: 2,
+	    v: 1,
+	    z: 0
+	  };
+	  instructions = [];
+	  path.replace(segment, function(p, command, args) {
+	    var type;
+	    type = command.toLowerCase();
+	    args = args.match(/-?[.0-9]+(?:e[-+]?\d+)?/ig);
+	    if (args) {
+	      args = args.map(Number);
+	    } else {
+	      args = [];
+	    }
+	    if (type === 'm' && args.length > 2) {
+	      instructions.push({
+	        command: command,
+	        params: args.splice(0, 2)
+	      });
+	      type = 'l';
+	      command = command === 'm' ? 'l' : 'L';
+	    }
+	    while (true) {
+	      if (args.length === length[type]) {
+	        return instructions.push({
+	          command: command,
+	          params: args
+	        });
+	      }
+	      if (args.length < length[type]) {
+	        throw new Error('Malformed path data');
+	      }
+	      instructions.push({
+	        command: command,
+	        params: args.splice(0, length[type])
+	      });
+	    }
+	  });
+	  return instructions;
+	};
+	
+	Path.fromString = function(path) {
+	  return Path(Path.stringToInstructions(path));
+	};
+	
+	Path.loadPath = function(url) {
+	  var data, parser, path, ref1, svg;
+	  data = Utils.domLoadDataSync(url);
+	  parser = new DOMParser();
+	  svg = parser.parseFromString(data, 'image/svg+xml');
+	  path = (ref1 = svg.getElementsByTagName('path')) != null ? ref1[0] : void 0;
+	  if (!path) {
+	    console.error("Path: no <path> elements found in file loaded from URL: '" + url + "'");
+	    return null;
+	  }
+	  if (path) {
+	    return Path.fromString(path.getAttribute('d'));
+	  }
+	};
+	
+	_.extend(exports, {
+	  Path: Path
+	});
+
+
+/***/ },
+/* 26 */
 /***/ function(module, exports) {
 
 	var _Force2DProperties, _WebkitProperties, filterFormat, roundToZero;
@@ -24104,7 +24674,7 @@
 
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var BaseClass, Defaults, Events, LayerStatesIgnoredKeys, _,
@@ -24356,7 +24926,7 @@
 
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var BaseClass, Defaults, EventBuffer, Events, Gestures, Simulation, Utils, _,
@@ -24372,11 +24942,11 @@
 	
 	Events = __webpack_require__(15).Events;
 	
-	Simulation = __webpack_require__(28).Simulation;
+	Simulation = __webpack_require__(29).Simulation;
 	
 	Defaults = __webpack_require__(17).Defaults;
 	
-	EventBuffer = __webpack_require__(33).EventBuffer;
+	EventBuffer = __webpack_require__(34).EventBuffer;
 	
 	Gestures = __webpack_require__(16).Gestures;
 	
@@ -25102,7 +25672,7 @@
 
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var BaseClass, Config, Defaults, Events, FrictionSimulator, MomentumBounceSimulator, SimulatorClasses, SpringSimulator, Utils, _,
@@ -25123,11 +25693,11 @@
 	
 	Events = __webpack_require__(15).Events;
 	
-	SpringSimulator = __webpack_require__(29).SpringSimulator;
+	SpringSimulator = __webpack_require__(30).SpringSimulator;
 	
-	FrictionSimulator = __webpack_require__(31).FrictionSimulator;
+	FrictionSimulator = __webpack_require__(32).FrictionSimulator;
 	
-	MomentumBounceSimulator = __webpack_require__(32).MomentumBounceSimulator;
+	MomentumBounceSimulator = __webpack_require__(33).MomentumBounceSimulator;
 	
 	Events.SimulationStart = 'simulationStart';
 	
@@ -25252,7 +25822,7 @@
 
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Defaults, Integrator, Simulator, Utils,
@@ -25264,7 +25834,7 @@
 	
 	Defaults = __webpack_require__(17).Defaults;
 	
-	Simulator = __webpack_require__(30).Simulator;
+	Simulator = __webpack_require__(31).Simulator;
 	
 	Integrator = __webpack_require__(23).Integrator;
 	
@@ -25327,7 +25897,7 @@
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var BaseClass, Config, Utils, _,
@@ -25385,7 +25955,7 @@
 
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Defaults, Integrator, Simulator, Utils,
@@ -25397,7 +25967,7 @@
 	
 	Defaults = __webpack_require__(17).Defaults;
 	
-	Simulator = __webpack_require__(30).Simulator;
+	Simulator = __webpack_require__(31).Simulator;
 	
 	Integrator = __webpack_require__(23).Integrator;
 	
@@ -25441,7 +26011,7 @@
 
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Defaults, FrictionSimulator, Simulator, SpringSimulator, Utils,
@@ -25453,11 +26023,11 @@
 	
 	Defaults = __webpack_require__(17).Defaults;
 	
-	Simulator = __webpack_require__(30).Simulator;
+	Simulator = __webpack_require__(31).Simulator;
 	
-	SpringSimulator = __webpack_require__(29).SpringSimulator;
+	SpringSimulator = __webpack_require__(30).SpringSimulator;
 	
-	FrictionSimulator = __webpack_require__(31).FrictionSimulator;
+	FrictionSimulator = __webpack_require__(32).FrictionSimulator;
 	
 	exports.MomentumBounceSimulator = (function(superClass) {
 	  extend(MomentumBounceSimulator, superClass);
@@ -25581,7 +26151,7 @@
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var BaseClass, Events, Utils, _,
@@ -25711,7 +26281,7 @@
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var BaseClass, Events, Gestures, Utils,
@@ -25889,7 +26459,7 @@
 
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Layer,
@@ -25937,7 +26507,7 @@
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Layer,
@@ -25979,7 +26549,7 @@
 
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Layer, _,
@@ -26019,7 +26589,7 @@
 
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var AnimationGroup, EventEmitter, _,
@@ -26077,561 +26647,6 @@
 	  return AnimationGroup;
 	
 	})(EventEmitter);
-
-
-/***/ },
-/* 39 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Layer, Path, Utils, _, catmullRom2Bezier, j, len, method, ref,
-	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
-	
-	_ = __webpack_require__(1)._;
-	
-	Utils = __webpack_require__(4);
-	
-	Layer = __webpack_require__(13).Layer;
-	
-	catmullRom2Bezier = function(points, closed, tension) {
-	  var c1x, c1y, c2x, c2y, d, i, j, l, p, ref, t, x, y, zero;
-	  if (closed == null) {
-	    closed = false;
-	  }
-	  if (tension == null) {
-	    tension = 0.5;
-	  }
-	  d = [];
-	  l = points.length;
-	  i = 0;
-	  zero = {
-	    x: 0,
-	    y: 0
-	  };
-	  for (i = j = 0, ref = l - !closed; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
-	    p = [points[i - 1] || zero, points[i] || zero, points[i + 1] || zero, points[i + 2] || zero];
-	    if (closed) {
-	      if (i === 0) {
-	        p[0] = points[l - 1];
-	      } else if (i === l - 2) {
-	        p[3] = points[0];
-	      } else if (i === l - 1) {
-	        p[2] = points[0];
-	        p[3] = points[1];
-	      }
-	    } else {
-	      if (i === l - 2) {
-	        p[3] = p[2];
-	      } else if (i === 0) {
-	        p[0] = points[i];
-	      }
-	    }
-	    t = (tension - 1) * 2;
-	    c1x = p[1].x - (p[2].x - p[0].x) / (6 / t);
-	    c1y = p[1].y - (p[2].y - p[0].y) / (6 / t);
-	    c2x = p[2].x + (p[3].x - p[1].x) / (6 / t);
-	    c2y = p[2].y + (p[3].y - p[1].y) / (6 / t);
-	    x = p[2].x;
-	    y = p[2].y;
-	    d.push([
-	      {
-	        x: c1x,
-	        y: c1y
-	      }, {
-	        x: c2x,
-	        y: c2y
-	      }, {
-	        x: x,
-	        y: y
-	      }
-	    ]);
-	  }
-	  return d;
-	};
-	
-	Path = function(init) {
-	  var arc, closePath, curve, curveTo, elementForDebugRepresentation, end, forLayer, functor, getTotalLength, hasOrigin, hlineTo, instructionToString, instructions, length, lineTo, moveTo, node, originOrZero, plus, point, pointAtLength, points, push, qcurveTo, smoothCurveTo, smoothqCurveTo, start, thru, toString, unshift, vlineTo;
-	  instructions = init || [];
-	  functor = function(f, args) {
-	    if (typeof f === 'function') {
-	      return f(instructions);
-	    } else {
-	      return f;
-	    }
-	  };
-	  instructionToString = function(arg) {
-	    var command, params;
-	    command = arg.command, params = arg.params;
-	    return command + " " + (params.join(' '));
-	  };
-	  point = function(arg, arg1) {
-	    var command, params, prev_x, prev_y;
-	    command = arg.command, params = arg.params;
-	    prev_x = arg1[0], prev_y = arg1[1];
-	    switch (command) {
-	      case 'M':
-	        return [params[0], params[1]];
-	      case 'L':
-	        return [params[0], params[1]];
-	      case 'H':
-	        return [params[0], prev_y];
-	      case 'V':
-	        return [prev_x, params[0]];
-	      case 'Z':
-	        return null;
-	      case 'C':
-	        return [params[4], params[5]];
-	      case 'S':
-	        return [params[2], params[3]];
-	      case 'Q':
-	        return [params[2], params[3]];
-	      case 'T':
-	        return [params[0], params[1]];
-	      case 'A':
-	        return [params[5], params[6]];
-	    }
-	  };
-	  push = function(arr, el) {
-	    var copy;
-	    copy = arr.slice(0, arr.length);
-	    copy.push(el);
-	    return copy;
-	  };
-	  unshift = function(arr, el) {
-	    var copy;
-	    copy = arr.slice(0, arr.length);
-	    copy.unshift(el);
-	    return copy;
-	  };
-	  plus = function(instruction) {
-	    return Path(push(instructions, instruction));
-	  };
-	  moveTo = function(arg) {
-	    var x, y;
-	    x = arg.x, y = arg.y;
-	    return plus({
-	      command: 'M',
-	      params: [x, y]
-	    });
-	  };
-	  lineTo = function(arg) {
-	    var x, y;
-	    x = arg.x, y = arg.y;
-	    return plus({
-	      command: 'L',
-	      params: [x, y]
-	    });
-	  };
-	  hlineTo = function(x) {
-	    return plus({
-	      command: 'H',
-	      params: [x]
-	    });
-	  };
-	  vlineTo = function(y) {
-	    return plus({
-	      command: 'V',
-	      params: [y]
-	    });
-	  };
-	  closePath = function() {
-	    return plus({
-	      command: 'Z',
-	      params: []
-	    });
-	  };
-	  curve = function(arg) {
-	    var control, control1, control2, p, to;
-	    to = arg.to, control = arg.control, control1 = arg.control1, control2 = arg.control2;
-	    p = Path(instructions);
-	    if (control) {
-	      control1 = control;
-	    }
-	    if (control1 && !control2) {
-	      p = p.qcurveTo(to, {
-	        control: control1
-	      });
-	    }
-	    if (control1 && control2) {
-	      p = p.curveTo(to, {
-	        control1: control1,
-	        control2: control2
-	      });
-	    }
-	    return p;
-	  };
-	  curveTo = function(to, arg) {
-	    var control1, control2;
-	    control1 = arg.control1, control2 = arg.control2;
-	    return plus({
-	      command: 'C',
-	      params: [control1.x, control1.y, control2.x, control2.y, to.x, to.y]
-	    });
-	  };
-	  smoothCurveTo = function(to, arg) {
-	    var control;
-	    control = arg.control;
-	    return plus({
-	      command: 'S',
-	      params: [control.x, control.y, to.x, to.y]
-	    });
-	  };
-	  qcurveTo = function(to, arg) {
-	    var control;
-	    control = arg.control;
-	    return plus({
-	      command: 'Q',
-	      params: [control.x, control.y, to.x, to.y]
-	    });
-	  };
-	  smoothqCurveTo = function(arg) {
-	    var x, y;
-	    x = arg.x, y = arg.y;
-	    return plus({
-	      command: 'T',
-	      params: [x, y]
-	    });
-	  };
-	  originOrZero = function(instructions) {
-	    var ref;
-	    if (((ref = instructions[0]) != null ? ref.command : void 0) === 'M') {
-	      return {
-	        x: instructions[0].params[0],
-	        y: instructions[0].params[1]
-	      };
-	    } else {
-	      return {
-	        x: 0,
-	        y: 0
-	      };
-	    }
-	  };
-	  arc = function(arg) {
-	    var largeArc, rx, ry, sweep, to, xrot;
-	    to = arg.to, rx = arg.rx, ry = arg.ry, xrot = arg.xrot, largeArc = arg.largeArc, sweep = arg.sweep;
-	    if (xrot == null) {
-	      xrot = 0;
-	    }
-	    if (rx == null) {
-	      rx = function(instructions) {
-	        var o;
-	        o = originOrZero(instructions);
-	        return to.x - o.x;
-	      };
-	    }
-	    if (ry == null) {
-	      ry = function(instructions) {
-	        var o;
-	        o = originOrZero(instructions);
-	        return to.y - o.y;
-	      };
-	    }
-	    if (largeArc == null) {
-	      largeArc = 0;
-	    }
-	    largeArc = largeArc ? 1 : 0;
-	    if (sweep == null) {
-	      sweep = 1;
-	    }
-	    sweep = sweep ? 1 : 0;
-	    return plus({
-	      command: 'A',
-	      params: [rx, ry, xrot, largeArc, sweep, to.x, to.y]
-	    });
-	  };
-	  thru = function(points, arg) {
-	    var b, beziers, closed, curviness, j, len, p, tension;
-	    curviness = (arg != null ? arg : {}).curviness;
-	    if (curviness == null) {
-	      curviness = 5;
-	    }
-	    tension = 1 - curviness / 10;
-	    closed = false;
-	    beziers = catmullRom2Bezier(points, closed, tension);
-	    p = Path(instructions).moveTo(points[0]);
-	    for (j = 0, len = beziers.length; j < len; j++) {
-	      b = beziers[j];
-	      p = p.curveTo(b[2], {
-	        control1: b[0],
-	        control2: b[1]
-	      });
-	    }
-	    return p;
-	  };
-	  toString = function() {
-	    var evaluate;
-	    evaluate = function(instruction, i) {
-	      return {
-	        command: instruction.command,
-	        params: instruction.params.map(functor)
-	      };
-	    };
-	    return instructions.map(evaluate).map(instructionToString).join(' ');
-	  };
-	  points = function() {
-	    var fn, instruction, j, len, prev, ps;
-	    ps = [];
-	    prev = [0, 0];
-	    fn = function() {
-	      var p;
-	      p = point(instruction, prev);
-	      prev = p;
-	      if (p) {
-	        return ps.push(p);
-	      }
-	    };
-	    for (j = 0, len = instructions.length; j < len; j++) {
-	      instruction = instructions[j];
-	      fn();
-	    }
-	    return ps;
-	  };
-	  pointAtLength = function(length) {
-	    return node.getPointAtLength(length);
-	  };
-	  getTotalLength = function() {
-	    return node.getTotalLength();
-	  };
-	  elementForDebugRepresentation = function() {
-	    var addx, addy, animatedPath, c1, c1x, c1y, c2, c2x, c2y, conn, conn2, connector, controlMarker, debugPath, element, elements, group, i, j, k, len, lx, ly, m, marker, mx, my, olx, oly, ref, ref1, relativeSegmentTypes, segment, segments;
-	    group = Utils.SVG.createElement('g');
-	    marker = Utils.SVG.createElement('circle', {
-	      r: 2,
-	      cx: 0,
-	      cy: 0,
-	      fill: 'red'
-	    });
-	    controlMarker = Utils.SVG.createElement('circle', {
-	      r: 2,
-	      cx: 0,
-	      cy: 0,
-	      fill: 'white',
-	      stroke: '#aaa',
-	      'stroke-width': '1px'
-	    });
-	    connector = Utils.SVG.createElement('path', {
-	      d: "M0,0",
-	      fill: 'transparent',
-	      stroke: 'rgba(0, 0, 0, 0.25)',
-	      'stroke-width': '1px',
-	      'stroke-dasharray': '4 4'
-	    });
-	    debugPath = node.cloneNode();
-	    lx = 0;
-	    ly = 0;
-	    segments = debugPath.pathSegList;
-	    relativeSegmentTypes = [SVGPathSeg.PATHSEG_MOVETO_REL, SVGPathSeg.PATHSEG_LINETO_REL, SVGPathSeg.PATHSEG_CURVETO_CUBIC_REL, SVGPathSeg.PATHSEG_CURVETO_QUADRATIC_REL, SVGPathSeg.PATHSEG_CURVETO_CUBIC_SMOOTH_REL, SVGPathSeg.PATHSEG_CURVETO_QUADRATIC_SMOOTH_REL, SVGPathSeg.PATHSEG_ARC_REL, SVGPathSeg.PATHSEG_LINETO_HORIZONTAL_REL, SVGPathSeg.PATHSEG_LINETO_VERTICAL_REL];
-	    elements = [];
-	    for (i = j = 0, ref = segments.numberOfItems; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
-	      segment = segments.getItem(i);
-	      if (ref1 = segment.pathSegType, indexOf.call(relativeSegmentTypes, ref1) >= 0) {
-	        addx = lx;
-	        addy = ly;
-	      } else {
-	        addx = 0;
-	        addy = 0;
-	      }
-	      olx = lx;
-	      oly = ly;
-	      if (segment.x || segment.y) {
-	        m = marker.cloneNode();
-	        mx = addx + (typeof segment.x === 'undefined' ? lx : segment.x);
-	        my = addy + (typeof segment.y === 'undefined' ? ly : segment.y);
-	        m.setAttribute('cx', mx);
-	        m.setAttribute('cy', my);
-	        m.setAttribute('class', 'debug-marker');
-	        lx = mx;
-	        ly = my;
-	        elements.push(m);
-	      }
-	      if (segment.x1) {
-	        c1 = controlMarker.cloneNode();
-	        c1x = addx + segment.x1;
-	        c1y = addy + segment.y1;
-	        c1.setAttribute('cx', c1x);
-	        c1.setAttribute('cy', c1y);
-	        c1.setAttribute('class', 'debug-control-marker');
-	        conn = connector.cloneNode();
-	        conn.setAttribute('d', "M" + olx + "," + oly + " L" + c1x + "," + c1y);
-	        conn.setAttribute('class', 'debug-connector');
-	        elements.push(c1);
-	        elements.push(conn);
-	        if (!segment.x2) {
-	          conn2 = connector.cloneNode();
-	          conn2.setAttribute('d', "M" + mx + "," + my + " L" + c1x + "," + c1y);
-	          conn2.setAttribute('class', 'debug-connector');
-	          elements.push(conn2);
-	        }
-	      }
-	      if (segment.x2) {
-	        c2 = controlMarker.cloneNode();
-	        c2x = addx + segment.x2;
-	        c2y = addy + segment.y2;
-	        c2.setAttribute('cx', c2x);
-	        c2.setAttribute('cy', c2y);
-	        c2.setAttribute('class', 'debug-control-marker');
-	        conn = connector.cloneNode();
-	        conn.setAttribute('d', "M" + mx + "," + my + " L" + c2x + "," + c2y);
-	        conn.setAttribute('class', 'debug-connector');
-	        elements.push(conn);
-	        elements.push(c2);
-	      }
-	    }
-	    for (k = 0, len = elements.length; k < len; k++) {
-	      element = elements[k];
-	      group.appendChild(element);
-	    }
-	    debugPath.setAttribute('stroke', 'rgba(255, 0, 0, 0.75)');
-	    debugPath.setAttribute('stroke-width', 1);
-	    debugPath.setAttribute('fill', 'transparent');
-	    debugPath.setAttribute('class', 'debug-path');
-	    animatedPath = debugPath.cloneNode();
-	    animatedPath.setAttribute('class', 'animated-path');
-	    animatedPath.setAttribute('stroke', 'transparent');
-	    animatedPath.setAttribute('stroke-dasharray', getTotalLength());
-	    animatedPath.setAttribute('stroke-dashoffset', getTotalLength());
-	    animatedPath.setAttribute('fill', 'transparent');
-	    group.appendChild(animatedPath);
-	    group.appendChild(debugPath);
-	    return group;
-	  };
-	  hasOrigin = function() {
-	    return indexOf.call(_.pluck(instructions, 'command'), 'M') >= 0;
-	  };
-	  forLayer = function(layer) {
-	    var x, y;
-	    x = layer.x + layer.originX * layer.width;
-	    y = layer.y + layer.originY * layer.height;
-	    if (!hasOrigin()) {
-	      return Path(unshift(instructions, {
-	        command: 'M',
-	        params: [x, y]
-	      }));
-	    }
-	    return Path(instructions);
-	  };
-	  node = null;
-	  length = null;
-	  start = null;
-	  end = null;
-	  if (hasOrigin()) {
-	    node = Utils.SVG.createElement('path', {
-	      d: toString(),
-	      fill: 'transparent'
-	    });
-	    length = getTotalLength();
-	    start = pointAtLength(0);
-	    end = pointAtLength(length);
-	  }
-	  return {
-	    moveTo: moveTo,
-	    lineTo: lineTo,
-	    hlineTo: hlineTo,
-	    vlineTo: vlineTo,
-	    closePath: closePath,
-	    curve: curve,
-	    curveTo: curveTo,
-	    smoothCurveTo: smoothCurveTo,
-	    qcurveTo: qcurveTo,
-	    smoothqCurveTo: smoothqCurveTo,
-	    arc: arc,
-	    thru: thru,
-	    pointAtLength: pointAtLength,
-	    elementForDebugRepresentation: elementForDebugRepresentation,
-	    start: start,
-	    end: end,
-	    length: length,
-	    node: node,
-	    forLayer: forLayer,
-	    toString: toString,
-	    points: points,
-	    instructions: instructions
-	  };
-	};
-	
-	ref = ['curve', 'arc', 'thru', 'moveTo'];
-	for (j = 0, len = ref.length; j < len; j++) {
-	  method = ref[j];
-	  Path[method] = (function(m) {
-	    return function() {
-	      return Path()[m].apply(this, arguments);
-	    };
-	  })(method);
-	}
-	
-	Path.stringToInstructions = function(path) {
-	  var instructions, length, segment;
-	  segment = /([astvzqmhlc])([^astvzqmhlc]*)/ig;
-	  length = {
-	    a: 7,
-	    c: 6,
-	    h: 1,
-	    l: 2,
-	    m: 2,
-	    q: 4,
-	    s: 4,
-	    t: 2,
-	    v: 1,
-	    z: 0
-	  };
-	  instructions = [];
-	  path.replace(segment, function(p, command, args) {
-	    var type;
-	    type = command.toLowerCase();
-	    args = args.match(/-?[.0-9]+(?:e[-+]?\d+)?/ig);
-	    if (args) {
-	      args = args.map(Number);
-	    } else {
-	      args = [];
-	    }
-	    if (type === 'm' && args.length > 2) {
-	      instructions.push({
-	        command: command,
-	        params: args.splice(0, 2)
-	      });
-	      type = 'l';
-	      command = command === 'm' ? 'l' : 'L';
-	    }
-	    while (true) {
-	      if (args.length === length[type]) {
-	        return instructions.push({
-	          command: command,
-	          params: args
-	        });
-	      }
-	      if (args.length < length[type]) {
-	        throw new Error('Malformed path data');
-	      }
-	      instructions.push({
-	        command: command,
-	        params: args.splice(0, length[type])
-	      });
-	    }
-	  });
-	  return instructions;
-	};
-	
-	Path.fromString = function(path) {
-	  return Path(Path.stringToInstructions(path));
-	};
-	
-	Path.loadPath = function(url) {
-	  var data, parser, path, ref1, svg;
-	  data = Utils.domLoadDataSync(url);
-	  parser = new DOMParser();
-	  svg = parser.parseFromString(data, 'image/svg+xml');
-	  path = (ref1 = svg.getElementsByTagName('path')) != null ? ref1[0] : void 0;
-	  if (!path) {
-	    console.error("Path: no <path> elements found in file loaded from URL: '" + url + "'");
-	    return null;
-	  }
-	  if (path) {
-	    return Path.fromString(path.getAttribute('d'));
-	  }
-	};
-	
-	_.extend(exports, {
-	  Path: Path
-	});
 
 
 /***/ },
@@ -30322,7 +30337,7 @@
 	
 	Events = __webpack_require__(15).Events;
 	
-	LayerStates = __webpack_require__(26).LayerStates;
+	LayerStates = __webpack_require__(27).LayerStates;
 	
 	Transitions = __webpack_require__(51);
 	
@@ -30503,7 +30518,7 @@
 	
 	Layer = __webpack_require__(13).Layer;
 	
-	LayerStates = __webpack_require__(26).LayerStates;
+	LayerStates = __webpack_require__(27).LayerStates;
 	
 	NavComponentTransition = (function() {
 	  function NavComponentTransition(navComponent, layerA, layerB) {
@@ -30781,7 +30796,7 @@
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 	
-	SVGLayer = __webpack_require__(37).SVGLayer;
+	SVGLayer = __webpack_require__(38).SVGLayer;
 	
 	exports.CircularProgressComponent = (function(superClass) {
 	  extend(CircularProgressComponent, superClass);
@@ -33771,17 +33786,17 @@
 /* 67 */
 /***/ function(module, exports) {
 
-	exports.date = 1470897250;
+	exports.date = 1472445976;
 	
 	exports.branch = "tisho/animation-paths";
 	
-	exports.hash = "e6b9505-dirty";
+	exports.hash = "8763d8b-dirty";
 	
-	exports.build = 2105;
+	exports.build = 2106;
 	
 	exports.version = exports.branch + "/" + exports.hash;
 
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=framer.debug.js.map?hash=dd866d39ba9791c7e236
+//# sourceMappingURL=framer.debug.js.map?hash=c73ae113a251c5603a67
