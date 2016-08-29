@@ -39,20 +39,6 @@ describe 'Path', ->
     path.instructions[1].command.should.eql "C"
     path.instructions[1].params.should.eql [110, 50, 250, 440, 530, 415]
 
-  it 'should be able to calculate the total length of a path', ->
-    path = Path.moveTo(x: 0, y: 0).lineTo(x: 50, y: 50)
-    path.length.should.be.closeTo(70.71, 0.1)
-
-  it 'should be able to return the coordinates of a point at arbitrary position along a path', ->
-    path = Path.moveTo(x: 0, y: 0).hlineTo(50)
-
-    path.pointAtLength(25).should.have.property 'x', 25
-    path.pointAtLength(25).should.have.property 'y', 0
-    path.pointAtLength(0).should.have.property 'x', 0
-    path.pointAtLength(0).should.have.property 'y', 0
-    path.pointAtLength(50).should.have.property 'x', 50
-    path.pointAtLength(50).should.have.property 'y', 0
-
   describe 'curve', ->
     it 'should produce a quadratic curve if only one control point is given', ->
       path = Path.curve(to: { x: 10, y: 20 }, control: { x: 50, y: 30 })
