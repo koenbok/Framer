@@ -390,13 +390,11 @@ class exports.Animation extends BaseClass
 			_.isFunction(v) or
 			isRelativeProperty(v) or
 			Color.isColorObject(v) or
-			(k == 'path' and _.isObject(v)) or
+			k == 'path' or
 			v == null
 				animatableProperties[k] = v
 			else if _.isString(v)
-				if k == 'path'
-					animatableProperties[k] = Path.fromString(v)
-				else if Color.isColorString(v)
+				if Color.isColorString(v)
 					animatableProperties[k] = new Color(v)
 
 
