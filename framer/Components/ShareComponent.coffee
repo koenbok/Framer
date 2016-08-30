@@ -278,7 +278,7 @@ class ShareComponent
 			height: 16
 
 		# If we miss a title from the json metadata, we fallback to the document url
-		fallbackTitle = _.replace(FramerStudioInfo.documentTitle, /\.framer$/, "")
+		fallbackTitle = _.replace(FramerStudioInfo?.documentTitle, /\.framer$/, "")
 
 		@credentialsTitle = new ShareLayer
 			parent: @credentials
