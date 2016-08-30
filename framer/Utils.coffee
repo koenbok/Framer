@@ -430,6 +430,14 @@ Utils.deviceFont = (os) ->
 	return "Segoe UI" if os is "windows"
 	return "Helvetica"
 
+Utils.webFont = (font) ->
+	link = document.createElement("link")
+	link.href = "https://fonts.googleapis.com/css?family=#{font}"
+	link.rel = "stylesheet"
+	document.getElementsByTagName("head")[0].appendChild(link)
+
+	return font
+
 ######################################################
 # MATH FUNCTIONS
 
