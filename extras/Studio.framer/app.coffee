@@ -1,7 +1,19 @@
+# Project Info
+# This info is presented in a widget when you share.
+# http://framerjs.com/docs/#info.info
+
+Framer.Info =
+	title: "NavComponent Example"
+	author: "Koen Bok"
+	twitter: "koenbok"
+	description: "A super simple email app NavComponent example. Still very beta©."
+
+
 Framer.Extras.Hints.enable()
 
 sketch = Framer.Importer.load("imported/Mail@2x")
 
+# Set up the component and add the initial view
 nav = new NavComponent
 nav.push(sketch.inbox)
 
@@ -21,58 +33,3 @@ sketch.status.parent = null
 sketch.status.point = 0
 sketch.status.bringToFront()
 
-
-# sketch.menu.bringToFront()
-# sketch.menu.bringToFront.point = 0
-
-
-# card = -> 
-# 	
-# 	layer = new Layer
-# 		size:Screen
-# 		backgroundColor: Utils.randomColor()
-# 	
-# 	layer.html = "Hello"
-# 	
-# 	return layer
-# 	
-# a = card()
-# b = card()
-# c = card()
-# 
-# c.frame = Utils.frameInset(c.frame, 100)
-# 
-# nav = new NavComponent
-# nav.push(a)
-
-# a.onTap -> nav.modalBottom(c)
-
-# a.onTap -> nav.push(b)
-# b.onTap -> nav.back()
-
-# scaleTransition = (nav, layerA, layerB, background) ->
-# 	transition =
-# 		layerA:
-# 			show: {x: 0, y: 0, scale: 1.0, opacity:1}
-# 			hide: {x: 0, y: 0, scale: 0.5, opacity:0}
-# 			options: {curve: "spring(300, 35, 0)"}
-# 		layerB:
-# 			show: {x: 0, y: 0, scale: 1.0, opacity:1}
-# 			hide: {x: 0, y: 0, scale: 0.5, opacity:0}
-# 			options: {curve: "spring(300, 35, 0)"}
-# 
-# 
-# 
-# cardA = new Layer
-# 	size: Screen.size
-# 	backgroundColor: "red"
-# 
-# cardB = new Layer
-# 	size: Screen.size
-# 	backgroundColor: "blue"
-# 
-# nav = new NavComponent()
-# nav.push(cardA)
-# 
-# cardA.onTap -> nav.push(cardB, true, true, scaleTransition)
-# cardB.onTap -> nav.back()

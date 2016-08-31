@@ -78,18 +78,31 @@ This pushes the layer into the view, optionally using a default push animation o
 
 ###### .dialog(layer : Layer, animate=true : Bool)
 
+Animate in from the center with the background faded.
+
 ###### .modalLeft(layer : Layer, animate=true : Bool)
+
+Animate in from the left with the background faded.
 
 ###### .modalTop(layer : Layer, animate=true : Bool)
 
+Animate in from the top with the background faded.
+
 ###### .modalRight(layer : Layer, animate=true : Bool)
+
+Animate in from the right with the background faded.
 
 ###### .modalBottom(layer : Layer, animate=true : Bool)
 
+Animate in from the bottom with the background faded.
+
 ###### .back()
+
+Go back to the previous layer and use the inverse animation.
 
 ### TODO
 
+- Inbox example scroll content is wrong
 - Check transition events
 - Wrapping of NavComponent
 - Hooks for startForward, endForward etc.
