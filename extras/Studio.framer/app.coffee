@@ -7,7 +7,7 @@ nav.push(sketch.inbox)
 
 # On a hamburger tap, we show the menu
 sketch.hamburger.onTap ->
-	nav.modalLeft(sketch.menu)
+	nav.modalBottom(sketch.menu)
 
 # If we tap on a few rows, show the mail
 for row in sketch.yesterday.children
