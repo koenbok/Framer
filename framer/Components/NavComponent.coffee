@@ -164,15 +164,18 @@ class exports.NavComponent extends Layer
 
 	_runTransition: (transition, direction, animate, from, to) =>
 
-
 		@_isTransitioning = true
 		@emit(Events.TransitionStart, from, to, direction)
 		@emit(direction, from, to)
 
-		transition[direction] animate, =>
-			@_isTransitioning = false
-			@emit(Events.TransitionEnd, from, to, direction)
-			@emit(direction, from, to)
+		# Start the transition with a small delay added so it only runs after all
+		# js has been processed. It's also important for hints, as they rely on 
+		# ignoreEvents to be false at the moment of a click.
+		Utils.delay 0, =>
+			transition[direction] animate, =>
+				@_isTransitioning = false
+				@emit(Events.TransitionEnd, from, to, direction)
+				@emit(direction, from, to)
 
 	_buildTransition: (template, layerA, layerB, background) ->
 
