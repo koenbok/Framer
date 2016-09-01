@@ -29,7 +29,14 @@ Framer.CircularProgressComponent = (require "./Components/CircularProgressCompon
 Framer.MIDIComponent = (require "./Components/MIDIComponent").MIDIComponent
 Framer.DeviceView = Framer.DeviceComponent # Compat
 
-_.extend(window, Framer) if window
+for name, module of Framer
+    Object.defineProperty window, name,
+        enumerable: false
+        configurable: false
+        writable: false
+        value: module
+
+# _.extend(window, Framer) if window
 
 # Framer level modules
 Framer.Context = (require "./Context").Context
