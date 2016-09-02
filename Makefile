@@ -3,7 +3,7 @@
 BIN = $(CURDIR)/node_modules/.bin
 
 DEFAULT_TARGET = extras/Studio.framer
-TARGET ?= DEFAULT_TARGET
+TARGET ?= $(DEFAULT_TARGET)
 TARGET_EXPANDED = $(shell echo $(TARGET)) # For ~ in paths, gulp needs this
 
 .PHONY: watch test debug release
@@ -30,7 +30,7 @@ clean:
 # Building and testing
 
 watch: lazy_bootstrap
-	cp $(DEFAULT_TARGET)/index.html $(TARGET)
+	-cp $(DEFAULT_TARGET)/index.html $(TARGET)
 	TARGET='$(strip $(TARGET_EXPANDED))' $(BIN)/gulp watch
 
 build: lazy_bootstrap
