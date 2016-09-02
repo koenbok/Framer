@@ -9,6 +9,8 @@ template = require("gulp-template")
 gutil = require("gulp-util")
 {exec} = require("child_process")
 
+DEBUG_TARGET = process.env.TARGET ? "extras/Studio.framer"
+
 ################################################################################
 # Base webpack config
 
@@ -71,7 +73,7 @@ gulp.task "webpack:debug", ["version"], (callback) ->
 			sourceMapFilename: "[file].map?hash=[hash]"
 
 	webpackDev "webpack:debug", config, ->
-		command "cp build/framer.debug.* extras/Studio.framer/framer/"
+		command "cp build/framer.debug.* '#{DEBUG_TARGET}/framer/'"
 		callback()
 
 gulp.task "webpack:release", ["version"], (callback) ->
