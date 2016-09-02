@@ -1298,7 +1298,7 @@ class exports.Layer extends BaseClass
 		layer = new Layer
 			frame: Utils.frameInset(highlightFrame, -1)
 			backgroundColor: null
-			borderColor: new Color("9013FE").alpha(.8)
+			borderColor: Framer.Defaults.Hints.color
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 3
 

@@ -76,6 +76,9 @@ Originals =
 		clip: true
 		mouseWheelEnabled: false
 		backgroundColor: null
+	Hints:
+		color: "rgba(144,19,254,0.8)"
+
 
 exports.Defaults =
 
