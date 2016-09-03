@@ -62,7 +62,6 @@ class exports.DeviceComponent extends BaseClass
 		@Type =
 			Tablet: "tablet"
 			Phone: "phone"
-			Browser: "browser"
 			Computer: "computer"
 
 	_setup: ->
