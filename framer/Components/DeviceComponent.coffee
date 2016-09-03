@@ -63,6 +63,7 @@ class exports.DeviceComponent extends BaseClass
 			Tablet: "tablet"
 			Phone: "phone"
 			Browser: "browser"
+			Computer: "computer"
 
 	_setup: ->
 
@@ -265,6 +266,10 @@ class exports.DeviceComponent extends BaseClass
 
 			@screen.backgroundColor = "black"
 			@screen.backgroundColor = device.backgroundColor if device.backgroundColor?
+
+			if device.deviceType is "computer"
+				Utils.domComplete ->
+					document.body.style.cursor = "auto"
 
 			@_device = _.clone(device)
 			@_deviceType = deviceType
@@ -865,6 +870,7 @@ AppleMacBook =
 	deviceImageCompression: true
 	screenWidth: 2304
 	screenHeight: 1440
+	deviceType: "computer"
 	minStudioVersion: newDeviceMinVersion
 
 AppleMacBookAir =
@@ -873,6 +879,7 @@ AppleMacBookAir =
 	deviceImageCompression: true
 	screenWidth: 1440
 	screenHeight: 900
+	deviceType: "computer"
 	minStudioVersion: newDeviceMinVersion
 
 AppleMacBookPro =
@@ -881,6 +888,7 @@ AppleMacBookPro =
 	deviceImageCompression: true
 	screenWidth: 2880
 	screenHeight: 1800
+	deviceType: "computer"
 	minStudioVersion: newDeviceMinVersion
 
 AppleIMac =
@@ -889,6 +897,7 @@ AppleIMac =
 	deviceImageCompression: true
 	screenWidth: 2560
 	screenHeight: 1440
+	deviceType: "computer"
 	minStudioVersion: newDeviceMinVersion
 
 DellXPS =
@@ -897,6 +906,7 @@ DellXPS =
 	deviceImageCompression: true
 	screenWidth: 3840
 	screenHeight: 2160
+	deviceType: "computer"
 	minStudioVersion: newDeviceMinVersion
 
 SonyW85OC =
