@@ -38,7 +38,7 @@ Events.DeviceFullScreenDidChange
 # 	DeviceScaleDidChange: "change:deviceScale"
 # 	DeviceContentScaleDidChange: "change:contentScale"
 # 	DeviceFullScreenDidChange: ""
-
+ 
 class exports.DeviceComponent extends BaseClass
 
 	@define "context", get: -> @_context
