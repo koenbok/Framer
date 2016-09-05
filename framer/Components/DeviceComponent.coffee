@@ -1061,7 +1061,7 @@ Devices =
 	"fullscreen":
 		name: "Fullscreen"
 		deviceType: "desktop"
-		backgroundColor: "white"
+		backgroundColor: "transparent"
 
 	"custom":
 		name: "Custom"
