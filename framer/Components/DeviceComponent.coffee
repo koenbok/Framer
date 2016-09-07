@@ -606,6 +606,7 @@ class exports.DeviceComponent extends BaseClass
 ###########################################################################
 # DEVICE CONFIGURATIONS
 
+desktopReleaseVersion = 70
 newDeviceMinVersion = 53
 oldDeviceMaxVersion = 52
 
@@ -870,7 +871,7 @@ AppleMacBook =
 	screenWidth: 2304
 	screenHeight: 1440
 	deviceType: "computer"
-	minStudioVersion: newDeviceMinVersion
+	minStudioVersion: desktopReleaseVersion
 
 AppleMacBookAir =
 	deviceImageWidth: 2000
@@ -879,7 +880,7 @@ AppleMacBookAir =
 	screenWidth: 1440
 	screenHeight: 900
 	deviceType: "computer"
-	minStudioVersion: newDeviceMinVersion
+	minStudioVersion: desktopReleaseVersion
 
 AppleMacBookPro =
 	deviceImageWidth: 3820
@@ -888,7 +889,7 @@ AppleMacBookPro =
 	screenWidth: 2880
 	screenHeight: 1800
 	deviceType: "computer"
-	minStudioVersion: newDeviceMinVersion
+	minStudioVersion: desktopReleaseVersion
 
 AppleIMac =
 	deviceImageWidth: 2800
@@ -897,7 +898,7 @@ AppleIMac =
 	screenWidth: 2560
 	screenHeight: 1440
 	deviceType: "computer"
-	minStudioVersion: newDeviceMinVersion
+	minStudioVersion: desktopReleaseVersion
 
 DellXPS =
 	deviceImageWidth: 5200
@@ -906,7 +907,7 @@ DellXPS =
 	screenWidth: 3840
 	screenHeight: 2160
 	deviceType: "computer"
-	minStudioVersion: newDeviceMinVersion
+	minStudioVersion: desktopReleaseVersion
 
 SonyW85OC =
 	deviceImageWidth: 1320
@@ -914,7 +915,7 @@ SonyW85OC =
 	deviceImageCompression: true
 	screenWidth: 1280
 	screenHeight: 720
-	minStudioVersion: newDeviceMinVersion
+	minStudioVersion: desktopReleaseVersion
 
 ###########################################################################
 # OLD DEVICE CONFIGURATIONS
