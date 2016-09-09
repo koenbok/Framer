@@ -314,7 +314,7 @@ class exports.DeviceComponent extends BaseClass
 			return name
 
 		# If this device is added by the user we use the name as it is
-		if @_deviceType not in BuiltInDevices
+		if @_deviceType not in BuiltInDevices or @_deviceType is "custom"
 			return name
 
 		# We want to get these image from our public resources server
