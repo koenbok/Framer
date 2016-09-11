@@ -52,7 +52,7 @@ class exports.NavComponent extends Layer
 	##############################################################
 	# Transitions
 
-	push: (layer, animate, wrap, transitionFunction) ->
+	_transition: (layer, animate, wrap, transitionFunction) ->
 
 		throw new Error "NavComponent.push expects a layer" unless layer
 		return if layer is @current
@@ -83,8 +83,11 @@ class exports.NavComponent extends Layer
 		@_runTransition(transition, "forward", animate, @current, layer)
 		@_stack.push({layer:layer, transition:transition})
 
+	push: (layer, animate) ->
+		@_transition(layer, animate, false, Transitions.push)
+
 	dialog: (layer, animate) ->
-		@push(layer, Transitions.dialog, animate, false)
+		@_transition(layer, animate, false, Transitions.dialog)
 
 	modal: (layer, animate) ->
 		@modalRight(layer, animate)
@@ -93,16 +96,16 @@ class exports.NavComponent extends Layer
 	# you can put them into a ScrollComponent yourself and then insert them.
 
 	modalLeft: (layer, animate) ->
-		@push(layer, animate, false, Transitions.modalLeft)
+		@_transition(layer, animate, false, Transitions.modalLeft)
 
 	modalRight: (layer, animate) ->
-		@push(layer, animate, false, Transitions.modalRight)
+		@_transition(layer, animate, false, Transitions.modalRight)
 	
 	modalTop: (layer, animate) ->
-		@push(layer, animate, false, Transitions.modalTop)
+		@_transition(layer, animate, false, Transitions.modalTop)
 
 	modalBottom: (layer, animate) ->
-		@push(layer, animate, false, Transitions.modalBottom)
+		@_transition(layer, animate, false, Transitions.modalBottom)
 
 	back: (animate=true) =>
 		return unless @previous
@@ -177,10 +180,10 @@ class exports.NavComponent extends Layer
 				@emit(Events.TransitionEnd, from, to, direction)
 				@emit(direction, from, to)
 
-	_buildTransition: (template, layerA, layerB, background) ->
+	_buildTransition: (transitionFunction, layerA, layerB, background) ->
 
 		# Get the executed template data by passing in the layers for this transition
-		template = template(@, layerA, layerB, background)
+		template = transitionFunction(@, layerA, layerB, background)
 
 		# Buld a new transtition object with empty states
 		transition = {}
