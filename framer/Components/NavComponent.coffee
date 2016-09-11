@@ -54,12 +54,18 @@ class exports.NavComponent extends Layer
 
 	_transition: (layer, animate, wrap, transitionFunction) ->
 
-		throw new Error "NavComponent.push expects a layer" unless layer
+		# Transition over to a new layer using a specific transtition function.
+
+		# Some basic error checking
+		throw new Error "NavComponent._transition expects a layer" unless layer
+		throw new Error "NavComponent._transition expects transitionFunction" unless transitionFunction
+
 		return if layer is @current
 
-		# Set the default values
+		# Set the default values so we get some expected results (visibility,
+		# correct parent, events, wrapping, etcetera).
 
-		# If this is the first layer, we skip the animation
+		# If this is the first layer we navigate to, we skip the animation
 		animate ?= if @_stack.length then true else false
 		wrap ?= true
 
@@ -71,15 +77,18 @@ class exports.NavComponent extends Layer
 		# that end up behind it without knowing it.
 		layer.ignoreEvents = false
 
-		# Wrap the layer and set this as the parent
+		# Wrap the layer into a ScrollComponent if it exceeds the size
+		# and correct the parent if needed.
 		wrappedLayer = layer
 		wrappedLayer = @_wrapLayer(layer) if wrap
 		wrappedLayer.parent = @
 
-		transitionFunction ?= Transitions.push
+		# Build the transition function to setup all the states, using the
+		# transition, current and new layer, and optionally a background.
 		transition = @_buildTransition(transitionFunction,
 			@_wrappedLayer(@current), wrappedLayer, @background)
 
+		# Run the transition and update the history
 		@_runTransition(transition, "forward", animate, @current, layer)
 		@_stack.push({layer:layer, transition:transition})
 
