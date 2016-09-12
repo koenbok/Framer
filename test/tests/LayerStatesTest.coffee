@@ -183,6 +183,24 @@ describe "LayerStates", ->
 			layer.on Events.AnimationEnd, ready
 			layer.animateToNextState()
 
+		it "ignoreEvents should not be part of the initial state", ->
+
+			layer = new Layer
+
+			layer.states.stateA =
+				backgroundColor: "rgba(255,0,255,1)"
+
+			layer.onClick ->
+				layer.animateToNextState()
+
+			layer.x.should.equal 0
+
+			layer.animateToNextState(instant: true)
+			layer.animateToNextState(instant: true)
+			layer.animateToNextState(instant: true)
+			layer.ignoreEvents.should.equal false
+
+
 		it "should set scroll property", ->
 
 			layer = new Layer
