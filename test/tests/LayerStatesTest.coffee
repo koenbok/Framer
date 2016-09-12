@@ -183,6 +183,36 @@ describe "LayerStates", ->
 			layer.on Events.AnimationEnd, ready
 			layer.animateToNextState()
 
+		it "should bring cycle when using 'animateToNextState'", (done) ->
+
+			layer = new Layer
+
+			layer.states.stateA =
+				x: 302
+				y: 445
+
+			layer.x.should.equal 0
+
+			count = 0
+			ready = (animation, layer) ->
+				console.log count
+				if count == 4
+					done()
+					return
+				count++
+				switch layer.states.currentName
+					when "stateA"
+						layer.x.should.equal 302
+						layer.y.should.equal 445
+						layer.animateToNextState(time: 0.05)
+					when "initial"
+						layer.x.should.equal 0
+						layer.rotation.should.equal 0
+						layer.animateToNextState(time: 0.05)
+
+			layer.on Events.AnimationEnd, ready
+			layer.animateToNextState(time: 0.05)
+
 		it "ignoreEvents should not be part of the initial state", ->
 
 			layer = new Layer
