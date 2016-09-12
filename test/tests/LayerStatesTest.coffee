@@ -195,7 +195,6 @@ describe "LayerStates", ->
 
 			count = 0
 			ready = (animation, layer) ->
-				console.log count
 				if count == 4
 					done()
 					return
