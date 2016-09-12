@@ -274,9 +274,8 @@ class exports.ScrollComponent extends Layer
 			point = {}
 			point.x = contentPoint.x if contentPoint.hasOwnProperty("x")
 			point.y = contentPoint.y if contentPoint.hasOwnProperty("y")
-			animationOptions.properties = point
 			@content.animateStop()
-			@content.animate(animationOptions)
+			@content.animate(point, animationOptions)
 		else
 			@content.point = contentPoint
 

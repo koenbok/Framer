@@ -85,10 +85,10 @@ class ErrorDisplay extends BaseClass
 		error.text.html = message
 
 		animation = error.animate
-			properties:
-				scale: 1
-			curve: "spring(800, 55, 10)"
-		
+			scale: 1
+			options:
+				curve: "spring(800, 55, 10)"
+
 	destroy: ->
 		@_context?.destroy()
 
