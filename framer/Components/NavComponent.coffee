@@ -52,13 +52,13 @@ class exports.NavComponent extends Layer
 	##############################################################
 	# Transitions
 
-	_transition: (layer, animate, wrap, transitionFunction) ->
+	transition: (layer, animate, wrap, transitionFunction) ->
 
 		# Transition over to a new layer using a specific transtition function.
 
 		# Some basic error checking
-		throw new Error "NavComponent._transition expects a layer" unless layer
-		throw new Error "NavComponent._transition expects transitionFunction" unless transitionFunction
+		throw new Error "NavComponent.transition expects a layer" unless layer
+		throw new Error "NavComponent.transition expects transitionFunction" unless transitionFunction
 
 		return if layer is @current
 
@@ -82,6 +82,7 @@ class exports.NavComponent extends Layer
 		wrappedLayer = layer
 		wrappedLayer = @_wrapLayer(layer) if wrap
 		wrappedLayer.parent = @
+		wrappedLayer.visible = false
 
 		# Build the transition function to setup all the states, using the
 		# transition, current and new layer, and optionally a background.
@@ -92,29 +93,26 @@ class exports.NavComponent extends Layer
 		@_runTransition(transition, "forward", animate, @current, layer)
 		@_stack.push({layer:layer, transition:transition})
 
-	push: (layer, animate) ->
-		@_transition(layer, animate, false, Transitions.push)
-
-	dialog: (layer, animate) ->
-		@_transition(layer, animate, false, Transitions.dialog)
-
-	modal: (layer, animate) ->
-		@modalRight(layer, animate)
+	show: (layer, animate) ->
+		@transition(layer, animate, false, Transitions.push)
 
 	# Modal transitions never get wrapped. If you'd like them to be scrollable
 	# you can put them into a ScrollComponent yourself and then insert them.
 
-	modalLeft: (layer, animate) ->
-		@_transition(layer, animate, false, Transitions.modalLeft)
+	showModalCenter: (layer, animate) ->
+		@transition(layer, animate, false, Transitions.modalCenter)
 
-	modalRight: (layer, animate) ->
-		@_transition(layer, animate, false, Transitions.modalRight)
+	showModalLeft: (layer, animate) ->
+		@transition(layer, animate, false, Transitions.modalLeft)
+
+	showModalRight: (layer, animate) ->
+		@transition(layer, animate, false, Transitions.modalRight)
 	
-	modalTop: (layer, animate) ->
-		@_transition(layer, animate, false, Transitions.modalTop)
+	showModalTop: (layer, animate) ->
+		@transition(layer, animate, false, Transitions.modalTop)
 
-	modalBottom: (layer, animate) ->
-		@_transition(layer, animate, false, Transitions.modalBottom)
+	showModalBottom: (layer, animate) ->
+		@transition(layer, animate, false, Transitions.modalBottom)
 
 	back: (animate=true) =>
 		return unless @previous
@@ -183,6 +181,7 @@ class exports.NavComponent extends Layer
 		# Start the transition with a small delay added so it only runs after all
 		# js has been processed. It's also important for hints, as they rely on 
 		# ignoreEvents to be false at the moment of a click.
+
 		Utils.delay 0, =>
 			transition[direction] animate, =>
 				@_isTransitioning = false
@@ -342,7 +341,7 @@ Transitions.push = (nav, layerA, layerB, background) ->
 			hide: {x: layerB.width}
 			options: {curve: "spring(300, 35, 0)"}
 
-Transitions.dialog = (nav, layerA, layerB, background) ->
+Transitions.modalCenter = (nav, layerA, layerB, background) ->
 	transition =
 		layerB:
 			show: {x:Align.center, y:Align.center, scale:1.0, opacity:1}

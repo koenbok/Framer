@@ -15,15 +15,15 @@ sketch = Framer.Importer.load("imported/Mail@2x")
 
 # Set up the component and add the initial view
 nav = new NavComponent
-nav.push(sketch.inbox)
+nav.show(sketch.inbox)
 
 # On a hamburger tap, we show the menu
 sketch.hamburger.onTap ->
-	nav.modalLeft(sketch.menu)
+	nav.showModalLeft(sketch.menu)
 
 # If we tap on a few rows, show the mail
 for row in sketch.yesterday.children
-	row.onTap -> nav.push(sketch.mail)
+	row.onTap -> nav.show(sketch.mail)
 
 # If we tap on the mail, we go back again
 sketch.mail.onTap -> nav.back()
