@@ -383,7 +383,7 @@ describe "LayerStates", ->
 	describe "Options", ->
 		it "should listen to layer.options", ->
 			layer = new Layer
-			layer.options =
+			layer.animationOptions =
 				time: 4
 			animation = layer.animate
 				x: 100

@@ -68,9 +68,9 @@ class exports.LayerStates
 				layer.animate(last, options)
 		deprecatedProperty @, "animationOptions", null, stateMachine
 		, (layer) ->
-				layer.options
+				layer.animationOptions
 		, (layer, value) ->
-				layer.options = value
+				layer.animationOptions = value
 		deprecatedProperty @, "animatingKeys", null, stateMachine, (layer) ->
 			->
 				keys = []
