@@ -62,7 +62,7 @@ class Button extends ShareLayer
 		@states =
 			hover: opacity: .8
 			full: opacity: 1
-		@states.animationOptions =
+		@animationOptions =
 			time: .3
 
 		@onMouseOver ->
