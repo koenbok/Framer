@@ -942,7 +942,7 @@ class exports.Layer extends BaseClass
 			animationFinished()
 		animation
 
-	switchTo: (properties,options={}) ->
+	switchInstant: (properties,options={}) ->
 		options = _.defaults({instant:true},options)
 		@animate properties, options
 
