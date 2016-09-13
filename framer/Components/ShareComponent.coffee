@@ -59,7 +59,7 @@ class Button extends ShareLayer
 
 		@props = _.merge(defaultProps, options)
 
-		@states.add
+		@states =
 			hover: opacity: .8
 			full: opacity: 1
 		@states.animationOptions =
