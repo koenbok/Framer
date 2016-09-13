@@ -388,3 +388,102 @@ describe "LayerStates", ->
 			animation = layer.animate
 				x: 100
 			animation.options.time.should.equal 4
+	describe "Backwards compatibility", ->
+		it "should still support layer.states.add", ->
+				layer = new Layer
+				layer.states.add
+					stateA: x: 200
+					stateB: scale: 0.5
+				assert.deepEqual layer.stateNames, ['initial','stateA','stateB']
+				assert.deepEqual layer.states.stateA, x: 200
+				assert.deepEqual layer.states.stateB, scale: 0.5
+
+		it "should still support layer.states.remove", ->
+			layer = new Layer
+			layer.states =
+				stateA: x: 200
+				stateB: scale: 0.5
+			assert.deepEqual layer.stateNames, ['initial','stateA','stateB']
+			layer.states.remove 'stateA'
+			assert.deepEqual layer.stateNames, ['initial','stateB']
+
+		it "should still support layer.states.switch", (done) ->
+			layer = new Layer
+			layer.states =
+				stateA: x: 200
+				stateB: scale: 0.5
+			layer.onStateDidSwitch ->
+				assert.equal layer.states.currentName, 'stateA'
+				done()
+			layer.states.switch 'stateA'
+
+		it "should still support layer.states.switchInstant", ->
+			layer = new Layer
+			layer.states =
+				stateA: x: 200
+				stateB: scale: 0.5
+			layer.states.switchInstant 'stateB'
+			assert.equal layer.states.currentName, 'stateB'
+
+		it "should still support layer.states.all", ->
+			layer = new Layer
+			layer.states =
+				stateA: x: 200
+				stateB: scale: 0.5
+			assert.deepEqual layer.states.all, ['initial','stateA','stateB']
+
+		it "should still support layer.states.states", ->
+			layer = new Layer
+			layer.states =
+				stateA: x: 200
+				stateB: scale: 0.5
+			assert.deepEqual layer.states.states, ['initial','stateA','stateB']
+
+		it "should still support layer.states.animatingKeys", ->
+			layer = new Layer
+			layer.states =
+				stateA: x: 200, y: 300
+				stateB: scale: 0.5
+			assert.deepEqual layer.states.animatingKeys(), ["width", "height", "visible", "opacity", "clip", "scrollHorizontal", "scrollVertical", "x", "y", "z", "scaleX", "scaleY", "scaleZ", "scale", "skewX", "skewY", "skew", "originX", "originY", "originZ", "perspective", "perspectiveOriginX", "perspectiveOriginY", "rotationX", "rotationY", "rotationZ", "rotation", "blur", "brightness", "saturate", "hueRotate", "contrast", "invert", "grayscale", "sepia", "shadowX", "shadowY", "shadowBlur", "shadowSpread", "shadowColor", "backgroundColor", "color", "borderColor", "borderWidth", "force2d", "flat", "backfaceVisible", "name", "borderRadius", "html", "image", "scrollX", "scrollY", "mouseWheelSpeedMultiplier", "velocityThreshold", "constrained"]
+			delete layer.states.initial
+			assert.deepEqual layer.states.animatingKeys(), ["x","y","scale"]
+
+		it "should still support layer.states.next", (done) ->
+			layer = new Layer
+			layer.states =
+				stateA: x: 200
+				stateB: scale: 0.5
+			layer.onStateDidSwitch ->
+				assert.equal layer.states.currentName, 'stateA'
+				done()
+			layer.states.next()
+
+		it "should still support layer.states.last", (done) ->
+			layer = new Layer
+			layer.states =
+				stateA: x: 200
+				stateB: scale: 0.5
+			layer.switchInstant 'stateB'
+			layer.switchInstant 'stateA'
+			layer.switchInstant 'stateB'
+			layer.onStateDidSwitch ->
+				assert.equal layer.states.currentName, 'stateA'
+				done()
+			layer.states.last()
+
+		it "should still support layer.states.animationOptions", ->
+			layer = new Layer
+			layer.states =
+				stateA: x: 200
+			layer.states.animationOptions =
+				time: 4
+			animation = layer.animate "stateA"
+			animation.options.time.should.equal 4
+
+		it "should work when using one of the deprecated methods as statename", ->
+			layer = new Layer
+			layer.states =
+				add: x: 200
+			layer.animate "add", instant: true
+			assert.equal layer.states.add.x, 200
+			assert.equal layer.x, 200
