@@ -631,6 +631,9 @@ Utils.loadImage = (url, callback, context) ->
 
 	element.src = url
 
+Utils.isInsideIframe = ->
+	return window isnt window.top
+
 ######################################################
 # GEOMETRY FUNCTIONS
 
