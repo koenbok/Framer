@@ -38,10 +38,20 @@ class exports.Animation extends BaseClass
 	# 'properties' are the layer properties that will be animated
 	# 'options' are the animationOptions for this animation
 	# It's also possible to provide options through an 'options' key in the 'properties object'
+	# or provide the options at top level and use 'properties' to specify the properties (old API)
 	constructor: (properties={}, options={}) ->
-		_.defaults(options, properties.options)
-
-		delete properties.options
+		if properties.options?
+			_.defaults(options, properties.options)
+			delete properties.options
+		else if properties.properties?
+			#Support old properties: syntax
+			layer = properties.layer
+			props = properties.properties
+			delete properties.properties
+			delete properties.layer
+			_.defaults(options, properties)
+			properties = props
+			properties.layer = layer
 		@options = _.cloneDeep Defaults.getDefaults "Animation", options
 		super properties
 		@layer = properties.layer ? null
