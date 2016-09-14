@@ -23,7 +23,7 @@ AnimatorClasses["cubic-bezier"] = AnimatorClasses["bezier-curve"]
 AnimatorClassBezierPresets = ["ease", "ease-in", "ease-out", "ease-in-out"]
 
 numberRE = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/
-relativePropertyRE = new RegExp('^(?:([+-])=|)(' + numberRE.source + ')([a-z%]*)$', 'i')
+relativePropertyRE = new RegExp("^(?:([+-])=|)(" + numberRE.source + ")([a-z%]*)$", "i")
 
 isRelativeProperty = (v) ->
 	_.isString(v) and relativePropertyRE.test(v)

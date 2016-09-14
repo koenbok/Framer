@@ -529,17 +529,17 @@ pad2 = (char) ->
 
 # Matchers
 matchers = do ->
-	css_integer = '[-\\+]?\\d+%?'
+	css_integer = "[-\\+]?\\d  +%?"
 	css_number = "[-\\+]?\\d*\\.\\d+%?"
 	css_unit = "(?:" + css_number + ")|(?:" + css_integer + ")"
 
-	permissive_match3 = '[\\s|\\(]+(' + css_unit + ')[,|\\s]+(' + css_unit + ')[,|\\s]+(' + css_unit + ')\\s*\\)?'
-	permissive_match4 = '[\\s|\\(]+(' + css_unit + ')[,|\\s]+(' + css_unit + ')[,|\\s]+(' + css_unit + ')[,|\\s]+(' + css_unit + ')\\s*\\)?'
+	permissive_match3 = "[\\s|\\(]+(" + css_unit + ")[,|\\s]+(" + css_unit + ")[,|\\s]+(" + css_unit + ")\\s*\\)?"
+	permissive_match4 = "[\\s|\\(]+(" + css_unit + ")[,|\\s]+(" + css_unit + ")[,|\\s]+(" + css_unit + ")[,|\\s]+(" + css_unit + ")\\s*\\)?"
 	return {
-	rgb: new RegExp('rgb' + permissive_match3)
-	rgba: new RegExp('rgba' + permissive_match4)
-	hsl: new RegExp('hsl' + permissive_match3)
-	hsla: new RegExp('hsla' + permissive_match4)
+	rgb: new RegExp("rgb" + permissive_match3)
+	rgba: new RegExp("rgba" + permissive_match4)
+	hsl: new RegExp("hsl" + permissive_match3)
+	hsla: new RegExp("hsla" + permissive_match4)
 	hex3: /^([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/
 	hex6: /^([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/
 	}

@@ -18,7 +18,7 @@ Utils.getValueForKeyPath = (obj, key) ->
 	result
 
 Utils.setValueForKeyPath = (obj, path, val) ->
-	fields = path.split('.')
+	fields = path.split(".")
 	result = obj
 	i = 0
 	n = fields.length
@@ -27,7 +27,7 @@ Utils.setValueForKeyPath = (obj, path, val) ->
 		if i == n - 1
 			result[field] = val
 		else
-			if typeof result[field] == 'undefined' or !_.isObject(result[field])
+			if typeof result[field] == "undefined" or !_.isObject(result[field])
 				result[field] = {}
 			result = result[field]
 		i++
@@ -872,7 +872,7 @@ Utils.frameMerge = ->
 	frame
 
 Utils.frameInFrame = (frameA, frameB) ->
-	
+
 	for point in Utils.pointsFromFrame(frameA)
 		return false unless Utils.pointInFrame(point, frameB)
 
@@ -1015,7 +1015,7 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 	ancestors = layer.ancestors(rootContext)
 	ancestors.reverse()
 	ancestors.push(layer) if includeLayer
-	
+
 	for ancestor in ancestors
 		continue unless ancestor.matrix3d
 		point = ancestor.matrix3d.inverse().point(point)

@@ -902,7 +902,7 @@ class exports.Layer extends BaseClass
 		@animate properties, options
 
 	animate: (properties,options={}) ->
-		if typeof properties == 'string'
+		if typeof properties == "string"
 			stateName = properties
 			return @animateToState stateName, options
 
@@ -948,7 +948,7 @@ class exports.Layer extends BaseClass
 
 	animateToNextState: (stateNames=[],options) ->
 		if not Array.isArray(stateNames)
-			if not options? and typeof stateNames is 'object'
+			if not options? and typeof stateNames is "object"
 				options = stateNames
 				stateNames = []
 			else
