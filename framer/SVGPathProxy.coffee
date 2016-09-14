@@ -1,5 +1,9 @@
 { createSVGElement } = require './Utils'
 
+setAttributes = (el, attributes) ->
+  for key, value of attributes
+    el.setAttribute key, value
+
 class exports.SVGPathProxy
   constructor: (string) ->
     @_node = createSVGElement 'path',
@@ -75,9 +79,10 @@ class exports.SVGPathProxy
         m = marker.cloneNode()
         mx = addx + (if typeof segment.x is 'undefined' then lx else segment.x)
         my = addy + (if typeof segment.y is 'undefined' then ly else segment.y)
-        m.setAttribute 'cx', mx
-        m.setAttribute 'cy', my
-        m.setAttribute 'class', 'debug-marker'
+        setAttributes m,
+          cx: mx
+          cy: my
+          class: 'debug-marker'
 
         lx = mx
         ly = my
@@ -88,13 +93,15 @@ class exports.SVGPathProxy
         c1 = controlMarker.cloneNode()
         c1x = addx + segment.x1
         c1y = addy + segment.y1
-        c1.setAttribute 'cx', c1x
-        c1.setAttribute 'cy', c1y
-        c1.setAttribute 'class', 'debug-control-marker'
+        setAttributes c1,
+          cx: c1x
+          cy: c1y
+          class: 'debug-control-marker'
 
         conn = connector.cloneNode()
-        conn.setAttribute('d', "M#{olx},#{oly} L#{c1x},#{c1y}")
-        conn.setAttribute 'class', 'debug-connector'
+        setAttributes conn,
+          d: "M#{olx},#{oly} L#{c1x},#{c1y}"
+          class: 'debug-connector'
 
         elements.push c1
         elements.push conn
@@ -102,40 +109,45 @@ class exports.SVGPathProxy
         # quadratic curves have a line from the control point to both anchors
         if !segment.x2?
           conn2 = connector.cloneNode()
-          conn2.setAttribute 'd', "M#{mx},#{my} L#{c1x},#{c1y}"
-          conn2.setAttribute 'class', 'debug-connector'
+          setAttributes conn2,
+            d: "M#{mx},#{my} L#{c1x},#{c1y}"
+            class: 'debug-connector'
           elements.push conn2
 
       if segment.x2?
         c2 = controlMarker.cloneNode()
         c2x = addx + segment.x2
         c2y = addy + segment.y2
-        c2.setAttribute 'cx', c2x
-        c2.setAttribute 'cy', c2y
-        c2.setAttribute 'class', 'debug-control-marker'
+        setAttributes c2,
+          cx: c2x
+          cy: c2y
+          class: 'debug-control-marker'
 
         conn = connector.cloneNode()
-        conn.setAttribute 'd', "M#{mx},#{my} L#{c2x},#{c2y}"
-        conn.setAttribute 'class', 'debug-connector'
+        setAttributes conn,
+          d: "M#{mx},#{my} L#{c2x},#{c2y}"
+          class: 'debug-connector'
 
         elements.push conn
         elements.push c2
 
     group.appendChild(element) for element in elements
 
-    debugPath.setAttribute 'stroke', 'rgba(0, 0, 0, 0.1)'
-    # debugPath.setAttribute 'stroke', 'rgba(255, 0, 0, 0.75)'
-    debugPath.setAttribute 'stroke-width', 1
-    debugPath.setAttribute 'fill', 'transparent'
-    debugPath.setAttribute 'class', 'debug-path'
+    setAttributes debugPath,
+      stroke: 'rgba(0, 0, 0, 0.1)'
+      # stroke: 'rgba(255, 0, 0, 0.75)'
+      'stroke-width': 1
+      fill: 'transparent'
+      class: 'debug-path'
 
     animatedPath = debugPath.cloneNode()
-    animatedPath.setAttribute 'class', 'animated-path'
-    animatedPath.setAttribute 'stroke', 'rgba(255, 0, 0, 0.75)'
-    # animatedPath.setAttribute 'stroke', 'transparent'
-    animatedPath.setAttribute 'stroke-dasharray', @length
-    animatedPath.setAttribute 'stroke-dashoffset', @length
-    animatedPath.setAttribute 'fill', 'transparent'
+    setAttributes animatedPath,
+      class: 'animated-path'
+      stroke: 'rgba(255, 0, 0, 0.75)'
+      # stroke: 'transparent'
+      'stroke-dasharray': @length
+      'stroke-dashoffset': @length
+      fill: 'transparent'
 
     group.appendChild animatedPath
     group.appendChild debugPath

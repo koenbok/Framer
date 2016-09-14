@@ -1102,12 +1102,18 @@ _svgNS = 'http://www.w3.org/2000/svg'
 Utils.getSVGContext = ->
 	unless _svgContext
 		_svgContext = document.createElementNS(_svgNS, 'svg')
-		_svgContext.style = "visibility: hidden; width: 0px; height: 0px; position: absolute; top: 0; left: 0"
+		_.extend _svgContext.style,
+			visibility: 'hidden'
+			width: 0
+			height: 0
+			position: 'absolute'
+			top: 0
+			left: 0
 		document.documentElement.appendChild(_svgContext)
 
 	_svgContext
 
-Utils.createSVGElement = (name, attributes) ->
+Utils.createSVGElement = (name, attributes=[]) ->
 	el = document.createElementNS(_svgNS, name)
 
 	for key, value of attributes

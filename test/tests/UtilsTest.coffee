@@ -428,3 +428,30 @@ describe "Utils", ->
 			Utils.isLocalAssetUrl("Desktop/index.html", "http://apple.com/index.html").should.equal(false)
 			Utils.isLocalAssetUrl("file:///Desktop/index.html", "http://apple.com/index.html").should.equal(true)
 			Utils.isLocalAssetUrl("http://apple.com/index.html", "http://127.0.0.1/index.html").should.equal(false)
+
+	describe "getSVGContext", ->
+		it "should create an SVG element", ->
+			svgContext = Utils.getSVGContext()
+			svgContext.should.have.property('nodeName', 'svg')
+
+		it "should be hidden and have 0 width and height", ->
+			svgContext = Utils.getSVGContext()
+			style = window.getComputedStyle(svgContext)
+			style.getPropertyValue('visibility').should.equal('hidden')
+			style.getPropertyValue('width').should.equal('0px')
+			style.getPropertyValue('height').should.equal('0px')
+
+	describe "createSVGElement", ->
+		it "should create a new SVG element when not passed any attributes", ->
+			el = Utils.createSVGElement "circle"
+			el.should.have.property("nodeName", "circle")
+
+		it "should create a new SVG element with the specified attributes", ->
+			el = Utils.createSVGElement "circle",
+				cx: 100
+				cy: 200
+				r: 50
+
+			el.getAttribute("cx").should.equal("100")
+			el.getAttribute("cy").should.equal("200")
+			el.getAttribute("r").should.equal("50")
