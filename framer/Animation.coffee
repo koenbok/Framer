@@ -35,19 +35,19 @@ evaluateRelativeProperty = (target, k, v) ->
 
 class exports.Animation extends BaseClass
 
-		_.defaults(options, parameters.options)
 	# 'properties' are the layer properties that will be animated
 	# 'options' are the animationOptions for this animation
 	# It's also possible to provide options through an 'options' key in the 'properties object'
 	constructor: (properties={}, options={}) ->
+		_.defaults(options, properties.options)
 
-		delete parameters.options
+		delete properties.options
 		@options = _.cloneDeep Defaults.getDefaults "Animation", options
-		super parameters
-		@layer = parameters.layer ? null
-		@properties = Animation.filterAnimatableProperties(parameters)
+		super properties
+		@layer = properties.layer ? null
+		@properties = Animation.filterAnimatableProperties(properties)
 
-		if parameters.origin
+		if properties.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
 		@_parseAnimatorOptions()
