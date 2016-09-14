@@ -81,7 +81,7 @@ class exports.Animation extends BaseClass
 				v = evaluateRelativeProperty(@_target, k, v)
 
 			# Filter out the properties that are equal
-			@_stateB[k] = v if @_stateA[k] != v
+			@_stateB[k] = v if @_stateA[k] isnt v
 
 		if _.keys(@_stateA).length is 0
 			console.warn "Animation: nothing to animate, no animatable properties"

@@ -46,7 +46,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 			@_properties[name] = value
 
-			if cssProperty != null
+			if cssProperty isnt null
 				@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
 			set?(@, value)
@@ -890,7 +890,7 @@ class exports.Layer extends BaseClass
 		if @_stateMachine.previousName is @_stateMachine.currentName
 			shouldChange = false
 			for property,value of properties
-				if @[property] != value
+				if @[property] isnt value
 					shouldChange = true
 					break
 			if not shouldChange

@@ -195,11 +195,11 @@ class exports.Color extends BaseClass
 
 		if colorA not instanceof Color and colorB instanceof Color
 			colorA = colorB.transparent()
-		else if colorA instanceof Color and colorA._a == 0 and colorB instanceof Color and colorB._a != 0
+		else if colorA instanceof Color and colorA._a == 0 and colorB instanceof Color and colorB._a isnt 0
 			colorA = colorB.transparent()
 		else if colorB not instanceof Color and colorA instanceof Color
 			colorB = colorA.transparent()
-		else if colorB instanceof Color and colorB._a == 0 and colorA instanceof Color and colorA._a != 0
+		else if colorB instanceof Color and colorB._a == 0 and colorA instanceof Color and colorA._a isnt 0
 			colorB = colorA.transparent()
 
 		if colorB instanceof Color
@@ -279,7 +279,7 @@ class exports.Color extends BaseClass
 
 	@isColorString: (colorString) ->
 		if _.isString(colorString)
-			return stringToObject(colorString) != false
+			return stringToObject(colorString) isnt false
 		return false
 
 	@isValidColorProperty: (name, value) ->
@@ -397,7 +397,7 @@ inputData = (color, g, b, alpha) ->
 
 	a = correctAlpha(a)
 
-	if type != ColorType.HSL
+	if type isnt ColorType.HSL
 		hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
 
 	return {
@@ -516,11 +516,11 @@ bound01 = (n, max) ->
 
 
 isOnePointZero = (n) ->
-	return typeof n == "string" and n.indexOf(".") != -1 and parseFloat(n) == 1
+	return typeof n == "string" and n.indexOf(".") isnt -1 and parseFloat(n) == 1
 
 # Check to see if string passed in is a percentage
 isPercentage = (n) ->
-	return typeof n == "string" and n.indexOf("%") != -1
+	return typeof n == "string" and n.indexOf("%") isnt -1
 
 # Force hex to have 2 characters.
 pad2 = (char) ->

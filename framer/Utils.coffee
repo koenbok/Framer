@@ -22,7 +22,7 @@ Utils.setValueForKeyPath = (obj, path, val) ->
 	result = obj
 	i = 0
 	n = fields.length
-	while i < n and result != undefined
+	while i < n and result isnt undefined
 		field = fields[i]
 		if i == n - 1
 			result[field] = val
@@ -207,7 +207,7 @@ Utils.inspectObjectType = (item) ->
 	# This is a hacky way to get nice object names, it tries to
 	# parse them from the .toString methods for objects.
 
-	if item.constructor?.name? and item.constructor?.name != "Object"
+	if item.constructor?.name? and item.constructor?.name isnt "Object"
 		return item.constructor.name
 
 	extract = (str) ->
@@ -356,7 +356,7 @@ Utils.isRelativeUrl = (url) ->
 	!/^([a-zA-Z]{1,8}:\/\/).*$/.test(url)
 
 Utils.isLocalServerUrl = (url) ->
-	return url.indexOf("127.0.0.1") != -1 or url.indexOf("localhost")  != -1
+	return url.indexOf("127.0.0.1") isnt -1 or url.indexOf("localhost")  isnt -1
 
 Utils.isLocalUrl = (url) ->
 	return true if Utils.isFileUrl(url)
@@ -370,7 +370,7 @@ Utils.isLocalAssetUrl = (url, baseUrl) ->
 	return false
 
 Utils.isFramerStudio = ->
-	navigator.userAgent.indexOf("FramerStudio") != -1
+	navigator.userAgent.indexOf("FramerStudio") isnt -1
 
 Utils.framerStudioVersion = ->
 
@@ -920,7 +920,7 @@ Utils.pointInPolygon = (point, vs) ->
 		yi = vs[i][1]
 		xj = vs[j][0]
 		yj = vs[j][1]
-		intersect = yi > y != yj > y and x < (xj - xi) * (y - yi) / (yj - yi) + xi
+		intersect = yi > y isnt yj > y and x < (xj - xi) * (y - yi) / (yj - yi) + xi
 		if intersect
 			inside = !inside
 		j = i++

@@ -22,7 +22,7 @@ getScaleFromName = (str) ->
 
 	re = /@([\d]+|[\d]+.[\d]+)x/
 	m = undefined
-	if (m = re.exec(str)) != null
+	if (m = re.exec(str)) isnt null
 		return parseFloat(m[1]) if m[1]
 
 	return null
@@ -147,11 +147,11 @@ class exports.Importer
 		layer.__framerImportedFromPath = @path
 
 		# Set scroll to true if scroll is in the layer name
-		if layerInfo.name.toLowerCase().indexOf("scroll") != -1
+		if layerInfo.name.toLowerCase().indexOf("scroll") isnt -1
 			layer.scroll = true
 
 		# Set draggable enabled if draggable is in the name
-		if layerInfo.name.toLowerCase().indexOf("draggable") != -1
+		if layerInfo.name.toLowerCase().indexOf("draggable") isnt -1
 			layer.draggable.enabled = true
 
 		# A layer without an image, mask or children should be zero

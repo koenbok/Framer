@@ -500,7 +500,7 @@ class exports.DeviceComponent extends BaseClass
 			@viewport.props = contentProperties
 			@_update()
 
-		@handsImageLayer.image = "" if @_orientation != 0
+		@handsImageLayer.image = "" if @_orientation isnt 0
 
 		@emit("change:orientation", @_orientation)
 
