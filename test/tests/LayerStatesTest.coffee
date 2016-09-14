@@ -487,3 +487,23 @@ describe "LayerStates", ->
 			layer.animate "add", instant: true
 			assert.equal layer.states.add.x, 200
 			assert.equal layer.x, 200
+
+		it "should work when mixing old and new API's", ->
+			layerA = new Layer
+			layerA.states =
+				add: y: 100
+				next: x: 200
+			layerB = new Layer
+			layerB.states.add
+				a: y: 300
+				b: x: 400
+			layerA.animate "next", instant: true
+			layerA.animate "add", instant: true
+			assert.equal layerA.states.next.x, 200
+			assert.equal layerA.x, 200
+			assert.equal layerA.states.add.y, 100
+			assert.equal layerA.y, 100
+			layerB.states.next(instant: true)
+			layerB.states.next(instant: true)
+			assert.equal layerB.y, 300
+			assert.equal layerB.x, 400

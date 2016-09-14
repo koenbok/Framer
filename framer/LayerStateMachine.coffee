@@ -10,6 +10,7 @@ class exports.LayerStateMachine extends BaseClass
 	constructor: (layer) ->
 		super
 		@_layer = layer
+		@properties = {}
 		@initial = LayerStates.filterStateProperties(layer.props)
 		@reset()
 
@@ -48,5 +49,3 @@ class exports.LayerStateMachine extends BaseClass
 			super
 			# Also emit this to the layer with self as argument
 			@_layer.emit args...
-
-	properties: {}
