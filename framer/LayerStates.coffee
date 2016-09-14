@@ -77,6 +77,9 @@ class exports.LayerStates
 				for name, state of layer.states
 					keys = _.union(keys, _.keys(state))
 				keys
+		deprecatedProperty @, "on", "layer.on", stateMachine, (layer) ->
+			(name, handler) ->
+				layer.on(name, handler)
 
 	@filterStateProperties: (properties) ->
 
