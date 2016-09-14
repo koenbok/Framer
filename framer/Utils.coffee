@@ -1096,27 +1096,24 @@ Utils.globalLayers = (importedLayers) ->
 
 # SVG Utils
 
-Utils.SVG = do ->
-	svgContext = null
-	svgNS = 'http://www.w3.org/2000/svg'
+_svgContext = null
+_svgNS = 'http://www.w3.org/2000/svg'
 
-	getContext = ->
-		unless svgContext
-			svgContext = document.createElementNS(svgNS, 'svg')
-			svgContext.style = "visibility: hidden; width: 0px; height: 0px; position: absolute; top: 0; left: 0"
-			document.documentElement.appendChild(svgContext)
+Utils.getSVGContext = ->
+	unless _svgContext
+		_svgContext = document.createElementNS(_svgNS, 'svg')
+		_svgContext.style = "visibility: hidden; width: 0px; height: 0px; position: absolute; top: 0; left: 0"
+		document.documentElement.appendChild(_svgContext)
 
-		svgContext
+	_svgContext
 
-	createElement = (name, attributes) ->
-		el = document.createElementNS(svgNS, name)
+Utils.createSVGElement = (name, attributes) ->
+	el = document.createElementNS(_svgNS, name)
 
-		for key, value of attributes
-			el.setAttribute(key, value)
+	for key, value of attributes
+		el.setAttribute(key, value)
 
-		el
-
-	{getContext, createElement}
+	el
 
 _textSizeNode = null
 

@@ -1,8 +1,8 @@
-{SVG} = require './Utils'
+{ createSVGElement } = require './Utils'
 
 class exports.SVGPathProxy
   constructor: (string) ->
-    @_node = SVG.createElement 'path',
+    @_node = createSVGElement 'path',
       d: string
       fill: 'transparent'
 
@@ -17,15 +17,15 @@ class exports.SVGPathProxy
     @_node.getTotalLength()
 
   elementForDebugRepresentation: ->
-    group = SVG.createElement 'g'
+    group = createSVGElement 'g'
 
-    marker = SVG.createElement 'circle',
+    marker = createSVGElement 'circle',
       r: 2
       cx: 0
       cy: 0
       fill: 'red'
 
-    controlMarker = SVG.createElement 'circle',
+    controlMarker = createSVGElement 'circle',
       r: 2
       cx: 0
       cy: 0
@@ -33,7 +33,7 @@ class exports.SVGPathProxy
       stroke: '#aaa'
       'stroke-width': '1px'
 
-    connector = SVG.createElement 'path',
+    connector = createSVGElement 'path',
       d: 'M0,0'
       fill: 'transparent'
       stroke: 'rgba(0, 0, 0, 0.25)'

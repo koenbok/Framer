@@ -36,8 +36,8 @@ evaluateRelativeProperty = (target, k, v) ->
 
 createDebugLayerForPath = (path) ->
 	padding = 10
-	sharedContext = Utils.SVG.getContext()
-	svg = Utils.SVG.createElement('svg', width: '100%', height: '100%')
+	sharedContext = Utils.getSVGContext()
+	svg = Utils.createSVGElement('svg', width: '100%', height: '100%')
 
 	debugLayer = new Layer
 		width: 100
