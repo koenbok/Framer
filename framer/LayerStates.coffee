@@ -12,7 +12,7 @@ readOnlyProperty = (object, name, enumerable, getter) ->
 		enumerable: enumerable
 		get: getter
 		set: ->
-			throw new Error "You can't override special state '#{name}'"
+			throw new Error "You can't override special state '#{name}'."
 
 deprecatedProperty = (object, name, replacementSuggestion, stateMachine, getter, setter=null) ->
 	Object.defineProperty object, name,
@@ -28,10 +28,10 @@ deprecatedProperty = (object, name, replacementSuggestion, stateMachine, getter,
 			getter(stateMachine._layer)
 		set: (value) ->
 			if setter?
-				console.warn "states.#{name} a reserved state name and might not work as expected"
+				console.warn "states.#{name} a reserved state name and might not work as expected."
 				setter(stateMachine._layer, value)
 			else
-				console.warn "states.#{name} is a deprecated method, using it as a state name may cause unexpected behaviour in old projects"
+				console.warn "states.#{name} is a deprecated method, using it as a state name may cause unexpected behaviour in old projects."
 				stateMachine.properties[name] = value
 
 class exports.LayerStates
