@@ -538,3 +538,23 @@ describe "LayerStates", ->
 				@layer.states.switchInstant 'a'
 
 
+		describe "Defaults", ->
+
+			it "should set defaults", ->
+
+				layer = new Layer
+				layer.states.add "test", {x:123}
+				animation = layer.states.switch "test"
+
+				animation.options.curve.should.equal Framer.Defaults.Animation.curve
+
+				Framer.Defaults.Animation =
+					curve: "spring(1, 2, 3)"
+
+				layer = new Layer
+				layer.states.add "test", {x:456}
+				animation = layer.states.switch "test"
+
+				animation.options.curve.should.equal "spring(1, 2, 3)"
+
+				Framer.resetDefaults()

@@ -44,8 +44,12 @@ class exports.LayerStates
 
 		## Deprecated methods
 		deprecatedProperty @, "add", "layer.states = ", stateMachine, (layer) ->
-			(states) ->
-				layer.states = states
+			(states, object={}) ->
+				if _.isString states
+					stateName = states
+					layer.states[stateName] = object
+				else
+					layer.states = states
 		deprecatedProperty @, "remove", "delete layer.states.a", stateMachine, (layer) ->
 			(stateName) ->
 				delete layer.states[stateName]
