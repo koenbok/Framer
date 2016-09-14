@@ -35,8 +35,8 @@ evaluateRelativeProperty = (target, k, v) ->
 
 class exports.Animation extends BaseClass
 
-	constructor: (parameters={},options={}) ->
 		_.defaults(options, parameters.options)
+	constructor: (properties={}, options={}) ->
 
 		delete parameters.options
 		@options = _.cloneDeep Defaults.getDefaults "Animation", options

@@ -889,7 +889,7 @@ class exports.Layer extends BaseClass
 		properties = @_stateMachine.switchTo stateName
 		if @_stateMachine.previousName is @_stateMachine.currentName
 			shouldChange = false
-			for property,value of properties
+			for property, value of properties
 				if @[property] isnt value
 					shouldChange = true
 					break
