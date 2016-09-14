@@ -100,7 +100,7 @@ class exports.Animation extends BaseClass
 			animate: true
 			looping: false
 
-		if options.properties.path
+		if options.properties.path?
 			@options.path = path = new SVGPathProxy(options.properties.path)
 			@options.properties.x = options.layer.x + path.end.x - path.start.x
 			@options.properties.y = options.layer.y + path.end.y - path.start.x
@@ -216,7 +216,7 @@ class exports.Animation extends BaseClass
 		@emit("stop") if emit
 		Framer.Loop.off("update", @_update)
 
-		if @_debugLayer
+		if @options.debug
 			animation = @_debugLayer.animate
 				properties: { opacity: 0 }
 				curve: 'linear'
@@ -307,7 +307,7 @@ class exports.Animation extends BaseClass
 		position.x += @_stateA.x - path.start.x
 		position.y += @_stateA.y - path.start.y
 
-		if @_debugLayer
+		if @options.debug
 			@_debugLayer.animatedPath.setAttribute('stroke-dashoffset', path.length * (1 - value))
 
 		if @options.autoRotate
