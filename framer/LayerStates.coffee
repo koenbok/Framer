@@ -59,6 +59,8 @@ class exports.LayerStates
 		deprecatedProperty @, "switchInstant", "layer.switchInstant \"a\"", stateMachine, (layer) ->
 			(stateName) ->
 				layer.switchInstant stateName
+		deprecatedProperty @, "state", "layer.states.currentName", stateMachine, (layer) ->
+			layer.states.currentName
 		deprecatedProperty @, "all", "layer.stateNames", stateMachine, (layer) ->
 			layer.stateNames
 		deprecatedProperty @, "states", "layer.stateNames", stateMachine, (layer) ->
