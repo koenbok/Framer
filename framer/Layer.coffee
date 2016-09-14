@@ -885,6 +885,8 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## ANIMATION
 
+	# Used to animate to a state with a specific name
+	# We lookup the stateName and call 'animate' with the properties of the state
 	animateToState: (stateName, options={}) ->
 		properties = @_stateMachine.switchTo stateName
 		if @_stateMachine.previousName is @_stateMachine.currentName

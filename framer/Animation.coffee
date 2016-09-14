@@ -36,6 +36,9 @@ evaluateRelativeProperty = (target, k, v) ->
 class exports.Animation extends BaseClass
 
 		_.defaults(options, parameters.options)
+	# 'properties' are the layer properties that will be animated
+	# 'options' are the animationOptions for this animation
+	# It's also possible to provide options through an 'options' key in the 'properties object'
 	constructor: (properties={}, options={}) ->
 
 		delete parameters.options
