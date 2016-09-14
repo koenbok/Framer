@@ -529,7 +529,7 @@ pad2 = (char) ->
 
 # Matchers
 matchers = do ->
-	css_integer = "[-\\+]?\\d  +%?"
+	css_integer = "[-\\+]?\\d+%?"
 	css_number = "[-\\+]?\\d*\\.\\d+%?"
 	css_unit = "(?:" + css_number + ")|(?:" + css_integer + ")"
 
