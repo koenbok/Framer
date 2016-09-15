@@ -8,7 +8,7 @@ class MIDIInput extends BaseClass
 	@define "enabled",
 		get: -> @_inputs?.length or @_request
 		set: (value) ->
-			return unless value != @enabled
+			return unless value isnt @enabled
 			return @_requestRejected() if not navigator.requestMIDIAccess
 			if value
 				@_request = navigator.requestMIDIAccess().then @_requestResolved, @_requestRejected

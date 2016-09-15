@@ -186,21 +186,21 @@ class TouchEmulator extends BaseClass
 		@touchPointLayer.midY = @point.y
 		@touchPointLayer.scale = 1.8
 		@touchPointLayer.animate
-			properties:
-				opacity: 1
-				scale: 1
-				# midX: @point.x + @touchPointerInitialOffset.x
-				# midY: @point.y + @touchPointerInitialOffset.y
-			time: 0.1
-			curve: "ease-out"
+			opacity: 1
+			scale: 1
+			# midX: @point.x + @touchPointerInitialOffset.x
+			# midY: @point.y + @touchPointerInitialOffset.y
+			options:
+				time: 0.1
+				curve: "ease-out"
 
 	hideTouchCursor: ->
 		@touchPointLayer.animateStop()
 		@touchPointLayer.animate
-			properties:
-				opacity: 0
-				scale: 1.2
-			time: 0.08
+			opacity: 0
+			scale: 1.2
+			options:
+				time: 0.08
 
 	mousemovePosition: (event) =>
 		@point =

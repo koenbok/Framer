@@ -40,12 +40,12 @@ describe "Utils", ->
 			result.args.should.eql ["100"]
 
 		it "should work with multiple arguments", ->
-			result = Utils.parseFunction "spring(100,50)"
+			result = Utils.parseFunction "spring(100, 50)"
 			result.name.should.equal "spring"
 			result.args.should.eql ["100", "50"]
 
 		it "should cleanup arguments", ->
-			result = Utils.parseFunction "spring(100 , 50 )"
+			result = Utils.parseFunction "spring(100, 50)"
 			result.name.should.equal "spring"
 			result.args.should.eql ["100", "50"]
 
@@ -231,7 +231,7 @@ describe "Utils", ->
 			# 	Utils.textSize(text, style, {width:100}).should.eql({width:100, height:40})
 
 			# it "should return the right size with height constraint", ->
-			# 	Utils.textSize(text, style, {height:100}).should.eql(width:168,height:100)
+			# 	Utils.textSize(text, style, {height:100}).should.eql(width:168, height:100)
 
 
 	describe "frameSortByAbsoluteDistance", ->

@@ -24,7 +24,7 @@ AnimatorClasses["cubic-bezier"] = AnimatorClasses["bezier-curve"]
 AnimatorClassBezierPresets = ["ease", "ease-in", "ease-out", "ease-in-out"]
 
 numberRE = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/
-relativePropertyRE = new RegExp('^(?:([+-])=|)(' + numberRE.source + ')([a-z%]*)$', 'i')
+relativePropertyRE = new RegExp("^(?:([+-])=|)(" + numberRE.source + ")([a-z%]*)$", "i")
 
 isRelativeProperty = (v) ->
 	_.isString(v) and relativePropertyRE.test(v)
@@ -34,90 +34,80 @@ evaluateRelativeProperty = (target, k, v) ->
 	return target[k] + (sign + 1) * number if sign
 	return +number
 
-# _runningAnimations = []
-
-# Todo: this would normally be BaseClass but the properties keyword
-# is not compatible and causes problems.
 class exports.Animation extends BaseClass
 
-	constructor: (options={}) ->
+	# 'properties' are the layer properties that will be animated
+	# 'options' are the animationOptions for this animation
+	# It's also possible to provide options through an 'options' key in the 'properties object'
+	# or provide the options at top level and use 'properties' to specify the properties (old API)
+	constructor: (properties={}, options={}) ->
+		if properties.options?
+			_.defaults(options, properties.options)
+			delete properties.options
+		else if properties.properties?
+			#Support old properties: syntax
+			layer = properties.layer
+			props = properties.properties
+			delete properties.properties
+			delete properties.layer
+			_.defaults(options, properties)
+			properties = props
+			properties.layer = layer
+		@options = _.cloneDeep Defaults.getDefaults "Animation", options
+		super properties
+		@layer = properties.layer ? null
+		@properties = Animation.filterAnimatableProperties(properties)
 
-		options = Defaults.getDefaults "Animation", options
-
-		super options
-
-		@options = _.clone _.defaults options,
-			layer: null
-			properties: {}
-			curve: "linear"
-			curveOptions: {}
-			time: 1
-			repeat: 0
-			delay: 0
-			debug: false
-			path: null
-			autoRotate: true
-			colorModel: "husl"
-			animate: true
-			looping: false
-
-		if options.properties.path?
-			if options.properties.x? or options.properties.y?
-				console.warn "Animation.path: the x and y animation properties are ignored when animating on a path"
-
-			@options.path = path = new SVGPathProxy(options.properties.path)
-			@options.properties.x = options.layer.x + path.end.x - path.start.x
-			@options.properties.y = options.layer.y + path.end.y - path.start.x
-			delete options.properties.path
-
-			if @options.debug
-				@_debugLayer = new SVGPathDebugLayer(path: path, alignedToLayer: @options.layer)
-
-		if options.origin
+		if properties.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
-		@options.properties = Animation.filterAnimatableProperties(@options.properties)
+		if @properties.path?
+			if @properties.x? or @properties.y?
+				console.warn "Animation.path: the x and y animation properties are ignored when animating on a path"
+
+			@_path = new SVGPathProxy(@properties.path)
+			@properties.x = @layer.x + @_path.end.x - @_path.start.x
+			@properties.y = @layer.y + @_path.end.y - @_path.start.x
+			delete @properties.path
+
+			if @options.debug
+				@_debugLayer = new SVGPathDebugLayer(path: @_path, alignedToLayer: @layer)
+
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
 
 	@define "isAnimating",
-		get: -> @ in @options.layer.context.animations
+		get: -> @ in @layer.context.animations
 
 	@define "looping",
 		get: -> @options.looping
 		set: (value) ->
 			@options?.looping = value
-			if @options?.looping and @options?.layer? and !@isAnimating
+			if @options?.looping and @layer? and !@isAnimating
 				@restart()
 
 	start: =>
-		if @options.layer is null
+		if @layer is null
 			console.error "Animation: missing layer"
 
-		AnimatorClass = @_animatorClass()
-
-		if @options.debug
-			console.log "Animation.start #{AnimatorClass.name}", @options.curveOptions
-
-		@_animator = new AnimatorClass @options.curveOptions
-
-		@_target = @options.layer
+		@_animator = @_createAnimator()
+		@_target = @layer
 		@_stateA = @_currentState()
 		@_stateB = {}
 
-		for k, v of @options.properties
+		for k, v of @properties
 
 			# Evaluate function properties
 			if _.isFunction(v)
-				v = v(@options.layer, k)
+				v = v(@layer, k)
 
 			# Evaluate relative properties
 			else if isRelativeProperty(v)
 				v = evaluateRelativeProperty(@_target, k, v)
 
 			# Filter out the properties that are equal
-			@_stateB[k] = v if @_stateA[k] != v
+			@_stateB[k] = v if @_stateA[k] isnt v
 
 		if _.keys(@_stateA).length is 0
 			console.warn "Animation: nothing to animate, no animatable properties"
@@ -174,7 +164,7 @@ class exports.Animation extends BaseClass
 		if @_delayTimer?
 			Framer.CurrentContext.removeTimer(@_delayTimer)
 			@_delayTimer = null
-		@options.layer.context.removeAnimation(@)
+		@layer.context.removeAnimation(@)
 
 		@emit("stop") if emit
 		Framer.Loop.off("update", @_update)
@@ -184,14 +174,15 @@ class exports.Animation extends BaseClass
 				properties: { opacity: 0 }
 				curve: 'linear'
 				time: 0.25
-			animation.on 'end', ->
-				@options.layer.destroy()
+			animation.on 'end', =>
+				@_debugLayer.destroy()
 
 	reverse: ->
 		# TODO: Add some tests
-		options = _.clone(@options)
-		options.properties = @_originalState
-		animation = new Animation options
+		properties = _.clone(@_originalState)
+		properties.options = _.clone(@options)
+		properties.layer = @layer
+		animation = new Animation properties
 		animation
 
 	reset: ->
@@ -202,7 +193,11 @@ class exports.Animation extends BaseClass
 		@reset()
 		@start()
 
-	copy: -> new Animation(_.clone(@options))
+	copy: ->
+		properties = _.clone(@properties)
+		properties.options = _.clone(@options)
+		properties.layer = @layer
+		new Animation(properties)
 
 	# A bunch of common aliases to minimize frustration
 	revert: -> 	@reverse()
@@ -212,7 +207,7 @@ class exports.Animation extends BaseClass
 	emit: (event) ->
 		super
 		# Also emit this to the layer with self as argument
-		@options.layer.emit(event, @)
+		@layer.emit(event, @)
 
 	animatingProperties: ->
 		_.keys(@_stateA)
@@ -225,7 +220,7 @@ class exports.Animation extends BaseClass
 		@emit("stop")
 
 	_start: =>
-		@options.layer.context.addAnimation(@)
+		@layer.context.addAnimation(@)
 		@emit("start")
 		Framer.Loop.on("update", @_update)
 
@@ -249,7 +244,7 @@ class exports.Animation extends BaseClass
 		for k, v of @_stateB
 			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
 				@_valueUpdaters[k] = @_updateColorValue
-			else if @options.path? and k in ['x', 'y']
+			else if @_path? and k in ['x', 'y']
 				@_valueUpdaters[k] = @_updatePositionAlongPath
 			else
 				@_valueUpdaters[k] = @_updateNumberValue
@@ -265,13 +260,12 @@ class exports.Animation extends BaseClass
 		return
 
 	_updatePositionAlongPath: (key, value) =>
-		{ path } = @options
-		position = path.getPointAtLength(path.length * value)
-		position.x += @_stateA.x - path.start.x
-		position.y += @_stateA.y - path.start.y
+		position = @_path.getPointAtLength(@_path.length * value)
+		position.x += @_stateA.x - @_path.start.x
+		position.y += @_stateA.y - @_path.start.y
 
 		if @options.debug
-			@_debugLayer.updatePositionAlongPath(path.length * (1 - value))
+			@_debugLayer.updatePositionAlongPath(@_path.length * (1 - value))
 
 		if @options.autoRotate
 			angle = Math.atan2(position.y - @_target.y, position.x - @_target.x) * 180 / Math.PI
@@ -287,7 +281,15 @@ class exports.Animation extends BaseClass
 		@_target[key] = Color.mix(@_stateA[key], @_stateB[key], value, false, @options.colorModel)
 
 	_currentState: ->
-		return _.pick(@options.layer, _.keys(@options.properties))
+		return _.pick(@layer, _.keys(@properties))
+
+	_createAnimator: ->
+		AnimatorClass = @_animatorClass()
+
+		if @options.debug
+			console.log "Animation.start #{AnimatorClass.name}", @options.curveOptions
+
+		return new AnimatorClass @options.curveOptions
 
 	_animatorClass: ->
 
@@ -323,7 +325,7 @@ class exports.Animation extends BaseClass
 			@options.curveOptions.values = animatorClassName
 			@options.curveOptions.time ?= @options.time
 
-		# All this is to support curve: "spring(100,20,10)". In the future we'd like people
+		# All this is to support curve: "spring(100, 20, 10)". In the future we'd like people
 		# to start using curveOptions: {tension:100, friction:10} etc
 
 		if parsedCurve.args.length
@@ -343,28 +345,25 @@ class exports.Animation extends BaseClass
 					value = parseFloat parsedCurve.args[i]
 					@options.curveOptions[k] = value if value
 
+	@isAnimatable = (v) ->
+		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v)
+
 	@filterAnimatableProperties = (properties) ->
 		# Function to filter only animatable properties out of a given set
 		animatableProperties = {}
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			if _.isNumber(v) or
-			_.isFunction(v) or
-			isRelativeProperty(v) or
-			Color.isColorObject(v) or
-			k == 'path' or
-			v == null
+			if @isAnimatable(v) or k == 'path'
 				animatableProperties[k] = v
-			else if _.isString(v)
-				if Color.isColorString(v)
-					animatableProperties[k] = new Color(v)
+			else if Color.isValidColorProperty(k, v)
+				animatableProperties[k] = new Color(v)
 
 
 		return animatableProperties
 
 	toInspect: ->
-		return "<#{@constructor.name} id:#{@id} isAnimating:#{@isAnimating} [#{_.keys(@options.properties)}]>"
+		return "<#{@constructor.name} id:#{@id} isAnimating:#{@isAnimating} [#{_.keys(@properties)}]>"
 
 
 	##############################################################

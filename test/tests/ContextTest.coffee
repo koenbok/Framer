@@ -132,7 +132,7 @@ describe "Context", ->
 
 			context.run ->
 				layer = new Layer
-				animation = layer.animateTo
+				animation = layer.animate
 					x: 100
 
 			# We should have a click listener

@@ -70,8 +70,7 @@ class exports.CircularProgressComponent extends SVGLayer
 			curve: "linear"
 			time: dynamicTime
 
-		animationOptions = _.extend animationOptions,
-			properties:
-				progress: Utils.clamp(value, 0, 1)
+		animationProperties =
+			progress: Utils.clamp(value, 0, 1)
 
-		@animate(animationOptions)
+		@animate(animationProperties, animationOptions)

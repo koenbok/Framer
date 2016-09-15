@@ -22,7 +22,7 @@ class NavComponentTransition
 				b: {x: @navComponent.width}
 
 		@animationOptions =
-			curve: "spring(300,35,0)"
+			curve: "spring(300, 35, 0)"
 
 	forward: (animate=true, callback) ->
 		options = _.extend(@animationOptions, {animate:animate})
@@ -38,7 +38,7 @@ class NavComponentTransition
 		@layerA?.visible = true
 		@statesA?.switch("b", options)
 		@statesB?.switch("b", options)
-		
+
 		f = Utils.callAfterCount(2, callback)
 		@statesA?.once(Events.StateDidSwitch, f)
 		@statesB?.once(Events.StateDidSwitch, f)
@@ -75,11 +75,11 @@ class NavComponentBackgroundTransition
 class NavComponentDialogTransition extends NavComponentBackgroundTransition
 
 	constructor: (@navComponent, @layerA, @layerB) ->
-		
+
 		if @layerB
 			@statesB = new LayerStates(@layerB)
 			@statesB.add
-				a: 
+				a:
 					point: Align.center
 					scale: 0.8
 					opacity: 0
@@ -90,7 +90,7 @@ class NavComponentDialogTransition extends NavComponentBackgroundTransition
 			@statesB.on Events.StateWillSwitch, (from, to) =>
 				if to is "b"
 					@statesB.animationOptions =
-						curve: "spring(800,28,0)"
+						curve: "spring(800, 28, 0)"
 				if to is "a"
 					@statesB.animationOptions =
 						curve: "ease-out"
@@ -113,17 +113,17 @@ class NavComponentDialogTransition extends NavComponentBackgroundTransition
 class NavComponentModalTransition extends NavComponentBackgroundTransition
 
 	constructor: (@navComponent, @layerA, @layerB) ->
-		
+
 		if @layerB
 			@statesB = new LayerStates(@layerB)
 			@statesB.add
-				a: 
+				a:
 					x: Align.center
 					y: @navComponent.height
 				b:
 					y: Align.bottom
 			@statesB.animationOptions =
-				curve: "spring(300,35,0)"
+				curve: "spring(300, 35, 0)"
 
 		if @navComponent.background
 			@background = @navComponent.background
