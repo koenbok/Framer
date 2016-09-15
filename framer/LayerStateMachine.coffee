@@ -43,7 +43,7 @@ class exports.LayerStateMachine extends BaseClass
 	reset: ->
 		@states = new LayerStates(@)
 		@_previousNames = []
-		@currentName = "initial"
+		@currentName = _.first(@stateNames)
 
 	emit: (args...) ->
 			super
