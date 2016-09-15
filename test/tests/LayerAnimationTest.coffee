@@ -579,3 +579,18 @@ describe "LayerAnimation", ->
 
 				@layer.x.should.equal 100
 				calledEvents.should.eql(["start", "end", "stop"])
+		describe "Backwards compatibility", ->
+			it "Should still support deprecated API", (done) ->
+				layer = new Layer()
+
+				animation = new Animation
+					layer: layer
+					properties:
+						x:50
+					curve: "linear"
+					time: 0.1
+
+				animation.start()
+				Utils.delay animation.options.time, ->
+					layer.x.should.equal 50
+					done()
