@@ -337,6 +337,7 @@ describe "LayerStates", ->
 		it "should set the initial state when creating a Layer", ->
 			layer = new Layer
 			layer.states.currentName.should.equal initialStateName
+			layer.states.default.x.should.equal 0
 			layer.states.initial.x.should.equal 0
 			assert.deepEqual layer.stateNames, [initialStateName]
 
