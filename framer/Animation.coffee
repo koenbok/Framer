@@ -62,6 +62,9 @@ class exports.Animation extends BaseClass
 			looping: false
 
 		if options.properties.path?
+			if options.properties.x? or options.properties.y?
+				console.warn "Animation.path: the x and y animation properties are ignored when animating on a path"
+
 			@options.path = path = new SVGPathProxy(options.properties.path)
 			@options.properties.x = options.layer.x + path.end.x - path.start.x
 			@options.properties.y = options.layer.y + path.end.y - path.start.x
