@@ -391,7 +391,9 @@ describe "LayerStates", ->
 			animation = layer.animate
 				x: 100
 			animation.options.time.should.equal 4
+	
 	describe "Backwards compatibility", ->
+
 		it "should still support layer.states.add", ->
 				layer = new Layer
 				layer.states.add
@@ -400,6 +402,28 @@ describe "LayerStates", ->
 				assert.deepEqual layer.stateNames, [initialStateName, "stateA", "stateB"]
 				assert.deepEqual layer.states.stateA, x: 200
 				assert.deepEqual layer.states.stateB, scale: 0.5
+
+		it "should still support layer.states.add 2", ->
+
+				layer = new Layer
+
+
+				transition =
+					layerA:
+						show: {x: 0, y:0}
+						hide: {x: 0 - 100 / 2, y:0}
+						options: {curve: "spring(300, 35, 0)"}
+					layerB:
+						show: {x: 0}
+						hide: {x: 100}
+						options: {curve: "spring(300, 35, 0)"}
+
+				layer.states.add transition.layerB
+
+				layer.states.add transition.layerB
+
+				assert.deepEqual layer.stateNames, [initialStateName, "show", "hide", "options"]
+
 
 		it "should still support layer.states.remove", ->
 			layer = new Layer

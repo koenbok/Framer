@@ -3,6 +3,7 @@ Utils = require "../Utils"
 {Layer} = require "../Layer"
 {Events} = require "../Events"
 {LayerStates} = require "../LayerStates"
+{LayerStateMachine} = require "../LayerStateMachine"
 # Transitions = require "./NavComponentTransitions"
 
 NavComponentLayerScrollKey = "_navComponentWrapped"
@@ -201,15 +202,15 @@ class exports.NavComponent extends Layer
 
 		# For every layer that exists, add the states form the template
 		if layerA and template.layerA
-			transition.states.layerA = new LayerStates(layerA)
+			transition.states.layerA = new LayerStates(new LayerStateMachine(layerA))
 			transition.states.layerA.add(template.layerA)
 
 		if layerB and template.layerB
-			transition.states.layerB = new LayerStates(layerB)
+			transition.states.layerB = new LayerStates(new LayerStateMachine(layerB))
 			transition.states.layerB.add(template.layerB)
 
 		if background and template.background
-			transition.states.background = new LayerStates(background)
+			transition.states.background = new LayerStates(new LayerStateMachine(background))
 			transition.states.background.add(template.background)
 
 		options = (layerName, animate) ->
@@ -221,11 +222,11 @@ class exports.NavComponent extends Layer
 		# but it's really tricky to get right.
 
 		if not transition.states.background
-			transition.states.layerA?.on Events.StateSwitchEnd, (previous, current) ->
+			transition.states.layerA?.on Events.StateDidSwitch, (previous, current) ->
 				# print "layerA.done #{current}", layerB.point
 				# layerA?.visible = false if current is "hide"
 				# layerB?.bringToFront() if current is "hide"
-			transition.states.layerB?.on Events.StateSwitchEnd, (previous, current) ->
+			transition.states.layerB?.on Events.StateDidSwitch, (previous, current) ->
 				# print "layerB.done #{current}", layerB.point
 				# layerB?.visible = false if current is "hide"
 				# layerA?.bringToFront() if current is "hide"
@@ -267,7 +268,7 @@ class exports.NavComponent extends Layer
 				layerB.ignoreEvents = true
 				# layerB.bringToFront()				
 				transition.states.layerB.switch("show", options("layerB", animate))
-				transition.states.layerB.once(Events.StateSwitchStop, onTransitionEnd)
+				transition.states.layerB.once(Events.AnimationStop, onTransitionEnd)
 
 
 			if transition.states.layerA
@@ -275,7 +276,7 @@ class exports.NavComponent extends Layer
 				transition.states.layerA.switch("hide", options("layerB", animate))
 				layerA.visible = true
 				layerB.ignoreEvents = false
-				transition.states.layerA.once(Events.StateSwitchStop, onTransitionEnd)
+				transition.states.layerA.once(Events.AnimationStop, onTransitionEnd)
 
 
 			if transition.states.background
@@ -283,7 +284,7 @@ class exports.NavComponent extends Layer
 				transition.states.background.switchInstant("hide")
 				background.visible = true
 				transition.states.background.switch("show", options("layerB", animate))
-				transition.states.background.once(Events.StateSwitchStop, onTransitionEnd)
+				transition.states.background.once(Events.AnimationStop, onTransitionEnd)
 
 
 		transition.back = (animate=true, callback) =>
@@ -302,7 +303,7 @@ class exports.NavComponent extends Layer
 			if transition.states.layerB
 				animationCount++
 				transition.states.layerB.switch("hide", options("layerB", animate))
-				transition.states.layerB.once(Events.StateSwitchStop, onTransitionEnd)
+				transition.states.layerB.once(Events.AnimationStop, onTransitionEnd)
 				layerB.visible = true
 				layerB.ignoreEvents = true
 
@@ -316,14 +317,14 @@ class exports.NavComponent extends Layer
 				layerA.ignoreEvents = false
 				# layerA.bringToFront()
 				transition.states.layerA.switch("show", options("layerB", animate))
-				transition.states.layerA.once(Events.StateSwitchStop, onTransitionEnd)
+				transition.states.layerA.once(Events.AnimationStop, onTransitionEnd)
 
 
 			if transition.states.background
 				animationCount++
 				transition.states.background.switchInstant("show")
 				transition.states.background.switch("hide", options("layerB", animate))
-				transition.states.background.once(Events.StateSwitchStop, onTransitionEnd)
+				transition.states.background.once(Events.AnimationStop, onTransitionEnd)
 				background.visible = true
 
 		return transition
