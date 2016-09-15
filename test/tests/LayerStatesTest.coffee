@@ -17,8 +17,8 @@ describe "LayerStates", ->
 			test = (previous, current, states) =>
 				previous.should.equal initialStateName
 				current.should.equal 'a'
-				@layer.states.current.should.equal @layer.states.initial
 				@layer.states.currentName.should.equal initialStateName
+				@layer.states._currentState.should.equal @layer.states[initialStateName]
 				done()
 
 			@layer.on Events.StateWillSwitch, test
@@ -30,7 +30,7 @@ describe "LayerStates", ->
 				previous.should.equal initialStateName
 				current.should.equal 'a'
 				@layer.states.currentName.should.equal 'a'
-				@layer.states.current.should.equal @layer.states.a
+				@layer.states._currentState.should.equal @layer.states.a
 				done()
 
 			@layer.on Events.StateDidSwitch, test
@@ -322,15 +322,15 @@ describe "LayerStates", ->
 				first: x: 100, options: instant: true
 				second: y: 200, options: instant: true
 
-			assert.equal(layer.states.previous, null)
-			assert.equal(layer.states.current, layer.states.initial)
+			assert.equal(layer.states._previousState, null)
+			assert.equal(layer.states._currentState, layer.states.initial)
 			layer.animate 'first'
-			assert.equal(layer.states.previous, layer.states.initial)
-			layer.states.current.should.equal layer.states.first
+			assert.equal(layer.states._previousState, layer.states.initial)
+			layer.states._currentState.should.equal layer.states.first
 			layer.x.should.equal 100
 			layer.animate 'second'
-			assert.equal(layer.states.previous, layer.states.first)
-			layer.states.current.should.equal layer.states.second
+			assert.equal(layer.states._previousState, layer.states.first)
+			layer.states._currentState.should.equal layer.states.second
 			layer.y.should.equal 200
 
 
