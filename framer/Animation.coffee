@@ -281,7 +281,7 @@ class exports.Animation extends BaseClass
 			@options.curveOptions.values = animatorClassName
 			@options.curveOptions.time ?= @options.time
 
-		# All this is to support curve: "spring(100,20,10)". In the future we'd like people
+		# All this is to support curve: "spring(100, 20, 10)". In the future we'd like people
 		# to start using curveOptions: {tension:100, friction:10} etc
 
 		if parsedCurve.args.length
@@ -312,7 +312,7 @@ class exports.Animation extends BaseClass
 		for k, v of properties
 			if @isAnimatable(v)
 				animatableProperties[k] = v
-			else if Color.isValidColorProperty(k,v)
+			else if Color.isValidColorProperty(k, v)
 				animatableProperties[k] = new Color(v)
 
 

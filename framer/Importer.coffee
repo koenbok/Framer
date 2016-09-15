@@ -190,10 +190,10 @@ class exports.Importer
 
 		return unless leftMostLayer
 
-		# Calculate the artboard positions to always be 0,0.
+		# Calculate the artboard positions to always be 0, 0.
 		pointOffset = leftMostLayer.point
 
-		# Correct the artboard positions to 0,0.
+		# Correct the artboard positions to 0, 0.
 		for layer in layers
 			if layer._info.kind is "artboard"
 				layer.x -= pointOffset.x

@@ -8,7 +8,7 @@ makeTest = (frame, originX, originY) ->
 	scroll.clip = false
 
 	scroll.backgroundColor = Utils.randomColor(.6)
-	# scroll.content.backgroundColor = "rgba(255,0,0,.7)"
+	# scroll.content.backgroundColor = "rgba(255, 0, 0, .7)"
 	
 	rows = 8
 	cols = 8

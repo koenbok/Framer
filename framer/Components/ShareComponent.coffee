@@ -77,7 +77,7 @@ class Button extends ShareLayer
 
 		@onTap ->
 			if options.shareButton
-				window.open(options.url, "Share", "width=560,height=714")
+				window.open(options.url, "Share", "width=560, height=714")
 			else
 				window.open(options.url, "_blank")
 
@@ -174,7 +174,7 @@ class ShareComponent
 			backgroundColor: "#FFF"
 			visible: false
 			style:
-				boxShadow: "0 0 0 1px rgba(0,0,0,.12), 0 1px 3px rgba(0,0,0,.08)"
+				boxShadow: "0 0 0 1px rgba(0, 0, 0, .12), 0 1px 3px rgba(0, 0, 0, .08)"
 
 	# Render buttons to open / close sheet
 	_renderToggleButtons: ->
@@ -186,7 +186,7 @@ class ShareComponent
 			backgroundColor: "#FFF"
 			visible: false
 			style:
-				boxShadow: "0 0 0 1px rgba(0,0,0,.12), 0 1px 3px rgba(0,0,0,.08)"
+				boxShadow: "0 0 0 1px rgba(0, 0, 0, .12), 0 1px 3px rgba(0, 0, 0, .08)"
 
 		openLogo = new Layer
 			parent: @open
@@ -335,7 +335,7 @@ class ShareComponent
 				parent: @avatar
 				borderRadius: 100
 				style:
-					boxShadow: "0 0 0 1px rgba(0,0,0,.1)"
+					boxShadow: "0 0 0 1px rgba(0, 0, 0, .1)"
 
 			# If author name isn't available, fallback to Twitter handle
 			name = if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}"

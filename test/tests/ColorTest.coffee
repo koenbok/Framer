@@ -250,7 +250,7 @@ describe "Color", ->
 	it "should compare colors", ->
 
 		red = new Color "red"
-		red.isEqual("rgb(255,0,0)").should.be.true
+		red.isEqual("rgb(255, 0, 0)").should.be.true
 
 		purple = new Color 128, 0, 128
 

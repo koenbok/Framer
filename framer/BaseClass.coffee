@@ -36,7 +36,7 @@ class exports.BaseClass extends EventEmitter
 		# Better readonly errors for debugging
 
 		# else
-		# 	descriptor.set = (value) -> 
+		# 	descriptor.set = (value) ->
 		# 		throw Error("#{@constructor.name}.#{propertyName} is readonly")
 
 		# Define the property
@@ -57,7 +57,7 @@ class exports.BaseClass extends EventEmitter
 
 		# We assume we don't import if there is no setter, because we can't
 		descriptor.importable = descriptor.importable and descriptor.set
-		# We also assume we don't export if there is no setter, because 
+		# We also assume we don't export if there is no setter, because
 		# it is likely a calculated property, and we can't set it.
 		descriptor.exportable = descriptor.exportable and descriptor.set
 
@@ -76,7 +76,7 @@ class exports.BaseClass extends EventEmitter
 				for depend in descriptor.depends
 					if depend not in @[DefinedPropertiesOrderKey]
 						@[DefinedPropertiesOrderKey].push(depend)
-			
+
 			@[DefinedPropertiesOrderKey].push(propertyName)
 
 	@simpleProperty = (name, fallback, options={}) ->
@@ -89,9 +89,9 @@ class exports.BaseClass extends EventEmitter
 
 		# Allows to easily proxy properties from an instance object
 		# Object property is in the form of "object.property"
-		
+
 		objectKey = keyPath.split(".")[0]
-		
+
 		descriptor = _.extend options,
 			get: ->
 				return unless _.isObject(@[objectKey])
@@ -130,7 +130,7 @@ class exports.BaseClass extends EventEmitter
 
 		set: (value) ->
 			propertyList = @_propertyList()
-			for k,v of value
+			for k, v of value
 				# We only apply properties that we know and are marked to be
 				# importable.
 				@[k] = v if propertyList[k]?.importable
@@ -167,7 +167,7 @@ class exports.BaseClass extends EventEmitter
 		@_id = @constructor[CounterKey]
 
 	_applyDefaults: (options) ->
-		
+
 		return unless @constructor[DefinedPropertiesOrderKey]
 		return unless options
 
@@ -194,13 +194,12 @@ class exports.BaseClass extends EventEmitter
 		# For each known property (registered with @define) that has a setter, fetch
 		# the value from the options object, unless the prop is not importable.
 		# When there's no user value, apply the default value:
-		
+
 		return unless descriptor.set
 
 		value = optionValue if descriptor.importable
 		value = Utils.valueOrDefault(optionValue, @_getPropertyDefaultValue(key))
 
 		return if value in [null, undefined]
-		
-		@[key] = value
 
+		@[key] = value

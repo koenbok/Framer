@@ -45,7 +45,7 @@ class ErrorDisplay extends BaseClass
 				y: Align.bottom
 				width: Canvas.width
 				height: Config.height
-				backgroundColor: "rgba(255,0,0,1)"
+				backgroundColor: "rgba(255, 0, 0, 1)"
 			
 			error.text = new Layer
 				name: "text"

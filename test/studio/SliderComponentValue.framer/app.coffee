@@ -43,7 +43,7 @@ valueLayer.states =
 	scaleDown: {scale: 0}
 	scaleUp:   {scale: 0.8}
 
-valueLayer.options = curve: "spring(300,30,0)"
+valueLayer.options = curve: "spring(300, 30, 0)"
 
 # Visualize output
 sliderA.knob.on Events.DragStart, ->

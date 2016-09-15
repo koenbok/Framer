@@ -15,9 +15,9 @@ layers = for i in [0..300]
 
 update = ->
 	for layer in layers
-		layer.backgroundColor = "rgba(0,255,255, 0.5)"
+		layer.backgroundColor = "rgba(0, 255, 255, 0.5)"
 	closest = scroll.closestContentLayer(originX, originY)
-	closest.backgroundColor = "rgba(255,0,0,.5)"
+	closest.backgroundColor = "rgba(255, 0, 0, .5)"
 
 update()
 

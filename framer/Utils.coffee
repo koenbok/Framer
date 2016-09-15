@@ -1081,7 +1081,7 @@ Utils.globalLayers = (importedLayers) ->
 	for layerName, layer of importedLayers
 
 		# Replace all whitespace in layer names
-		layerName = layerName.replace(/\s/g,"")
+		layerName = layerName.replace(/\s/g, "")
 
 		# Check if there are global variables with the same name
 		if window.hasOwnProperty(layerName) and not window.Framer._globalWarningGiven

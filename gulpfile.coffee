@@ -93,7 +93,7 @@ gulp.task "webpack:release", ["version"], (callback) ->
 
 	webpackDev("webpack:release", config, callback)
 
-gulp.task "webpack:tests", ["webpack:debug"],(callback) ->
+gulp.task "webpack:tests", ["webpack:debug"], (callback) ->
 
 	config = _.extend WEBPACK,
 		entry: "./test/tests.coffee"

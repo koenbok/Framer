@@ -903,7 +903,7 @@ class exports.Layer extends BaseClass
 			finished?()
 		@animate properties, options
 
-	animate: (properties,options={}) ->
+	animate: (properties, options={}) ->
 		if typeof properties == "string"
 			stateName = properties
 			return @animateToState stateName, options
@@ -915,11 +915,11 @@ class exports.Layer extends BaseClass
 			properties = options.properties
 			delete options.properties
 
-		_.defaults(options,properties.options,@animationOptions)
+		_.defaults(options, properties.options, @animationOptions)
 		delete properties.options
 
 		animatableProperties = Animation.filterAnimatableProperties(properties)
-		nonAnimatableProperties = _.omit(_.clone(properties),_.keys(animatableProperties))
+		nonAnimatableProperties = _.omit(_.clone(properties), _.keys(animatableProperties))
 
 		start = options.start
 		start ?= true
@@ -944,11 +944,11 @@ class exports.Layer extends BaseClass
 			animationFinished()
 		animation
 
-	switchInstant: (properties,options={}) ->
-		options = _.defaults({instant:true},options)
+	switchInstant: (properties, options={}) ->
+		options = _.defaults({instant:true}, options)
 		@animate properties, options
 
-	animateToNextState: (stateNames=[],options) ->
+	animateToNextState: (stateNames=[], options) ->
 		if not Array.isArray(stateNames)
 			if not options? and typeof stateNames is "object"
 				options = stateNames
@@ -1020,7 +1020,7 @@ class exports.Layer extends BaseClass
 		get: -> @_stateMachine.states
 		set: (states) ->
 			@_stateMachine.reset()
-			for name,state of states
+			for name, state of states
 				@_stateMachine.states[name] = state
 
 	@define "stateNames",
@@ -1379,5 +1379,5 @@ class exports.Layer extends BaseClass
 		name = if @name then "name:#{@name} " else ""
 		variablename = @__framerInstanceInfo?.name or ""
 		return "<#{constructor} #{variablename} id:#{@id} #{name}
-			(#{Utils.roundWhole(@x)},#{Utils.roundWhole(@y)})
+			(#{Utils.roundWhole(@x)}, #{Utils.roundWhole(@y)})
 			#{Utils.roundWhole(@width)}x#{Utils.roundWhole(@height)}>"

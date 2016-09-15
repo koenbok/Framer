@@ -322,7 +322,7 @@ class exports.GestureInputRecognizer
 
 	_getEventPoint: (event) ->
 		return @_getTouchPoint(event, 0) if event.touches?.length
-		return {x:event.pageX ,y:event.pageY}
+		return {x:event.pageX, y:event.pageY}
 
 	_getGestureEvent: (event) ->
 

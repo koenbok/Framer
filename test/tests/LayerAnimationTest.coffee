@@ -10,13 +10,13 @@ describe "LayerAnimation", ->
 		it "should use defaults", ->
 
 			Framer.Defaults.Animation =
-				curve: "spring(1,2,3)"
+				curve: "spring(1, 2, 3)"
 
 			animation = new Animation
 				layer: new Layer()
 				x:50
 
-			animation.options.curve.should.equal "spring(1,2,3)"
+			animation.options.curve.should.equal "spring(1, 2, 3)"
 
 			Framer.resetDefaults()
 

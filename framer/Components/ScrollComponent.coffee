@@ -263,7 +263,7 @@ class exports.ScrollComponent extends Layer
 			return 0 unless @content
 			return -@content.draggable.angle
 
-	scrollToPoint: (point, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
+	scrollToPoint: (point, animate=true, animationOptions={curve:"spring(500, 50, 0)"}) ->
 
 		# We never let you scroll to a point that does not make sense (out of bounds). If you still
 		# would like to do that, access the .content.y directly.
@@ -279,10 +279,10 @@ class exports.ScrollComponent extends Layer
 		else
 			@content.point = contentPoint
 
-	scrollToTop: (animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
+	scrollToTop: (animate=true, animationOptions={curve:"spring(500, 50, 0)"}) ->
 		@scrollToPoint({x:0, y:0}, animate, animationOptions)
 
-	scrollToLayer: (contentLayer, originX=0, originY=0, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
+	scrollToLayer: (contentLayer, originX=0, originY=0, animate=true, animationOptions={curve:"spring(500, 50, 0)"}) ->
 
 		if contentLayer and contentLayer.parent isnt @content
 			throw Error("Can't scroll to this layer because it's not in the ScrollComponent. Add it to the content like layer.parent = scroll.content.")
@@ -298,7 +298,7 @@ class exports.ScrollComponent extends Layer
 
 		return contentLayer
 
-	scrollToClosestLayer: (originX=0, originY=0, animate=true, animationOptions={curve:"spring(500,50,0)"}) ->
+	scrollToClosestLayer: (originX=0, originY=0, animate=true, animationOptions={curve:"spring(500, 50, 0)"}) ->
 		closestLayer = @closestContentLayer(originX, originY, animate, animationOptions)
 		if closestLayer
 			@scrollToLayer(closestLayer, originX, originY)
