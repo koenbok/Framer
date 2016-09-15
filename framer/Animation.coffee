@@ -34,45 +34,6 @@ evaluateRelativeProperty = (target, k, v) ->
 	return target[k] + (sign + 1) * number if sign
 	return +number
 
-createDebugLayerForPath = (path) ->
-	padding = 10
-	sharedContext = Utils.getSVGContext()
-	svg = Utils.createSVGElement('svg', width: '100%', height: '100%')
-
-	debugLayer = new Layer
-		width: 100
-		height: 100
-		backgroundColor: 'transparent'
-		name: 'debug-path'
-
-	debugLayer._element.appendChild(svg)
-	debugLayer.path = path
-
-	debugElementsGroup = path.elementForDebugRepresentation()
-	sharedContext.appendChild(debugElementsGroup)
-	bbox = debugElementsGroup.getBBox()
-
-	svg.appendChild(debugElementsGroup)
-
-	debugLayer.width = bbox.width + Math.abs(bbox.x) + padding * 2
-	debugLayer.height = bbox.height + Math.abs(bbox.y) + padding * 2
-	debugLayer.pathOffset = { x: bbox.x - padding, y: bbox.y - padding }
-	debugLayer.animatedPath = debugElementsGroup.getElementsByClassName('animated-path')?[0]
-
-	debugElementsGroup.setAttribute('transform', "translate(#{-bbox.x + padding}, #{-bbox.y + padding})")
-
-	debugLayer
-
-positionDebugLayerInFrontOfLayer = (debugLayer, layer) ->
-	path = debugLayer.path
-	layerScreenFrame = layer.screenFrame
-	layerOriginX = layerScreenFrame.x + layer.originX * layerScreenFrame.width
-	layerOriginY = layerScreenFrame.y + layer.originY * layerScreenFrame.height
-
-	debugLayer.props =
-		x: layerOriginX - path.start.x + debugLayer.pathOffset.x
-		y: layerOriginY - path.start.y + debugLayer.pathOffset.y
-
 # _runningAnimations = []
 
 # Todo: this would normally be BaseClass but the properties keyword
@@ -107,8 +68,7 @@ class exports.Animation extends BaseClass
 			delete options.properties.path
 
 			if @options.debug
-				@_debugLayer = createDebugLayerForPath(path)
-				positionDebugLayerInFrontOfLayer(@_debugLayer, @options.layer)
+				@_debugLayer = new SVGPathDebugLayer(path: path, alignedToLayer: @options.layer)
 
 		if options.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
@@ -308,7 +268,7 @@ class exports.Animation extends BaseClass
 		position.y += @_stateA.y - path.start.y
 
 		if @options.debug
-			@_debugLayer.animatedPath.setAttribute('stroke-dashoffset', path.length * (1 - value))
+			@_debugLayer.updatePositionAlongPath(path.length * (1 - value))
 
 		if @options.autoRotate
 			angle = Math.atan2(position.y - @_target.y, position.x - @_target.x) * 180 / Math.PI
