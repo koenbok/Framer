@@ -1,6 +1,8 @@
 assert = require "assert"
 {expect} = require "chai"
 
+initialStateName = "default"
+
 describe "LayerStates", ->
 
 	describe "Events", ->
@@ -13,10 +15,10 @@ describe "LayerStates", ->
 		it "should emit willSwitch when switching", (done) ->
 
 			test = (previous, current, states) =>
-				previous.should.equal 'initial'
+				previous.should.equal initialStateName
 				current.should.equal 'a'
-				@layer.states.currentName.should.equal 'initial'
 				@layer.states.current.should.equal @layer.states.initial
+				@layer.states.currentName.should.equal initialStateName
 				done()
 
 			@layer.on Events.StateWillSwitch, test
@@ -25,7 +27,7 @@ describe "LayerStates", ->
 		it "should emit didSwitch when switching", (done) ->
 
 			test = (previous, current, states) =>
-				previous.should.equal 'initial'
+				previous.should.equal initialStateName
 				current.should.equal 'a'
 				@layer.states.currentName.should.equal 'a'
 				@layer.states.current.should.equal @layer.states.a
@@ -64,7 +66,7 @@ describe "LayerStates", ->
 				layer.states =
 					stateA: x:200
 					stateB: scale: 0.5
-				assert.deepEqual layer.stateNames, ['initial','stateA','stateB']
+				assert.deepEqual layer.stateNames, [initialStateName,'stateA','stateB']
 
 			it "should reset the previous and current states", ->
 				layer = new Layer
@@ -74,7 +76,7 @@ describe "LayerStates", ->
 					stateA: x:200
 					stateB: scale: 0.5
 				assert.equal layer.states.previousName, null
-				layer.states.currentName.should.equal 'initial'
+				layer.states.currentName.should.equal initialStateName
 
 
 
@@ -133,7 +135,7 @@ describe "LayerStates", ->
 			layer.style.fontFamily = "Helvetica"
 			layer.style.fontFamily.should.equal "Helvetica"
 
-			layer.animate "initial", instant: true
+			layer.animate initialStateName, instant: true
 			layer.x.should.equal 0
 			layer.style.fontFamily.should.equal "Helvetica"
 
@@ -175,7 +177,7 @@ describe "LayerStates", ->
 						layer.x.should.equal 200
 						layer.rotation.should.equal 180
 						layer.animateToNextState(time: 0.05)
-					when "initial"
+					when initialStateName
 						layer.x.should.equal 0
 						layer.rotation.should.equal 0
 						done()
@@ -204,7 +206,7 @@ describe "LayerStates", ->
 						layer.x.should.equal 302
 						layer.y.should.equal 445
 						layer.animateToNextState(time: 0.05)
-					when "initial"
+					when initialStateName
 						layer.x.should.equal 0
 						layer.rotation.should.equal 0
 						layer.animateToNextState(time: 0.05)
@@ -289,7 +291,7 @@ describe "LayerStates", ->
 			layer.animate "stateA", instant: true
 			layer.x.should.equal 200 - (layer.width // 2)
 
-			layer.animate "initial", instant: true
+			layer.animate initialStateName, instant: true
 			layer.x.should.equal 0
 
 		it "should set the parent", ->
@@ -311,7 +313,7 @@ describe "LayerStates", ->
 			layerB.animate "noParent", instant: true
 			assert.equal(layerB.parent, null)
 
-			layerB.animate "initial", instant: true
+			layerB.animate initialStateName, instant: true
 			# assert.equal(layerB.parent, layerA)
 
 		it "should set the current and previous states when switching", ->
@@ -334,9 +336,9 @@ describe "LayerStates", ->
 
 		it "should set the initial state when creating a Layer", ->
 			layer = new Layer
-			layer.states.currentName.should.equal 'initial'
+			layer.states.currentName.should.equal initialStateName
 			layer.states.initial.x.should.equal 0
-			assert.deepEqual layer.stateNames, ['initial']
+			assert.deepEqual layer.stateNames, [initialStateName]
 
 		it "should listen to options provided to animateToNextState", ->
 			layer = new Layer
@@ -394,7 +396,7 @@ describe "LayerStates", ->
 				layer.states.add
 					stateA: x: 200
 					stateB: scale: 0.5
-				assert.deepEqual layer.stateNames, ['initial','stateA','stateB']
+				assert.deepEqual layer.stateNames, [initialStateName,'stateA','stateB']
 				assert.deepEqual layer.states.stateA, x: 200
 				assert.deepEqual layer.states.stateB, scale: 0.5
 
@@ -403,9 +405,9 @@ describe "LayerStates", ->
 			layer.states =
 				stateA: x: 200
 				stateB: scale: 0.5
-			assert.deepEqual layer.stateNames, ['initial','stateA','stateB']
+			assert.deepEqual layer.stateNames, [initialStateName,'stateA','stateB']
 			layer.states.remove 'stateA'
-			assert.deepEqual layer.stateNames, ['initial','stateB']
+			assert.deepEqual layer.stateNames, [initialStateName,'stateB']
 
 		it "should still support layer.states.switch", (done) ->
 			layer = new Layer
@@ -430,14 +432,14 @@ describe "LayerStates", ->
 			layer.states =
 				stateA: x: 200
 				stateB: scale: 0.5
-			assert.deepEqual layer.states.all, ['initial','stateA','stateB']
+			assert.deepEqual layer.states.all, [initialStateName,'stateA','stateB']
 
 		it "should still support layer.states.states", ->
 			layer = new Layer
 			layer.states =
 				stateA: x: 200
 				stateB: scale: 0.5
-			assert.deepEqual layer.states.states, ['initial','stateA','stateB']
+			assert.deepEqual layer.states.states, [initialStateName,'stateA','stateB']
 
 		it "should still support layer.states.animatingKeys", ->
 			layer = new Layer
@@ -445,7 +447,7 @@ describe "LayerStates", ->
 				stateA: x: 200, y: 300
 				stateB: scale: 0.5
 			assert.deepEqual layer.states.animatingKeys(), ["width", "height", "visible", "opacity", "clip", "scrollHorizontal", "scrollVertical", "x", "y", "z", "scaleX", "scaleY", "scaleZ", "scale", "skewX", "skewY", "skew", "originX", "originY", "originZ", "perspective", "perspectiveOriginX", "perspectiveOriginY", "rotationX", "rotationY", "rotationZ", "rotation", "blur", "brightness", "saturate", "hueRotate", "contrast", "invert", "grayscale", "sepia", "shadowX", "shadowY", "shadowBlur", "shadowSpread", "shadowColor", "backgroundColor", "color", "borderColor", "borderWidth", "force2d", "flat", "backfaceVisible", "name", "borderRadius", "html", "image", "scrollX", "scrollY", "mouseWheelSpeedMultiplier", "velocityThreshold", "constrained"]
-			delete layer.states.initial
+			delete layer.states[initialStateName]
 			assert.deepEqual layer.states.animatingKeys(), ["x","y","scale"]
 
 		it "should still support layer.states.next", (done) ->
@@ -518,9 +520,9 @@ describe "LayerStates", ->
 			it "should emit willSwitch when switching", (done) ->
 
 				test = (previous, current, states) =>
-					previous.should.equal 'initial'
+					previous.should.equal initialStateName
 					current.should.equal 'a'
-					@layer.states.state.should.equal 'initial'
+					@layer.states.state.should.equal initialStateName
 					done()
 
 				@layer.states.on 'willSwitch', test
@@ -529,7 +531,7 @@ describe "LayerStates", ->
 			it "should emit didSwitch when switching", (done) ->
 
 				test = (previous, current, states) =>
-					previous.should.equal 'initial'
+					previous.should.equal initialStateName
 					current.should.equal 'a'
 					@layer.states.state.should.equal 'a'
 					done()
