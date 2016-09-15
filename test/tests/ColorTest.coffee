@@ -64,7 +64,7 @@ describe "Color", ->
 				second = color[f](10)
 				first.isEqual(second).should.be.true
 
-		for f in ['lighten','brighten','darken','desaturate','saturate','grayscale']
+		for f in ["lighten", "brighten", "darken", "desaturate", "saturate", "grayscale"]
 			testModifyFunction(f)
 
 	it "should brighten color", ->

@@ -1126,7 +1126,7 @@ describe "Layer", ->
 
 			X = 100
 			Y = 200
-			IMAGE = '../static/test.png'
+			IMAGE = "../static/test.png"
 			BORDERRADIUS = 20
 
 			layer = new Layer

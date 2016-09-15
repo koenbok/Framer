@@ -89,7 +89,7 @@ describe "LayerAnimation", ->
 				layer[p] = 50
 
 				properties = {}
-				properties[p] = '+=50'
+				properties[p] = "+=50"
 
 				layer.animate properties,
 					curve: "linear"
@@ -106,7 +106,7 @@ describe "LayerAnimation", ->
 				layer[p] = 50
 
 				properties = {}
-				properties[p] = '+=50'
+				properties[p] = "+=50"
 
 				layer.animate properties,
 					curve: "linear"
@@ -440,7 +440,7 @@ describe "LayerAnimation", ->
 						layer: @layer
 						x: 100
 						options:
-							curve: 'cubic-bezier'
+							curve: "cubic-bezier"
 							curveOptions:
 								time: 2
 								values: [0, 0, 0.58, 1]
@@ -454,10 +454,10 @@ describe "LayerAnimation", ->
 						layer: @layer
 						x: 100
 						options:
-							curve: 'cubic-bezier'
+							curve: "cubic-bezier"
 							curveOptions:
 								time: 2
-								values: 'ease-out'
+								values: "ease-out"
 
 					animation.start()
 					animation._animator.options.time.should.equal 2
@@ -468,8 +468,8 @@ describe "LayerAnimation", ->
 						layer: @layer
 						x: 100
 						options:
-							curve: 'cubic-bezier'
-							curveOptions: 'ease-out'
+							curve: "cubic-bezier"
+							curveOptions: "ease-out"
 
 					animation.start()
 					animation._animator.options.time.should.equal 1
@@ -481,8 +481,8 @@ describe "LayerAnimation", ->
 						x: 100
 						options:
 							time: 2
-							curve: 'cubic-bezier'
-							curveOptions: 'ease-out'
+							curve: "cubic-bezier"
+							curveOptions: "ease-out"
 
 					animation.start()
 					animation._animator.options.time.should.equal 2
@@ -494,7 +494,7 @@ describe "LayerAnimation", ->
 						x: 100
 						options:
 							time: 2
-							curve: 'cubic-bezier(0, 0, 0.58, 1)'
+							curve: "cubic-bezier(0, 0, 0.58, 1)"
 
 					animation.start()
 					animation._animator.options.time.should.equal 2
@@ -506,7 +506,7 @@ describe "LayerAnimation", ->
 						x: 100
 						options:
 							time: 2
-							curve: 'cubic-bezier'
+							curve: "cubic-bezier"
 							curveOptions: [0, 0, 0.58, 1]
 
 					animation.start()
@@ -520,7 +520,7 @@ describe "LayerAnimation", ->
 					layer: @layer
 					x: 100
 					options:
-						curve: 'linear'
+						curve: "linear"
 						time: 2
 
 				animation.start()
@@ -531,7 +531,7 @@ describe "LayerAnimation", ->
 					layer: @layer
 					x: 100
 					options:
-						curve: 'linear'
+						curve: "linear"
 						curveOptions:
 							time: 2
 

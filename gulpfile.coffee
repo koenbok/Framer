@@ -112,7 +112,7 @@ log = (task, args...) ->
 
 command = (cmd, cb) ->
 	exec cmd, {cwd: __dirname}, (err, stdout, stderr) ->
-		cb?(null, stdout.split('\n').join(''))
+		cb?(null, stdout.split("\n").join(""))
 
 webpackDev = (name, config, callback) ->
 	webpackDev._instances ?= {}

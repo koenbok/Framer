@@ -200,7 +200,7 @@ describe "BaseClass", ->
 
 		instance = new TestClass()
 		instance.props =
-			testPropA: 'a'
+			testPropA: "a"
 			testPropB: true
 
 		instance.testPropA.should.equal "a"
