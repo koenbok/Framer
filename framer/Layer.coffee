@@ -910,7 +910,7 @@ class exports.Layer extends BaseClass
 
 		#Support the old properties syntax
 		if properties.properties?
-			console.warn "Using Layer.animate with 'properties' key is deprecated: please provide properties directly and use the 'options' key to provide animation options instead"
+			# console.warn "Using Layer.animate with 'properties' key is deprecated: please provide properties directly and use the 'options' key to provide animation options instead"
 			options = properties
 			properties = options.properties
 			delete options.properties

@@ -24,14 +24,14 @@ deprecatedProperty = (object, name, replacementSuggestion, stateMachine, getter,
 			message = "layer.states.#{name} is deprecated"
 			if replacementSuggestion?
 				message += ", use '#{replacementSuggestion}' instead."
-			console.warn message
+			# console.warn message
 			getter(stateMachine._layer)
 		set: (value) ->
 			if setter?
-				console.warn "layer.states.#{name} a reserved state name and might not work as expected."
+				# console.warn "layer.states.#{name} a reserved state name and might not work as expected."
 				setter(stateMachine._layer, value)
 			else
-				console.warn "layer.states.#{name} is a deprecated method, using it as a state name may cause unexpected behaviour in old projects."
+				# console.warn "layer.states.#{name} is a deprecated method, using it as a state name may cause unexpected behaviour in old projects."
 				stateMachine.properties[name] = value
 
 class exports.LayerStates
