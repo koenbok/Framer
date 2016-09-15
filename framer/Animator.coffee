@@ -22,7 +22,7 @@ class exports.Animator
 	finished: ->
 		throw Error "Not implemented"
 
-	values: (delta=1/60,limit=100)->
+	values: (delta=1/60, limit=100)->
 		values = []
 		for i in [0..limit]
 			values.push(@next(delta))

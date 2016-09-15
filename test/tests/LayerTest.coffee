@@ -26,8 +26,8 @@ describe "Layer", ->
 			Framer.Defaults.Layer.height.should.equal previousHeight
 
 		it "should set defaults", ->
-			width = Utils.randomNumber(0,400)
-			height = Utils.randomNumber(0,400)
+			width = Utils.randomNumber(0, 400)
+			height = Utils.randomNumber(0, 400)
 			Framer.Defaults =
 				Layer:
 					width: width
@@ -114,7 +114,7 @@ describe "Layer", ->
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
 			layer.style.webkitTransform.should.equal "translate3d(0.00001px, 0.000001px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 
-		it "should handle scientific notation in scaleX,Y and Z", ->
+		it "should handle scientific notation in scaleX, Y and Z", ->
 
 			layer = new Layer
 			layer.scaleX = 2
@@ -891,7 +891,7 @@ describe "Layer", ->
 
 		it "should calculate scaled frame", ->
 			layerA = new Layer x:100, width:500, height:900, scale:0.5
-			layerA.scaledFrame().should.eql {"x":225,"y":225,"width":250,"height":450}
+			layerA.scaledFrame().should.eql {"x":225, "y":225, "width":250, "height":450}
 
 		it "should calculate scaled screen frame", ->
 
@@ -899,9 +899,9 @@ describe "Layer", ->
 			layerB = new Layer y:50, width:600, height:600, scale:0.8, superLayer:layerA
 			layerC = new Layer y:-60, width:800, height:700, scale:1.2, superLayer:layerB
 
-			layerA.screenScaledFrame().should.eql {"x":225,"y":225,"width":250,"height":450}
-			layerB.screenScaledFrame().should.eql {"x":255,"y":280,"width":240,"height":240}
-			layerC.screenScaledFrame().should.eql {"x":223,"y":228,"width":384,"height":336}
+			layerA.screenScaledFrame().should.eql {"x":225, "y":225, "width":250, "height":450}
+			layerB.screenScaledFrame().should.eql {"x":255, "y":280, "width":240, "height":240}
+			layerC.screenScaledFrame().should.eql {"x":223, "y":228, "width":384, "height":336}
 
 		it "should accept point shortcut", ->
 			layer = new Layer point:10
@@ -1126,7 +1126,7 @@ describe "Layer", ->
 
 			X = 100
 			Y = 200
-			IMAGE = '../static/test.png'
+			IMAGE = "../static/test.png"
 			BORDERRADIUS = 20
 
 			layer = new Layer
@@ -1175,9 +1175,9 @@ describe "Layer", ->
 			layer = new Layer
 			layer.draggable.enabled = true
 
-			a1 = layer.animateTo x:100
-			a2 = layer.animateTo y:100
-			a3 = layer.animateTo blur:1
+			a1 = layer.animate x:100
+			a2 = layer.animate y:100
+			a3 = layer.animate blur:1
 
 			a1.isAnimating.should.equal true
 			a2.isAnimating.should.equal true
@@ -1229,7 +1229,7 @@ describe "Layer", ->
 
 		it "should correctly convert points when layers are nested", ->
 
-			layerBOffset = 
+			layerBOffset =
 				x: 0
 				y: 200
 
@@ -1282,4 +1282,3 @@ describe "Layer", ->
 
 			canvasToLayerBPoint.x.should.equal -25
 			canvasToLayerBPoint.y.should.equal 125
-

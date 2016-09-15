@@ -62,7 +62,7 @@ class exports.DeviceComponent extends BaseClass
 		@Type =
 			Tablet: "tablet"
 			Phone: "phone"
-			Browser: "browser"
+			Computer: "computer"
 
 	_setup: ->
 
@@ -141,6 +141,7 @@ class exports.DeviceComponent extends BaseClass
 			@background.width  = window.innerWidth  + (2 * backgroundOverlap)
 			@background.height = window.innerHeight + (2 * backgroundOverlap)
 
+			@_updateDeviceImage()
 			@hands.scale = @_calculatePhoneScale()
 			@hands.center()
 			@phone.center()
@@ -160,6 +161,9 @@ class exports.DeviceComponent extends BaseClass
 
 	_shouldRenderFullScreen: ->
 
+		if Utils.isInsideIframe()
+			return false
+
 		if not @_device
 			return true
 
@@ -176,6 +180,9 @@ class exports.DeviceComponent extends BaseClass
 			return true
 
 		if Utils.deviceType() is "phone" and @_device.deviceType is "tablet"
+			return true
+
+		if @_device.screenWidth is Canvas.width and @_device.screenHeight is Canvas.height
 			return true
 
 		return false
@@ -266,6 +273,10 @@ class exports.DeviceComponent extends BaseClass
 			@screen.backgroundColor = "black"
 			@screen.backgroundColor = device.backgroundColor if device.backgroundColor?
 
+			if device.deviceType is "computer"
+				Utils.domComplete ->
+					document.body.style.cursor = "auto"
+
 			@_device = _.clone(device)
 			@_deviceType = deviceType
 			@fullscreen = false
@@ -310,7 +321,7 @@ class exports.DeviceComponent extends BaseClass
 			return name
 
 		# If this device is added by the user we use the name as it is
-		if @_deviceType not in BuiltInDevices
+		if @_deviceType not in BuiltInDevices or @_deviceType is "custom"
 			return name
 
 		# We want to get these image from our public resources server
@@ -489,7 +500,7 @@ class exports.DeviceComponent extends BaseClass
 			@viewport.props = contentProperties
 			@_update()
 
-		@handsImageLayer.image = "" if @_orientation != 0
+		@handsImageLayer.image = "" if @_orientation isnt 0
 
 		@emit("change:orientation", @_orientation)
 
@@ -602,6 +613,7 @@ class exports.DeviceComponent extends BaseClass
 ###########################################################################
 # DEVICE CONFIGURATIONS
 
+desktopReleaseVersion = 70
 newDeviceMinVersion = 53
 oldDeviceMaxVersion = 52
 
@@ -865,7 +877,8 @@ AppleMacBook =
 	deviceImageCompression: true
 	screenWidth: 2304
 	screenHeight: 1440
-	minStudioVersion: newDeviceMinVersion
+	deviceType: "computer"
+	minStudioVersion: desktopReleaseVersion
 
 AppleMacBookAir =
 	deviceImageWidth: 2000
@@ -873,7 +886,8 @@ AppleMacBookAir =
 	deviceImageCompression: true
 	screenWidth: 1440
 	screenHeight: 900
-	minStudioVersion: newDeviceMinVersion
+	deviceType: "computer"
+	minStudioVersion: desktopReleaseVersion
 
 AppleMacBookPro =
 	deviceImageWidth: 3820
@@ -881,7 +895,8 @@ AppleMacBookPro =
 	deviceImageCompression: true
 	screenWidth: 2880
 	screenHeight: 1800
-	minStudioVersion: newDeviceMinVersion
+	deviceType: "computer"
+	minStudioVersion: desktopReleaseVersion
 
 AppleIMac =
 	deviceImageWidth: 2800
@@ -889,7 +904,8 @@ AppleIMac =
 	deviceImageCompression: true
 	screenWidth: 2560
 	screenHeight: 1440
-	minStudioVersion: newDeviceMinVersion
+	deviceType: "computer"
+	minStudioVersion: desktopReleaseVersion
 
 DellXPS =
 	deviceImageWidth: 5200
@@ -897,7 +913,8 @@ DellXPS =
 	deviceImageCompression: true
 	screenWidth: 3840
 	screenHeight: 2160
-	minStudioVersion: newDeviceMinVersion
+	deviceType: "computer"
+	minStudioVersion: desktopReleaseVersion
 
 SonyW85OC =
 	deviceImageWidth: 1320
@@ -905,7 +922,7 @@ SonyW85OC =
 	deviceImageCompression: true
 	screenWidth: 1280
 	screenHeight: 720
-	minStudioVersion: newDeviceMinVersion
+	minStudioVersion: desktopReleaseVersion
 
 ###########################################################################
 # OLD DEVICE CONFIGURATIONS
@@ -1052,7 +1069,7 @@ Devices =
 	"fullscreen":
 		name: "Fullscreen"
 		deviceType: "desktop"
-		backgroundColor: "white"
+		backgroundColor: "transparent"
 
 	"custom":
 		name: "Custom"

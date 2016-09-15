@@ -19,7 +19,7 @@ class Printer
 			@_printLayer.html = ""
 			@_printLayer.style =
 				"font": "12px/1.35em Menlo"
-				"color": "rgba(0,0,0,.7)"
+				"color": "rgba(0, 0, 0, .7)"
 				"padding": "8px"
 				"padding-bottom": "30px"
 				"border-top": "1px solid #d9d9d9"

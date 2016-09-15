@@ -62,7 +62,7 @@ class UnitBezier
 	constructor: (p1x, p1y, p2x, p2y) ->
 
 		# pre-calculate the polynomial coefficients
-		# First and last control points are implied to be (0,0) and (1.0, 1.0)
+		# First and last control points are implied to be (0, 0) and (1.0, 1.0)
 		@cx = 3.0 * p1x
 		@bx = 3.0 * (p2x - p1x) - @cx
 		@ax = 1.0 - @cx - @bx

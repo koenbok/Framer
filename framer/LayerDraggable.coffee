@@ -145,7 +145,7 @@ class exports.LayerDraggable extends BaseClass
 
 		# Stop any animations influencing the position, but no others.
 		for animation in @layer.animations()
-			properties = animation.options.properties
+			properties = animation.properties
 			if properties.hasOwnProperty("x") or properties.hasOwnProperty("y")
 				animation.stop()
 
@@ -303,8 +303,8 @@ class exports.LayerDraggable extends BaseClass
 	@define "isBeyondConstraints",
 		get: ->
 			constraintsOffset = @constraintsOffset
-			return true if constraintsOffset.x != 0
-			return true if constraintsOffset.y != 0
+			return true if constraintsOffset.x isnt 0
+			return true if constraintsOffset.y isnt 0
 			return false
 
 	_clampAndScale: (value, min, max, scale) ->

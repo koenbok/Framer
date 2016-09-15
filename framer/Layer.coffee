@@ -11,7 +11,7 @@ Utils = require "./Utils"
 {Matrix} = require "./Matrix"
 {Animation} = require "./Animation"
 {LayerStyle} = require "./LayerStyle"
-{LayerStates} = require "./LayerStates"
+{LayerStateMachine} = require "./LayerStateMachine"
 {LayerDraggable} = require "./LayerDraggable"
 {LayerPinchable} = require "./LayerPinchable"
 {Gestures} = require "./Gestures"
@@ -46,7 +46,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 			@_properties[name] = value
 
-			if cssProperty != null
+			if cssProperty isnt null
 				@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
 			set?(@, value)
@@ -132,6 +132,8 @@ class exports.Layer extends BaseClass
 			if options.hasOwnProperty(p)
 				@[p] = options[p]
 
+		@animationOptions = {}
+		@_stateMachine = new LayerStateMachine(@)
 		@_context.emit("layer:create", @)
 
 	##############################################################
@@ -883,35 +885,84 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## ANIMATION
 
-	animate: (options) ->
-		# console.warn "Layer.animate is deprecated: please use Layer.animateTo instead"
-		properties = options.properties
-		delete options.properties
-		@animateTo(properties, options)
+	# Used to animate to a state with a specific name
+	# We lookup the stateName and call 'animate' with the properties of the state
+	animateToState: (stateName, options={}) ->
+		properties = @_stateMachine.switchTo stateName
+		if @_stateMachine.previousName is @_stateMachine.currentName
+			shouldChange = false
+			for property, value of properties
+				if @[property] isnt value
+					shouldChange = true
+					break
+			if not shouldChange
+				return null
+		finished = options.completion
+		options.completion = =>
+			@_stateMachine.emit(Events.StateDidSwitch, @_stateMachine.previousName, @_stateMachine.currentName, @)
+			finished?()
+		@animate properties, options
 
-	animateTo: (properties,options={}) ->
-		_.defaults(options,properties.options)
+	animate: (properties, options={}) ->
+		if typeof properties == "string"
+			stateName = properties
+			return @animateToState stateName, options
+
+		#Support the old properties syntax
+		if properties.properties?
+			# console.warn "Using Layer.animate with 'properties' key is deprecated: please provide properties directly and use the 'options' key to provide animation options instead"
+			options = properties
+			properties = options.properties
+			delete options.properties
+
+		_.defaults(options, properties.options, @animationOptions)
 		delete properties.options
-		options.properties = Animation.filterAnimatableProperties(properties)
-		options.layer = @
+
+		animatableProperties = Animation.filterAnimatableProperties(properties)
+		nonAnimatableProperties = _.omit(_.clone(properties), _.keys(animatableProperties))
 
 		start = options.start
 		start ?= true
 		delete options.start
-
-		if options.instant
+		instant = options.instant ? false
+		if instant
 			options.animate = false
 		delete options.instant
-		
-		animation = new Animation options
-		animation.start() if start
+		parameters = animatableProperties
+		parameters.layer = @
+
+		animation = new Animation parameters, options
+		animationFinished = =>
+			for k, v of nonAnimatableProperties
+				@[k] = v
+			options.completion?()
+
+		animation.once Events.AnimationStop, animationFinished
+		started = animation.start() if start
+		if not started
+			# If the animation didn't start (e.g. because there are no properties to animate), call the finished handler ourselves
+			animationFinished()
 		animation
 
-	animations: ->
+	switchInstant: (properties, options={}) ->
+		options = _.defaults({instant:true}, options)
+		@animate properties, options
 
+	animateToNextState: (stateNames=[], options) ->
+		if not Array.isArray(stateNames)
+			if not options? and typeof stateNames is "object"
+				options = stateNames
+				stateNames = []
+			else
+				stateNames = Utils.arrayFromArguments arguments
+				options = {}
+		nextState = @_stateMachine.next(stateNames)
+		@animate nextState, options
+
+	animations: ->
 		# Current running animations on this layer
 		_.filter @_context.animations, (animation) =>
-			animation.options.layer is @
+			animation.layer is @
 
 	animatingProperties: ->
 
@@ -966,7 +1017,17 @@ class exports.Layer extends BaseClass
 		enumerable: false
 		exportable: false
 		importable: false
-		get: -> @_states ?= new LayerStates @
+		get: -> @_stateMachine.states
+		set: (states) ->
+			@_stateMachine.reset()
+			for name, state of states
+				@_stateMachine.states[name] = state
+
+	@define "stateNames",
+		enumerable: false
+		exportable: false
+		importable: false
+		get: -> @_stateMachine.stateNames
 
 	#############################################################################
 	## Draggable, Pinchable
@@ -1252,7 +1313,7 @@ class exports.Layer extends BaseClass
 
 		# Don't show any hints while we are animating
 		if @isAnimating
-			return false 
+			return false
 
 		for parent in @ancestors()
 			return false if parent.isAnimating
@@ -1298,7 +1359,7 @@ class exports.Layer extends BaseClass
 		layer = new Layer
 			frame: Utils.frameInset(highlightFrame, -1)
 			backgroundColor: null
-			borderColor: new Color("9013FE").alpha(.8)
+			borderColor: Framer.Defaults.Hints.color
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 3
 
@@ -1326,5 +1387,5 @@ class exports.Layer extends BaseClass
 		name = if @name then "name:#{@name} " else ""
 		variablename = @__framerInstanceInfo?.name or ""
 		return "<#{constructor} #{variablename} id:#{@id} #{name}
-			(#{Utils.roundWhole(@x)},#{Utils.roundWhole(@y)})
+			(#{Utils.roundWhole(@x)}, #{Utils.roundWhole(@y)})
 			#{Utils.roundWhole(@width)}x#{Utils.roundWhole(@height)}>"

@@ -7,6 +7,7 @@ class exports.VideoLayer extends Layer
 		# We need the player to exist before we add the options
 		@player = document.createElement("video")
 		@player.setAttribute("webkit-playsinline", "true")
+		@player.setAttribute("playsinline", "")
 		@player.style.width = "100%"
 		@player.style.height = "100%"
 

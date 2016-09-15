@@ -8,6 +8,8 @@ template = require("gulp-template")
 gutil = require("gulp-util")
 {exec} = require("child_process")
 
+DEBUG_TARGET = process.env.TARGET ? "extras/Studio.framer"
+
 ################################################################################
 # Base webpack config
 
@@ -70,7 +72,7 @@ gulp.task "webpack:debug", ["version"], (callback) ->
 			sourceMapFilename: "[file].map?hash=[hash]"
 
 	webpackDev "webpack:debug", config, ->
-		command "cp build/framer.debug.* extras/Studio.framer/framer/"
+		command "cp build/framer.debug.* '#{DEBUG_TARGET}/framer/'"
 		callback()
 
 gulp.task "webpack:release", ["version"], (callback) ->
@@ -90,7 +92,7 @@ gulp.task "webpack:release", ["version"], (callback) ->
 
 	webpackDev("webpack:release", config, callback)
 
-gulp.task "webpack:tests", ["webpack:debug"],(callback) ->
+gulp.task "webpack:tests", ["webpack:debug"], (callback) ->
 
 	config = _.extend WEBPACK,
 		entry: "./test/tests.coffee"
@@ -109,7 +111,7 @@ log = (task, args...) ->
 
 command = (cmd, cb) ->
 	exec cmd, {cwd: __dirname}, (err, stdout, stderr) ->
-		cb?(null, stdout.split('\n').join(''))
+		cb?(null, stdout.split("\n").join(""))
 
 webpackDev = (name, config, callback) ->
 	webpackDev._instances ?= {}
