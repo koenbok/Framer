@@ -888,76 +888,45 @@ class exports.Layer extends BaseClass
 	# Used to animate to a state with a specific name
 	# We lookup the stateName and call 'animate' with the properties of the state
 	animateToState: (stateName, options={}) ->
-		properties = @_stateMachine.switchTo stateName
-		if @_stateMachine.previousName is @_stateMachine.currentName
-			shouldChange = false
-			for property, value of properties
-				if @[property] isnt value
-					shouldChange = true
-					break
-			if not shouldChange
-				return null
-		finished = options.completion
-		options.completion = =>
-			@_stateMachine.emit(Events.StateDidSwitch, @_stateMachine.previousName, @_stateMachine.currentName, @)
-			finished?()
-		@animate properties, options
+		return @_stateMachine.switchTo(stateName, options)
 
 	animate: (properties, options={}) ->
-		if typeof properties == "string"
-			stateName = properties
-			return @animateToState stateName, options
 
-		#Support the old properties syntax
-		if properties.properties?
-			# console.warn "Using Layer.animate with 'properties' key is deprecated: please provide properties directly and use the 'options' key to provide animation options instead"
+		# print "layer.animate", properties, options
+
+		# If the properties are a string, we assume it's a state name
+		if _.isString(properties)
+			return @animateToState(properties, options)
+
+		# Support the old properties syntax, we add all properties top level and
+		# move the options into an options property.
+		if properties.hasOwnProperty("properties")
 			options = properties
 			properties = options.properties
 			delete options.properties
 
-		_.defaults(options, properties.options, @animationOptions)
-		delete properties.options
+		# With the new api we treat the properties as animatable properties, and use
+		# the special options keyword for animation options.
+		if properties.hasOwnProperty("options")
+			options = _.defaults(properties.options, options)
+			delete properties.options
 
-		animatableProperties = Animation.filterAnimatableProperties(properties)
-		nonAnimatableProperties = _.omit(_.clone(properties), _.keys(animatableProperties))
+		# Merge the animation options with the default animation options for this layer
+		options = _.defaults(options, @animationOptions)
+		options.start ?= true
 
-		start = options.start
-		start ?= true
-		delete options.start
-		instant = options.instant ? false
-		if instant
-			options.animate = false
-		delete options.instant
-		parameters = animatableProperties
-		parameters.layer = @
+		animation = new Animation(@, properties, options)
+		animation.start() if options.start
 
-		animation = new Animation parameters, options
-		animationFinished = =>
-			for k, v of nonAnimatableProperties
-				@[k] = v
-			options.completion?()
-
-		animation.once Events.AnimationStop, animationFinished
-		started = animation.start() if start
-		if not started
-			# If the animation didn't start (e.g. because there are no properties to animate), call the finished handler ourselves
-			animationFinished()
-		animation
+		return animation
 
 	switchInstant: (properties, options={}) ->
-		options = _.defaults({instant:true}, options)
-		@animate properties, options
+		@animate(properties, _.merge(options, {instant: true}))
 
-	animateToNextState: (stateNames=[], options) ->
-		if not Array.isArray(stateNames)
-			if not options? and typeof stateNames is "object"
-				options = stateNames
-				stateNames = []
-			else
-				stateNames = Utils.arrayFromArguments arguments
-				options = {}
-		nextState = @_stateMachine.next(stateNames)
-		@animate nextState, options
+	animateToNextState: (args..., options={}) ->
+		states = []
+		states = _.flatten(args) if args.length
+		@animate(@_stateMachine.next(states), options)
 
 	animations: ->
 		# Current running animations on this layer
@@ -1196,8 +1165,12 @@ class exports.Layer extends BaseClass
 	onDragAnimationEnd: (cb) -> @on(Events.DragAnimationEnd, cb)
 	onDirectionLockStart: (cb) -> @on(Events.DirectionLockStart, cb)
 
-	onStateDidSwitch: (cb) -> @on(Events.StateDidSwitch, cb)
-	onStateWillSwitch: (cb) -> @on(Events.StateWillSwitch, cb)
+	onStateSwitchStart: (cb) -> @on(Events.StateSwitchStart, cb)
+	onStateSwitchStop: (cb) -> @on(Events.StateSwitchStop, cb)
+	onStateSwitchEnd: (cb) -> @on(Events.StateSwitchEnd, cb)
+
+	onStateWillSwitch: (cb) -> @on(Events.StateSwitchStart, cb) # Deprecated
+	onStateDidSwitch: (cb) -> @on(Events.StateSwitchEnd, cb) # Deprecated
 
 	# Gestures
 

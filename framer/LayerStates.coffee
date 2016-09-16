@@ -15,6 +15,7 @@ readOnlyProperty = (object, name, enumerable, getter) ->
 			throw new Error "You can't override special state '#{name}'."
 
 deprecatedProperty = (object, name, replacementSuggestion, stateMachine, getter, setter=null) ->
+
 	Object.defineProperty object, name,
 		configurable: true
 		enumerable: false
@@ -35,7 +36,9 @@ deprecatedProperty = (object, name, replacementSuggestion, stateMachine, getter,
 				stateMachine.properties[name] = value
 
 class exports.LayerStates
+
 	constructor: (stateMachine) ->
+		
 		readOnlyProperty @, "default", true, -> @initial
 		readOnlyProperty @, "initial", false, -> stateMachine.initial
 		readOnlyProperty @, "previous", false, -> @previousName

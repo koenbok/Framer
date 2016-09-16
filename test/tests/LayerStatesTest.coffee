@@ -139,12 +139,12 @@ describe "LayerStates", ->
 			layer.x.should.equal 0
 			layer.style.fontFamily.should.equal "Helvetica"
 
-		it "should be a no-op to change to the current state", ->
-			layer = new Layer
-			layer.states.stateA = {x: 100}
-			layer.switchInstant "stateA"
-			animation = layer.animate "stateA", time: 0.05
-			assert.equal(animation, null)
+		# it "should be a no-op to change to the current state", ->
+		# 	layer = new Layer
+		# 	layer.states.stateA = {x: 100}
+		# 	layer.switchInstant "stateA"
+		# 	animation = layer.animate "stateA", time: 0.05
+		# 	assert.equal(animation, null)
 
 		it "should change to a state when the properties defined are not the current", (done) ->
 			layer = new Layer
@@ -152,6 +152,7 @@ describe "LayerStates", ->
 			layer.switchInstant "stateA"
 			layer.x = 150
 			layer.onStateDidSwitch ->
+				layer.states.currentName.should.equal "stateA"
 				layer.x.should.equal 100
 				done()
 			animation = layer.animate "stateA", time: 0.05
@@ -236,8 +237,8 @@ describe "LayerStates", ->
 
 			layer = new Layer
 			layer.states =
-				stateA: {scroll:true}
-				stateB: {scroll:false}
+				stateA: {scroll: true}
+				stateB: {scroll: false}
 
 			layer.animate "stateA", instant: true
 			layer.scroll.should.equal true
@@ -355,11 +356,11 @@ describe "LayerStates", ->
 			layer.states =
 				stateA: x: 300
 				stateB: y: 300
-			layer.animateToNextState "stateA", "stateB"
+			layer.animateToNextState "stateA", "stateB", {instant: true}
 			layer.states.currentName.should.equal "stateA"
-			layer.animateToNextState "stateA", "stateB"
+			layer.animateToNextState "stateA", "stateB", {instant: true}
 			layer.states.currentName.should.equal "stateB"
-			layer.animateToNextState "stateA", "stateB"
+			layer.animateToNextState "stateA", "stateB", {instant: true}
 			layer.states.currentName.should.equal "stateA"
 
 		it "should listen to options provided to animateToNextState when no states are provided", ->
@@ -526,7 +527,7 @@ describe "LayerStates", ->
 					@layer.states.state.should.equal initialStateName
 					done()
 
-				@layer.states.on "willSwitch", test
+				@layer.states.on Events.StateWillSwitch, test
 				@layer.states.switchInstant "a"
 
 			it "should emit didSwitch when switching", (done) ->
@@ -537,7 +538,7 @@ describe "LayerStates", ->
 					@layer.states.state.should.equal "a"
 					done()
 
-				@layer.states.on "didSwitch", test
+				@layer.states.on Events.StateDidSwitch, test
 				@layer.states.switchInstant "a"
 
 
