@@ -561,17 +561,37 @@ describe "LayerAnimation", ->
 
 				@layer.x.should.equal 100
 				calledEvents.should.eql(["start", "stop", "end"])
-		describe "Backwards compatibility", ->
-			it "Should still support deprecated API", (done) ->
+
+		describe.only "Backwards compatibility", ->
+
+			it "should support the original api", ->
+
+				layer = new Layer()
+
+				animation = new Animation
+					layer: layer
+					properties:
+						x: 50
+					curve: "linear"
+					time: 0.1
+
+				animation.layer.should.equal layer
+				animation.properties.should.eql {x: 50}
+				animation.options.curve.should.equal "linear"
+				animation.options.time.should.equal 0.1
+
+			it "should support the original api variation 1", ->
+
 				layer = new Layer()
 
 				animation = new Animation layer,
 					properties:
-						x:50
-					curve: "linear"
-					time: 0.1
+						x: 50
+					options:
+						curve: "linear"
+						time: 0.1
 
-				animation.start()
-				Utils.delay animation.options.time, ->
-					layer.x.should.equal 50
-					done()
+				animation.layer.should.equal layer
+				animation.properties.should.eql {x: 50}
+				animation.options.curve.should.equal "linear"
+				animation.options.time.should.equal 0.1
