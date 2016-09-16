@@ -35,26 +35,59 @@ evaluateRelativeProperty = (target, k, v) ->
 
 class exports.Animation extends BaseClass
 
-	# 'properties' are the layer properties that will be animated
-	# 'options' are the animationOptions for this animation
-	# It's also possible to provide options through an 'options' key in the 'properties object'
-	# or provide the options at top level and use 'properties' to specify the properties (old API)
-	constructor: (properties={}, options={}) ->
-		if properties.options?
-			_.defaults(options, properties.options)
-			delete properties.options
-		else if properties.properties?
-			#Support old properties: syntax
-			layer = properties.layer
-			props = properties.properties
-			delete properties.properties
-			delete properties.layer
-			_.defaults(options, properties)
-			properties = props
-			properties.layer = layer
-		@options = _.cloneDeep Defaults.getDefaults "Animation", options
-		super properties
-		@layer = properties.layer ? null
+	constructor: (args...) ->
+
+		# Old API detection
+
+		# animationA = new Animation
+		# 	layer: layerA
+		# 	properties:
+		# 		x: 100
+
+		# print args
+
+		layer = null
+		properties = {}
+		options = {}
+
+		if arguments.length is 3
+			layer = args[0]
+			properties = args[1]
+			options = args[2]
+
+		if arguments.length is 2
+			layer = args[0]
+			if args[1].properties
+				properties = args[1].properties
+			else
+				properties = args[1]
+			options = args[1].options if args[1].options
+
+
+		if arguments.length is 1
+			layer = args[0].layer
+			properties = args[0].properties
+			if args[0].options
+				options = args[0].options
+			else
+				options = args[0]
+
+		delete options.layer
+		delete options.properties
+		delete options.options
+
+		 
+		# print "Animation", layer, properties, options
+
+		@options = _.cloneDeep(Defaults.getDefaults("Animation", options))
+
+		super
+
+		@_layer = layer
+
+		unless layer instanceof Layer
+			throw Error("Animation: missing layer") 
+
 		@properties = Animation.filterAnimatableProperties(properties)
 
 		if properties.origin
@@ -63,6 +96,9 @@ class exports.Animation extends BaseClass
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
+
+	@define "layer",
+		get: -> @_layer
 
 	@define "isAnimating",
 		get: -> @ in @layer.context.animations
@@ -75,8 +111,6 @@ class exports.Animation extends BaseClass
 				@restart()
 
 	start: =>
-		if @layer is null
-			console.error "Animation: missing layer"
 
 		@_animator = @_createAnimator()
 		@_target = @layer
@@ -98,11 +132,11 @@ class exports.Animation extends BaseClass
 
 		if _.keys(@_stateA).length is 0
 			console.warn "Animation: nothing to animate, no animatable properties"
-			return false
+			return @_noop()
 
 		if _.isEqual(@_stateA, @_stateB)
 			console.warn "Animation: nothing to animate, all properties are equal to what it is now"
-			return false
+			return @_noop()
 
 		# If this animation wants to animate a property that is already being animated, it stops
 		# that currently running animation. If not, it allows them both to continue.
@@ -138,22 +172,28 @@ class exports.Animation extends BaseClass
 					@_repeatCounter--
 		# If animate is false we set everything immediately and skip the actual animation
 		start = @_start
-		start = @_instant if @options.animate is false
+
+		# The option keywords animate and instant trigger an instant animation
+		if @options.animate is false or @options.instant is true
+			start = @_instant
 
 		# If we have a delay, we wait a bit for it to start
 		if @options.delay
 			@_delayTimer = Utils.delay(@options.delay, start)
 		else
 			start()
+		
 		return true
 
-	stop: (emit=true)->
+	stop: (emit=true) ->
+
 		if @_delayTimer?
 			Framer.CurrentContext.removeTimer(@_delayTimer)
 			@_delayTimer = null
+		
 		@layer.context.removeAnimation(@)
 
-		@emit("stop") if emit
+		@emit(Events.AnimationStop) if emit
 		Framer.Loop.off("update", @_update)
 
 	reverse: ->
@@ -192,15 +232,21 @@ class exports.Animation extends BaseClass
 		_.keys(@_stateA)
 
 	_instant: =>
-		@emit("start")
+		@emit(Events.AnimationStart)
 		@_prepareUpdateValues()
 		@_updateValues(1)
-		@emit("end")
-		@emit("stop")
+		@emit(Events.AnimationStop)
+		@emit(Events.AnimationEnd)
+
+	_noop: =>
+		@emit(Events.AnimationStart)
+		@emit(Events.AnimationStop)
+		@emit(Events.AnimationEnd)
+		return false
 
 	_start: =>
 		@layer.context.addAnimation(@)
-		@emit("start")
+		@emit(Events.AnimationStart)
 		Framer.Loop.on("update", @_update)
 
 		# Figure out what kind of values we have so we don't have to do it in
@@ -212,8 +258,8 @@ class exports.Animation extends BaseClass
 		if @_animator.finished()
 			@_updateValues(1)
 			@stop(emit=false)
-			@emit("end")
-			@emit("stop")
+			@emit(Events.AnimationStop)
+			@emit(Events.AnimationEnd)
 		else
 			@_updateValues(@_animator.next(delta))
 

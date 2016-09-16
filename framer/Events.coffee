@@ -38,13 +38,18 @@ Events.Click = Events.TouchEnd
 Events.AnimationStart = "start"
 Events.AnimationStop = "stop"
 Events.AnimationEnd = "end"
-Events.AnimationDidStart = "start"
-Events.AnimationDidStop = "stop"
-Events.AnimationDidEnd = "end"
+
+Events.AnimationDidStart = Events.AnimationStart # Deprecated
+Events.AnimationDidStop = Events.AnimationStop # Deprecated
+Events.AnimationDidEnd = Events.AnimationEnd # Deprecated
 
 # State events
-Events.StateWillSwitch = "willSwitch"
-Events.StateDidSwitch = "didSwitch"
+Events.StateSwitchStart = "stateswitchstart"
+Events.StateSwitchStop = "stateswitchstop"
+Events.StateSwitchEnd = "stateswitchend"
+
+Events.StateWillSwitch = Events.StateSwitchStart # Deprecated
+Events.StateDidSwitch = Events.StateSwitchEnd # Deprecated
 
 # Scroll events
 Events.Scroll = "scroll"
