@@ -562,7 +562,7 @@ describe "LayerAnimation", ->
 				@layer.x.should.equal 100
 				calledEvents.should.eql(["start", "stop", "end"])
 
-		describe.only "Backwards compatibility", ->
+		describe "Backwards compatibility", ->
 
 			it "should support the original api", ->
 

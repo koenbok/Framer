@@ -44,17 +44,17 @@ class exports.Animation extends BaseClass
 		# 	properties:
 		# 		x: 100
 
-		# print args
-
 		layer = null
 		properties = {}
 		options = {}
 
+		# Actual current api
 		if arguments.length is 3
 			layer = args[0]
 			properties = args[1]
 			options = args[2]
 
+		# Mix of current and old api
 		if arguments.length is 2
 			layer = args[0]
 			if args[1].properties
@@ -63,7 +63,7 @@ class exports.Animation extends BaseClass
 				properties = args[1]
 			options = args[1].options if args[1].options
 
-
+		# Old api
 		if arguments.length is 1
 			layer = args[0].layer
 			properties = args[0].properties
@@ -76,7 +76,6 @@ class exports.Animation extends BaseClass
 		delete options.properties
 		delete options.options
 
-		 
 		# print "Animation", layer, properties, options
 
 		@options = _.cloneDeep(Defaults.getDefaults("Animation", options))
