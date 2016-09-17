@@ -6,8 +6,7 @@ class exports.LayerStateMachine extends BaseClass
 		super
 
 		@initial = @_states.constructor.filterStateProperties(@_layer.props)
-		@_previousNames = []
-		@_currentName = "default"
+		@reset()
 
 	@define "layer",
 		get: -> @_layer
@@ -26,8 +25,7 @@ class exports.LayerStateMachine extends BaseClass
 		get: -> _.last(@_previousNames)
 
 	@define "stateNames",
-		get: -> 
-			k for k of @_states
+		get: -> k for k of @_states
 
 	@define "states",
 		get: -> @_states
@@ -87,6 +85,14 @@ class exports.LayerStateMachine extends BaseClass
 		super
 		# Also emit this to the layer with self as argument
 		@_layer.emit args...
+
+	reset: ->
+
+		for k in _.keys(@states)
+			delete @states[k]
+
+		@_previousNames = []
+		@_currentName = "default"
 
 	# _namedState: (name) ->
 	# 	return _.extend(_.clone(@states[name]), {name: name})

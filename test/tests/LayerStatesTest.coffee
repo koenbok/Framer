@@ -381,7 +381,7 @@ describe "LayerStates", ->
 			layer = new Layer
 			throwing = ->
 				layer.states =
-					state: y: 10
+					something: y: 10
 					previous: x: 300
 			expect(throwing).to.throw('The state \'previous\' is a reserved name.')
 

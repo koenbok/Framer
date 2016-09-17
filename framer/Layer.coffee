@@ -989,9 +989,7 @@ class exports.Layer extends BaseClass
 			@_states ?= new LayerStates(@)
 			return @_states
 		set: (states) ->
-			intial = @states.machine["intial"]
-			@_states = null
-			@states.machine["intial"] = intial
+			@states.machine.reset()
 			_.extend(@states, states)
 
 	@define "stateNames",
