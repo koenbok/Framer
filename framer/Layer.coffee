@@ -11,7 +11,7 @@ Utils = require "./Utils"
 {Matrix} = require "./Matrix"
 {Animation} = require "./Animation"
 {LayerStyle} = require "./LayerStyle"
-{LayerStateMachine} = require "./LayerStateMachine"
+{LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
 {LayerPinchable} = require "./LayerPinchable"
 {Gestures} = require "./Gestures"
@@ -133,7 +133,6 @@ class exports.Layer extends BaseClass
 				@[p] = options[p]
 
 		@animationOptions = {}
-		@_stateMachine = new LayerStateMachine(@)
 		@_context.emit("layer:create", @)
 
 	##############################################################
@@ -888,7 +887,7 @@ class exports.Layer extends BaseClass
 	# Used to animate to a state with a specific name
 	# We lookup the stateName and call 'animate' with the properties of the state
 	animateToState: (stateName, options={}) ->
-		return @_stateMachine.switchTo(stateName, options)
+		return @states.machine.switchTo(stateName, options)
 
 	animate: (properties, options={}) ->
 
@@ -926,7 +925,7 @@ class exports.Layer extends BaseClass
 	animateToNextState: (args..., options={}) ->
 		states = []
 		states = _.flatten(args) if args.length
-		@animate(@_stateMachine.next(states), options)
+		@animate(@states.machine.next(states), options)
 
 	animations: ->
 		# Current running animations on this layer
@@ -986,17 +985,20 @@ class exports.Layer extends BaseClass
 		enumerable: false
 		exportable: false
 		importable: false
-		get: -> @_stateMachine.states
+		get: ->
+			@_states ?= new LayerStates(@)
+			return @_states
 		set: (states) ->
-			@_stateMachine.reset()
-			for name, state of states
-				@_stateMachine.states[name] = state
+			intial = @states.machine["intial"]
+			@_states = null
+			@states.machine["intial"] = intial
+			_.extend(@states, states)
 
 	@define "stateNames",
 		enumerable: false
 		exportable: false
 		importable: false
-		get: -> @_stateMachine.stateNames
+		get: -> @states.machine.stateNames
 
 	#############################################################################
 	## Draggable, Pinchable
