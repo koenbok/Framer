@@ -29,15 +29,18 @@ class exports.LayerStateMachine extends BaseClass
 	@define "states",
 		get: -> @_states
 
+	switchInstant: (stateName) ->
+		@switchTo(stateName, {instant: true})
+
 	switchTo: (stateName, options={}) ->
-		
+
 		# Check if the state exists, if not this is a pretty serious error
 		throw Error "No such state: '#{stateName}'" unless @states[stateName]
 
 		# Prep the properties and the options. The options come from the state, and can be overriden
 		# with the function arguments here.
 		properties = @states[stateName]
-		options = _.defaults(properties.options, options) if properties.options
+		options = _.defaults({}, options, properties.options) if properties.options
 
 		stateNameA = @currentName
 		stateNameB = stateName
