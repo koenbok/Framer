@@ -3,104 +3,72 @@
 {Events} = require "./Events"
 {BaseClass} = require "./BaseClass"
 {Defaults} = require "./Defaults"
+{LayerStateMachine} = require "./LayerStateMachine"
 
 LayerStatesIgnoredKeys = ["ignoreEvents"]
 
-readOnlyProperty = (object, name, enumerable, getter) ->
-	Object.defineProperty object, name,
-		configurable: true
-		enumerable: enumerable
-		get: getter
-		set: ->
-			throw new Error "You can't override special state '#{name}'."
+reservedStateError = (name) ->
+	throw Error("The state '#{name}' is a reserved name.")
 
-deprecatedProperty = (object, name, replacementSuggestion, stateMachine, getter, setter=null) ->
+deprecatedWarning = (name, suggestion) ->
+	message = "layer.states.#{name} is deprecated"
+	message += ", use '#{suggestion}' instead." if suggestion?
+	console.warn message
 
-	Object.defineProperty object, name,
-		configurable: true
-		enumerable: false
-		get: ->
-			if stateMachine.properties[name]?
-				return stateMachine.properties[name]
-			message = "layer.states.#{name} is deprecated"
-			if replacementSuggestion?
-				message += ", use '#{replacementSuggestion}' instead."
-			# console.warn message
-			getter(stateMachine._layer)
-		set: (value) ->
-			if setter?
-				# console.warn "layer.states.#{name} a reserved state name and might not work as expected."
-				setter(stateMachine._layer, value)
-			else
-				# console.warn "layer.states.#{name} is a deprecated method, using it as a state name may cause unexpected behaviour in old projects."
-				stateMachine.properties[name] = value
+deprecatedStateName = (name) ->
+	return "default" if name is "initial"
+	return name
 
-class exports.LayerStates
+class LayerStates
 
-	constructor: (stateMachine) ->
-		
-		readOnlyProperty @, "default", true, -> @initial
-		readOnlyProperty @, "initial", false, -> stateMachine.initial
-		readOnlyProperty @, "previous", false, -> @previousName
-		readOnlyProperty @, "current", false, -> @currentName
-		readOnlyProperty @, "previousName", false, -> stateMachine.previousName
-		readOnlyProperty @, "currentName", false, -> stateMachine.currentName
-		readOnlyProperty @, "_previousState", false, -> stateMachine.previous
-		readOnlyProperty @, "_currentState", false, -> stateMachine.current
+	@defineReserved = (propertyName, descriptor) ->
+		descriptor.configurable = true
+		descriptor.enumerable ?= false
+		descriptor.set ?= -> reservedStateError(propertyName)
+		Object.defineProperty(@prototype, propertyName, descriptor)
 
-		## Deprecated methods
-		deprecatedProperty @, "add", "layer.states = ", stateMachine, (layer) ->
-			(states, object={}) ->
-				if _.isString states
-					stateName = states
-					layer.states[stateName] = object
-				else
-					layer.states = states
-		deprecatedProperty @, "remove", "delete layer.states.a", stateMachine, (layer) ->
-			(stateName) ->
-				delete layer.states[stateName]
-		deprecatedProperty @, "switch", "layer.animate \"a\"", stateMachine, (layer) ->
-			(stateName) ->
-				layer.animate stateName
-		deprecatedProperty @, "switchInstant", "layer.switchInstant \"a\"", stateMachine, (layer) ->
-			(stateName) ->
-				layer.switchInstant stateName
-		deprecatedProperty @, "state", "layer.states.currentName", stateMachine, (layer) ->
-			layer.states.currentName
-		deprecatedProperty @, "all", "layer.stateNames", stateMachine, (layer) ->
-			layer.stateNames
-		deprecatedProperty @, "states", "layer.stateNames", stateMachine, (layer) ->
-			layer.stateNames
-		deprecatedProperty @, "next", "layer.animateToNextState", stateMachine, (layer) ->
-			(options) ->
-				layer.animateToNextState(options)
-		deprecatedProperty @, "last", null, stateMachine, (layer) ->
-			(options) ->
-				last = _.last(stateMachine._previousNames)
-				layer.animate(last, options)
-		deprecatedProperty @, "animationOptions", null, stateMachine
-		, (layer) ->
-				layer.animationOptions
-		, (layer, value) ->
-				layer.animationOptions = value
-		deprecatedProperty @, "animatingKeys", null, stateMachine, (layer) ->
-			->
-				keys = []
-				for name, state of layer.states
-					keys = _.union(keys, _.keys(state))
-				keys
-		deprecatedProperty @, "on", "layer.on", stateMachine, (layer) ->
-			(name, handler) ->
-				layer.on(name, handler)
+	# @defineReserved "initial", get: -> @machine.initial
+	@defineReserved "previous", get: -> @machine.previousName
+	@defineReserved "current", get: -> @machine.currentName
+
+	# Not sure about these, maybe we should change it
+	@defineReserved "previousName", get: -> @machine.previousName
+	@defineReserved "currentName", get: -> @machine.currentName
+	@defineReserved "_previousState", get: -> @[@machine.previous]
+	@defineReserved "_currentState", get: -> @[@machine.current]
+
+	# Backwards compatibility, we now prefer 'initial'
+	@defineReserved "default", get: -> @initial
+
+	capture = (name) ->
+		@[name] = LayerStates.filterStateProperties(@machine.layer.props)
+
+	@defineReserved "capture", get: -> capture
+
+	constructor: (layer) ->
+
+		_machine = new LayerStateMachine(layer, @)
+
+		# A trick to include a reference to the state machine, without exposing
+		# the key on the layer states object.
+
+		Object.defineProperty @, "machine",
+			enumerable: false
+			configurable: false
+			get: -> _machine
+			set: -> reservedStateError("machine")
+
+		@capture("initial")
 
 	@filterStateProperties: (properties) ->
 
 		stateProperties = {}
 
-		# TODO: Maybe we want to support advanced data structures like objects in the future too.
 		for k, v of properties
+			
 			if k in LayerStatesIgnoredKeys
 				continue
+			
 			if Color.isValidColorProperty(k, v)
 				stateProperties[k] = new Color(v)
 				continue
@@ -119,3 +87,81 @@ class exports.LayerStates
 		return true if v is null
 		return true if v?.constructor?.name is "Layer"
 		return false
+
+	#################################################################
+	# Backwards compatibility
+
+	methods =
+
+		add: (states, object={}) ->
+			deprecatedWarning("add", "layer.states = ")
+			if _.isString(states)
+				@[states] = object
+			else
+				@machine.layer.states = states
+
+		remove: (stateName) ->
+			deprecatedWarning("remove", "delete layer.states.a")
+			delete @[stateName]
+
+		switch:  (stateName, options) ->
+			deprecatedWarning("switch", "layer.animate(\"state\")")
+			stateName = deprecatedStateName(stateName)
+			@machine.switchTo(stateName, options)
+
+		switchInstant: (stateName) ->
+			deprecatedWarning("switchInstant", "layer.animate(\"state\", {instant: true})")
+			stateName = deprecatedStateName(stateName)
+			@machine.switchTo(stateName, {instant: true})
+
+		state: ->
+			deprecatedWarning("state", "layer.states.currentName")
+			deprecatedStateName(@currentName)
+
+		all: ->
+			deprecatedWarning("all", "layer.stateNames")
+			@machine.stateNames.map(deprecatedStateName)
+
+		stateNames: ->
+			deprecatedWarning("stateNames", "layer.stateNames")
+			@machine.stateNames.map(deprecatedStateName)
+
+		states: ->
+			deprecatedWarning("states", "layer.stateNames")
+			@machine.stateNames.map(deprecatedStateName)
+
+		animatingKeys: ->
+			deprecatedWarning("animatingKeys")
+			keys = []
+			for name, state of @
+				keys = _.union(keys, _.keys(state))
+			return keys
+
+		next: (options) ->
+			deprecatedWarning("next", "layer.animateToNextState()")
+			@machine.layer.animateToNextState(options)
+
+		last: (options) ->
+			deprecatedWarning("last")
+			@machine.switchTo(@machine.previousName, options)
+
+		on: (eventName, handler) ->
+			@machine.on(eventName, handler)
+
+	@defineReserved "add", get: -> methods.add
+	@defineReserved "remove", get: -> methods.remove
+	@defineReserved "switch", get: -> methods.switch
+	@defineReserved "switchInstant", get: -> methods.switchInstant
+	@defineReserved "animatingKeys", get: -> methods.animatingKeys
+	@defineReserved "next", get: -> methods.next
+	@defineReserved "last", get: -> methods.last
+	@defineReserved "state", get: methods.state
+	@defineReserved "all", get: methods.all
+	@defineReserved "stateNames", get: methods.stateNames
+	@defineReserved "states", get: methods.states
+	@defineReserved "on", get: -> methods.on
+	@defineReserved "animationOptions",
+		get: -> @machine.layer.animationOptions
+		set: (options) -> @machine.layer.animationOptions = options
+
+exports.LayerStates = LayerStates
