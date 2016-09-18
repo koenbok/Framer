@@ -10,14 +10,14 @@ describe "LayerStates Backwards compatibility", ->
 			layer.states.add
 				stateA: x: 200
 				stateB: scale: 0.5
-			assert.deepEqual layer.stateNames, ["stateA", "stateB", initialStateName]
+			assert.deepEqual layer.states.stateNames, [initialStateName, "stateA", "stateB"]
 			assert.deepEqual layer.states.stateA, x: 200
 			assert.deepEqual layer.states.stateB, scale: 0.5
 
 	it "should still support layer.states.add single", ->
 			layer = new Layer
 			layer.states.add("stateA", x: 200)
-			assert.deepEqual layer.stateNames, ["stateA", initialStateName]
+			assert.deepEqual layer.states.stateNames, [initialStateName, "stateA"]
 			assert.deepEqual layer.states.stateA, x: 200
 
 	it "should still support layer.states.remove", ->
@@ -25,9 +25,9 @@ describe "LayerStates Backwards compatibility", ->
 		layer.states =
 			stateA: x: 200
 			stateB: scale: 0.5
-		assert.deepEqual layer.stateNames, ["stateA", "stateB", initialStateName]
+		assert.deepEqual layer.states.stateNames, [initialStateName, "stateA", "stateB"]
 		layer.states.remove "stateA"
-		assert.deepEqual layer.stateNames, ["stateB", initialStateName]
+		assert.deepEqual layer.states.stateNames, [initialStateName, "stateB"]
 
 	it "should still support layer.states.switch", (done) ->
 		layer = new Layer
@@ -52,14 +52,14 @@ describe "LayerStates Backwards compatibility", ->
 		layer.states =
 			stateA: x: 200
 			stateB: scale: 0.5
-		assert.deepEqual layer.states.all, ["stateA", "stateB", initialStateName]
+		assert.deepEqual layer.states.all, [initialStateName, "stateA", "stateB"]
 
 	it "should still support layer.states.states", ->
 		layer = new Layer
 		layer.states =
 			stateA: x: 200
 			stateB: scale: 0.5
-		assert.deepEqual layer.states.states, ["stateA", "stateB", initialStateName, ]
+		assert.deepEqual layer.states.states, [initialStateName, "stateA", "stateB"]
 
 	it "should still support layer.states.animatingKeys", ->
 		layer = new Layer
@@ -140,9 +140,9 @@ describe "LayerStates Backwards compatibility", ->
 		it "should emit StateWillSwitch when switching", (done) ->
 
 			test = (previous, current, states) =>
-				previous.should.equal initialStateName
+				previous.should.equal "initial"
 				current.should.equal "a"
-				@layer.states.state.should.equal initialStateName
+				@layer.states.state.should.equal "default"
 				done()
 
 			@layer.states.on Events.StateWillSwitch, test
@@ -151,7 +151,7 @@ describe "LayerStates Backwards compatibility", ->
 		it "should emit didSwitch when switching", (done) ->
 
 			test = (previous, current, states) =>
-				previous.should.equal initialStateName
+				previous.should.equal "initial"
 				current.should.equal "a"
 				@layer.states.state.should.equal "a"
 				done()

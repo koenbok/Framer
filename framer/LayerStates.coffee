@@ -15,6 +15,10 @@ deprecatedWarning = (name, suggestion) ->
 	message += ", use '#{suggestion}' instead." if suggestion?
 	console.warn message
 
+deprecatedStateName = (name) ->
+	return "default" if name is "initial"
+	return name
+
 class LayerStates
 
 	@defineReserved = (propertyName, descriptor) ->
@@ -23,7 +27,7 @@ class LayerStates
 		descriptor.set ?= -> reservedStateError(propertyName)
 		Object.defineProperty(@prototype, propertyName, descriptor)
 
-	@defineReserved "initial", get: -> @machine.initial
+	# @defineReserved "initial", get: -> @machine.initial
 	@defineReserved "previous", get: -> @machine.previousName
 	@defineReserved "current", get: -> @machine.currentName
 
@@ -34,7 +38,12 @@ class LayerStates
 	@defineReserved "_currentState", get: -> @[@machine.current]
 
 	# Backwards compatibility, we now prefer 'initial'
-	@defineReserved "default", {enumerable: true, get: -> @initial}
+	@defineReserved "default", get: -> @initial
+
+	capture = (name) ->
+		@[name] = LayerStates.filterStateProperties(@machine.layer.props)
+
+	@defineReserved "capture", get: -> capture
 
 	constructor: (layer) ->
 
@@ -49,14 +58,17 @@ class LayerStates
 			get: -> _machine
 			set: -> reservedStateError("machine")
 
+		@capture("initial")
+
 	@filterStateProperties: (properties) ->
 
 		stateProperties = {}
 
-		# TODO: Maybe we want to support advanced data structures like objects in the future too.
 		for k, v of properties
+			
 			if k in LayerStatesIgnoredKeys
 				continue
+			
 			if Color.isValidColorProperty(k, v)
 				stateProperties[k] = new Color(v)
 				continue
@@ -80,6 +92,7 @@ class LayerStates
 	# Backwards compatibility
 
 	methods =
+
 		add: (states, object={}) ->
 			deprecatedWarning("add", "layer.states = ")
 			if _.isString(states)
@@ -93,27 +106,29 @@ class LayerStates
 
 		switch:  (stateName, options) ->
 			deprecatedWarning("switch", "layer.animate(\"state\")")
+			stateName = deprecatedStateName(stateName)
 			@machine.switchTo(stateName, options)
 
 		switchInstant: (stateName) ->
 			deprecatedWarning("switchInstant", "layer.animate(\"state\", {instant: true})")
+			stateName = deprecatedStateName(stateName)
 			@machine.switchTo(stateName, {instant: true})
 
 		state: ->
 			deprecatedWarning("state", "layer.states.currentName")
-			@currentName
+			deprecatedStateName(@currentName)
 
 		all: ->
 			deprecatedWarning("all", "layer.stateNames")
-			@machine.stateNames
+			@machine.stateNames.map(deprecatedStateName)
 
 		stateNames: ->
 			deprecatedWarning("stateNames", "layer.stateNames")
-			@machine.stateNames
+			@machine.stateNames.map(deprecatedStateName)
 
 		states: ->
 			deprecatedWarning("states", "layer.stateNames")
-			@machine.stateNames
+			@machine.stateNames.map(deprecatedStateName)
 
 		animatingKeys: ->
 			deprecatedWarning("animatingKeys")

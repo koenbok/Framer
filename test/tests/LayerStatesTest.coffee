@@ -1,7 +1,7 @@
 assert = require "assert"
 {expect} = require "chai"
 
-initialStateName = "default"
+initialStateName = "initial"
 
 describe "LayerStates", ->
 
@@ -42,7 +42,7 @@ describe "LayerStates", ->
 		it "should set defaults", ->
 
 			layer = new Layer
-			layer.states.test = {x:123}
+			layer.states.test = {x: 123}
 			animation = layer.animate "test"
 
 			animation.options.curve.should.equal Framer.Defaults.Animation.curve
@@ -51,7 +51,7 @@ describe "LayerStates", ->
 				curve: "spring(1, 2, 3)"
 
 			layer = new Layer
-			layer.states.test = {x:456}
+			layer.states.test = {x: 456}
 			animation = layer.animate "test"
 
 			animation.options.curve.should.equal "spring(1, 2, 3)"
@@ -67,7 +67,7 @@ describe "LayerStates", ->
 				layer.states.test = x: 100
 				layer.stateNames.sort().should.eql [initialStateName, "test"].sort()
 				layer.states =
-					stateA: x:200
+					stateA: x: 200
 					stateB: scale: 0.5
 				layer.stateNames.sort().should.eql [initialStateName, "stateA", "stateB"].sort()
 
@@ -76,11 +76,26 @@ describe "LayerStates", ->
 				layer.states.test = x: 100
 				layer.switchInstant "test"
 				layer.states =
-					stateA: x:200
+					stateA: x: 200
 					stateB: scale: 0.5
 				assert.equal layer.states.previousName, null
 				layer.states.currentName.should.equal initialStateName
 
+	describe "Initial", ->
+
+		testStates = (layer, states) ->
+			layer.stateNames.sort().should.eql(states)
+			Object.keys(layer.states).sort().should.eql(states)
+			(k for k, v of layer.states).sort().should.eql(states)
+
+		it "should have an initial state", ->
+			layer = new Layer
+			testStates(layer, ["initial"])
+
+		it "should have an extra state", ->
+			layer = new Layer
+			layer.states.test = {x: 100}
+			testStates(layer, ["initial", "test"])
 
 	describe "Switch", ->
 
@@ -371,11 +386,11 @@ describe "LayerStates", ->
 				curve: "linear"
 			animation.options.curve.should.equal "linear"
 
-		it "should throw an error when you try to override a special state", ->
-			layer = new Layer
-			throwing = ->
-				layer.states.initial = x: 300
-			expect(throwing).to.throw('The state \'initial\' is a reserved name.')
+		# it "should throw an error when you try to override a special state", ->
+		# 	layer = new Layer
+		# 	throwing = ->
+		# 		layer.states.initial = x: 300
+		# 	expect(throwing).to.throw('The state \'initial\' is a reserved name.')
 
 		it "should throw an error when one fo the states is a special state", ->
 			layer = new Layer
