@@ -8,43 +8,47 @@ Utils = require "../Utils"
 
 NavComponentLayerScrollKey = "_navComponentWrapped"
 
-Events.NavTransitionStart = "transitionstart"
-Events.NavTransitionStop = "transitionstop"
-Events.NavTransitionEnd = "transitionend"
-# Events.NavModalStart = "transitionend"
-# Events.NavModalEnd = "transitionend"
-# Events.NavForward = "forward"
-# Events.NavBack = "back"
+Events.TransitionStart = "transitionstart"
+Events.TransitionStop = "transitionstop"
+Events.TransitionEnd = "transitionend"
 
 class exports.NavComponent extends Layer
 
 	constructor: (options={}) ->
 
-		options = _.defaults options,
-			width: Screen.width
-			height: Screen.height
+		options = _.defaults {}, options,
 			backgroundColor: "black"
 
+		if not options.size
+			options.width ?= Screen.width
+			options.height ?= Screen.height
+
 		super options
+
 
 		@_stack = []
 		@_seen = []
 		@_current = null
+		@_isTransitioning = false
+		@_isModal = false
 
 		@overlay = new Layer
 			name: "overlay"
 			parent: @
-			size: @size
+			size: 0
 			backgroundColor: "black"
 			visible: false
 
-		@overlay.onTap => @back()
+		@overlay.onTap(@_handleOverlayTap)
 
 	@define "isTransitioning",
 		get: -> @_isTransitioning
 
+	@define "isModal",
+		get: -> @_isModal
+
 	@define "stack",
-		get: -> _.clone(@_stack)
+		get: -> @_stack.map (item) -> item.layer
 
 	@define "current",
 		get: -> return @_stack[@_stack.length - 1]?.layer
@@ -70,9 +74,14 @@ class exports.NavComponent extends Layer
 		# correct parent, events, wrapping, etcetera).
 
 		# If this is the first layer we navigate to, we skip the animation
-		options.animate ?= if @_stack.length then true else false
-		options.scroll ?= true
-		options.modal ?= true
+
+		options = _.defaults {}, options,
+			animate: if @_stack.length then true else false
+			scroll: true
+			modal: false
+
+		# Deal with modal transitions, where a click on the overlay goes back
+		@_isModal = options.modal
 
 		# Make sure the layer is visible
 		layer.visible = true
@@ -101,14 +110,11 @@ class exports.NavComponent extends Layer
 	show: (layer, options={}) ->
 		@transition(layer, Transitions.show, options)
 
-	back: (animate=true) =>
+	back: (options={}) =>
 		return unless @previous
+		options = _.defaults({}, {animate: true})
 		previous = @_stack.pop()
-		@_runTransition(previous?.transition, "back", animate, @current, previous.layer)
-
-
-	# Modal transitions never get wrapped. If you'd like them to be scrollable
-	# you can put them into a ScrollComponent yourself and then insert them.
+		@_runTransition(previous?.transition, "back", options.animate, @current, previous.layer)
 
 	showOverlayCenter: (layer, options={}) ->
 		@_showOverlay(layer, Transitions.overlayCenter, options)
@@ -125,12 +131,19 @@ class exports.NavComponent extends Layer
 	showOverlayLeft: (layer, options={}) ->
 		@_showOverlay(layer, Transitions.overlayLeft, options)
 
-	_showOverlay: (layer, transition, options={}) ->
-		@transition(layer, transition, _.defaults({}, options, 
-			{animate: true, scroll: false, modal: true}))
+	emit: (args...) ->
+		print "emit", args
+		super
 
 	##############################################################
 	# Internal methods
+
+	_showOverlay: (layer, transition, options={}) ->
+		@transition(layer, transition, _.defaults({}, options, 
+			{animate: true, scroll: false, modal: false}))
+
+	_handleOverlayTap: =>
+		@back() if not @isModal
 
 	_wrapLayer: (layer) ->
 
@@ -184,8 +197,7 @@ class exports.NavComponent extends Layer
 	_runTransition: (transition, direction, animate, from, to) =>
 
 		@_isTransitioning = true
-		@emit(Events.TransitionStart, from, to, direction)
-		@emit(direction, from, to)
+		@emit(Events.TransitionStart, from, to, {direction: direction, modal: @isModal})
 
 		# Start the transition with a small delay added so it only runs after all
 		# js has been processed. It's also important for hints, as they rely on 
@@ -194,8 +206,7 @@ class exports.NavComponent extends Layer
 		Utils.delay 0, =>
 			transition[direction] animate, =>
 				@_isTransitioning = false
-				@emit(Events.TransitionEnd, from, to, direction)
-				@emit(direction, from, to)
+				@emit(Events.TransitionEnd, from, to, {direction: direction, modal: @isModal})
 
 	_buildTransition: (transitionFunction, layerA, layerB, overlay) ->
 
@@ -233,9 +244,12 @@ class exports.NavComponent extends Layer
 			# If this transition build on a overlay we need it to be
 			# visible and at the right index, just behind the layerB.
 			if transition.states.overlay
+				overlay.size = @size
+				overlay.point = Utils.pointZero()
 				overlay.ignoreEvents = false
 				overlay.visible = true
 				overlay.placeBehind(layerB)
+
 
 			# If not, we make sure the overlay layer is not visible, and
 			# we want the dissapearing layer to ge invisible after the
