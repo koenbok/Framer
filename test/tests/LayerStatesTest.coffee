@@ -409,3 +409,16 @@ describe "LayerStates", ->
 			animation = layer.animate
 				x: 100
 			animation.options.time.should.equal 4
+
+		it "should keep options intact", ->
+			
+			state =
+				x: 500
+				options: {curve: "spring"} 
+
+			layer = new Layer
+			layer.states.test = _.cloneDeep(state)
+
+			assert.deepEqual(layer.states.test, state)
+			layer.animate("test", {curve: "ease-in"})
+			assert.deepEqual(layer.states.test, state)
