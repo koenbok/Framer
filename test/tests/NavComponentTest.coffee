@@ -1,6 +1,6 @@
 assert = require "assert"
 
-describe.only "NavComponent", ->
+describe "NavComponent", ->
 
 	it "should not animate first show", ->
 
@@ -23,7 +23,7 @@ describe.only "NavComponent", ->
 		nav.back(animate:false)
 		nav.current.should.equal cardA
 
-	describe.only "Scroll", ->
+	describe "Scroll", ->
 
 		it "should make views scrollable", ->
 
@@ -62,4 +62,27 @@ describe.only "NavComponent", ->
 
 			nav.show(cardA, scroll:false)
 			nav.children[1].constructor.name.should.equal "Layer"
+
+	describe "Events", ->
+
+		# it "should throw the right events", (done) ->
+
+		# 	cardA = new Layer size: 100
+		# 	cardB = new Layer size: 100
+
+		# 	nav = new NavComponent()
+		# 	nav.show(cardA)
+
+		# 	nav.show(cardB)
+		# 	nav.back()
+
+		# 	events = []
+
+		# 	nav.on Events.TransitionStart, ->
+		# 		events.push(Events.TransitionStart)
+
+		# 		print "WUUUUT", events
+
+		# 	nav.on Events.TransitionEnd, ->
+		# 		events.push(Events.TransitionEnd)
 

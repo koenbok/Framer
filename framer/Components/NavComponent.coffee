@@ -29,7 +29,6 @@ class exports.NavComponent extends Layer
 		@_stack = []
 		@_seen = []
 		@_current = null
-		@_isTransitioning = false
 		@_isModal = false
 
 		@overlay = new Layer
@@ -42,7 +41,7 @@ class exports.NavComponent extends Layer
 		@overlay.onTap(@_handleOverlayTap)
 
 	@define "isTransitioning",
-		get: -> @_isTransitioning
+		get: -> @_runningTransition
 
 	@define "isModal",
 		get: -> @_isModal
@@ -112,6 +111,7 @@ class exports.NavComponent extends Layer
 
 	back: (options={}) =>
 		return unless @previous
+		return if @isTransitioning
 		options = _.defaults({}, {animate: true})
 		previous = @_stack.pop()
 		@_runTransition(previous?.transition, "back", options.animate, @current, previous.layer)
@@ -132,8 +132,8 @@ class exports.NavComponent extends Layer
 		@_showOverlay(layer, Transitions.overlayLeft, options)
 
 	emit: (args...) ->
-		print "emit", args
 		super
+		print args
 
 	##############################################################
 	# Internal methods
@@ -196,7 +196,13 @@ class exports.NavComponent extends Layer
 
 	_runTransition: (transition, direction, animate, from, to) =>
 
-		@_isTransitioning = true
+		# @_runningTransition = 
+		# 	transition: transition
+		# 	direction: direction
+		# 	animate: animate
+		# 	from: from
+		# 	to: to
+
 		@emit(Events.TransitionStart, from, to, {direction: direction, modal: @isModal})
 
 		# Start the transition with a small delay added so it only runs after all
@@ -205,7 +211,7 @@ class exports.NavComponent extends Layer
 
 		Utils.delay 0, =>
 			transition[direction] animate, =>
-				@_isTransitioning = false
+				# @_runningTransition = null
 				@emit(Events.TransitionEnd, from, to, {direction: direction, modal: @isModal})
 
 	_buildTransition: (transitionFunction, layerA, layerB, overlay) ->
@@ -255,7 +261,7 @@ class exports.NavComponent extends Layer
 			# we want the dissapearing layer to ge invisible after the
 			# transition stops.
 			else
-				overlay.ignoreEvents = true
+				# overlay.ignoreEvents = true
 				overlay.visible = false
 
 			animationCount = 0
@@ -263,6 +269,9 @@ class exports.NavComponent extends Layer
 			onTransitionEnd = ->
 				animationCount--
 				callback?() if animationCount is 0
+
+				if not transition.states.overlay and layerA
+					layerA.visible = false
 
 			if transition.states.layerB
 				animationCount++
@@ -275,7 +284,7 @@ class exports.NavComponent extends Layer
 					transition.states.layerB.machine.switchInstant("hide")
 
 				layerB.visible = true
-				layerB.ignoreEvents = true
+				# layerB.ignoreEvents = true
 				# layerB.bringToFront()				
 				transition.states.layerB.machine.switchTo("show", {instant: !animate})
 				transition.states.layerB.machine.once(Events.StateSwitchEnd, onTransitionEnd)
@@ -285,9 +294,8 @@ class exports.NavComponent extends Layer
 				animationCount++
 				transition.states.layerA.machine.switchTo("hide", {instant: !animate})
 				layerA.visible = true
-				layerB.ignoreEvents = false
+				# layerB.ignoreEvents = false
 				transition.states.layerA.machine.once(Events.StateSwitchEnd, onTransitionEnd)
-
 
 			if transition.states.overlay
 				animationCount++
@@ -310,21 +318,20 @@ class exports.NavComponent extends Layer
 				animationCount--
 				callback?() if animationCount is 0
 
+				if not transition.states.overlay and layerB
+					layerB.visible = false
+
 			if transition.states.layerB
 				animationCount++
 				transition.states.layerB.machine.switchTo("hide", {instant: !animate})
 				transition.states.layerB.machine.once(Events.AnimationStop, onTransitionEnd)
 				layerB.visible = true
-				layerB.ignoreEvents = true
-
-				# if not transition.states.overlay
-				# 	transition.states.layerB.once Events.StateSwitchEnd, ->
-				# 		layerB?.visible = false
+				# layerB.ignoreEvents = true
 
 			if transition.states.layerA
 				animationCount++
 				layerA.visible = true
-				layerA.ignoreEvents = false
+				# layerA.ignoreEvents = false
 				# layerA.bringToFront()
 				transition.states.layerA.machine.switchTo("show", {instant: !animate})
 				transition.states.layerA.machine.once(Events.AnimationStop, onTransitionEnd)
