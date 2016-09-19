@@ -91,10 +91,10 @@ class exports.LayerStateMachine extends BaseClass
 	reset: ->
 
 		for k in _.keys(@states)
-			delete @states[k] unless k is "initial"
+			delete @states[k] unless k is "default"
 
 		@_previousNames = []
-		@_currentName = "initial"
+		@_currentName = "default"
 
 	# _namedState: (name) ->
 	# 	return _.extend(_.clone(@states[name]), {name: name})
