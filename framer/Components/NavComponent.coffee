@@ -104,7 +104,10 @@ class exports.NavComponent extends Layer
 
 		# Run the transition and update the history
 		@_runTransition(transition, "forward", options.animate, @current, layer)
+
+
 		@_stack.push({layer:layer, transition:transition})
+		
 
 	show: (layer, options={}) ->
 		@transition(layer, Transitions.show, options)
@@ -131,9 +134,9 @@ class exports.NavComponent extends Layer
 	showOverlayLeft: (layer, options={}) ->
 		@_showOverlay(layer, Transitions.overlayLeft, options)
 
-	emit: (args...) ->
-		super
-		print args
+	# emit: (args...) ->
+	# 	super
+	# 	print args
 
 	##############################################################
 	# Internal methods
