@@ -982,7 +982,7 @@ describe "Layer", ->
 			layer = new Layer
 			layer.destroy()
 
-			(layer in Framer.CurrentContext.getLayers()).should.be.false
+			(layer in Framer.CurrentContext.layers).should.be.false
 			assert.equal layer._element.parentNode, null
 
 		it "should set text", ->
