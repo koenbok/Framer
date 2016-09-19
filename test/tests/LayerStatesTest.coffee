@@ -1,7 +1,7 @@
 assert = require "assert"
 {expect} = require "chai"
 
-initialStateName = "initial"
+initialStateName = "default"
 
 describe "LayerStates", ->
 
@@ -90,12 +90,12 @@ describe "LayerStates", ->
 
 		it "should have an initial state", ->
 			layer = new Layer
-			testStates(layer, ["initial"])
+			testStates(layer, ["default"])
 
 		it "should have an extra state", ->
 			layer = new Layer
 			layer.states.test = {x: 100}
-			testStates(layer, ["initial", "test"])
+			testStates(layer, ["default", "test"])
 
 	describe "Switch", ->
 
@@ -340,9 +340,9 @@ describe "LayerStates", ->
 				second: y: 200, options: instant: true
 
 			assert.equal(layer.states._previousState, null)
-			assert.equal(layer.states._currentState, layer.states.initial)
+			assert.equal(layer.states._currentState, layer.states.default)
 			layer.animate "first"
-			assert.equal(layer.states._previousState, layer.states.initial)
+			assert.equal(layer.states._previousState, layer.states.default)
 			layer.states._currentState.should.equal layer.states.first
 			layer.x.should.equal 100
 			layer.animate "second"
@@ -351,12 +351,22 @@ describe "LayerStates", ->
 			layer.y.should.equal 200
 
 
-		it "should set the initial state when creating a Layer", ->
+		it "should set the default state when creating a", ->
 			layer = new Layer
-			layer.states.currentName.should.equal initialStateName
+			layer.states.currentName.should.equal "default"
 			layer.states.default.x.should.equal 0
-			layer.states.initial.x.should.equal 0
-			assert.deepEqual layer.stateNames, [initialStateName]
+
+		it "should set the default state when creating b", ->
+			layer = new Layer
+				x: 100
+			layer.states.currentName.should.equal "default"
+			layer.states.default.x.should.equal 100
+
+		it "should set the default state when creating c", ->
+			layer = new Layer
+			layer.states.default.x = 100
+			layer.states.currentName.should.equal "default"
+			layer.states.default.x.should.equal 100
 
 		it "should listen to options provided to animateToNextState", ->
 			layer = new Layer

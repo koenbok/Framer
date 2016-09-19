@@ -140,7 +140,7 @@ describe "LayerStates Backwards compatibility", ->
 		it "should emit StateWillSwitch when switching", (done) ->
 
 			test = (previous, current, states) =>
-				previous.should.equal "initial"
+				previous.should.equal "default"
 				current.should.equal "a"
 				@layer.states.state.should.equal "default"
 				done()
@@ -151,7 +151,7 @@ describe "LayerStates Backwards compatibility", ->
 		it "should emit didSwitch when switching", (done) ->
 
 			test = (previous, current, states) =>
-				previous.should.equal "initial"
+				previous.should.equal "default"
 				current.should.equal "a"
 				@layer.states.state.should.equal "a"
 				done()
