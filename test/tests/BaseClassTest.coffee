@@ -107,29 +107,29 @@ describe "BaseClass", ->
 		testClass = new TestClass3()
 		testClass.keys().should.eql ["testA", "testB"]
 
-	it "should create getters/setters", ->
+	# it "should create getters/setters", ->
 
-		class TestClass4 extends Framer.BaseClass
-			@define "testA", @simpleProperty "testA", 100
+	# 	class TestClass4 extends Framer.BaseClass
+	# 		@define "testA", @simpleProperty "testA", 100
 
-		testClass = new TestClass4()
-		testClass.setTestA(500)
-		testClass.getTestA().should.equal 500
-		testClass.testA.should.equal 500
+	# 	testClass = new TestClass4()
+	# 	testClass.setTestA(500)
+	# 	testClass.getTestA().should.equal 500
+	# 	testClass.testA.should.equal 500
 
-	it "should override getters/setters", ->
+	# it "should override getters/setters", ->
 
-		class TestClass5 extends Framer.BaseClass
-			@define "testA", @simpleProperty "testA", 100
+	# 	class TestClass5 extends Framer.BaseClass
+	# 		@define "testA", @simpleProperty "testA", 100
 
-		class TestClass6 extends TestClass5
-			setTestA: (value) ->
-				super value * 10
+	# 	class TestClass6 extends TestClass5
+	# 		setTestA: (value) ->
+	# 			super value * 10
 
-		testClass = new TestClass6()
-		testClass.setTestA(500)
-		testClass.getTestA().should.equal 5000
-		testClass.testA.should.equal 5000
+	# 	testClass = new TestClass6()
+	# 	testClass.setTestA(500)
+	# 	testClass.getTestA().should.equal 5000
+	# 	testClass.testA.should.equal 5000
 
 	it "should work with proxyProperties", ->
 

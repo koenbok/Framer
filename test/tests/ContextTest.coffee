@@ -219,7 +219,7 @@ describe "Context", ->
 
 			context = new Framer.Context(name:"Test")
 			context.on "layer:create", ->
-				context.getLayers().length.should.equal 1
+				context.layers.length.should.equal 1
 				callback()
 
 			context.run ->
@@ -231,10 +231,10 @@ describe "Context", ->
 			context = new Framer.Context(name:"Test")
 
 			context.on "layer:create", ->
-				context.getLayers().length.should.equal 1
+				context.layers.length.should.equal 1
 
 			context.on "layer:destroy", ->
-				context.getLayers().length.should.equal 0
+				context.layers.length.should.equal 0
 				callback()
 
 			context.run ->

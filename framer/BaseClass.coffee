@@ -23,19 +23,7 @@ class exports.BaseClass extends EventEmitter
 		if @ isnt BaseClass
 			@_addDescriptor(propertyName, descriptor)
 
-		# Set the getter/setter as setProperty on this object so we can access and override it easily
-		getName = "get#{capitalizeFirstLetter(propertyName)}"
-		@::[getName] = descriptor.get
-		descriptor.get = @::[getName]
-
-		if descriptor.set
-			setName = "set#{capitalizeFirstLetter(propertyName)}"
-			@::[setName] = descriptor.set
-			descriptor.set = @::[setName]
-
-		# Better readonly errors for debugging
-
-		# else
+		# if not descriptor.set
 		# 	descriptor.set = (value) ->
 		# 		throw Error("#{@constructor.name}.#{propertyName} is readonly")
 
