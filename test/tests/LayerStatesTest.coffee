@@ -90,12 +90,12 @@ describe "LayerStates", ->
 
 		it "should have an initial state", ->
 			layer = new Layer
-			testStates(layer, ["default"])
+			testStates(layer, [initialStateName])
 
 		it "should have an extra state", ->
 			layer = new Layer
 			layer.states.test = {x: 100}
-			testStates(layer, ["default", "test"])
+			testStates(layer, [initialStateName, "test"])
 
 	describe "Switch", ->
 
@@ -353,19 +353,19 @@ describe "LayerStates", ->
 
 		it "should set the default state when creating a", ->
 			layer = new Layer
-			layer.states.currentName.should.equal "default"
+			layer.states.currentName.should.equal initialStateName
 			layer.states.default.x.should.equal 0
 
 		it "should set the default state when creating b", ->
 			layer = new Layer
 				x: 100
-			layer.states.currentName.should.equal "default"
+			layer.states.currentName.should.equal initialStateName
 			layer.states.default.x.should.equal 100
 
 		it "should set the default state when creating c", ->
 			layer = new Layer
 			layer.states.default.x = 100
-			layer.states.currentName.should.equal "default"
+			layer.states.currentName.should.equal initialStateName
 			layer.states.default.x.should.equal 100
 
 		it "should listen to options provided to animateToNextState", ->

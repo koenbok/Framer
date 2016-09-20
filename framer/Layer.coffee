@@ -891,23 +891,21 @@ class exports.Layer extends BaseClass
 
 	animate: (properties, options={}) ->
 
-		# print "layer.animate", properties, options
-
 		# If the properties are a string, we assume it's a state name
 		if _.isString(properties)
 			return @animateToState(properties, options)
 
 		# Support the old properties syntax, we add all properties top level and
 		# move the options into an options property.
-		if properties.hasOwnProperty("properties")
+		if properties.properties?
 			options = properties
 			properties = options.properties
 			delete options.properties
 
 		# With the new api we treat the properties as animatable properties, and use
 		# the special options keyword for animation options.
-		if properties.hasOwnProperty("options")
-			options = _.defaults(properties.options, options)
+		if properties.options?
+			options = _.defaults({}, options, properties.options)
 			delete properties.options
 
 		# Merge the animation options with the default animation options for this layer
