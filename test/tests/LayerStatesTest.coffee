@@ -530,6 +530,19 @@ describe "LayerStates", ->
 						layer.states.current.name.should.equal "testA"
 						done()
 
+		it "should cycle all without state list", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.testA = {x: 200}
+			layer.states.testB = {x: 400}
+			layer.stateCycle onEnd: ->
+				layer.states.current.name.should.equal "testA"
+				layer.stateCycle onEnd: ->
+					layer.states.current.name.should.equal "testB"
+					layer.stateCycle onEnd: ->
+						layer.states.current.name.should.equal "default"
+						done()
+
 	describe "Switch", ->
 
 		it "should switch", ->
