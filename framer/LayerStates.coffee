@@ -29,10 +29,6 @@ class LayerStates
 	@defineReserved "previous", get: -> namedState(@[@machine.previousName], @machine.previousName)
 	@defineReserved "current", get: -> namedState(@[@machine.currentName], @machine.currentName)
 
-	# Not sure about these, maybe we should change it
-	@defineReserved "previousName", get: -> @machine.previousName
-	@defineReserved "currentName", get: -> @machine.currentName
-
 	capture = (name) ->
 		@[name] = LayerStates.filterStateProperties(@machine.layer.props)
 
@@ -107,7 +103,7 @@ class LayerStates
 
 		state: ->
 			deprecatedWarning("state", "layer.states.current.name")
-			@currentName
+			@machine.currentName
 
 		all: ->
 			deprecatedWarning("all", "layer.stateNames")

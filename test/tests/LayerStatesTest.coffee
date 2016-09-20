@@ -105,7 +105,7 @@ describe "LayerStates", ->
 				layer.states =
 					stateA: x: 200
 					stateB: scale: 0.5
-				assert.equal layer.states.previousName, initialStateName
+				layer.states.previous.name.should.equal initialStateName
 				layer.states.current.name.should.equal initialStateName
 
 	describe "Initial", ->
