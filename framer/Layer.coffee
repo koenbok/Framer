@@ -884,18 +884,13 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## ANIMATION
 
-	# Used to animate to a state with a specific name
-	# We lookup the stateName and call 'animate' with the properties of the state
-	animateToState: (stateName, options={}) ->
-		return @states.machine.switchTo(stateName, options)
-
 	animate: (properties, options={}) ->
 
 		# If the properties are a string, we assume it's a state name
 		if _.isString(properties)
 			# Support options as an object
 			options = options.options if options.options?
-			return @animateToState(properties, options)
+			return @states.machine.switchTo(properties, options)
 
 		# Support the old properties syntax, we add all properties top level and
 		# move the options into an options property.
@@ -919,13 +914,13 @@ class exports.Layer extends BaseClass
 
 		return animation
 
-	switchInstant: (properties, options={}) ->
-		@animate(properties, _.merge(options, {instant: true}))
-
 	stateCycle: (args..., options={}) ->
 		states = []
 		states = _.flatten(args) if args.length
 		@animate(@states.machine.next(states), options)
+
+	stateSwitch: (stateName, options={}) ->
+		@animate(stateName, _.defaults({}, options, {instant:true}))
 
 	animations: ->
 		# Current running animations on this layer

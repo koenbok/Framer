@@ -74,7 +74,7 @@ describe "LayerStates", ->
 			it "should reset the previous and current states", ->
 				layer = new Layer
 				layer.states.test = x: 100
-				layer.switchInstant "test"
+				layer.stateSwitch "test"
 				layer.states =
 					stateA: x: 200
 					stateB: scale: 0.5
@@ -110,11 +110,11 @@ describe "LayerStates", ->
 					options:
 						instant: true
 
-			layer.switchInstant "stateA"
+			layer.stateSwitch "stateA"
 			layer.states.currentName.should.equal "stateA"
 			layer.x.should.equal 123
 
-			layer.switchInstant "stateB"
+			layer.stateSwitch "stateB"
 			layer.states.currentName.should.equal "stateB"
 			layer.y.should.equal 123
 
@@ -158,14 +158,14 @@ describe "LayerStates", ->
 		# it "should be a no-op to change to the current state", ->
 		# 	layer = new Layer
 		# 	layer.states.stateA = {x: 100}
-		# 	layer.switchInstant "stateA"
+		# 	layer.stateSwitch "stateA"
 		# 	animation = layer.animate "stateA", time: 0.05
 		# 	assert.equal(animation, null)
 
 		it "should change to a state when the properties defined are not the current", (done) ->
 			layer = new Layer
 			layer.states.stateA = {x: 100}
-			layer.switchInstant "stateA"
+			layer.stateSwitch "stateA"
 			layer.x = 150
 			layer.onStateDidSwitch ->
 				layer.states.currentName.should.equal "stateA"

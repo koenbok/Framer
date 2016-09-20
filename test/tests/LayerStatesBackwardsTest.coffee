@@ -85,9 +85,9 @@ describe "LayerStates Backwards compatibility", ->
 		layer.states =
 			stateA: x: 200
 			stateB: scale: 0.5
-		layer.switchInstant "stateB"
-		layer.switchInstant "stateA"
-		layer.switchInstant "stateB"
+		layer.stateSwitch "stateB"
+		layer.stateSwitch "stateA"
+		layer.stateSwitch "stateB"
 		layer.onStateDidSwitch ->
 			assert.equal layer.states.currentName, "stateA"
 			done()
