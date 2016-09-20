@@ -32,8 +32,6 @@ class LayerStates
 	# Not sure about these, maybe we should change it
 	@defineReserved "previousName", get: -> @machine.previousName
 	@defineReserved "currentName", get: -> @machine.currentName
-	@defineReserved "_previousState", get: -> @[@machine.previous]
-	@defineReserved "_currentState", get: -> @[@machine.current]
 
 	capture = (name) ->
 		@[name] = LayerStates.filterStateProperties(@machine.layer.props)

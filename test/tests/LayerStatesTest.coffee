@@ -3,6 +3,9 @@ assert = require "assert"
 
 initialStateName = "default"
 
+cleanState = (state) ->
+	return _.pickBy(state, (value, key) -> key isnt "name")
+
 describe "LayerStates", ->
 
 	describe "Events", ->
@@ -18,7 +21,7 @@ describe "LayerStates", ->
 				previous.should.equal initialStateName
 				current.should.equal "a"
 				@layer.states.current.name.should.equal initialStateName
-				@layer.states._currentState.should.eql @layer.states[initialStateName]
+				cleanState(@layer.states.current).should.eql @layer.states[initialStateName]
 				done()
 
 			@layer.on Events.StateWillSwitch, test
@@ -30,7 +33,7 @@ describe "LayerStates", ->
 				previous.should.equal initialStateName
 				current.should.equal "a"
 				@layer.states.current.name.should.equal "a"
-				@layer.states._currentState.should.equal @layer.states.a
+				cleanState(@layer.states.current).should.eql @layer.states.a
 				done()
 
 			@layer.on Events.StateDidSwitch, test
@@ -356,9 +359,6 @@ describe "LayerStates", ->
 
 			layerB.animate initialStateName, instant: true
 			# assert.equal(layerB.parent, layerA)
-
-		cleanState = (state) ->
-			return _.pickBy(state, (value, key) -> key isnt "name")
 
 		it "should set the current and previous states when switching", ->
 			
