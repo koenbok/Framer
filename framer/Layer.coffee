@@ -53,7 +53,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 			# We try to not send any events while we run the constructor, it just
 			# doesn't make sense, because no one can listen to use yet.
-			return if @__constructing
+			return if @__constructor
 
 			@emit("change:#{name}", value)
 			@emit("change:point", value) if name in ["x", "y"]
@@ -84,9 +84,9 @@ class exports.Layer extends BaseClass
 	constructor: (options={}) ->
 
 		# Make sure we never call the constructor twice
-		throw Error("Layer.constructor #{@toInspect()} called twice") if @__constructed
-		@__constructed = true
-		@__constructing = true
+		throw Error("Layer.constructor #{@toInspect()} called twice") if @__constructorCalled
+		@__constructorCalled = true
+		@__constructor = true
 
 		# Set needed private variables
 		@_properties = {}
@@ -142,7 +142,7 @@ class exports.Layer extends BaseClass
 		@_stateMachine = new LayerStateMachine(@)
 		@_context.emit("layer:create", @)
 
-		delete @__constructing
+		delete @__constructor
 
 	##############################################################
 	# Properties
