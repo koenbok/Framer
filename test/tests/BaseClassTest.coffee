@@ -186,7 +186,7 @@ describe "BaseClass", ->
 				get: () -> "value"
 
 		instance = new TestClass()
-		(-> instance.testProp = "foo").should.throw "setting a property that has only a getter"
+		(-> instance.testProp = "foo").should.throw "TestClass.testProp is readonly"
 
 	it "should not set read-only prop via props setter", ->
 
