@@ -491,6 +491,20 @@ describe "LayerStates", ->
 						layer.states.current.should.equal "testA"
 						done()
 
+	describe "Switch", ->
+
+		it "should switch", ->
+			layer = new Layer
+			layer.states.testA = {x: 200}
+			layer.states.testB = {x: 400}
+			layer.states.current.should.equal "default"
+			layer.stateSwitch("testA")
+			layer.states.current.should.equal "testA"
+			layer.x.should.equal 200
+			layer.stateSwitch("testB")
+			layer.x.should.equal 400
+			layer.states.current.should.equal "testB"
+
 	describe "Options", ->
 
 		it "should listen to layer.options", ->
