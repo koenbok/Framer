@@ -922,7 +922,7 @@ class exports.Layer extends BaseClass
 	switchInstant: (properties, options={}) ->
 		@animate(properties, _.merge(options, {instant: true}))
 
-	animateToNextState: (args..., options={}) ->
+	stateCycle: (args..., options={}) ->
 		states = []
 		states = _.flatten(args) if args.length
 		@animate(@states.machine.next(states), options)

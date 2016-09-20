@@ -175,7 +175,7 @@ describe "LayerStates", ->
 
 	describe "Properties", ->
 
-		it "should bring back the 'initial' state values when using 'animateToNextState'", (done) ->
+		it "should bring back the 'initial' state values when using 'stateCycle'", (done) ->
 
 			layer = new Layer
 			layer.states =
@@ -189,20 +189,20 @@ describe "LayerStates", ->
 					when "stateA"
 						layer.x.should.equal 100
 						layer.rotation.should.equal 90
-						layer.animateToNextState()
+						layer.stateCycle()
 					when "stateB"
 						layer.x.should.equal 200
 						layer.rotation.should.equal 180
-						layer.animateToNextState(time: 0.05)
+						layer.stateCycle(time: 0.05)
 					when initialStateName
 						layer.x.should.equal 0
 						layer.rotation.should.equal 0
 						done()
 
 			layer.on Events.AnimationEnd, ready
-			layer.animateToNextState()
+			layer.stateCycle()
 
-		it "should bring cycle when using 'animateToNextState'", (done) ->
+		it "should bring cycle when using 'stateCycle'", (done) ->
 
 			layer = new Layer
 
@@ -222,14 +222,14 @@ describe "LayerStates", ->
 					when "stateA"
 						layer.x.should.equal 302
 						layer.y.should.equal 445
-						layer.animateToNextState(time: 0.05)
+						layer.stateCycle(time: 0.05)
 					when initialStateName
 						layer.x.should.equal 0
 						layer.rotation.should.equal 0
-						layer.animateToNextState(time: 0.05)
+						layer.stateCycle(time: 0.05)
 
 			layer.on Events.AnimationEnd, ready
-			layer.animateToNextState(time: 0.05)
+			layer.stateCycle(time: 0.05)
 
 		it "ignoreEvents should not be part of the initial state", ->
 
@@ -239,13 +239,13 @@ describe "LayerStates", ->
 				backgroundColor: "rgba(255, 0, 255, 1)"
 
 			layer.onClick ->
-				layer.animateToNextState()
+				layer.stateCycle()
 
 			layer.x.should.equal 0
 
-			layer.animateToNextState(instant: true)
-			layer.animateToNextState(instant: true)
-			layer.animateToNextState(instant: true)
+			layer.stateCycle(instant: true)
+			layer.stateCycle(instant: true)
+			layer.stateCycle(instant: true)
 			layer.ignoreEvents.should.equal false
 
 
@@ -368,31 +368,31 @@ describe "LayerStates", ->
 			layer.states.currentName.should.equal initialStateName
 			layer.states.default.x.should.equal 100
 
-		it "should listen to options provided to animateToNextState", ->
+		it "should listen to options provided to stateCycle", ->
 			layer = new Layer
 			layer.states =
 				stateA: x: 300
 				stateB: y: 300
-			animation = layer.animateToNextState ["stateA", "stateB"],
+			animation = layer.stateCycle ["stateA", "stateB"],
 				curve: "linear"
 			animation.options.curve.should.equal "linear"
 
-		it "should correctly switch to next state without using an array animateToNextState", ->
+		it "should correctly switch to next state without using an array stateCycle", ->
 			layer = new Layer
 			layer.states =
 				stateA: x: 300
 				stateB: y: 300
-			layer.animateToNextState "stateA", "stateB", {instant: true}
+			layer.stateCycle "stateA", "stateB", {instant: true}
 			layer.states.currentName.should.equal "stateA"
-			layer.animateToNextState "stateA", "stateB", {instant: true}
+			layer.stateCycle "stateA", "stateB", {instant: true}
 			layer.states.currentName.should.equal "stateB"
-			layer.animateToNextState "stateA", "stateB", {instant: true}
+			layer.stateCycle "stateA", "stateB", {instant: true}
 			layer.states.currentName.should.equal "stateA"
 
-		it "should listen to options provided to animateToNextState when no states are provided", ->
+		it "should listen to options provided to stateCycle when no states are provided", ->
 			layer = new Layer
 			layer.states.test = x: 300
-			animation = layer.animateToNextState
+			animation = layer.stateCycle
 				curve: "linear"
 			animation.options.curve.should.equal "linear"
 
@@ -409,6 +409,87 @@ describe "LayerStates", ->
 					something: y: 10
 					previous: x: 300
 			expect(throwing).to.throw('The state \'previous\' is a reserved name.')
+
+	describe "Cycling", ->
+
+		it "should do nothing without states", ->
+			layer = new Layer
+			layer.stateCycle()
+			layer.states.current.should.equal "default"
+
+		it "should cycle two", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.test = {x: 200}
+			
+			layer.on Events.StateSwitchEnd, ->
+				layer.states.current.should.equal "test"
+				done()
+
+			layer.stateCycle()
+
+		it "should cycle two with options", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.test = {x: 200}
+			layer.stateCycle onEnd: ->
+				layer.x.should.equal 200
+				layer.states.current.should.equal "test"
+				layer.stateCycle onEnd: ->
+					layer.x.should.equal 0
+					layer.states.current.should.equal "default"
+					layer.stateCycle onEnd: ->
+						layer.x.should.equal 200
+						layer.states.current.should.equal "test"
+						done()
+
+		it "should cycle three with options", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.testA = {x: 200}
+			layer.states.testB = {x: 400}
+			layer.stateCycle onEnd: ->
+				layer.x.should.equal 200
+				layer.states.current.should.equal "testA"
+				layer.stateCycle onEnd: ->
+					layer.x.should.equal 400
+					layer.states.current.should.equal "testB"
+					layer.stateCycle onEnd: ->
+						layer.x.should.equal 0
+						layer.states.current.should.equal "default"
+						done()
+
+		it "should cycle two out of three in a list", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.testA = {x: 200}
+			layer.states.testB = {x: 400}
+			layer.stateCycle ["testA", "testB"], onEnd: ->
+				layer.x.should.equal 200
+				layer.states.current.should.equal "testA"
+				layer.stateCycle ["testA", "testB"], onEnd: ->
+					layer.x.should.equal 400
+					layer.states.current.should.equal "testB"
+					layer.stateCycle ["testA", "testB"], onEnd: ->
+						layer.x.should.equal 200
+						layer.states.current.should.equal "testA"
+						done()
+
+		it "should cycle two out of three in arguments", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.testA = {x: 200}
+			layer.states.testB = {x: 400}
+			layer.stateCycle "testA", "testB", onEnd: ->
+				layer.x.should.equal 200
+				layer.states.current.should.equal "testA"
+				layer.stateCycle "testA", "testB", onEnd: ->
+					layer.x.should.equal 400
+					layer.states.current.should.equal "testB"
+					layer.stateCycle "testA", "testB", onEnd: ->
+						layer.x.should.equal 200
+						layer.states.current.should.equal "testA"
+						done()
 
 	describe "Options", ->
 

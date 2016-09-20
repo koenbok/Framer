@@ -128,8 +128,8 @@ class LayerStates
 			return keys
 
 		next: (options) ->
-			deprecatedWarning("next", "layer.animateToNextState()")
-			@machine.layer.animateToNextState(options)
+			deprecatedWarning("next", "layer.stateCycle()")
+			@machine.layer.stateCycle(options)
 
 		last: (options) ->
 			deprecatedWarning("last")
