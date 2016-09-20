@@ -161,6 +161,11 @@ class exports.Animation extends BaseClass
 			console.log "Animation.start"
 			console.log "\t#{k}: #{@_stateA[k]} -> #{@_stateB[k]}" for k, v of @_stateB
 
+		# Add the callbacks
+		@on(Events.AnimationStart, @options.onStart) if _.isFunction(@options.onStart)
+		@on(Events.AnimationStop, @options.onStop) if _.isFunction(@options.onStop)
+		@on(Events.AnimationEnd, @options.onEnd) if _.isFunction(@options.onEnd)
+
 		# See if we need to repeat this animation
 		# Todo: more repeat behaviours:
 		# 1) add (from end position) 2) reverse (loop between a and b)

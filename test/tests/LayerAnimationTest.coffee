@@ -562,6 +562,38 @@ describe "LayerAnimation", ->
 				@layer.x.should.equal 100
 				calledEvents.should.eql(["start", "stop", "end"])
 
+		describe "Callbacks", ->
+
+			it "should call start", (done) ->
+				layer = new Layer
+				layer.animate
+					x: 100
+					options:
+						time: 0.1
+						onStart: ->
+							layer.x.should.eql 0
+							done()
+
+			it "should call stop", (done) ->
+				layer = new Layer
+				layer.animate
+					x: 100
+					options:
+						time: 0.1
+						onStop: ->
+							layer.x.should.eql 100
+							done()
+
+			it "should call end", (done) ->
+				layer = new Layer
+				layer.animate
+					x: 100
+					options:
+						time: 0.1
+						onEnd: -> 
+							layer.x.should.eql 100
+							done()
+
 		describe "Backwards compatibility", ->
 
 			it "should support the original api", ->

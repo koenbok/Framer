@@ -419,3 +419,55 @@ describe "LayerStates", ->
 			animation = layer.animate
 				x: 100
 			animation.options.time.should.equal 4
+
+		it "should listen to layer.animate options", ->
+			layer = new Layer
+			layer.states.test = {x: 100}
+			animation = layer.animate "test", time: 4
+			animation.options.time.should.equal 4
+
+	describe "Callbacks", ->
+
+		it "should call start", (done) ->
+
+			layer = new Layer
+			layer.states.test = x: 300
+
+			onStart = ->
+				layer.x.should.eql 0
+				done()
+
+			animation = layer.animate "test",
+				onStart: onStart
+
+			animation.options.onStart.should.equal onStart
+
+		it "should call stop", (done) ->
+
+			layer = new Layer
+			layer.states.test = x: 300
+
+			onStop = ->
+				layer.x.should.eql 300
+				done()
+
+			animation = layer.animate "test",
+				onStop: onStop
+				time: 0.1
+
+			animation.options.onStop.should.equal onStop
+
+		it "should call end", (done) ->
+
+			layer = new Layer
+			layer.states.test = x: 300
+
+			onEnd = ->
+				layer.x.should.eql 300
+				done()
+
+			animation = layer.animate "test",
+				onEnd: onEnd
+				time: 0.1
+
+			animation.options.onEnd.should.equal onEnd
