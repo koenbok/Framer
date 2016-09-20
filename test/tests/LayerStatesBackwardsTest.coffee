@@ -35,7 +35,7 @@ describe "LayerStates Backwards compatibility", ->
 			stateA: x: 200
 			stateB: scale: 0.5
 		layer.onStateDidSwitch ->
-			assert.equal layer.states.currentName, "stateA"
+			assert.equal layer.states.current.name, "stateA"
 			done()
 		layer.states.switch "stateA"
 
@@ -45,7 +45,7 @@ describe "LayerStates Backwards compatibility", ->
 			stateA: x: 200
 			stateB: scale: 0.5
 		layer.states.switchInstant "stateB"
-		assert.equal layer.states.currentName, "stateB"
+		assert.equal layer.states.current.name, "stateB"
 
 	it "should still support layer.states.all", ->
 		layer = new Layer
@@ -66,7 +66,7 @@ describe "LayerStates Backwards compatibility", ->
 		layer.states =
 			stateA: x: 200, y: 300
 			stateB: scale: 0.5
-		assert.deepEqual layer.states.animatingKeys().sort(), ["width", "height", "visible", "opacity", "clip", "scrollHorizontal", "scrollVertical", "x", "y", "z", "scaleX", "scaleY", "scaleZ", "scale", "skewX", "skewY", "skew", "originX", "originY", "originZ", "perspective", "perspectiveOriginX", "perspectiveOriginY", "rotationX", "rotationY", "rotationZ", "rotation", "blur", "brightness", "saturate", "hueRotate", "contrast", "invert", "grayscale", "sepia", "shadowX", "shadowY", "shadowBlur", "shadowSpread", "shadowColor", "backgroundColor", "color", "borderColor", "borderWidth", "force2d", "flat", "backfaceVisible", "name", "borderRadius", "html", "image", "scrollX", "scrollY", "mouseWheelSpeedMultiplier", "velocityThreshold", "constrained"].sort()
+		assert.deepEqual layer.states.animatingKeys().sort(), ["width", "height", "visible", "opacity", "clip", "scrollHorizontal", "scrollVertical", "x", "y", "z", "scaleX", "scaleY", "scaleZ", "scale", "skewX", "skewY", "skew", "originX", "originY", "originZ", "perspective", "perspectiveOriginX", "perspectiveOriginY", "rotationX", "rotationY", "rotationZ", "rotation", "blur", "brightness", "saturate", "hueRotate", "contrast", "invert", "grayscale", "sepia", "shadowX", "shadowY", "shadowBlur", "shadowSpread", "shadowColor", "backgroundColor", "color", "borderColor", "borderWidth", "force2d", "flat", "backfaceVisible", "borderRadius", "html", "image", "scrollX", "scrollY", "mouseWheelSpeedMultiplier", "velocityThreshold", "constrained"].sort()
 		# delete layer.states[initialStateName]
 		# assert.deepEqual layer.states.animatingKeys().sort(), ["x", "y", "scale"].sort()
 
@@ -76,7 +76,7 @@ describe "LayerStates Backwards compatibility", ->
 			stateA: x: 200
 			stateB: scale: 0.5
 		layer.onStateDidSwitch ->
-			assert.equal layer.states.currentName, "stateA"
+			assert.equal layer.states.current.name, "stateA"
 			done()
 		layer.states.next()
 
@@ -89,7 +89,7 @@ describe "LayerStates Backwards compatibility", ->
 		layer.stateSwitch "stateA"
 		layer.stateSwitch "stateB"
 		layer.onStateDidSwitch ->
-			assert.equal layer.states.currentName, "stateA"
+			assert.equal layer.states.current.name, "stateA"
 			done()
 		layer.states.last()
 

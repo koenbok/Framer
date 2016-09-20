@@ -5,7 +5,7 @@
 {Defaults} = require "./Defaults"
 {LayerStateMachine} = require "./LayerStateMachine"
 
-LayerStatesIgnoredKeys = ["ignoreEvents"]
+LayerStatesIgnoredKeys = ["ignoreEvents", "name", "id"]
 
 reservedStateError = (name) ->
 	throw Error("The state '#{name}' is a reserved name.")
@@ -15,6 +15,9 @@ deprecatedWarning = (name, suggestion) ->
 	message += ", use '#{suggestion}' instead." if suggestion?
 	console.warn message
 
+namedState = (state, name) ->
+	return _.extend({}, state, {name: name})
+
 class LayerStates
 
 	@defineReserved = (propertyName, descriptor) ->
@@ -23,8 +26,8 @@ class LayerStates
 		descriptor.set ?= -> reservedStateError(propertyName)
 		Object.defineProperty(@prototype, propertyName, descriptor)
 
-	@defineReserved "previous", get: -> @machine.previousName
-	@defineReserved "current", get: -> @machine.currentName
+	@defineReserved "previous", get: -> namedState(@[@machine.previousName], @machine.previousName)
+	@defineReserved "current", get: -> namedState(@[@machine.currentName], @machine.currentName)
 
 	# Not sure about these, maybe we should change it
 	@defineReserved "previousName", get: -> @machine.previousName
@@ -105,7 +108,7 @@ class LayerStates
 			@machine.switchTo(stateName, {instant: true})
 
 		state: ->
-			deprecatedWarning("state", "layer.states.currentName")
+			deprecatedWarning("state", "layer.states.current.name")
 			@currentName
 
 		all: ->

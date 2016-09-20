@@ -17,7 +17,7 @@ describe "LayerStates", ->
 			test = (previous, current, states) =>
 				previous.should.equal initialStateName
 				current.should.equal "a"
-				@layer.states.currentName.should.equal initialStateName
+				@layer.states.current.name.should.equal initialStateName
 				@layer.states._currentState.should.eql @layer.states[initialStateName]
 				done()
 
@@ -29,13 +29,37 @@ describe "LayerStates", ->
 			test = (previous, current, states) =>
 				previous.should.equal initialStateName
 				current.should.equal "a"
-				@layer.states.currentName.should.equal "a"
+				@layer.states.current.name.should.equal "a"
 				@layer.states._currentState.should.equal @layer.states.a
 				done()
 
 			@layer.on Events.StateDidSwitch, test
 			@layer.animate "a", instant: true
 
+	describe "Special states", ->
+
+		it "should work for current", ->
+			layer = new Layer
+			layer.states.current.name.should.equal "default"
+
+		it "should work for previous", ->
+			layer = new Layer
+
+			layer.states.testA = {x: 100}
+			layer.stateSwitch("testA")
+
+			layer.x.should.equal 100
+			layer.states.current.name.should.equal "testA"
+			layer.states.current.x.should.equal 100
+
+			layer.states.previous.name.should.equal "default"
+			layer.states.previous.x.should.equal 0
+
+		it "should always have previous", ->
+			layer = new Layer
+
+			layer.states.previous.name.should.equal "default"
+			layer.states.previous.x.should.equal 0
 
 	describe "Defaults", ->
 
@@ -78,8 +102,8 @@ describe "LayerStates", ->
 				layer.states =
 					stateA: x: 200
 					stateB: scale: 0.5
-				assert.equal layer.states.previousName, null
-				layer.states.currentName.should.equal initialStateName
+				assert.equal layer.states.previousName, initialStateName
+				layer.states.current.name.should.equal initialStateName
 
 	describe "Initial", ->
 
@@ -111,11 +135,11 @@ describe "LayerStates", ->
 						instant: true
 
 			layer.stateSwitch "stateA"
-			layer.states.currentName.should.equal "stateA"
+			layer.states.current.name.should.equal "stateA"
 			layer.x.should.equal 123
 
 			layer.stateSwitch "stateB"
-			layer.states.currentName.should.equal "stateB"
+			layer.states.current.name.should.equal "stateB"
 			layer.y.should.equal 123
 
 		it "should not change html when using switch instant", ->
@@ -168,7 +192,7 @@ describe "LayerStates", ->
 			layer.stateSwitch "stateA"
 			layer.x = 150
 			layer.onStateDidSwitch ->
-				layer.states.currentName.should.equal "stateA"
+				layer.states.current.name.should.equal "stateA"
 				layer.x.should.equal 100
 				done()
 			animation = layer.animate "stateA", time: 0.05
@@ -185,7 +209,7 @@ describe "LayerStates", ->
 			layer.x.should.equal 0
 
 			ready = (animation, layer) ->
-				switch layer.states.currentName
+				switch layer.states.current.name
 					when "stateA"
 						layer.x.should.equal 100
 						layer.rotation.should.equal 90
@@ -218,7 +242,7 @@ describe "LayerStates", ->
 					done()
 					return
 				count++
-				switch layer.states.currentName
+				switch layer.states.current.name
 					when "stateA"
 						layer.x.should.equal 302
 						layer.y.should.equal 445
@@ -333,39 +357,54 @@ describe "LayerStates", ->
 			layerB.animate initialStateName, instant: true
 			# assert.equal(layerB.parent, layerA)
 
-		it "should set the current and previous states when switching", ->
-			layer = new Layer
-			layer.states =
-				first: x: 100, options: instant: true
-				second: y: 200, options: instant: true
+		cleanState = (state) ->
+			return _.pickBy(state, (value, key) -> key isnt "name")
 
-			assert.equal(layer.states._previousState, null)
-			assert.equal(layer.states._currentState, layer.states.default)
-			layer.animate "first"
-			assert.equal(layer.states._previousState, layer.states.default)
-			layer.states._currentState.should.equal layer.states.first
-			layer.x.should.equal 100
-			layer.animate "second"
-			assert.equal(layer.states._previousState, layer.states.first)
-			layer.states._currentState.should.equal layer.states.second
-			layer.y.should.equal 200
+		it "should set the current and previous states when switching", ->
+			
+			layer = new Layer
+			
+			layer.states =
+				stateA: {x: 100, options: instant: true}
+				stateB: {y: 200, options: instant: true}
+
+			layer.states.default.hasOwnProperty("name").should.equal false
+
+			layer.states.previous.name.should.equal "default"
+			layer.states.previous.x.should.equal 0
+			layer.states.previous.y.should.equal 0
+			cleanState(layer.states.previous).should.eql layer.states.default
+
+			layer.states.default.hasOwnProperty("name").should.equal false
+
+			layer.stateSwitch("stateA")
+
+			layer.states.current.name.should.equal "stateA"
+			layer.states.current.x.should.equal 100
+
+			layer.states.previous.name.should.equal "default"
+			layer.states.previous.x.should.equal 0
+			layer.states.previous.y.should.equal 0
+
+			cleanState(layer.states.current).should.eql layer.states.stateA
+			cleanState(layer.states.previous).should.eql layer.states.default
 
 
 		it "should set the default state when creating a", ->
 			layer = new Layer
-			layer.states.currentName.should.equal initialStateName
+			layer.states.current.name.should.equal initialStateName
 			layer.states.default.x.should.equal 0
 
 		it "should set the default state when creating b", ->
 			layer = new Layer
 				x: 100
-			layer.states.currentName.should.equal initialStateName
+			layer.states.current.name.should.equal initialStateName
 			layer.states.default.x.should.equal 100
 
 		it "should set the default state when creating c", ->
 			layer = new Layer
 			layer.states.default.x = 100
-			layer.states.currentName.should.equal initialStateName
+			layer.states.current.name.should.equal initialStateName
 			layer.states.default.x.should.equal 100
 
 		it "should listen to options provided to stateCycle", ->
@@ -383,11 +422,11 @@ describe "LayerStates", ->
 				stateA: x: 300
 				stateB: y: 300
 			layer.stateCycle "stateA", "stateB", {instant: true}
-			layer.states.currentName.should.equal "stateA"
+			layer.states.current.name.should.equal "stateA"
 			layer.stateCycle "stateA", "stateB", {instant: true}
-			layer.states.currentName.should.equal "stateB"
+			layer.states.current.name.should.equal "stateB"
 			layer.stateCycle "stateA", "stateB", {instant: true}
-			layer.states.currentName.should.equal "stateA"
+			layer.states.current.name.should.equal "stateA"
 
 		it "should listen to options provided to stateCycle when no states are provided", ->
 			layer = new Layer
@@ -415,7 +454,7 @@ describe "LayerStates", ->
 		it "should do nothing without states", ->
 			layer = new Layer
 			layer.stateCycle()
-			layer.states.current.should.equal "default"
+			layer.states.current.name.should.equal "default"
 
 		it "should cycle two", (done) ->
 			layer = new Layer
@@ -423,7 +462,7 @@ describe "LayerStates", ->
 			layer.states.test = {x: 200}
 			
 			layer.on Events.StateSwitchEnd, ->
-				layer.states.current.should.equal "test"
+				layer.states.current.name.should.equal "test"
 				done()
 
 			layer.stateCycle()
@@ -434,13 +473,13 @@ describe "LayerStates", ->
 			layer.states.test = {x: 200}
 			layer.stateCycle onEnd: ->
 				layer.x.should.equal 200
-				layer.states.current.should.equal "test"
+				layer.states.current.name.should.equal "test"
 				layer.stateCycle onEnd: ->
 					layer.x.should.equal 0
-					layer.states.current.should.equal "default"
+					layer.states.current.name.should.equal "default"
 					layer.stateCycle onEnd: ->
 						layer.x.should.equal 200
-						layer.states.current.should.equal "test"
+						layer.states.current.name.should.equal "test"
 						done()
 
 		it "should cycle three with options", (done) ->
@@ -450,13 +489,13 @@ describe "LayerStates", ->
 			layer.states.testB = {x: 400}
 			layer.stateCycle onEnd: ->
 				layer.x.should.equal 200
-				layer.states.current.should.equal "testA"
+				layer.states.current.name.should.equal "testA"
 				layer.stateCycle onEnd: ->
 					layer.x.should.equal 400
-					layer.states.current.should.equal "testB"
+					layer.states.current.name.should.equal "testB"
 					layer.stateCycle onEnd: ->
 						layer.x.should.equal 0
-						layer.states.current.should.equal "default"
+						layer.states.current.name.should.equal "default"
 						done()
 
 		it "should cycle two out of three in a list", (done) ->
@@ -466,13 +505,13 @@ describe "LayerStates", ->
 			layer.states.testB = {x: 400}
 			layer.stateCycle ["testA", "testB"], onEnd: ->
 				layer.x.should.equal 200
-				layer.states.current.should.equal "testA"
+				layer.states.current.name.should.equal "testA"
 				layer.stateCycle ["testA", "testB"], onEnd: ->
 					layer.x.should.equal 400
-					layer.states.current.should.equal "testB"
+					layer.states.current.name.should.equal "testB"
 					layer.stateCycle ["testA", "testB"], onEnd: ->
 						layer.x.should.equal 200
-						layer.states.current.should.equal "testA"
+						layer.states.current.name.should.equal "testA"
 						done()
 
 		it "should cycle two out of three in arguments", (done) ->
@@ -482,13 +521,13 @@ describe "LayerStates", ->
 			layer.states.testB = {x: 400}
 			layer.stateCycle "testA", "testB", onEnd: ->
 				layer.x.should.equal 200
-				layer.states.current.should.equal "testA"
+				layer.states.current.name.should.equal "testA"
 				layer.stateCycle "testA", "testB", onEnd: ->
 					layer.x.should.equal 400
-					layer.states.current.should.equal "testB"
+					layer.states.current.name.should.equal "testB"
 					layer.stateCycle "testA", "testB", onEnd: ->
 						layer.x.should.equal 200
-						layer.states.current.should.equal "testA"
+						layer.states.current.name.should.equal "testA"
 						done()
 
 	describe "Switch", ->
@@ -497,13 +536,13 @@ describe "LayerStates", ->
 			layer = new Layer
 			layer.states.testA = {x: 200}
 			layer.states.testB = {x: 400}
-			layer.states.current.should.equal "default"
+			layer.states.current.name.should.equal "default"
 			layer.stateSwitch("testA")
-			layer.states.current.should.equal "testA"
+			layer.states.current.name.should.equal "testA"
 			layer.x.should.equal 200
 			layer.stateSwitch("testB")
 			layer.x.should.equal 400
-			layer.states.current.should.equal "testB"
+			layer.states.current.name.should.equal "testB"
 
 	describe "Options", ->
 

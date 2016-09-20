@@ -21,7 +21,7 @@ class exports.LayerStateMachine extends BaseClass
 		get: -> @_currentName
 
 	@define "previousName",
-		get: -> _.last(@_previousNames)
+		get: -> _.last(@_previousNames) or "default"
 
 	@define "stateNames",
 		get: -> Object.keys(@states)
