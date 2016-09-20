@@ -627,3 +627,68 @@ describe "LayerAnimation", ->
 				animation.properties.should.eql {x: 50}
 				animation.options.curve.should.equal "linear"
 				animation.options.time.should.equal 0.1
+
+
+		describe "API Variations", ->
+
+			it "should support properties", (done) ->
+				layer = new Layer
+				layer.animationOptions = time: AnimationTime
+				animation = layer.animate x: 10
+				animation.on Events.AnimationEnd, ->
+					layer.x.should.equal 10
+					done()
+
+			it "should support properties with options", (done) ->
+				layer = new Layer
+				layer.animationOptions = time: AnimationTime
+				animation = layer.animate({x: 10}, {curve: "linear"})
+				animation.options.curve.should.equal "linear"
+				animation.on Events.AnimationEnd, ->
+					layer.x.should.equal 10
+					done()
+
+			it "should support properties with options as object", (done) ->
+				layer = new Layer
+				layer.animationOptions = time: AnimationTime
+				animation = layer.animate
+					x: 10
+					options:
+						curve: "linear"
+
+				animation.options.curve.should.equal "linear"
+				animation.on Events.AnimationEnd, ->
+					layer.x.should.equal 10
+					done()
+
+			it "should support states", (done) ->
+				layer = new Layer
+				layer.animationOptions = time: AnimationTime
+				layer.states.test = {x: 10}
+				animation = layer.animate "test"
+				animation.on Events.AnimationEnd, ->
+					layer.x.should.equal 10
+					done()
+
+			it "should support state with options", (done) ->
+				layer = new Layer
+				layer.animationOptions = time: AnimationTime
+				layer.states.test = {x: 10}
+				animation = layer.animate("test", {curve: "linear"})
+				animation.options.curve.should.equal "linear"
+				animation.on Events.AnimationEnd, ->
+					layer.x.should.equal 10
+					done()
+
+			it "should support state with options as object", (done) ->
+				layer = new Layer
+				layer.animationOptions = time: AnimationTime
+				layer.states.test = {x: 10}
+				animation = layer.animate "test",
+					options:
+						curve: "linear"
+
+				animation.options.curve.should.equal "linear"
+				animation.on Events.AnimationEnd, ->
+					layer.x.should.equal 10
+					done()

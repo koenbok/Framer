@@ -893,6 +893,8 @@ class exports.Layer extends BaseClass
 
 		# If the properties are a string, we assume it's a state name
 		if _.isString(properties)
+			# Support options as an object
+			options = options.options if options.options?
 			return @animateToState(properties, options)
 
 		# Support the old properties syntax, we add all properties top level and
