@@ -738,6 +738,8 @@ class exports.Layer extends BaseClass
 
 			return if layer is @_parent
 
+			throw Error("Layer.parent: a layer cannot be it's own parent.") if layer is @
+
 			# Check the type
 			if not layer instanceof Layer
 				throw Error "Layer.parent needs to be a Layer object"
