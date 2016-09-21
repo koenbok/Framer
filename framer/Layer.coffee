@@ -11,7 +11,7 @@ Utils = require "./Utils"
 {Matrix} = require "./Matrix"
 {Animation} = require "./Animation"
 {LayerStyle} = require "./LayerStyle"
-{LayerStateMachine} = require "./LayerStateMachine"
+{LayerStates} = require "./LayerStates"
 {LayerDraggable} = require "./LayerDraggable"
 {LayerPinchable} = require "./LayerPinchable"
 {Gestures} = require "./Gestures"
@@ -139,7 +139,6 @@ class exports.Layer extends BaseClass
 				@[p] = options[p]
 
 		@animationOptions = {}
-		@_stateMachine = new LayerStateMachine(@)
 		@_context.emit("layer:create", @)
 
 		delete @__constructor
@@ -893,30 +892,29 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## ANIMATION
 
-	# Used to animate to a state with a specific name
-	# We lookup the stateName and call 'animate' with the properties of the state
-	animateToState: (stateName, options={}) ->
-		return @_stateMachine.switchTo(stateName, options)
-
 	animate: (properties, options={}) ->
-
-		# print "layer.animate", properties, options
 
 		# If the properties are a string, we assume it's a state name
 		if _.isString(properties)
-			return @animateToState(properties, options)
+
+			stateName = properties
+
+			# Support options as an object
+			options = options.options if options.options?
+			
+			return @states.machine.switchTo(stateName, options)
 
 		# Support the old properties syntax, we add all properties top level and
 		# move the options into an options property.
-		if properties.hasOwnProperty("properties")
+		if properties.properties?
 			options = properties
 			properties = options.properties
 			delete options.properties
 
 		# With the new api we treat the properties as animatable properties, and use
 		# the special options keyword for animation options.
-		if properties.hasOwnProperty("options")
-			options = _.defaults(properties.options, options)
+		if properties.options?
+			options = _.defaults({}, options, properties.options)
 			delete properties.options
 
 		# Merge the animation options with the default animation options for this layer
@@ -928,13 +926,14 @@ class exports.Layer extends BaseClass
 
 		return animation
 
-	switchInstant: (properties, options={}) ->
-		@animate(properties, _.merge(options, {instant: true}))
-
-	animateToNextState: (args..., options={}) ->
+	stateCycle: (args..., options={}) ->
 		states = []
 		states = _.flatten(args) if args.length
-		@animate(@_stateMachine.next(states), options)
+		@animate(@states.machine.next(states), options)
+
+	stateSwitch: (stateName, options={}) ->
+		return @animate(stateName, options) if options.animate is true
+		return @animate(stateName, _.defaults({}, options, {instant:true}))
 
 	animations: ->
 		# Current running animations on this layer
@@ -994,17 +993,18 @@ class exports.Layer extends BaseClass
 		enumerable: false
 		exportable: false
 		importable: false
-		get: -> @_stateMachine.states
+		get: ->
+			@_states ?= new LayerStates(@)
+			return @_states
 		set: (states) ->
-			@_stateMachine.reset()
-			for name, state of states
-				@_stateMachine.states[name] = state
+			@states.machine.reset()
+			_.extend(@states, states)
 
 	@define "stateNames",
 		enumerable: false
 		exportable: false
 		importable: false
-		get: -> @_stateMachine.stateNames
+		get: -> @states.machine.stateNames
 
 	#############################################################################
 	## Draggable, Pinchable

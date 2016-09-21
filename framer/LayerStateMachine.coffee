@@ -1,47 +1,46 @@
-# {_} = require "./Underscore"
-#
-# {Events} = require "./Events"
 {BaseClass} = require "./BaseClass"
-# {Defaults} = require "./Defaults"
-
-{LayerStates} = require "./LayerStates"
 
 class exports.LayerStateMachine extends BaseClass
 
-	constructor: (layer) ->
+	constructor: (@_layer, @_states) ->
 		super
-		@_layer = layer
-		@properties = {}
-		@initial = LayerStates.filterStateProperties(layer.props)
+
 		@reset()
 
 	@define "layer",
 		get: -> @_layer
 
 	@define "current",
-		get: -> @states[@currentName]
+		get: -> @currentName
+
+	@define "previous",
+		get: -> @previousName
+
 
 	@define "currentName",
 		get: -> @_currentName
 
-	@define "previous",
-		get: -> @states[@previousName]
-
 	@define "previousName",
-		get: -> _.last(@_previousNames)
+		get: -> _.last(@_previousNames) or "default"
 
 	@define "stateNames",
-		get: -> _.keys(@states)
+		get: -> Object.keys(@states)
+
+	@define "states",
+		get: -> @_states
+
+	switchInstant: (stateName) ->
+		@switchTo(stateName, {instant: true})
 
 	switchTo: (stateName, options={}) ->
-		
+
 		# Check if the state exists, if not this is a pretty serious error
-		throw Error "No such state: '#{stateName}'" unless @states.hasOwnProperty(stateName)
+		throw Error "No such state: '#{stateName}'" unless @states[stateName]
 
 		# Prep the properties and the options. The options come from the state, and can be overriden
 		# with the function arguments here.
 		properties = @states[stateName]
-		options = _.defaults(properties.options, options) if properties.options
+		options = _.defaults({}, options, properties.options) if properties.options
 
 		stateNameA = @currentName
 		stateNameB = stateName
@@ -84,12 +83,21 @@ class exports.LayerStateMachine extends BaseClass
 			states = @stateNames
 		Utils.arrayNext(states, @currentName)
 
-	reset: ->
-		@states = new LayerStates(@)
-		@_previousNames = []
-		@_currentName = _.first(@stateNames)
-
 	emit: (args...) ->
-			super
-			# Also emit this to the layer with self as argument
-			@_layer.emit args...
+		super
+		# Also emit this to the layer with self as argument
+		@_layer.emit args...
+
+	reset: ->
+
+		for k in _.keys(@states)
+			delete @states[k] unless k is "default"
+
+		@_previousNames = []
+		@_currentName = "default"
+
+	# _namedState: (name) ->
+	# 	return _.extend(_.clone(@states[name]), {name: name})
+
+	toInspect: (constructor) ->
+		return "<#{@constructor.name} id:#{@id} layer:#{@layer.id} current:'#{@currentName}'>"

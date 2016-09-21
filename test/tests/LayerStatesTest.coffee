@@ -3,6 +3,9 @@ assert = require "assert"
 
 initialStateName = "default"
 
+stateWithoutName = (state) ->
+	return _.pickBy(state, (value, key) -> key isnt "name")
+
 describe "LayerStates", ->
 
 	describe "Events", ->
@@ -17,8 +20,8 @@ describe "LayerStates", ->
 			test = (previous, current, states) =>
 				previous.should.equal initialStateName
 				current.should.equal "a"
-				@layer.states.currentName.should.equal initialStateName
-				@layer.states._currentState.should.equal @layer.states[initialStateName]
+				@layer.states.current.name.should.equal initialStateName
+				stateWithoutName(@layer.states.current).should.eql @layer.states[initialStateName]
 				done()
 
 			@layer.on Events.StateWillSwitch, test
@@ -29,20 +32,44 @@ describe "LayerStates", ->
 			test = (previous, current, states) =>
 				previous.should.equal initialStateName
 				current.should.equal "a"
-				@layer.states.currentName.should.equal "a"
-				@layer.states._currentState.should.equal @layer.states.a
+				@layer.states.current.name.should.equal "a"
+				stateWithoutName(@layer.states.current).should.eql @layer.states.a
 				done()
 
 			@layer.on Events.StateDidSwitch, test
 			@layer.animate "a", instant: true
 
+	describe "Special states", ->
+
+		it "should work for current", ->
+			layer = new Layer
+			layer.states.current.name.should.equal "default"
+
+		it "should work for previous", ->
+			layer = new Layer
+
+			layer.states.testA = {x: 100}
+			layer.stateSwitch("testA")
+
+			layer.x.should.equal 100
+			layer.states.current.name.should.equal "testA"
+			layer.states.current.x.should.equal 100
+
+			layer.states.previous.name.should.equal "default"
+			layer.states.previous.x.should.equal 0
+
+		it "should always have previous", ->
+			layer = new Layer
+
+			layer.states.previous.name.should.equal "default"
+			layer.states.previous.x.should.equal 0
 
 	describe "Defaults", ->
 
 		it "should set defaults", ->
 
 			layer = new Layer
-			layer.states.test = {x:123}
+			layer.states.test = {x: 123}
 			animation = layer.animate "test"
 
 			animation.options.curve.should.equal Framer.Defaults.Animation.curve
@@ -51,7 +78,7 @@ describe "LayerStates", ->
 				curve: "spring(1, 2, 3)"
 
 			layer = new Layer
-			layer.states.test = {x:456}
+			layer.states.test = {x: 456}
 			animation = layer.animate "test"
 
 			animation.options.curve.should.equal "spring(1, 2, 3)"
@@ -59,27 +86,43 @@ describe "LayerStates", ->
 			Framer.resetDefaults()
 
 	describe "Adding", ->
+
 		describe "when setting multiple states", ->
+		
 			it "should override existing states", ->
 				layer = new Layer
 				layer.states.test = x: 100
+				layer.stateNames.sort().should.eql [initialStateName, "test"].sort()
 				layer.states =
-					stateA: x:200
+					stateA: x: 200
 					stateB: scale: 0.5
-				assert.deepEqual layer.stateNames, [initialStateName, "stateA", "stateB"]
+				layer.stateNames.sort().should.eql [initialStateName, "stateA", "stateB"].sort()
 
 			it "should reset the previous and current states", ->
 				layer = new Layer
 				layer.states.test = x: 100
-				layer.switchInstant "test"
+				layer.stateSwitch "test"
 				layer.states =
-					stateA: x:200
+					stateA: x: 200
 					stateB: scale: 0.5
-				assert.equal layer.states.previousName, null
-				layer.states.currentName.should.equal initialStateName
+				layer.states.previous.name.should.equal initialStateName
+				layer.states.current.name.should.equal initialStateName
 
+	describe "Initial", ->
 
+		testStates = (layer, states) ->
+			layer.stateNames.sort().should.eql(states)
+			Object.keys(layer.states).sort().should.eql(states)
+			(k for k, v of layer.states).sort().should.eql(states)
 
+		it "should have an initial state", ->
+			layer = new Layer
+			testStates(layer, [initialStateName])
+
+		it "should have an extra state", ->
+			layer = new Layer
+			layer.states.test = {x: 100}
+			testStates(layer, [initialStateName, "test"])
 
 	describe "Switch", ->
 
@@ -94,12 +137,12 @@ describe "LayerStates", ->
 					options:
 						instant: true
 
-			layer.switchInstant "stateA"
-			layer.states.currentName.should.equal "stateA"
+			layer.stateSwitch "stateA"
+			layer.states.current.name.should.equal "stateA"
 			layer.x.should.equal 123
 
-			layer.switchInstant "stateB"
-			layer.states.currentName.should.equal "stateB"
+			layer.stateSwitch "stateB"
+			layer.states.current.name.should.equal "stateB"
 			layer.y.should.equal 123
 
 		it "should not change html when using switch instant", ->
@@ -142,24 +185,24 @@ describe "LayerStates", ->
 		# it "should be a no-op to change to the current state", ->
 		# 	layer = new Layer
 		# 	layer.states.stateA = {x: 100}
-		# 	layer.switchInstant "stateA"
+		# 	layer.stateSwitch "stateA"
 		# 	animation = layer.animate "stateA", time: 0.05
 		# 	assert.equal(animation, null)
 
 		it "should change to a state when the properties defined are not the current", (done) ->
 			layer = new Layer
 			layer.states.stateA = {x: 100}
-			layer.switchInstant "stateA"
+			layer.stateSwitch "stateA"
 			layer.x = 150
 			layer.onStateDidSwitch ->
-				layer.states.currentName.should.equal "stateA"
+				layer.states.current.name.should.equal "stateA"
 				layer.x.should.equal 100
 				done()
 			animation = layer.animate "stateA", time: 0.05
 
 	describe "Properties", ->
 
-		it "should bring back the 'initial' state values when using 'animateToNextState'", (done) ->
+		it "should bring back the 'initial' state values when using 'stateCycle'", (done) ->
 
 			layer = new Layer
 			layer.states =
@@ -169,24 +212,24 @@ describe "LayerStates", ->
 			layer.x.should.equal 0
 
 			ready = (animation, layer) ->
-				switch layer.states.currentName
+				switch layer.states.current.name
 					when "stateA"
 						layer.x.should.equal 100
 						layer.rotation.should.equal 90
-						layer.animateToNextState()
+						layer.stateCycle()
 					when "stateB"
 						layer.x.should.equal 200
 						layer.rotation.should.equal 180
-						layer.animateToNextState(time: 0.05)
+						layer.stateCycle(time: 0.05)
 					when initialStateName
 						layer.x.should.equal 0
 						layer.rotation.should.equal 0
 						done()
 
 			layer.on Events.AnimationEnd, ready
-			layer.animateToNextState()
+			layer.stateCycle()
 
-		it "should bring cycle when using 'animateToNextState'", (done) ->
+		it "should bring cycle when using 'stateCycle'", (done) ->
 
 			layer = new Layer
 
@@ -202,18 +245,18 @@ describe "LayerStates", ->
 					done()
 					return
 				count++
-				switch layer.states.currentName
+				switch layer.states.current.name
 					when "stateA"
 						layer.x.should.equal 302
 						layer.y.should.equal 445
-						layer.animateToNextState(time: 0.05)
+						layer.stateCycle(time: 0.05)
 					when initialStateName
 						layer.x.should.equal 0
 						layer.rotation.should.equal 0
-						layer.animateToNextState(time: 0.05)
+						layer.stateCycle(time: 0.05)
 
 			layer.on Events.AnimationEnd, ready
-			layer.animateToNextState(time: 0.05)
+			layer.stateCycle(time: 0.05)
 
 		it "ignoreEvents should not be part of the initial state", ->
 
@@ -223,13 +266,13 @@ describe "LayerStates", ->
 				backgroundColor: "rgba(255, 0, 255, 1)"
 
 			layer.onClick ->
-				layer.animateToNextState()
+				layer.stateCycle()
 
 			layer.x.should.equal 0
 
-			layer.animateToNextState(instant: true)
-			layer.animateToNextState(instant: true)
-			layer.animateToNextState(instant: true)
+			layer.stateCycle(instant: true)
+			layer.stateCycle(instant: true)
+			layer.stateCycle(instant: true)
 			layer.ignoreEvents.should.equal false
 
 
@@ -318,73 +361,204 @@ describe "LayerStates", ->
 			# assert.equal(layerB.parent, layerA)
 
 		it "should set the current and previous states when switching", ->
+			
 			layer = new Layer
+			
 			layer.states =
-				first: x: 100, options: instant: true
-				second: y: 200, options: instant: true
+				stateA: {x: 100, options: instant: true}
+				stateB: {y: 200, options: instant: true}
 
-			assert.equal(layer.states._previousState, null)
-			assert.equal(layer.states._currentState, layer.states.initial)
-			layer.animate "first"
-			assert.equal(layer.states._previousState, layer.states.initial)
-			layer.states._currentState.should.equal layer.states.first
-			layer.x.should.equal 100
-			layer.animate "second"
-			assert.equal(layer.states._previousState, layer.states.first)
-			layer.states._currentState.should.equal layer.states.second
-			layer.y.should.equal 200
+			layer.states.default.hasOwnProperty("name").should.equal false
+
+			layer.states.previous.name.should.equal "default"
+			layer.states.previous.x.should.equal 0
+			layer.states.previous.y.should.equal 0
+			stateWithoutName(layer.states.previous).should.eql layer.states.default
+
+			layer.states.default.hasOwnProperty("name").should.equal false
+
+			layer.stateSwitch("stateA")
+
+			layer.states.current.name.should.equal "stateA"
+			layer.states.current.x.should.equal 100
+
+			layer.states.previous.name.should.equal "default"
+			layer.states.previous.x.should.equal 0
+			layer.states.previous.y.should.equal 0
+
+			stateWithoutName(layer.states.current).should.eql layer.states.stateA
+			stateWithoutName(layer.states.previous).should.eql layer.states.default
 
 
-		it "should set the initial state when creating a Layer", ->
+		it "should set the default state when creating a", ->
 			layer = new Layer
-			layer.states.currentName.should.equal initialStateName
+			layer.states.current.name.should.equal initialStateName
 			layer.states.default.x.should.equal 0
-			layer.states.initial.x.should.equal 0
-			assert.deepEqual layer.stateNames, [initialStateName]
 
-		it "should listen to options provided to animateToNextState", ->
+		it "should set the default state when creating b", ->
+			layer = new Layer
+				x: 100
+			layer.states.current.name.should.equal initialStateName
+			layer.states.default.x.should.equal 100
+
+		it "should set the default state when creating c", ->
+			layer = new Layer
+			layer.states.default.x = 100
+			layer.states.current.name.should.equal initialStateName
+			layer.states.default.x.should.equal 100
+
+		it "should listen to options provided to stateCycle", ->
 			layer = new Layer
 			layer.states =
 				stateA: x: 300
 				stateB: y: 300
-			animation = layer.animateToNextState ["stateA", "stateB"],
+			animation = layer.stateCycle ["stateA", "stateB"],
 				curve: "linear"
 			animation.options.curve.should.equal "linear"
 
-		it "should correctly switch to next state without using an array animateToNextState", ->
+		it "should correctly switch to next state without using an array stateCycle", ->
 			layer = new Layer
 			layer.states =
 				stateA: x: 300
 				stateB: y: 300
-			layer.animateToNextState "stateA", "stateB", {instant: true}
-			layer.states.currentName.should.equal "stateA"
-			layer.animateToNextState "stateA", "stateB", {instant: true}
-			layer.states.currentName.should.equal "stateB"
-			layer.animateToNextState "stateA", "stateB", {instant: true}
-			layer.states.currentName.should.equal "stateA"
+			layer.stateCycle "stateA", "stateB", {instant: true}
+			layer.states.current.name.should.equal "stateA"
+			layer.stateCycle "stateA", "stateB", {instant: true}
+			layer.states.current.name.should.equal "stateB"
+			layer.stateCycle "stateA", "stateB", {instant: true}
+			layer.states.current.name.should.equal "stateA"
 
-		it "should listen to options provided to animateToNextState when no states are provided", ->
+		it "should listen to options provided to stateCycle when no states are provided", ->
 			layer = new Layer
 			layer.states.test = x: 300
-			animation = layer.animateToNextState
+			animation = layer.stateCycle
 				curve: "linear"
 			animation.options.curve.should.equal "linear"
 
-		it "should throw an error when you try to override a special state", ->
-			layer = new Layer
-			throwing = ->
-				layer.states.initial = x: 300
-			expect(throwing).to.throw(/You can't override special state 'initial'/)
+		# it "should throw an error when you try to override a special state", ->
+		# 	layer = new Layer
+		# 	throwing = ->
+		# 		layer.states.initial = x: 300
+		# 	expect(throwing).to.throw('The state \'initial\' is a reserved name.')
 
 		it "should throw an error when one fo the states is a special state", ->
 			layer = new Layer
 			throwing = ->
 				layer.states =
-					state: y: 10
+					something: y: 10
 					previous: x: 300
-			expect(throwing).to.throw(/You can't override special state 'previous'/)
+			expect(throwing).to.throw('The state \'previous\' is a reserved name.')
+
+	describe "Cycling", ->
+
+		it "should do nothing without states", ->
+			layer = new Layer
+			layer.stateCycle()
+			layer.states.current.name.should.equal "default"
+
+		it "should cycle two", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.test = {x: 200}
+			
+			layer.on Events.StateSwitchEnd, ->
+				layer.states.current.name.should.equal "test"
+				done()
+
+			layer.stateCycle()
+
+		it "should cycle two with options", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.test = {x: 200}
+			layer.stateCycle onEnd: ->
+				layer.x.should.equal 200
+				layer.states.current.name.should.equal "test"
+				layer.stateCycle onEnd: ->
+					layer.x.should.equal 0
+					layer.states.current.name.should.equal "default"
+					layer.stateCycle onEnd: ->
+						layer.x.should.equal 200
+						layer.states.current.name.should.equal "test"
+						done()
+
+		it "should cycle three with options", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.testA = {x: 200}
+			layer.states.testB = {x: 400}
+			layer.stateCycle onEnd: ->
+				layer.x.should.equal 200
+				layer.states.current.name.should.equal "testA"
+				layer.stateCycle onEnd: ->
+					layer.x.should.equal 400
+					layer.states.current.name.should.equal "testB"
+					layer.stateCycle onEnd: ->
+						layer.x.should.equal 0
+						layer.states.current.name.should.equal "default"
+						done()
+
+		it "should cycle two out of three in a list", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.testA = {x: 200}
+			layer.states.testB = {x: 400}
+			layer.stateCycle ["testA", "testB"], onEnd: ->
+				layer.x.should.equal 200
+				layer.states.current.name.should.equal "testA"
+				layer.stateCycle ["testA", "testB"], onEnd: ->
+					layer.x.should.equal 400
+					layer.states.current.name.should.equal "testB"
+					layer.stateCycle ["testA", "testB"], onEnd: ->
+						layer.x.should.equal 200
+						layer.states.current.name.should.equal "testA"
+						done()
+
+		it "should cycle two out of three in arguments", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.testA = {x: 200}
+			layer.states.testB = {x: 400}
+			layer.stateCycle "testA", "testB", onEnd: ->
+				layer.x.should.equal 200
+				layer.states.current.name.should.equal "testA"
+				layer.stateCycle "testA", "testB", onEnd: ->
+					layer.x.should.equal 400
+					layer.states.current.name.should.equal "testB"
+					layer.stateCycle "testA", "testB", onEnd: ->
+						layer.x.should.equal 200
+						layer.states.current.name.should.equal "testA"
+						done()
+
+		it "should cycle all without state list", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.testA = {x: 200}
+			layer.states.testB = {x: 400}
+			layer.stateCycle onEnd: ->
+				layer.states.current.name.should.equal "testA"
+				layer.stateCycle onEnd: ->
+					layer.states.current.name.should.equal "testB"
+					layer.stateCycle onEnd: ->
+						layer.states.current.name.should.equal "default"
+						done()
+
+	describe "Switch", ->
+
+		it "should switch", ->
+			layer = new Layer
+			layer.states.testA = {x: 200}
+			layer.states.testB = {x: 400}
+			layer.states.current.name.should.equal "default"
+			layer.stateSwitch("testA")
+			layer.states.current.name.should.equal "testA"
+			layer.x.should.equal 200
+			layer.stateSwitch("testB")
+			layer.x.should.equal 400
+			layer.states.current.name.should.equal "testB"
 
 	describe "Options", ->
+
 		it "should listen to layer.options", ->
 			layer = new Layer
 			layer.animationOptions =
@@ -392,173 +566,55 @@ describe "LayerStates", ->
 			animation = layer.animate
 				x: 100
 			animation.options.time.should.equal 4
-	describe "Backwards compatibility", ->
-		it "should still support layer.states.add", ->
-				layer = new Layer
-				layer.states.add
-					stateA: x: 200
-					stateB: scale: 0.5
-				assert.deepEqual layer.stateNames, [initialStateName, "stateA", "stateB"]
-				assert.deepEqual layer.states.stateA, x: 200
-				assert.deepEqual layer.states.stateB, scale: 0.5
 
-		it "should still support layer.states.remove", ->
+		it "should listen to layer.animate options", ->
 			layer = new Layer
-			layer.states =
-				stateA: x: 200
-				stateB: scale: 0.5
-			assert.deepEqual layer.stateNames, [initialStateName, "stateA", "stateB"]
-			layer.states.remove "stateA"
-			assert.deepEqual layer.stateNames, [initialStateName, "stateB"]
-
-		it "should still support layer.states.switch", (done) ->
-			layer = new Layer
-			layer.states =
-				stateA: x: 200
-				stateB: scale: 0.5
-			layer.onStateDidSwitch ->
-				assert.equal layer.states.currentName, "stateA"
-				done()
-			layer.states.switch "stateA"
-
-		it "should still support layer.states.switchInstant", ->
-			layer = new Layer
-			layer.states =
-				stateA: x: 200
-				stateB: scale: 0.5
-			layer.states.switchInstant "stateB"
-			assert.equal layer.states.currentName, "stateB"
-
-		it "should still support layer.states.all", ->
-			layer = new Layer
-			layer.states =
-				stateA: x: 200
-				stateB: scale: 0.5
-			assert.deepEqual layer.states.all, [initialStateName, "stateA", "stateB"]
-
-		it "should still support layer.states.states", ->
-			layer = new Layer
-			layer.states =
-				stateA: x: 200
-				stateB: scale: 0.5
-			assert.deepEqual layer.states.states, [initialStateName, "stateA", "stateB"]
-
-		it "should still support layer.states.animatingKeys", ->
-			layer = new Layer
-			layer.states =
-				stateA: x: 200, y: 300
-				stateB: scale: 0.5
-			assert.deepEqual layer.states.animatingKeys(), ["width", "height", "visible", "opacity", "clip", "scrollHorizontal", "scrollVertical", "x", "y", "z", "scaleX", "scaleY", "scaleZ", "scale", "skewX", "skewY", "skew", "originX", "originY", "originZ", "perspective", "perspectiveOriginX", "perspectiveOriginY", "rotationX", "rotationY", "rotationZ", "rotation", "blur", "brightness", "saturate", "hueRotate", "contrast", "invert", "grayscale", "sepia", "shadowX", "shadowY", "shadowBlur", "shadowSpread", "shadowColor", "backgroundColor", "color", "borderColor", "borderWidth", "force2d", "flat", "backfaceVisible", "name", "borderRadius", "html", "image", "scrollX", "scrollY", "mouseWheelSpeedMultiplier", "velocityThreshold", "constrained"]
-			delete layer.states[initialStateName]
-			assert.deepEqual layer.states.animatingKeys(), ["x", "y", "scale"]
-
-		it "should still support layer.states.next", (done) ->
-			layer = new Layer
-			layer.states =
-				stateA: x: 200
-				stateB: scale: 0.5
-			layer.onStateDidSwitch ->
-				assert.equal layer.states.currentName, "stateA"
-				done()
-			layer.states.next()
-
-		it "should still support layer.states.last", (done) ->
-			layer = new Layer
-			layer.states =
-				stateA: x: 200
-				stateB: scale: 0.5
-			layer.switchInstant "stateB"
-			layer.switchInstant "stateA"
-			layer.switchInstant "stateB"
-			layer.onStateDidSwitch ->
-				assert.equal layer.states.currentName, "stateA"
-				done()
-			layer.states.last()
-
-		it "should still support layer.states.animationOptions", ->
-			layer = new Layer
-			layer.states =
-				stateA: x: 200
-			layer.states.animationOptions =
-				time: 4
-			animation = layer.animate "stateA"
+			layer.states.test = {x: 100}
+			animation = layer.animate "test", time: 4
 			animation.options.time.should.equal 4
 
-		it "should work when using one of the deprecated methods as statename", ->
+	describe "Callbacks", ->
+
+		it "should call start", (done) ->
+
 			layer = new Layer
-			layer.states =
-				add: x: 200
-			layer.animate "add", instant: true
-			assert.equal layer.states.add.x, 200
-			assert.equal layer.x, 200
+			layer.states.test = x: 300
 
-		it "should work when mixing old and new API's", ->
-			layerA = new Layer
-			layerA.states =
-				add: y: 100
-				next: x: 200
-			layerB = new Layer
-			layerB.states.add
-				a: y: 300
-				b: x: 400
-			layerA.animate "next", instant: true
-			layerA.animate "add", instant: true
-			assert.equal layerA.states.next.x, 200
-			assert.equal layerA.x, 200
-			assert.equal layerA.states.add.y, 100
-			assert.equal layerA.y, 100
-			layerB.states.next(instant: true)
-			layerB.states.next(instant: true)
-			assert.equal layerB.y, 300
-			assert.equal layerB.x, 400
+			onStart = ->
+				layer.x.should.eql 0
+				done()
 
-		describe "Events", ->
+			animation = layer.animate "test",
+				onStart: onStart
 
-			beforeEach ->
-				@layer = new Layer()
-				@layer.states.add("a", {x:100, y:100})
-				@layer.states.add("b", {x:200, y:200})
+			animation.options.onStart.should.equal onStart
 
-			it "should emit willSwitch when switching", (done) ->
+		it "should call stop", (done) ->
 
-				test = (previous, current, states) =>
-					previous.should.equal initialStateName
-					current.should.equal "a"
-					@layer.states.state.should.equal initialStateName
-					done()
+			layer = new Layer
+			layer.states.test = x: 300
 
-				@layer.states.on Events.StateWillSwitch, test
-				@layer.states.switchInstant "a"
+			onStop = ->
+				layer.x.should.eql 300
+				done()
 
-			it "should emit didSwitch when switching", (done) ->
+			animation = layer.animate "test",
+				onStop: onStop
+				time: 0.1
 
-				test = (previous, current, states) =>
-					previous.should.equal initialStateName
-					current.should.equal "a"
-					@layer.states.state.should.equal "a"
-					done()
+			animation.options.onStop.should.equal onStop
 
-				@layer.states.on Events.StateDidSwitch, test
-				@layer.states.switchInstant "a"
+		it "should call end", (done) ->
 
+			layer = new Layer
+			layer.states.test = x: 300
 
-		describe "Defaults", ->
+			onEnd = ->
+				layer.x.should.eql 300
+				done()
 
-			it "should set defaults", ->
+			animation = layer.animate "test",
+				onEnd: onEnd
+				time: 0.1
 
-				layer = new Layer
-				layer.states.add "test", {x:123}
-				animation = layer.states.switch "test"
-
-				animation.options.curve.should.equal Framer.Defaults.Animation.curve
-
-				Framer.Defaults.Animation =
-					curve: "spring(1, 2, 3)"
-
-				layer = new Layer
-				layer.states.add "test", {x:456}
-				animation = layer.states.switch "test"
-
-				animation.options.curve.should.equal "spring(1, 2, 3)"
-
-				Framer.resetDefaults()
+			animation.options.onEnd.should.equal onEnd

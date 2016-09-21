@@ -195,6 +195,7 @@ class TouchEmulator extends BaseClass
 				curve: "ease-out"
 
 	hideTouchCursor: ->
+		return unless @touchPointLayer.opacity > 0
 		@touchPointLayer.animateStop()
 		@touchPointLayer.animate
 			opacity: 0
