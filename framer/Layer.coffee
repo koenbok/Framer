@@ -50,6 +50,11 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 				@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
 			set?(@, value)
+
+			# We try to not send any events while we run the constructor, it just
+			# doesn't make sense, because no one can listen to use yet.
+			return if @__constructor
+
 			@emit("change:#{name}", value)
 			@emit("change:point", value) if name in ["x", "y"]
 			@emit("change:size", value)  if name in ["width", "height"]
@@ -79,8 +84,9 @@ class exports.Layer extends BaseClass
 	constructor: (options={}) ->
 
 		# Make sure we never call the constructor twice
-		throw Error("Layer.constructor #{@toInspect()} called twice") if @__constructed
-		@__constructed = true
+		throw Error("Layer.constructor #{@toInspect()} called twice") if @__constructorCalled
+		@__constructorCalled = true
+		@__constructor = true
 
 		# Set needed private variables
 		@_properties = {}
@@ -134,6 +140,8 @@ class exports.Layer extends BaseClass
 
 		@animationOptions = {}
 		@_context.emit("layer:create", @)
+
+		delete @__constructor
 
 	##############################################################
 	# Properties
@@ -776,7 +784,7 @@ class exports.Layer extends BaseClass
 
 			# If there is no parent we need to walk through the root
 			if @parent is null
-				return _.filter @_context.getLayers(), (layer) =>
+				return _.filter @_context.layers, (layer) =>
 					layer isnt @ and layer.parent is null
 
 			return _.without @parent.children, @

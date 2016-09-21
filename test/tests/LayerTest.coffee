@@ -525,7 +525,7 @@ describe "Layer", ->
 			layer.shadowBlur.should.equal 10
 			layer.shadowSpread.should.equal 10
 
-			layer.style.boxShadow.should.equal "rgba(123, 123, 123, 0.496094) 10px 10px 10px 10px"
+			layer.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 10px 10px 10px"
 
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = "red"
@@ -982,7 +982,7 @@ describe "Layer", ->
 			layer = new Layer
 			layer.destroy()
 
-			(layer in Framer.CurrentContext.getLayers()).should.be.false
+			(layer in Framer.CurrentContext.layers).should.be.false
 			assert.equal layer._element.parentNode, null
 
 		it "should set text", ->
