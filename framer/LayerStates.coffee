@@ -16,7 +16,7 @@ deprecatedWarning = (name, suggestion) ->
 	console.warn message
 
 namedState = (state, name) ->
-	return _.extend({}, state, {name: name})
+	return _.extend({}, {name: name}, state)
 
 class LayerStates
 

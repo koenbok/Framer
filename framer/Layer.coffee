@@ -888,9 +888,13 @@ class exports.Layer extends BaseClass
 
 		# If the properties are a string, we assume it's a state name
 		if _.isString(properties)
+
+			stateName = properties
+
 			# Support options as an object
 			options = options.options if options.options?
-			return @states.machine.switchTo(properties, options)
+			
+			return @states.machine.switchTo(stateName, options)
 
 		# Support the old properties syntax, we add all properties top level and
 		# move the options into an options property.
@@ -920,7 +924,8 @@ class exports.Layer extends BaseClass
 		@animate(@states.machine.next(states), options)
 
 	stateSwitch: (stateName, options={}) ->
-		@animate(stateName, _.defaults({}, options, {instant:true}))
+		return @animate(stateName, options) if options.animate is true
+		return @animate(stateName, _.defaults({}, options, {instant:true}))
 
 	animations: ->
 		# Current running animations on this layer

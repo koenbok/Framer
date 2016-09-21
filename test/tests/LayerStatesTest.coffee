@@ -3,7 +3,7 @@ assert = require "assert"
 
 initialStateName = "default"
 
-cleanState = (state) ->
+stateWithoutName = (state) ->
 	return _.pickBy(state, (value, key) -> key isnt "name")
 
 describe "LayerStates", ->
@@ -21,7 +21,7 @@ describe "LayerStates", ->
 				previous.should.equal initialStateName
 				current.should.equal "a"
 				@layer.states.current.name.should.equal initialStateName
-				cleanState(@layer.states.current).should.eql @layer.states[initialStateName]
+				stateWithoutName(@layer.states.current).should.eql @layer.states[initialStateName]
 				done()
 
 			@layer.on Events.StateWillSwitch, test
@@ -33,7 +33,7 @@ describe "LayerStates", ->
 				previous.should.equal initialStateName
 				current.should.equal "a"
 				@layer.states.current.name.should.equal "a"
-				cleanState(@layer.states.current).should.eql @layer.states.a
+				stateWithoutName(@layer.states.current).should.eql @layer.states.a
 				done()
 
 			@layer.on Events.StateDidSwitch, test
@@ -373,7 +373,7 @@ describe "LayerStates", ->
 			layer.states.previous.name.should.equal "default"
 			layer.states.previous.x.should.equal 0
 			layer.states.previous.y.should.equal 0
-			cleanState(layer.states.previous).should.eql layer.states.default
+			stateWithoutName(layer.states.previous).should.eql layer.states.default
 
 			layer.states.default.hasOwnProperty("name").should.equal false
 
@@ -386,8 +386,8 @@ describe "LayerStates", ->
 			layer.states.previous.x.should.equal 0
 			layer.states.previous.y.should.equal 0
 
-			cleanState(layer.states.current).should.eql layer.states.stateA
-			cleanState(layer.states.previous).should.eql layer.states.default
+			stateWithoutName(layer.states.current).should.eql layer.states.stateA
+			stateWithoutName(layer.states.previous).should.eql layer.states.default
 
 
 		it "should set the default state when creating a", ->
