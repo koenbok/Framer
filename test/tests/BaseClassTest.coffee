@@ -204,3 +204,23 @@ describe "BaseClass", ->
 
 		instance.testPropA.should.equal "a"
 		instance.testPropB.should.equal "value"
+	it "should not share properties in subclasses", ->
+
+		class LalaLayer extends Framer.BaseClass
+			@define "blabla",
+				get: -> "hoera"
+				set: -> "sdfsd"
+
+		class TestClassD extends LalaLayer
+			@define "a",
+				get: -> "getClassD"
+				set: -> "setClassD"
+
+
+		class TestClassC extends LalaLayer
+			@define "a",
+				get: -> "getClassC"
+				# set: -> "setClassC"
+
+		expect(TestClassD["_DefinedPropertiesKey"]?.a?.set).to.be.ok
+		expect(TestClassC["_DefinedPropertiesKey"]?.a?.set).to.not.be.ok
