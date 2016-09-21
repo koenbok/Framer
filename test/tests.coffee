@@ -40,6 +40,7 @@ require "./tests/ScrollComponentTest"
 require "./tests/VersionTest"
 require "./tests/ColorTest"
 require "./tests/DeviceComponentTest"
+require "./tests/SVGPathProxyTest"
 require "./tests/SliderComponentTest"
 
 mocha.run()

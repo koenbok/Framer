@@ -737,14 +737,14 @@ Utils.sizeZero = (n=0)->
 
 Utils.sizeMin = ->
 	sizes = Utils.arrayFromArguments arguments
-	size  =
-		width:  _.min sizes.map (size) -> size.width
+	size	=
+		width:	_.min sizes.map (size) -> size.width
 		height: _.min sizes.map (size) -> size.height
 
 Utils.sizeMax = ->
 	sizes = Utils.arrayFromArguments arguments
-	size  =
-		width:  _.max sizes.map (size) -> size.width
+	size	=
+		width:	_.max sizes.map (size) -> size.width
 		height: _.max sizes.map (size) -> size.height
 
 # Rect
@@ -866,10 +866,16 @@ Utils.frameMerge = ->
 		x: _.min frames.map Utils.frameGetMinX
 		y: _.min frames.map Utils.frameGetMinY
 
-	frame.width  = _.max(frames.map Utils.frameGetMaxX) - frame.x
+	frame.width	= _.max(frames.map Utils.frameGetMaxX) - frame.x
 	frame.height = _.max(frames.map Utils.frameGetMaxY) - frame.y
 
 	frame
+
+Utils.frameFittingPoints = (points...) ->
+	min = Utils.pointMin(points...)
+	max = Utils.pointMax(points...)
+
+	new Frame(x: min.x, y: min.y, width: max.x - min.x, height: max.y - min.y)
 
 Utils.frameInFrame = (frameA, frameB) ->
 
@@ -1091,6 +1097,32 @@ Utils.globalLayers = (importedLayers) ->
 
 	window.Framer._globalWarningGiven = true
 
+# SVG Utils
+
+_svgContext = null
+_svgNS = 'http://www.w3.org/2000/svg'
+
+Utils.getSVGContext = ->
+	unless _svgContext
+		_svgContext = document.createElementNS(_svgNS, 'svg')
+		_.extend _svgContext.style,
+			visibility: 'hidden'
+			width: 0
+			height: 0
+			position: 'absolute'
+			top: 0
+			left: 0
+		document.documentElement.appendChild(_svgContext)
+
+	_svgContext
+
+Utils.createSVGElement = (name, attributes=[]) ->
+	el = document.createElementNS(_svgNS, name)
+
+	for key, value of attributes
+		el.setAttribute(key, value)
+
+	el
 
 _textSizeNode = null
 

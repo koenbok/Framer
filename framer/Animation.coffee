@@ -10,6 +10,7 @@ Utils = require "./Utils"
 {BezierCurveAnimator} = require "./Animators/BezierCurveAnimator"
 {SpringRK4Animator} = require "./Animators/SpringRK4Animator"
 {SpringDHOAnimator} = require "./Animators/SpringDHOAnimator"
+{SVGPathProxy} = require "./SVGPathProxy"
 
 AnimatorClasses =
 	"linear": LinearAnimator
@@ -89,6 +90,18 @@ class exports.Animation extends BaseClass
 
 		if properties.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
+
+		if @properties.path?
+			if @properties.x? or @properties.y?
+				console.warn "Animation.path: the x and y animation properties are ignored when animating on a path"
+
+			@_path = new SVGPathProxy(@properties.path)
+			@properties.x = @layer.x + @_path.end.x - @_path.start.x
+			@properties.y = @layer.y + @_path.end.y - @_path.start.x
+			delete @properties.path
+
+			if @options.debug
+				@_debugLayer = new SVGPathDebugLayer(path: @_path, alignedToLayer: @layer)
 
 		@_parseAnimatorOptions()
 		@_originalState = @_currentState()
@@ -198,6 +211,14 @@ class exports.Animation extends BaseClass
 		@emit(Events.AnimationStop) if emit
 		Framer.Loop.off("update", @_update)
 
+		if @options.debug
+			animation = @_debugLayer.animate
+				properties: { opacity: 0 }
+				curve: 'linear'
+				time: 0.25
+			animation.on 'end', =>
+				@_debugLayer.destroy()
+
 	reverse: ->
 		# TODO: Add some tests
 		properties = _.clone(@_originalState)
@@ -271,15 +292,38 @@ class exports.Animation extends BaseClass
 		for k, v of @_stateB
 			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
 				@_valueUpdaters[k] = @_updateColorValue
+			else if @_path? and k in ['x', 'y']
+				@_valueUpdaters[k] = @_updatePositionAlongPath
 			else
 				@_valueUpdaters[k] = @_updateNumberValue
 
 	_updateValues: (value) =>
-		@_valueUpdaters[k](k, value) for k, v of @_stateB
+		for k, v of @_stateB
+			@_valueUpdaters[k](k, value)
 		return null
 
 	_updateNumberValue: (key, value) =>
 		@_target[key] = Utils.mapRange(value, 0, 1, @_stateA[key], @_stateB[key])
+
+		return
+
+	_updatePositionAlongPath: (key, value) =>
+		position = @_path.getPointAtLength(@_path.length * value)
+		position.x += @_stateA.x - @_path.start.x
+		position.y += @_stateA.y - @_path.start.y
+
+		if @options.debug
+			@_debugLayer.updatePositionAlongPath(@_path.length * (1 - value))
+
+		if @options.autoRotate
+			angle = Math.atan2(position.y - @_target.y, position.x - @_target.x) * 180 / Math.PI
+			if position.y != @_target.y && position.x != @_target.x
+				@_target.rotationZ = angle
+
+		@_target.x = position.x
+		@_target.y = position.y
+
+		return
 
 	_updateColorValue: (key, value) =>
 		@_target[key] = Color.mix(@_stateA[key], @_stateB[key], value, false, @options.colorModel)
@@ -358,7 +402,7 @@ class exports.Animation extends BaseClass
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			if @isAnimatable(v)
+			if @isAnimatable(v) or k == 'path'
 				animatableProperties[k] = v
 			else if Color.isValidColorProperty(k, v)
 				animatableProperties[k] = new Color(v)

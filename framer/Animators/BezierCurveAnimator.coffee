@@ -10,6 +10,7 @@ BezierCurveDefaults =
 	"ease-out": [0, 0, .58, 1]
 	"ease-in-out": [.42, 0, .58, 1]
 
+
 class exports.BezierCurveAnimator extends Animator
 
 	setup: (options) ->
