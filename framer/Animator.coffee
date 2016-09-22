@@ -51,7 +51,7 @@ class exports.Animator
 		if animatorClassName in AnimatorClassBezierPresets
 			return BezierCurveAnimator
 
-		return LinearAnimator
+		return null
 
 	@curveOptionsFor: (options={}) ->
 		curveOptions = options.curveOptions ? {}
