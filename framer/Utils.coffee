@@ -1,6 +1,7 @@
 {_} = require "./Underscore"
 {Screen} = require "./Screen"
 {Matrix} = require "./Matrix"
+{Animator} = require "./Animator"
 
 Utils = {}
 
@@ -497,16 +498,7 @@ Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 # STRING FUNCTIONS
 
 Utils.parseFunction = (str) ->
-
-	result = {name: "", args: []}
-
-	if _.endsWith str, ")"
-		result.name = str.split("(")[0]
-		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.trimEnd(a, ")"))
-	else
-		result.name = str
-
-	return result
+	Animator.parseFunction(str)
 
 ######################################################
 # DOM FUNCTIONS
