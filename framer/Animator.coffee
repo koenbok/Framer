@@ -53,7 +53,7 @@ class exports.Animator
 
 		return LinearAnimator
 
-	@curveOptionsFor: (options) ->
+	@curveOptionsFor: (options={}) ->
 		curveOptions = options.curveOptions ? {}
 		animatorClass = @classForCurve(options.curve)
 		parsedCurve = @parseFunction options.curve
