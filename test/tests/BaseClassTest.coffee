@@ -206,7 +206,8 @@ describe "BaseClass", ->
 
 		instance.testPropA.should.equal "a"
 		instance.testPropB.should.equal "value"
-	it "should not share properties in subclasses", ->
+
+	it "should have defined properties set in sibling subclasses", ->
 
 		class LalaLayer extends Framer.BaseClass
 			@define "blabla",
