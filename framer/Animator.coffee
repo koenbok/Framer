@@ -1,8 +1,3 @@
-Utils = require "./Utils"
-{Config} = require "./Config"
-
-
-
 AnimatorClasses = {}
 
 AnimatorClassBezierPresets = ["ease", "ease-in", "ease-out", "ease-in-out"]
