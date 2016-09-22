@@ -645,8 +645,8 @@ iPadProBaseDevice =
 	minStudioVersion: newDeviceMinVersion
 
 iPhone7BaseDevice =
-	deviceImageWidth: 874
-	deviceImageHeight: 1792
+	deviceImageWidth: 890
+	deviceImageHeight: 1814
 	deviceImageCompression: true
 	screenWidth: 750
 	screenHeight: 1334
