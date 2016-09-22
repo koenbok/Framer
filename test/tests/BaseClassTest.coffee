@@ -1,3 +1,5 @@
+{expect} = require "chai"
+
 describe "BaseClass", ->
 
 	testProperty = (name, fallback) ->
