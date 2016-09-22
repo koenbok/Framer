@@ -5,22 +5,7 @@ Utils = require "./Utils"
 {Config} = require "./Config"
 {Defaults} = require "./Defaults"
 {BaseClass} = require "./BaseClass"
-
-{LinearAnimator} = require "./Animators/LinearAnimator"
-{BezierCurveAnimator} = require "./Animators/BezierCurveAnimator"
-{SpringRK4Animator} = require "./Animators/SpringRK4Animator"
-{SpringDHOAnimator} = require "./Animators/SpringDHOAnimator"
-
-AnimatorClasses =
-	"linear": LinearAnimator
-	"bezier-curve": BezierCurveAnimator
-	"spring-rk4": SpringRK4Animator
-	"spring-dho": SpringDHOAnimator
-
-AnimatorClasses["spring"] = AnimatorClasses["spring-rk4"]
-AnimatorClasses["cubic-bezier"] = AnimatorClasses["bezier-curve"]
-
-AnimatorClassBezierPresets = ["ease", "ease-in", "ease-out", "ease-in-out"]
+{Animator} = require "./Animator"
 
 numberRE = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/
 relativePropertyRE = new RegExp("^(?:([+-])=|)(" + numberRE.source + ")([a-z%]*)$", "i")
@@ -90,7 +75,7 @@ class exports.Animation extends BaseClass
 		if properties.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
-		@_parseAnimatorOptions()
+		@options.curveOptions = Animator.curveOptionsFor(@options)
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
 
@@ -294,67 +279,12 @@ class exports.Animation extends BaseClass
 		return _.pick(@layer, _.keys(@properties))
 
 	_createAnimator: ->
-		AnimatorClass = @_animatorClass()
+		AnimatorClass = Animator.classForCurve(@options.curve)
 
 		if @options.debug
 			console.log "Animation.start #{AnimatorClass.name}", @options.curveOptions
 
 		return new AnimatorClass @options.curveOptions
-
-	_animatorClass: ->
-
-		parsedCurve = Utils.parseFunction(@options.curve)
-		animatorClassName = parsedCurve.name.toLowerCase()
-
-		if AnimatorClasses.hasOwnProperty(animatorClassName)
-			return AnimatorClasses[animatorClassName]
-
-		if animatorClassName in AnimatorClassBezierPresets
-			return BezierCurveAnimator
-
-		return LinearAnimator
-
-	_parseAnimatorOptions: ->
-
-		animatorClass = @_animatorClass()
-		parsedCurve = Utils.parseFunction @options.curve
-		animatorClassName = parsedCurve.name.toLowerCase()
-
-		# This is for compatibility with the direct Animation.time argument. This should
-		# ideally also be passed as a curveOption
-
-		@options.curveOptions ?= {}
-		if animatorClass in [LinearAnimator, BezierCurveAnimator]
-			if _.isString(@options.curveOptions) or _.isArray(@options.curveOptions)
-				@options.curveOptions =
-					values: @options.curveOptions
-
-			@options.curveOptions.time ?= @options.time
-
-		# Support ease-in etc
-		if animatorClass in [BezierCurveAnimator] and animatorClassName in AnimatorClassBezierPresets
-			@options.curveOptions.values = animatorClassName
-			@options.curveOptions.time ?= @options.time
-
-		# All this is to support curve: "spring(100, 20, 10)". In the future we'd like people
-		# to start using curveOptions: {tension:100, friction:10} etc
-
-		if parsedCurve.args.length
-
-			# console.warn "Animation.curve arguments are deprecated. Please use Animation.curveOptions"
-
-			if animatorClass is BezierCurveAnimator
-				@options.curveOptions.values = parsedCurve.args.map (v) -> parseFloat(v) or 0
-
-			if animatorClass is SpringRK4Animator
-				for k, i in ["tension", "friction", "velocity", "tolerance"]
-					value = parseFloat parsedCurve.args[i]
-					@options.curveOptions[k] = value if value
-
-			if animatorClass is SpringDHOAnimator
-				for k, i in ["stiffness", "damping", "mass", "tolerance"]
-					value = parseFloat parsedCurve.args[i]
-					@options.curveOptions[k] = value if value
 
 	@isAnimatable = (v) ->
 		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v)
