@@ -1,9 +1,9 @@
 describe "DeviceComponent", ->
 
-	it "should default to iphone 5s spacegray", ->
+	it "should default to iphone 7 silver", ->
 
 		comp = new DeviceComponent()
-		comp.deviceType.should.equal "apple-iphone-6s-silver"
+		comp.deviceType.should.equal "apple-iphone-7-silver"
 
 	it "should use images on server for built in devices when not in Studio", ->
 
