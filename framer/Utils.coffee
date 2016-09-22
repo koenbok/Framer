@@ -77,6 +77,11 @@ Utils.nearestIncrement = (x, increment) ->
 window.requestAnimationFrame ?= window.webkitRequestAnimationFrame
 window.requestAnimationFrame ?= (f) -> Utils.delay 1/60, f
 
+Utils.animatorFor = (options) ->
+	AnimatorClass = Animator.classForCurve(options.curve)
+	curveOptions = Animator.curveOptionsFor(options)
+	return new AnimatorClass curveOptions
+
 ######################################################
 # TIME FUNCTIONS
 
