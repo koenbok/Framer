@@ -227,3 +227,31 @@ describe "BaseClass", ->
 
 		expect(TestClassD["_DefinedPropertiesKey"]?.a?.set).to.be.ok
 		expect(TestClassC["_DefinedPropertiesKey"]?.a?.set).to.not.be.ok
+
+
+	it "should not export a shared property name in props of in sibling subclasses", ->
+
+		class BaseSubClass extends Framer.BaseClass
+			@define "blabla",
+				get: -> "hoera"
+				set: -> "sdfsd"
+
+		class SiblingA extends BaseSubClass
+			@define "sharedProperty",
+				get: -> "getSiblingA"
+				set: -> "setSiblingA"
+
+		class SiblingB extends BaseSubClass
+			@define "sharedProperty",
+				get: -> "getSiblingB"
+
+		a = new SiblingA
+		b = new SiblingB
+		expect(a.sharedProperty).to.be.ok
+		expect(b.sharedProperty).to.be.ok
+		expect(a.props.sharedProperty).to.be.ok
+		expect(b.props.sharedProperty).to.not.be.ok
+		expect(a.blabla).to.be.ok
+		expect(b.blabla).to.be.ok
+		expect(a.props.blabla).to.be.ok
+		expect(b.props.blabla).to.be.ok
