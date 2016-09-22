@@ -329,7 +329,7 @@ class exports.DeviceComponent extends BaseClass
 
 		# If we are running a local copy of Framer from the drive, get the resource online
 		if Utils.isFileUrl(window.location.href)
-			resourceUrl = "http://#{resourceUrl}"
+			resourceUrl = "http:#{resourceUrl}"
 
 		# If we're running Framer Studio and have local files, we'd like to use those.
 		# For now we always use jp2 inside framer stusio
@@ -643,6 +643,38 @@ iPadProBaseDevice =
 	screenHeight: 2732
 	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
+
+iPhone7BaseDevice =
+	deviceImageWidth: 874
+	deviceImageHeight: 1792
+	deviceImageCompression: true
+	screenWidth: 750
+	screenHeight: 1334
+	deviceType: "phone"
+	minStudioVersion: 71
+	hands:
+		"iphone-hands-2":
+			width:  2400
+			height: 3740
+		"iphone-hands-1":
+			width:  2400
+			height: 3740
+
+iPhone7PlusBaseDevice =
+	deviceImageWidth: 1452
+	deviceImageHeight: 2968
+	deviceImageCompression: true
+	screenWidth: 1242
+	screenHeight: 2208
+	deviceType: "phone"
+	minStudioVersion: 71
+	hands:
+		"iphone-hands-2":
+			width:  3987
+			height: 6212
+		"iphone-hands-1":
+			width:  3987
+			height: 6212
 
 iPhone6BaseDevice =
 	deviceImageWidth: 874
@@ -1094,13 +1126,27 @@ Devices =
 	"apple-ipad-pro-gold": _.clone(iPadProBaseDevice)
 	"apple-ipad-pro-space-gray": _.clone(iPadProBaseDevice)
 
-	# iPhone 6
+	# iPhone 7
+	"apple-iphone-7-gold": _.clone(iPhone7BaseDevice)
+	"apple-iphone-7-rose-gold": _.clone(iPhone7BaseDevice)
+	"apple-iphone-7-silver" : _.clone(iPhone7BaseDevice)
+	"apple-iphone-7-black": _.clone(iPhone7BaseDevice)
+	"apple-iphone-7-jet-black": _.clone(iPhone7BaseDevice)
+
+	# iPhone 7 Plus
+	"apple-iphone-7-plus-gold": _.clone(iPhone7PlusBaseDevice)
+	"apple-iphone-7-plus-rose-gold": _.clone(iPhone7PlusBaseDevice)
+	"apple-iphone-7-plus-silver": _.clone(iPhone7PlusBaseDevice)
+	"apple-iphone-7-plus-black": _.clone(iPhone7PlusBaseDevice)
+	"apple-iphone-7-plus-jet-black": _.clone(iPhone7PlusBaseDevice)
+
+	# iPhone 6s
 	"apple-iphone-6s-gold": _.clone(iPhone6BaseDevice)
 	"apple-iphone-6s-rose-gold": _.clone(iPhone6BaseDevice)
 	"apple-iphone-6s-silver" : _.clone(iPhone6BaseDevice)
 	"apple-iphone-6s-space-gray": _.clone(iPhone6BaseDevice)
 
-	# iPhone 6+
+	# iPhone 6s Plus
 	"apple-iphone-6s-plus-gold": _.clone(iPhone6PlusBaseDevice)
 	"apple-iphone-6s-plus-rose-gold": _.clone(iPhone6PlusBaseDevice)
 	"apple-iphone-6s-plus-silver": _.clone(iPhone6PlusBaseDevice)
