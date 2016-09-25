@@ -33,14 +33,14 @@ imageLayer.states = {
 ```
 ###### Set default animation options
 ```javascript
-imageLayer.options = {
+imageLayer.animationOptions = {
 	curve: "spring(500,12,0)"
 }
 ```
 ###### Toggle states on click
 ```javascript
 imageLayer.onClick(function(event) {
-	imageLayer.animateToNext()
+	imageLayer.stateCycle()
 })
 ```
 #### Features
