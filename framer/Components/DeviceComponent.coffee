@@ -1134,11 +1134,11 @@ Devices =
 	"apple-iphone-7-jet-black": _.clone(iPhone7BaseDevice)
 
 	# iPhone 7 Plus
-	"apple-iphone-7-plus-gold": _.clone(iPhone7PlusBaseDevice)
-	"apple-iphone-7-plus-rose-gold": _.clone(iPhone7PlusBaseDevice)
-	"apple-iphone-7-plus-silver": _.clone(iPhone7PlusBaseDevice)
-	"apple-iphone-7-plus-black": _.clone(iPhone7PlusBaseDevice)
-	"apple-iphone-7-plus-jet-black": _.clone(iPhone7PlusBaseDevice)
+	#"apple-iphone-7-plus-gold": _.clone(iPhone7PlusBaseDevice)
+	#"apple-iphone-7-plus-rose-gold": _.clone(iPhone7PlusBaseDevice)
+	#"apple-iphone-7-plus-silver": _.clone(iPhone7PlusBaseDevice)
+	#"apple-iphone-7-plus-black": _.clone(iPhone7PlusBaseDevice)
+	#"apple-iphone-7-plus-jet-black": _.clone(iPhone7PlusBaseDevice)
 
 	# iPhone 6s
 	"apple-iphone-6s-gold": _.clone(iPhone6BaseDevice)
