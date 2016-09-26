@@ -32,7 +32,7 @@ Originals =
 	DeviceComponent:
 		fullScreen: false
 		padding: 50
-		deviceType: "apple-iphone-6s-silver"
+		deviceType: "apple-iphone-7-silver"
 		deviceZoom: "fit"
 		contentZoom: 1
 		orientation: "portrait"
