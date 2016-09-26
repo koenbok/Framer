@@ -23,4 +23,4 @@ for fileName in os.listdir("."):
 		print fileName
 		os.system("sips -s format jp2 %s -s formatOptions %s --out %s" % (fileName, jp2_quality, fileName.replace(".png", ".jp2")))
 		os.system("cwebp -q %s '%s' -o '%s'" % (webp_quality, fileName, fileName.replace(".png", ".webp")))
-		os.system("optipng -o4 '%s'" % fileName)
+		os.system("optipng '%s'" % fileName)

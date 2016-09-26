@@ -68,8 +68,5 @@ site-upload: bootstrap site-build
 
 # Resources
 
-resources-optimize:
+resources:
 	python scripts/resources-optimize.py
-
-resources-upload:
-	cd extras/resources.framerjs.com; cactus deploy

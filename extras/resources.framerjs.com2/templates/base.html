@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="shortcut icon" href="/assets/static/images/favicon.ico">
+	<link rel="stylesheet" href="/assets/css/style.css">
+
+	<title>{% block title %}Default{% endblock %}</title>
+
+	{% block header %}
+	{% endblock %}
+
+</head>
+<body>
+	{% block content %}
+	Main content
+	{% endblock %}
+
+	{% block scripts %}
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="/assets/scripts/main.coffee.js"></script>
+	{% endblock %}
+</body>
+</html>
