@@ -89,6 +89,9 @@ There are also a set of visual and interactive tests for Framer Studio which you
 
 
 ## More
+
 - [Framer Studio](http://framerjs.com) - Prototyping application for OS X, built on Framer
 - [Latest Builds](http://builds.framerjs.com) - Latest builds of Framer.js
 - [Framer 3 Changes](https://github.com/koenbok/Framer/wiki/Framer-3-Changes) - What's new in Framer 3
+
+To add or update the resources for http://resources.framerjs.com (like the devices) run `make resources` and commit. The result will automatically get deployed.
