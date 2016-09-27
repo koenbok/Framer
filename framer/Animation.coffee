@@ -184,7 +184,7 @@ class exports.Animation extends BaseClass
 			@_delayTimer = Utils.delay(@options.delay, start)
 		else
 			start()
-		
+
 		return true
 
 	stop: (emit=true) ->
@@ -192,7 +192,7 @@ class exports.Animation extends BaseClass
 		if @_delayTimer?
 			Framer.CurrentContext.removeTimer(@_delayTimer)
 			@_delayTimer = null
-		
+
 		@layer.context.removeAnimation(@)
 
 		@emit(Events.AnimationStop) if emit

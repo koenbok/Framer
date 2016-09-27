@@ -146,15 +146,15 @@ describe "LayerAnimation", ->
 				done()
 
 		it "should not animate non-animatable properties that are set to null", ->
-			
+
 			layerA = new Layer
 			layerB = new Layer parent: layerA
-			
+
 			layerB.animate
 				parent: null
 				options:
 					instant: true
-			
+
 			assert.equal(layerB.parent, layerA)
 
 
@@ -622,7 +622,7 @@ describe "LayerAnimation", ->
 					x: 100
 					options:
 						time: 0.1
-						onEnd: -> 
+						onEnd: ->
 							layer.x.should.eql 100
 							done()
 
