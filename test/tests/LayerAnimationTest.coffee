@@ -210,6 +210,29 @@ describe "LayerAnimation", ->
 			Utils.delay animation.options.time, ->
 				done()
 
+		it "copy should work", (done) ->
+			layer = new Layer
+				x: 50
+			animation = new Animation layer, {x: 100}, {time: AnimationTime}
+			copy = animation.copy()
+			copy.onAnimationEnd ->
+				layer.x.should.equal 100
+				done()
+			copy.start()
+
+		it "reverse should work", (done) ->
+			layer = new Layer
+				x: 50
+			animation = new Animation layer, {x: 100}, {time: AnimationTime}
+			animation.onAnimationEnd ->
+				layer.x.should.equal 100
+				a = animation.reverse()
+				a.once Events.AnimationEnd, ->
+					layer.x.should.equal 50
+					done()
+				a.start()
+			animation.start()
+
 	describe "Context", ->
 
 		it "should list running animations", ->

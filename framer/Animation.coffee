@@ -201,10 +201,8 @@ class exports.Animation extends BaseClass
 	reverse: ->
 		# TODO: Add some tests
 		properties = _.clone(@_originalState)
-		properties.options = _.clone(@options)
-		properties.layer = @layer
-		animation = new Animation properties
-		animation
+		options = _.clone(@options)
+		new Animation @layer, properties, options
 
 	reset: ->
 		for k, v of @_stateA
@@ -216,9 +214,8 @@ class exports.Animation extends BaseClass
 
 	copy: ->
 		properties = _.clone(@properties)
-		properties.options = _.clone(@options)
-		properties.layer = @layer
-		new Animation(properties)
+		options = _.clone(@options)
+		new Animation(@layer, properties, options)
 
 	# A bunch of common aliases to minimize frustration
 	revert: -> 	@reverse()
