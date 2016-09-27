@@ -82,8 +82,8 @@ class exports.Animation extends BaseClass
 
 		@_layer = layer
 
-		unless layer instanceof Layer
-			throw Error("Animation: missing layer") 
+		unless layer instanceof _Layer
+			throw Error("Animation: missing layer")
 
 		@properties = Animation.filterAnimatableProperties(properties)
 

@@ -201,6 +201,15 @@ describe "LayerAnimation", ->
 
 			stopped.should.equal true
 
+		it "should work, even with MobileScrollFix enabled", (done) ->
+			layer = new Layer()
+			Framer.Extras.MobileScrollFix.enable()
+			layer.animationOptions = time: AnimationTime
+			animation = layer.animate x: 100
+			animation.start()
+			Utils.delay animation.options.time, ->
+				done()
+
 	describe "Context", ->
 
 		it "should list running animations", ->
