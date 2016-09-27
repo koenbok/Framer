@@ -661,6 +661,20 @@ describe "LayerAnimation", ->
 					layer.x.should.equal 10
 					done()
 
+			it "should support properties with options that have undefined curveOptions as object", (done) ->
+				layer = new Layer
+				layer.animationOptions = time: AnimationTime
+				animation = layer.animate
+					x: 10
+					options:
+						curve: "linear"
+						curveOptions: undefined
+
+				animation.options.curve.should.equal "linear"
+				animation.on Events.AnimationEnd, ->
+					layer.x.should.equal 10
+				done()
+
 			it "should support states", (done) ->
 				layer = new Layer
 				layer.animationOptions = time: AnimationTime

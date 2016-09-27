@@ -317,6 +317,7 @@ class exports.Animation extends BaseClass
 		# This is for compatibility with the direct Animation.time argument. This should
 		# ideally also be passed as a curveOption
 
+		@options.curveOptions ?= {}
 		if animatorClass in [LinearAnimator, BezierCurveAnimator]
 			if _.isString(@options.curveOptions) or _.isArray(@options.curveOptions)
 				@options.curveOptions =
