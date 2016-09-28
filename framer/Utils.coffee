@@ -352,6 +352,9 @@ Utils.isMobile = ->
 Utils.isFileUrl = (url) ->
 	return _.startsWith(url, "file://")
 
+Utils.isDataUrl = (url) ->
+	return _.startsWith(url, "data:")
+
 Utils.isRelativeUrl = (url) ->
 	!/^([a-zA-Z]{1,8}:\/\/).*$/.test(url)
 
@@ -365,6 +368,7 @@ Utils.isLocalUrl = (url) ->
 
 Utils.isLocalAssetUrl = (url, baseUrl) ->
 	baseUrl ?= window.location.href
+	return false if Utils.isDataUrl(url)
 	return true if Utils.isLocalUrl(url)
 	return true if Utils.isRelativeUrl(url) and Utils.isLocalUrl(baseUrl)
 	return false
