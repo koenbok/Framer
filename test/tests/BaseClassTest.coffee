@@ -207,7 +207,7 @@ describe "BaseClass", ->
 		instance.testPropA.should.equal "a"
 		instance.testPropB.should.equal "value"
 
-	it "should have defined properties set in sibling subclasses", ->
+	it.skip "should have defined properties set in sibling subclasses", ->
 
 		class LalaLayer extends Framer.BaseClass
 			@define "blabla",
@@ -229,7 +229,7 @@ describe "BaseClass", ->
 		expect(TestClassC["_DefinedPropertiesKey"]?.a?.set).to.not.be.ok
 
 
-	it "should not export a shared property name in props of in sibling subclasses", ->
+	it.skip "should not export a shared property name in props of in sibling subclasses", ->
 
 		class BaseSubClass extends Framer.BaseClass
 			@define "blabla",
