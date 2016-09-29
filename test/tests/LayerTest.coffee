@@ -259,18 +259,16 @@ describe "Layer", ->
 					
 		it "should not append nocache to a base64 encoded image", ->
 
-			prefix = "../"
-			imagePath = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEwAAABMBAMAAAA1uUwYAAAAAXNSR0IArs4c6QAAABVQTFRFKK/6LFj/g9n/lNf9lqz/wez/////Ke+vpgAAAK1JREFUSMft1sENhDAMBdFIrmBboAjuaWFrsNN/CRwAgUPsTAH556c5WVFKQyuLLYbZf/MLmDHW5yJmjHW5kBljPhczY8zlEmaMvXMZM8ZeuZQZY08uZzZh5dqen+XNhLFBbsiEsW9uzISxTy5gwlifi5gw1uVCJoz5XMyEMZdLmASs/s5NnkFl7M7NmDJ25aZMGTtzc6aMtcqYMtYqY8pYq4wpY60ypuvnsNizA+E6656TNMZlAAAAAElFTkSuQmCC"
-			fullPath = prefix + imagePath
+			fullPath = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEwAAABMBAMAAAA1uUwYAAAAAXNSR0IArs4c6QAAABVQTFRFKK/6LFj/g9n/lNf9lqz/wez/////Ke+vpgAAAK1JREFUSMft1sENhDAMBdFIrmBboAjuaWFrsNN/CRwAgUPsTAH556c5WVFKQyuLLYbZf/MLmDHW5yJmjHW5kBljPhczY8zlEmaMvXMZM8ZeuZQZY08uZzZh5dqen+XNhLFBbsiEsW9uzISxTy5gwlifi5gw1uVCJoz5XMyEMZdLmASs/s5NnkFl7M7NmDJ25aZMGTtzc6aMtcqYMtYqY8pYq4wpY60ypuvnsNizA+E6656TNMZlAAAAAElFTkSuQmCC"
 			layer = new Layer
 
 			layer.image = fullPath
 			layer.image.should.equal fullPath
 
 			image = layer.props.image
-			layer.props.image.should.equal fullPath
+			image.should.equal fullPath
 
-			layer.style["background-image"].indexOf(imagePath).should.not.equal(-1)
+			layer.style["background-image"].indexOf(fullPath).should.not.equal(-1)
 			layer.style["background-image"].indexOf("data:").should.not.equal(-1)
 			layer.style["background-image"].indexOf("?nocache=").should.equal(-1)
 
