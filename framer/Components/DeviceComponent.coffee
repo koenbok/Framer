@@ -879,6 +879,22 @@ SamsungGalaxyNote5BaseDevice =
 			height: 6668
 			offset: -84
 
+AppleWatchSeries242Device =
+	deviceImageWidth: 512
+	deviceImageHeight: 990
+	deviceImageCompression: true
+	screenWidth: 312
+	screenHeight: 390
+	minStudioVersion: 71
+
+AppleWatchSeries238Device =
+	deviceImageWidth: 472
+	deviceImageHeight: 772
+	deviceImageCompression: true
+	screenWidth: 272
+	screenHeight: 340
+	minStudioVersion: 71
+
 AppleWatch42Device =
 	deviceImageWidth: 512
 	deviceImageHeight: 990
@@ -1163,6 +1179,50 @@ Devices =
 	"apple-iphone-5c-red": _.clone(iPhone5CBaseDevice)
 	"apple-iphone-5c-white": _.clone(iPhone5CBaseDevice)
 	"apple-iphone-5c-yellow": _.clone(iPhone5CBaseDevice)
+
+	# Apple Watch Series 2 38mm
+	"apple-watch-series-2-38mm-black-steel-black": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-edition": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-rose-gold-aluminum-midnight-blue": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-silver-aluminum-cocoa": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-silver-aluminum-concrete": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-silver-aluminum-ocean-blue": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-silver-aluminum-red": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-silver-aluminum-turquoise": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-silver-aluminum-white": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-silver-aluminum-yellow": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-space-gray-aluminum-black": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-sport-aluminum-walnut": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-steel-white": _.clone(AppleWatchSeries238Device)
+
+	# Apple Watch Series 2 42mm
+	"apple-watch-series-2-42mm-edition": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-gold-aluminum-cocoa": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-rose-gold-aluminum-midnight-blue": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-concrete": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-green": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-light-pink": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-ocean-blue": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-pink-sand": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-red": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-turquoise": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-white": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-yellow": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-space-black-steel-black": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-space-gray-aluminum-black": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-steel-white": _.clone(AppleWatchSeries242Device)
+
+	# Apple Watch Nike+ 38mm
+	"apple-watch-nike-plus-38mm-silver-aluminum-flat-silver-volt": _.clone(AppleWatchSeries238Device)
+	"apple-watch-nike-plus-38mm-silver-aluminum-flat-silver-white": _.clone(AppleWatchSeries238Device)
+	"apple-watch-nike-plus-38mm-space-gray-aluminum-black-cool-gray": _.clone(AppleWatchSeries238Device)
+	"apple-watch-nike-plus-38mm-space-gray-aluminum-black-volt": _.clone(AppleWatchSeries238Device)
+
+	# Apple Watch Nike+ 42mm
+	"apple-watch-nike-plus-42mm-silver-aluminum-flat-silver-volt": _.clone(AppleWatchSeries242Device)
+	"apple-watch-nike-plus-42mm-silver-aluminum-flat-silver-white": _.clone(AppleWatchSeries242Device)
+	"apple-watch-nike-plus-42mm-space-gray-aluminum-black-cool-gray": _.clone(AppleWatchSeries242Device)
+	"apple-watch-nike-plus-42mm-space-gray-aluminum-black-volt": _.clone(AppleWatchSeries242Device)
 
 	# Apple Watch 38mm
 
