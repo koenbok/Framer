@@ -401,6 +401,15 @@ describe "Utils", ->
 			Utils.isFileUrl("file:///Users/koen/Desktop/index.html").should.equal(true)
 			Utils.isFileUrl("http://apple.com/index.html").should.equal(false)
 			Utils.isFileUrl("https://apple.com/index.html").should.equal(false)
+			
+	describe "isDataUrl", ->
+		it "should work", ->
+			dataUrlGif = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+			dataUrlPng = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAADUlEQVQI12P4z8DwHwAFAAH/cpxSZwAAAABJRU5ErkJggg=="
+			Utils.isDataUrl(dataUrlGif).should.equal(true)
+			Utils.isDataUrl(dataUrlPng).should.equal(true)
+			Utils.isDataUrl("file:///Users/koen/Desktop/foo.gif").should.equal(false)
+			Utils.isDataUrl("http://data.com/1x1.png").should.equal(false)
 
 	describe "isRelativeUrl", ->
 		it "should work", ->
