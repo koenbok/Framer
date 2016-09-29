@@ -252,6 +252,9 @@ class exports.Animation extends BaseClass
 		# the actual update loop. This saves a lot of frame budget.
 		@_prepareUpdateValues()
 
+	finish: =>
+		@stop()
+		@_updateValues(1)
 
 	_update: (delta) =>
 		if @_animator.finished()
