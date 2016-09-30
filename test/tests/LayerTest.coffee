@@ -63,9 +63,9 @@ describe "Layer", ->
 
 		it "should set defaults with override", ->
 
-			layer = new Layer x:50, y:50
+			layer = new Layer x:50, y:60
 			layer.x.should.equal 50
-			layer.x.should.equal 50
+			layer.y.should.equal 60
 
 	describe "Properties", ->
 
