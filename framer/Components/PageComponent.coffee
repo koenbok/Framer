@@ -23,8 +23,10 @@ class exports.PageComponent extends ScrollComponent
 	@define "originY", @simpleProperty("originY", .5)
 	@define "velocityThreshold", @simpleProperty("velocityThreshold", 0.1)
 
-	constructor: ->
-		super
+	constructor: (options) ->
+		super _.defaults options,
+			animationOptions:
+				curve:"spring(500, 50, 0)"
 
 		@content.draggable.momentum = false
 		@content.draggable.bounce = false
