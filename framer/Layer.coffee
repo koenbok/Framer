@@ -250,7 +250,7 @@ class exports.Layer extends BaseClass
 		default: ""
 		get: ->
 			name = @_getPropertyValue("name")
-			return name ? ""
+			return if name? then "#{name}" else ""
 
 		set: (value) ->
 			@_setPropertyValue("name", value)

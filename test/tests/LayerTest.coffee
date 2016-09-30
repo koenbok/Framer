@@ -331,6 +331,12 @@ describe "Layer", ->
 			layer.name.should.equal "Test"
 			layer._element.getAttribute("name").should.equal "Test"
 
+		it "should handle false layer names correctly", ->
+			layer = new Layer
+				name: 0
+			layer.name.should.equal "0"
+			layer._element.getAttribute("name").should.equal "0"
+
 		it "should handle background color with image", ->
 
 			# We want the background color to be there until an images
