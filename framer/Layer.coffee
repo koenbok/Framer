@@ -138,7 +138,6 @@ class exports.Layer extends BaseClass
 			if options.hasOwnProperty(p)
 				@[p] = options[p]
 
-		@animationOptions = {}
 		@_context.emit("layer:create", @)
 
 		delete @__constructor
@@ -151,6 +150,9 @@ class exports.Layer extends BaseClass
 
 	# A placeholder for layer bound properties defined by the user:
 	@define "custom", @simpleProperty("custom", undefined)
+
+	# Default animation options for every animation of this layer
+	@define "animationOptions", @simpleProperty("animationOptions", {})
 
 	# Css properties
 	@define "width",  layerProperty(@, "width",  "width", 100, _.isNumber)
