@@ -67,6 +67,10 @@ describe "Layer", ->
 			layer.x.should.equal 50
 			layer.y.should.equal 60
 
+		it "should have default animationOptions", ->
+			layer = new Layer
+			layer.animationOptions.should.eql {}
+
 	describe "Properties", ->
 
 		it "should set defaults", ->
