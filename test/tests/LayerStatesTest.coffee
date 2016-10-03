@@ -543,6 +543,21 @@ describe "LayerStates", ->
 						layer.states.current.name.should.equal "default"
 						done()
 
+		it "should listen to animation options defined in a state", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.testA = {x: 200, options: curve: "spring"}
+			cycle = layer.stateCycle onEnd: ->
+				layer.states.current.name.should.equal "testA"
+				cycle2 = layer.stateCycle onEnd: ->
+					layer.states.current.name.should.equal "default"
+					cycle3 = layer.stateCycle onEnd: ->
+						layer.states.current.name.should.equal "testA"
+						done()
+					cycle3.options.curve.should.equal "spring"
+				cycle2.options.curve.should.equal "ease"
+			cycle.options.curve.should.equal "spring"
+
 	describe "Switch", ->
 
 		it "should switch", ->

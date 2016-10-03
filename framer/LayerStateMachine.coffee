@@ -39,7 +39,7 @@ class exports.LayerStateMachine extends BaseClass
 
 		# Prep the properties and the options. The options come from the state, and can be overriden
 		# with the function arguments here.
-		properties = @states[stateName]
+		properties = _.clone(@states[stateName])
 		options = _.defaults({}, options, properties.options) if properties.options
 
 		stateNameA = @currentName
