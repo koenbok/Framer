@@ -131,7 +131,7 @@ class exports.Animation extends BaseClass
 			console.warn "Animation: nothing to animate, no animatable properties"
 			return @_noop()
 
-		if _.isEqual(@_stateA, @_stateB)
+		if _.isEqual(@_stateA, @_stateB) or _.keys(@_stateB).length is 0
 			console.warn "Animation: nothing to animate, all properties are equal to what it is now"
 			return @_noop()
 
