@@ -588,6 +588,14 @@ describe "LayerStates", ->
 			animation = layer.animate "test", time: 4
 			animation.options.time.should.equal 4
 
+		it "should listen to layer.animate options.start", ->
+			layer = new Layer
+			layer.states.test = {x: 100}
+			animation = layer.animate "test", start: false
+			animation.isAnimating.should.equal false
+			animation.start()
+			animation.isAnimating.should.equal true
+
 	describe "Callbacks", ->
 
 		it "should call start", (done) ->

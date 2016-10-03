@@ -49,6 +49,7 @@ class exports.LayerStateMachine extends BaseClass
 		# might be different as they could be set by hand on the layer object.
 		
 		# Grab the animation and make state switching have the same events (start, stop, end)
+		startAnimation = options.start ? true
 		options.start = false
 		animation = @layer.animate(properties, options)
 
@@ -73,8 +74,8 @@ class exports.LayerStateMachine extends BaseClass
 		animation.on(Events.AnimationStart, onStart)
 		animation.on(Events.AnimationStop, onStop)
 		animation.on(Events.AnimationEnd, onEnd)
-		
-		animation.start()
+
+		animation.start() if startAnimation
 
 		return animation
 
