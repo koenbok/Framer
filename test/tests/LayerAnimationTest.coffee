@@ -233,6 +233,19 @@ describe "LayerAnimation", ->
 				a.start()
 			animation.start()
 
+		it "it should set the noop property", ->
+			layer = new Layer
+			animation = layer.animate
+				x: 50
+			animation.isNoop.should.be.equal false
+			animation.finish()
+			layer.x.should.be.equal 50
+			animation2 = layer.animate
+				x: 50
+			animation2.isNoop.should.be.equal true
+
+
+
 	describe "Context", ->
 
 		it "should list running animations", ->

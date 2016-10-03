@@ -107,6 +107,8 @@ class exports.Animation extends BaseClass
 			if @options?.looping and @layer? and !@isAnimating
 				@restart()
 
+	@define "isNoop", @simpleProperty("isNoop", false)
+
 	start: =>
 
 		@_animator = @_createAnimator()
@@ -238,10 +240,11 @@ class exports.Animation extends BaseClass
 		@emit(Events.AnimationEnd)
 
 	_noop: =>
+		@isNoop = true
 		@emit(Events.AnimationStart)
 		@emit(Events.AnimationStop)
 		@emit(Events.AnimationEnd)
-		return false
+		return not @isNoop
 
 	_start: =>
 		@layer.context.addAnimation(@)
