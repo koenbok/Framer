@@ -497,7 +497,6 @@ Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 # STRING FUNCTIONS
 
 Utils.parseFunction = (str) ->
-
 	result = {name: "", args: []}
 
 	if _.endsWith str, ")"

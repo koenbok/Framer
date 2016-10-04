@@ -1,6 +1,3 @@
-{_} = require "../Underscore"
-Utils = require "../Utils"
-
 {Animator} = require "../Animator"
 
 BezierCurveDefaults =

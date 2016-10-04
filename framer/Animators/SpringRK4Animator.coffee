@@ -1,5 +1,3 @@
-Utils = require "../Utils"
-
 {Animator} = require "../Animator"
 {Integrator} = require "../Integrator"
 

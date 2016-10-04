@@ -1,5 +1,3 @@
-Utils = require "../Utils"
-
 {Animator} = require "../Animator"
 
 class exports.SpringDHOAnimator extends Animator
