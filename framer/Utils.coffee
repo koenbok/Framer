@@ -80,7 +80,7 @@ window.requestAnimationFrame ?= (f) -> Utils.delay 1/60, f
 Utils.animatorFor = (options) ->
 	AnimatorClass = Animator.classForCurve(options.curve)
 	return null if not AnimatorClass?
-	curveOptions = Animator.curveOptionsFor(options)
+	curveOptions = options.curveOptions ? Animator.curveOptionsFor(options)
 	return new AnimatorClass curveOptions
 
 ######################################################

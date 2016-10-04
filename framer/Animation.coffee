@@ -279,12 +279,9 @@ class exports.Animation extends BaseClass
 		return _.pick(@layer, _.keys(@properties))
 
 	_createAnimator: ->
-		AnimatorClass = Animator.classForCurve(@options.curve) ? LinearAnimator
-
 		if @options.debug
 			console.log "Animation.start #{AnimatorClass.name}", @options.curveOptions
-
-		return new AnimatorClass @options.curveOptions
+		return Utils.animatorFor(@options) ? new LinearAnimator(@options.curveOptions)
 
 	@isAnimatable = (v) ->
 		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v)
