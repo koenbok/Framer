@@ -1,7 +1,6 @@
 {_} = require "./Underscore"
 {Screen} = require "./Screen"
 {Matrix} = require "./Matrix"
-{Animator} = require "./Animator"
 
 Utils = {}
 
@@ -76,12 +75,6 @@ Utils.nearestIncrement = (x, increment) ->
 # in another one as it gets called at 60 fps. So we make it a global.
 window.requestAnimationFrame ?= window.webkitRequestAnimationFrame
 window.requestAnimationFrame ?= (f) -> Utils.delay 1/60, f
-
-Utils.animatorFor = (options) ->
-	AnimatorClass = Animator.classForCurve(options.curve)
-	return null if not AnimatorClass?
-	curveOptions = options.curveOptions ? Animator.curveOptionsFor(options)
-	return new AnimatorClass curveOptions
 
 ######################################################
 # TIME FUNCTIONS
@@ -504,7 +497,15 @@ Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 # STRING FUNCTIONS
 
 Utils.parseFunction = (str) ->
-	Animator.parseFunction(str)
+	result = {name: "", args: []}
+
+	if _.endsWith str, ")"
+		result.name = str.split("(")[0]
+		result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.trimEnd(a, ")"))
+	else
+		result.name = str
+
+	return result
 
 ######################################################
 # DOM FUNCTIONS

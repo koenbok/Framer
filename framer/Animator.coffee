@@ -30,19 +30,8 @@ class exports.Animator
 				break
 		return values
 
-	@parseFunction: (str) ->
-		result = {name: "", args: []}
-
-		if _.endsWith str, ")"
-			result.name = str.split("(")[0]
-			result.args = str.split("(")[1].split(",").map (a) -> _.trim(_.trimEnd(a, ")"))
-		else
-			result.name = str
-
-		return result
-
 	@classForCurve: (curve) ->
-		parsedCurve = @parseFunction(curve)
+		parsedCurve = Utils.parseFunction(curve)
 		animatorClassName = parsedCurve.name.toLowerCase()
 
 		if AnimatorClasses.hasOwnProperty(animatorClassName)
@@ -56,7 +45,7 @@ class exports.Animator
 	@curveOptionsFor: (options={}) ->
 		curveOptions = options.curveOptions ? {}
 		animatorClass = @classForCurve(options.curve)
-		parsedCurve = @parseFunction options.curve
+		parsedCurve = Utils.parseFunction options.curve
 		animatorClassName = parsedCurve.name.toLowerCase()
 
 		# This is for compatibility with the direct Animation.time argument. This should

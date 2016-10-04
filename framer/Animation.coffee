@@ -96,7 +96,7 @@ class exports.Animation extends BaseClass
 
 	start: =>
 
-		@_animator = @_createAnimator()
+		@_animator = Animation._createAnimator(@options) ? new LinearAnimator(@options.curveOptions)
 		@_target = @layer
 		@_stateA = @_currentState()
 		@_stateB = {}
@@ -278,10 +278,14 @@ class exports.Animation extends BaseClass
 	_currentState: ->
 		return _.pick(@layer, _.keys(@properties))
 
-	_createAnimator: ->
-		if @options.debug
-			console.log "Animation.start #{AnimatorClass.name}", @options.curveOptions
-		return Utils.animatorFor(@options) ? new LinearAnimator(@options.curveOptions)
+	@_createAnimator: (options) ->
+		AnimatorClass = Animator.classForCurve(options.curve)
+		return null if not AnimatorClass?
+		curveOptions = options.curveOptions ? Animator.curveOptionsFor(options)
+		if options.debug
+			console.log "Animation.start #{AnimatorClass.name}", curveOptions
+
+		return new AnimatorClass curveOptions
 
 	@isAnimatable = (v) ->
 		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v)
