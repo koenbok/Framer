@@ -88,7 +88,7 @@ describe "LayerStates", ->
 	describe "Adding", ->
 
 		describe "when setting multiple states", ->
-		
+
 			it "should override existing states", ->
 				layer = new Layer
 				layer.states.test = x: 100
@@ -513,6 +513,33 @@ describe "LayerStates", ->
 						layer.x.should.equal 200
 						layer.states.current.name.should.equal "testA"
 						done()
+
+		it "should cycle list without options", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.testA = {x: 200}
+			layer.states.testB = {x: 400}
+			layer.once Events.StateSwitchEnd, ->
+				layer.states.current.name.should.equal "testB"
+				layer.once Events.StateSwitchEnd, ->
+					layer.states.current.name.should.equal "testA"
+					done()
+				layer.stateCycle ["testB", "testA"]
+			layer.stateCycle ["testB", "testA"]
+
+		it "should cycle multiple arguments without options", (done) ->
+			layer = new Layer
+			layer.animationOptions.time = 0.1
+			layer.states.testA = {x: 200}
+			layer.states.testB = {x: 400}
+			layer.once Events.StateSwitchEnd, ->
+				layer.states.current.name.should.equal "testB"
+				layer.once Events.StateSwitchEnd, ->
+					layer.states.current.name.should.equal "testA"
+					done()
+				layer.stateCycle "testB", "testA"
+			layer.stateCycle "testB", "testA"
+
 
 		it "should cycle two out of three in arguments", (done) ->
 			layer = new Layer

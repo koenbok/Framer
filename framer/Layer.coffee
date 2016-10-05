@@ -928,11 +928,12 @@ class exports.Layer extends BaseClass
 
 		return animation
 
-	stateCycle: (args..., options={}) ->
-		states = []
-		states = _.flatten(args) if args.length
-		@animate(@states.machine.next(states), options)
+	stateCycle: (args...) ->
+		states = _.flatten(args)
+		if _.isObject(_.last(states))
+			options = states.pop()
 
+		@animate(@states.machine.next(states), options)
 	stateSwitch: (stateName, options={}) ->
 		return @animate(stateName, options) if options.animate is true
 		return @animate(stateName, _.defaults({}, options, {instant:true}))

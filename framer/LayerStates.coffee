@@ -54,10 +54,10 @@ class LayerStates
 		stateProperties = {}
 
 		for k, v of properties
-			
+
 			if k in LayerStatesIgnoredKeys
 				continue
-			
+
 			if Color.isValidColorProperty(k, v)
 				stateProperties[k] = new Color(v)
 				continue
@@ -124,8 +124,9 @@ class LayerStates
 				keys = _.union(keys, _.keys(state))
 			return keys
 
-		next: (options) ->
+		next: (options...) ->
 			deprecatedWarning("next", "layer.stateCycle()")
+			options = _.flatten(options)
 			@machine.layer.stateCycle(options)
 
 		last: (options) ->

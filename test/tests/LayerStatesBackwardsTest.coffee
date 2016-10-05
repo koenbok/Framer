@@ -80,6 +80,32 @@ describe "LayerStates Backwards compatibility", ->
 			done()
 		layer.states.next()
 
+	it "should still support layer.states.next with string arguments", (done) ->
+		layer = new Layer
+		layer.states =
+			stateA: x: 200
+			stateB: scale: 0.5
+		layer.once Events.StateSwitchEnd, ->
+			layer.states.current.name.should.equal "stateB"
+			layer.once Events.StateSwitchEnd, ->
+				layer.states.current.name.should.equal "stateA"
+				done()
+			layer.states.next("stateB", "stateA")
+		layer.states.next("stateB", "stateA")
+
+	it "should still support layer.states.next with list arguments", (done) ->
+		layer = new Layer
+		layer.states =
+			stateA: x: 200
+			stateB: scale: 0.5
+		layer.once Events.StateSwitchEnd, ->
+			layer.states.current.name.should.equal "stateB"
+			layer.once Events.StateSwitchEnd, ->
+				layer.states.current.name.should.equal "stateA"
+				done()
+			layer.states.next ["stateB", "stateA"]
+		layer.states.next ["stateB", "stateA"]
+
 	it "should still support layer.states.last", (done) ->
 		layer = new Layer
 		layer.states =
