@@ -4,7 +4,7 @@ Utils = require "./Utils"
 class Printer
 
 	constructor: ->
-		@_context = new Context(name:"Print")
+		@_context = new Context(name:"PrintConsole")
 		@_context.run => Events.wrap(window).addEventListener("resize", @resize)
 
 	createLayer: =>
