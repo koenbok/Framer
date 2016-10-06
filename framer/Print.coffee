@@ -57,12 +57,12 @@ class Printer
 		@_closeButton.maxX = @_container.maxX - @_closeButton.y
 
 	hide: ->
-		@_container.visible = false
+		@_context.visible = false
 
 	print: (args...) =>
 
 		@createLayer()
-		@_container.visible = true
+		@_context.visible = true
 		printPrefix = "» "
 
 		printNode = document.createElement("div")
