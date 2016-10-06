@@ -40,6 +40,7 @@ class Printer
 				width: 10
 				height: 10
 				backgroundColor: null
+			@_closeButton.style["cursor"] = "auto"
 			@_closeButton.onClick =>
 				@hide()
 		@resize()
