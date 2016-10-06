@@ -361,9 +361,9 @@ describe "LayerStates", ->
 			# assert.equal(layerB.parent, layerA)
 
 		it "should set the current and previous states when switching", ->
-			
+
 			layer = new Layer
-			
+
 			layer.states =
 				stateA: {x: 100, options: instant: true}
 				stateB: {y: 200, options: instant: true}
@@ -460,7 +460,7 @@ describe "LayerStates", ->
 			layer = new Layer
 			layer.animationOptions.time = 0.1
 			layer.states.test = {x: 200}
-			
+
 			layer.on Events.StateSwitchEnd, ->
 				layer.states.current.name.should.equal "test"
 				done()
@@ -570,10 +570,10 @@ describe "LayerStates", ->
 						layer.states.current.name.should.equal "default"
 						done()
 
-		it "should listen to animation options defined in a state", (done) ->
+		it "should listen to animationOptions defined in a state", (done) ->
 			layer = new Layer
 			layer.animationOptions.time = 0.1
-			layer.states.testA = {x: 200, options: curve: "spring"}
+			layer.states.testA = {x: 200, animationOptions: curve: "spring"}
 			cycle = layer.stateCycle onEnd: ->
 				layer.states.current.name.should.equal "testA"
 				cycle2 = layer.stateCycle onEnd: ->
@@ -582,8 +582,11 @@ describe "LayerStates", ->
 						layer.states.current.name.should.equal "testA"
 						done()
 					cycle3.options.curve.should.equal "spring"
+					layer.animationOptions.should.eql {time: 0.1}
 				cycle2.options.curve.should.equal "ease"
+				layer.animationOptions.should.eql {time: 0.1}
 			cycle.options.curve.should.equal "spring"
+			layer.animationOptions.should.eql {time: 0.1}
 
 	describe "Switch", ->
 

@@ -40,14 +40,15 @@ class exports.LayerStateMachine extends BaseClass
 		# Prep the properties and the options. The options come from the state, and can be overriden
 		# with the function arguments here.
 		properties = _.clone(@states[stateName])
-		options = _.defaults({}, options, properties.options) if properties.options
+		options = _.defaults({}, options, properties.animationOptions) if properties.animationOptions
+		delete properties.animationOptions
 
 		stateNameA = @currentName
 		stateNameB = stateName
 
 		# Note: even if the state is the current state we still want to switch because some properties
 		# might be different as they could be set by hand on the layer object.
-		
+
 		# Grab the animation and make state switching have the same events (start, stop, end)
 		startAnimation = options.start ? true
 		options.start = false
@@ -63,7 +64,7 @@ class exports.LayerStateMachine extends BaseClass
 
 		onEnd = =>
 			instantProperties = _.difference(
-				_.keys(properties), 
+				_.keys(properties),
 				_.keys(animation.properties))
 
 			for k in instantProperties
