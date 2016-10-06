@@ -67,13 +67,10 @@ class Button extends ShareLayer
 
 		@onMouseOver ->
 			@style.cursor = "pointer"
-			@states.switch("hover")
-			@animate
-				properties:
-					opacity: .8
+			@animate("hover")
 
 		@onMouseOut ->
-			@states.switch("full")
+			@animate("full")
 
 		@onTap ->
 			if options.shareButton
