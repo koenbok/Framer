@@ -903,7 +903,7 @@ class exports.Layer extends BaseClass
 
 			# Support options as an object
 			options = options.options if options.options?
-			
+
 			return @states.machine.switchTo(stateName, options)
 
 		# Support the old properties syntax, we add all properties top level and
@@ -935,6 +935,8 @@ class exports.Layer extends BaseClass
 
 		@animate(@states.machine.next(states), options)
 	stateSwitch: (stateName, options={}) ->
+		unless stateName?
+			throw new Error("Missing required argument 'stateName' in stateSwitch()")
 		return @animate(stateName, options) if options.animate is true
 		return @animate(stateName, _.defaults({}, options, {instant:true}))
 

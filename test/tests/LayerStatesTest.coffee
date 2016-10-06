@@ -602,6 +602,11 @@ describe "LayerStates", ->
 			layer.x.should.equal 400
 			layer.states.current.name.should.equal "testB"
 
+		it "should throw an error when called without a stateName", ->
+			layer = new Layer
+			layer.states.testA = {x: 200}
+			expect(-> layer.stateSwitch()).to.throw("Missing required argument 'stateName' in stateSwitch()")
+
 	describe "Options", ->
 
 		it "should listen to layer.options", ->
