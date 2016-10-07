@@ -85,7 +85,7 @@ class exports.Animation extends BaseClass
 	@define "isPending", get: -> @_delayTimer?
 
 	@define "isAnimating",
-		get: -> @ in @layer.context.animations
+		get: -> @ in @layer.animations()
 
 	@define "looping",
 		get: -> @options.looping

@@ -332,6 +332,18 @@ describe "LayerAnimation", ->
 			layer.animateStop()
 			layer.isAnimating.should.equal(false)
 
+		it "should tell you if delayed animations are running", (done) ->
+			layer = new Layer()
+			animation = layer.animate
+				x: 100
+				options:
+					time: 0.3
+					delay: 0.1
+			animation.isAnimating.should.equal(false)
+			Utils.delay 0.2, ->
+				animation.isAnimating.should.equal(true)
+				done()
+
 
 	describe "Events", ->
 
