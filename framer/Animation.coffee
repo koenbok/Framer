@@ -176,6 +176,7 @@ class exports.Animation extends BaseClass
 		else
 			start = @_start
 
+		@layer.context.addAnimation(@)
 		# If we have a delay, we wait a bit for it to start
 		if @options.delay
 			@_delayTimer = Utils.delay(@options.delay, start)
@@ -185,7 +186,6 @@ class exports.Animation extends BaseClass
 		return true
 
 	stop: (emit=true) ->
-
 		if @_delayTimer?
 			Framer.CurrentContext.removeTimer(@_delayTimer)
 			@_delayTimer = null
@@ -241,7 +241,6 @@ class exports.Animation extends BaseClass
 		return not @isNoop
 
 	_start: =>
-		@layer.context.addAnimation(@)
 		@_delayTimer = null
 		@emit(Events.AnimationStart)
 		Framer.Loop.on("update", @_update)

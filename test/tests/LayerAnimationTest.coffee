@@ -417,6 +417,16 @@ describe "LayerAnimation", ->
 			Utils.delay 0.3, ->
 				a.isPending.should.equal false
 				done()
+
+		it "should add pending animations to the context", ->
+			layer = new Layer
+			a = layer.animate
+				x: 100
+				options:
+					delay: 0.3
+			(a in layer.context.animations).should.equal true
+
+
 	describe "Repeat", ->
 
 		it "should start repeatedly", (done) ->
