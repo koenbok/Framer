@@ -940,10 +940,11 @@ class exports.Layer extends BaseClass
 		return @animate(stateName, options) if options.animate is true
 		return @animate(stateName, _.defaults({}, options, {instant:true}))
 
-	animations: ->
+	animations: (includePending=false)->
 		# Current running animations on this layer
 		_.filter @_context.animations, (animation) =>
-			animation.layer is @
+			return false unless (animation.layer is @)
+			return includePending or not animation.isPending
 
 	animatingProperties: ->
 

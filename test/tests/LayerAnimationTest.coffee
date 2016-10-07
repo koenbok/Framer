@@ -287,6 +287,39 @@ describe "LayerAnimation", ->
 			animation.on "end", test
 			animation.on "stop", test
 
+		it "shouldn't return delayed animations from layer.animations()", (done) ->
+			layer = new Layer()
+			animation = layer.animate
+				x: 100
+				options:
+					time: 0.1
+					delay: 0.1
+			count = 0
+			test = ->
+				layer.animations().length.should.equal 0
+				count++
+				if count is 3
+					done()
+			test()
+			animation.on "end", test
+			animation.on "stop", test
+
+		it "should return delayed animations when calling layer.animations(true)", (done) ->
+			layer = new Layer
+			animation = layer.animate
+				x: 100
+				options:
+					time: 0.1
+					delay: 0.1
+			count = 0
+			test = ->
+				(animation in layer.animations(true)).should.equal true
+				count++
+				if count is 2
+					done()
+			test()
+			animation.on "start", test
+
 		it "should tell you if animations are running", ->
 
 			layer = new Layer()
