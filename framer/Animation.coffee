@@ -167,12 +167,12 @@ class exports.Animation extends BaseClass
 		# the actual update loop. This saves a lot of frame budget.
 		@_prepareUpdateValues()
 
-		# If animate is false we set everything immediately and skip the actual animation
-		start = @_start
-
 		# The option keywords animate and instant trigger an instant animation
 		if @options.animate is false or @options.instant is true
+			# If animate is false we set everything immediately and skip the actual animation
 			start = @_instant
+		else
+			start = @_start
 
 		# If we have a delay, we wait a bit for it to start
 		if @options.delay
