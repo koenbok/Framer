@@ -400,6 +400,23 @@ describe "LayerAnimation", ->
 					layer.x.should.equal 0
 					done()
 
+		it "pending flag should be false by default", ->
+			layer = new Layer
+			a = layer.animate
+				x: 100
+			a.isPending.should.equal false
+			a.stop()
+
+		it "should add a pending flag for delayed animations", (done) ->
+			layer = new Layer
+			a = layer.animate
+				x: 100
+				options:
+					delay: 0.3
+			a.isPending.should.equal true
+			Utils.delay 0.3, ->
+				a.isPending.should.equal false
+				done()
 	describe "Repeat", ->
 
 		it "should start repeatedly", (done) ->

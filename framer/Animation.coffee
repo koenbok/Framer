@@ -82,6 +82,8 @@ class exports.Animation extends BaseClass
 	@define "layer",
 		get: -> @_layer
 
+	@define "isPending", get: -> @_delayTimer?
+
 	@define "isAnimating",
 		get: -> @ in @layer.context.animations
 
@@ -240,6 +242,7 @@ class exports.Animation extends BaseClass
 
 	_start: =>
 		@layer.context.addAnimation(@)
+		@_delayTimer = null
 		@emit(Events.AnimationStart)
 		Framer.Loop.on("update", @_update)
 
