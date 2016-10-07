@@ -244,7 +244,13 @@ describe "LayerAnimation", ->
 				x: 50
 			animation2.isNoop.should.be.equal true
 
-
+		it "In shouldn't crash when finish on delayed animation", ->
+			layer = new Layer
+			animation = layer.animate
+				x: 50
+				options:
+					delay: 1
+			animation.finish.should.not.throw()
 
 	describe "Context", ->
 

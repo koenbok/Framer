@@ -162,6 +162,11 @@ class exports.Animation extends BaseClass
 				@restart()
 				if not @looping
 					@_repeatCounter--
+
+		# Figure out what kind of values we have so we don't have to do it in
+		# the actual update loop. This saves a lot of frame budget.
+		@_prepareUpdateValues()
+
 		# If animate is false we set everything immediately and skip the actual animation
 		start = @_start
 
@@ -222,7 +227,6 @@ class exports.Animation extends BaseClass
 
 	_instant: =>
 		@emit(Events.AnimationStart)
-		@_prepareUpdateValues()
 		@_updateValues(1)
 		@emit(Events.AnimationStop)
 		@emit(Events.AnimationEnd)
@@ -238,10 +242,6 @@ class exports.Animation extends BaseClass
 		@layer.context.addAnimation(@)
 		@emit(Events.AnimationStart)
 		Framer.Loop.on("update", @_update)
-
-		# Figure out what kind of values we have so we don't have to do it in
-		# the actual update loop. This saves a lot of frame budget.
-		@_prepareUpdateValues()
 
 	finish: =>
 		@stop()
