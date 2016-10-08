@@ -35,10 +35,10 @@ class Printer
 
 			@_closeButton = new Layer
 				parent: @_container
-				html: '<svg><g><path d="M6.73184358,5 L10,1.73184358 L8.26815642,0 L5,3.26815642 L1.73184358,0 L0,1.73184358 L3.26815642,5 L0,8.26815642 L1.73184358,10 L5,6.73184358 L8.26815642,10 L10,8.26815642 L6.73184358,5 Z" fill="#BDBDBD"></path></g></svg>'
-				y: 6
-				width: 10
-				height: 10
+				html: '<svg><g stroke="#B8B8B8"><path d="M1,1 L8,8"></path><path d="M1,8 L8,1"></path></g></svg>'
+				y: 9
+				width: 9
+				height: 9
 				backgroundColor: null
 			@_closeButton.style["cursor"] = "auto"
 			@_closeButton.onClick =>
@@ -54,7 +54,7 @@ class Printer
 		@_container.maxY = window.innerHeight
 
 		@_printLayer.size = @_container.size
-		@_closeButton.maxX = @_container.maxX - @_closeButton.y
+		@_closeButton.maxX = @_container.maxX - @_closeButton.y + 1
 
 	hide: ->
 		@_context.visible = false
