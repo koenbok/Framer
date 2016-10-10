@@ -15,28 +15,43 @@ describe "LayerStates", ->
 			@layer.states.a = {x:100, y:100}
 			@layer.states.b = {x:200, y:200}
 
-		it "should emit willSwitch when switching", (done) ->
+		it "should emit StateSwitchStart when switching", (done) ->
 
 			test = (previous, current, states) =>
 				previous.should.equal initialStateName
 				current.should.equal "a"
 				@layer.states.current.name.should.equal initialStateName
+				@layer.states.machine._previousNames.should.eql []
 				stateWithoutName(@layer.states.current).should.eql @layer.states[initialStateName]
 				done()
 
-			@layer.on Events.StateWillSwitch, test
+			@layer.on Events.StateSwitchStart, test
 			@layer.animate "a", instant: true
 
-		it "should emit didSwitch when switching", (done) ->
+		it "should emit StateSwitchStop when switching", (done) ->
 
 			test = (previous, current, states) =>
 				previous.should.equal initialStateName
 				current.should.equal "a"
 				@layer.states.current.name.should.equal "a"
+				@layer.states.machine._previousNames.should.eql ["default"]
 				stateWithoutName(@layer.states.current).should.eql @layer.states.a
 				done()
 
-			@layer.on Events.StateDidSwitch, test
+			@layer.on Events.StateSwitchStop, test
+			@layer.animate "a", time: 0.01
+
+		it "should emit StateSwitchStop when switching instant", (done) ->
+
+			test = (previous, current, states) =>
+				previous.should.equal initialStateName
+				current.should.equal "a"
+				@layer.states.current.name.should.equal "a"
+				@layer.states.machine._previousNames.should.eql ["default"]
+				stateWithoutName(@layer.states.current).should.eql @layer.states.a
+				done()
+
+			@layer.on Events.StateSwitchStop, test
 			@layer.animate "a", instant: true
 
 	describe "Special states", ->

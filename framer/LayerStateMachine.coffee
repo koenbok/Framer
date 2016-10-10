@@ -33,7 +33,6 @@ class exports.LayerStateMachine extends BaseClass
 		@switchTo(stateName, {instant: true})
 
 	switchTo: (stateName, options={}) ->
-
 		# Check if the state exists, if not this is a pretty serious error
 		throw Error "No such state: '#{stateName}'" unless @states[stateName]
 
@@ -54,8 +53,18 @@ class exports.LayerStateMachine extends BaseClass
 		options.start = false
 		animation = @layer.animate(properties, options)
 
+		# In the case of instant: true, onStart and onStop are called from within animation.start()
+		# This function is called once after animation.start() or in onStart, whichEver comes first.
+		stateSwitched = false
+		switchState = =>
+			return if stateSwitched
+			stateSwitched = true
+			@_previousNames.push(stateNameA)
+			@_currentName = stateNameB
+
 		onStart = =>
 			@emit(Events.StateSwitchStart, stateNameA, stateNameB, @)
+			switchState()
 
 		onStop = =>
 			@emit(Events.StateSwitchStop, stateNameA, stateNameB, @)
@@ -76,8 +85,7 @@ class exports.LayerStateMachine extends BaseClass
 
 		animation.start() if startAnimation
 
-		@_previousNames.push(stateNameA)
-		@_currentName = stateNameB
+		switchState()
 
 		return animation
 
