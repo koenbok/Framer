@@ -932,8 +932,8 @@ class exports.Layer extends BaseClass
 		states = _.flatten(args)
 		if _.isObject(_.last(states))
 			options = states.pop()
-
 		@animate(@states.machine.next(states), options)
+
 	stateSwitch: (stateName, options={}) ->
 		unless stateName?
 			throw new Error("Missing required argument 'stateName' in stateSwitch()")

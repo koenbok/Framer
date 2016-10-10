@@ -57,9 +57,8 @@ class exports.LayerStateMachine extends BaseClass
 		onStart = =>
 			@emit(Events.StateSwitchStart, stateNameA, stateNameB, @)
 
+
 		onStop = =>
-			@_previousNames.push(stateNameA)
-			@_currentName = stateNameB
 			@emit(Events.StateSwitchStop, stateNameA, stateNameB, @)
 
 		onEnd = =>
@@ -77,6 +76,9 @@ class exports.LayerStateMachine extends BaseClass
 		animation.on(Events.AnimationEnd, onEnd)
 
 		animation.start() if startAnimation
+
+		@_previousNames.push(stateNameA)
+		@_currentName = stateNameB
 
 		return animation
 
