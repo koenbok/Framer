@@ -55,6 +55,7 @@ class exports.LayerStateMachine extends BaseClass
 
 		# In the case of instant: true, onStart and onStop are called from within animation.start()
 		# This function is called once after animation.start() or in onStart, whichEver comes first.
+		# We could fix this by adding another event that fires before a delayed animation is started
 		stateSwitched = false
 		switchState = =>
 			return if stateSwitched
