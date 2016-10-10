@@ -57,7 +57,6 @@ class exports.LayerStateMachine extends BaseClass
 		onStart = =>
 			@emit(Events.StateSwitchStart, stateNameA, stateNameB, @)
 
-
 		onStop = =>
 			@emit(Events.StateSwitchStop, stateNameA, stateNameB, @)
 
