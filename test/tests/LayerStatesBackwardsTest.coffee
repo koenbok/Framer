@@ -132,7 +132,7 @@ describe "LayerStates Backwards compatibility", ->
 			test = (previous, current, states) =>
 				previous.should.equal "default"
 				current.should.equal "a"
-				@layer.states.state.should.equal "default"
+				@layer.states.current.name.should.equal "default"
 				done()
 
 			@layer.states.on Events.StateWillSwitch, test
@@ -143,7 +143,7 @@ describe "LayerStates Backwards compatibility", ->
 			test = (previous, current, states) =>
 				previous.should.equal "default"
 				current.should.equal "a"
-				@layer.states.state.should.equal "a"
+				@layer.states.current.name.should.equal "a"
 				done()
 
 			@layer.states.on Events.StateDidSwitch, test

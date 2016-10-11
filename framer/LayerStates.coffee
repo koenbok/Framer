@@ -101,10 +101,6 @@ class LayerStates
 			deprecatedWarning("switchInstant", "layer.animate(\"state\", {instant: true})")
 			@machine.switchTo(stateName, {instant: true})
 
-		state: ->
-			deprecatedWarning("state", "layer.states.current.name")
-			@machine.currentName
-
 		next: (options...) ->
 			deprecatedWarning("next", "layer.stateCycle()")
 			options = _.flatten(options)
@@ -118,7 +114,6 @@ class LayerStates
 	@defineReserved "switch", get: -> methods.switch
 	@defineReserved "switchInstant", get: -> methods.switchInstant
 	@defineReserved "next", get: -> methods.next
-	@defineReserved "state", get: methods.state
 	@defineReserved "on", get: -> methods.on
 	@defineReserved "animationOptions",
 		get: -> @machine.layer.animationOptions
