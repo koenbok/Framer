@@ -117,13 +117,6 @@ class LayerStates
 			deprecatedWarning("states", "layer.stateNames")
 			@machine.stateNames
 
-		animatingKeys: ->
-			deprecatedWarning("animatingKeys")
-			keys = []
-			for name, state of @
-				keys = _.union(keys, _.keys(state))
-			return keys
-
 		next: (options...) ->
 			deprecatedWarning("next", "layer.stateCycle()")
 			options = _.flatten(options)
@@ -140,7 +133,6 @@ class LayerStates
 	@defineReserved "remove", get: -> methods.remove
 	@defineReserved "switch", get: -> methods.switch
 	@defineReserved "switchInstant", get: -> methods.switchInstant
-	@defineReserved "animatingKeys", get: -> methods.animatingKeys
 	@defineReserved "next", get: -> methods.next
 	@defineReserved "last", get: -> methods.last
 	@defineReserved "state", get: methods.state
