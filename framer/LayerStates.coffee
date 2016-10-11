@@ -106,15 +106,11 @@ class LayerStates
 			options = _.flatten(options)
 			@machine.layer.stateCycle(options)
 
-		on: (eventName, handler) ->
-			@machine.on(eventName, handler)
-
 	@defineReserved "add", get: -> methods.add
 	@defineReserved "remove", get: -> methods.remove
 	@defineReserved "switch", get: -> methods.switch
 	@defineReserved "switchInstant", get: -> methods.switchInstant
 	@defineReserved "next", get: -> methods.next
-	@defineReserved "on", get: -> methods.on
 	@defineReserved "animationOptions",
 		get: -> @machine.layer.animationOptions
 		set: (options) -> @machine.layer.animationOptions = options

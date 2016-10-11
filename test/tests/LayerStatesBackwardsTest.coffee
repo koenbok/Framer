@@ -135,7 +135,7 @@ describe "LayerStates Backwards compatibility", ->
 				@layer.states.current.name.should.equal "default"
 				done()
 
-			@layer.states.on Events.StateWillSwitch, test
+			@layer.on Events.StateWillSwitch, test
 			@layer.states.switchInstant "a"
 
 		it "should emit didSwitch when switching", (done) ->
@@ -146,7 +146,7 @@ describe "LayerStates Backwards compatibility", ->
 				@layer.states.current.name.should.equal "a"
 				done()
 
-			@layer.states.on Events.StateDidSwitch, test
+			@layer.on Events.StateDidSwitch, test
 			@layer.states.switchInstant "a"
 
 
