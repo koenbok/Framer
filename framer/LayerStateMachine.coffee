@@ -80,14 +80,20 @@ class exports.LayerStateMachine extends BaseClass
 
 			for k in instantProperties
 				@layer[k] = properties[k]
-
 			@emit(Events.StateSwitchEnd, stateNameA, stateNameB, @)
 
 		animation.on(Events.AnimationStart, onStart)
 		animation.on(Events.AnimationStop, onStop)
 		animation.on(Events.AnimationEnd, onEnd)
 
-		animation.start() if startAnimation
+		if startAnimation
+			started = animation.start()
+			if not started
+				# When the animation didn't even start, the animation events will not be emitted,
+				# so call the handlers manually
+				onStart()
+				onStop()
+				onEnd()
 
 		switchState()
 

@@ -673,6 +673,7 @@ describe "LayerAnimation", ->
 						curve: "spring"
 						time: 2
 						instant: true
+						start: false
 
 				calledEvents = []
 

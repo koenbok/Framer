@@ -235,9 +235,11 @@ class exports.Animation extends BaseClass
 
 	_noop: =>
 		@isNoop = true
-		@emit(Events.AnimationStart)
-		@emit(Events.AnimationStop)
-		@emit(Events.AnimationEnd)
+		# We don't emit these so you can call layer.animate safely
+		# from the same layers layer.onAnimationEnd handler
+		# @emit(Events.AnimationStart)
+		# @emit(Events.AnimationStop)
+		# @emit(Events.AnimationEnd)
 		return not @isNoop
 
 	_start: =>
