@@ -110,10 +110,6 @@ class LayerStates
 			options = _.flatten(options)
 			@machine.layer.stateCycle(options)
 
-		last: (options) ->
-			deprecatedWarning("last")
-			@machine.switchTo(@machine.previousName, options)
-
 		on: (eventName, handler) ->
 			@machine.on(eventName, handler)
 
@@ -122,7 +118,6 @@ class LayerStates
 	@defineReserved "switch", get: -> methods.switch
 	@defineReserved "switchInstant", get: -> methods.switchInstant
 	@defineReserved "next", get: -> methods.next
-	@defineReserved "last", get: -> methods.last
 	@defineReserved "state", get: methods.state
 	@defineReserved "on", get: -> methods.on
 	@defineReserved "animationOptions",

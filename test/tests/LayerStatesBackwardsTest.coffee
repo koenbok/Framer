@@ -83,19 +83,6 @@ describe "LayerStates Backwards compatibility", ->
 			layer.states.next ["stateB", "stateA"]
 		layer.states.next ["stateB", "stateA"]
 
-	it "should still support layer.states.last", (done) ->
-		layer = new Layer
-		layer.states =
-			stateA: x: 200
-			stateB: scale: 0.5
-		layer.stateSwitch "stateB"
-		layer.stateSwitch "stateA"
-		layer.stateSwitch "stateB"
-		layer.onStateDidSwitch ->
-			assert.equal layer.states.current.name, "stateA"
-			done()
-		layer.states.last()
-
 	it "should still support layer.states.animationOptions", ->
 		layer = new Layer
 		layer.states =
