@@ -215,6 +215,19 @@ describe "LayerStates", ->
 				done()
 			animation = layer.animate "stateA", time: 0.05
 
+	it "should change the state name when using 'previous' as stateName", (done) ->
+		layer = new Layer
+		layer.states =
+			stateA: x: 200
+			stateB: scale: 0.5
+		layer.stateSwitch "stateB"
+		layer.stateSwitch "stateA"
+		layer.stateSwitch "stateB"
+		layer.onStateDidSwitch ->
+			assert.equal layer.states.current.name, "stateA"
+			done()
+		layer.animate "previous"
+
 	describe "Properties", ->
 
 		it "should bring back the 'initial' state values when using 'stateCycle'", (done) ->

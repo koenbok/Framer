@@ -101,53 +101,16 @@ class LayerStates
 			deprecatedWarning("switchInstant", "layer.animate(\"state\", {instant: true})")
 			@machine.switchTo(stateName, {instant: true})
 
-		state: ->
-			deprecatedWarning("state", "layer.states.current.name")
-			@machine.currentName
-
-		all: ->
-			deprecatedWarning("all", "layer.stateNames")
-			@machine.stateNames
-
-		stateNames: ->
-			deprecatedWarning("stateNames", "layer.stateNames")
-			@machine.stateNames
-
-		states: ->
-			deprecatedWarning("states", "layer.stateNames")
-			@machine.stateNames
-
-		animatingKeys: ->
-			deprecatedWarning("animatingKeys")
-			keys = []
-			for name, state of @
-				keys = _.union(keys, _.keys(state))
-			return keys
-
 		next: (options...) ->
 			deprecatedWarning("next", "layer.stateCycle()")
 			options = _.flatten(options)
 			@machine.layer.stateCycle(options)
 
-		last: (options) ->
-			deprecatedWarning("last")
-			@machine.switchTo(@machine.previousName, options)
-
-		on: (eventName, handler) ->
-			@machine.on(eventName, handler)
-
 	@defineReserved "add", get: -> methods.add
 	@defineReserved "remove", get: -> methods.remove
 	@defineReserved "switch", get: -> methods.switch
 	@defineReserved "switchInstant", get: -> methods.switchInstant
-	@defineReserved "animatingKeys", get: -> methods.animatingKeys
 	@defineReserved "next", get: -> methods.next
-	@defineReserved "last", get: -> methods.last
-	@defineReserved "state", get: methods.state
-	@defineReserved "all", get: methods.all
-	@defineReserved "stateNames", get: methods.stateNames
-	@defineReserved "states", get: methods.states
-	@defineReserved "on", get: -> methods.on
 	@defineReserved "animationOptions",
 		get: -> @machine.layer.animationOptions
 		set: (options) -> @machine.layer.animationOptions = options
