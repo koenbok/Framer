@@ -215,7 +215,7 @@ describe "LayerStates", ->
 				done()
 			animation = layer.animate "stateA", time: 0.05
 
-	it.skip "should change the state name when using 'previous' as stateName", (done) ->
+	it "should change the state name when using 'previous' as stateName", (done) ->
 		layer = new Layer
 		layer.states =
 			stateA: x: 200
@@ -226,7 +226,6 @@ describe "LayerStates", ->
 		layer.onStateDidSwitch ->
 			assert.equal layer.states.current.name, "stateA"
 			done()
-		console.log layer.states.machine._previousNames, layer.states.previous.name
 		layer.animate "previous"
 
 	describe "Properties", ->
