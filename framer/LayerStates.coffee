@@ -105,18 +105,6 @@ class LayerStates
 			deprecatedWarning("state", "layer.states.current.name")
 			@machine.currentName
 
-		all: ->
-			deprecatedWarning("all", "layer.stateNames")
-			@machine.stateNames
-
-		stateNames: ->
-			deprecatedWarning("stateNames", "layer.stateNames")
-			@machine.stateNames
-
-		states: ->
-			deprecatedWarning("states", "layer.stateNames")
-			@machine.stateNames
-
 		next: (options...) ->
 			deprecatedWarning("next", "layer.stateCycle()")
 			options = _.flatten(options)
@@ -136,9 +124,6 @@ class LayerStates
 	@defineReserved "next", get: -> methods.next
 	@defineReserved "last", get: -> methods.last
 	@defineReserved "state", get: methods.state
-	@defineReserved "all", get: methods.all
-	@defineReserved "stateNames", get: methods.stateNames
-	@defineReserved "states", get: methods.states
 	@defineReserved "on", get: -> methods.on
 	@defineReserved "animationOptions",
 		get: -> @machine.layer.animationOptions

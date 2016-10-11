@@ -10,14 +10,14 @@ describe "LayerStates Backwards compatibility", ->
 			layer.states.add
 				stateA: x: 200
 				stateB: scale: 0.5
-			assert.deepEqual layer.states.stateNames, [initialStateName, "stateA", "stateB"]
+			assert.deepEqual layer.stateNames, [initialStateName, "stateA", "stateB"]
 			assert.deepEqual layer.states.stateA, x: 200
 			assert.deepEqual layer.states.stateB, scale: 0.5
 
 	it "should still support layer.states.add single", ->
 			layer = new Layer
 			layer.states.add("stateA", x: 200)
-			assert.deepEqual layer.states.stateNames, [initialStateName, "stateA"]
+			assert.deepEqual layer.stateNames, [initialStateName, "stateA"]
 			assert.deepEqual layer.states.stateA, x: 200
 
 	it "should still support layer.states.remove", ->
@@ -25,9 +25,9 @@ describe "LayerStates Backwards compatibility", ->
 		layer.states =
 			stateA: x: 200
 			stateB: scale: 0.5
-		assert.deepEqual layer.states.stateNames, [initialStateName, "stateA", "stateB"]
+		assert.deepEqual layer.stateNames, [initialStateName, "stateA", "stateB"]
 		layer.states.remove "stateA"
-		assert.deepEqual layer.states.stateNames, [initialStateName, "stateB"]
+		assert.deepEqual layer.stateNames, [initialStateName, "stateB"]
 
 	it "should still support layer.states.switch", (done) ->
 		layer = new Layer
@@ -46,20 +46,6 @@ describe "LayerStates Backwards compatibility", ->
 			stateB: scale: 0.5
 		layer.states.switchInstant "stateB"
 		assert.equal layer.states.current.name, "stateB"
-
-	it "should still support layer.states.all", ->
-		layer = new Layer
-		layer.states =
-			stateA: x: 200
-			stateB: scale: 0.5
-		assert.deepEqual layer.states.all, [initialStateName, "stateA", "stateB"]
-
-	it "should still support layer.states.states", ->
-		layer = new Layer
-		layer.states =
-			stateA: x: 200
-			stateB: scale: 0.5
-		assert.deepEqual layer.states.states, [initialStateName, "stateA", "stateB"]
 
 	it "should still support layer.states.next", (done) ->
 		layer = new Layer
