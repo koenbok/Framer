@@ -6,6 +6,7 @@ Utils = require "./Utils"
 {Defaults} = require "./Defaults"
 {BaseClass} = require "./BaseClass"
 {Animator} = require "./Animator"
+{LinearAnimator} = require "./Animators/LinearAnimator"
 
 numberRE = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/
 relativePropertyRE = new RegExp("^(?:([+-])=|)(" + numberRE.source + ")([a-z%]*)$", "i")
