@@ -613,6 +613,7 @@ class exports.DeviceComponent extends BaseClass
 ###########################################################################
 # DEVICE CONFIGURATIONS
 
+googlePixelReleaseVersion = 75
 desktopReleaseVersion = 70
 newDeviceMinVersion = 53
 oldDeviceMaxVersion = 52
@@ -797,6 +798,24 @@ Nexus6BaseDevice =
 			width:  4304
 			height: 6707
 			offset: 8
+
+PixelBaseDevice =
+	deviceImageWidth: 1224
+	deviceImageHeight: 2492
+	deviceImageCompression: true
+	screenWidth: 1080
+	screenHeight: 1920
+	deviceType: "phone"
+	minStudioVersion: googlePixelReleaseVersion
+	hands:
+		"iphone-hands-2":
+			width:  3344
+			height: 5211
+			offset: 23
+		"iphone-hands-1":
+			width:  3344
+			height: 5211
+			offset: 23
 
 Nexus9BaseDevice =
 	deviceImageWidth: 1896
@@ -1265,6 +1284,11 @@ Devices =
 	"google-nexus-5x": _.clone(Nexus5BaseDevice)
 	"google-nexus-6p": _.clone(Nexus6BaseDevice)
 	"google-nexus-9": _.clone(Nexus9BaseDevice)
+
+	# Pixel
+	"google-pixel-quite-black": _.clone(PixelBaseDevice)
+	"google-pixel-really-blue": _.clone(PixelBaseDevice)
+	"google-pixel-very-silver": _.clone(PixelBaseDevice)
 
 	# HTC ONE A9
 	"htc-one-a9-black": _.clone(HTCa9BaseDevice)
