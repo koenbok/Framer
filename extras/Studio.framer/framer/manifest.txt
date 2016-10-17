@@ -1,26 +1,24 @@
 app.coffee
-app.js
-framer/backups/backup-2016-08-29 21.36.30.coffee
-framer/backups/backup-2016-08-29 21.41.21.coffee
-framer/backups/backup-2016-08-29 21.46.30.coffee
-framer/backups/backup-2016-08-29 21.47.30.coffee
-framer/backups/backup-2016-08-29 21.48.30.coffee
-framer/backups/backup-2016-08-29 21.49.17.coffee
-framer/backups/backup-2016-08-29 21.49.30.coffee
-framer/backups/backup-2016-08-29 21.50.30.coffee
-framer/backups/backup-2016-08-29 21.55.18.coffee
-framer/backups/backup-2016-08-29 21.55.30.coffee
-framer/backups/backup-2016-08-29 21.56.17.coffee
-framer/backups/backup-2016-08-29 21.56.30.coffee
-framer/backups/backup-2016-08-29 21.58.30.coffee
-framer/backups/backup-2016-08-29 21.59.17.coffee
-framer/backups/backup-2016-08-29 21.59.30.coffee
-framer/backups/backup-2016-08-29 22.00.30.coffee
-framer/backups/backup-2016-08-29 22.01.30.coffee
-framer/backups/backup-2016-08-30 20.49.56.coffee
-framer/backups/backup-2016-08-30 20.51.56.coffee
-framer/backups/backup-2016-08-30 20.53.56.coffee
-framer/backups/backup-2016-09-01 21.54.01.coffee
+framer/backups/backup-2016-09-09 13.00.21.coffee
+framer/backups/backup-2016-09-09 13.17.21.coffee
+framer/backups/backup-2016-09-09 13.18.21.coffee
+framer/backups/backup-2016-09-16 11.25.31.coffee
+framer/backups/backup-2016-09-16 11.43.31.coffee
+framer/backups/backup-2016-09-16 11.53.31.coffee
+framer/backups/backup-2016-09-16 13.52.54.coffee
+framer/backups/backup-2016-09-16 14.03.54.coffee
+framer/backups/backup-2016-09-16 14.04.54.coffee
+framer/backups/backup-2016-09-16 14.05.54.coffee
+framer/backups/backup-2016-09-16 14.06.54.coffee
+framer/backups/backup-2016-09-16 14.07.54.coffee
+framer/backups/backup-2016-09-16 14.08.54.coffee
+framer/backups/backup-2016-09-16 14.11.54.coffee
+framer/backups/backup-2016-09-16 14.12.54.coffee
+framer/backups/backup-2016-09-16 14.13.54.coffee
+framer/backups/backup-2016-09-19 10.37.50.coffee
+framer/backups/backup-2016-10-17 12.05.35.coffee
+framer/backups/backup-2016-10-17 12.34.35.coffee
+framer/backups/backup-2016-10-17 13.30.35.coffee
 framer/coffee-script.js
 framer/config.json
 framer/framer.debug.js
@@ -40,12 +38,17 @@ framer/images/icon-180.png
 framer/images/icon-192.png
 framer/images/icon-76.png
 framer/manifest.txt
+framer/metadata.json
 framer/preview.png
 framer/style.css
 framer/version
 images/banner.png
-images/framer-icon.png
-images/photo.jpg
+images/bg.jpg
+images/close.png
+images/icon-facebook.png
+images/icon-twitter.png
+images/logo-button.png
+images/logo.png
 imported/label@1x/images/Layer-appBar-rty5mtld.png
 imported/label@1x/images/Layer-description-ruy1ntfe.png
 imported/label@1x/images/Layer-iconBack-q0q4rjk2.png
@@ -69,7 +72,12 @@ imported/label@1x/images/Layer-statusBarContent-nezcmjc2.png
 imported/label@1x/images/Layer-title-rjg2qtzd.png
 imported/label@1x/layers.json
 imported/label@1x/layers.json.js
-imported/test@2x/images/Layer-main-ndeymdbd.png
+imported/test@1x/images/Layer-Group-ndg2mzvg.png
+imported/test@1x/layers.json
+imported/test@1x/layers.json.js
+imported/test@2x/images/Layer-Group-ndg2mzvg.png
 imported/test@2x/layers.json
 imported/test@2x/layers.json.js
 index.html
+modules/mediaInfo.coffee
+modules/WindowComponent.coffee

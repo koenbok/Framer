@@ -28,6 +28,7 @@ class exports.InputLayer extends TextLayer
 			width: @width - 60
 			parent: @
 
+
 		if not @multiLine
 			@_inputElement = document.createElement("input")
 		else
@@ -38,6 +39,9 @@ class exports.InputLayer extends TextLayer
 		# To allow styling the placeholder colors of seperate elements.
 		@_id = Utils.round(Utils.randomNumber(0, 100))
 		@_inputElement.className = "input" + @_id
+
+		@on "change:width", =>
+			@_inputElement.style.width = "#{@input.width}px}"
 
 		# Append element
 		@input._element.appendChild(@_inputElement)
@@ -53,8 +57,11 @@ class exports.InputLayer extends TextLayer
 		@_inputElement.style.width = "#{@width - 64}px"
 		@_inputElement.style.height = "#{@height}px"
 		@_inputElement.style.cursor = "auto"
+		@_inputElement.style.webkitAppearance = "none"
+		@_inputElement.style.resize = "none"
 
 		# If text has been defined, use that, otherwise default to placeholder
+		@_defaultText = @text
 		@_setPlaceholder()
 
 		# Override text property setting the html
@@ -67,7 +74,6 @@ class exports.InputLayer extends TextLayer
 		@_inputElement.onfocus = (e) =>
 
 			@_inputElement.style.color = "#000"
-			@_inputElement.value = ""
 
 			# Emit focus event
 			@emit(Events.InputFocus, event)
@@ -102,8 +108,8 @@ class exports.InputLayer extends TextLayer
 				@_setPlaceholder()
 
 	_setPlaceholder: =>
-		@_inputElement.placeholder =
-			if @text isnt "" and @text isnt "Type Something" then @text else "Placeholder"
+
+		@_inputElement.placeholder = @_defaultText
 
 		unless @_isFocused
 			@_inputElement.style.color =

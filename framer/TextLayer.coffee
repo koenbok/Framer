@@ -7,10 +7,13 @@ class exports.TextLayer extends Layer
 
 		options.width ?= 300
 		options.backgroundColor ?= "transparent"
-		options.html ?= "Type Something"
+		options.html ?= "Add text"
 		options.color ?= "#888"
 
 		super options
+
+		# Set word-break
+		# @style.wordBreak = "break-word"
 
 		# Set type defaults
 		if not @fontFamily
