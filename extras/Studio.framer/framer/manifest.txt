@@ -1,24 +1,25 @@
 app.coffee
-framer/backups/backup-2016-09-09 13.00.21.coffee
-framer/backups/backup-2016-09-09 13.17.21.coffee
-framer/backups/backup-2016-09-09 13.18.21.coffee
-framer/backups/backup-2016-09-16 11.25.31.coffee
-framer/backups/backup-2016-09-16 11.43.31.coffee
-framer/backups/backup-2016-09-16 11.53.31.coffee
-framer/backups/backup-2016-09-16 13.52.54.coffee
-framer/backups/backup-2016-09-16 14.03.54.coffee
-framer/backups/backup-2016-09-16 14.04.54.coffee
-framer/backups/backup-2016-09-16 14.05.54.coffee
-framer/backups/backup-2016-09-16 14.06.54.coffee
-framer/backups/backup-2016-09-16 14.07.54.coffee
-framer/backups/backup-2016-09-16 14.08.54.coffee
-framer/backups/backup-2016-09-16 14.11.54.coffee
-framer/backups/backup-2016-09-16 14.12.54.coffee
-framer/backups/backup-2016-09-16 14.13.54.coffee
-framer/backups/backup-2016-09-19 10.37.50.coffee
-framer/backups/backup-2016-10-17 12.05.35.coffee
-framer/backups/backup-2016-10-17 12.34.35.coffee
-framer/backups/backup-2016-10-17 13.30.35.coffee
+framer/backups/backup-2016-10-17 14.57.35.coffee
+framer/backups/backup-2016-10-17 14.58.35.coffee
+framer/backups/backup-2016-10-17 15.24.35.coffee
+framer/backups/backup-2016-10-17 15.25.35.coffee
+framer/backups/backup-2016-10-17 15.26.35.coffee
+framer/backups/backup-2016-10-17 15.27.35.coffee
+framer/backups/backup-2016-10-17 15.29.35.coffee
+framer/backups/backup-2016-10-17 15.30.35.coffee
+framer/backups/backup-2016-10-17 15.31.35.coffee
+framer/backups/backup-2016-10-17 15.34.35.coffee
+framer/backups/backup-2016-10-17 15.35.35.coffee
+framer/backups/backup-2016-10-17 16.37.35.coffee
+framer/backups/backup-2016-10-17 16.38.35.coffee
+framer/backups/backup-2016-10-17 16.39.35.coffee
+framer/backups/backup-2016-10-17 16.54.35.coffee
+framer/backups/backup-2016-10-17 16.56.35.coffee
+framer/backups/backup-2016-10-17 16.58.35.coffee
+framer/backups/backup-2016-10-17 17.00.35.coffee
+framer/backups/backup-2016-10-17 17.05.35.coffee
+framer/backups/backup-2016-10-18 11.31.34.coffee
+framer/backups/backup-2016-10-18 11.32.34.coffee
 framer/coffee-script.js
 framer/config.json
 framer/framer.debug.js

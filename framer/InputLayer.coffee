@@ -26,14 +26,15 @@ class exports.InputLayer extends TextLayer
 			backgroundColor: "transparent"
 			x: 30
 			width: @width - 60
+			height: @height
 			parent: @
-
+			name: "input"
 
 		if not @multiLine
 			@_inputElement = document.createElement("input")
 		else
 			@_inputElement = document.createElement("textarea")
-			@input.y = 30
+			@input.y = 25
 
 		# The id serves to differentiate multiple input elements from one another.
 		# To allow styling the placeholder colors of seperate elements.
@@ -47,18 +48,31 @@ class exports.InputLayer extends TextLayer
 		@input._element.appendChild(@_inputElement)
 
 		# Match TextLayer defaults and type properties
-		@_inputElement.style.fontFamily = @fontFamily
-		@_inputElement.style.fontSize = @fontSize
-		@_inputElement.style.lineHeight = @lineHeight
-		@_inputElement.style.fontWeight = @fontWeight
-		@_inputElement.style.color = @color
-		@_inputElement.style.outline = "none"
-		@_inputElement.style.backgroundColor = "transparent"
-		@_inputElement.style.width = "#{@width - 64}px"
-		@_inputElement.style.height = "#{@height}px"
-		@_inputElement.style.cursor = "auto"
-		@_inputElement.style.webkitAppearance = "none"
-		@_inputElement.style.resize = "none"
+		@_setTextProperties = =>
+			@_inputElement.style.fontFamily = @fontFamily
+			@_inputElement.style.fontSize = @fontSize
+			@_inputElement.style.lineHeight = @lineHeight
+			@_inputElement.style.fontWeight = @fontWeight
+			@_inputElement.style.color = @color
+			@_inputElement.style.outline = "none"
+			@_inputElement.style.backgroundColor = "transparent"
+			@_inputElement.style.width = "#{@width - 64}px"
+			@_inputElement.style.height = "#{@height}px"
+			@_inputElement.style.cursor = "auto"
+			@_inputElement.style.webkitAppearance = "none"
+			@_inputElement.style.resize = "none"
+
+		@_setTextProperties()
+
+		# All inherited properties
+		@_textProperties =
+			{@fontFamily, @fontSize, @lineHeight, @fontWeight, @color, @backgroundColor, @width, @height}
+
+		for property, value of @_textProperties
+
+			@on "change:#{property}", (value) =>
+				@_setTextProperties()
+				@_setPlaceholder()
 
 		# If text has been defined, use that, otherwise default to placeholder
 		@_defaultText = @text
@@ -108,7 +122,6 @@ class exports.InputLayer extends TextLayer
 				@_setPlaceholder()
 
 	_setPlaceholder: =>
-
 		@_inputElement.placeholder = @_defaultText
 
 		unless @_isFocused
