@@ -1,8 +1,8 @@
-field = new TextLayer
-	text: "hey"  
-	
-field.color = "red"
-field.fontWeight = 600
+# field = new TextLayer
+# 	text: "hey"  
+# 	
+# field.color = "red"
+# field.fontWeight = 600
 
 field = new InputLayer
 	text: "hey"  
@@ -11,4 +11,4 @@ field = new InputLayer
 	
 field.fontWeight = 600
 field.color = "red"
-field.focusColor = "red"
+field.focusColor = "blue"

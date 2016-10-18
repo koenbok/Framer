@@ -12,9 +12,6 @@ class exports.TextLayer extends Layer
 
 		super options
 
-		# Set word-break
-		# @style.wordBreak = "break-word"
-
 		# Set type defaults
 		if not @fontFamily
 
