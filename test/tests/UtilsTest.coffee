@@ -40,12 +40,12 @@ describe "Utils", ->
 			result.args.should.eql ["100"]
 
 		it "should work with multiple arguments", ->
-			result = Utils.parseFunction "spring(100,50)"
+			result = Utils.parseFunction "spring(100, 50)"
 			result.name.should.equal "spring"
 			result.args.should.eql ["100", "50"]
 
 		it "should cleanup arguments", ->
-			result = Utils.parseFunction "spring(100 , 50 )"
+			result = Utils.parseFunction "spring(100, 50)"
 			result.name.should.equal "spring"
 			result.args.should.eql ["100", "50"]
 
@@ -231,7 +231,7 @@ describe "Utils", ->
 			# 	Utils.textSize(text, style, {width:100}).should.eql({width:100, height:40})
 
 			# it "should return the right size with height constraint", ->
-			# 	Utils.textSize(text, style, {height:100}).should.eql(width:168,height:100)
+			# 	Utils.textSize(text, style, {height:100}).should.eql(width:168, height:100)
 
 
 	describe "frameSortByAbsoluteDistance", ->
@@ -401,6 +401,15 @@ describe "Utils", ->
 			Utils.isFileUrl("file:///Users/koen/Desktop/index.html").should.equal(true)
 			Utils.isFileUrl("http://apple.com/index.html").should.equal(false)
 			Utils.isFileUrl("https://apple.com/index.html").should.equal(false)
+			
+	describe "isDataUrl", ->
+		it "should work", ->
+			dataUrlGif = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+			dataUrlPng = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAADUlEQVQI12P4z8DwHwAFAAH/cpxSZwAAAABJRU5ErkJggg=="
+			Utils.isDataUrl(dataUrlGif).should.equal(true)
+			Utils.isDataUrl(dataUrlPng).should.equal(true)
+			Utils.isDataUrl("file:///Users/koen/Desktop/foo.gif").should.equal(false)
+			Utils.isDataUrl("http://data.com/1x1.png").should.equal(false)
 
 	describe "isRelativeUrl", ->
 		it "should work", ->
@@ -422,9 +431,11 @@ describe "Utils", ->
 
 	describe "isLocalAssetUrl", ->
 		it "should work", ->
+			dataUrl = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
 			Utils.isLocalAssetUrl("Desktop/index.html", "http://localhost/index.html").should.equal(true)
 			Utils.isLocalAssetUrl("/Desktop/index.html", "http://localhost/index.html").should.equal(true)
 			Utils.isLocalAssetUrl("Desktop/index.html", "http://127.0.0.1/index.html").should.equal(true)
 			Utils.isLocalAssetUrl("Desktop/index.html", "http://apple.com/index.html").should.equal(false)
 			Utils.isLocalAssetUrl("file:///Desktop/index.html", "http://apple.com/index.html").should.equal(true)
 			Utils.isLocalAssetUrl("http://apple.com/index.html", "http://127.0.0.1/index.html").should.equal(false)
+			Utils.isLocalAssetUrl("Desktop/index.html", dataUrl).should.equal(false)

@@ -11,9 +11,9 @@ Utils = require "./Utils"
 {FrictionSimulator} = require "./Simulators/FrictionSimulator"
 {MomentumBounceSimulator} = require "./Simulators/MomentumBounceSimulator"
 
-Events.SimulationStart = 'simulationStart'
-Events.SimulationStep = 'simulationStep'
-Events.SimulationStop = 'simulationStop'
+Events.SimulationStart = "simulationStart"
+Events.SimulationStep = "simulationStep"
+Events.SimulationStop = "simulationStop"
 
 SimulatorClasses =
 	"spring": SpringSimulator

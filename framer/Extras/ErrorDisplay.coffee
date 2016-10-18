@@ -45,7 +45,7 @@ class ErrorDisplay extends BaseClass
 				y: Align.bottom
 				width: Canvas.width
 				height: Config.height
-				backgroundColor: "rgba(255,0,0,1)"
+				backgroundColor: "rgba(255, 0, 0, 1)"
 			
 			error.text = new Layer
 				name: "text"
@@ -85,10 +85,10 @@ class ErrorDisplay extends BaseClass
 		error.text.html = message
 
 		animation = error.animate
-			properties:
-				scale: 1
-			curve: "spring(800, 55, 10)"
-		
+			scale: 1
+			options:
+				curve: "spring(800, 55, 10)"
+
 	destroy: ->
 		@_context?.destroy()
 

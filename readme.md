@@ -25,22 +25,22 @@ imageLayer.center()
 ```
 ###### Add states
 ```javascript  
-imageLayer.states.add({
+imageLayer.states = {
 	second: {y:100, scale:0.6, rotationZ:100},
 	third:  {y:300, scale:1.3},
-	fourth:	{y:200, scale:0.9, rotationZ:200},
-})
+	fourth:	{y:200, scale:0.9, rotationZ:200}
+}
 ```
 ###### Set default animation options
 ```javascript
-imageLayer.states.animationOptions = {
+imageLayer.animationOptions = {
 	curve: "spring(500,12,0)"
 }
 ```
 ###### Toggle states on click
 ```javascript
 imageLayer.onClick(function(event) {
-	imageLayer.states.next()
+	imageLayer.stateCycle()
 })
 ```
 #### Features
@@ -89,6 +89,9 @@ There are also a set of visual and interactive tests for Framer Studio which you
 
 
 ## More
+
 - [Framer Studio](http://framerjs.com) - Prototyping application for OS X, built on Framer
 - [Latest Builds](http://builds.framerjs.com) - Latest builds of Framer.js
 - [Framer 3 Changes](https://github.com/koenbok/Framer/wiki/Framer-3-Changes) - What's new in Framer 3
+
+To add or update the resources for http://resources.framerjs.com (like the devices) run `make resources` and commit. The result will automatically get deployed.

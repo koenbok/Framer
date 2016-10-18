@@ -6,16 +6,23 @@ Utils = require "./Utils"
 
 Originals =
 	Layer:
-		backgroundColor: "rgba(123,123,123,0.5)"
+		backgroundColor: "rgba(123, 123, 123, 0.5)"
 		color: "white"
-		shadowColor: "rgba(123,123,123,0.5)"
-		borderColor: "rgba(123,123,123,0.5)"
+		shadowColor: "rgba(123, 123, 123, 0.5)"
+		borderColor: "rgba(123, 123, 123, 0.5)"
 		width: 200
 		height: 200
 	Animation:
-		# curve: "spring(400,40,0)" # Or, the Cemre-Curve
+		# curve: "spring(400, 40, 0)" # Or, the Cemre-Curve
 		curve: "ease"
+		curveOptions: {}
 		time: 1
+		repeat: 0
+		delay: 0
+		debug: false
+		colorModel: "husl"
+		animate: true
+		looping: false
 	Context:
 		perspective: 0
 		perspectiveOriginX: 0.5
@@ -25,7 +32,7 @@ Originals =
 	DeviceComponent:
 		fullScreen: false
 		padding: 50
-		deviceType: "apple-iphone-6s-silver"
+		deviceType: "apple-iphone-7-silver"
 		deviceZoom: "fit"
 		contentZoom: 1
 		orientation: "portrait"
@@ -77,7 +84,7 @@ Originals =
 		mouseWheelEnabled: false
 		backgroundColor: null
 	Hints:
-		color: "rgba(144,19,254,0.8)"
+		color: "rgba(144, 19, 254, 0.8)"
 
 
 exports.Defaults =

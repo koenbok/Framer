@@ -46,7 +46,7 @@ class exports.SliderComponent extends Layer
 		@knob = new Knob
 			backgroundColor: "#fff"
 			shadowY: 1, shadowBlur: 3
-			shadowColor: "rgba(0,0,0,0.35)"
+			shadowColor: "rgba(0, 0, 0, 0.35)"
 			name: "knob"
 
 		@fill = new Layer
@@ -243,7 +243,7 @@ class exports.SliderComponent extends Layer
 			else
 				return Utils.modulate(value, [0, @height], [@min, @max], true)
 
-	animateToValue: (value, animationOptions={curve:"spring(300,25,0)"}) ->
+	animateToValue: (value, animationOptions={curve:"spring(300, 25, 0)"}) ->
 		if @width > @height
 			animationOptions.properties = {x: @pointForValue(value) - (@knob.width/2)}
 		else

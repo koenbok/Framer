@@ -7,6 +7,7 @@ Framer._ = _
 Framer.Utils = (require "./Utils")
 Framer.Color = (require "./Color").Color
 Framer.Layer = (require "./Layer").Layer
+Framer._Layer = Framer.Layer # So it won't be overridden by MobileScrollFix
 Framer.BackgroundLayer = (require "./BackgroundLayer").BackgroundLayer
 Framer.VideoLayer = (require "./VideoLayer").VideoLayer
 Framer.SVGLayer = (require "./SVGLayer").SVGLayer

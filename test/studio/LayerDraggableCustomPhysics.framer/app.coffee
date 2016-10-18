@@ -3,7 +3,7 @@ constraints = new Layer
 	width: Screen.width - 100
 	height: Screen.height - 400
 constraints.clip = false
-constraints.backgroundColor = "rgba(0,0,0,.1)"
+constraints.backgroundColor = "rgba(0, 0, 0, .1)"
 constraints.center()
 
 layer = new Layer

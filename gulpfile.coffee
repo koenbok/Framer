@@ -93,7 +93,7 @@ gulp.task "webpack:release", ["version"], (callback) ->
 
 	webpackDev("webpack:release", config, callback)
 
-gulp.task "webpack:tests", ["webpack:debug"],(callback) ->
+gulp.task "webpack:tests", ["webpack:debug"], (callback) ->
 
 	config = _.extend WEBPACK,
 		entry: "./test/tests.coffee"
@@ -112,7 +112,7 @@ log = (task, args...) ->
 
 command = (cmd, cb) ->
 	exec cmd, {cwd: __dirname}, (err, stdout, stderr) ->
-		cb?(null, stdout.split('\n').join(''))
+		cb?(null, stdout.split("\n").join(""))
 
 webpackDev = (name, config, callback) ->
 	webpackDev._instances ?= {}

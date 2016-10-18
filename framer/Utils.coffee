@@ -18,16 +18,16 @@ Utils.getValueForKeyPath = (obj, key) ->
 	result
 
 Utils.setValueForKeyPath = (obj, path, val) ->
-	fields = path.split('.')
+	fields = path.split(".")
 	result = obj
 	i = 0
 	n = fields.length
-	while i < n and result != undefined
+	while i < n and result isnt undefined
 		field = fields[i]
 		if i == n - 1
 			result[field] = val
 		else
-			if typeof result[field] == 'undefined' or !_.isObject(result[field])
+			if typeof result[field] == "undefined" or !_.isObject(result[field])
 				result[field] = {}
 			result = result[field]
 		i++
@@ -207,7 +207,7 @@ Utils.inspectObjectType = (item) ->
 	# This is a hacky way to get nice object names, it tries to
 	# parse them from the .toString methods for objects.
 
-	if item.constructor?.name? and item.constructor?.name != "Object"
+	if item.constructor?.name? and item.constructor?.name isnt "Object"
 		return item.constructor.name
 
 	extract = (str) ->
@@ -352,11 +352,14 @@ Utils.isMobile = ->
 Utils.isFileUrl = (url) ->
 	return _.startsWith(url, "file://")
 
+Utils.isDataUrl = (url) ->
+	return _.startsWith(url, "data:")
+
 Utils.isRelativeUrl = (url) ->
 	!/^([a-zA-Z]{1,8}:\/\/).*$/.test(url)
 
 Utils.isLocalServerUrl = (url) ->
-	return url.indexOf("127.0.0.1") != -1 or url.indexOf("localhost")  != -1
+	return url.indexOf("127.0.0.1") isnt -1 or url.indexOf("localhost")  isnt -1
 
 Utils.isLocalUrl = (url) ->
 	return true if Utils.isFileUrl(url)
@@ -365,12 +368,13 @@ Utils.isLocalUrl = (url) ->
 
 Utils.isLocalAssetUrl = (url, baseUrl) ->
 	baseUrl ?= window.location.href
+	return false if Utils.isDataUrl(url)
 	return true if Utils.isLocalUrl(url)
 	return true if Utils.isRelativeUrl(url) and Utils.isLocalUrl(baseUrl)
 	return false
 
 Utils.isFramerStudio = ->
-	navigator.userAgent.indexOf("FramerStudio") != -1
+	navigator.userAgent.indexOf("FramerStudio") isnt -1
 
 Utils.framerStudioVersion = ->
 
@@ -501,7 +505,6 @@ Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 # STRING FUNCTIONS
 
 Utils.parseFunction = (str) ->
-
 	result = {name: "", args: []}
 
 	if _.endsWith str, ")"
@@ -638,6 +641,9 @@ Utils.loadImage = (url, callback, context) ->
 		callback(true)
 
 	element.src = url
+
+Utils.isInsideIframe = ->
+	return window isnt window.top
 
 ######################################################
 # GEOMETRY FUNCTIONS
@@ -877,7 +883,7 @@ Utils.frameMerge = ->
 	frame
 
 Utils.frameInFrame = (frameA, frameB) ->
-	
+
 	for point in Utils.pointsFromFrame(frameA)
 		return false unless Utils.pointInFrame(point, frameB)
 
@@ -925,7 +931,7 @@ Utils.pointInPolygon = (point, vs) ->
 		yi = vs[i][1]
 		xj = vs[j][0]
 		yj = vs[j][1]
-		intersect = yi > y != yj > y and x < (xj - xi) * (y - yi) / (yj - yi) + xi
+		intersect = yi > y isnt yj > y and x < (xj - xi) * (y - yi) / (yj - yi) + xi
 		if intersect
 			inside = !inside
 		j = i++
@@ -1020,7 +1026,7 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 	ancestors = layer.ancestors(rootContext)
 	ancestors.reverse()
 	ancestors.push(layer) if includeLayer
-	
+
 	for ancestor in ancestors
 		continue unless ancestor.matrix3d
 		point = ancestor.matrix3d.inverse().point(point)
@@ -1086,7 +1092,7 @@ Utils.globalLayers = (importedLayers) ->
 	for layerName, layer of importedLayers
 
 		# Replace all whitespace in layer names
-		layerName = layerName.replace(/\s/g,"")
+		layerName = layerName.replace(/\s/g, "")
 
 		# Check if there are global variables with the same name
 		if window.hasOwnProperty(layerName) and not window.Framer._globalWarningGiven

@@ -26,8 +26,8 @@ describe "Layer", ->
 			Framer.Defaults.Layer.height.should.equal previousHeight
 
 		it "should set defaults", ->
-			width = Utils.randomNumber(0,400)
-			height = Utils.randomNumber(0,400)
+			width = Utils.randomNumber(0, 400)
+			height = Utils.randomNumber(0, 400)
 			Framer.Defaults =
 				Layer:
 					width: width
@@ -63,9 +63,13 @@ describe "Layer", ->
 
 		it "should set defaults with override", ->
 
-			layer = new Layer x:50, y:50
+			layer = new Layer x:50, y:60
 			layer.x.should.equal 50
-			layer.x.should.equal 50
+			layer.y.should.equal 60
+
+		it "should have default animationOptions", ->
+			layer = new Layer
+			layer.animationOptions.should.eql {}
 
 	describe "Properties", ->
 
@@ -114,7 +118,7 @@ describe "Layer", ->
 			# layer.style.webkitTransform.should.equal "matrix(1, 0, 0, 1, 100, 0)"
 			layer.style.webkitTransform.should.equal "translate3d(0.00001px, 0.000001px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
 
-		it "should handle scientific notation in scaleX,Y and Z", ->
+		it "should handle scientific notation in scaleX, Y and Z", ->
 
 			layer = new Layer
 			layer.scaleX = 2
@@ -256,6 +260,23 @@ describe "Layer", ->
 			#layer.computedStyle()["background-size"].should.equal "cover"
 			#layer.computedStyle()["background-repeat"].should.equal "no-repeat"
 
+					
+		it "should not append nocache to a base64 encoded image", ->
+
+			fullPath = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEwAAABMBAMAAAA1uUwYAAAAAXNSR0IArs4c6QAAABVQTFRFKK/6LFj/g9n/lNf9lqz/wez/////Ke+vpgAAAK1JREFUSMft1sENhDAMBdFIrmBboAjuaWFrsNN/CRwAgUPsTAH556c5WVFKQyuLLYbZf/MLmDHW5yJmjHW5kBljPhczY8zlEmaMvXMZM8ZeuZQZY08uZzZh5dqen+XNhLFBbsiEsW9uzISxTy5gwlifi5gw1uVCJoz5XMyEMZdLmASs/s5NnkFl7M7NmDJ25aZMGTtzc6aMtcqYMtYqY8pYq4wpY60ypuvnsNizA+E6656TNMZlAAAAAElFTkSuQmCC"
+			layer = new Layer
+
+			layer.image = fullPath
+			layer.image.should.equal fullPath
+
+			image = layer.props.image
+			image.should.equal fullPath
+
+			layer.style["background-image"].indexOf(fullPath).should.not.equal(-1)
+			layer.style["background-image"].indexOf("data:").should.not.equal(-1)
+			layer.style["background-image"].indexOf("?nocache=").should.equal(-1)
+
+
 		it "should cancel loading when setting image to null", (done) ->
 			prefix = "../"
 			imagePath = "static/test.png"
@@ -309,6 +330,12 @@ describe "Layer", ->
 			layer.name = "Test"
 			layer.name.should.equal "Test"
 			layer._element.getAttribute("name").should.equal "Test"
+
+		it "should handle false layer names correctly", ->
+			layer = new Layer
+				name: 0
+			layer.name.should.equal "0"
+			layer._element.getAttribute("name").should.equal "0"
 
 		it "should handle background color with image", ->
 
@@ -525,7 +552,7 @@ describe "Layer", ->
 			layer.shadowBlur.should.equal 10
 			layer.shadowSpread.should.equal 10
 
-			layer.style.boxShadow.should.equal "rgba(123, 123, 123, 0.496094) 10px 10px 10px 10px"
+			layer.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 10px 10px 10px"
 
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = "red"
@@ -891,7 +918,7 @@ describe "Layer", ->
 
 		it "should calculate scaled frame", ->
 			layerA = new Layer x:100, width:500, height:900, scale:0.5
-			layerA.scaledFrame().should.eql {"x":225,"y":225,"width":250,"height":450}
+			layerA.scaledFrame().should.eql {"x":225, "y":225, "width":250, "height":450}
 
 		it "should calculate scaled screen frame", ->
 
@@ -899,9 +926,9 @@ describe "Layer", ->
 			layerB = new Layer y:50, width:600, height:600, scale:0.8, superLayer:layerA
 			layerC = new Layer y:-60, width:800, height:700, scale:1.2, superLayer:layerB
 
-			layerA.screenScaledFrame().should.eql {"x":225,"y":225,"width":250,"height":450}
-			layerB.screenScaledFrame().should.eql {"x":255,"y":280,"width":240,"height":240}
-			layerC.screenScaledFrame().should.eql {"x":223,"y":228,"width":384,"height":336}
+			layerA.screenScaledFrame().should.eql {"x":225, "y":225, "width":250, "height":450}
+			layerB.screenScaledFrame().should.eql {"x":255, "y":280, "width":240, "height":240}
+			layerC.screenScaledFrame().should.eql {"x":223, "y":228, "width":384, "height":336}
 
 		it "should accept point shortcut", ->
 			layer = new Layer point:10
@@ -982,7 +1009,7 @@ describe "Layer", ->
 			layer = new Layer
 			layer.destroy()
 
-			(layer in Framer.CurrentContext.getLayers()).should.be.false
+			(layer in Framer.CurrentContext.layers).should.be.false
 			assert.equal layer._element.parentNode, null
 
 		it "should set text", ->
@@ -1126,7 +1153,7 @@ describe "Layer", ->
 
 			X = 100
 			Y = 200
-			IMAGE = '../static/test.png'
+			IMAGE = "../static/test.png"
 			BORDERRADIUS = 20
 
 			layer = new Layer
@@ -1175,9 +1202,9 @@ describe "Layer", ->
 			layer = new Layer
 			layer.draggable.enabled = true
 
-			a1 = layer.animateTo x:100
-			a2 = layer.animateTo y:100
-			a3 = layer.animateTo blur:1
+			a1 = layer.animate x:100
+			a2 = layer.animate y:100
+			a3 = layer.animate blur:1
 
 			a1.isAnimating.should.equal true
 			a2.isAnimating.should.equal true
@@ -1229,7 +1256,7 @@ describe "Layer", ->
 
 		it "should correctly convert points when layers are nested", ->
 
-			layerBOffset = 
+			layerBOffset =
 				x: 0
 				y: 200
 
@@ -1282,4 +1309,3 @@ describe "Layer", ->
 
 			canvasToLayerBPoint.x.should.equal -25
 			canvasToLayerBPoint.y.should.equal 125
-
