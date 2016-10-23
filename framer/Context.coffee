@@ -131,6 +131,9 @@ class exports.Context extends BaseClass
 		return layer if layer
 		return @layerForElement(element.parentNode)
 
+	selectLayers: (selector) -> 
+		return _.filter @_layers, (layer) -> Utils.layerMatchesSelector(layer, selector)
+
 	# Animations
 	@define "animations", get: -> _.clone(@_animations)
 
