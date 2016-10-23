@@ -132,7 +132,7 @@ describe "Context", ->
 
 			context.run ->
 				layer = new Layer
-				animation = layer.animateTo
+				animation = layer.animate
 					x: 100
 
 			# We should have a click listener
@@ -219,7 +219,7 @@ describe "Context", ->
 
 			context = new Framer.Context(name:"Test")
 			context.on "layer:create", ->
-				context.getLayers().length.should.equal 1
+				context.layers.length.should.equal 1
 				callback()
 
 			context.run ->
@@ -231,10 +231,10 @@ describe "Context", ->
 			context = new Framer.Context(name:"Test")
 
 			context.on "layer:create", ->
-				context.getLayers().length.should.equal 1
+				context.layers.length.should.equal 1
 
 			context.on "layer:destroy", ->
-				context.getLayers().length.should.equal 0
+				context.layers.length.should.equal 0
 				callback()
 
 			context.run ->

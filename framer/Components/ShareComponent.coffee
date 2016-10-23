@@ -59,25 +59,22 @@ class Button extends ShareLayer
 
 		@props = _.merge(defaultProps, options)
 
-		@states.add
+		@states =
 			hover: opacity: .8
 			full: opacity: 1
-		@states.animationOptions =
+		@animationOptions =
 			time: .3
 
 		@onMouseOver ->
 			@style.cursor = "pointer"
-			@states.switch("hover")
-			@animate
-				properties:
-					opacity: .8
+			@animate("hover")
 
 		@onMouseOut ->
-			@states.switch("full")
+			@animate("full")
 
 		@onTap ->
 			if options.shareButton
-				window.open(options.url, "Share", "width=560,height=714")
+				window.open(options.url, "Share", "width=560, height=714")
 			else
 				window.open(options.url, "_blank")
 
@@ -174,7 +171,7 @@ class ShareComponent
 			backgroundColor: "#FFF"
 			visible: false
 			style:
-				boxShadow: "0 0 0 1px rgba(0,0,0,.12), 0 1px 3px rgba(0,0,0,.08)"
+				boxShadow: "0 0 0 1px rgba(0, 0, 0, .12), 0 1px 3px rgba(0, 0, 0, .08)"
 
 	# Render buttons to open / close sheet
 	_renderToggleButtons: ->
@@ -186,7 +183,7 @@ class ShareComponent
 			backgroundColor: "#FFF"
 			visible: false
 			style:
-				boxShadow: "0 0 0 1px rgba(0,0,0,.12), 0 1px 3px rgba(0,0,0,.08)"
+				boxShadow: "0 0 0 1px rgba(0, 0, 0, .12), 0 1px 3px rgba(0, 0, 0, .08)"
 
 		openLogo = new Layer
 			parent: @open
@@ -278,7 +275,7 @@ class ShareComponent
 			height: 16
 
 		# If we miss a title from the json metadata, we fallback to the document url
-		fallbackTitle = _.replace(FramerStudioInfo.documentTitle, /\.framer$/, "")
+		fallbackTitle = _.replace(FramerStudioInfo?.documentTitle, /\.framer$/, "")
 
 		@credentialsTitle = new ShareLayer
 			parent: @credentials
@@ -335,7 +332,7 @@ class ShareComponent
 				parent: @avatar
 				borderRadius: 100
 				style:
-					boxShadow: "0 0 0 1px rgba(0,0,0,.1)"
+					boxShadow: "0 0 0 1px rgba(0, 0, 0, .1)"
 
 			# If author name isn't available, fallback to Twitter handle
 			name = if @shareInfo.author then @shareInfo.author else "@#{@shareInfo.twitter}"

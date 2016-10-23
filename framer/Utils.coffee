@@ -18,16 +18,16 @@ Utils.getValueForKeyPath = (obj, key) ->
 	result
 
 Utils.setValueForKeyPath = (obj, path, val) ->
-	fields = path.split('.')
+	fields = path.split(".")
 	result = obj
 	i = 0
 	n = fields.length
-	while i < n and result != undefined
+	while i < n and result isnt undefined
 		field = fields[i]
 		if i == n - 1
 			result[field] = val
 		else
-			if typeof result[field] == 'undefined' or !_.isObject(result[field])
+			if typeof result[field] == "undefined" or !_.isObject(result[field])
 				result[field] = {}
 			result = result[field]
 		i++
@@ -152,7 +152,7 @@ Utils.randomImage = (layer, offset=50) ->
 	if _.isNumber(layer)
 		layer = {id: layer}
 
-	photos = ["1417733403748-83bbc7c05140", "1423841265803-dfac59ebf718", "1463560018368-0814042d17b7", "1433689056001-018e493576bc", "1430812411929-de4cf1d1fe73", "1457269449834-928af64c684d", "1443616839562-036bb2afd9a2", "1461535676131-2de1f7054d3f", "1462393582935-1ac76b85dcf1", "1414589530802-cb54ce0575d9", "1422908132590-117a051fc5cd", "1438522014717-d7ce32b9bab9", "1451650804883-52fb86cc5b18", "1462058164249-2dcdcda67ce7", "1456757014009-0614a080ff7f", "1434238255348-4fb0d9caa0a4", "1448071792026-7064a01897e7", "1458681842652-019f4eeda5e5", "1460919920543-d8c45f4bd621", "1447767961238-038617b84a2b", "1449089299624-89ce41e8306c", "1414777410116-81e404502b52", "1433994349623-0a18966ee9c0", "1452567772283-91d67178f409", "1458245229726-a8ba04cb5969", "1422246719650-cb30d19825e3", "1417392639864-2c88dd07f460", "1442328166075-47fe7153c128", "1448467258552-6b3982373a13", "1447023362548-250f3a7b80ed", "1451486242265-24b0c0ef9a51", "1414339372428-797ec111646d"]
+	photos = ["1417733403748-83bbc7c05140", "1423841265803-dfac59ebf718", "1433689056001-018e493576bc", "1430812411929-de4cf1d1fe73", "1457269449834-928af64c684d", "1443616839562-036bb2afd9a2", "1461535676131-2de1f7054d3f", "1462393582935-1ac76b85dcf1", "1414589530802-cb54ce0575d9", "1422908132590-117a051fc5cd", "1438522014717-d7ce32b9bab9", "1451650804883-52fb86cc5b18", "1462058164249-2dcdcda67ce7", "1456757014009-0614a080ff7f", "1434238255348-4fb0d9caa0a4", "1448071792026-7064a01897e7", "1458681842652-019f4eeda5e5", "1460919920543-d8c45f4bd621", "1447767961238-038617b84a2b", "1449089299624-89ce41e8306c", "1414777410116-81e404502b52", "1433994349623-0a18966ee9c0", "1452567772283-91d67178f409", "1458245229726-a8ba04cb5969", "1422246719650-cb30d19825e3", "1417392639864-2c88dd07f460", "1442328166075-47fe7153c128", "1448467258552-6b3982373a13", "1447023362548-250f3a7b80ed", "1451486242265-24b0c0ef9a51", "1414339372428-797ec111646d"]
 	photo = Utils.randomChoice(photos)
 	photo = photos[(layer.id) % photos.length] if layer?.id
 
@@ -207,7 +207,7 @@ Utils.inspectObjectType = (item) ->
 	# This is a hacky way to get nice object names, it tries to
 	# parse them from the .toString methods for objects.
 
-	if item.constructor?.name? and item.constructor?.name != "Object"
+	if item.constructor?.name? and item.constructor?.name isnt "Object"
 		return item.constructor.name
 
 	extract = (str) ->
@@ -372,11 +372,14 @@ Utils.isMobile = ->
 Utils.isFileUrl = (url) ->
 	return _.startsWith(url, "file://")
 
+Utils.isDataUrl = (url) ->
+	return _.startsWith(url, "data:")
+
 Utils.isRelativeUrl = (url) ->
 	!/^([a-zA-Z]{1,8}:\/\/).*$/.test(url)
 
 Utils.isLocalServerUrl = (url) ->
-	return url.indexOf("127.0.0.1") != -1 or url.indexOf("localhost")  != -1
+	return url.indexOf("127.0.0.1") isnt -1 or url.indexOf("localhost")  isnt -1
 
 Utils.isLocalUrl = (url) ->
 	return true if Utils.isFileUrl(url)
@@ -385,12 +388,13 @@ Utils.isLocalUrl = (url) ->
 
 Utils.isLocalAssetUrl = (url, baseUrl) ->
 	baseUrl ?= window.location.href
+	return false if Utils.isDataUrl(url)
 	return true if Utils.isLocalUrl(url)
 	return true if Utils.isRelativeUrl(url) and Utils.isLocalUrl(baseUrl)
 	return false
 
 Utils.isFramerStudio = ->
-	navigator.userAgent.indexOf("FramerStudio") != -1
+	navigator.userAgent.indexOf("FramerStudio") isnt -1
 
 Utils.framerStudioVersion = ->
 
@@ -513,7 +517,6 @@ Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 # STRING FUNCTIONS
 
 Utils.parseFunction = (str) ->
-
 	result = {name: "", args: []}
 
 	if _.endsWith str, ")"
@@ -650,6 +653,9 @@ Utils.loadImage = (url, callback, context) ->
 		callback(true)
 
 	element.src = url
+
+Utils.isInsideIframe = ->
+	return window isnt window.top
 
 ######################################################
 # GEOMETRY FUNCTIONS
@@ -889,7 +895,7 @@ Utils.frameMerge = ->
 	frame
 
 Utils.frameInFrame = (frameA, frameB) ->
-	
+
 	for point in Utils.pointsFromFrame(frameA)
 		return false unless Utils.pointInFrame(point, frameB)
 
@@ -937,7 +943,7 @@ Utils.pointInPolygon = (point, vs) ->
 		yi = vs[i][1]
 		xj = vs[j][0]
 		yj = vs[j][1]
-		intersect = yi > y != yj > y and x < (xj - xi) * (y - yi) / (yj - yi) + xi
+		intersect = yi > y isnt yj > y and x < (xj - xi) * (y - yi) / (yj - yi) + xi
 		if intersect
 			inside = !inside
 		j = i++
@@ -1032,7 +1038,7 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 	ancestors = layer.ancestors(rootContext)
 	ancestors.reverse()
 	ancestors.push(layer) if includeLayer
-	
+
 	for ancestor in ancestors
 		continue unless ancestor.matrix3d
 		point = ancestor.matrix3d.inverse().point(point)
@@ -1098,7 +1104,7 @@ Utils.globalLayers = (importedLayers) ->
 	for layerName, layer of importedLayers
 
 		# Replace all whitespace in layer names
-		layerName = layerName.replace(/\s/g,"")
+		layerName = layerName.replace(/\s/g, "")
 
 		# Check if there are global variables with the same name
 		if window.hasOwnProperty(layerName) and not window.Framer._globalWarningGiven

@@ -2,6 +2,10 @@
 
 BIN = $(CURDIR)/node_modules/.bin
 
+DEFAULT_TARGET = extras/Studio.framer
+TARGET ?= $(DEFAULT_TARGET)
+TARGET_EXPANDED = $(shell echo $(TARGET)) # For ~ in paths, gulp needs this
+
 .PHONY: watch test debug release
 
 default: lazy_bootstrap lazy_build test
@@ -26,7 +30,8 @@ clean:
 # Building and testing
 
 watch: lazy_bootstrap
-	$(BIN)/gulp watch
+	-cp $(DEFAULT_TARGET)/index.html $(TARGET)
+	TARGET='$(strip $(TARGET_EXPANDED))' $(BIN)/gulp watch
 
 build: lazy_bootstrap
 	$(BIN)/gulp webpack:debug
@@ -43,7 +48,7 @@ release: lazy_bootstrap
 # Framer Studio
 
 studio:
-	open -a "Framer Beta" extras/Studio.framer
+	open -a "Framer Beta" ${TARGET}
 	make watch
 
 perf: debug
@@ -63,8 +68,5 @@ site-upload: bootstrap site-build
 
 # Resources
 
-resources-optimize:
+resources:
 	python scripts/resources-optimize.py
-
-resources-upload:
-	cd extras/resources.framerjs.com; cactus deploy

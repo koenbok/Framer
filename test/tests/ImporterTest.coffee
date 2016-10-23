@@ -21,7 +21,7 @@ describe "ExternalDocument", ->
 		jsonA = JSON.stringify dataA, null, "\t"
 		jsonB = JSON.stringify dataB, null, "\t"
 
-		if jsonA != jsonB
+		if jsonA isnt jsonB
 			# Uncomment this to see current dump
 			console.log ""
 			console.log "Name: #{name}"

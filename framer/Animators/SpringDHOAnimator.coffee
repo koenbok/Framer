@@ -1,5 +1,3 @@
-Utils = require "../Utils"
-
 {Animator} = require "../Animator"
 
 class exports.SpringDHOAnimator extends Animator
@@ -13,8 +11,6 @@ class exports.SpringDHOAnimator extends Animator
 			damping: 2
 			mass: 0.2
 			time: null # Hack
-
-		console.log "SpringDHOAnimator.options", @options, options
 
 		@_time = 0
 		@_value = 0

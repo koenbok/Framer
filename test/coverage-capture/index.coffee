@@ -11,7 +11,7 @@ fs = require "fs"
 
 collectCoverage = (page) ->
 
-  console.log 'collecting...'
+  console.log "collecting..."
 
   coverage = page.evaluate (() ->
     # Collect the main coverage object from the browser:

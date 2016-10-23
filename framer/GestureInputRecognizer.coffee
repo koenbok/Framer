@@ -322,7 +322,7 @@ class exports.GestureInputRecognizer
 
 	_getEventPoint: (event) ->
 		return @_getTouchPoint(event, 0) if event.touches?.length
-		return {x:event.pageX ,y:event.pageY}
+		return {x:event.pageX, y:event.pageY}
 
 	_getGestureEvent: (event) ->
 
@@ -406,7 +406,7 @@ class exports.GestureInputRecognizer
 		# For delta we switch to center-compare if there are two fingers
 		if @session?.lastEvent
 			# If we just switched fingers, we skip the delta event entirely
-			if event.fingers != @session.lastEvent.fingers == 2
+			if event.fingers isnt @session.lastEvent.fingers == 2
 				event.delta = {x:0, y:0}
 			# If we are having two finger events, we use the touchCenter as base for delta
 			if event.fingers == 2 and @session.lastEvent.fingers == 2

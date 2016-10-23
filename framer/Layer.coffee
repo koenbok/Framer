@@ -46,10 +46,15 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 			@_properties[name] = value
 
-			if cssProperty != null
+			if cssProperty isnt null
 				@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
 			set?(@, value)
+
+			# We try to not send any events while we run the constructor, it just
+			# doesn't make sense, because no one can listen to use yet.
+			return if @__constructor
+
 			@emit("change:#{name}", value)
 			@emit("change:point", value) if name in ["x", "y"]
 			@emit("change:size", value)  if name in ["width", "height"]
@@ -79,8 +84,9 @@ class exports.Layer extends BaseClass
 	constructor: (options={}) ->
 
 		# Make sure we never call the constructor twice
-		throw Error("Layer.constructor #{@toInspect()} called twice") if @__constructed
-		@__constructed = true
+		throw Error("Layer.constructor #{@toInspect()} called twice") if @__constructorCalled
+		@__constructorCalled = true
+		@__constructor = true
 
 		# Set needed private variables
 		@_properties = {}
@@ -134,6 +140,8 @@ class exports.Layer extends BaseClass
 
 		@_context.emit("layer:create", @)
 
+		delete @__constructor
+
 	##############################################################
 	# Properties
 
@@ -142,6 +150,9 @@ class exports.Layer extends BaseClass
 
 	# A placeholder for layer bound properties defined by the user:
 	@define "custom", @simpleProperty("custom", undefined)
+
+	# Default animation options for every animation of this layer
+	@define "animationOptions", @simpleProperty("animationOptions", {})
 
 	# Css properties
 	@define "width",  layerProperty(@, "width",  "width", 100, _.isNumber)
@@ -239,7 +250,7 @@ class exports.Layer extends BaseClass
 		default: ""
 		get: ->
 			name = @_getPropertyValue("name")
-			return name or ""
+			return if name? then "#{name}" else ""
 
 		set: (value) ->
 			@_setPropertyValue("name", value)
@@ -775,7 +786,7 @@ class exports.Layer extends BaseClass
 
 			# If there is no parent we need to walk through the root
 			if @parent is null
-				return _.filter @_context.getLayers(), (layer) =>
+				return _.filter @_context.layers, (layer) =>
 					layer isnt @ and layer.parent is null
 
 			return _.without @parent.children, @
@@ -887,35 +898,57 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## ANIMATION
 
-	animate: (options) ->
-		# console.warn "Layer.animate is deprecated: please use Layer.animateTo instead"
-		properties = options.properties
-		delete options.properties
-		@animateTo(properties, options)
+	animate: (properties, options={}) ->
 
-	animateTo: (properties,options={}) ->
-		_.defaults(options,properties.options)
-		delete properties.options
-		options.properties = Animation.filterAnimatableProperties(properties)
-		options.layer = @
+		# If the properties are a string, we assume it's a state name
+		if _.isString(properties)
 
-		start = options.start
-		start ?= true
-		delete options.start
+			stateName = properties
 
-		if options.instant
-			options.animate = false
-		delete options.instant
-		
-		animation = new Animation options
-		animation.start() if start
-		animation
+			# Support options as an object
+			options = options.options if options.options?
 
-	animations: ->
+			return @states.machine.switchTo(stateName, options)
 
+		# Support the old properties syntax, we add all properties top level and
+		# move the options into an options property.
+		if properties.properties?
+			options = properties
+			properties = options.properties
+			delete options.properties
+
+		# With the new api we treat the properties as animatable properties, and use
+		# the special options keyword for animation options.
+		if properties.options?
+			options = _.defaults({}, options, properties.options)
+			delete properties.options
+
+		# Merge the animation options with the default animation options for this layer
+		options = _.defaults(options, @animationOptions)
+		options.start ?= true
+
+		animation = new Animation(@, properties, options)
+		animation.start() if options.start
+
+		return animation
+
+	stateCycle: (args...) ->
+		states = _.flatten(args)
+		if _.isObject(_.last(states))
+			options = states.pop()
+		@animate(@states.machine.next(states), options)
+
+	stateSwitch: (stateName, options={}) ->
+		unless stateName?
+			throw new Error("Missing required argument 'stateName' in stateSwitch()")
+		return @animate(stateName, options) if options.animate is true
+		return @animate(stateName, _.defaults({}, options, {instant:true}))
+
+	animations: (includePending=false)->
 		# Current running animations on this layer
 		_.filter @_context.animations, (animation) =>
-			animation.options.layer is @
+			return false unless (animation.layer is @)
+			return includePending or not animation.isPending
 
 	animatingProperties: ->
 
@@ -970,7 +1003,18 @@ class exports.Layer extends BaseClass
 		enumerable: false
 		exportable: false
 		importable: false
-		get: -> @_states ?= new LayerStates @
+		get: ->
+			@_states ?= new LayerStates(@)
+			return @_states
+		set: (states) ->
+			@states.machine.reset()
+			_.extend(@states, states)
+
+	@define "stateNames",
+		enumerable: false
+		exportable: false
+		importable: false
+		get: -> @states.machine.stateNames
 
 	#############################################################################
 	## Draggable, Pinchable
@@ -1139,8 +1183,12 @@ class exports.Layer extends BaseClass
 	onDragAnimationEnd: (cb) -> @on(Events.DragAnimationEnd, cb)
 	onDirectionLockStart: (cb) -> @on(Events.DirectionLockStart, cb)
 
-	onStateDidSwitch: (cb) -> @on(Events.StateDidSwitch, cb)
-	onStateWillSwitch: (cb) -> @on(Events.StateWillSwitch, cb)
+	onStateSwitchStart: (cb) -> @on(Events.StateSwitchStart, cb)
+	onStateSwitchStop: (cb) -> @on(Events.StateSwitchStop, cb)
+	onStateSwitchEnd: (cb) -> @on(Events.StateSwitchEnd, cb)
+
+	onStateWillSwitch: (cb) -> @on(Events.StateSwitchStart, cb) # Deprecated
+	onStateDidSwitch: (cb) -> @on(Events.StateSwitchEnd, cb) # Deprecated
 
 	# Gestures
 
@@ -1256,7 +1304,7 @@ class exports.Layer extends BaseClass
 
 		# Don't show any hints while we are animating
 		if @isAnimating
-			return false 
+			return false
 
 		for parent in @ancestors()
 			return false if parent.isAnimating
@@ -1302,7 +1350,7 @@ class exports.Layer extends BaseClass
 		layer = new Layer
 			frame: Utils.frameInset(highlightFrame, -1)
 			backgroundColor: null
-			borderColor: new Color("9013FE").alpha(.8)
+			borderColor: Framer.Defaults.Hints.color
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 3
 
@@ -1322,5 +1370,5 @@ class exports.Layer extends BaseClass
 		name = if @name then "name:#{@name} " else ""
 		variablename = @__framerInstanceInfo?.name or ""
 		return "<#{constructor} #{variablename} id:#{@id} #{name}
-			(#{Utils.roundWhole(@x)},#{Utils.roundWhole(@y)})
+			(#{Utils.roundWhole(@x)}, #{Utils.roundWhole(@y)})
 			#{Utils.roundWhole(@width)}x#{Utils.roundWhole(@height)}>"

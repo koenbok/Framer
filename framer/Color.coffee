@@ -195,11 +195,11 @@ class exports.Color extends BaseClass
 
 		if colorA not instanceof Color and colorB instanceof Color
 			colorA = colorB.transparent()
-		else if colorA instanceof Color and colorA._a == 0 and colorB instanceof Color and colorB._a != 0
+		else if colorA instanceof Color and colorA._a == 0 and colorB instanceof Color and colorB._a isnt 0
 			colorA = colorB.transparent()
 		else if colorB not instanceof Color and colorA instanceof Color
 			colorB = colorA.transparent()
-		else if colorB instanceof Color and colorB._a == 0 and colorA instanceof Color and colorA._a != 0
+		else if colorB instanceof Color and colorB._a == 0 and colorA instanceof Color and colorA._a isnt 0
 			colorB = colorA.transparent()
 
 		if colorB instanceof Color
@@ -279,7 +279,15 @@ class exports.Color extends BaseClass
 
 	@isColorString: (colorString) ->
 		if _.isString(colorString)
-			return stringToObject(colorString) != false
+			return stringToObject(colorString) isnt false
+		return false
+
+	@isValidColorProperty: (name, value) ->
+		# We check if the property name ends with color, because we don't want
+		# to convert every string that looks like a Color, like the html property containing "add"
+		if _.endsWith(name.toLowerCase(), "color") and _.isString(value) and Color.isColorString(value)
+			return true
+
 		return false
 
 	@equal: (colorA, colorB) ->
@@ -389,7 +397,7 @@ inputData = (color, g, b, alpha) ->
 
 	a = correctAlpha(a)
 
-	if type != ColorType.HSL
+	if type isnt ColorType.HSL
 		hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
 
 	return {
@@ -508,11 +516,11 @@ bound01 = (n, max) ->
 
 
 isOnePointZero = (n) ->
-	return typeof n == "string" and n.indexOf(".") != -1 and parseFloat(n) == 1
+	return typeof n == "string" and n.indexOf(".") isnt -1 and parseFloat(n) == 1
 
 # Check to see if string passed in is a percentage
 isPercentage = (n) ->
-	return typeof n == "string" and n.indexOf("%") != -1
+	return typeof n == "string" and n.indexOf("%") isnt -1
 
 # Force hex to have 2 characters.
 pad2 = (char) ->
@@ -521,17 +529,17 @@ pad2 = (char) ->
 
 # Matchers
 matchers = do ->
-	css_integer = '[-\\+]?\\d+%?'
+	css_integer = "[-\\+]?\\d+%?"
 	css_number = "[-\\+]?\\d*\\.\\d+%?"
 	css_unit = "(?:" + css_number + ")|(?:" + css_integer + ")"
 
-	permissive_match3 = '[\\s|\\(]+(' + css_unit + ')[,|\\s]+(' + css_unit + ')[,|\\s]+(' + css_unit + ')\\s*\\)?'
-	permissive_match4 = '[\\s|\\(]+(' + css_unit + ')[,|\\s]+(' + css_unit + ')[,|\\s]+(' + css_unit + ')[,|\\s]+(' + css_unit + ')\\s*\\)?'
+	permissive_match3 = "[\\s|\\(]+(" + css_unit + ")[,|\\s]+(" + css_unit + ")[,|\\s]+(" + css_unit + ")\\s*\\)?"
+	permissive_match4 = "[\\s|\\(]+(" + css_unit + ")[,|\\s]+(" + css_unit + ")[,|\\s]+(" + css_unit + ")[,|\\s]+(" + css_unit + ")\\s*\\)?"
 	return {
-	rgb: new RegExp('rgb' + permissive_match3)
-	rgba: new RegExp('rgba' + permissive_match4)
-	hsl: new RegExp('hsl' + permissive_match3)
-	hsla: new RegExp('hsla' + permissive_match4)
+	rgb: new RegExp("rgb" + permissive_match3)
+	rgba: new RegExp("rgba" + permissive_match4)
+	hsl: new RegExp("hsl" + permissive_match3)
+	hsla: new RegExp("hsla" + permissive_match4)
 	hex3: /^([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/
 	hex6: /^([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/
 	}
