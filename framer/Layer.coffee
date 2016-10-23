@@ -858,7 +858,7 @@ class exports.Layer extends BaseClass
 		if @_context._parent
 			return @_context._parent
 
-	find: (selector) ->
+	select: (selector) ->
 		layers = _.find @descendants, (layer) ->
 			Utils.layerMatchesSelector(layer,selector)
 
