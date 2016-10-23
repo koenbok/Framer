@@ -617,7 +617,7 @@ describe "Layer", ->
 			layer.shadowBlur.should.equal 10
 			layer.shadowSpread.should.equal 10
 
-			layer.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 10px 10px 10px"
+			layer.style.boxShadow.should.equal "rgba(123, 123, 123, 0.496094) 10px 10px 10px 10px"
 
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = "red"
@@ -878,17 +878,17 @@ describe "Layer", ->
 			layerC = new Layer superLayer: layerB
 			layerC.ancestors().should.eql [layerB, layerA]
 
-	describe "Find", ->
-		it "should find the layer named B", ->
+	describe "Select", ->
+		it "should select the layer named B", ->
 			layerA = new Layer name: 'A'
 			layerB = new Layer name: 'B', parent: layerA
-			layerA.find('B').should.equal layerB
+			layerA.select('B').should.equal layerB
 
-		it "should find the layer named C", ->
+		it "should select the layer named C", ->
 			layerA = new Layer name: 'A'
 			layerB = new Layer name: 'B', parent: layerA
 			layerC = new Layer name: 'C', parent: layerB
-			layerA.find('B > *').should.equal layerC
+			layerA.select('B > *').should.equal layerC
 
 	describe "Frame", ->
 
