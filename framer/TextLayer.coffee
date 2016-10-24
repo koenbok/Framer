@@ -44,14 +44,7 @@ class exports.TextLayer extends Layer
 			@_setStyle(@fontFamily, @fontSize, @fontWeight, 1.25)
 
 		# Reset width and height
-		if @autoWidth and not @autoHeight
-			@_setSize(true, false)
-
-		if @autoHeight and not @autoWidth
-			@_setSize(false, true)
-
-		if @autoWidth and @autoHeight
-			@_setSize(true, true)
+		@_setSize(@autoWidth, @autoHeight)
 
 	_setStyle: (fontFamily, fontSize, fontWeight, lineHeight, letterSpacing, textAlign, textTransform) =>
 		@style =
