@@ -5,10 +5,12 @@ class exports.TextLayer extends Layer
 
 	constructor: (options={}) ->
 
-		options.width ?= 300
-		options.backgroundColor ?= "transparent"
-		options.html ?= "Add text"
-		options.color ?= "#888"
+		_.defaults options,
+			backgroundColor: "transparent"
+			width: 300
+			height: 50
+			html: "Add text"
+			color: "#888"
 
 		super options
 
