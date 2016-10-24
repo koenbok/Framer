@@ -5,7 +5,7 @@ Utils = require "./Utils"
 {Events} = require "./Events"
 
 Events.EnterKey  = "EnterKey"
-Events.BackSpaceKey  = "BackSpaceKey"
+Events.BackspaceKey  = "BackspaceKey"
 Events.InputValueChange = "InputValueChange"
 Events.InputFocus = "InputFocus"
 Events.InputBlur = "InputBlur"
@@ -115,7 +115,7 @@ class exports.InputLayer extends TextLayer
 
 			# If backspace key
 			if e.which is 8
-				@emit(Events.BackSpaceKey, event)
+				@emit(Events.BackspaceKey, event)
 
 			# Revert to placeholder
 			if @value is ""
@@ -145,7 +145,7 @@ class exports.InputLayer extends TextLayer
 	@define "multiLine", @simpleProperty("multiLine", false)
 
 	onEnterKey: (cb) -> @on(Events.EnterKey, cb)
-	onBackSpaceKey: (cb) -> @on(Events.BackSpaceKey, cb)
+	onBackspaceKey: (cb) -> @on(Events.BackspaceKey, cb)
 	onInputChange: (cb) -> @on(Events.InputValueChange, cb)
 	onInputFocus: (cb) -> @on(Events.InputFocus, cb)
 	onInputBlur: (cb) -> @on(Events.InputBlur, cb)
