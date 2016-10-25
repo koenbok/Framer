@@ -51,10 +51,10 @@ class exports.InputLayer extends TextLayer
 		@_setTextProperties()
 
 		# All inherited properties
-		@_textProperties =
+		textProperties =
 			{@fontFamily, @fontSize, @lineHeight, @fontWeight, @color, @backgroundColor, @width, @height}
 
-		for property, value of @_textProperties
+		for property, value of textProperties
 
 			@on "change:#{property}", (value) =>
 				@_setTextProperties()
