@@ -84,10 +84,16 @@ class exports.InputLayer extends TextLayer
 		@_inputElement.onblur = (e) =>
 			@emit(Events.InputBlur, event)
 
+		# To filter if value changed later
+		currentValue = undefined
+
+		# Store current value
+		@_inputElement.onkeydown = (e) =>
+			currentValue = @value
+
 		@_inputElement.onkeyup = (e) =>
 
-			# Exclude enter, shift, caps lock, control, alt, command etc.
-			unless e.which in [13, 16, 17, 18, 20, 91, 93]
+			if currentValue isnt @value
 				@emit("change:value", @value)
 				@emit(Events.InputValueChange, @value)
 
@@ -95,7 +101,7 @@ class exports.InputLayer extends TextLayer
 			if e.which is 13
 				@emit(Events.EnterKey, event)
 
-			# If backspace key
+			# If backspace key is pressed
 			if e.which is 8
 				@emit(Events.BackspaceKey, event)
 
@@ -135,6 +141,6 @@ class exports.InputLayer extends TextLayer
 
 	onEnterKey: (cb) -> @on(Events.EnterKey, cb)
 	onBackspaceKey: (cb) -> @on(Events.BackspaceKey, cb)
-	onInputChange: (cb) -> @on(Events.InputValueChange, cb)
+	onInputValueChange: (cb) -> @on(Events.InputValueChange, cb)
 	onInputFocus: (cb) -> @on(Events.InputFocus, cb)
 	onInputBlur: (cb) -> @on(Events.InputBlur, cb)
