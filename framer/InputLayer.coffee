@@ -30,11 +30,11 @@ class exports.InputLayer extends TextLayer
 			parent: @
 			name: "input"
 
-		if not @multiLine
-			@_inputElement = document.createElement("input")
-		else
+		if @multiLine
 			@_inputElement = document.createElement("textarea")
 			@input.y = 25
+		else
+			@_inputElement = document.createElement("input")
 
 		# The id serves to differentiate multiple input elements from one another.
 		# To allow styling the placeholder colors of seperate elements.
