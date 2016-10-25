@@ -79,31 +79,31 @@ class exports.TextLayer extends Layer
 
 	@define "fontFamily",
 		get: -> @style.fontFamily
-		set: (value) -> @_setStyle(value, @fontSize, @fontWeight, @lineHeight, @letterSpacing, @textAlign, @textTransform)
+		set: (value) -> @style.fontFamily = value
 
 	@define "fontSize",
 		get: -> @style.fontSize or 40
-		set: (value) -> @_setStyle(@fontFamily, value, @fontWeight, @lineHeight, @letterSpacing, @textAlign, @textTransform)
+		set: (value) -> @style.fontSize = "#{value}px"
 
 	@define "fontWeight",
 		get: -> @style.fontWeight or 400
-		set: (value) -> @_setStyle(@fontFamily, @fontSize, value, @lineHeight, @letterSpacing, @textAlign, @textTransform)
+		set: (value) -> @style.fontWeight = "#{value}"
 
 	@define "lineHeight",
 		get: -> @style.lineHeight or 1.25
-		set: (value) -> @_setStyle(@fontFamily, @fontSize, @fontWeight, value, @letterSpacing, @textAlign, @textTransform)
+		set: (value) -> @style.lineHeight = "#{value}"
 
 	@define "letterSpacing",
 		get: -> @style.letterSpacing
-		set: (value) -> @_setStyle(@fontFamily, @fontSize, @fontWeight, @lineHeight, value, @textAlign, @textTransform)
+		set: (value) -> @style.letterSpacing = "#{value}px"
 
 	@define "textAlign",
 		get: -> @style.textAlign
-		set: (value) -> @_setStyle(@fontFamily, @fontSize, @fontWeight, @lineHeight, @letterSpacing, value, @textTransform)
+		set: (value) -> @style.textAlign = value
 
 	@define "textTransform",
 		get: -> @style.textTransform
-		set: (value) -> @_setStyle(@fontFamily, @fontSize, @fontWeight, @lineHeight, @letterSpacing, @textAlign, value)
+		set: (value) -> @style.textTransform = value
 
 	@define "autoWidth", @simpleProperty("autoWidth", false)
 	@define "autoHeight", @simpleProperty("autoHeight", false)
