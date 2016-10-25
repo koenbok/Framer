@@ -80,9 +80,8 @@ class exports.InputLayer extends TextLayer
 
 			@_isFocused = true
 
-		# On blur event
+		# Emit blur event
 		@_inputElement.onblur = (e) =>
-			# Emit blur event
 			@emit(Events.InputBlur, event)
 
 		@_inputElement.onkeyup = (e) =>
@@ -102,10 +101,6 @@ class exports.InputLayer extends TextLayer
 			# If backspace key
 			if e.which is 8
 				@emit(Events.BackspaceKey, event)
-
-			# Revert to placeholder
-			if @value is ""
-				@_setPlaceholder()
 
 	_setPlaceholder: =>
 		@_inputElement.placeholder = @_defaultText
