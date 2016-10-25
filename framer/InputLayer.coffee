@@ -73,7 +73,7 @@ class exports.InputLayer extends TextLayer
 		# Default focus interaction
 		@_inputElement.onfocus = (e) =>
 
-			@_inputElement.style.color = "#000"
+			@focusColor = "#000"
 
 			# Emit focus event
 			@emit(Events.InputFocus, event)
@@ -111,9 +111,7 @@ class exports.InputLayer extends TextLayer
 		@_inputElement.placeholder = @_defaultText
 
 		unless @_isFocused
-			@_inputElement.style.color =
-				if @color? then @color else "#aaa"
-
+			@_inputElement.style.color = @color ? "#aaa"
 			@_setPlaceholderColor(@_id, @color)
 
 	_setPlaceholderColor: (id, color) ->
@@ -139,9 +137,7 @@ class exports.InputLayer extends TextLayer
 
 	@define "focusColor",
 		get: -> @_inputElement.style.color
-		set: (value) ->
-			@onInputFocus ->
-				@_inputElement.style.color = value
+		set: (value) -> @_inputElement.style.color = value
 
 	@define "multiLine", @simpleProperty("multiLine", false)
 
