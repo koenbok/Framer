@@ -47,7 +47,7 @@ class exports.TextLayer extends Layer
 			textAlign: textAlign
 			textTransform: textTransform
 
-	_setSize: (width, height) =>
+	_setSize: (autoWidth, autoHeight) =>
 
 		# Get current style
 		currentStyle =
@@ -62,13 +62,13 @@ class exports.TextLayer extends Layer
 		# Set width and height based on style
 		constraints = width: @width
 
-		if width and not height
+		if autoWidth or autoHeight
 			@width = Utils.textSize(@text, currentStyle).width
 
-		if height and not width
+		if autoHeight and not autoWidth
 			@height = Utils.textSize(@text, currentStyle, constraints).height
 
-		if width and height
+		if autoWidth and autoHeight
 			@size = Utils.textSize(@text, currentStyle)
 
 		@emit("change:size")
