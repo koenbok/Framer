@@ -135,6 +135,7 @@ class exports.InputLayer extends TextLayer
 
 	@define "value",
 		get: -> @_inputElement.value
+		set: (value) -> @_inputElement.value = value
 
 	@define "focusColor",
 		get: -> @_inputElement.style.color
