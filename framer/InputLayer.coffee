@@ -86,9 +86,6 @@ class exports.InputLayer extends TextLayer
 
 		@_inputElement.onkeyup = (e) =>
 
-			# Check last character
-			lastCharacter = @_inputElement.value.substr(@_inputElement.value.length - 1)
-
 			# Exclude enter, shift, caps lock, control, alt, command etc.
 			unless e.which in [13, 16, 17, 18, 20, 91, 93]
 				@emit("change:value", @value)
