@@ -75,35 +75,51 @@ class exports.TextLayer extends Layer
 
 	@define "text",
 		get: -> @html
-		set: (value) -> @html = value
+		set: (value) ->
+			@html = value
+			@emit("change:text", value)
 
 	@define "fontFamily",
 		get: -> @style.fontFamily
-		set: (value) -> @style.fontFamily = value
+		set: (value) ->
+			@style.fontFamily = value
+			@emit("change:fontFamily", value)
 
 	@define "fontSize",
 		get: -> @style.fontSize or 40
-		set: (value) -> @style.fontSize = "#{value}px"
+		set: (value) ->
+			@style.fontSize = "#{value}px"
+			@emit("change:fontSize", value)
 
 	@define "fontWeight",
 		get: -> @style.fontWeight or 400
-		set: (value) -> @style.fontWeight = "#{value}"
+		set: (value) ->
+			@style.fontWeight = "#{value}"
+			@emit("change:fontWeight", value)
 
 	@define "lineHeight",
 		get: -> @style.lineHeight or 1.25
-		set: (value) -> @style.lineHeight = "#{value}"
+		set: (value) ->
+			@style.lineHeight = "#{value}"
+			@emit("change:lineHeight", value)
 
 	@define "letterSpacing",
 		get: -> @style.letterSpacing
-		set: (value) -> @style.letterSpacing = "#{value}px"
+		set: (value) ->
+			@style.letterSpacing = "#{value}px"
+			@emit("change:letterSpacing", value)
 
 	@define "textAlign",
 		get: -> @style.textAlign
-		set: (value) -> @style.textAlign = value
+		set: (value) ->
+			@style.textAlign = value
+			@emit("change:textAlign", value)
 
 	@define "textTransform",
 		get: -> @style.textTransform
-		set: (value) -> @style.textTransform = value
+		set: (value) ->
+			@style.textTransform = value
+			@emit("change:textTransform", value)
 
 	@define "autoWidth", @simpleProperty("autoWidth", false)
 	@define "autoHeight", @simpleProperty("autoHeight", false)

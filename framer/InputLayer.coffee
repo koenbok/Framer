@@ -48,20 +48,6 @@ class exports.InputLayer extends TextLayer
 		@input._element.appendChild(@_inputElement)
 
 		# Match TextLayer defaults and type properties
-		@_setTextProperties = =>
-			@_inputElement.style.fontFamily = @fontFamily
-			@_inputElement.style.fontSize = @fontSize
-			@_inputElement.style.lineHeight = @lineHeight
-			@_inputElement.style.fontWeight = @fontWeight
-			@_inputElement.style.color = @color
-			@_inputElement.style.outline = "none"
-			@_inputElement.style.backgroundColor = "transparent"
-			@_inputElement.style.width = "#{@width - 64}px"
-			@_inputElement.style.height = "#{@height}px"
-			@_inputElement.style.cursor = "auto"
-			@_inputElement.style.webkitAppearance = "none"
-			@_inputElement.style.resize = "none"
-
 		@_setTextProperties()
 
 		# All inherited properties
@@ -132,6 +118,20 @@ class exports.InputLayer extends TextLayer
 
 	_setPlaceholderColor: (id, color) ->
 		document.styleSheets[0].addRule(".input#{id}::-webkit-input-placeholder", "color: #{color}")
+
+	_setTextProperties: =>
+		@_inputElement.style.fontFamily = @fontFamily
+		@_inputElement.style.fontSize = @fontSize
+		@_inputElement.style.lineHeight = @lineHeight
+		@_inputElement.style.fontWeight = @fontWeight
+		@_inputElement.style.color = @color
+		@_inputElement.style.outline = "none"
+		@_inputElement.style.backgroundColor = "transparent"
+		@_inputElement.style.width = "#{@width - 64}px"
+		@_inputElement.style.height = "#{@height}px"
+		@_inputElement.style.cursor = "auto"
+		@_inputElement.style.webkitAppearance = "none"
+		@_inputElement.style.resize = "none"
 
 	@define "value",
 		get: -> @_inputElement.value
