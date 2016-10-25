@@ -34,15 +34,6 @@ class exports.TextLayer extends Layer
 			else
 				@_setStyle("-apple-system, SF UI Text, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
 
-		if not @fontSize
-			@_setStyle(@fontFamily, 40, @fontWeight, @lineHeight)
-
-		if not @fontWeight
-			@_setStyle(@fontFamily, @fontSize, 400, @lineHeight)
-
-		if not @lineHeight
-			@_setStyle(@fontFamily, @fontSize, @fontWeight, 1.25)
-
 		# Reset width and height
 		@_setSize(@autoWidth, @autoHeight)
 
@@ -91,15 +82,15 @@ class exports.TextLayer extends Layer
 		set: (value) -> @_setStyle(value, @fontSize, @fontWeight, @lineHeight, @letterSpacing, @textAlign, @textTransform)
 
 	@define "fontSize",
-		get: -> @style.fontSize
+		get: -> @style.fontSize or 40
 		set: (value) -> @_setStyle(@fontFamily, value, @fontWeight, @lineHeight, @letterSpacing, @textAlign, @textTransform)
 
 	@define "fontWeight",
-		get: -> @style.fontWeight
+		get: -> @style.fontWeight or 400
 		set: (value) -> @_setStyle(@fontFamily, @fontSize, value, @lineHeight, @letterSpacing, @textAlign, @textTransform)
 
 	@define "lineHeight",
-		get: -> @style.lineHeight
+		get: -> @style.lineHeight or 1.25
 		set: (value) -> @_setStyle(@fontFamily, @fontSize, @fontWeight, value, @letterSpacing, @textAlign, @textTransform)
 
 	@define "letterSpacing",
