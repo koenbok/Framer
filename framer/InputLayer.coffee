@@ -60,7 +60,7 @@ class exports.InputLayer extends TextLayer
 				@_setTextProperties()
 				@_setPlaceholder()
 
-		# If text has been defined, use that, otherwise default to placeholder
+		# Set default placeholder text
 		@_defaultText = @text
 		@_setPlaceholder()
 
