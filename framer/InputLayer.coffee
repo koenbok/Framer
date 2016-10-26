@@ -83,6 +83,8 @@ class exports.InputLayer extends TextLayer
 		# Emit blur event
 		@_inputElement.onblur = (e) =>
 			@emit(Events.InputBlur, event)
+			
+			@_isFocused = false
 
 		# To filter if value changed later
 		currentValue = undefined
