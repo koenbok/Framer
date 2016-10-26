@@ -21,32 +21,28 @@ class exports.TextLayer extends Layer
 
 			# Apple Device: SF UI
 			if currentDevice.indexOf("apple") > -1
-				@_setStyle("-apple-system, SF UI Text, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
+				@_setDefaults("-apple-system, SF UI Text, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
 
 			# Google Device: Roboto
 			if currentDevice.indexOf("google") > -1
-				@_setStyle("Roboto, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
+				@_setDefaults("Roboto, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
 
 			if currentDevice.indexOf("microsoft") > -1
-				@_setStyle("Segoe UI, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
+				@_setDefaults("Segoe UI, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
 
 			# Else: macOS
 			else
-				@_setStyle("-apple-system, SF UI Text, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
+				@_setDefaults("-apple-system, SF UI Text, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
 
 		# Reset width and height
 		@_setSize(@autoWidth, @autoHeight)
 
-	_setStyle: (fontFamily, fontSize, fontWeight, lineHeight, letterSpacing, textAlign, textTransform, textDecoration) =>
+	_setDefaults: (fontFamily, fontSize, fontWeight, lineHeight) =>
 		@style =
 			fontFamily: fontFamily
 			fontSize: "#{fontSize}px"
 			fontWeight: "#{fontWeight}"
 			lineHeight: "#{lineHeight}"
-			letterSpacing: "#{letterSpacing}px"
-			textAlign: textAlign
-			textTransform: textTransform
-			textDecoration: textDecoration
 
 	_setSize: (autoWidth, autoHeight) =>
 
