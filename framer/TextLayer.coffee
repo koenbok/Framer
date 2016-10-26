@@ -27,10 +27,11 @@ class exports.TextLayer extends Layer
 			if currentDevice.indexOf("google") > -1
 				@_setDefaults("Roboto, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
 
+			# Microsoft Device: Segoe UI
 			if currentDevice.indexOf("microsoft") > -1
 				@_setDefaults("Segoe UI, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
 
-			# Else: macOS
+			# General default: macOS
 			else
 				@_setDefaults("-apple-system, SF UI Text, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
 
