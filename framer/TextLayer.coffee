@@ -37,7 +37,7 @@ class exports.TextLayer extends Layer
 		# Reset width and height
 		@_setSize(@autoWidth, @autoHeight)
 
-	_setStyle: (fontFamily, fontSize, fontWeight, lineHeight, letterSpacing, textAlign, textTransform) =>
+	_setStyle: (fontFamily, fontSize, fontWeight, lineHeight, letterSpacing, textAlign, textTransform, textDecoration) =>
 		@style =
 			fontFamily: fontFamily
 			fontSize: "#{fontSize}px"
@@ -46,6 +46,7 @@ class exports.TextLayer extends Layer
 			letterSpacing: "#{letterSpacing}px"
 			textAlign: textAlign
 			textTransform: textTransform
+			textDecoration: textDecoration
 
 	_setSize: (autoWidth, autoHeight) =>
 
@@ -58,6 +59,7 @@ class exports.TextLayer extends Layer
 			letterSpacing: @letterSpacing
 			textAlign: @textAlign
 			textTransform: @textTransform
+			textDecoration: @textDecoration
 
 		# Set width and height based on style
 		constraints = width: @width
@@ -120,6 +122,12 @@ class exports.TextLayer extends Layer
 		set: (value) ->
 			@style.textTransform = value
 			@emit("change:textTransform", value)
+
+	@define "textDecoration",
+		get: -> @style.textDecoration
+		set: (value) ->
+			@style.textDecoration = value
+			@emit("change:textDecoration", value)
 
 	@define "autoWidth", @simpleProperty("autoWidth", false)
 	@define "autoHeight", @simpleProperty("autoHeight", false)
