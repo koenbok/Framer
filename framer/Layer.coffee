@@ -1069,7 +1069,20 @@ class exports.Layer extends BaseClass
 
 	select: (selector) ->
 		layers = _.find @descendants, (layer) ->
-			Utils.layerMatchesSelector(layer,selector)
+			Utils.layerMatchesSelector(layer, selector)
+
+	selectAll: (selector) ->
+		layers = @descendants.filter (layer) ->
+			Utils.layerMatchesSelector(layer, selector)
+
+
+	@select: (selector) ->
+		layers = _.find Framer.CurrentContext.layers, (layer) ->
+			Utils.layerMatchesSelector(layer, selector)
+
+	@selectAll: (selector) ->
+		layers = Framer.CurrentContext.layers.filter (layer) ->
+			Utils.layerMatchesSelector(layer, selector)
 
 	##############################################################
 	# Backwards superLayer and children compatibility
