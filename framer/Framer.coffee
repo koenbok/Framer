@@ -12,7 +12,6 @@ Framer.BackgroundLayer = (require "./BackgroundLayer").BackgroundLayer
 Framer.VideoLayer = (require "./VideoLayer").VideoLayer
 Framer.SVGLayer = (require "./SVGLayer").SVGLayer
 Framer.TextLayer = (require "./TextLayer").TextLayer
-Framer.InputLayer = (require "./InputLayer").InputLayer
 Framer.Events = (require "./Events").Events
 Framer.Gestures = (require "./Gestures").Gestures
 Framer.Animation = (require "./Animation").Animation
