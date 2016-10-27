@@ -45,7 +45,7 @@ class Hints
 
 	showHints: ->
 		context = Framer.CurrentContext
-		@_context.run => _.invokeMap(context.rootLayers, "_showHint")
+		@_context.run -> _.invokeMap(context.rootLayers, "_showHint")
 
 	destroy: ->
 		@_context.destroy()

@@ -966,7 +966,7 @@ Utils.rotationNormalizer = ->
 
 	lastValue = null
 
-	return (value) =>
+	return (value) ->
 		lastValue = value if not lastValue?
 
 		diff = lastValue - value
@@ -998,7 +998,7 @@ Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLaye
 Utils.convertFrameToContext = (frame = {}, layer, rootContext=false, includeLayer=true) ->
 	frame = _.defaults(frame, {x:0, y:0, width:100, height:100})
 	corners = Utils.pointsFromFrame(frame)
-	convertedCorners = corners.map (point) =>
+	convertedCorners = corners.map (point) ->
 		return Utils.convertPointToContext(point, layer, rootContext, includeLayer)
 	return Utils.frameFromPoints(convertedCorners)
 
@@ -1029,7 +1029,7 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 Utils.convertFrameFromContext = (frame = {}, layer, rootContext=false, includeLayer=true) ->
 	frame = _.defaults(frame, {x:0, y:0, width:100, height:100})
 	corners = Utils.pointsFromFrame(frame)
-	convertedCorners = corners.map (point) =>
+	convertedCorners = corners.map (point) ->
 		return Utils.convertPointFromContext(point, layer, rootContext, includeLayer)
 	return Utils.frameFromPoints(convertedCorners)
 

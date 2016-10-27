@@ -42,7 +42,7 @@ class exports.EventBuffer extends BaseClass
 	@define "events",
 		get: ->
 			timeout = Date.now() - @options.velocityTimeout
-			return _.filter @_events, (event) => event.t > timeout
+			return _.filter @_events, (event) -> event.t > timeout
 
 	@define "angle",
 		get: ->
