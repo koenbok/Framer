@@ -19,22 +19,25 @@ class exports.InputLayer extends TextLayer
 			width: 500
 			height: 100
 
-		super options
-
 		# Layer containing input element
 		@input = new Layer
 			backgroundColor: "transparent"
-			x: 30
-			width: @width - 60
-			height: @height
-			parent: @
 			name: "input"
+			x: 30
+
+		@_inputElement = document.createElement("input")
+
+		super options
+
+		@input.parent = @
+		@input.width = @width - 60
+		@input.height = @height
 
 		if @multiLine
 			@_inputElement = document.createElement("textarea")
+
+			# Add top padding to multi-line text area inputs
 			@input.y = 25
-		else
-			@_inputElement = document.createElement("input")
 
 		# The id serves to differentiate multiple input elements from one another.
 		# To allow styling the placeholder colors of seperate elements.
@@ -60,10 +63,6 @@ class exports.InputLayer extends TextLayer
 				@_setTextProperties()
 				@_setPlaceholder()
 
-		# Set default placeholder text
-		@_defaultText = @text
-		@_setPlaceholder()
-
 		# Override text property setting the html
 		@html = ""
 
@@ -83,7 +82,7 @@ class exports.InputLayer extends TextLayer
 		# Emit blur event
 		@_inputElement.onblur = (e) =>
 			@emit(Events.InputBlur, event)
-			
+
 			@_isFocused = false
 
 		# To filter if value changed later
@@ -107,8 +106,8 @@ class exports.InputLayer extends TextLayer
 			if e.which is 8
 				@emit(Events.BackspaceKey, event)
 
-	_setPlaceholder: =>
-		@_inputElement.placeholder = @_defaultText
+	_setPlaceholder: (text) =>
+		@_inputElement.placeholder = text
 
 		unless @_isFocused
 			@_inputElement.style.color = @color ? "#aaa"
@@ -140,6 +139,14 @@ class exports.InputLayer extends TextLayer
 		set: (value) -> @_inputElement.style.color = value
 
 	@define "multiLine", @simpleProperty("multiLine", false)
+
+	@define "text",
+		get: -> @html
+		set: (value) ->
+			print value
+
+			@_setPlaceholder(value)
+			@emit("change:text", value)
 
 	onEnterKey: (cb) -> @on(Events.EnterKey, cb)
 	onBackspaceKey: (cb) -> @on(Events.BackspaceKey, cb)
