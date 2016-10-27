@@ -34,7 +34,7 @@ class exports.InputLayer extends TextLayer
 
 		if @multiLine
 			@_inputElement = document.createElement("textarea")
-
+			
 			# Add top padding to multi-line text area inputs
 			@input.y = 25
 
@@ -71,14 +71,10 @@ class exports.InputLayer extends TextLayer
 		# Check if in focus
 		@_isFocused = false
 
-		@on "change:focusColor", =>
-			print "yep",@focusColor
-			@color = @focusColor
-
 		# Default focus interaction
 		@_inputElement.onfocus = (e) =>
 
-			@focusColor = "#000"
+			@focusColor ?= "#000"
 
 			# Emit focus event
 			@emit(Events.InputFocus, event)

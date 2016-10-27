@@ -61,7 +61,7 @@ class exports.TextLayer extends Layer
 		# Set width and height based on style
 		constraints = width: @width
 
-		if autoWidth or autoHeight
+		if autoWidth and not autoHeight
 			@width = Utils.textSize(@text, currentStyle).width
 
 		if autoHeight and not autoWidth
