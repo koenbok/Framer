@@ -14,7 +14,7 @@ Utils.getValue = (value) ->
 Utils.getValueForKeyPath = (obj, key) ->
 	result = obj
 	return obj[key] if not "." in key
-	result = result[key] for key in key.split(".")
+	result = (result[key] for key in key.split("."))
 	result
 
 Utils.setValueForKeyPath = (obj, path, val) ->
