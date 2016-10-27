@@ -571,7 +571,7 @@ class ShareComponent
 			@sheet.height = @sheet.maxHeight
 
 			if @options.truncatedDescription
- 				@description.height = @descriptionTruncatedSize.height
+				@description.height = @descriptionTruncatedSize.height
 			else
 				@description.height = @descriptionSize.height
 

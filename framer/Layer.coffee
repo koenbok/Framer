@@ -1074,7 +1074,7 @@ class exports.Layer extends BaseClass
 				Events.Click, Events.Tap, Events.TapStart, Events.TapEnd,
 				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
 
-				parentDraggableLayer = @_parentDraggableLayer()
+					parentDraggableLayer = @_parentDraggableLayer()
 
 				if parentDraggableLayer
 
@@ -1271,7 +1271,7 @@ class exports.Layer extends BaseClass
 
 		for parent in @ancestors(context=true)
 			if parent.clip
-				 frame = Utils.frameIntersection(frame, parent.canvasFrame)
+				frame = Utils.frameIntersection(frame, parent.canvasFrame)
 			if not frame
 				return
 

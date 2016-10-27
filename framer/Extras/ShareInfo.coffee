@@ -18,7 +18,7 @@ class ShareInfo extends BaseClass
 
 		# When enabled before specifying Framer.Info
 		if _.isEmpty(Framer.Info)
- 			Utils.delay 0, run
+			Utils.delay 0, run
 		else
 			run()
 

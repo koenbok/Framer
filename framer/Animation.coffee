@@ -140,13 +140,13 @@ class exports.Animation extends BaseClass
 				@_stateA.hasOwnProperty("minX") or
 				@_stateA.hasOwnProperty("midX") or
 				@_stateA.hasOwnProperty("maxX"))
-				animation.stop()
+					animation.stop()
 
 			if property is "y" and (
 				@_stateA.hasOwnProperty("minY") or
 				@_stateA.hasOwnProperty("midY") or
 				@_stateA.hasOwnProperty("maxY"))
-				animation.stop()
+					animation.stop()
 
 		if @options.debug
 			console.log "Animation.start"

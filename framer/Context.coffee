@@ -345,8 +345,8 @@ class exports.Context extends BaseClass
 
 	@define "perspectiveOriginY",
 		get: ->
-				return @_perspectiveOriginY if _.isNumber(@_perspectiveOriginY)
-				return .5
+			return @_perspectiveOriginY if _.isNumber(@_perspectiveOriginY)
+			return .5
 		set: (value) ->
 			if _.isNumber(value)
 				@_perspectiveOriginY = value
