@@ -434,11 +434,20 @@ Utils.deviceFont = (os) ->
 	return "Segoe UI" if os is "windows"
 	return "Helvetica"
 
-Utils.webFont = (font) ->
+# Load fonts from Google Web Fonts
+_loadedFonts = []
+
+Utils.loadWebFont = (font) ->
+
+	if font in _loadedFonts
+		return font
+
 	link = document.createElement("link")
 	link.href = "https://fonts.googleapis.com/css?family=#{font}"
 	link.rel = "stylesheet"
 	document.getElementsByTagName("head")[0].appendChild(link)
+
+	_loadedFonts.push(font)
 
 	return font
 

@@ -38,6 +38,9 @@ class exports.TextLayer extends Layer
 		# Reset width and height
 		@_setSize(@autoWidth, @autoHeight)
 
+		@on "change:text", =>
+			@_setSize(@autoWidth, @autoHeight)
+
 	_setDefaults: (fontFamily, fontSize, fontWeight, lineHeight) =>
 		@style =
 			fontFamily: fontFamily
