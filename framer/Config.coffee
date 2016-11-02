@@ -52,7 +52,7 @@ body {
 # https://github.com/motif/company/issues/1642
 
 # FramerCSSSafari = """
-# @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) { 
+# @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
 # 	.framerLayer {
 # 		image-rendering: pixelated;
 # 	}

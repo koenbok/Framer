@@ -50,7 +50,7 @@ class exports.EventBuffer extends BaseClass
 			return 0 if events.length < 2
 			p1 = events[0]
 			p2 = events[1]
-			return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+			return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI
 
 	@define "velocity",
 		get: ->

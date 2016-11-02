@@ -27,7 +27,7 @@ class exports.GridComponent extends Layer
 				value = {horizontal: value, vertical: value}
 			@_spacing = value
 			@_render()
-	
+
 	@define "renderCell",
 		get: -> @_renderCell or @_defaultRenderCell
 		set: (f) ->
@@ -48,14 +48,14 @@ class exports.GridComponent extends Layer
 	@define "cells",
 		get: -> _.values(@_cells)
 
-	cellX: (row) -> 
+	cellX: (row) ->
 		row * (@cellWidth + @spacing.horizontal)
-	
+
 	cellY: (column) ->
 		column * (@cellHeight + @spacing.vertical)
 
 	cellFrame: (column, row) ->
-		frame = 
+		frame =
 			x: @cellX(column)
 			y: @cellY(row)
 			width: @cellWidth
@@ -70,9 +70,9 @@ class exports.GridComponent extends Layer
 	# columns and rows
 
 	_render: ->
-		
+
 		@_reset()
-		
+
 		for row in [@rows-1..0]
 			for column in [@columns-1..0]
 
@@ -86,9 +86,9 @@ class exports.GridComponent extends Layer
 					parent: @
 					frame: frame
 					name: "Cell #{column}:#{row}"
-					
+
 				@renderCell(cell, row, column)
-				
+
 				@_cells["#{column}:#{row}"] = cell
 
 	_defaultRenderCell: (cell, column, row) ->
@@ -105,4 +105,3 @@ class exports.GridComponent extends Layer
 	# copy: ->
 	# 	result = super
 	# 	result.render()
-	

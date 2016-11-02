@@ -260,7 +260,7 @@ class ShareComponent
 			style:
 				textAlign: "center"
 				color: "#00AAFF"
-				padding: 0;
+				padding: 0
 
 	# Render info section
 	_renderInfo: ->
