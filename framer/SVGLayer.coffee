@@ -3,12 +3,12 @@
 {Layer} = require "./Layer"
 
 class exports.SVGLayer extends Layer
-	
+
 	constructor: (options={}) ->
 
 		super _.defaults options,
 			backgroundColor: null
-		
+
 		@svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
 		@svg.setAttribute("width", "100%")
 		@svg.setAttribute("height", "100%")

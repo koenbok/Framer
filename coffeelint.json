@@ -34,7 +34,7 @@
     "level": "warn"
   },
   "eol_last": {
-    "level": "ignore"
+    "level": "warn"
   },
   "indentation": {
     "value": 1,
