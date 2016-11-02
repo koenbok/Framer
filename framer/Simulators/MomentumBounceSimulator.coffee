@@ -70,10 +70,10 @@ class exports.MomentumBounceSimulator extends Simulator
 	# further away, then transition from friction to spring simulation
 	_tryTransitionToSpring: (force) ->
 
-		belowMinWithVelocity = @_state.x < @options.min && @_state.v <= 0
-		aboveMaxWithVelocity = @_state.x > @options.max && @_state.v >= 0
+		belowMinWithVelocity = @_state.x < @options.min and @_state.v <= 0
+		aboveMaxWithVelocity = @_state.x > @options.max and @_state.v >= 0
 
-		if (belowMinWithVelocity || aboveMaxWithVelocity)
+		if (belowMinWithVelocity or aboveMaxWithVelocity)
 			bound = @options.min if belowMinWithVelocity
 			bound = @options.max if aboveMaxWithVelocity
 			@_transitionToSpring(bound)
@@ -93,8 +93,8 @@ class exports.MomentumBounceSimulator extends Simulator
 
 		# Note that if velocity is 0, the state is still valid (should use spring,
 		# not friction), and we don't want to divide by 0 later in the check.
-		belowMinTravelingBack = @_state.x < @options.min && @_state.v > 0
-		aboveMaxTravelingBack = @_state.x > @options.max && @_state.v < 0
+		belowMinTravelingBack = @_state.x < @options.min and @_state.v > 0
+		aboveMaxTravelingBack = @_state.x > @options.max and @_state.v < 0
 
 		check = false
 

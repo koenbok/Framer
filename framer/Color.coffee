@@ -175,7 +175,7 @@ class exports.Color extends BaseClass
 	toInspect: =>
 		if @_type is ColorType.HSL
 			return "<#{@constructor.name} h:#{@h} s:#{@s} l:#{@l} a:#{@a}>"
-		else if @_type is ColorType.HEX || @_type is ColorType.NAME
+		else if @_type is ColorType.HEX or @_type is ColorType.NAME
 			return "<#{@constructor.name} \"#{@color}\">"
 		else
 			return "<#{@constructor.name} r:#{@r} g:#{@g} b:#{@b} a:#{@a}>"
@@ -292,12 +292,12 @@ class exports.Color extends BaseClass
 
 	@equal: (colorA, colorB) ->
 
-		if !@validColorValue(colorA)
-			if !Color.isColorString(colorA)
+		if not @validColorValue(colorA)
+			if not Color.isColorString(colorA)
 				return false
 
-		if !@validColorValue(colorB)
-			if !Color.isColorString(colorB)
+		if not @validColorValue(colorB)
+			if not Color.isColorString(colorB)
 				return false
 
 		colorA = new Color(colorA)
@@ -361,7 +361,7 @@ inputData = (color, g, b, alpha) ->
 		if typeof color is "string"
 			color = stringToObject(color)
 
-			if !color
+			if not color
 				color =
 					r: 0
 					g: 0
@@ -545,7 +545,7 @@ matchers = do ->
 	}
 
 isNumeric = (value) ->
-	return !isNaN(value) && isFinite(value)
+	return not isNaN(value) and isFinite(value)
 
 percentToFraction = (percentage) ->
 	return numberFromString(percentage) / 100

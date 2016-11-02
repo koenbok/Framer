@@ -50,7 +50,7 @@ class exports.PageComponent extends ScrollComponent
 		# Figure out the point from where to look for next layers in a direction
 		point = {x: 0, y: 0}
 		point = Utils.framePointForOrigin(currentPage, @originX, @originY) if currentPage
-		if !withoutCurrentPage
+		if not withoutCurrentPage
 			point = {x: @scrollX + (@originX * @width), y: @scrollY + (@originY * @height)}
 
 		layers = @content.childrenAbove(point, @originX, @originY) if direction in ["up", "top", "north"]
@@ -141,8 +141,8 @@ class exports.PageComponent extends ScrollComponent
 		# See if we meet the minimum velocity to scroll to the next page. If not we snap
 		# to the layer closest to the scroll point.
 
-		xDisabled = !@scrollHorizontal and (@direction is "right" or @direction is "left")
-		yDisabled = !@scrollVertical and (@direction is "down" or @direction is "up")
+		xDisabled = not @scrollHorizontal and (@direction is "right" or @direction is "left")
+		yDisabled = not @scrollVertical and (@direction is "down" or @direction is "up")
 
 		xLock = @content.draggable._directionLockEnabledX and (@direction is "right" or @direction is "left")
 		yLock = @content.draggable._directionLockEnabledY and (@direction is "down" or @direction is "up")

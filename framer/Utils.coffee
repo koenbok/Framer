@@ -28,7 +28,7 @@ Utils.setValueForKeyPath = (obj, path, val) ->
 		if i is n - 1
 			result[field] = val
 		else
-			if typeof result[field] is "undefined" or !_.isObject(result[field])
+			if typeof result[field] is "undefined" or not _.isObject(result[field])
 				result[field] = {}
 			result = result[field]
 		i++
@@ -177,8 +177,8 @@ Utils.defineEnum = (names = [], offset = 0, geometric = 0) ->
 	Enum = {}
 	for name, i in names
 		j = i
-		j = if ! offset    then j else j + offset
-		j = if ! geometric then j else Math.pow geometric, j
+		j = if not offset    then j else j + offset
+		j = if not geometric then j else Math.pow geometric, j
 		Enum[Enum[name] = j] = name
 	return Enum
 
@@ -357,7 +357,7 @@ Utils.isDataUrl = (url) ->
 	return _.startsWith(url, "data:")
 
 Utils.isRelativeUrl = (url) ->
-	!/^([a-zA-Z]{1,8}:\/\/).*$/.test(url)
+	not /^([a-zA-Z]{1,8}:\/\/).*$/.test(url)
 
 Utils.isLocalServerUrl = (url) ->
 	return url.indexOf("127.0.0.1") isnt -1 or url.indexOf("localhost")  isnt -1
@@ -475,7 +475,7 @@ Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 	[toLow, toHigh] = rangeB
 
 	# if rangeB consists of Colors we return a color tween
-	# if Color.isColor(toLow) || _.isString(toLow) && Color.isColorString(toLow)
+	# if Color.isColor(toLow) or _.isString(toLow) and Color.isColorString(toLow)
 	# 	ratio = Utils.modulate(value, rangeA, [0, 1])
 	# 	result = Color.mix(toLow, toHigh, ratio)
 	# 	return result
@@ -926,7 +926,7 @@ Utils.pointInPolygon = (point, vs) ->
 		yj = vs[j][1]
 		intersect = yi > y isnt yj > y and x < (xj - xi) * (y - yi) / (yj - yi) + xi
 		if intersect
-			inside = !inside
+			inside = not inside
 		j = i++
 	inside
 
@@ -1104,7 +1104,7 @@ Utils.textSize = (text, style={}, constraints={}) ->
 	# returns the rendered text size. This can be pretty slow, so use sporadically.
 	# http://stackoverflow.com/questions/118241/calculate-text-width-with-javascript
 
-	shouldCreateNode = !_textSizeNode
+	shouldCreateNode = not _textSizeNode
 
 	if shouldCreateNode
 		_textSizeNode = document.createElement("div")

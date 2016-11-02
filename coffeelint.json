@@ -120,8 +120,8 @@
     "level": "ignore"
   },
   "prefer_english_operator": {
-    "level": "ignore",
-    "doubleNotLevel": "ignore"
+    "level": "warn",
+    "doubleNotLevel": "warn"
   },
   "space_operators": {
     "level": "ignore"

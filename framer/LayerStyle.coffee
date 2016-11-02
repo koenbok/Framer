@@ -3,7 +3,7 @@ filterFormat = (value, unit) ->
 	# "#{value}#{unit}"
 
 roundToZero = (num) ->
-	if (-1e-6 < num && num < 1e-6)
+	if (-1e-6 < num and num < 1e-6)
 		return 0
 	return num
 

@@ -157,7 +157,7 @@ class exports.DeviceComponent extends BaseClass
 			@content.height = height
 			@screen.center()
 
-			@setHand(@selectedHand) if @selectedHand && @_orientation is 0
+			@setHand(@selectedHand) if @selectedHand and @_orientation is 0
 
 	_shouldRenderFullScreen: ->
 
@@ -334,8 +334,8 @@ class exports.DeviceComponent extends BaseClass
 		# If we're running Framer Studio and have local files, we'd like to use those.
 		# For now we always use jp2 inside framer stusio
 		if Utils.isFramerStudio() and window.FramerStudioInfo
-			if @_device.minStudioVersion and Utils.framerStudioVersion() >= @_device.minStudioVersion or !@_device.minStudioVersion
-				if @_device.maxStudioVersion and Utils.framerStudioVersion() <= @_device.maxStudioVersion or !@_device.maxStudioVersion
+			if @_device.minStudioVersion and Utils.framerStudioVersion() >= @_device.minStudioVersion or not @_device.minStudioVersion
+				if @_device.maxStudioVersion and Utils.framerStudioVersion() <= @_device.maxStudioVersion or not @_device.maxStudioVersion
 					resourceUrl = window.FramerStudioInfo.deviceImagesUrl
 					return "#{resourceUrl}/#{name.replace(".png", ".jp2")}"
 
@@ -531,7 +531,7 @@ class exports.DeviceComponent extends BaseClass
 		@emit("change:orientation", window.orientation)
 
 	@define "isPortrait", get: -> Math.abs(@orientation) % 180 is 0
-	@define "isLandscape", get: -> !@isPortrait
+	@define "isLandscape", get: -> not @isPortrait
 
 	@define "orientationName",
 		get: ->
@@ -571,7 +571,7 @@ class exports.DeviceComponent extends BaseClass
 
 	setHand: (hand) ->
 		@selectedHand = hand
-		return @handsImageLayer.image = "" if !hand or !@handSwitchingSupported()
+		return @handsImageLayer.image = "" if not hand or not @handSwitchingSupported()
 
 		handData = @_device.hands[hand]
 		if handData
