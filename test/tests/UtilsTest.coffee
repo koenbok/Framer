@@ -286,7 +286,9 @@ describe "Utils", ->
 
 		it "should work for named functions", ->
 			# There are no named function in coffee script
+			# coffeelint: disable=no_backticks
 			`function test(a) { return "a"; }`
+			# coffeelint: enable=no_backticks
 			Utils.inspect(test).should.equal("<Function test(a) { return \"a\"; }>")
 
 		it "should work for long functions", ->
@@ -401,7 +403,7 @@ describe "Utils", ->
 			Utils.isFileUrl("file:///Users/koen/Desktop/index.html").should.equal(true)
 			Utils.isFileUrl("http://apple.com/index.html").should.equal(false)
 			Utils.isFileUrl("https://apple.com/index.html").should.equal(false)
-			
+
 	describe "isDataUrl", ->
 		it "should work", ->
 			dataUrlGif = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
