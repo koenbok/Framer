@@ -1,42 +1,42 @@
 {
-  "no_tabs": {
-    "level": "ignore"
-  },
-  "no_trailing_whitespace": {
-    "level": "ignore"
-  },
-  "max_line_length": {
-    "value": 80,
-    "level": "ignore"
-  },
   "camel_case_classes": {
     "level": "error"
+  },
+  "cyclomatic_complexity": {
+    "level": "ignore",
+    "value": 11
   },
   "indentation": {
     "value": 1,
     "level": "error"
   },
+  "line_endings": {
+    "level": "error",
+    "value": "unix"
+  },
+  "max_line_length": {
+    "value": 80,
+    "level": "ignore"
+  },
   "no_implicit_braces": {
     "level": "ignore"
   },
-  "no_trailing_semicolons": {
+  "no_implicit_parens": {
     "level": "ignore"
   },
   "no_plusplus": {
     "level": "ignore"
   },
+  "no_tabs": {
+    "level": "ignore"
+  },
   "no_throwing_strings": {
     "level": "error"
   },
-  "cyclomatic_complexity": {
-    "value": 11,
+  "no_trailing_semicolons": {
     "level": "ignore"
   },
-  "line_endings": {
-    "value": "unix",
-    "level": "error"
-  },
-  "no_implicit_parens": {
+  "no_trailing_whitespace": {
     "level": "ignore"
   }
 }
