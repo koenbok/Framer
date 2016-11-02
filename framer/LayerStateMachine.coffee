@@ -36,7 +36,7 @@ class exports.LayerStateMachine extends BaseClass
 		# Check if the state exists, if not this is a pretty serious error
 		throw Error "No such state: '#{stateName}'" unless @states[stateName]
 
-		if stateName == "previous"
+		if stateName is "previous"
 			stateName = @previousName
 
 		# Prep the properties and the options. The options come from the state, and can be overriden

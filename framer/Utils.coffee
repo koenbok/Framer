@@ -25,10 +25,10 @@ Utils.setValueForKeyPath = (obj, path, val) ->
 	n = fields.length
 	while i < n and result isnt undefined
 		field = fields[i]
-		if i == n - 1
+		if i is n - 1
 			result[field] = val
 		else
-			if typeof result[field] == "undefined" or !_.isObject(result[field])
+			if typeof result[field] is "undefined" or !_.isObject(result[field])
 				result[field] = {}
 			result = result[field]
 		i++
@@ -271,7 +271,7 @@ Utils.uuid = ->
 		random = 0x2000000 + (Math.random() * 0x1000000) | 0 if (random <= 0x02)
 		r = random & 0xf
 		random = random >> 4
-		output[digit] = chars[if digit == 19 then (r & 0x3) | 0x8 else r]
+		output[digit] = chars[if digit is 19 then (r & 0x3) | 0x8 else r]
 
 	output.join ""
 

@@ -355,8 +355,8 @@ class exports.LayerDraggable extends BaseClass
 				x: Utils.clamp(proposedPoint.x, minX, maxX)
 				y: Utils.clamp(proposedPoint.y, minY, maxY)
 
-		point.x = proposedPoint.x if @speedX == 0 or @horizontal is false
-		point.y = proposedPoint.y if @speedY == 0 or @vertical   is false
+		point.x = proposedPoint.x if @speedX is 0 or @horizontal is false
+		point.y = proposedPoint.y if @speedY is 0 or @vertical   is false
 
 		return point
 

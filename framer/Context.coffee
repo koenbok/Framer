@@ -364,7 +364,7 @@ class exports.Context extends BaseClass
 	toInspect: ->
 
 		round = (value) ->
-			if parseInt(value) == value
+			if parseInt(value) is value
 				return parseInt(value)
 			return Utils.round(value, 1)
 

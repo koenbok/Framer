@@ -288,7 +288,7 @@ class exports.ScrollComponent extends Layer
 		if contentLayer and contentLayer.parent isnt @content
 			throw Error("Can't scroll to this layer because it's not in the ScrollComponent. Add it to the content like layer.parent = scroll.content.")
 
-		if not contentLayer or @content.children.length == 0
+		if not contentLayer or @content.children.length is 0
 			scrollPoint = {x: 0, y: 0}
 		else
 			scrollPoint = @_scrollPointForLayer(contentLayer, originX, originY)
@@ -381,7 +381,7 @@ class exports.ScrollComponent extends Layer
 		if @scrollVertical
 			deltaY = event.wheelDeltaY
 
-		if deltaX == 0 and deltaY == 0
+		if deltaX is 0 and deltaY is 0
 			return
 
 		if not @_mouseWheelScrolling

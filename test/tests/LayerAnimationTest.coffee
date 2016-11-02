@@ -379,7 +379,7 @@ describe "LayerAnimation", ->
 					time: AnimationTime
 
 			count = 0
-			test = -> count++; done() if count == 2
+			test = -> count++; done() if count is 2
 
 			animation.on "end", test
 			layer.on "end", test
@@ -398,7 +398,7 @@ describe "LayerAnimation", ->
 					time: AnimationTime * 2
 
 			count = 0
-			test = -> count++; done() if count == 2
+			test = -> count++; done() if count is 2
 
 			animation.on "stop", test
 			layer.on "stop", test

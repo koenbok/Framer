@@ -269,7 +269,7 @@ describe "LayerStates", ->
 
 			count = 0
 			ready = (animation, layer) ->
-				if count == 4
+				if count is 4
 					done()
 					return
 				count++

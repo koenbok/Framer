@@ -76,9 +76,9 @@ class exports.GestureInputRecognizer
 
 		if event.touches?
 			if Utils.isTouch()
-				return unless (event.touches.length == 0)
+				return unless (event.touches.length is 0)
 			else
-				return unless (event.touches.length == event.changedTouches.length)
+				return unless (event.touches.length is event.changedTouches.length)
 
 		@em.wrap(window).removeEventListener("mousemove", @touchmove)
 		@em.wrap(window).removeEventListener("mouseup", @touchend)
@@ -298,10 +298,10 @@ class exports.GestureInputRecognizer
 		# Detect pinch, rotate and scale events
 
 		# Stop panning if we go from 2 to 1 finger
-		if @session.started.pinch and event.fingers == 1
+		if @session.started.pinch and event.fingers is 1
 			@pinchend(event)
 		# If we did not start yet and get two fingers, start
-		else if not @session.started.pinch and event.fingers == 2
+		else if not @session.started.pinch and event.fingers is 2
 			@pinchstart(event)
 		# If we did start send pinch events
 		else if @session.started.pinch
@@ -406,10 +406,10 @@ class exports.GestureInputRecognizer
 		# For delta we switch to center-compare if there are two fingers
 		if @session?.lastEvent
 			# If we just switched fingers, we skip the delta event entirely
-			if event.fingers isnt @session.lastEvent.fingers == 2
+			if event.fingers isnt @session.lastEvent.fingers is 2
 				event.delta = {x: 0, y: 0}
 			# If we are having two finger events, we use the touchCenter as base for delta
-			if event.fingers == 2 and @session.lastEvent.fingers == 2
+			if event.fingers is 2 and @session.lastEvent.fingers is 2
 				event.delta = Utils.pointSubtract(event.touchCenter, @session.lastEvent.touchCenter)
 
 		# Force touch

@@ -157,7 +157,7 @@ class exports.DeviceComponent extends BaseClass
 			@content.height = height
 			@screen.center()
 
-			@setHand(@selectedHand) if @selectedHand && @_orientation == 0
+			@setHand(@selectedHand) if @selectedHand && @_orientation is 0
 
 	_shouldRenderFullScreen: ->
 
@@ -259,7 +259,7 @@ class exports.DeviceComponent extends BaseClass
 				lDevicetype = deviceType.toLowerCase()
 				for key in _.keys(Devices)
 					lKey = key.toLowerCase()
-					device = Devices[key] if lDevicetype == lKey
+					device = Devices[key] if lDevicetype is lKey
 
 			if not device
 				throw Error "No device named #{deviceType}. Options are: #{_.keys Devices}"
@@ -360,12 +360,12 @@ class exports.DeviceComponent extends BaseClass
 
 	setDeviceScale: (deviceScale, animate=false) ->
 
-		if deviceScale == "fit" or deviceScale < 0
+		if deviceScale is "fit" or deviceScale < 0
 			deviceScale = "fit"
 		else
 			deviceScale = parseFloat(deviceScale)
 
-		if deviceScale == @_deviceScale
+		if deviceScale is @_deviceScale
 			return
 
 		@_deviceScale = deviceScale
@@ -373,7 +373,7 @@ class exports.DeviceComponent extends BaseClass
 		if @_shouldRenderFullScreen()
 			return
 
-		if deviceScale == "fit"
+		if deviceScale is "fit"
 			phoneScale = @_calculatePhoneScale()
 		else
 			phoneScale = deviceScale
@@ -455,12 +455,12 @@ class exports.DeviceComponent extends BaseClass
 
 	setOrientation: (orientation, animate=false) ->
 
-		orientation *= -1 if Utils.framerStudioVersion() == oldDeviceMaxVersion
+		orientation *= -1 if Utils.framerStudioVersion() is oldDeviceMaxVersion
 
-		if orientation == "portrait"
+		if orientation is "portrait"
 			orientation = 0
 
-		if orientation == "landscape"
+		if orientation is "landscape"
 			orientation = 90
 
 		if @_shouldRenderFullScreen()
@@ -512,7 +512,7 @@ class exports.DeviceComponent extends BaseClass
 		@content.height = height
 
 		offset = (@screen.width - width) / 2
-		offset *= -1 if @_orientation == -90
+		offset *= -1 if @_orientation is -90
 
 		[x, y] = [0, 0]
 

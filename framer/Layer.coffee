@@ -610,8 +610,8 @@ class exports.Layer extends BaseClass
 			# then we turn off ignoreEvents so buttons etc will work.
 
 			# if not (
-			# 	@_elementHTML.childNodes.length == 1 and
-			# 	@_elementHTML.childNodes[0].nodeName == "#text")
+			# 	@_elementHTML.childNodes.length is 1 and
+			# 	@_elementHTML.childNodes[0].nodeName is "#text")
 			# 	@ignoreEvents = false
 
 			@emit "change:html"
@@ -671,7 +671,7 @@ class exports.Layer extends BaseClass
 
 			currentValue = @_getPropertyValue "image"
 
-			if currentValue == value
+			if currentValue is value
 				return @emit "load"
 
 			# Unset the background color only if it’s the default color
@@ -817,10 +817,10 @@ class exports.Layer extends BaseClass
 		layer.parent = null
 
 	childrenWithName: (name) ->
-		_.filter @children, (layer) -> layer.name == name
+		_.filter @children, (layer) -> layer.name is name
 
 	siblingsWithName: (name) ->
-		_.filter @siblingLayers, (layer) -> layer.name == name
+		_.filter @siblingLayers, (layer) -> layer.name is name
 
 	ancestors: (context=false) ->
 

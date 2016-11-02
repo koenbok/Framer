@@ -8,7 +8,7 @@ open -a Google\ Chrome -–allow-file-access-from-files
 
 resizeFrame = (scale, frame) ->
 
-	return frame if scale == 1
+	return frame if scale is 1
 
 	result = {}
 

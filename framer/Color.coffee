@@ -13,7 +13,7 @@ ColorType =
 class exports.Color extends BaseClass
 	constructor: (@color, r, g, b) ->
 
-		if @color == ""
+		if @color is ""
 			@color = null
 
 		color = @color
@@ -62,7 +62,7 @@ class exports.Color extends BaseClass
 		return "#" + @toHex(allow3Char)
 
 	toRgb: ->
-		if @_rgb == undefined
+		if @_rgb is undefined
 			@_rgb =
 				r: Math.round(@_r)
 				g: Math.round(@_g)
@@ -71,11 +71,11 @@ class exports.Color extends BaseClass
 		return _.clone(@_rgb)
 
 	toRgbString: ->
-		if @_a == 1 then "rgb(#{Utils.round(@_r, 0)}, #{Utils.round(@_g, 0)}, #{Utils.round(@_b, 0)})"
+		if @_a is 1 then "rgb(#{Utils.round(@_r, 0)}, #{Utils.round(@_g, 0)}, #{Utils.round(@_b, 0)})"
 		else "rgba(#{Utils.round(@_r, 0)}, #{Utils.round(@_g, 0)}, #{Utils.round(@_b, 0)}, #{@_roundA})"
 
 	toHsl: ->
-		if @_hsl == undefined
+		if @_hsl is undefined
 			@_hsl =
 				h: @h
 				s: @s
@@ -84,7 +84,7 @@ class exports.Color extends BaseClass
 		return _.clone(@_hsl)
 
 	toHusl: ->
-		if @_husl == undefined
+		if @_husl is undefined
 			c = libhusl._conv
 			husl = c.lch.husl c.luv.lch c.xyz.luv c.rgb.xyz([@r/255, @g/255, @b/255])
 			@_husl = {h: husl[0], s: husl[1], l: husl[2]}
@@ -92,12 +92,12 @@ class exports.Color extends BaseClass
 		return _.clone(@_husl)
 
 	toHslString: ->
-		if @_hslString == undefined
+		if @_hslString is undefined
 			hsl = @toHsl()
 			h = Math.round(hsl.h)
 			s = Math.round(hsl.s * 100)
 			l = Math.round(hsl.l * 100)
-			if @_a == 1
+			if @_a is 1
 				@_hslString = "hsl(#{h}, #{s}%, #{l}%)"
 			else
 				@_hslString = "hsla(#{h}, #{s}%, #{l}%, #{@_roundA})"
@@ -110,7 +110,7 @@ class exports.Color extends BaseClass
 
 		for key in _.keys cssNames
 			value = cssNames[key]
-			if value == hex
+			if value is hex
 				return key
 
 		return false
@@ -173,9 +173,9 @@ class exports.Color extends BaseClass
 		return Color.equal(@, colorB)
 
 	toInspect: =>
-		if @_type == ColorType.HSL
+		if @_type is ColorType.HSL
 			return "<#{@constructor.name} h:#{@h} s:#{@s} l:#{@l} a:#{@a}>"
-		else if @_type == ColorType.HEX || @_type == ColorType.NAME
+		else if @_type is ColorType.HEX || @_type is ColorType.NAME
 			return "<#{@constructor.name} \"#{@color}\">"
 		else
 			return "<#{@constructor.name} r:#{@r} g:#{@g} b:#{@b} a:#{@a}>"
@@ -195,11 +195,11 @@ class exports.Color extends BaseClass
 
 		if colorA not instanceof Color and colorB instanceof Color
 			colorA = colorB.transparent()
-		else if colorA instanceof Color and colorA._a == 0 and colorB instanceof Color and colorB._a isnt 0
+		else if colorA instanceof Color and colorA._a is 0 and colorB instanceof Color and colorB._a isnt 0
 			colorA = colorB.transparent()
 		else if colorB not instanceof Color and colorA instanceof Color
 			colorB = colorA.transparent()
-		else if colorB instanceof Color and colorB._a == 0 and colorA instanceof Color and colorA._a isnt 0
+		else if colorB instanceof Color and colorB._a is 0 and colorA instanceof Color and colorA._a isnt 0
 			colorB = colorA.transparent()
 
 		if colorB instanceof Color
@@ -227,9 +227,9 @@ class exports.Color extends BaseClass
 					hslA = colorA.toHusl()
 					hslB = colorB.toHusl()
 
-				if hslA.s == 0
+				if hslA.s is 0
 					hslA.h = hslB.h
-				else if hslB.s == 0
+				else if hslB.s is 0
 					hslB.h = hslA.h
 
 				fromH = hslA.h
@@ -267,7 +267,7 @@ class exports.Color extends BaseClass
 	@gray: (args...) -> @grey(args...)
 
 	@toColor: (color) -> return new Color(color)
-	@validColorValue: (color) -> return color instanceof Color or color == null
+	@validColorValue: (color) -> return color instanceof Color or color is null
 
 	@isColor: (color) ->
 		if _.isString(color)
@@ -345,7 +345,7 @@ inputData = (color, g, b, alpha) ->
 	ok = false
 	type = ColorType.RGB
 
-	if color == null
+	if color is null
 		a = 0
 	else if _.isNumber(color)
 		rgb.r = color
@@ -358,7 +358,7 @@ inputData = (color, g, b, alpha) ->
 			a = alpha
 	else
 
-		if typeof color == "string"
+		if typeof color is "string"
 			color = stringToObject(color)
 
 			if !color
@@ -371,7 +371,7 @@ inputData = (color, g, b, alpha) ->
 			if color.hasOwnProperty("type")
 				type = color.type
 
-		if typeof color == "object"
+		if typeof color is "object"
 
 			if color.hasOwnProperty("r") or color.hasOwnProperty("g") or color.hasOwnProperty("b")
 				rgb = rgbToRgb(color.r, color.g, color.b)
@@ -429,7 +429,7 @@ rgbToHex = (r, g, b, allow3Char) ->
 		pad2(Math.round(g).toString(16))
 		pad2(Math.round(b).toString(16))
 	]
-	if allow3Char and hex[0].charAt(0) == hex[0].charAt(1) and hex[1].charAt(0) == hex[1].charAt(1) and hex[2].charAt(0) == hex[2].charAt(1)
+	if allow3Char and hex[0].charAt(0) is hex[0].charAt(1) and hex[1].charAt(0) is hex[1].charAt(1) and hex[2].charAt(0) is hex[2].charAt(1)
 		return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0)
 	hex.join ""
 
@@ -443,7 +443,7 @@ rgbToHsl = (r, g, b) ->
 	min = Math.min(r, g, b)
 	h = s = l = (max + min) / 2
 
-	if max == min then h = s = 0
+	if max is min then h = s = 0
 	else
 		d = max - min
 		s = if l > 0.5 then d / (2 - max - min) else d / (max + min)
@@ -472,7 +472,7 @@ hslToRgb = (h, s, l) ->
 		if t < 2 / 3 then return p + (q - p) * (2 / 3 - t) * 6
 		return p
 
-	if s == 0
+	if s is 0
 		r = g = b = l # Achromatic
 
 	else
@@ -516,15 +516,15 @@ bound01 = (n, max) ->
 
 
 isOnePointZero = (n) ->
-	return typeof n == "string" and n.indexOf(".") isnt -1 and parseFloat(n) == 1
+	return typeof n is "string" and n.indexOf(".") isnt -1 and parseFloat(n) is 1
 
 # Check to see if string passed in is a percentage
 isPercentage = (n) ->
-	return typeof n == "string" and n.indexOf("%") isnt -1
+	return typeof n is "string" and n.indexOf("%") isnt -1
 
 # Force hex to have 2 characters.
 pad2 = (char) ->
-	if char.length == 1 then "0" + char
+	if char.length is 1 then "0" + char
 	else "" + char
 
 # Matchers
@@ -563,7 +563,7 @@ stringToObject = (color) ->
 		named = true
 		type: ColorType.NAME
 
-	else if color == "transparent"
+	else if color is "transparent"
 		return {
 			r: 0
 			g: 0
