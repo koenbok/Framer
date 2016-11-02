@@ -736,7 +736,7 @@ Utils.size = (input) ->
 
 	return result
 
-Utils.sizeZero = (n=0)->
+Utils.sizeZero = (n=0) ->
 	return {width:n, height:n}
 
 Utils.sizeMin = ->

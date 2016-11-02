@@ -20,7 +20,7 @@ class Canvas extends BaseClass
 		get: -> Framer.Device.background.image
 		set: (value) -> Framer.Device.background.image = value
 
-	constructor: (options={})->
+	constructor: (options={}) ->
 		super options
 		Events.wrap(window).addEventListener("resize", @_handleResize)
 
