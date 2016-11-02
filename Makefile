@@ -41,6 +41,10 @@ lazy_build: ; @test -f ./build/framer.debug.js || make build
 test: lazy_build
 	$(BIN)/gulp test
 
+lint: lazy_build
+	$(BIN)/gulp lint
+
+
 release: lazy_bootstrap
 	$(BIN)/gulp webpack:release
 
@@ -68,8 +72,5 @@ site-upload: bootstrap site-build
 
 # Resources
 
-resources-optimize:
+resources:
 	python scripts/resources-optimize.py
-
-resources-upload:
-	cd extras/resources.framerjs.com; cactus deploy

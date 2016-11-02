@@ -28,3 +28,6 @@ class exports.Simulator extends BaseClass
 
 	finished: ->
 		throw Error "Not implemented"
+
+	setState: (state) ->
+		@_state = state

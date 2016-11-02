@@ -175,7 +175,7 @@ class exports.SliderComponent extends Layer
 			@_hitArea
 		set: (value) ->
 			@_hitArea = value
-			if @width > @height			
+			if @width > @height
 				@sliderOverlay.width = @width + @hitArea
 				@sliderOverlay.height = @hitArea
 			else
@@ -212,7 +212,7 @@ class exports.SliderComponent extends Layer
 			@value = @valueForPoint(@knob.midY)
 
 	_updateValue: =>
-		
+
 		return if @_lastUpdatedValue is @value
 
 		@_lastUpdatedValue = @value

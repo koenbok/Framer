@@ -52,13 +52,15 @@ class Preloader extends BaseClass
 				@_handleProgress()
 
 	addPlayer: (player) =>
-		if player and player.readyState? and player not in @_media
-			if player.readyState < 3
-				@_media.push(player)
-				# Wait until there is enough data for playback to start playing smoothly
-				Events.wrap(player).addEventListener "canplaythrough", =>
-					@_mediaLoaded.push(player)
-					@_handleProgress()
+		return unless player and player not in @_media
+		return unless player.src? and player.getAttribute('src') isnt "undefined"
+		return unless player.readyState? and player.readyState < 3
+		# … else
+		@_media.push(player)
+		# Wait until there is enough data for playback to start playing
+		Events.wrap(player).addEventListener "canplaythrough", =>
+			@_mediaLoaded.push(player)
+			@_handleProgress()
 
 	start: =>
 		return if @isLoading

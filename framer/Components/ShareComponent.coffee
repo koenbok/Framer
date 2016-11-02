@@ -67,13 +67,10 @@ class Button extends ShareLayer
 
 		@onMouseOver ->
 			@style.cursor = "pointer"
-			@states.switch("hover")
-			@animate
-				properties:
-					opacity: .8
+			@animate("hover")
 
 		@onMouseOut ->
-			@states.switch("full")
+			@animate("full")
 
 		@onTap ->
 			if options.shareButton
@@ -263,7 +260,7 @@ class ShareComponent
 			style:
 				textAlign: "center"
 				color: "#00AAFF"
-				padding: 0;
+				padding: 0
 
 	# Render info section
 	_renderInfo: ->
@@ -574,7 +571,7 @@ class ShareComponent
 			@sheet.height = @sheet.maxHeight
 
 			if @options.truncatedDescription
- 				@description.height = @descriptionTruncatedSize.height
+				@description.height = @descriptionTruncatedSize.height
 			else
 				@description.height = @descriptionSize.height
 

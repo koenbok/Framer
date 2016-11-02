@@ -14,7 +14,8 @@ Utils.getValue = (value) ->
 Utils.getValueForKeyPath = (obj, key) ->
 	result = obj
 	return obj[key] if not "." in key
-	result = result[key] for key in key.split(".")
+	for key in key.split(".")
+		result = result[key]
 	result
 
 Utils.setValueForKeyPath = (obj, path, val) ->
@@ -152,7 +153,7 @@ Utils.randomImage = (layer, offset=50) ->
 	if _.isNumber(layer)
 		layer = {id: layer}
 
-	photos = ["1417733403748-83bbc7c05140", "1423841265803-dfac59ebf718", "1463560018368-0814042d17b7", "1433689056001-018e493576bc", "1430812411929-de4cf1d1fe73", "1457269449834-928af64c684d", "1443616839562-036bb2afd9a2", "1461535676131-2de1f7054d3f", "1462393582935-1ac76b85dcf1", "1414589530802-cb54ce0575d9", "1422908132590-117a051fc5cd", "1438522014717-d7ce32b9bab9", "1451650804883-52fb86cc5b18", "1462058164249-2dcdcda67ce7", "1456757014009-0614a080ff7f", "1434238255348-4fb0d9caa0a4", "1448071792026-7064a01897e7", "1458681842652-019f4eeda5e5", "1460919920543-d8c45f4bd621", "1447767961238-038617b84a2b", "1449089299624-89ce41e8306c", "1414777410116-81e404502b52", "1433994349623-0a18966ee9c0", "1452567772283-91d67178f409", "1458245229726-a8ba04cb5969", "1422246719650-cb30d19825e3", "1417392639864-2c88dd07f460", "1442328166075-47fe7153c128", "1448467258552-6b3982373a13", "1447023362548-250f3a7b80ed", "1451486242265-24b0c0ef9a51", "1414339372428-797ec111646d"]
+	photos = ["1417733403748-83bbc7c05140", "1423841265803-dfac59ebf718", "1433689056001-018e493576bc", "1430812411929-de4cf1d1fe73", "1457269449834-928af64c684d", "1443616839562-036bb2afd9a2", "1461535676131-2de1f7054d3f", "1462393582935-1ac76b85dcf1", "1414589530802-cb54ce0575d9", "1422908132590-117a051fc5cd", "1438522014717-d7ce32b9bab9", "1451650804883-52fb86cc5b18", "1462058164249-2dcdcda67ce7", "1456757014009-0614a080ff7f", "1434238255348-4fb0d9caa0a4", "1448071792026-7064a01897e7", "1458681842652-019f4eeda5e5", "1460919920543-d8c45f4bd621", "1447767961238-038617b84a2b", "1449089299624-89ce41e8306c", "1414777410116-81e404502b52", "1433994349623-0a18966ee9c0", "1452567772283-91d67178f409", "1458245229726-a8ba04cb5969", "1422246719650-cb30d19825e3", "1417392639864-2c88dd07f460", "1442328166075-47fe7153c128", "1448467258552-6b3982373a13", "1447023362548-250f3a7b80ed", "1451486242265-24b0c0ef9a51", "1414339372428-797ec111646d"]
 	photo = Utils.randomChoice(photos)
 	photo = photos[(layer.id) % photos.length] if layer?.id
 
@@ -352,6 +353,9 @@ Utils.isMobile = ->
 Utils.isFileUrl = (url) ->
 	return _.startsWith(url, "file://")
 
+Utils.isDataUrl = (url) ->
+	return _.startsWith(url, "data:")
+
 Utils.isRelativeUrl = (url) ->
 	!/^([a-zA-Z]{1,8}:\/\/).*$/.test(url)
 
@@ -365,6 +369,7 @@ Utils.isLocalUrl = (url) ->
 
 Utils.isLocalAssetUrl = (url, baseUrl) ->
 	baseUrl ?= window.location.href
+	return false if Utils.isDataUrl(url)
 	return true if Utils.isLocalUrl(url)
 	return true if Utils.isRelativeUrl(url) and Utils.isLocalUrl(baseUrl)
 	return false
@@ -493,7 +498,6 @@ Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 # STRING FUNCTIONS
 
 Utils.parseFunction = (str) ->
-
 	result = {name: "", args: []}
 
 	if _.endsWith str, ")"
@@ -971,7 +975,7 @@ Utils.rotationNormalizer = ->
 
 	lastValue = null
 
-	return (value) =>
+	return (value) ->
 		lastValue = value if not lastValue?
 
 		diff = lastValue - value
@@ -1003,7 +1007,7 @@ Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLaye
 Utils.convertFrameToContext = (frame = {}, layer, rootContext=false, includeLayer=true) ->
 	frame = _.defaults(frame, {x:0, y:0, width:100, height:100})
 	corners = Utils.pointsFromFrame(frame)
-	convertedCorners = corners.map (point) =>
+	convertedCorners = corners.map (point) ->
 		return Utils.convertPointToContext(point, layer, rootContext, includeLayer)
 	return Utils.frameFromPoints(convertedCorners)
 
@@ -1034,7 +1038,7 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 Utils.convertFrameFromContext = (frame = {}, layer, rootContext=false, includeLayer=true) ->
 	frame = _.defaults(frame, {x:0, y:0, width:100, height:100})
 	corners = Utils.pointsFromFrame(frame)
-	convertedCorners = corners.map (point) =>
+	convertedCorners = corners.map (point) ->
 		return Utils.convertPointFromContext(point, layer, rootContext, includeLayer)
 	return Utils.frameFromPoints(convertedCorners)
 

@@ -13,11 +13,11 @@ imageLayer.states = {
 }
 
 // Set the default animation options
-imageLayer.options = {
+imageLayer.animationOptions = {
 	curve: "spring(500,12,0)"
 }
 
 // On a click, go to the next state
 imageLayer.on(Events.Click, function() {
-	imageLayer.animateToNext()
+	imageLayer.stateCycle()
 })

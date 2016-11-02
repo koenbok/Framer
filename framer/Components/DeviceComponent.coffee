@@ -329,7 +329,7 @@ class exports.DeviceComponent extends BaseClass
 
 		# If we are running a local copy of Framer from the drive, get the resource online
 		if Utils.isFileUrl(window.location.href)
-			resourceUrl = "http://#{resourceUrl}"
+			resourceUrl = "http:#{resourceUrl}"
 
 		# If we're running Framer Studio and have local files, we'd like to use those.
 		# For now we always use jp2 inside framer stusio
@@ -613,6 +613,7 @@ class exports.DeviceComponent extends BaseClass
 ###########################################################################
 # DEVICE CONFIGURATIONS
 
+googlePixelReleaseVersion = 75
 desktopReleaseVersion = 70
 newDeviceMinVersion = 53
 oldDeviceMaxVersion = 52
@@ -643,6 +644,38 @@ iPadProBaseDevice =
 	screenHeight: 2732
 	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
+
+iPhone7BaseDevice =
+	deviceImageWidth: 874
+	deviceImageHeight: 1792
+	deviceImageCompression: true
+	screenWidth: 750
+	screenHeight: 1334
+	deviceType: "phone"
+	minStudioVersion: 71
+	hands:
+		"iphone-hands-2":
+			width:  2400
+			height: 3740
+		"iphone-hands-1":
+			width:  2400
+			height: 3740
+
+iPhone7PlusBaseDevice =
+	deviceImageWidth: 1452
+	deviceImageHeight: 2968
+	deviceImageCompression: true
+	screenWidth: 1242
+	screenHeight: 2208
+	deviceType: "phone"
+	minStudioVersion: 71
+	hands:
+		"iphone-hands-2":
+			width:  3987
+			height: 6212
+		"iphone-hands-1":
+			width:  3987
+			height: 6212
 
 iPhone6BaseDevice =
 	deviceImageWidth: 874
@@ -766,6 +799,24 @@ Nexus6BaseDevice =
 			height: 6707
 			offset: 8
 
+PixelBaseDevice =
+	deviceImageWidth: 1224
+	deviceImageHeight: 2492
+	deviceImageCompression: true
+	screenWidth: 1080
+	screenHeight: 1920
+	deviceType: "phone"
+	minStudioVersion: googlePixelReleaseVersion
+	hands:
+		"iphone-hands-2":
+			width:  3344
+			height: 5211
+			offset: 23
+		"iphone-hands-1":
+			width:  3344
+			height: 5211
+			offset: 23
+
 Nexus9BaseDevice =
 	deviceImageWidth: 1896
 	deviceImageHeight: 2648
@@ -846,6 +897,22 @@ SamsungGalaxyNote5BaseDevice =
 			width:  4279
 			height: 6668
 			offset: -84
+
+AppleWatchSeries242Device =
+	deviceImageWidth: 512
+	deviceImageHeight: 990
+	deviceImageCompression: true
+	screenWidth: 312
+	screenHeight: 390
+	minStudioVersion: 71
+
+AppleWatchSeries238Device =
+	deviceImageWidth: 472
+	deviceImageHeight: 772
+	deviceImageCompression: true
+	screenWidth: 272
+	screenHeight: 340
+	minStudioVersion: 71
 
 AppleWatch42Device =
 	deviceImageWidth: 512
@@ -1094,13 +1161,27 @@ Devices =
 	"apple-ipad-pro-gold": _.clone(iPadProBaseDevice)
 	"apple-ipad-pro-space-gray": _.clone(iPadProBaseDevice)
 
-	# iPhone 6
+	# iPhone 7
+	"apple-iphone-7-gold": _.clone(iPhone7BaseDevice)
+	"apple-iphone-7-rose-gold": _.clone(iPhone7BaseDevice)
+	"apple-iphone-7-silver" : _.clone(iPhone7BaseDevice)
+	"apple-iphone-7-black": _.clone(iPhone7BaseDevice)
+	"apple-iphone-7-jet-black": _.clone(iPhone7BaseDevice)
+
+	# iPhone 7 Plus
+	"apple-iphone-7-plus-gold": _.clone(iPhone7PlusBaseDevice)
+	"apple-iphone-7-plus-rose-gold": _.clone(iPhone7PlusBaseDevice)
+	"apple-iphone-7-plus-silver": _.clone(iPhone7PlusBaseDevice)
+	"apple-iphone-7-plus-black": _.clone(iPhone7PlusBaseDevice)
+	"apple-iphone-7-plus-jet-black": _.clone(iPhone7PlusBaseDevice)
+
+	# iPhone 6s
 	"apple-iphone-6s-gold": _.clone(iPhone6BaseDevice)
 	"apple-iphone-6s-rose-gold": _.clone(iPhone6BaseDevice)
 	"apple-iphone-6s-silver" : _.clone(iPhone6BaseDevice)
 	"apple-iphone-6s-space-gray": _.clone(iPhone6BaseDevice)
 
-	# iPhone 6+
+	# iPhone 6s Plus
 	"apple-iphone-6s-plus-gold": _.clone(iPhone6PlusBaseDevice)
 	"apple-iphone-6s-plus-rose-gold": _.clone(iPhone6PlusBaseDevice)
 	"apple-iphone-6s-plus-silver": _.clone(iPhone6PlusBaseDevice)
@@ -1117,6 +1198,50 @@ Devices =
 	"apple-iphone-5c-red": _.clone(iPhone5CBaseDevice)
 	"apple-iphone-5c-white": _.clone(iPhone5CBaseDevice)
 	"apple-iphone-5c-yellow": _.clone(iPhone5CBaseDevice)
+
+	# Apple Watch Series 2 38mm
+	"apple-watch-series-2-38mm-black-steel-black": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-edition": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-rose-gold-aluminum-midnight-blue": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-silver-aluminum-cocoa": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-silver-aluminum-concrete": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-silver-aluminum-ocean-blue": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-silver-aluminum-red": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-silver-aluminum-turquoise": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-silver-aluminum-white": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-silver-aluminum-yellow": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-space-gray-aluminum-black": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-sport-aluminum-walnut": _.clone(AppleWatchSeries238Device)
+	"apple-watch-series-2-38mm-steel-white": _.clone(AppleWatchSeries238Device)
+
+	# Apple Watch Series 2 42mm
+	"apple-watch-series-2-42mm-edition": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-gold-aluminum-cocoa": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-rose-gold-aluminum-midnight-blue": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-concrete": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-green": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-light-pink": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-ocean-blue": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-pink-sand": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-red": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-turquoise": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-white": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-silver-aluminum-yellow": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-space-black-steel-black": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-space-gray-aluminum-black": _.clone(AppleWatchSeries242Device)
+	"apple-watch-series-2-42mm-steel-white": _.clone(AppleWatchSeries242Device)
+
+	# Apple Watch Nike+ 38mm
+	"apple-watch-nike-plus-38mm-silver-aluminum-flat-silver-volt": _.clone(AppleWatchSeries238Device)
+	"apple-watch-nike-plus-38mm-silver-aluminum-flat-silver-white": _.clone(AppleWatchSeries238Device)
+	"apple-watch-nike-plus-38mm-space-gray-aluminum-black-cool-gray": _.clone(AppleWatchSeries238Device)
+	"apple-watch-nike-plus-38mm-space-gray-aluminum-black-volt": _.clone(AppleWatchSeries238Device)
+
+	# Apple Watch Nike+ 42mm
+	"apple-watch-nike-plus-42mm-silver-aluminum-flat-silver-volt": _.clone(AppleWatchSeries242Device)
+	"apple-watch-nike-plus-42mm-silver-aluminum-flat-silver-white": _.clone(AppleWatchSeries242Device)
+	"apple-watch-nike-plus-42mm-space-gray-aluminum-black-cool-gray": _.clone(AppleWatchSeries242Device)
+	"apple-watch-nike-plus-42mm-space-gray-aluminum-black-volt": _.clone(AppleWatchSeries242Device)
 
 	# Apple Watch 38mm
 
@@ -1159,6 +1284,11 @@ Devices =
 	"google-nexus-5x": _.clone(Nexus5BaseDevice)
 	"google-nexus-6p": _.clone(Nexus6BaseDevice)
 	"google-nexus-9": _.clone(Nexus9BaseDevice)
+
+	# Pixel
+	"google-pixel-quite-black": _.clone(PixelBaseDevice)
+	"google-pixel-really-blue": _.clone(PixelBaseDevice)
+	"google-pixel-very-silver": _.clone(PixelBaseDevice)
 
 	# HTC ONE A9
 	"htc-one-a9-black": _.clone(HTCa9BaseDevice)

@@ -1,3 +1,5 @@
+{expect} = require "chai"
+
 describe "BaseClass", ->
 
 	testProperty = (name, fallback) ->
@@ -179,14 +181,13 @@ describe "BaseClass", ->
 
 		props.hasOwnProperty("testProp").should.be.false
 
-	it "should throw on assignment of read-only prop", ->
-
+	it.skip "should throw on assignment of read-only prop", ->
 		class TestClass extends Framer.BaseClass
 			@define "testProp",
 				get: () -> "value"
 
 		instance = new TestClass()
-		(-> instance.testProp = "foo").should.throw "setting a property that has only a getter"
+		(-> instance.testProp = "foo").should.throw "TestClass.testProp is readonly"
 
 	it "should not set read-only prop via props setter", ->
 
@@ -205,3 +206,52 @@ describe "BaseClass", ->
 
 		instance.testPropA.should.equal "a"
 		instance.testPropB.should.equal "value"
+
+	it.skip "should have defined properties set in sibling subclasses", ->
+
+		class LalaLayer extends Framer.BaseClass
+			@define "blabla",
+				get: -> "hoera"
+				set: -> "sdfsd"
+
+		class TestClassD extends LalaLayer
+			@define "a",
+				get: -> "getClassD"
+				set: -> "setClassD"
+
+
+		class TestClassC extends LalaLayer
+			@define "a",
+				get: -> "getClassC"
+				# set: -> "setClassC"
+
+		expect(TestClassD["_DefinedPropertiesKey"]?.a?.set).to.be.ok
+		expect(TestClassC["_DefinedPropertiesKey"]?.a?.set).to.not.be.ok
+
+
+	it.skip "should not export a shared property name in props of in sibling subclasses", ->
+
+		class BaseSubClass extends Framer.BaseClass
+			@define "blabla",
+				get: -> "hoera"
+				set: -> "sdfsd"
+
+		class SiblingA extends BaseSubClass
+			@define "sharedProperty",
+				get: -> "getSiblingA"
+				set: -> "setSiblingA"
+
+		class SiblingB extends BaseSubClass
+			@define "sharedProperty",
+				get: -> "getSiblingB"
+
+		a = new SiblingA
+		b = new SiblingB
+		expect(a.sharedProperty).to.be.ok
+		expect(b.sharedProperty).to.be.ok
+		expect(a.props.sharedProperty).to.be.ok
+		expect(b.props.sharedProperty).to.not.be.ok
+		expect(a.blabla).to.be.ok
+		expect(b.blabla).to.be.ok
+		expect(a.props.blabla).to.be.ok
+		expect(b.props.blabla).to.be.ok

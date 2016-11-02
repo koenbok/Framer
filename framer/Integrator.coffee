@@ -1,8 +1,3 @@
-
-Utils = require "./Utils"
-
-{Config} = require "./Config"
-
 class exports.Integrator
 
 	"""

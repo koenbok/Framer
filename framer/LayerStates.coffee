@@ -5,7 +5,7 @@
 {Defaults} = require "./Defaults"
 {LayerStateMachine} = require "./LayerStateMachine"
 
-LayerStatesIgnoredKeys = ["ignoreEvents"]
+LayerStatesIgnoredKeys = ["ignoreEvents", "name", "id"]
 
 reservedStateError = (name) ->
 	throw Error("The state '#{name}' is a reserved name.")
@@ -15,6 +15,9 @@ deprecatedWarning = (name, suggestion) ->
 	message += ", use '#{suggestion}' instead." if suggestion?
 	console.warn message
 
+namedState = (state, name) ->
+	return _.extend({}, {name: name}, state)
+
 class LayerStates
 
 	@defineReserved = (propertyName, descriptor) ->
@@ -23,14 +26,8 @@ class LayerStates
 		descriptor.set ?= -> reservedStateError(propertyName)
 		Object.defineProperty(@prototype, propertyName, descriptor)
 
-	@defineReserved "previous", get: -> @machine.previousName
-	@defineReserved "current", get: -> @machine.currentName
-
-	# Not sure about these, maybe we should change it
-	@defineReserved "previousName", get: -> @machine.previousName
-	@defineReserved "currentName", get: -> @machine.currentName
-	@defineReserved "_previousState", get: -> @[@machine.previous]
-	@defineReserved "_currentState", get: -> @[@machine.current]
+	@defineReserved "previous", get: -> namedState(@[@machine.previousName], @machine.previousName)
+	@defineReserved "current", get: -> namedState(@[@machine.currentName], @machine.currentName)
 
 	capture = (name) ->
 		@[name] = LayerStates.filterStateProperties(@machine.layer.props)
@@ -57,10 +54,10 @@ class LayerStates
 		stateProperties = {}
 
 		for k, v of properties
-			
+
 			if k in LayerStatesIgnoredKeys
 				continue
-			
+
 			if Color.isValidColorProperty(k, v)
 				stateProperties[k] = new Color(v)
 				continue
@@ -104,52 +101,16 @@ class LayerStates
 			deprecatedWarning("switchInstant", "layer.animate(\"state\", {instant: true})")
 			@machine.switchTo(stateName, {instant: true})
 
-		state: ->
-			deprecatedWarning("state", "layer.states.currentName")
-			@currentName
-
-		all: ->
-			deprecatedWarning("all", "layer.stateNames")
-			@machine.stateNames
-
-		stateNames: ->
-			deprecatedWarning("stateNames", "layer.stateNames")
-			@machine.stateNames
-
-		states: ->
-			deprecatedWarning("states", "layer.stateNames")
-			@machine.stateNames
-
-		animatingKeys: ->
-			deprecatedWarning("animatingKeys")
-			keys = []
-			for name, state of @
-				keys = _.union(keys, _.keys(state))
-			return keys
-
-		next: (options) ->
-			deprecatedWarning("next", "layer.animateToNextState()")
-			@machine.layer.animateToNextState(options)
-
-		last: (options) ->
-			deprecatedWarning("last")
-			@machine.switchTo(@machine.previousName, options)
-
-		on: (eventName, handler) ->
-			@machine.on(eventName, handler)
+		next: (options...) ->
+			deprecatedWarning("next", "layer.stateCycle()")
+			options = _.flatten(options)
+			@machine.layer.stateCycle(options)
 
 	@defineReserved "add", get: -> methods.add
 	@defineReserved "remove", get: -> methods.remove
 	@defineReserved "switch", get: -> methods.switch
 	@defineReserved "switchInstant", get: -> methods.switchInstant
-	@defineReserved "animatingKeys", get: -> methods.animatingKeys
 	@defineReserved "next", get: -> methods.next
-	@defineReserved "last", get: -> methods.last
-	@defineReserved "state", get: methods.state
-	@defineReserved "all", get: methods.all
-	@defineReserved "stateNames", get: methods.stateNames
-	@defineReserved "states", get: methods.states
-	@defineReserved "on", get: -> methods.on
 	@defineReserved "animationOptions",
 		get: -> @machine.layer.animationOptions
 		set: (options) -> @machine.layer.animationOptions = options

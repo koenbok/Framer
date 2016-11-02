@@ -73,6 +73,7 @@ class exports.Context extends BaseClass
 		@_createDOMEventManager()
 		@_createRootElement()
 
+		@resetFrozenEvents()
 		@resetLayers()
 		@resetAnimations()
 		@resetTimers()
@@ -148,6 +149,8 @@ class exports.Context extends BaseClass
 		return unless @_animations
 		@_animations.map (animation) -> animation.stop(true)
 
+	resetFrozenEvents: ->
+		delete @_frozenEvents
 
 	# Timers
 	@define "timers", get: -> _.clone(@_timers)
@@ -237,7 +240,7 @@ class exports.Context extends BaseClass
 				for listener in listeners
 					layer.on(eventName, listener)
 
-		delete @_frozenEvents
+		@resetFrozenEvents()
 
 
 	##############################################################
@@ -342,8 +345,8 @@ class exports.Context extends BaseClass
 
 	@define "perspectiveOriginY",
 		get: ->
-				return @_perspectiveOriginY if _.isNumber(@_perspectiveOriginY)
-				return .5
+			return @_perspectiveOriginY if _.isNumber(@_perspectiveOriginY)
+			return .5
 		set: (value) ->
 			if _.isNumber(value)
 				@_perspectiveOriginY = value

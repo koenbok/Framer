@@ -53,7 +53,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 			# We try to not send any events while we run the constructor, it just
 			# doesn't make sense, because no one can listen to use yet.
-			return if @__constructing
+			return if @__constructor
 
 			@emit("change:#{name}", value)
 			@emit("change:point", value) if name in ["x", "y"]
@@ -84,9 +84,9 @@ class exports.Layer extends BaseClass
 	constructor: (options={}) ->
 
 		# Make sure we never call the constructor twice
-		throw Error("Layer.constructor #{@toInspect()} called twice") if @__constructed
-		@__constructed = true
-		@__constructing = true
+		throw Error("Layer.constructor #{@toInspect()} called twice") if @__constructorCalled
+		@__constructorCalled = true
+		@__constructor = true
 
 		# Set needed private variables
 		@_properties = {}
@@ -138,10 +138,9 @@ class exports.Layer extends BaseClass
 			if options.hasOwnProperty(p)
 				@[p] = options[p]
 
-		@animationOptions = {}
 		@_context.emit("layer:create", @)
 
-		delete @__constructing
+		delete @__constructor
 
 	##############################################################
 	# Properties
@@ -151,6 +150,9 @@ class exports.Layer extends BaseClass
 
 	# A placeholder for layer bound properties defined by the user:
 	@define "custom", @simpleProperty("custom", undefined)
+
+	# Default animation options for every animation of this layer
+	@define "animationOptions", @simpleProperty("animationOptions", {})
 
 	# Css properties
 	@define "width",  layerProperty(@, "width",  "width", 100, _.isNumber)
@@ -248,7 +250,7 @@ class exports.Layer extends BaseClass
 		default: ""
 		get: ->
 			name = @_getPropertyValue("name")
-			return name or ""
+			return if name? then "#{name}" else ""
 
 		set: (value) ->
 			@_setPropertyValue("name", value)
@@ -894,31 +896,31 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## ANIMATION
 
-	# Used to animate to a state with a specific name
-	# We lookup the stateName and call 'animate' with the properties of the state
-	animateToState: (stateName, options={}) ->
-		return @states.machine.switchTo(stateName, options)
-
 	animate: (properties, options={}) ->
 
 		# If the properties are a string, we assume it's a state name
 		if _.isString(properties)
-			return @animateToState(properties, options)
 
+			stateName = properties
+
+			# Support options as an object
+			options = options.options if options.options?
+
+			return @states.machine.switchTo(stateName, options)
 		# We need to clone the properties so we don't modify them unexpectedly
 		properties = _.clone(properties)
 
 		# Support the old properties syntax, we add all properties top level and
 		# move the options into an options property.
-		if properties.hasOwnProperty("properties")
+		if properties.properties?
 			options = properties
 			properties = options.properties
 			delete options.properties
 
 		# With the new api we treat the properties as animatable properties, and use
 		# the special options keyword for animation options.
-		if properties.hasOwnProperty("options")
-			options = _.defaults({}, properties.options, options)
+		if properties.options?
+			options = _.defaults({}, options, properties.options)
 			delete properties.options
 
 		# Merge the animation options with the default animation options for this layer
@@ -930,18 +932,23 @@ class exports.Layer extends BaseClass
 
 		return animation
 
-	switchInstant: (properties, options={}) ->
-		@animate(properties, _.merge(options, {instant: true}))
-
-	animateToNextState: (args..., options={}) ->
-		states = []
-		states = _.flatten(args) if args.length
+	stateCycle: (args...) ->
+		states = _.flatten(args)
+		if _.isObject(_.last(states))
+			options = states.pop()
 		@animate(@states.machine.next(states), options)
 
-	animations: ->
+	stateSwitch: (stateName, options={}) ->
+		unless stateName?
+			throw new Error("Missing required argument 'stateName' in stateSwitch()")
+		return @animate(stateName, options) if options.animate is true
+		return @animate(stateName, _.defaults({}, options, {instant:true}))
+
+	animations: (includePending=false)->
 		# Current running animations on this layer
 		_.filter @_context.animations, (animation) =>
-			animation.layer is @
+			return false unless (animation.layer is @)
+			return includePending or not animation.isPending
 
 	animatingProperties: ->
 

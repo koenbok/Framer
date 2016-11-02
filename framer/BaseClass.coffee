@@ -9,9 +9,6 @@ DefinedPropertiesKey = "_DefinedPropertiesKey"
 DefinedPropertiesValuesKey = "_DefinedPropertiesValuesKey"
 DefinedPropertiesOrderKey = "_DefinedPropertiesOrderKey"
 
-capitalizeFirstLetter = (string) ->
-	string.charAt(0).toUpperCase() + string.slice(1)
-
 class exports.BaseClass extends EventEmitter
 
 	#################################################################
@@ -23,11 +20,11 @@ class exports.BaseClass extends EventEmitter
 		if @ isnt BaseClass
 			@_addDescriptor(propertyName, descriptor)
 
-		# if not descriptor.set
+		# if not descriptor.set?
 		# 	descriptor.set = (value) ->
 		# 		throw Error("#{@constructor.name}.#{propertyName} is readonly")
 
-		# Define the property
+		# Define the property on the prototype
 		Object.defineProperty(@prototype, propertyName, descriptor)
 
 	@_addDescriptor: (propertyName, descriptor) ->

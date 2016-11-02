@@ -5,22 +5,8 @@ Utils = require "./Utils"
 {Config} = require "./Config"
 {Defaults} = require "./Defaults"
 {BaseClass} = require "./BaseClass"
-
+{Animator} = require "./Animator"
 {LinearAnimator} = require "./Animators/LinearAnimator"
-{BezierCurveAnimator} = require "./Animators/BezierCurveAnimator"
-{SpringRK4Animator} = require "./Animators/SpringRK4Animator"
-{SpringDHOAnimator} = require "./Animators/SpringDHOAnimator"
-
-AnimatorClasses =
-	"linear": LinearAnimator
-	"bezier-curve": BezierCurveAnimator
-	"spring-rk4": SpringRK4Animator
-	"spring-dho": SpringDHOAnimator
-
-AnimatorClasses["spring"] = AnimatorClasses["spring-rk4"]
-AnimatorClasses["cubic-bezier"] = AnimatorClasses["bezier-curve"]
-
-AnimatorClassBezierPresets = ["ease", "ease-in", "ease-out", "ease-in-out"]
 
 numberRE = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/
 relativePropertyRE = new RegExp("^(?:([+-])=|)(" + numberRE.source + ")([a-z%]*)$", "i")
@@ -57,17 +43,17 @@ class exports.Animation extends BaseClass
 		# Mix of current and old api
 		if arguments.length is 2
 			layer = args[0]
-			if args[1].properties
+			if args[1].properties?
 				properties = args[1].properties
 			else
 				properties = args[1]
-			options = args[1].options if args[1].options
+			options = args[1].options if args[1].options?
 
 		# Old api
 		if arguments.length is 1
 			layer = args[0].layer
 			properties = args[0].properties
-			if args[0].options
+			if args[0].options?
 				options = args[0].options
 			else
 				options = args[0]
@@ -76,31 +62,31 @@ class exports.Animation extends BaseClass
 		delete options.properties
 		delete options.options
 
-		# print "Animation", layer, properties, options
-
 		@options = _.cloneDeep(Defaults.getDefaults("Animation", options))
 
 		super
 
 		@_layer = layer
 
-		unless layer instanceof Layer
-			throw Error("Animation: missing layer") 
+		unless layer instanceof _Layer
+			throw Error("Animation: missing layer")
 
 		@properties = Animation.filterAnimatableProperties(properties)
 
 		if properties.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
-		@_parseAnimatorOptions()
+		@options.curveOptions = Animator.curveOptionsFor(@options)
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
 
 	@define "layer",
 		get: -> @_layer
 
+	@define "isPending", get: -> @_delayTimer?
+
 	@define "isAnimating",
-		get: -> @ in @layer.context.animations
+		get: -> @ in @layer.animations()
 
 	@define "looping",
 		get: -> @options.looping
@@ -109,9 +95,11 @@ class exports.Animation extends BaseClass
 			if @options?.looping and @layer? and !@isAnimating
 				@restart()
 
+	@define "isNoop", @simpleProperty("isNoop", false)
+
 	start: =>
 
-		@_animator = @_createAnimator()
+		@_animator = Animation._createAnimator(@options) ? new LinearAnimator(@options.curveOptions)
 		@_target = @layer
 		@_stateA = @_currentState()
 		@_stateB = {}
@@ -137,6 +125,9 @@ class exports.Animation extends BaseClass
 			console.warn "Animation: nothing to animate, all properties are equal to what it is now"
 			return @_noop()
 
+		if _.keys(@_stateB).length is 0
+			return @_noop()
+
 		# If this animation wants to animate a property that is already being animated, it stops
 		# that currently running animation. If not, it allows them both to continue.
 		for property, animation of @_target.animatingProperties()
@@ -149,17 +140,22 @@ class exports.Animation extends BaseClass
 				@_stateA.hasOwnProperty("minX") or
 				@_stateA.hasOwnProperty("midX") or
 				@_stateA.hasOwnProperty("maxX"))
-				animation.stop()
+					animation.stop()
 
 			if property is "y" and (
 				@_stateA.hasOwnProperty("minY") or
 				@_stateA.hasOwnProperty("midY") or
 				@_stateA.hasOwnProperty("maxY"))
-				animation.stop()
+					animation.stop()
 
 		if @options.debug
 			console.log "Animation.start"
 			console.log "\t#{k}: #{@_stateA[k]} -> #{@_stateB[k]}" for k, v of @_stateB
+
+		# Add the callbacks
+		@on(Events.AnimationStart, @options.onStart) if _.isFunction(@options.onStart)
+		@on(Events.AnimationStop, @options.onStop) if _.isFunction(@options.onStop)
+		@on(Events.AnimationEnd, @options.onEnd) if _.isFunction(@options.onEnd)
 
 		# See if we need to repeat this animation
 		# Todo: more repeat behaviours:
@@ -169,27 +165,32 @@ class exports.Animation extends BaseClass
 				@restart()
 				if not @looping
 					@_repeatCounter--
-		# If animate is false we set everything immediately and skip the actual animation
-		start = @_start
+
+		# Figure out what kind of values we have so we don't have to do it in
+		# the actual update loop. This saves a lot of frame budget.
+		@_prepareUpdateValues()
 
 		# The option keywords animate and instant trigger an instant animation
 		if @options.animate is false or @options.instant is true
+			# If animate is false we set everything immediately and skip the actual animation
 			start = @_instant
+		else
+			start = @_start
 
+		@layer.context.addAnimation(@)
 		# If we have a delay, we wait a bit for it to start
 		if @options.delay
 			@_delayTimer = Utils.delay(@options.delay, start)
 		else
 			start()
-		
+
 		return true
 
 	stop: (emit=true) ->
-
 		if @_delayTimer?
 			Framer.CurrentContext.removeTimer(@_delayTimer)
 			@_delayTimer = null
-		
+
 		@layer.context.removeAnimation(@)
 
 		@emit(Events.AnimationStop) if emit
@@ -198,10 +199,8 @@ class exports.Animation extends BaseClass
 	reverse: ->
 		# TODO: Add some tests
 		properties = _.clone(@_originalState)
-		properties.options = _.clone(@options)
-		properties.layer = @layer
-		animation = new Animation properties
-		animation
+		options = _.clone(@options)
+		new Animation @layer, properties, options
 
 	reset: ->
 		for k, v of @_stateA
@@ -213,9 +212,8 @@ class exports.Animation extends BaseClass
 
 	copy: ->
 		properties = _.clone(@properties)
-		properties.options = _.clone(@options)
-		properties.layer = @layer
-		new Animation(properties)
+		options = _.clone(@options)
+		new Animation(@layer, properties, options)
 
 	# A bunch of common aliases to minimize frustration
 	revert: -> 	@reverse()
@@ -232,26 +230,27 @@ class exports.Animation extends BaseClass
 
 	_instant: =>
 		@emit(Events.AnimationStart)
-		@_prepareUpdateValues()
 		@_updateValues(1)
 		@emit(Events.AnimationStop)
 		@emit(Events.AnimationEnd)
 
 	_noop: =>
-		@emit(Events.AnimationStart)
-		@emit(Events.AnimationStop)
-		@emit(Events.AnimationEnd)
-		return false
+		@isNoop = true
+		# We don't emit these so you can call layer.animate safely
+		# from the same layers layer.onAnimationEnd handler
+		# @emit(Events.AnimationStart)
+		# @emit(Events.AnimationStop)
+		# @emit(Events.AnimationEnd)
+		return not @isNoop
 
 	_start: =>
-		@layer.context.addAnimation(@)
+		@_delayTimer = null
 		@emit(Events.AnimationStart)
 		Framer.Loop.on("update", @_update)
 
-		# Figure out what kind of values we have so we don't have to do it in
-		# the actual update loop. This saves a lot of frame budget.
-		@_prepareUpdateValues()
-
+	finish: =>
+		@stop()
+		@_updateValues(1)
 
 	_update: (delta) =>
 		if @_animator.finished()
@@ -284,67 +283,14 @@ class exports.Animation extends BaseClass
 	_currentState: ->
 		return _.pick(@layer, _.keys(@properties))
 
-	_createAnimator: ->
-		AnimatorClass = @_animatorClass()
+	@_createAnimator: (options) ->
+		AnimatorClass = Animator.classForCurve(options.curve)
+		return null if not AnimatorClass?
+		curveOptions = options.curveOptions ? Animator.curveOptionsFor(options)
+		if options.debug
+			console.log "Animation.start #{AnimatorClass.name}", curveOptions
 
-		if @options.debug
-			console.log "Animation.start #{AnimatorClass.name}", @options.curveOptions
-
-		return new AnimatorClass @options.curveOptions
-
-	_animatorClass: ->
-
-		parsedCurve = Utils.parseFunction(@options.curve)
-		animatorClassName = parsedCurve.name.toLowerCase()
-
-		if AnimatorClasses.hasOwnProperty(animatorClassName)
-			return AnimatorClasses[animatorClassName]
-
-		if animatorClassName in AnimatorClassBezierPresets
-			return BezierCurveAnimator
-
-		return LinearAnimator
-
-	_parseAnimatorOptions: ->
-
-		animatorClass = @_animatorClass()
-		parsedCurve = Utils.parseFunction @options.curve
-		animatorClassName = parsedCurve.name.toLowerCase()
-
-		# This is for compatibility with the direct Animation.time argument. This should
-		# ideally also be passed as a curveOption
-
-		if animatorClass in [LinearAnimator, BezierCurveAnimator]
-			if _.isString(@options.curveOptions) or _.isArray(@options.curveOptions)
-				@options.curveOptions =
-					values: @options.curveOptions
-
-			@options.curveOptions.time ?= @options.time
-
-		# Support ease-in etc
-		if animatorClass in [BezierCurveAnimator] and animatorClassName in AnimatorClassBezierPresets
-			@options.curveOptions.values = animatorClassName
-			@options.curveOptions.time ?= @options.time
-
-		# All this is to support curve: "spring(100, 20, 10)". In the future we'd like people
-		# to start using curveOptions: {tension:100, friction:10} etc
-
-		if parsedCurve.args.length
-
-			# console.warn "Animation.curve arguments are deprecated. Please use Animation.curveOptions"
-
-			if animatorClass is BezierCurveAnimator
-				@options.curveOptions.values = parsedCurve.args.map (v) -> parseFloat(v) or 0
-
-			if animatorClass is SpringRK4Animator
-				for k, i in ["tension", "friction", "velocity", "tolerance"]
-					value = parseFloat parsedCurve.args[i]
-					@options.curveOptions[k] = value if value
-
-			if animatorClass is SpringDHOAnimator
-				for k, i in ["stiffness", "damping", "mass", "tolerance"]
-					value = parseFloat parsedCurve.args[i]
-					@options.curveOptions[k] = value if value
+		return new AnimatorClass curveOptions
 
 	@isAnimatable = (v) ->
 		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v)

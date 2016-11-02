@@ -6,28 +6,28 @@ initialStateName = "default"
 describe "LayerStates Backwards compatibility", ->
 
 	it "should still support layer.states.add", ->
-			layer = new Layer
-			layer.states.add
-				stateA: x: 200
-				stateB: scale: 0.5
-			assert.deepEqual layer.states.stateNames, [initialStateName, "stateA", "stateB"]
-			assert.deepEqual layer.states.stateA, x: 200
-			assert.deepEqual layer.states.stateB, scale: 0.5
+		layer = new Layer
+		layer.states.add
+			stateA: x: 200
+			stateB: scale: 0.5
+		assert.deepEqual layer.stateNames, [initialStateName, "stateA", "stateB"]
+		assert.deepEqual layer.states.stateA, x: 200
+		assert.deepEqual layer.states.stateB, scale: 0.5
 
 	it "should still support layer.states.add single", ->
-			layer = new Layer
-			layer.states.add("stateA", x: 200)
-			assert.deepEqual layer.states.stateNames, [initialStateName, "stateA"]
-			assert.deepEqual layer.states.stateA, x: 200
+		layer = new Layer
+		layer.states.add("stateA", x: 200)
+		assert.deepEqual layer.stateNames, [initialStateName, "stateA"]
+		assert.deepEqual layer.states.stateA, x: 200
 
 	it "should still support layer.states.remove", ->
 		layer = new Layer
 		layer.states =
 			stateA: x: 200
 			stateB: scale: 0.5
-		assert.deepEqual layer.states.stateNames, [initialStateName, "stateA", "stateB"]
+		assert.deepEqual layer.stateNames, [initialStateName, "stateA", "stateB"]
 		layer.states.remove "stateA"
-		assert.deepEqual layer.states.stateNames, [initialStateName, "stateB"]
+		assert.deepEqual layer.stateNames, [initialStateName, "stateB"]
 
 	it "should still support layer.states.switch", (done) ->
 		layer = new Layer
@@ -35,7 +35,7 @@ describe "LayerStates Backwards compatibility", ->
 			stateA: x: 200
 			stateB: scale: 0.5
 		layer.onStateDidSwitch ->
-			assert.equal layer.states.currentName, "stateA"
+			assert.equal layer.states.current.name, "stateA"
 			done()
 		layer.states.switch "stateA"
 
@@ -45,30 +45,7 @@ describe "LayerStates Backwards compatibility", ->
 			stateA: x: 200
 			stateB: scale: 0.5
 		layer.states.switchInstant "stateB"
-		assert.equal layer.states.currentName, "stateB"
-
-	it "should still support layer.states.all", ->
-		layer = new Layer
-		layer.states =
-			stateA: x: 200
-			stateB: scale: 0.5
-		assert.deepEqual layer.states.all, [initialStateName, "stateA", "stateB"]
-
-	it "should still support layer.states.states", ->
-		layer = new Layer
-		layer.states =
-			stateA: x: 200
-			stateB: scale: 0.5
-		assert.deepEqual layer.states.states, [initialStateName, "stateA", "stateB"]
-
-	it "should still support layer.states.animatingKeys", ->
-		layer = new Layer
-		layer.states =
-			stateA: x: 200, y: 300
-			stateB: scale: 0.5
-		assert.deepEqual layer.states.animatingKeys().sort(), ["width", "height", "visible", "opacity", "clip", "scrollHorizontal", "scrollVertical", "x", "y", "z", "scaleX", "scaleY", "scaleZ", "scale", "skewX", "skewY", "skew", "originX", "originY", "originZ", "perspective", "perspectiveOriginX", "perspectiveOriginY", "rotationX", "rotationY", "rotationZ", "rotation", "blur", "brightness", "saturate", "hueRotate", "contrast", "invert", "grayscale", "sepia", "shadowX", "shadowY", "shadowBlur", "shadowSpread", "shadowColor", "backgroundColor", "color", "borderColor", "borderWidth", "force2d", "flat", "backfaceVisible", "name", "borderRadius", "html", "image", "scrollX", "scrollY", "mouseWheelSpeedMultiplier", "velocityThreshold", "constrained"].sort()
-		# delete layer.states[initialStateName]
-		# assert.deepEqual layer.states.animatingKeys().sort(), ["x", "y", "scale"].sort()
+		assert.equal layer.states.current.name, "stateB"
 
 	it "should still support layer.states.next", (done) ->
 		layer = new Layer
@@ -76,22 +53,35 @@ describe "LayerStates Backwards compatibility", ->
 			stateA: x: 200
 			stateB: scale: 0.5
 		layer.onStateDidSwitch ->
-			assert.equal layer.states.currentName, "stateA"
+			assert.equal layer.states.current.name, "stateA"
 			done()
 		layer.states.next()
 
-	it "should still support layer.states.last", (done) ->
+	it "should still support layer.states.next with string arguments", (done) ->
 		layer = new Layer
 		layer.states =
 			stateA: x: 200
 			stateB: scale: 0.5
-		layer.switchInstant "stateB"
-		layer.switchInstant "stateA"
-		layer.switchInstant "stateB"
-		layer.onStateDidSwitch ->
-			assert.equal layer.states.currentName, "stateA"
-			done()
-		layer.states.last()
+		layer.once Events.StateSwitchEnd, ->
+			layer.states.current.name.should.equal "stateB"
+			layer.once Events.StateSwitchEnd, ->
+				layer.states.current.name.should.equal "stateA"
+				done()
+			layer.states.next("stateB", "stateA")
+		layer.states.next("stateB", "stateA")
+
+	it "should still support layer.states.next with list arguments", (done) ->
+		layer = new Layer
+		layer.states =
+			stateA: x: 200
+			stateB: scale: 0.5
+		layer.once Events.StateSwitchEnd, ->
+			layer.states.current.name.should.equal "stateB"
+			layer.once Events.StateSwitchEnd, ->
+				layer.states.current.name.should.equal "stateA"
+				done()
+			layer.states.next ["stateB", "stateA"]
+		layer.states.next ["stateB", "stateA"]
 
 	it "should still support layer.states.animationOptions", ->
 		layer = new Layer
@@ -142,10 +132,10 @@ describe "LayerStates Backwards compatibility", ->
 			test = (previous, current, states) =>
 				previous.should.equal "default"
 				current.should.equal "a"
-				@layer.states.state.should.equal "default"
+				@layer.states.current.name.should.equal "default"
 				done()
 
-			@layer.states.on Events.StateWillSwitch, test
+			@layer.on Events.StateWillSwitch, test
 			@layer.states.switchInstant "a"
 
 		it "should emit didSwitch when switching", (done) ->
@@ -153,10 +143,10 @@ describe "LayerStates Backwards compatibility", ->
 			test = (previous, current, states) =>
 				previous.should.equal "default"
 				current.should.equal "a"
-				@layer.states.state.should.equal "a"
+				@layer.states.current.name.should.equal "a"
 				done()
 
-			@layer.states.on Events.StateDidSwitch, test
+			@layer.on Events.StateDidSwitch, test
 			@layer.states.switchInstant "a"
 
 

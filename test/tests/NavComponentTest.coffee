@@ -61,7 +61,7 @@ describe "NavComponent", ->
 			cardA = new Layer width: 100, height: 200
 
 			nav.show(cardA, scroll:false)
-			nav.children[1].constructor.name.should.equal "Layer"
+			nav.children[1].constructor.name.should.not.equal "ScrollComponent"
 
 	describe "Events", ->
 
@@ -83,7 +83,6 @@ describe "NavComponent", ->
 				# print Events.TransitionEnd, args
 				# print nav.current, nav._stack
 				nav.current.should.equal cardB
-				print nav.current
 				done()
 				#events.push(Events.TransitionEnd)
 

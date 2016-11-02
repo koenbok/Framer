@@ -7,6 +7,7 @@ rename = require("gulp-rename")
 template = require("gulp-template")
 gutil = require("gulp-util")
 {exec} = require("child_process")
+coffeelint = require('gulp-coffeelint')
 
 DEBUG_TARGET = process.env.TARGET ? "extras/Studio.framer"
 
@@ -29,7 +30,7 @@ WEBPACK =
 gulp.task "watch", ["test"], ->
 	gulp.watch(["./*.coffee", "framer/**", "test/tests/**", "!Version.coffee"], ["test"])
 
-gulp.task "test", ["webpack:tests"], ->
+gulp.task "test", ["webpack:tests", "lint"], ->
 	return gulp
 		.src("test/phantomjs/index.html")
 		.pipe(phantomjs({
@@ -38,6 +39,11 @@ gulp.task "test", ["webpack:tests"], ->
 			useColors: true,
 			loadImages: false
 		}))
+
+gulp.task 'lint', ->
+	gulp.src(["./framer/**","!./framer/Version.coffee.template","./test/tests/**","./test/tests.coffee","./gulpfile.coffee","scripts/site.coffee"])
+		.pipe(coffeelint())
+		.pipe(coffeelint.reporter())
 
 gulp.task "version", (callback) ->
 	versionInfo (info) ->

@@ -63,9 +63,13 @@ describe "Layer", ->
 
 		it "should set defaults with override", ->
 
-			layer = new Layer x:50, y:50
+			layer = new Layer x:50, y:60
 			layer.x.should.equal 50
-			layer.x.should.equal 50
+			layer.y.should.equal 60
+
+		it "should have default animationOptions", ->
+			layer = new Layer
+			layer.animationOptions.should.eql {}
 
 	describe "Properties", ->
 
@@ -256,6 +260,23 @@ describe "Layer", ->
 			#layer.computedStyle()["background-size"].should.equal "cover"
 			#layer.computedStyle()["background-repeat"].should.equal "no-repeat"
 
+					
+		it "should not append nocache to a base64 encoded image", ->
+
+			fullPath = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEwAAABMBAMAAAA1uUwYAAAAAXNSR0IArs4c6QAAABVQTFRFKK/6LFj/g9n/lNf9lqz/wez/////Ke+vpgAAAK1JREFUSMft1sENhDAMBdFIrmBboAjuaWFrsNN/CRwAgUPsTAH556c5WVFKQyuLLYbZf/MLmDHW5yJmjHW5kBljPhczY8zlEmaMvXMZM8ZeuZQZY08uZzZh5dqen+XNhLFBbsiEsW9uzISxTy5gwlifi5gw1uVCJoz5XMyEMZdLmASs/s5NnkFl7M7NmDJ25aZMGTtzc6aMtcqYMtYqY8pYq4wpY60ypuvnsNizA+E6656TNMZlAAAAAElFTkSuQmCC"
+			layer = new Layer
+
+			layer.image = fullPath
+			layer.image.should.equal fullPath
+
+			image = layer.props.image
+			image.should.equal fullPath
+
+			layer.style["background-image"].indexOf(fullPath).should.not.equal(-1)
+			layer.style["background-image"].indexOf("data:").should.not.equal(-1)
+			layer.style["background-image"].indexOf("?nocache=").should.equal(-1)
+
+
 		it "should cancel loading when setting image to null", (done) ->
 			prefix = "../"
 			imagePath = "static/test.png"
@@ -309,6 +330,12 @@ describe "Layer", ->
 			layer.name = "Test"
 			layer.name.should.equal "Test"
 			layer._element.getAttribute("name").should.equal "Test"
+
+		it "should handle false layer names correctly", ->
+			layer = new Layer
+				name: 0
+			layer.name.should.equal "0"
+			layer._element.getAttribute("name").should.equal "0"
 
 		it "should handle background color with image", ->
 
@@ -525,7 +552,7 @@ describe "Layer", ->
 			layer.shadowBlur.should.equal 10
 			layer.shadowSpread.should.equal 10
 
-			layer.style.boxShadow.should.equal "rgba(123, 123, 123, 0.496094) 10px 10px 10px 10px"
+			layer.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 10px 10px 10px"
 
 			# Only after we set a color a shadow should be drawn
 			layer.shadowColor = "red"

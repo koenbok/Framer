@@ -146,15 +146,15 @@ describe "LayerAnimation", ->
 				done()
 
 		it "should not animate non-animatable properties that are set to null", ->
-			
+
 			layerA = new Layer
 			layerB = new Layer parent: layerA
-			
+
 			layerB.animate
 				parent: null
 				options:
 					instant: true
-			
+
 			assert.equal(layerB.parent, layerA)
 
 
@@ -201,6 +201,57 @@ describe "LayerAnimation", ->
 
 			stopped.should.equal true
 
+		it "should work, even with MobileScrollFix enabled", (done) ->
+			layer = new Layer()
+			Framer.Extras.MobileScrollFix.enable()
+			layer.animationOptions = time: AnimationTime
+			animation = layer.animate x: 100
+			animation.start()
+			Utils.delay animation.options.time, ->
+				done()
+
+		it "copy should work", (done) ->
+			layer = new Layer
+				x: 50
+			animation = new Animation layer, {x: 100}, {time: AnimationTime}
+			copy = animation.copy()
+			copy.onAnimationEnd ->
+				layer.x.should.equal 100
+				done()
+			copy.start()
+
+		it "reverse should work", (done) ->
+			layer = new Layer
+				x: 50
+			animation = new Animation layer, {x: 100}, {time: AnimationTime}
+			animation.onAnimationEnd ->
+				layer.x.should.equal 100
+				a = animation.reverse()
+				a.once Events.AnimationEnd, ->
+					layer.x.should.equal 50
+					done()
+				a.start()
+			animation.start()
+
+		it "it should set the noop property", ->
+			layer = new Layer
+			animation = layer.animate
+				x: 50
+			animation.isNoop.should.be.equal false
+			animation.finish()
+			layer.x.should.be.equal 50
+			animation2 = layer.animate
+				x: 50
+			animation2.isNoop.should.be.equal true
+
+		it "In shouldn't crash when finish on delayed animation", ->
+			layer = new Layer
+			animation = layer.animate
+				x: 50
+				options:
+					delay: 1
+			animation.finish.should.not.throw()
+
 	describe "Context", ->
 
 		it "should list running animations", ->
@@ -236,6 +287,39 @@ describe "LayerAnimation", ->
 			animation.on "end", test
 			animation.on "stop", test
 
+		it "shouldn't return delayed animations from layer.animations()", (done) ->
+			layer = new Layer()
+			animation = layer.animate
+				x: 100
+				options:
+					time: 0.1
+					delay: 0.1
+			count = 0
+			test = ->
+				layer.animations().length.should.equal 0
+				count++
+				if count is 3
+					done()
+			test()
+			animation.on "end", test
+			animation.on "stop", test
+
+		it "should return delayed animations when calling layer.animations(true)", (done) ->
+			layer = new Layer
+			animation = layer.animate
+				x: 100
+				options:
+					time: 0.1
+					delay: 0.1
+			count = 0
+			test = ->
+				(animation in layer.animations(true)).should.equal true
+				count++
+				if count is 2
+					done()
+			test()
+			animation.on "start", test
+
 		it "should tell you if animations are running", ->
 
 			layer = new Layer()
@@ -247,6 +331,18 @@ describe "LayerAnimation", ->
 			layer.isAnimating.should.equal(true)
 			layer.animateStop()
 			layer.isAnimating.should.equal(false)
+
+		it "should tell you if delayed animations are running", (done) ->
+			layer = new Layer()
+			animation = layer.animate
+				x: 100
+				options:
+					time: 0.3
+					delay: 0.1
+			animation.isAnimating.should.equal(false)
+			Utils.delay 0.2, ->
+				animation.isAnimating.should.equal(true)
+				done()
 
 
 	describe "Events", ->
@@ -348,6 +444,33 @@ describe "LayerAnimation", ->
 				Utils.delay 0.5, ->
 					layer.x.should.equal 0
 					done()
+
+		it "pending flag should be false by default", ->
+			layer = new Layer
+			a = layer.animate
+				x: 100
+			a.isPending.should.equal false
+			a.stop()
+
+		it "should add a pending flag for delayed animations", (done) ->
+			layer = new Layer
+			a = layer.animate
+				x: 100
+				options:
+					delay: 0.3
+			a.isPending.should.equal true
+			Utils.delay 0.3, ->
+				a.isPending.should.equal false
+				done()
+
+		it "should add pending animations to the context", ->
+			layer = new Layer
+			a = layer.animate
+				x: 100
+				options:
+					delay: 0.3
+			(a in layer.context.animations).should.equal true
+
 
 	describe "Repeat", ->
 
@@ -550,6 +673,7 @@ describe "LayerAnimation", ->
 						curve: "spring"
 						time: 2
 						instant: true
+						start: false
 
 				calledEvents = []
 
@@ -561,6 +685,38 @@ describe "LayerAnimation", ->
 
 				@layer.x.should.equal 100
 				calledEvents.should.eql(["start", "stop", "end"])
+
+		describe "Callbacks", ->
+
+			it "should call start", (done) ->
+				layer = new Layer
+				layer.animate
+					x: 100
+					options:
+						time: 0.1
+						onStart: ->
+							layer.x.should.eql 0
+							done()
+
+			it "should call stop", (done) ->
+				layer = new Layer
+				layer.animate
+					x: 100
+					options:
+						time: 0.1
+						onStop: ->
+							layer.x.should.eql 100
+							done()
+
+			it "should call end", (done) ->
+				layer = new Layer
+				layer.animate
+					x: 100
+					options:
+						time: 0.1
+						onEnd: ->
+							layer.x.should.eql 100
+							done()
 
 		describe "Backwards compatibility", ->
 
@@ -595,3 +751,82 @@ describe "LayerAnimation", ->
 				animation.properties.should.eql {x: 50}
 				animation.options.curve.should.equal "linear"
 				animation.options.time.should.equal 0.1
+
+
+		describe "API Variations", ->
+
+			it "should support properties", (done) ->
+				layer = new Layer
+				layer.animationOptions = time: AnimationTime
+				animation = layer.animate x: 10
+				animation.on Events.AnimationEnd, ->
+					layer.x.should.equal 10
+					done()
+
+			it "should support properties with options", (done) ->
+				layer = new Layer
+				layer.animationOptions = time: AnimationTime
+				animation = layer.animate({x: 10}, {curve: "linear"})
+				animation.options.curve.should.equal "linear"
+				animation.on Events.AnimationEnd, ->
+					layer.x.should.equal 10
+					done()
+
+			it "should support properties with options as object", (done) ->
+				layer = new Layer
+				layer.animationOptions = time: AnimationTime
+				animation = layer.animate
+					x: 10
+					options:
+						curve: "linear"
+
+				animation.options.curve.should.equal "linear"
+				animation.on Events.AnimationEnd, ->
+					layer.x.should.equal 10
+					done()
+
+			it "should support properties with options that have undefined curveOptions as object", (done) ->
+				layer = new Layer
+				layer.animationOptions = time: AnimationTime
+				animation = layer.animate
+					x: 10
+					options:
+						curve: "linear"
+						curveOptions: undefined
+
+				animation.options.curve.should.equal "linear"
+				animation.on Events.AnimationEnd, ->
+					layer.x.should.equal 10
+				done()
+
+			it "should support states", (done) ->
+				layer = new Layer
+				layer.animationOptions = time: AnimationTime
+				layer.states.test = {x: 10}
+				animation = layer.animate "test"
+				animation.on Events.AnimationEnd, ->
+					layer.x.should.equal 10
+					done()
+
+			it "should support state with options", (done) ->
+				layer = new Layer
+				layer.animationOptions = time: AnimationTime
+				layer.states.test = {x: 10}
+				animation = layer.animate("test", {curve: "linear"})
+				animation.options.curve.should.equal "linear"
+				animation.on Events.AnimationEnd, ->
+					layer.x.should.equal 10
+					done()
+
+			it "should support state with options as object", (done) ->
+				layer = new Layer
+				layer.animationOptions = time: AnimationTime
+				layer.states.test = {x: 10}
+				animation = layer.animate "test",
+					options:
+						curve: "linear"
+
+				animation.options.curve.should.equal "linear"
+				animation.on Events.AnimationEnd, ->
+					layer.x.should.equal 10
+					done()
