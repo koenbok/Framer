@@ -65,7 +65,7 @@ describe "NavComponent", ->
 
 	describe "Events", ->
 
-		it.only "should throw the right events", (done) ->
+		it "should throw the right events", (done) ->
 
 			cardA = new Layer name: "cardA", size: 100
 			cardB = new Layer name: "cardB", size: 100
