@@ -85,7 +85,6 @@ class exports.LayerDraggable extends BaseClass
 				y: @layer.y - @_correctedLayerStartPoint.y
 
 	constructor: (@layer) ->
-
 		options = Defaults.getDefaults("LayerDraggable", {})
 
 		super options
@@ -196,12 +195,11 @@ class exports.LayerDraggable extends BaseClass
 		# If we started dragging from another event we need to capture some initial values
 		@touchStart(event) if not @_point
 
-		@_lastEvent = event
-
 		event.preventDefault()
 		event.stopPropagation() if @propagateEvents is false
 
 		touchEvent = Events.touchEvent(event)
+		@_lastEvent = touchEvent
 
 		@_eventBuffer.push
 			x: touchEvent.clientX
@@ -280,8 +278,9 @@ class exports.LayerDraggable extends BaseClass
 		# (which would return a stale value before the simulation had finished one tick)
 		# and because @_start currently calls calculateVelocity().
 		@_isDragging = false
-
 		@_ignoreUpdateLayerPosition = true
+		@_lastEvent = null
+		@_eventBuffer.reset()
 
 
 	##############################################################
@@ -378,6 +377,15 @@ class exports.LayerDraggable extends BaseClass
 		get: ->
 			# return null if not @isDragging
 			velocity = @velocity
+			if velocity.x == 0 and velocity.y == 0
+				delta = @_lastEvent?.delta
+				return null if not delta
+				if Math.abs(delta.x) > Math.abs(delta.y)
+					return "right" if delta.x > 0
+					return "left"
+				else
+					return "down" if delta.y > 0
+					return "up"
 			if Math.abs(velocity.x) > Math.abs(velocity.y)
 				return "right" if velocity.x > 0
 				return "left"
