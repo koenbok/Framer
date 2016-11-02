@@ -127,7 +127,7 @@
     "level": "ignore"
   },
   "spacing_after_comma": {
-    "level": "ignore"
+    "level": "error"
   },
   "transform_messes_up_line_numbers": {
     "level": "warn"

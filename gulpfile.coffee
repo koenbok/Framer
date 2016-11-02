@@ -42,7 +42,7 @@ gulp.task "test", ["webpack:tests", "lint"], ->
 		}))
 
 gulp.task 'lint', ->
-	gulp.src(["./framer/**","!./framer/Version.coffee.template","./test/tests/**","./test/tests.coffee","./gulpfile.coffee","scripts/site.coffee"])
+	gulp.src(["./framer/**", "!./framer/Version.coffee.template", "./test/tests/**", "./test/tests.coffee", "./gulpfile.coffee", "scripts/site.coffee"])
 		.pipe(coffeelint())
 		.pipe(coffeelint.reporter())
 
