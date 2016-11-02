@@ -26,6 +26,7 @@ class DOMEventManagerElement extends EventEmitter
 	on: @::addListener
 	off: @::removeListener
 
+
 class exports.DOMEventManager
 
 	constructor: (element) ->

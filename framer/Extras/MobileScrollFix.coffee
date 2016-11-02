@@ -53,5 +53,6 @@ exports.enable = ->
 			else
 				super
 
+
 	# Override the standard window Layer with this patched one
 	window.Layer = window.Framer.Layer = MobileScrollFixLayer

@@ -71,6 +71,7 @@ class exports.ScrollComponent extends Layer
 		exportable: false
 		get: -> @_content
 
+
 	@define "mouseWheelSpeedMultiplier", @simpleProperty("mouseWheelSpeedMultiplier", 1)
 
 	constructor: (options={}) ->

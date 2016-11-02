@@ -46,7 +46,6 @@ calculateFrame = (layer, rules) ->
 	return frame
 
 
-
 class LayerAnchor extends EventEmitter
 
 	constructor: (@layer, rules) ->
@@ -89,5 +88,6 @@ class LayerAnchor extends EventEmitter
 
 	_parseRules: ->
 		return Utils.parseRect(Utils.arrayFromArguments(arguments))
+
 
 exports.LayerAnchor = LayerAnchor

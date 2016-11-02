@@ -67,6 +67,7 @@ class exports.LayerDraggable extends BaseClass
 				@_constraints = {x: 0, y: 0, width: 0, height: 0}
 			@_updateSimulationConstraints(@_constraints) if @_constraints
 
+
 	# The isDragging only is true when there was actual movement, so you can
 	# use it to determine a click from a drag event.
 	@define "isDragging", get: -> @_isDragging or false

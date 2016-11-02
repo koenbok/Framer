@@ -25,6 +25,7 @@ class ShareInfo extends BaseClass
 	destroy: ->
 		@context.destroy()
 
+
 exports.enable = ->
 	return if ShareInfoDisabled
 	Framer.ShareInfo ?= new ShareInfo()

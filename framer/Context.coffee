@@ -37,11 +37,9 @@ class exports.Context extends BaseClass
 
 	@all = -> return _.clone(Contexts)
 
-	@define "parent",
-		get: -> @_parent
+	@define "parent", get: -> @_parent
 
-	@define "element",
-		get: -> @_element
+	@define "element", get: -> @_element
 
 	constructor: (options={}) ->
 
