@@ -24,6 +24,7 @@
     "coverage-capture": "./test/coverage-capture",
     "eventemitter3": "^1.1.1",
     "gulp": "^3.8.11",
+    "gulp-coffeelint": "^0.6.0",
     "gulp-mocha-phantomjs": "^0.11.0",
     "gulp-plumber": "^1.0.1",
     "gulp-rename": "^1.2.2",
