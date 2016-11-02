@@ -26,7 +26,7 @@ class exports.PageComponent extends ScrollComponent
 	constructor: (options) ->
 		super _.defaults options,
 			animationOptions:
-				curve:"spring(500, 50, 0)"
+				curve: "spring(500, 50, 0)"
 
 		@content.draggable.momentum = false
 		@content.draggable.bounce = false
@@ -48,10 +48,10 @@ class exports.PageComponent extends ScrollComponent
 		currentPage ?= @currentPage
 
 		# Figure out the point from where to look for next layers in a direction
-		point = {x:0, y:0}
+		point = {x: 0, y: 0}
 		point = Utils.framePointForOrigin(currentPage, @originX, @originY) if currentPage
 		if !withoutCurrentPage
-			point = {x:@scrollX + (@originX * @width), y:@scrollY + (@originY * @height)}
+			point = {x: @scrollX + (@originX * @width), y: @scrollY + (@originY * @height)}
 
 		layers = @content.childrenAbove(point, @originX, @originY) if direction in ["up", "top", "north"]
 		layers = @content.childrenBelow(point, @originX, @originY) if direction in ["down", "bottom", "south"]
@@ -130,7 +130,7 @@ class exports.PageComponent extends ScrollComponent
 
 		if currentPage not in [_.last(@_previousPages), undefined]
 			@_previousPages.push(currentPage)
-			@emit("change:currentPage", {old:@previousPage, new:currentPage})
+			@emit("change:currentPage", {old: @previousPage, new: currentPage})
 
 	_scrollEnd: =>
 

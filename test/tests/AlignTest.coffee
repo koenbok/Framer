@@ -33,9 +33,9 @@ describe "Align", ->
 			layer.y.should.equal 75
 
 		it "should take borderWidth into account", ->
-			{child} = createAlignedLayers("x", Align.center, {borderWidth:30})
+			{child} = createAlignedLayers("x", Align.center, {borderWidth: 30})
 			child.x.should.equal 170
-			{child} = createAlignedLayers("y", Align.center, {borderWidth:30})
+			{child} = createAlignedLayers("y", Align.center, {borderWidth: 30})
 			child.y.should.equal 20
 
 
@@ -52,7 +52,7 @@ describe "Align", ->
 			layer.x.should.equal 0
 
 		it "should take borderWidth into account", ->
-			{child} = createAlignedLayers("x", Align.left, {borderWidth:30})
+			{child} = createAlignedLayers("x", Align.left, {borderWidth: 30})
 			child.x.should.equal 0
 
 	describe "right", ->
@@ -68,7 +68,7 @@ describe "Align", ->
 			layer.x.should.equal 300
 
 		it "should take borderWidth into account", ->
-			{child} = createAlignedLayers("x", Align.right, {borderWidth:30})
+			{child} = createAlignedLayers("x", Align.right, {borderWidth: 30})
 			child.x.should.equal 340
 
 	describe "top", ->
@@ -84,7 +84,7 @@ describe "Align", ->
 			layer.y.should.equal 0
 
 		it "should take borderWidth into account", ->
-			{child} = createAlignedLayers("y", Align.top, {borderWidth:30})
+			{child} = createAlignedLayers("y", Align.top, {borderWidth: 30})
 			child.y.should.equal 0
 
 	describe "bottom", ->
@@ -100,7 +100,7 @@ describe "Align", ->
 			layer.y.should.equal 200
 
 		it "should take borderWidth into account", ->
-			{child} = createAlignedLayers("y", Align.bottom, {borderWidth:30})
+			{child} = createAlignedLayers("y", Align.bottom, {borderWidth: 30})
 			child.y.should.equal 40
 
 	describe "constructors", ->

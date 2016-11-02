@@ -656,7 +656,7 @@ Utils.point = (input) ->
 	return result
 
 Utils.pointZero = (n=0) ->
-	return {x:n, y:n}
+	return {x: n, y: n}
 
 Utils.pointDivide = (point, fraction) ->
 	return point =
@@ -737,37 +737,37 @@ Utils.size = (input) ->
 	return result
 
 Utils.sizeZero = (n=0) ->
-	return {width:n, height:n}
+	return {width: n, height: n}
 
 Utils.sizeMin = ->
 	sizes = Utils.arrayFromArguments arguments
 	size  =
-		width:  _.min sizes.map (size) -> size.width
+		width: _.min sizes.map (size) -> size.width
 		height: _.min sizes.map (size) -> size.height
 
 Utils.sizeMax = ->
 	sizes = Utils.arrayFromArguments arguments
 	size  =
-		width:  _.max sizes.map (size) -> size.width
+		width: _.max sizes.map (size) -> size.width
 		height: _.max sizes.map (size) -> size.height
 
 # Rect
 
 Utils.rectZero = (args={}) ->
-	return _.defaults(args, {top:0, right:0, bottom:0, left:0})
+	return _.defaults(args, {top: 0, right: 0, bottom: 0, left: 0})
 
 Utils.parseRect = (args) ->
 	if _.isArray(args) and _.isNumber(args[0])
-		return Utils.parseRect({top:args[0]}) if args.length is 1
-		return Utils.parseRect({top:args[0], right:args[1]}) if args.length is 2
-		return Utils.parseRect({top:args[0], right:args[1], bottom:args[2]}) if args.length is 3
-		return Utils.parseRect({top:args[0], right:args[1], bottom:args[2], left:args[3]}) if args.length is 4
+		return Utils.parseRect({top: args[0]}) if args.length is 1
+		return Utils.parseRect({top: args[0], right: args[1]}) if args.length is 2
+		return Utils.parseRect({top: args[0], right: args[1], bottom: args[2]}) if args.length is 3
+		return Utils.parseRect({top: args[0], right: args[1], bottom: args[2], left: args[3]}) if args.length is 4
 	if _.isArray(args) and _.isObject(args[0])
 		return args[0]
 	if _.isObject(args)
 		return args
 	if _.isNumber(args)
-		return {top:args, right:args, bottom:args, left:args}
+		return {top: args, right: args, bottom: args, left: args}
 
 	return {}
 
@@ -814,7 +814,7 @@ Utils.frame = (input) ->
 	return result
 
 Utils.frameZero = (n=0) ->
-	return {x:n, y:n}
+	return {x: n, y: n}
 
 Utils.frameSize = (frame) ->
 	size =
@@ -831,10 +831,10 @@ Utils.pointsFromFrame = (frame) ->
 	maxX = Utils.frameGetMaxX(frame)
 	minY = Utils.frameGetMinY(frame)
 	maxY = Utils.frameGetMaxY(frame)
-	corner1 = {x:minX, y:minY}
-	corner2 = {x:minX, y:maxY}
-	corner3 = {x:maxX, y:maxY}
-	corner4 = {x:maxX, y:minY}
+	corner1 = {x: minX, y: minY}
+	corner2 = {x: minX, y: maxY}
+	corner3 = {x: maxX, y: maxY}
+	corner4 = {x: maxX, y: minY}
 	return [corner1, corner2, corner3, corner4]
 
 Utils.frameFromPoints = (points) ->
@@ -892,7 +892,7 @@ Utils.framePointForOrigin = (frame, originX, originY) ->
 Utils.frameInset = (frame, inset) ->
 
 	if _.isNumber(inset)
-		inset = {top:inset, right:inset, bottom:inset, left:inset}
+		inset = {top: inset, right: inset, bottom: inset, left: inset}
 
 	frame = Utils.frame(frame)
 
@@ -985,7 +985,7 @@ Utils.rotationNormalizer = ->
 
 # convert a point from a layer to the context level, with rootContext enabled you can make it cross to the top context
 Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLayer=true) ->
-	point = _.defaults(point, {x:0, y:0, z:0})
+	point = _.defaults(point, {x: 0, y: 0, z: 0})
 	ancestors = layer.ancestors(rootContext)
 	ancestors.unshift(layer) if includeLayer
 
@@ -997,7 +997,7 @@ Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLaye
 	return point
 
 Utils.convertFrameToContext = (frame = {}, layer, rootContext=false, includeLayer=true) ->
-	frame = _.defaults(frame, {x:0, y:0, width:100, height:100})
+	frame = _.defaults(frame, {x: 0, y: 0, width: 100, height: 100})
 	corners = Utils.pointsFromFrame(frame)
 	convertedCorners = corners.map (point) ->
 		return Utils.convertPointToContext(point, layer, rootContext, includeLayer)
@@ -1006,7 +1006,7 @@ Utils.convertFrameToContext = (frame = {}, layer, rootContext=false, includeLaye
 # convert a point from the context level to a layer, with rootContext enabled you can make it cross from the top context
 Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLayer=true) ->
 
-	point = _.defaults(point, {x:0, y:0, z:0})
+	point = _.defaults(point, {x: 0, y: 0, z: 0})
 
 	if rootContext and webkitConvertPointFromPageToNode?
 		if includeLayer
@@ -1028,7 +1028,7 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 
 # convert a frame from the context level to a layer, with rootContext enabled you can make it start from the top context
 Utils.convertFrameFromContext = (frame = {}, layer, rootContext=false, includeLayer=true) ->
-	frame = _.defaults(frame, {x:0, y:0, width:100, height:100})
+	frame = _.defaults(frame, {x: 0, y: 0, width: 100, height: 100})
 	corners = Utils.pointsFromFrame(frame)
 	convertedCorners = corners.map (point) ->
 		return Utils.convertPointFromContext(point, layer, rootContext, includeLayer)
@@ -1038,7 +1038,7 @@ Utils.convertFrameFromContext = (frame = {}, layer, rootContext=false, includeLa
 Utils.convertPoint = (input, layerA, layerB, rootContext=false) ->
 
 	# Convert a point between two layer coordinate systems
-	point = _.defaults(input, {x:0, y:0, z:0})
+	point = _.defaults(input, {x: 0, y: 0, z: 0})
 	point = Utils.convertPointToContext(point, layerA, rootContext) if layerA
 	if layerB?
 		return Utils.convertPointFromContext(point, layerB, rootContext)
@@ -1050,7 +1050,7 @@ Utils.convertPoint = (input, layerA, layerB, rootContext=false) ->
 
 # get the bounding frame of a layer, either at the canvas (rootcontext) or screen level
 Utils.boundingFrame = (layer, rootContext=true) ->
-	frame = {x:0, y:0, width:layer.width, height:layer.height}
+	frame = {x: 0, y: 0, width: layer.width, height: layer.height}
 	cornerPoints = Utils.pointsFromFrame(frame)
 	contextCornerPoints = cornerPoints.map (point) ->
 		return Utils.convertPointToContext(point, layer, rootContext)

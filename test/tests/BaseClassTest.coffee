@@ -36,7 +36,7 @@ describe "BaseClass", ->
 
 	it "should set defaults on construction", ->
 
-		testClass = new TestClass width:100, height:100
+		testClass = new TestClass width: 100, height: 100
 
 		testClass.width.should.equal 100
 		testClass.height.should.equal 100
@@ -141,7 +141,7 @@ describe "BaseClass", ->
 			constructor: ->
 				super
 
-				@poop = {hello:100}
+				@poop = {hello: 100}
 
 		testClass = new TestClass7()
 		testClass.poop.hello.should.equal 100

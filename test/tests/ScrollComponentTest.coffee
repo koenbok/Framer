@@ -7,8 +7,8 @@ describe "ScrollComponent", ->
 		scroll = new ScrollComponent
 			size: 300
 
-		scroll.frame.should.eql {x:0, y:0, width:300, height:300}
-		scroll.content.frame.should.eql {x:0, y:0, width:300, height:300}
+		scroll.frame.should.eql {x: 0, y: 0, width: 300, height: 300}
+		scroll.content.frame.should.eql {x: 0, y: 0, width: 300, height: 300}
 
 	it "should have the right content frame with align", ->
 
@@ -20,8 +20,8 @@ describe "ScrollComponent", ->
 			size: 100
 			point: Align.center
 
-		scroll.content.frame.should.eql {x:0, y:0, width:300, height:300}
-		layer.frame.should.eql {x:100, y:100, width:100, height:100}
+		scroll.content.frame.should.eql {x: 0, y: 0, width: 300, height: 300}
+		layer.frame.should.eql {x: 100, y: 100, width: 100, height: 100}
 
 	it "should apply constructor options", ->
 
@@ -154,23 +154,23 @@ describe "ScrollComponent", ->
 
 		it "should use the wrapped layer as content layer when there are children", ->
 
-			layerA = new Layer frame:Screen.frame
-			layerB = new Layer superLayer:layerA
+			layerA = new Layer frame: Screen.frame
+			layerB = new Layer superLayer: layerA
 
 			scroll = ScrollComponent.wrap(layerA)
 			scroll.content.should.equal layerA
 
 		it "should use the wrapped layer as content if there are no children", ->
 
-			layerA = new Layer frame:Screen.frame
+			layerA = new Layer frame: Screen.frame
 
 			scroll = ScrollComponent.wrap(layerA)
 			scroll.content.children[0].should.equal layerA
 
 		it "should copy the name and image", ->
 
-			layerA = new Layer frame:Screen.frame, name:"Koen", image:"../static/test.png"
-			layerB = new Layer superLayer:layerA
+			layerA = new Layer frame: Screen.frame, name: "Koen", image: "../static/test.png"
+			layerB = new Layer superLayer: layerA
 
 			scroll = ScrollComponent.wrap(layerA)
 
@@ -187,7 +187,7 @@ describe "ScrollComponent", ->
 			frame.width += 100
 			frame.height += 100
 
-			layerA = new Layer frame:frame
+			layerA = new Layer frame: frame
 
 			scroll = ScrollComponent.wrap(layerA)
 			scroll.width.should.equal Screen.width
@@ -199,8 +199,8 @@ describe "ScrollComponent", ->
 			frame.width += 100
 			frame.height += 100
 
-			layerA = new Layer frame:frame
-			layerB = new Layer superLayer:layerA
+			layerA = new Layer frame: frame
+			layerB = new Layer superLayer: layerA
 
 			scroll = ScrollComponent.wrap(layerA)
 			scroll.width.should.equal Screen.width
@@ -209,7 +209,7 @@ describe "ScrollComponent", ->
 		it "should work with null backgroundColor", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer:layerA
+			layerB = new Layer superLayer: layerA
 
 			delete layerA._properties.backgroundColor
 			scroll = ScrollComponent.wrap(layerA)

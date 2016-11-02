@@ -98,7 +98,7 @@ class exports.NavComponent extends Layer
 
 		transition = new TransitionType(@, @_wrappedLayer(@current), wrappedLayer)
 		@_runTransition(transition, "forward", animate, @current, layer)
-		@_stack.push({layer:layer, transition:transition})
+		@_stack.push({layer: layer, transition: transition})
 
 	dialog: (layer, animate) ->
 		@push(layer, Transitions.dialog, animate, false)
@@ -125,11 +125,11 @@ class exports.NavComponent extends Layer
 		get: -> return @_stack[@_stack.length - 2]?.layer
 
 	_runTransition: (transition, direction, animate, from, to) =>
-		
+
 		@_isTransitioning = true
 		@emit(Events.TransitionStart, from, to, direction)
 		@emit(direction, from, to)
-		
+
 		transition[direction] animate, =>
 			@_isTransitioning = false
 			@emit(Events.TransitionEnd, from, to, direction)

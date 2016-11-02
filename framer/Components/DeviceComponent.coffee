@@ -77,11 +77,11 @@ class exports.DeviceComponent extends BaseClass
 		@background.classList.add("DeviceBackground")
 
 		@hands    = new Layer
-		@handsImageLayer = new Layer parent:@hands
-		@phone    = new Layer parent:@hands
-		@screen   = new Layer parent:@phone
-		@viewport = new Layer parent:@screen
-		@content  = new Layer parent:@viewport
+		@handsImageLayer = new Layer parent: @hands
+		@phone    = new Layer parent: @hands
+		@screen   = new Layer parent: @phone
+		@viewport = new Layer parent: @screen
+		@content  = new Layer parent: @viewport
 
 		@hands.backgroundColor = "transparent"
 		@hands._alwaysUseImageCache = true
@@ -109,7 +109,7 @@ class exports.DeviceComponent extends BaseClass
 		for layer in [@background, @phone, @viewport, @content, @screen]
 			layer.on "touchmove", (event) -> event.preventDefault()
 
-		@_context = new Framer.Context(parent:@content, name:"DeviceScreen")
+		@_context = new Framer.Context(parent: @content, name: "DeviceScreen")
 		@_context.perspective = 1200
 		@_context.device = @
 
@@ -382,7 +382,7 @@ class exports.DeviceComponent extends BaseClass
 
 		if animate
 			@hands.animate _.extend @animationOptions,
-				properties: {scale:phoneScale}
+				properties: {scale: phoneScale}
 		else
 			@hands.scale = phoneScale
 			@hands.center()
@@ -655,10 +655,10 @@ iPhone7BaseDevice =
 	minStudioVersion: 71
 	hands:
 		"iphone-hands-2":
-			width:  2400
+			width: 2400
 			height: 3740
 		"iphone-hands-1":
-			width:  2400
+			width: 2400
 			height: 3740
 
 iPhone7PlusBaseDevice =
@@ -671,10 +671,10 @@ iPhone7PlusBaseDevice =
 	minStudioVersion: 71
 	hands:
 		"iphone-hands-2":
-			width:  3987
+			width: 3987
 			height: 6212
 		"iphone-hands-1":
-			width:  3987
+			width: 3987
 			height: 6212
 
 iPhone6BaseDevice =
@@ -687,10 +687,10 @@ iPhone6BaseDevice =
 	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
-			width:  2400
+			width: 2400
 			height: 3740
 		"iphone-hands-1":
-			width:  2400
+			width: 2400
 			height: 3740
 
 iPhone6PlusBaseDevice =
@@ -703,10 +703,10 @@ iPhone6PlusBaseDevice =
 	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
-			width:  3987
+			width: 3987
 			height: 6212
 		"iphone-hands-1":
-			width:  3987
+			width: 3987
 			height: 6212
 
 iPhone5BaseDevice =
@@ -719,11 +719,11 @@ iPhone5BaseDevice =
 	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
-			width:  2098
+			width: 2098
 			height: 3269
 			offset: 19
 		"iphone-hands-1":
-			width:  2098
+			width: 2098
 			height: 3269
 			offset: 19
 
@@ -737,11 +737,11 @@ iPhone5CBaseDevice =
 	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
-			width:  2098
+			width: 2098
 			height: 3269
 			offset: 28
 		"iphone-hands-1":
-			width:  2098
+			width: 2098
 			height: 3269
 			offset: 28
 
@@ -755,11 +755,11 @@ Nexus4BaseDevice =
 	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
-			width:  2362
+			width: 2362
 			height: 3681
 			offset: -52
 		"iphone-hands-1":
-			width:  2362
+			width: 2362
 			height: 3681
 			offset: -52
 
@@ -773,11 +773,11 @@ Nexus5BaseDevice =
 	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
-			width:  3292
+			width: 3292
 			height: 5130
 			offset: 8
 		"iphone-hands-1":
-			width:  3292
+			width: 3292
 			height: 5130
 			offset: 8
 
@@ -791,11 +791,11 @@ Nexus6BaseDevice =
 	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
-			width:  4304
+			width: 4304
 			height: 6707
 			offset: 8
 		"iphone-hands-1":
-			width:  4304
+			width: 4304
 			height: 6707
 			offset: 8
 
@@ -809,11 +809,11 @@ PixelBaseDevice =
 	minStudioVersion: googlePixelReleaseVersion
 	hands:
 		"iphone-hands-2":
-			width:  3344
+			width: 3344
 			height: 5211
 			offset: 23
 		"iphone-hands-1":
-			width:  3344
+			width: 3344
 			height: 5211
 			offset: 23
 
@@ -836,11 +836,11 @@ HTCa9BaseDevice =
 	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
-			width:  3436
+			width: 3436
 			height: 5354
 			offset: 36
 		"iphone-hands-1":
-			width:  3436
+			width: 3436
 			height: 5354
 			offset: 36
 
@@ -854,11 +854,11 @@ HTCm8BaseDevice =
 	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
-			width:  3436
+			width: 3436
 			height: 5354
 			offset: 12
 		"iphone-hands-1":
-			width:  3436
+			width: 3436
 			height: 5354
 			offset: 12
 
@@ -872,11 +872,11 @@ MSFTLumia950BaseDevice =
 	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
-			width:  4494
+			width: 4494
 			height: 7003
 			offset: -84
 		"iphone-hands-1":
-			width:  4494
+			width: 4494
 			height: 7003
 			offset: -84
 
@@ -890,11 +890,11 @@ SamsungGalaxyNote5BaseDevice =
 	minStudioVersion: newDeviceMinVersion
 	hands:
 		"iphone-hands-2":
-			width:  4279
+			width: 4279
 			height: 6668
 			offset: -24
 		"iphone-hands-1":
-			width:  4279
+			width: 4279
 			height: 6668
 			offset: -84
 
@@ -1164,7 +1164,7 @@ Devices =
 	# iPhone 7
 	"apple-iphone-7-gold": _.clone(iPhone7BaseDevice)
 	"apple-iphone-7-rose-gold": _.clone(iPhone7BaseDevice)
-	"apple-iphone-7-silver" : _.clone(iPhone7BaseDevice)
+	"apple-iphone-7-silver": _.clone(iPhone7BaseDevice)
 	"apple-iphone-7-black": _.clone(iPhone7BaseDevice)
 	"apple-iphone-7-jet-black": _.clone(iPhone7BaseDevice)
 
@@ -1178,7 +1178,7 @@ Devices =
 	# iPhone 6s
 	"apple-iphone-6s-gold": _.clone(iPhone6BaseDevice)
 	"apple-iphone-6s-rose-gold": _.clone(iPhone6BaseDevice)
-	"apple-iphone-6s-silver" : _.clone(iPhone6BaseDevice)
+	"apple-iphone-6s-silver": _.clone(iPhone6BaseDevice)
 	"apple-iphone-6s-space-gray": _.clone(iPhone6BaseDevice)
 
 	# iPhone 6s Plus
@@ -1369,7 +1369,7 @@ Devices =
 
 	# iPhone 5S
 	"iphone-5s-spacegray": _.clone(old_iPhone5BaseDevice)
-	"iphone-5s-spacegray-hand":_.clone(old_iPhone5BaseDeviceHand)
+	"iphone-5s-spacegray-hand": _.clone(old_iPhone5BaseDeviceHand)
 	"iphone-5s-silver": _.clone(old_iPhone5BaseDevice)
 	"iphone-5s-silver-hand": _.clone(old_iPhone5BaseDeviceHand)
 	"iphone-5s-gold": _.clone(old_iPhone5BaseDevice)

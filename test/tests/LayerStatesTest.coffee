@@ -12,8 +12,8 @@ describe "LayerStates", ->
 
 		beforeEach ->
 			@layer = new Layer()
-			@layer.states.a = {x:100, y:100}
-			@layer.states.b = {x:200, y:200}
+			@layer.states.a = {x: 100, y: 100}
+			@layer.states.b = {x: 200, y: 200}
 
 		it "should emit StateSwitchStart when switching", (done) ->
 
@@ -146,9 +146,9 @@ describe "LayerStates", ->
 			layer = new Layer
 			layer.states =
 				stateA:
-					x:123
+					x: 123
 				stateB:
-					y:123
+					y: 123
 					options:
 						instant: true
 
@@ -169,7 +169,7 @@ describe "LayerStates", ->
 
 		it "should switch non animatable properties", ->
 			layer = new Layer
-			layer.states.stateA = {x: 100, image:"static/test2.png"}
+			layer.states.stateA = {x: 100, image: "static/test2.png"}
 			layer.animate "stateA", instant: true
 			layer.x.should.equal 100
 			layer.image.should.equal "static/test2.png"
@@ -234,8 +234,8 @@ describe "LayerStates", ->
 
 			layer = new Layer
 			layer.states =
-				stateA: {x:100, rotation: 90, options: time: 0.05}
-				stateB: {x:200, rotation: 180, options: time: 0.05}
+				stateA: {x: 100, rotation: 90, options: time: 0.05}
+				stateB: {x: 200, rotation: 180, options: time: 0.05}
 
 			layer.x.should.equal 0
 
@@ -324,7 +324,7 @@ describe "LayerStates", ->
 
 			layer = new Layer
 			layer.states =
-				stateA: {scroll:true, backgroundColor:"red"}
+				stateA: {scroll: true, backgroundColor: "red"}
 
 			layer.scroll.should.equal false
 
@@ -339,7 +339,7 @@ describe "LayerStates", ->
 
 			layer = new Layer
 			layer.states =
-				stateA: {x:200, backgroundColor:"red"}
+				stateA: {x: 200, backgroundColor: "red"}
 
 			# layer.scroll.should.equal false
 			layer.x.should.equal 0
@@ -350,13 +350,13 @@ describe "LayerStates", ->
 				layer.style.backgroundColor.should.equal new Color("red").toString()
 				done()
 
-			layer.animate "stateA", {curve:"linear", time:0.1}
+			layer.animate "stateA", {curve: "linear", time: 0.1}
 
 		it "should restore the initial state when using non exportable properties", ->
 
 			layer = new Layer
 			layer.states =
-				stateA: {midX:200}
+				stateA: {midX: 200}
 
 			layer.x.should.equal 0
 

@@ -17,7 +17,7 @@ chai.should()
 chai.config.truncateThreshold = 2
 chai.config.showDiff = true
 
-mocha.setup({ui:"bdd", bail:true, reporter:"dot"})
+mocha.setup({ui: "bdd", bail: true, reporter: "dot"})
 mocha.globals(["__import__"])
 
 window.print = (args...) ->

@@ -64,7 +64,7 @@ Framer.resetDefaults = Defaults.reset
 
 # Create the default context, set it to invisble by default so
 # the preloader can pick it up if it needs to.
-Framer.DefaultContext = new Framer.Context(name:"Default")
+Framer.DefaultContext = new Framer.Context(name: "Default")
 Framer.DefaultContext.backgroundColor = "white"
 Framer.DefaultContext.visible = false
 Framer.CurrentContext = Framer.DefaultContext

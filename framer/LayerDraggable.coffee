@@ -53,7 +53,7 @@ class exports.LayerDraggable extends BaseClass
 
 	@define "momentumVelocityMultiplier", @simpleProperty("momentumVelocityMultiplier", 800)
 	@define "directionLock", @simpleProperty("directionLock", true)
-	@define "directionLockThreshold", @simpleProperty("directionLockThreshold", {x:10, y:10})
+	@define "directionLockThreshold", @simpleProperty("directionLockThreshold", {x: 10, y: 10})
 	@define "propagateEvents", @simpleProperty("propagateEvents", true)
 
 	@define "constraints",
@@ -61,10 +61,10 @@ class exports.LayerDraggable extends BaseClass
 		set: (value) ->
 			if value and _.isObject(value)
 				value = _.pick(value, ["x", "y", "width", "height"])
-				value = _.defaults(value, {x:0, y:0, width:0, height:0})
+				value = _.defaults(value, {x: 0, y: 0, width: 0, height: 0})
 				@_constraints = value
 			else
-				@_constraints = {x:0, y:0, width:0, height:0}
+				@_constraints = {x: 0, y: 0, width: 0, height: 0}
 			@_updateSimulationConstraints(@_constraints) if @_constraints
 
 	# The isDragging only is true when there was actual movement, so you can
@@ -74,12 +74,12 @@ class exports.LayerDraggable extends BaseClass
 	@define "isMoving", get: -> @_isMoving or false
 
 	@define "layerStartPoint", get: -> @_layerStartPoint or @layer.point
-	@define "cursorStartPoint", get: -> @_cursorStartPoint or {x:0, y:0}
-	@define "layerCursorOffset", get: -> @_layerCursorOffset or {x:0, y:0}
+	@define "cursorStartPoint", get: -> @_cursorStartPoint or {x: 0, y: 0}
+	@define "layerCursorOffset", get: -> @_layerCursorOffset or {x: 0, y: 0}
 
 	@define "offset",
 		get: ->
-			return {x:0, y:0} if not @_correctedLayerStartPoint
+			return {x: 0, y: 0} if not @_correctedLayerStartPoint
 			return offset =
 				x: @layer.x - @_correctedLayerStartPoint.x
 				y: @layer.y - @_correctedLayerStartPoint.y
@@ -291,7 +291,7 @@ class exports.LayerDraggable extends BaseClass
 
 	@define "constraintsOffset",
 		get: ->
-			return {x:0, y:0} unless @constraints
+			return {x: 0, y: 0} unless @constraints
 			{minX, maxX, minY, maxY} = @_calculateConstraints(@constraints)
 			point = @layer.point
 			constrainedPoint =
@@ -367,11 +367,11 @@ class exports.LayerDraggable extends BaseClass
 		get: ->
 			return @_calculateSimulationVelocity() if @isAnimating
 			return @_eventBuffer.velocity
-			return {x:0, y:0}
+			return {x: 0, y: 0}
 
 			# return @_eventBuffer.velocity if @isDragging
 			# return @_calculateSimulationVelocity() if @isAnimating
-			# return {x:0, y:0}
+			# return {x: 0, y: 0}
 
 	@define "angle",
 		get: -> @_eventBuffer.angle
@@ -405,7 +405,7 @@ class exports.LayerDraggable extends BaseClass
 		xFinished = @_simulation.x.finished()
 		yFinished = @_simulation.y.finished()
 
-		velocity = {x:0, y:0}
+		velocity = {x: 0, y: 0}
 		velocity.x = (@_simulation.x.simulator.state.v / @momentumVelocityMultiplier) if not xFinished
 		velocity.y = (@_simulation.y.simulator.state.v / @momentumVelocityMultiplier) if not yFinished
 
@@ -483,11 +483,11 @@ class exports.LayerDraggable extends BaseClass
 		return unless @_simulation
 		if constraints
 			{minX, maxX, minY, maxY} = @_calculateConstraints(@_constraints)
-			@_simulation.x.simulator.options = {min:minX, max:maxX}
-			@_simulation.y.simulator.options = {min:minY, max:maxY}
+			@_simulation.x.simulator.options = {min: minX, max: maxX}
+			@_simulation.y.simulator.options = {min: minY, max: maxY}
 		else
-			@_simulation.x.simulator.options = {min:-Infinity, max:+Infinity}
-			@_simulation.y.simulator.options = {min:-Infinity, max:+Infinity}
+			@_simulation.x.simulator.options = {min: -Infinity, max: +Infinity}
+			@_simulation.y.simulator.options = {min: -Infinity, max: +Infinity}
 
 	_onSimulationStep: (axis, state) =>
 

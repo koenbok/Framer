@@ -11,7 +11,7 @@ describe "Context", ->
 			# There's one default context:
 			document.querySelectorAll(".framerContext").length.should.equal(c1)
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 
 			context.reset()
 			context.reset()
@@ -28,7 +28,7 @@ describe "Context", ->
 
 		it "should remove events", ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 
 			layer = null
 			handler = ->
@@ -44,7 +44,7 @@ describe "Context", ->
 
 		it "should restore events", ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 
 			layer = null
 			handler = ->
@@ -61,7 +61,7 @@ describe "Context", ->
 
 		it "should freeze and restore multiple events on multiple layers", ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 
 			layerA = layerB = null
 			handlerA = ->
@@ -93,7 +93,7 @@ describe "Context", ->
 
 		it "should freeze and restore multiple events a layer", ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 
 			layerA = null
 			handlerA = ->
@@ -123,7 +123,7 @@ describe "Context", ->
 
 		it "should stop animations", ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 
 			layer = null
 			animation = null
@@ -142,7 +142,7 @@ describe "Context", ->
 
 		it "should stop timers", ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 
 			layer = null
 			timer = null
@@ -163,7 +163,7 @@ describe "Context", ->
 
 		it "should add and remove layers", ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 
 			context.run ->
 
@@ -178,12 +178,12 @@ describe "Context", ->
 
 		it "should list root layers", ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 
 			context.run ->
 
 				layerA = new Layer
-				layerB = new Layer parent:layerA
+				layerB = new Layer parent: layerA
 
 				context.rootLayers.should.eql [layerA]
 				layerB.parent = null
@@ -191,7 +191,7 @@ describe "Context", ->
 
 		it "should get layers by id", ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 
 			context.run ->
 				layerA = new Layer
@@ -199,7 +199,7 @@ describe "Context", ->
 
 		it "should get layers by element", ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 
 			context.run ->
 				layerA = new Layer
@@ -211,13 +211,13 @@ describe "Context", ->
 
 		it "should emit reset", (callback) ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 			context.on "reset", -> callback()
 			context.reset()
 
 		it "should emit layer create", (callback) ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 			context.on "layer:create", ->
 				context.layers.length.should.equal 1
 				callback()
@@ -228,7 +228,7 @@ describe "Context", ->
 
 		it "should emit layer destroy", (callback) ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 
 			context.on "layer:create", ->
 				context.layers.length.should.equal 1
@@ -243,7 +243,7 @@ describe "Context", ->
 
 		it "should keep layer id count per context", ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 
 			context.run ->
 				layer = new Layer
@@ -263,7 +263,7 @@ describe "Context", ->
 
 		it "should set backgroundColor", ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 			context.backgroundColor = "red"
 			color = new Color "red"
 			colorString = color.toString()
@@ -271,11 +271,11 @@ describe "Context", ->
 
 		it "should have a default perspective of 0", ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 			context._element.style["webkitPerspective"].should.equal "0"
 
 		it "should allow the perspective to be changed", ->
 
-			context = new Framer.Context(name:"Test")
+			context = new Framer.Context(name: "Test")
 			context.perspective = 800
 			context._element.style["webkitPerspective"].should.equal "800"
