@@ -87,7 +87,7 @@ class exports.Color extends BaseClass
 		if @_husl == undefined
 			c = libhusl._conv
 			husl = c.lch.husl c.luv.lch c.xyz.luv c.rgb.xyz([@r/255, @g/255, @b/255])
-			@_husl = { h: husl[0], s: husl[1], l: husl[2] }
+			@_husl = {h: husl[0], s: husl[1], l: husl[2]}
 
 		return _.clone(@_husl)
 
@@ -339,8 +339,8 @@ rgbaFromHusl = (husl) ->
 
 # Functions
 inputData = (color, g, b, alpha) ->
-	rgb = { r:0, g:0, b:0 }
-	hsl = { h:0, s:0, l:0 }
+	rgb = {r:0, g:0, b:0}
+	hsl = {h:0, s:0, l:0}
 	a = 1
 	ok = false
 	type = ColorType.RGB
@@ -452,7 +452,7 @@ rgbToHsl = (r, g, b) ->
 			when g then h = (b - r) / d + 2
 			when b then h = (r - g) / d + 4
 		h /= 6
-	return { h:h * 360, s:s, l:l }
+	return {h:h * 360, s:s, l:l}
 
 # HSL to RGB
 hslToRgb = (h, s, l) ->
@@ -482,7 +482,7 @@ hslToRgb = (h, s, l) ->
 		g = hue2rgb(p, q, h)
 		b = hue2rgb(p, q, h - (1 / 3))
 
-	return { r:r*255, g:g*255, b:b*255 }
+	return {r:r*255, g:g*255, b:b*255}
 
 # Utility Functions
 

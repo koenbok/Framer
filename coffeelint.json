@@ -3,7 +3,7 @@
     "level": "warn"
   },
   "braces_spacing": {
-    "level": "ignore",
+    "level": "warn",
     "spaces": 0,
     "empty_object_spaces": 0
   },

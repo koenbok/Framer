@@ -13,15 +13,15 @@ class exports.BezierCurveAnimator extends Animator
 
 		# Input is a one of the named bezier curves
 		if _.isString(options) and BezierCurveDefaults.hasOwnProperty options.toLowerCase()
-			options = { values: BezierCurveDefaults[options.toLowerCase()] }
+			options = {values: BezierCurveDefaults[options.toLowerCase()]}
 
 		# Input values is one of the named bezier curves
 		if options.values and _.isString(options.values) and BezierCurveDefaults.hasOwnProperty options.values.toLowerCase()
-			options = { values: BezierCurveDefaults[options.values.toLowerCase()], time: options.time }
+			options = {values: BezierCurveDefaults[options.values.toLowerCase()], time: options.time}
 
 		# Input is a single array of 4 values
 		if _.isArray(options) and options.length is 4
-			options = { values: options }
+			options = {values: options}
 
 		@options = _.defaults options,
 			values: BezierCurveDefaults["ease-in-out"]
