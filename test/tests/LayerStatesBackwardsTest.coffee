@@ -6,19 +6,19 @@ initialStateName = "default"
 describe "LayerStates Backwards compatibility", ->
 
 	it "should still support layer.states.add", ->
-			layer = new Layer
-			layer.states.add
-				stateA: x: 200
-				stateB: scale: 0.5
-			assert.deepEqual layer.stateNames, [initialStateName, "stateA", "stateB"]
-			assert.deepEqual layer.states.stateA, x: 200
-			assert.deepEqual layer.states.stateB, scale: 0.5
+		layer = new Layer
+		layer.states.add
+			stateA: x: 200
+			stateB: scale: 0.5
+		assert.deepEqual layer.stateNames, [initialStateName, "stateA", "stateB"]
+		assert.deepEqual layer.states.stateA, x: 200
+		assert.deepEqual layer.states.stateB, scale: 0.5
 
 	it "should still support layer.states.add single", ->
-			layer = new Layer
-			layer.states.add("stateA", x: 200)
-			assert.deepEqual layer.stateNames, [initialStateName, "stateA"]
-			assert.deepEqual layer.states.stateA, x: 200
+		layer = new Layer
+		layer.states.add("stateA", x: 200)
+		assert.deepEqual layer.stateNames, [initialStateName, "stateA"]
+		assert.deepEqual layer.states.stateA, x: 200
 
 	it "should still support layer.states.remove", ->
 		layer = new Layer
