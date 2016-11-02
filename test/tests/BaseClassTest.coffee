@@ -153,7 +153,7 @@ describe "BaseClass", ->
 
 		class TestClass extends Framer.BaseClass
 			@define "testProp",
-				get: () -> "value"
+				get: -> "value"
 				exportable: false
 
 		instance = new TestClass()
@@ -171,7 +171,7 @@ describe "BaseClass", ->
 
 		class TestClass extends Framer.BaseClass
 			@define "testProp",
-				get: () -> "value"
+				get: -> "value"
 				enumerable: false
 
 		instance = new TestClass()
@@ -184,7 +184,7 @@ describe "BaseClass", ->
 	it.skip "should throw on assignment of read-only prop", ->
 		class TestClass extends Framer.BaseClass
 			@define "testProp",
-				get: () -> "value"
+				get: -> "value"
 
 		instance = new TestClass()
 		(-> instance.testProp = "foo").should.throw "TestClass.testProp is readonly"
