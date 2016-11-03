@@ -35,7 +35,7 @@ describe "ScrollComponent", ->
 		copy = instance.copy()
 		copy.scrollHorizontal.should.be.false
 	describe "Events", ->
-		describe "scolling with mousEvents", ->
+		describe "scrolling with mousEvents", ->
 			it "should work", ->
 				scroll = new ScrollComponent size: 200
 				new Layer
@@ -83,6 +83,36 @@ describe "ScrollComponent", ->
 					event.y.should.equal -150
 					done()
 				scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
+
+		describe "scrolling with touch events", ->
+			it "should have direction", (done) ->
+				scroll = new ScrollComponent size: 200
+				draggable = scroll.content.draggable
+				new Layer
+					width: 400
+					height: 400
+					parent: scroll.content
+
+				# collect the move events as they happen
+				moves = []
+				scroll.on Events.Move, (event) -> moves.push scroll.direction
+
+				# verify the timeline of move events looks good
+				draggable.on Events.DragAnimationEnd, (event) ->
+					ups = _.lastIndexOf(moves, "up")
+					downs = moves.indexOf("down")
+					nulls = moves.indexOf(null)
+					if ups < downs < nulls or (nulls == -1 and ups < downs) then return done()
+					done("expected up+, down+, null+, but got: #{moves}")
+
+				# TODO instead of actually taking time, trick time
+				draggable._touchStart({clientX:100, clientY:100, preventDefault:(()->), stopPropagation:(()->)})
+				Utils.delay 0.01, ->
+					draggable._touchMove({clientX:100, clientY:111, preventDefault:(()->), stopPropagation:(()->), delta:{x:0,y:11}})
+				Utils.delay 0.20, -> # enough time to set velocity to zero
+					draggable._touchMove({clientX:100, clientY:112, preventDefault:(()->), stopPropagation:(()->), delta:{x:0,y:1}})
+				Utils.delay 0.21, ->
+					draggable._touchEnd({clientX:100, clientY:112, preventDefault:(()->), stopPropagation:(()->), delta:{x:0,y:0}})
 
 		describe "PageComponent", ->
 			it "should fire scroll events", (done) ->
