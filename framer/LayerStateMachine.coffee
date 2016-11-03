@@ -50,7 +50,7 @@ class exports.LayerStateMachine extends BaseClass
 
 		# Note: even if the state is the current state we still want to switch because some properties
 		# might be different as they could be set by hand on the layer object.
-		
+
 		# Grab the animation and make state switching have the same events (start, stop, end)
 		startAnimation = options.start ? true
 		options.start = false
@@ -75,7 +75,7 @@ class exports.LayerStateMachine extends BaseClass
 
 		onEnd = =>
 			instantProperties = _.difference(
-				_.keys(properties), 
+				_.keys(properties),
 				_.keys(animation.properties))
 
 			for k in instantProperties
@@ -94,7 +94,7 @@ class exports.LayerStateMachine extends BaseClass
 				onStart()
 				onStop()
 				onEnd()
-		
+
 		switchState()
 
 		return animation

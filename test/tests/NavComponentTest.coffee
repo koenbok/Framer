@@ -18,7 +18,7 @@ describe "NavComponent", ->
 		cardB = new Layer size: 100
 
 		nav.show(cardA)
-		nav.show(cardB, animate:false)		
+		nav.show(cardB, animate:false)
 		nav.stack.should.eql [cardA, cardB]
 		nav.back(animate:false)
 		nav.current.should.equal cardA

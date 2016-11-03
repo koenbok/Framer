@@ -107,7 +107,7 @@ class exports.NavComponent extends Layer
 
 
 		@_stack.push({layer:layer, transition:transition})
-		
+
 
 	show: (layer, options={}) ->
 		@transition(layer, Transitions.show, options)
@@ -142,7 +142,7 @@ class exports.NavComponent extends Layer
 	# Internal methods
 
 	_showOverlay: (layer, transition, options={}) ->
-		@transition(layer, transition, _.defaults({}, options, 
+		@transition(layer, transition, _.defaults({}, options,
 			{animate: true, scroll: false, modal: false}))
 
 	_handleOverlayTap: =>
@@ -199,7 +199,7 @@ class exports.NavComponent extends Layer
 
 	_runTransition: (transition, direction, animate, from, to) =>
 
-		# @_runningTransition = 
+		# @_runningTransition =
 		# 	transition: transition
 		# 	direction: direction
 		# 	animate: animate
@@ -209,7 +209,7 @@ class exports.NavComponent extends Layer
 		@emit(Events.TransitionStart, from, to, {direction: direction, modal: @isModal})
 
 		# Start the transition with a small delay added so it only runs after all
-		# js has been processed. It's also important for hints, as they rely on 
+		# js has been processed. It's also important for hints, as they rely on
 		# ignoreEvents to be false at the moment of a click.
 
 		Utils.delay 0, =>
@@ -278,9 +278,9 @@ class exports.NavComponent extends Layer
 
 			if transition.states.layerB
 				animationCount++
-			
+
 				# We only need to set the initial push if we have never seen this layer
-				# before, because it might be in a half-transition from goin back, and 
+				# before, because it might be in a half-transition from goin back, and
 				# then we don't want to mess with it.
 				if layerB in @_seen is false
 					@_seen.push(layerB)
@@ -288,7 +288,7 @@ class exports.NavComponent extends Layer
 
 				layerB.visible = true
 				# layerB.ignoreEvents = true
-				# layerB.bringToFront()				
+				# layerB.bringToFront()
 				transition.states.layerB.machine.switchTo("show", {instant: !animate})
 				transition.states.layerB.machine.once(Events.StateSwitchEnd, onTransitionEnd)
 
@@ -308,7 +308,7 @@ class exports.NavComponent extends Layer
 				transition.states.overlay.machine.once(Events.StateSwitchEnd, onTransitionEnd)
 
 
-		transition.back = (animate=true, callback) =>
+		transition.back = (animate=true, callback) ->
 
 			# If this transition build on a overlay we need it to be
 			# visible and at the right index, just behind the layerB.
@@ -378,7 +378,7 @@ Transitions.overlayLeft = (nav, layerA, layerB, overlay) ->
 		overlay:
 			show: {options: {time: 0.1}, opacity: .5}
 			hide: {options: {time: 0.1}, opacity: 0}
-			
+
 Transitions.overlayRight = (nav, layerA, layerB, overlay) ->
 	transition =
 		layerB:

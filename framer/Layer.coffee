@@ -1078,19 +1078,19 @@ class exports.Layer extends BaseClass
 				Events.Click, Events.Tap, Events.TapStart, Events.TapEnd,
 				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
 
-				parentDraggableLayer = @_parentDraggableLayer()
+					parentDraggableLayer = @_parentDraggableLayer()
 
-				if parentDraggableLayer
+					if parentDraggableLayer
 
-					# If we had a reasonable scrolling offset we cancel the click
-					offset = parentDraggableLayer.draggable.offset
-					return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
-					return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
+						# If we had a reasonable scrolling offset we cancel the click
+						offset = parentDraggableLayer.draggable.offset
+						return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
+						return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
 
-					# If there is still some velocity (scroll is moving) we cancel the click
-					velocity = parentDraggableLayer.draggable.velocity
-					return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
-					return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
+						# If there is still some velocity (scroll is moving) we cancel the click
+						velocity = parentDraggableLayer.draggable.velocity
+						return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
+						return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
 
 		# Always scope the event this to the layer and pass the layer as
 		# last argument for every event.
@@ -1275,7 +1275,7 @@ class exports.Layer extends BaseClass
 
 		for parent in @ancestors(context=true)
 			if parent.clip
-				 frame = Utils.frameIntersection(frame, parent.canvasFrame)
+				frame = Utils.frameIntersection(frame, parent.canvasFrame)
 			if not frame
 				return
 

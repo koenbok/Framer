@@ -56,3 +56,4 @@ _projects
 .idea
 Icon
 /extras/resources.framerjs.com/static/DeviceResources/.*
+/yarn.lock
