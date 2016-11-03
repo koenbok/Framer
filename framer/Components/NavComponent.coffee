@@ -259,7 +259,6 @@ class exports.NavComponent extends Layer
 				overlay.visible = true
 				overlay.placeBehind(layerB)
 
-
 			# If not, we make sure the overlay layer is not visible, and
 			# we want the dissapearing layer to ge invisible after the
 			# transition stops.
@@ -271,10 +270,12 @@ class exports.NavComponent extends Layer
 
 			onTransitionEnd = ->
 				animationCount--
-				callback?() if animationCount is 0
+				return unless animationCount is 0
+				callback?()
 
-				if not transition.states.overlay and layerA
-					layerA.visible = false
+				# TODO: We should only hide it if the transition is fully finished
+				# if not transition.states.overlay and layerA
+				# 	layerA.visible = false
 
 			if transition.states.layerB
 				animationCount++
