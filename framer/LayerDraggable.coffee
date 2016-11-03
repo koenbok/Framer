@@ -381,7 +381,7 @@ class exports.LayerDraggable extends BaseClass
 		get: ->
 			# return null if not @isDragging
 			velocity = @velocity
-			if velocity.x == 0 and velocity.y == 0
+			if velocity.x is 0 and velocity.y is 0
 				delta = @_lastEvent?.delta
 				return null if not delta
 				if Math.abs(delta.x) > Math.abs(delta.y)
