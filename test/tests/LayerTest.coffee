@@ -260,7 +260,7 @@ describe "Layer", ->
 			#layer.computedStyle()["background-size"].should.equal "cover"
 			#layer.computedStyle()["background-repeat"].should.equal "no-repeat"
 
-					
+
 		it "should not append nocache to a base64 encoded image", ->
 
 			fullPath = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEwAAABMBAMAAAA1uUwYAAAAAXNSR0IArs4c6QAAABVQTFRFKK/6LFj/g9n/lNf9lqz/wez/////Ke+vpgAAAK1JREFUSMft1sENhDAMBdFIrmBboAjuaWFrsNN/CRwAgUPsTAH556c5WVFKQyuLLYbZf/MLmDHW5yJmjHW5kBljPhczY8zlEmaMvXMZM8ZeuZQZY08uZzZh5dqen+XNhLFBbsiEsW9uzISxTy5gwlifi5gw1uVCJoz5XMyEMZdLmASs/s5NnkFl7M7NmDJ25aZMGTtzc6aMtcqYMtYqY8pYq4wpY60ypuvnsNizA+E6656TNMZlAAAAAElFTkSuQmCC"
@@ -1194,28 +1194,6 @@ describe "Layer", ->
 			copy.style["font-family"].should.equal "-apple-system"
 			copy.style["font-size"].should.equal "1.2em"
 			copy.style["text-align"].should.equal "right"
-
-	describe "Draggable", ->
-
-		it "should stop x and y animations on drag start", ->
-
-			layer = new Layer
-			layer.draggable.enabled = true
-
-			a1 = layer.animate x:100
-			a2 = layer.animate y:100
-			a3 = layer.animate blur:1
-
-			a1.isAnimating.should.equal true
-			a2.isAnimating.should.equal true
-			a3.isAnimating.should.equal true
-
-			layer.draggable.touchStart(document.createEvent("MouseEvent"))
-
-			a1.isAnimating.should.equal false
-			a2.isAnimating.should.equal false
-			a3.isAnimating.should.equal true
-
 
 	describe "Point conversion", ->
 

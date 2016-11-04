@@ -35,7 +35,8 @@ class exports.Simulation extends BaseClass
 			modelOptions: {}
 			delay: 0
 			debug: false
-
+		@layer = @options.layer
+		@properties = @options.properties
 		@_running = false
 
 		SimulatorClass = SimulatorClasses[@options.model] or SpringSimulator
@@ -46,18 +47,18 @@ class exports.Simulation extends BaseClass
 	# necessary to return them so that conflicting animations/simulations can
 	# detect one another and not run at the same time.
 	animatingProperties: ->
-		_.keys(@options.properties)
+		_.keys(@properties)
 
 	start: =>
 
-		if @options.layer is null
+		if @layer is null
 			console.error "Simulation: missing layer"
 
 		if @options.debug
 			console.log "Simulation.start #{@_simulator.constructor.name}", @options.modelOptions
 
 		animatingProperties = @animatingProperties()
-		for property, animation of @options.layer.animatingProperties()
+		for property, animation of @layer.animatingProperties()
 			if property in animatingProperties
 				animation.stop()
 
@@ -73,7 +74,7 @@ class exports.Simulation extends BaseClass
 
 		@_running = false
 
-		@options.layer.context.removeAnimation(@)
+		@layer.context.removeAnimation(@)
 
 		@emit(Events.SimulationStop) if emit
 		Framer.Loop.off("update", @_update)
@@ -83,14 +84,14 @@ class exports.Simulation extends BaseClass
 	emit: (event) ->
 		super
 		# Also emit this to the layer with self as argument
-		@options.layer.emit(event, @)
+		@layer.emit(event, @)
 
 	_start: =>
 		return if @_running
 
 		@_running = true
 
-		@options.layer.context.addAnimation(@)
+		@layer.context.addAnimation(@)
 
 		@emit(Events.SimulationStart)
 		Framer.Loop.on("update", @_update)
