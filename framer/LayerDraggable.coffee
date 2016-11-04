@@ -31,15 +31,15 @@ Events.DirectionLockDidStart = Events.DirectionLockStart
 
 """
 
-    ┌──────┐                   │
-    │      │
-    │      │  ───────────────▶ │ ◀────▶
-    │      │
-    └──────┘                   │
+	┌──────┐                   │
+	│      │
+	│      │  ───────────────▶ │ ◀────▶
+	│      │
+	└──────┘                   │
 
-    ════════  ═════════════════ ═══════
+	════════  ═════════════════ ═══════
 
-      Drag         Momentum      Bounce
+		Drag         Momentum      Bounce
 
 """
 
