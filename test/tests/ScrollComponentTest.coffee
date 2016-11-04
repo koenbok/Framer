@@ -1,3 +1,4 @@
+assert = require "assert"
 
 describe "ScrollComponent", ->
 
@@ -93,12 +94,24 @@ describe "ScrollComponent", ->
 					height: 400
 					parent: scroll.content
 
+				# also check isMoving, isDragging, isAnimating throughout this test
+				# TODO should be separate, when we can actually trick time
+				assert !scroll.isMoving, "must not be moving at start"
+
 				# collect the move events as they happen
 				moves = []
-				scroll.on Events.Move, (event) -> moves.push scroll.direction
+				scroll.on Events.Move, (event) ->
+					#console.log "MOVE", scroll.isMoving, scroll.direction
+					assert scroll.isMoving, "move must be moving"
+					assert scroll.isDragging or scroll.isAnimating, "move must have reason"
+					moves.push scroll.direction
 
 				# verify the timeline of move events looks good
 				draggable.on Events.DragAnimationEnd, (event) ->
+					#console.log "END", scroll.isMoving, scroll.direction
+					assert !scroll.isMoving, "no more moving"
+					assert !scroll.isAnimating, "no more animating"
+					assert !scroll.isDragging, "no more dragging"
 					ups = _.lastIndexOf(moves, "up")
 					downs = moves.indexOf("down")
 					nulls = moves.indexOf(null)
