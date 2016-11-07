@@ -22,7 +22,7 @@ describe "Layer", ->
 			a3.isAnimating.should.equal true
 
 		describe "Simulation", ->
-			it.only "should be cancelled when animating the same property", (done) ->
+			it "should be cancelled when animating the same property", (done) ->
 				layerA = new Layer
 				time = 0.04
 				for i in [0..3]
