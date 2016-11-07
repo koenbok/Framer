@@ -63,7 +63,7 @@ describe "Layer", ->
 
 		it "should set defaults with override", ->
 
-			layer = new Layer x:50, y:60
+			layer = new Layer x: 50, y: 60
 			layer.x.should.equal 50
 			layer.y.should.equal 60
 
@@ -86,7 +86,7 @@ describe "Layer", ->
 
 		it "should set width", ->
 
-			layer = new Layer width:200
+			layer = new Layer width: 200
 
 			layer.width.should.equal 200
 			layer.style.width.should.equal "200px"
@@ -166,8 +166,8 @@ describe "Layer", ->
 
 		it "should handle midX and midY when width and height are 0", ->
 			box = new Layer
-				midX:200
-				midY:300
+				midX: 200
+				midY: 300
 				width: 0
 				height: 0
 
@@ -301,16 +301,16 @@ describe "Layer", ->
 
 		it "should set image", ->
 			imagePath = "../static/test.png"
-			layer = new Layer image:imagePath
+			layer = new Layer image: imagePath
 			layer.image.should.equal imagePath
 
 		it "should unset image with null", ->
-			layer = new Layer image:"../static/test.png"
+			layer = new Layer image: "../static/test.png"
 			layer.image = null
 			layer.image.should.equal ""
 
 		it "should unset image with empty string", ->
-			layer = new Layer image:"../static/test.png"
+			layer = new Layer image: "../static/test.png"
 			layer.image = ""
 			layer.image.should.equal ""
 
@@ -321,7 +321,7 @@ describe "Layer", ->
 			f.should.throw()
 
 		it "should set name on create", ->
-			layer = new Layer name:"Test"
+			layer = new Layer name: "Test"
 			layer.name.should.equal "Test"
 			layer._element.getAttribute("name").should.equal "Test"
 
@@ -344,14 +344,14 @@ describe "Layer", ->
 
 			imagePath = "../static/test.png"
 
-			layer = new Layer image:imagePath
+			layer = new Layer image: imagePath
 			assert.equal layer.backgroundColor.color, null
 
 			layer = new Layer
 			layer.image = imagePath
 			assert.equal layer.backgroundColor.color, null
 
-			layer = new Layer backgroundColor:"red"
+			layer = new Layer backgroundColor: "red"
 			layer.image = imagePath
 			Color.equal(layer.backgroundColor, new Color("red")).should.be.true
 
@@ -401,9 +401,9 @@ describe "Layer", ->
 		it "should set scroll from properties", ->
 
 			layer = new Layer
-			layer.props = {scroll:false}
+			layer.props = {scroll: false}
 			layer.scroll.should.equal false
-			layer.props = {scroll:true}
+			layer.props = {scroll: true}
 			layer.scroll.should.equal true
 
 		it "should set scrollHorizontal", ->
@@ -503,12 +503,12 @@ describe "Layer", ->
 
 		it "should only set name when explicitly set", ->
 			layer = new Layer
-			layer.__framerInstanceInfo = {name:"aap"}
+			layer.__framerInstanceInfo = {name: "aap"}
 			layer.name.should.equal ""
 
 		it "it should show the variable name in toInspect()", ->
 			layer = new Layer
-			layer.__framerInstanceInfo = {name:"aap"}
+			layer.__framerInstanceInfo = {name: "aap"}
 			(_.startsWith layer.toInspect(), "<Layer aap id:").should.be.true
 
 
@@ -621,13 +621,13 @@ describe "Layer", ->
 
 		it "should check superLayer", ->
 
-			f = -> layer = new Layer superLayer:1
+			f = -> layer = new Layer superLayer: 1
 			f.should.throw()
 
 		it "should add child", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer:layerA
+			layerB = new Layer superLayer: layerA
 
 			assert.equal layerB._element.parentNode, layerA._element
 			assert.equal layerB.superLayer, layerA
@@ -635,7 +635,7 @@ describe "Layer", ->
 		it "should remove child", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer:layerA
+			layerB = new Layer superLayer: layerA
 
 			layerB.superLayer = null
 
@@ -645,8 +645,8 @@ describe "Layer", ->
 		it "should list children", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer:layerA
-			layerC = new Layer superLayer:layerA
+			layerB = new Layer superLayer: layerA
+			layerC = new Layer superLayer: layerA
 
 			assert.deepEqual layerA.children, [layerB, layerC]
 
@@ -669,8 +669,8 @@ describe "Layer", ->
 		it "should list sibling layers", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer:layerA
-			layerC = new Layer superLayer:layerA
+			layerB = new Layer superLayer: layerA
+			layerC = new Layer superLayer: layerA
 
 			assert.deepEqual layerB.siblingLayers, [layerC]
 			assert.deepEqual layerC.siblingLayers, [layerB]
@@ -678,24 +678,24 @@ describe "Layer", ->
 		it "should list super layers", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer:layerA
-			layerC = new Layer superLayer:layerB
+			layerB = new Layer superLayer: layerA
+			layerC = new Layer superLayer: layerB
 
 			assert.deepEqual layerC.superLayers(), [layerB, layerA]
 
 		it "should list descendants deeply", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer:layerA
-			layerC = new Layer superLayer:layerB
+			layerB = new Layer superLayer: layerA
+			layerC = new Layer superLayer: layerB
 
 			layerA.descendants.should.eql [layerB, layerC]
 
 		it "should list descendants", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer:layerA
-			layerC = new Layer superLayer:layerA
+			layerB = new Layer superLayer: layerA
+			layerC = new Layer superLayer: layerA
 
 			layerA.descendants.should.eql [layerB, layerC]
 
@@ -718,7 +718,7 @@ describe "Layer", ->
 
 		it "should set at creation", ->
 
-			layer = new Layer index:666
+			layer = new Layer index: 666
 			layer.index.should.equal 666
 
 		it "should change index", ->
@@ -737,8 +737,8 @@ describe "Layer", ->
 		it "should be in front", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer:layerA
-			layerC = new Layer superLayer:layerA
+			layerB = new Layer superLayer: layerA
+			layerC = new Layer superLayer: layerA
 
 			assert.equal layerB.index, 1
 			assert.equal layerC.index, 2
@@ -746,8 +746,8 @@ describe "Layer", ->
 		it "should send back and front", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer:layerA
-			layerC = new Layer superLayer:layerA
+			layerB = new Layer superLayer: layerA
+			layerC = new Layer superLayer: layerA
 
 			layerC.sendToBack()
 
@@ -762,9 +762,9 @@ describe "Layer", ->
 		it "should place in front", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer:layerA # 1
-			layerC = new Layer superLayer:layerA # 2
-			layerD = new Layer superLayer:layerA # 3
+			layerB = new Layer superLayer: layerA # 1
+			layerC = new Layer superLayer: layerA # 2
+			layerD = new Layer superLayer: layerA # 3
 
 			layerB.placeBefore layerC
 
@@ -775,9 +775,9 @@ describe "Layer", ->
 		it "should place behind", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer:layerA # 1
-			layerC = new Layer superLayer:layerA # 2
-			layerD = new Layer superLayer:layerA # 3
+			layerB = new Layer superLayer: layerA # 1
+			layerC = new Layer superLayer: layerA # 2
+			layerD = new Layer superLayer: layerA # 3
 
 			layerC.placeBehind layerB
 
@@ -790,9 +790,9 @@ describe "Layer", ->
 		it "should get a children by name", ->
 
 			layerA = new Layer
-			layerB = new Layer name:"B", superLayer:layerA
-			layerC = new Layer name:"C", superLayer:layerA
-			layerD = new Layer name:"C", superLayer:layerA
+			layerB = new Layer name: "B", superLayer: layerA
+			layerC = new Layer name: "C", superLayer: layerA
+			layerD = new Layer name: "C", superLayer: layerA
 
 			layerA.childrenWithName("B").should.eql [layerB]
 			layerA.childrenWithName("C").should.eql [layerC, layerD]
@@ -800,17 +800,17 @@ describe "Layer", ->
 		it "should get a siblinglayer by name", ->
 
 			layerA = new Layer
-			layerB = new Layer name:"B", superLayer:layerA
-			layerC = new Layer name:"C", superLayer:layerA
-			layerD = new Layer name:"C", superLayer:layerA
+			layerB = new Layer name: "B", superLayer: layerA
+			layerC = new Layer name: "C", superLayer: layerA
+			layerD = new Layer name: "C", superLayer: layerA
 
 			layerB.siblingLayersByName("C").should.eql [layerC, layerD]
 			layerD.siblingLayersByName("B").should.eql [layerB]
 
 		it "should get a superlayers", ->
 			layerA = new Layer
-			layerB = new Layer superLayer:layerA
-			layerC = new Layer superLayer:layerB
+			layerB = new Layer superLayer: layerA
+			layerC = new Layer superLayer: layerB
 			layerC.superLayers().should.eql [layerB, layerA]
 
 
@@ -818,7 +818,7 @@ describe "Layer", ->
 
 		it "should set on create", ->
 
-			layer = new Layer frame:{x:111, y:222, width:333, height:444}
+			layer = new Layer frame: {x: 111, y: 222, width: 333, height: 444}
 
 			assert.equal layer.x, 111
 			assert.equal layer.y, 222
@@ -828,7 +828,7 @@ describe "Layer", ->
 		it "should set after create", ->
 
 			layer = new Layer
-			layer.frame = {x:111, y:222, width:333, height:444}
+			layer.frame = {x: 111, y: 222, width: 333, height: 444}
 
 			assert.equal layer.x, 111
 			assert.equal layer.y, 222
@@ -836,69 +836,69 @@ describe "Layer", ->
 			assert.equal layer.height, 444
 
 		it "should set minX on creation", ->
-			layer = new Layer minX:200, y:100, width:100, height:100
+			layer = new Layer minX: 200, y: 100, width: 100, height: 100
 			layer.x.should.equal 200
 
 		it "should set midX on creation", ->
-			layer = new Layer midX:200, y:100, width:100, height:100
+			layer = new Layer midX: 200, y: 100, width: 100, height: 100
 			layer.x.should.equal 150
 
 		it "should set maxX on creation", ->
-			layer = new Layer maxX:200, y:100, width:100, height:100
+			layer = new Layer maxX: 200, y: 100, width: 100, height: 100
 			layer.x.should.equal 100
 
 		it "should set minY on creation", ->
-			layer = new Layer x:100, minY:200, width:100, height:100
+			layer = new Layer x: 100, minY: 200, width: 100, height: 100
 			layer.y.should.equal 200
 
 		it "should set midY on creation", ->
-			layer = new Layer x:100, midY:200, width:100, height:100
+			layer = new Layer x: 100, midY: 200, width: 100, height: 100
 			layer.y.should.equal 150
 
 		it "should set maxY on creation", ->
-			layer = new Layer x:100, maxY:200, width:100, height:100
+			layer = new Layer x: 100, maxY: 200, width: 100, height: 100
 			layer.y.should.equal 100
 
 
 		it "should set minX", ->
-			layer = new Layer y:100, width:100, height:100
+			layer = new Layer y: 100, width: 100, height: 100
 			layer.minX = 200
 			layer.x.should.equal 200
 
 		it "should set midX", ->
-			layer = new Layer y:100, width:100, height:100
+			layer = new Layer y: 100, width: 100, height: 100
 			layer.midX = 200
 			layer.x.should.equal 150
 
 		it "should set maxX", ->
-			layer = new Layer y:100, width:100, height:100
+			layer = new Layer y: 100, width: 100, height: 100
 			layer.maxX = 200
 			layer.x.should.equal 100
 
 		it "should set minY", ->
-			layer = new Layer x:100, width:100, height:100
+			layer = new Layer x: 100, width: 100, height: 100
 			layer.minY = 200
 			layer.y.should.equal 200
 
 		it "should set midY", ->
-			layer = new Layer x:100, width:100, height:100
+			layer = new Layer x: 100, width: 100, height: 100
 			layer.midY = 200
 			layer.y.should.equal 150
 
 		it "should set maxY", ->
-			layer = new Layer x:100, width:100, height:100
+			layer = new Layer x: 100, width: 100, height: 100
 			layer.maxY = 200
 			layer.y.should.equal 100
 
 		it "should get and set canvasFrame", ->
 
-			layerA = new Layer x:100, y:100, width:100, height:100
-			layerB = new Layer x:300, y:300, width:100, height:100, superLayer:layerA
+			layerA = new Layer x: 100, y: 100, width: 100, height: 100
+			layerB = new Layer x: 300, y: 300, width: 100, height: 100, superLayer: layerA
 
 			assert.equal layerB.canvasFrame.x, 400
 			assert.equal layerB.canvasFrame.y, 400
 
-			layerB.canvasFrame = {x:1000, y:1000}
+			layerB.canvasFrame = {x: 1000, y: 1000}
 
 			assert.equal layerB.canvasFrame.x, 1000
 			assert.equal layerB.canvasFrame.y, 1000
@@ -911,48 +911,48 @@ describe "Layer", ->
 			assert.equal layerB.canvasFrame.y, 900
 
 		it "should calculate scale", ->
-			layerA = new Layer scale:0.9
-			layerB = new Layer scale:0.8, superLayer:layerA
+			layerA = new Layer scale: 0.9
+			layerB = new Layer scale: 0.8, superLayer: layerA
 			layerB.screenScaleX().should.equal 0.9 * 0.8
 			layerB.screenScaleY().should.equal 0.9 * 0.8
 
 		it "should calculate scaled frame", ->
-			layerA = new Layer x:100, width:500, height:900, scale:0.5
-			layerA.scaledFrame().should.eql {"x":225, "y":225, "width":250, "height":450}
+			layerA = new Layer x: 100, width: 500, height: 900, scale: 0.5
+			layerA.scaledFrame().should.eql {"x": 225, "y": 225, "width": 250, "height": 450}
 
 		it "should calculate scaled screen frame", ->
 
-			layerA = new Layer x:100, width:500, height:900, scale:0.5
-			layerB = new Layer y:50, width:600, height:600, scale:0.8, superLayer:layerA
-			layerC = new Layer y:-60, width:800, height:700, scale:1.2, superLayer:layerB
+			layerA = new Layer x: 100, width: 500, height: 900, scale: 0.5
+			layerB = new Layer y: 50, width: 600, height: 600, scale: 0.8, superLayer: layerA
+			layerC = new Layer y: -60, width: 800, height: 700, scale: 1.2, superLayer: layerB
 
-			layerA.screenScaledFrame().should.eql {"x":225, "y":225, "width":250, "height":450}
-			layerB.screenScaledFrame().should.eql {"x":255, "y":280, "width":240, "height":240}
-			layerC.screenScaledFrame().should.eql {"x":223, "y":228, "width":384, "height":336}
+			layerA.screenScaledFrame().should.eql {"x": 225, "y": 225, "width": 250, "height": 450}
+			layerB.screenScaledFrame().should.eql {"x": 255, "y": 280, "width": 240, "height": 240}
+			layerC.screenScaledFrame().should.eql {"x": 223, "y": 228, "width": 384, "height": 336}
 
 		it "should accept point shortcut", ->
-			layer = new Layer point:10
+			layer = new Layer point: 10
 			layer.x.should.equal 10
 			layer.y.should.equal 10
 
 		it "should accept size shortcut", ->
-			layer = new Layer size:10
+			layer = new Layer size: 10
 			layer.width.should.equal 10
 			layer.height.should.equal 10
 
 	describe "Center", ->
 
 		it "should center", ->
-			layerA = new Layer width:200, height:200
-			layerB = new Layer width:100, height:100, superLayer:layerA
+			layerA = new Layer width: 200, height: 200
+			layerB = new Layer width: 100, height: 100, superLayer: layerA
 			layerB.center()
 
 			assert.equal layerB.x, 50
 			assert.equal layerB.y, 50
 
 		it "should center with offset", ->
-			layerA = new Layer width:200, height:200
-			layerB = new Layer width:100, height:100, superLayer:layerA
+			layerA = new Layer width: 200, height: 200
+			layerB = new Layer width: 100, height: 100, superLayer: layerA
 			layerB.centerX(50)
 			layerB.centerY(50)
 
@@ -960,14 +960,14 @@ describe "Layer", ->
 			assert.equal layerB.y, 100
 
 		it "should center return layer", ->
-			layerA = new Layer width:200, height:200
+			layerA = new Layer width: 200, height: 200
 			layerA.center().should.equal layerA
 			layerA.centerX().should.equal layerA
 			layerA.centerY().should.equal layerA
 
 		it "should center pixel align", ->
-			layerA = new Layer width:200, height:200
-			layerB = new Layer width:111, height:111, superLayer:layerA
+			layerA = new Layer width: 200, height: 200
+			layerB = new Layer width: 111, height: 111, superLayer: layerA
 			layerB.center().pixelAlign()
 
 			assert.equal layerB.x, 44
@@ -989,7 +989,7 @@ describe "Layer", ->
 				backgroundColor: "red"
 			layerB.center()
 
-			layerB.frame.should.eql {x:20, y:20, width:100, height:100}
+			layerB.frame.should.eql {x: 20, y: 20, width: 100, height: 100}
 
 
 	describe "CSS", ->
@@ -1157,9 +1157,9 @@ describe "Layer", ->
 			BORDERRADIUS = 20
 
 			layer = new Layer
-				x:X
-				y:Y
-				image:IMAGE
+				x: X
+				y: Y
+				image: IMAGE
 
 			layer.borderRadius = BORDERRADIUS
 
@@ -1186,9 +1186,9 @@ describe "Layer", ->
 		it "copied Layer should also copy styles", ->
 			layer = new Layer
 				style:
-					"font-family" : "-apple-system"
-					"font-size" : "1.2em"
-					"text-align" : "right"
+					"font-family": "-apple-system"
+					"font-size": "1.2em"
+					"text-align": "right"
 
 			copy = layer.copy()
 			copy.style["font-family"].should.equal "-apple-system"
