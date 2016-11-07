@@ -96,7 +96,7 @@ describe "ScrollComponent", ->
 
 				# also check isMoving, isDragging, isAnimating throughout this test
 				# TODO should be separate, when we can actually trick time
-				assert !scroll.isMoving, "must not be moving at start"
+				assert not scroll.isMoving, "must not be moving at start"
 
 				# collect the move events as they happen
 				moves = []
@@ -109,9 +109,9 @@ describe "ScrollComponent", ->
 				# verify the timeline of move events looks good
 				draggable.on Events.DragAnimationEnd, (event) ->
 					#console.log "END", scroll.isMoving, scroll.direction
-					assert !scroll.isMoving, "no more moving"
-					assert !scroll.isAnimating, "no more animating"
-					assert !scroll.isDragging, "no more dragging"
+					assert not scroll.isMoving, "no more moving"
+					assert not scroll.isAnimating, "no more animating"
+					assert not scroll.isDragging, "no more dragging"
 					ups = _.lastIndexOf(moves, "up")
 					downs = moves.indexOf("down")
 					nulls = moves.indexOf(null)
