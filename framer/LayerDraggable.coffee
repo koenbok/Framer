@@ -140,7 +140,7 @@ class exports.LayerDraggable extends BaseClass
 
 		# Only reset isMoving if this was not animating when we were clicking
 		# so we can use it to detect a click versus a drag.
-		@_isMoving = @isAnimating
+		@_isMoving = @_isAnimating
 
 		# Stop any animations influencing the position, but no others.
 		for animation in @layer.animations()
@@ -278,6 +278,9 @@ class exports.LayerDraggable extends BaseClass
 		# (which would return a stale value before the simulation had finished one tick)
 		# and because @_start currently calls calculateVelocity().
 		@_isDragging = false
+
+		# reset isMoving if not animating, otherwise animation start/stop will reset it
+		@_isMoving = @_isAnimating
 		@_ignoreUpdateLayerPosition = true
 		@_lastEvent = null
 		@_eventBuffer.reset()
@@ -569,12 +572,14 @@ class exports.LayerDraggable extends BaseClass
 		@emit(Events.DragAnimationStart)
 
 	_stopSimulation: =>
+		@emit(Events.Move, @layer.point) if @_isMoving
 		@_isAnimating = false
+		@_isMoving = false
+
 		return unless @_simulation
 		@_simulation?.x.stop()
 		@_simulation?.y.stop()
 		@_simulation = null
-		@emit(Events.Move, @layer.point)
 		@emit(Events.DragAnimationEnd)
 
 	animateStop: ->
