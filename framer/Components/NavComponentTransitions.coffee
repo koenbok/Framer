@@ -25,7 +25,7 @@ class NavComponentTransition
 			curve: "spring(300, 35, 0)"
 
 	forward: (animate=true, callback) ->
-		options = _.extend(@animationOptions, {animate:animate})
+		options = _.extend(@animationOptions, {animate: animate})
 		@statesA?.switch("a", options)
 		@statesB?.switchInstant("b")
 		@statesB?.switch("a", options)
@@ -34,7 +34,7 @@ class NavComponentTransition
 			callback?()
 
 	back: (animate=true, callback) ->
-		options = _.extend(@animationOptions, {animate:animate})
+		options = _.extend(@animationOptions, {animate: animate})
 		@layerA?.visible = true
 		@statesA?.switch("b", options)
 		@statesB?.switch("b", options)

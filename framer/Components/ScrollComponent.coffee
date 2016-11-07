@@ -71,6 +71,7 @@ class exports.ScrollComponent extends Layer
 		exportable: false
 		get: -> @_content
 
+
 	@define "mouseWheelSpeedMultiplier", @simpleProperty("mouseWheelSpeedMultiplier", 1)
 
 	constructor: (options={}) ->
@@ -102,7 +103,7 @@ class exports.ScrollComponent extends Layer
 		return size =
 			x: 0
 			y: 0
-			width:  Math.max(@width,  contentFrame.x + contentFrame.width)
+			width: Math.max(@width, contentFrame.x + contentFrame.width)
 			height: Math.max(@height, contentFrame.y + contentFrame.height)
 
 	setContentLayer: (layer) ->
@@ -130,7 +131,7 @@ class exports.ScrollComponent extends Layer
 
 		@updateContent()
 
-		@scrollPoint = {x:0, y:0}
+		@scrollPoint = {x: 0, y: 0}
 
 		@content.on(Events.AnimationStart, @_onAnimationStart)
 		@content.on(Events.AnimationStop, @_onAnimationStop)
@@ -157,7 +158,7 @@ class exports.ScrollComponent extends Layer
 		constraintsFrame =
 			x: -constraintsFrame.width  + @width - @_contentInset.right
 			y: -constraintsFrame.height + @height - @_contentInset.bottom
-			width: 	constraintsFrame.width  + constraintsFrame.width  - @width +
+			width: constraintsFrame.width  + constraintsFrame.width  - @width +
 				@_contentInset.left + @_contentInset.right
 			height: constraintsFrame.height + constraintsFrame.height - @height +
 				@_contentInset.top + @_contentInset.bottom
@@ -184,7 +185,7 @@ class exports.ScrollComponent extends Layer
 			@scrollHorizontal = @scrollVertical = value
 
 	_calculateContentPoint: (scrollPoint) ->
-		scrollPoint = _.defaults(scrollPoint, {x:0, y:0})
+		scrollPoint = _.defaults(scrollPoint, {x: 0, y: 0})
 		scrollPoint.x -= @contentInset.left
 		scrollPoint.y -= @contentInset.top
 		point = @_pointInConstraints(scrollPoint)
@@ -197,7 +198,7 @@ class exports.ScrollComponent extends Layer
 		set: (value) ->
 			return unless @content
 			@content.draggable.animateStop()
-			@content.x = @_calculateContentPoint({x:value, y:0}).x
+			@content.x = @_calculateContentPoint({x: value, y: 0}).x
 
 	@define "scrollY",
 		get: ->
@@ -206,7 +207,7 @@ class exports.ScrollComponent extends Layer
 		set: (value) ->
 			return unless @content
 			@content.draggable.animateStop()
-			@content.y = @_calculateContentPoint({x:0, y:value}).y
+			@content.y = @_calculateContentPoint({x: 0, y: value}).y
 
 	@define "scrollPoint",
 		importable: true
@@ -264,7 +265,7 @@ class exports.ScrollComponent extends Layer
 			return 0 unless @content
 			return -@content.draggable.angle
 
-	scrollToPoint: (point, animate=true, animationOptions={curve:"spring(500, 50, 0)"}) ->
+	scrollToPoint: (point, animate=true, animationOptions={curve: "spring(500, 50, 0)"}) ->
 
 		# We never let you scroll to a point that does not make sense (out of bounds). If you still
 		# would like to do that, access the .content.y directly.
@@ -280,16 +281,16 @@ class exports.ScrollComponent extends Layer
 		else
 			@content.point = contentPoint
 
-	scrollToTop: (animate=true, animationOptions={curve:"spring(500, 50, 0)"}) ->
-		@scrollToPoint({x:0, y:0}, animate, animationOptions)
+	scrollToTop: (animate=true, animationOptions={curve: "spring(500, 50, 0)"}) ->
+		@scrollToPoint({x: 0, y: 0}, animate, animationOptions)
 
-	scrollToLayer: (contentLayer, originX=0, originY=0, animate=true, animationOptions={curve:"spring(500, 50, 0)"}) ->
+	scrollToLayer: (contentLayer, originX=0, originY=0, animate=true, animationOptions={curve: "spring(500, 50, 0)"}) ->
 
 		if contentLayer and contentLayer.parent isnt @content
 			throw Error("Can't scroll to this layer because it's not in the ScrollComponent. Add it to the content like layer.parent = scroll.content.")
 
-		if not contentLayer or @content.children.length == 0
-			scrollPoint = {x:0, y:0}
+		if not contentLayer or @content.children.length is 0
+			scrollPoint = {x: 0, y: 0}
 		else
 			scrollPoint = @_scrollPointForLayer(contentLayer, originX, originY)
 			scrollPoint.x -= @width * originX
@@ -299,13 +300,13 @@ class exports.ScrollComponent extends Layer
 
 		return contentLayer
 
-	scrollToClosestLayer: (originX=0, originY=0, animate=true, animationOptions={curve:"spring(500, 50, 0)"}) ->
+	scrollToClosestLayer: (originX=0, originY=0, animate=true, animationOptions={curve: "spring(500, 50, 0)"}) ->
 		closestLayer = @closestContentLayer(originX, originY, animate, animationOptions)
 		if closestLayer
 			@scrollToLayer(closestLayer, originX, originY)
 			return closestLayer
 		else
-			@scrollToPoint({x:0, y:0}) unless closestLayer
+			@scrollToPoint({x: 0, y: 0}) unless closestLayer
 			return null
 
 	closestContentLayer: (originX=0, originY=0) ->
@@ -381,7 +382,7 @@ class exports.ScrollComponent extends Layer
 		if @scrollVertical
 			deltaY = event.wheelDeltaY
 
-		if deltaX == 0 and deltaY == 0
+		if deltaX is 0 and deltaY is 0
 			return
 
 		if not @_mouseWheelScrolling
@@ -428,7 +429,7 @@ class exports.ScrollComponent extends Layer
 		return wrapComponent(new @(options), layer, options)
 
 
-wrapComponent = (instance, layer, options = {correct:true}) ->
+wrapComponent = (instance, layer, options = {correct: true}) ->
 
 	if not (layer instanceof Layer)
 		throw new Error("ScrollComponent.wrap expects a layer, not #{layer}. Are you sure the layer exists?")

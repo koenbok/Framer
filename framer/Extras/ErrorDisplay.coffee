@@ -23,7 +23,7 @@ class ErrorDisplay extends BaseClass
 
 	constructor: ->
 
-		@_context ?= new Context name:"ErrorDisplay"
+		@_context ?= new Context name: "ErrorDisplay"
 		@_context.index = 1000
 
 		@_context.run =>
@@ -46,7 +46,7 @@ class ErrorDisplay extends BaseClass
 				width: Canvas.width
 				height: Config.height
 				backgroundColor: "rgba(255, 0, 0, 1)"
-			
+
 			error.text = new Layer
 				name: "text"
 				parent: error
@@ -54,14 +54,14 @@ class ErrorDisplay extends BaseClass
 				point: Align.center
 				backgroundColor: null
 				clip: true
-			
+
 			error.text.style =
 				font: "#{Config.fontSize}px/1em #{Utils.deviceFont()}"
 				lineHeight: "#{parseInt(error.text.height - 2)}px"
 				textAlign: "center"
 				wordWrap: "break-word"
 				textOverflow: "ellipsis"
-				
+
 			error.onTap =>
 				@_errorLayer?.destroy()
 				@_errorLayer = null

@@ -92,7 +92,7 @@ class exports.Animation extends BaseClass
 		get: -> @options.looping
 		set: (value) ->
 			@options?.looping = value
-			if @options?.looping and @layer? and !@isAnimating
+			if @options?.looping and @layer? and not @isAnimating
 				@restart()
 
 	@define "isNoop", @simpleProperty("isNoop", false)
@@ -161,7 +161,7 @@ class exports.Animation extends BaseClass
 		# Todo: more repeat behaviours:
 		# 1) add (from end position) 2) reverse (loop between a and b)
 		@once "end", =>
-			if @_repeatCounter > 0 || @looping
+			if @_repeatCounter > 0 or @looping
 				@restart()
 				if not @looping
 					@_repeatCounter--

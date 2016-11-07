@@ -105,7 +105,7 @@ describe "DeviceComponent", ->
 
 		device.deviceType = "nexus-5-black"
 		device.context.run ->
-			Screen.size.should.eql {width:1080, height:1920}
+			Screen.size.should.eql {width: 1080, height: 1920}
 			Utils.inspect(Screen).should.equal "<Screen 1080x1920>"
 
 	it "should calculate canvas frames", ->
@@ -116,7 +116,7 @@ describe "DeviceComponent", ->
 
 		device.deviceType = "nexus-5-black"
 		device.context.run ->
-			Screen.size.should.eql {width:1080, height:1920}
+			Screen.size.should.eql {width: 1080, height: 1920}
 			Screen.canvasFrame.should.eql device.screen.canvasFrame
 
 		device.deviceType = "fullscreen"
@@ -133,19 +133,19 @@ describe "DeviceComponent", ->
 
 		device.orientation.should.equal 0
 		device.isPortrait.should.equal true
-		device.screenSize.should.eql {width:1080, height:1920}
+		device.screenSize.should.eql {width: 1080, height: 1920}
 
 		device.rotateLeft(false)
 		device.orientation.should.equal 90
 		device.isPortrait.should.equal false
-		device.screenSize.should.eql {width:1920, height:1080}
+		device.screenSize.should.eql {width: 1920, height: 1080}
 
 		device.rotateRight(false)
 		device.orientation.should.equal 0
 		device.isPortrait.should.equal true
-		device.screenSize.should.eql {width:1080, height:1920}
+		device.screenSize.should.eql {width: 1080, height: 1920}
 
 		device.rotateRight(false)
 		device.orientation.should.equal -90
 		device.isPortrait.should.equal false
-		device.screenSize.should.eql {width:1920, height:1080}
+		device.screenSize.should.eql {width: 1920, height: 1080}

@@ -7,8 +7,8 @@ describe "ScrollComponent", ->
 		scroll = new ScrollComponent
 			size: 300
 
-		scroll.frame.should.eql {x:0, y:0, width:300, height:300}
-		scroll.content.frame.should.eql {x:0, y:0, width:300, height:300}
+		scroll.frame.should.eql {x: 0, y: 0, width: 300, height: 300}
+		scroll.content.frame.should.eql {x: 0, y: 0, width: 300, height: 300}
 
 	it "should have the right content frame with align", ->
 
@@ -20,8 +20,8 @@ describe "ScrollComponent", ->
 			size: 100
 			point: Align.center
 
-		scroll.content.frame.should.eql {x:0, y:0, width:300, height:300}
-		layer.frame.should.eql {x:100, y:100, width:100, height:100}
+		scroll.content.frame.should.eql {x: 0, y: 0, width: 300, height: 300}
+		layer.frame.should.eql {x: 100, y: 100, width: 100, height: 100}
 
 	it "should apply constructor options", ->
 
@@ -96,7 +96,7 @@ describe "ScrollComponent", ->
 
 				# also check isMoving, isDragging, isAnimating throughout this test
 				# TODO should be separate, when we can actually trick time
-				assert !scroll.isMoving, "must not be moving at start"
+				assert not scroll.isMoving, "must not be moving at start"
 
 				# collect the move events as they happen
 				moves = []
@@ -109,23 +109,23 @@ describe "ScrollComponent", ->
 				# verify the timeline of move events looks good
 				draggable.on Events.DragAnimationEnd, (event) ->
 					#console.log "END", scroll.isMoving, scroll.direction
-					assert !scroll.isMoving, "no more moving"
-					assert !scroll.isAnimating, "no more animating"
-					assert !scroll.isDragging, "no more dragging"
+					assert not scroll.isMoving, "no more moving"
+					assert not scroll.isAnimating, "no more animating"
+					assert not scroll.isDragging, "no more dragging"
 					ups = _.lastIndexOf(moves, "up")
 					downs = moves.indexOf("down")
 					nulls = moves.indexOf(null)
-					if ups < downs < nulls or (nulls == -1 and ups < downs) then return done()
+					if ups < downs < nulls or (nulls is -1 and ups < downs) then return done()
 					done("expected up+, down+, null+, but got: #{moves}")
 
 				# TODO instead of actually taking time, trick time
-				draggable._touchStart({clientX:100, clientY:100, preventDefault:(()->), stopPropagation:(()->)})
+				draggable._touchStart({clientX: 100, clientY: 100, preventDefault: (->), stopPropagation: (->)})
 				Utils.delay 0.01, ->
-					draggable._touchMove({clientX:100, clientY:111, preventDefault:(()->), stopPropagation:(()->), delta:{x:0,y:11}})
+					draggable._touchMove({clientX: 100, clientY: 111, preventDefault: (->), stopPropagation: (->), delta: {x: 0, y: 11}})
 				Utils.delay 0.20, -> # enough time to set velocity to zero
-					draggable._touchMove({clientX:100, clientY:112, preventDefault:(()->), stopPropagation:(()->), delta:{x:0,y:1}})
+					draggable._touchMove({clientX: 100, clientY: 112, preventDefault: (->), stopPropagation: (->), delta: {x: 0, y: 1}})
 				Utils.delay 0.21, ->
-					draggable._touchEnd({clientX:100, clientY:112, preventDefault:(()->), stopPropagation:(()->), delta:{x:0,y:0}})
+					draggable._touchEnd({clientX: 100, clientY: 112, preventDefault: (->), stopPropagation: (->), delta: {x: 0, y: 0}})
 
 		describe "PageComponent", ->
 			it "should fire scroll events", (done) ->
@@ -154,23 +154,23 @@ describe "ScrollComponent", ->
 
 		it "should use the wrapped layer as content layer when there are children", ->
 
-			layerA = new Layer frame:Screen.frame
-			layerB = new Layer superLayer:layerA
+			layerA = new Layer frame: Screen.frame
+			layerB = new Layer superLayer: layerA
 
 			scroll = ScrollComponent.wrap(layerA)
 			scroll.content.should.equal layerA
 
 		it "should use the wrapped layer as content if there are no children", ->
 
-			layerA = new Layer frame:Screen.frame
+			layerA = new Layer frame: Screen.frame
 
 			scroll = ScrollComponent.wrap(layerA)
 			scroll.content.children[0].should.equal layerA
 
 		it "should copy the name and image", ->
 
-			layerA = new Layer frame:Screen.frame, name:"Koen", image:"../static/test.png"
-			layerB = new Layer superLayer:layerA
+			layerA = new Layer frame: Screen.frame, name: "Koen", image: "../static/test.png"
+			layerB = new Layer superLayer: layerA
 
 			scroll = ScrollComponent.wrap(layerA)
 
@@ -187,7 +187,7 @@ describe "ScrollComponent", ->
 			frame.width += 100
 			frame.height += 100
 
-			layerA = new Layer frame:frame
+			layerA = new Layer frame: frame
 
 			scroll = ScrollComponent.wrap(layerA)
 			scroll.width.should.equal Screen.width
@@ -199,8 +199,8 @@ describe "ScrollComponent", ->
 			frame.width += 100
 			frame.height += 100
 
-			layerA = new Layer frame:frame
-			layerB = new Layer superLayer:layerA
+			layerA = new Layer frame: frame
+			layerB = new Layer superLayer: layerA
 
 			scroll = ScrollComponent.wrap(layerA)
 			scroll.width.should.equal Screen.width
@@ -209,7 +209,7 @@ describe "ScrollComponent", ->
 		it "should work with null backgroundColor", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer:layerA
+			layerB = new Layer superLayer: layerA
 
 			delete layerA._properties.backgroundColor
 			scroll = ScrollComponent.wrap(layerA)

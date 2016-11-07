@@ -13,7 +13,7 @@ describe "LayerAnimation", ->
 				curve: "spring(1, 2, 3)"
 
 			animation = new Animation new Layer(),
-				x:50
+				x: 50
 
 			animation.options.curve.should.equal "spring(1, 2, 3)"
 
@@ -24,7 +24,7 @@ describe "LayerAnimation", ->
 			# We shouldn't change the linear default, people rely on it
 
 			animation = new Animation new Layer(),
-				x:50
+				x: 50
 
 			animation.options.curve.should.equal "ease"
 			animation.options.time.should.equal 1
@@ -352,7 +352,7 @@ describe "LayerAnimation", ->
 			layer = new Layer()
 
 			animation = new Animation layer,
-				x:50
+				x: 50
 				options:
 					curve: "linear"
 					time: AnimationTime
@@ -373,13 +373,13 @@ describe "LayerAnimation", ->
 			layer = new Layer()
 
 			animation = new Animation layer,
-				x:50
+				x: 50
 				options:
 					curve: "linear"
 					time: AnimationTime
 
 			count = 0
-			test = -> count++; done() if count == 2
+			test = -> count++; done() if count is 2
 
 			animation.on "end", test
 			layer.on "end", test
@@ -392,13 +392,13 @@ describe "LayerAnimation", ->
 			layer = new Layer()
 
 			animation = new Animation layer,
-				x:50
+				x: 50
 				options:
 					curve: "linear"
 					time: AnimationTime * 2
 
 			count = 0
-			test = -> count++; done() if count == 2
+			test = -> count++; done() if count is 2
 
 			animation.on "stop", test
 			layer.on "stop", test
@@ -415,7 +415,7 @@ describe "LayerAnimation", ->
 			layer = new Layer()
 
 			animation = new Animation layer,
-				x:50
+				x: 50
 				options:
 					curve: "linear"
 					time: AnimationTime
@@ -432,7 +432,7 @@ describe "LayerAnimation", ->
 		it "should stop when stopped before delay ends", (done) ->
 			layer = new Layer()
 			animation = new Animation layer,
-				properties: {x:50}
+				properties: {x: 50}
 				curve: "linear"
 				time: 0.5
 				delay: 0.3
@@ -499,24 +499,24 @@ describe "LayerAnimation", ->
 
 		it "should only stop when all animations are done", (done) ->
 
-			layerA = new Layer width:80, height:80
+			layerA = new Layer width: 80, height: 80
 			layerA.name = "layerA"
 			layerA.animate
-				y:300
+				y: 300
 				options:
 					time: 2 * AnimationTime
 
-			layerB = new Layer width:80, height:80, x:100, backgroundColor:"red"
+			layerB = new Layer width: 80, height: 80, x: 100, backgroundColor: "red"
 			layerB.name = "layerB"
 			layerB.animate
-				y:300
+				y: 300
 				options:
 					time: 5 * AnimationTime
 
-			layerC = new Layer width:80, height:80, x:200, backgroundColor:"orange"
+			layerC = new Layer width: 80, height: 80, x: 200, backgroundColor: "orange"
 			layerC.name = "layerC"
 			layerC.animate
-				y:300
+				y: 300
 				options:
 					time: 2 * AnimationTime
 					curve: "cubic-bezier"

@@ -69,7 +69,7 @@ class exports.Simulation extends BaseClass
 
 		return true
 
-	stop: (emit=true)->
+	stop: (emit=true) ->
 		return unless @_running
 
 		@_running = false
