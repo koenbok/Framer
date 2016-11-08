@@ -154,7 +154,7 @@ class exports.Animation extends BaseClass
 
 		# Add the callbacks
 		@on(Events.AnimationStart, @options.onStart) if _.isFunction(@options.onStart)
-		@on(Events.AnimationBreak, @options.onBreak) if _.isFunction(@options.onBreak)
+		@on(Events.AnimationHalt, @options.onHalt) if _.isFunction(@options.onHalt)
 		@on(Events.AnimationStop, @options.onStop) if _.isFunction(@options.onStop)
 		@on(Events.AnimationEnd, @options.onEnd) if _.isFunction(@options.onEnd)
 
@@ -193,7 +193,7 @@ class exports.Animation extends BaseClass
 			@_delayTimer = null
 
 		@layer.context.removeAnimation(@)
-		@emit(Events.AnimationBreak) if emit
+		@emit(Events.AnimationHalt) if emit
 		@emit(Events.AnimationStop) if emit
 		Framer.Loop.off("update", @_update)
 

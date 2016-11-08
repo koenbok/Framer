@@ -693,18 +693,18 @@ describe "LayerAnimation", ->
 				layer.animate
 					x: 100
 					options:
-						time: 0.1
+						time: AnimationTime
 						onStart: ->
 							layer.x.should.eql 0
 							done()
 
-			it "should call break", (done) ->
+			it "should call halt", (done) ->
 				layer = new Layer
 				layer.animate
 					x: 100
 					options:
-						time: 0.1
-						onBreak: ->
+						time: AnimationTime
+						onHalt: ->
 							done()
 				layer.animateStop()
 
@@ -713,7 +713,7 @@ describe "LayerAnimation", ->
 				layer.animate
 					x: 100
 					options:
-						time: 0.1
+						time: AnimationTime
 						onStop: ->
 							layer.x.should.eql 100
 							done()
@@ -723,7 +723,7 @@ describe "LayerAnimation", ->
 				layer.animate
 					x: 100
 					options:
-						time: 0.1
+						time: AnimationTime
 						onEnd: ->
 							layer.x.should.eql 100
 							done()
