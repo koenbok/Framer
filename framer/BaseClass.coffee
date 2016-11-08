@@ -182,7 +182,6 @@ class exports.BaseClass extends EventEmitter
 
 		return unless descriptor.set
 
-		value = optionValue if descriptor.importable
 		value = Utils.valueOrDefault(optionValue, @_getPropertyDefaultValue(key))
 
 		return if value in [null, undefined]

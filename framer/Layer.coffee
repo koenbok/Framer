@@ -1016,13 +1016,13 @@ class exports.Layer extends BaseClass
 	## Draggable, Pinchable
 
 	@define "draggable",
-		importable: false
+		importable: true
 		exportable: false
 		get: -> @_draggable ?= new LayerDraggable(@)
 		set: (value) -> @draggable.enabled = value if _.isBoolean(value)
 
 	@define "pinchable",
-		importable: false
+		importable: true
 		exportable: false
 		get: -> @_pinchable ?= new LayerPinchable(@)
 		set: (value) -> @pinchable.enabled = value if _.isBoolean(value)
