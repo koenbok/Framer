@@ -318,6 +318,7 @@ class exports.Animation extends BaseClass
 	## EVENT HELPERS
 
 	onAnimationStart: (cb) -> @on(Events.AnimationStart, cb)
+	onAnimationHalt: (cb) -> @on(Events.AnimationHalt, cb)
 	onAnimationStop: (cb) -> @on(Events.AnimationStop, cb)
 	onAnimationEnd: (cb) -> @on(Events.AnimationEnd, cb)
 	onAnimationDidStart: (cb) -> @on(Events.AnimationDidStart, cb)
