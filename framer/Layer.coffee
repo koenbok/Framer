@@ -160,7 +160,7 @@ class exports.Layer extends BaseClass
 
 	@define "visible", layerProperty(@, "visible", "display", true, _.isBoolean)
 	@define "opacity", layerProperty(@, "opacity", "opacity", 1, _.isNumber)
-	@define "index", layerProperty(@, "index", "zIndex", 0, _.isNumber, null, {importable:false, exportable:false})
+	@define "index", layerProperty(@, "index", "zIndex", 0, _.isNumber, null, {importable: false, exportable: false})
 	@define "clip", layerProperty(@, "clip", "overflow", false, _.isBoolean)
 
 	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBoolean, null, {}, (layer, value) ->
@@ -435,7 +435,7 @@ class exports.Layer extends BaseClass
 			@frame = Utils.convertFrameFromContext(frame, @, false, false)
 
 	contentFrame: ->
-		return {x:0, y:0, width:0, height:0} unless @children.length
+		return {x: 0, y: 0, width: 0, height: 0} unless @children.length
 		return Utils.frameMerge(_.map(@children, "frame"))
 
 	totalFrame: ->
@@ -522,7 +522,7 @@ class exports.Layer extends BaseClass
 		frame =
 			x: 0
 			y: 0
-			width:  @width  * @screenScaleX()
+			width: @width  * @screenScaleX()
 			height: @height * @screenScaleY()
 
 		layers = @ancestors(context=true)
@@ -610,8 +610,8 @@ class exports.Layer extends BaseClass
 			# then we turn off ignoreEvents so buttons etc will work.
 
 			# if not (
-			# 	@_elementHTML.childNodes.length == 1 and
-			# 	@_elementHTML.childNodes[0].nodeName == "#text")
+			# 	@_elementHTML.childNodes.length is 1 and
+			# 	@_elementHTML.childNodes[0].nodeName is "#text")
 			# 	@ignoreEvents = false
 
 			@emit "change:html"
@@ -671,7 +671,7 @@ class exports.Layer extends BaseClass
 
 			currentValue = @_getPropertyValue "image"
 
-			if currentValue == value
+			if currentValue is value
 				return @emit "load"
 
 			# Unset the background color only if it’s the default color
@@ -753,15 +753,15 @@ class exports.Layer extends BaseClass
 			if @_parent
 				@_parent._children = _.without @_parent._children, @
 				@_parent._element.removeChild @_element
-				@_parent.emit "change:children", {added:[], removed:[@]}
-				@_parent.emit "change:subLayers", {added:[], removed:[@]}
+				@_parent.emit "change:children", {added: [], removed: [@]}
+				@_parent.emit "change:subLayers", {added: [], removed: [@]}
 
 			# Either insert the element to the new parent element or into dom
 			if layer
 				layer._element.appendChild @_element
 				layer._children.push @
-				layer.emit "change:children", {added:[@], removed:[]}
-				layer.emit "change:subLayers", {added:[@], removed:[]}
+				layer.emit "change:children", {added: [@], removed: []}
+				layer.emit "change:subLayers", {added: [@], removed: []}
 			else
 				@_insertElement()
 
@@ -819,10 +819,10 @@ class exports.Layer extends BaseClass
 		layer.parent = null
 
 	childrenWithName: (name) ->
-		_.filter @children, (layer) -> layer.name == name
+		_.filter @children, (layer) -> layer.name is name
 
 	siblingsWithName: (name) ->
-		_.filter @siblingLayers, (layer) -> layer.name == name
+		_.filter @siblingLayers, (layer) -> layer.name is name
 
 	ancestors: (context=false) ->
 
@@ -942,9 +942,9 @@ class exports.Layer extends BaseClass
 		unless stateName?
 			throw new Error("Missing required argument 'stateName' in stateSwitch()")
 		return @animate(stateName, options) if options.animate is true
-		return @animate(stateName, _.defaults({}, options, {instant:true}))
+		return @animate(stateName, _.defaults({}, options, {instant: true}))
 
-	animations: (includePending=false)->
+	animations: (includePending=false) ->
 		# Current running animations on this layer
 		_.filter @_context.animations, (animation) =>
 			return false unless (animation.layer is @)
@@ -1193,66 +1193,66 @@ class exports.Layer extends BaseClass
 	# Gestures
 
 	# Tap
-	onTap:(cb) -> @on(Events.Tap, cb)
-	onTapStart:(cb) -> @on(Events.TapStart, cb)
-	onTapEnd:(cb) -> @on(Events.TapEnd, cb)
-	onDoubleTap:(cb) -> @on(Events.DoubleTap, cb)
+	onTap: (cb) -> @on(Events.Tap, cb)
+	onTapStart: (cb) -> @on(Events.TapStart, cb)
+	onTapEnd: (cb) -> @on(Events.TapEnd, cb)
+	onDoubleTap: (cb) -> @on(Events.DoubleTap, cb)
 
 	# Force Tap
-	onForceTap:(cb) -> @on(Events.ForceTap, cb)
-	onForceTapChange:(cb) -> @on(Events.ForceTapChange, cb)
-	onForceTapStart:(cb) -> @on(Events.ForceTapStart, cb)
-	onForceTapEnd:(cb) -> @on(Events.ForceTapEnd, cb)
+	onForceTap: (cb) -> @on(Events.ForceTap, cb)
+	onForceTapChange: (cb) -> @on(Events.ForceTapChange, cb)
+	onForceTapStart: (cb) -> @on(Events.ForceTapStart, cb)
+	onForceTapEnd: (cb) -> @on(Events.ForceTapEnd, cb)
 
 	# Press
-	onLongPress:(cb) -> @on(Events.LongPress, cb)
-	onLongPressStart:(cb) -> @on(Events.LongPressStart, cb)
-	onLongPressEnd:(cb) -> @on(Events.LongPressEnd, cb)
+	onLongPress: (cb) -> @on(Events.LongPress, cb)
+	onLongPressStart: (cb) -> @on(Events.LongPressStart, cb)
+	onLongPressEnd: (cb) -> @on(Events.LongPressEnd, cb)
 
 	# Swipe
-	onSwipe:(cb) -> @on(Events.Swipe, cb)
-	onSwipeStart:(cb) -> @on(Events.SwipeStart, cb)
-	onSwipeEnd:(cb) -> @on(Events.SwipeEnd, cb)
+	onSwipe: (cb) -> @on(Events.Swipe, cb)
+	onSwipeStart: (cb) -> @on(Events.SwipeStart, cb)
+	onSwipeEnd: (cb) -> @on(Events.SwipeEnd, cb)
 
-	onSwipeUp:(cb) -> @on(Events.SwipeUp, cb)
-	onSwipeUpStart:(cb) -> @on(Events.SwipeUpStart, cb)
-	onSwipeUpEnd:(cb) -> @on(Events.SwipeUpEnd, cb)
+	onSwipeUp: (cb) -> @on(Events.SwipeUp, cb)
+	onSwipeUpStart: (cb) -> @on(Events.SwipeUpStart, cb)
+	onSwipeUpEnd: (cb) -> @on(Events.SwipeUpEnd, cb)
 
-	onSwipeDown:(cb) -> @on(Events.SwipeDown, cb)
-	onSwipeDownStart:(cb) -> @on(Events.SwipeDownStart, cb)
-	onSwipeDownEnd:(cb) -> @on(Events.SwipeDownEnd, cb)
+	onSwipeDown: (cb) -> @on(Events.SwipeDown, cb)
+	onSwipeDownStart: (cb) -> @on(Events.SwipeDownStart, cb)
+	onSwipeDownEnd: (cb) -> @on(Events.SwipeDownEnd, cb)
 
-	onSwipeLeft:(cb) -> @on(Events.SwipeLeft, cb)
-	onSwipeLeftStart:(cb) -> @on(Events.SwipeLeftStart, cb)
-	onSwipeLeftEnd:(cb) -> @on(Events.SwipeLeftEnd, cb)
+	onSwipeLeft: (cb) -> @on(Events.SwipeLeft, cb)
+	onSwipeLeftStart: (cb) -> @on(Events.SwipeLeftStart, cb)
+	onSwipeLeftEnd: (cb) -> @on(Events.SwipeLeftEnd, cb)
 
-	onSwipeRight:(cb) -> @on(Events.SwipeRight, cb)
-	onSwipeRightStart:(cb) -> @on(Events.SwipeRightStart, cb)
-	onSwipeRightEnd:(cb) -> @on(Events.SwipeRightEnd, cb)
+	onSwipeRight: (cb) -> @on(Events.SwipeRight, cb)
+	onSwipeRightStart: (cb) -> @on(Events.SwipeRightStart, cb)
+	onSwipeRightEnd: (cb) -> @on(Events.SwipeRightEnd, cb)
 
 	# Pan
-	onPan:(cb) -> @on(Events.Pan, cb)
-	onPanStart:(cb) -> @on(Events.PanStart, cb)
-	onPanEnd:(cb) -> @on(Events.PanEnd, cb)
-	onPanLeft:(cb) -> @on(Events.PanLeft, cb)
-	onPanRight:(cb) -> @on(Events.PanRight, cb)
-	onPanUp:(cb) -> @on(Events.PanUp, cb)
-	onPanDown:(cb) -> @on(Events.PanDown, cb)
+	onPan: (cb) -> @on(Events.Pan, cb)
+	onPanStart: (cb) -> @on(Events.PanStart, cb)
+	onPanEnd: (cb) -> @on(Events.PanEnd, cb)
+	onPanLeft: (cb) -> @on(Events.PanLeft, cb)
+	onPanRight: (cb) -> @on(Events.PanRight, cb)
+	onPanUp: (cb) -> @on(Events.PanUp, cb)
+	onPanDown: (cb) -> @on(Events.PanDown, cb)
 
 	# Pinch
-	onPinch:(cb) -> @on(Events.Pinch, cb)
-	onPinchStart:(cb) -> @on(Events.PinchStart, cb)
-	onPinchEnd:(cb) -> @on(Events.PinchEnd, cb)
+	onPinch: (cb) -> @on(Events.Pinch, cb)
+	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
+	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
 
 	# Scale
-	onScale:(cb) -> @on(Events.Scale, cb)
-	onScaleStart:(cb) -> @on(Events.ScaleStart, cb)
-	onScaleEnd:(cb) -> @on(Events.ScaleEnd, cb)
+	onScale: (cb) -> @on(Events.Scale, cb)
+	onScaleStart: (cb) -> @on(Events.ScaleStart, cb)
+	onScaleEnd: (cb) -> @on(Events.ScaleEnd, cb)
 
 	# Rotate
-	onRotate:(cb) -> @on(Events.Rotate, cb)
-	onRotateStart:(cb) -> @on(Events.RotateStart, cb)
-	onRotateEnd:(cb) -> @on(Events.RotateEnd, cb)
+	onRotate: (cb) -> @on(Events.Rotate, cb)
+	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
+	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
 
 
 	##############################################################

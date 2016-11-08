@@ -1,35 +1,47 @@
-# Project Info
-# This info is presented in a widget when you share.
-# http://framerjs.com/docs/#info.info
+class AnimationGroup
 
-Framer.Info =
-	title: "NavComponent Example"
-	author: "Koen Bok"
-	twitter: "koenbok"
-	description: "A super simple email app NavComponent example. Still very beta©."
+	constructor: (args...) ->
+		@_animations = args
+		@_started = []
+		@_stopped = []
+		@_ended = []
+		
+	start: (stateName) ->
+		
+		@stop()
+		@_onStart()
+		
+		@_animations.map (animation) =>
+			@_started.push(animation.start())
+			
+			animation.onAnimationStop =>
+				@_stopped.push(animation)
+				print "stop", animation
+			
+			animation.onAnimationEnd =>
+				@_ended.push(animation)
+				@_onEnd if @_ended.length is @_started.length
+				print "end", @_ended.length, @_started.length
+	
+	stop: ->
+		_.invoke(@_animations, "stop")
+		@_running  = []
+		@_
+		
+	_onStart: -> print "start"
+	_onStop: ->
+	_onEnd: -> print "end"
 
 
-Framer.Extras.Hints.enable()
+class StateGroup
 
-sketch = Framer.Importer.load("imported/Mail@2x")
 
-# Set up the component and add the initial view
-nav = new NavComponent
-nav.showNext(sketch.inbox)
 
-# On a hamburger tap, we show the menu
-sketch.hamburger.onTap ->
-	nav.showOverlayLeft(sketch.menu)
+layerA = new Layer
+layerB = new Layer
 
-# If we tap on a few rows, show the mail
-for row in sketch.yesterday.children
-	row.onTap -> nav.showNext(sketch.mail)
+a1 = new Animation layerA, x: 500
+a2 = new Animation layerB, y: 500
 
-# If we tap on the mail, we go back again
-sketch.mail.onTap -> nav.showPrevious()
-
-# Set up menu bar (not so interesting)
-sketch.status.parent = null
-sketch.status.point = 0
-sketch.status.bringToFront()
-
+ag = new AnimationGroup(a1, a2)
+ag.start()

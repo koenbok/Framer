@@ -124,8 +124,8 @@ describe "LayerStates Backwards compatibility", ->
 
 		beforeEach ->
 			@layer = new Layer()
-			@layer.states.add("a", {x:100, y:100})
-			@layer.states.add("b", {x:200, y:200})
+			@layer.states.add("a", {x: 100, y: 100})
+			@layer.states.add("b", {x: 200, y: 200})
 
 		it "should emit StateWillSwitch when switching", (done) ->
 
@@ -155,7 +155,7 @@ describe "LayerStates Backwards compatibility", ->
 		it "should set defaults", ->
 
 			layer = new Layer
-			layer.states.add "test", {x:123}
+			layer.states.add "test", {x: 123}
 			animation = layer.states.switch "test"
 
 			animation.options.curve.should.equal Framer.Defaults.Animation.curve
@@ -164,7 +164,7 @@ describe "LayerStates Backwards compatibility", ->
 				curve: "spring(1, 2, 3)"
 
 			layer = new Layer
-			layer.states.add "test", {x:456}
+			layer.states.add "test", {x: 456}
 			animation = layer.states.switch "test"
 
 			animation.options.curve.should.equal "spring(1, 2, 3)"

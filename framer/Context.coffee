@@ -37,11 +37,9 @@ class exports.Context extends BaseClass
 
 	@all = -> return _.clone(Contexts)
 
-	@define "parent",
-		get: -> @_parent
+	@define "parent", get: -> @_parent
 
-	@define "element",
-		get: -> @_element
+	@define "element", get: -> @_element
 
 	constructor: (options={}) ->
 
@@ -306,7 +304,7 @@ class exports.Context extends BaseClass
 			return @parent.height if @parent?
 			return window.innerHeight
 
-	@define "frame", get: -> {x:0, y:0, width:@width, height:@height}
+	@define "frame", get: -> {x: 0, y: 0, width: @width, height: @height}
 	@define "size",  get: -> _.pick(@frame, ["width", "height"])
 	@define "point", get: -> _.pick(@frame, ["x", "y"])
 	@define "canvasFrame",
@@ -364,7 +362,7 @@ class exports.Context extends BaseClass
 	toInspect: ->
 
 		round = (value) ->
-			if parseInt(value) == value
+			if parseInt(value) is value
 				return parseInt(value)
 			return Utils.round(value, 1)
 

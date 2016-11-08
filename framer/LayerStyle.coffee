@@ -3,7 +3,7 @@ filterFormat = (value, unit) ->
 	# "#{value}#{unit}"
 
 roundToZero = (num) ->
-	if (-1e-6 < num && num < 1e-6)
+	if (-1e-6 < num and num < 1e-6)
 		return 0
 	return num
 
@@ -163,7 +163,7 @@ exports.LayerStyle =
 
 		if not props.shadowColor
 			return ""
-		else if props.shadowX == 0 and props.shadowY == 0 and props.shadowBlur == 0 and props.shadowSpread == 0
+		else if props.shadowX is 0 and props.shadowY is 0 and props.shadowBlur is 0 and props.shadowSpread is 0
 			return ""
 
 		return "#{layer._properties.shadowX}px #{layer._properties.shadowY}px #{layer._properties.shadowBlur}px #{layer._properties.shadowSpread}px #{layer._properties.shadowColor}"

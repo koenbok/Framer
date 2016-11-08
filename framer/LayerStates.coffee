@@ -93,7 +93,7 @@ class LayerStates
 			deprecatedWarning("remove", "delete layer.states.a")
 			delete @[stateName]
 
-		switch:  (stateName, options) ->
+		switch: (stateName, options) ->
 			deprecatedWarning("switch", "layer.animate(\"state\")")
 			@machine.switchTo(stateName, options)
 

@@ -8,7 +8,7 @@ open -a Google\ Chrome -–allow-file-access-from-files
 
 resizeFrame = (scale, frame) ->
 
-	return frame if scale == 1
+	return frame if scale is 1
 
 	result = {}
 
@@ -164,7 +164,7 @@ class exports.Importer
 		# If this is an artboard we retain the size, but set the coordinates to zero
 		# because all coordinates within artboards are 0, 0 based.
 		if info.kind is "artboard"
-			layer.point = {x:0, y:0}
+			layer.point = {x: 0, y: 0}
 
 		# If this is not an artboard, and does not have an image or mask, we clip the
 		# layer to its content size.

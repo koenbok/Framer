@@ -36,7 +36,7 @@ describe "BaseClass", ->
 
 	it "should set defaults on construction", ->
 
-		testClass = new TestClass width:100, height:100
+		testClass = new TestClass width: 100, height: 100
 
 		testClass.width.should.equal 100
 		testClass.height.should.equal 100
@@ -141,7 +141,7 @@ describe "BaseClass", ->
 			constructor: ->
 				super
 
-				@poop = {hello:100}
+				@poop = {hello: 100}
 
 		testClass = new TestClass7()
 		testClass.poop.hello.should.equal 100
@@ -153,7 +153,7 @@ describe "BaseClass", ->
 
 		class TestClass extends Framer.BaseClass
 			@define "testProp",
-				get: () -> "value"
+				get: -> "value"
 				exportable: false
 
 		instance = new TestClass()
@@ -171,7 +171,7 @@ describe "BaseClass", ->
 
 		class TestClass extends Framer.BaseClass
 			@define "testProp",
-				get: () -> "value"
+				get: -> "value"
 				enumerable: false
 
 		instance = new TestClass()
@@ -184,7 +184,7 @@ describe "BaseClass", ->
 	it.skip "should throw on assignment of read-only prop", ->
 		class TestClass extends Framer.BaseClass
 			@define "testProp",
-				get: () -> "value"
+				get: -> "value"
 
 		instance = new TestClass()
 		(-> instance.testProp = "foo").should.throw "TestClass.testProp is readonly"

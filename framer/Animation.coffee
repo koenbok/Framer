@@ -92,7 +92,7 @@ class exports.Animation extends BaseClass
 		get: -> @options.looping
 		set: (value) ->
 			@options?.looping = value
-			if @options?.looping and @layer? and !@isAnimating
+			if @options?.looping and @layer? and not @isAnimating
 				@restart()
 
 	@define "isNoop", @simpleProperty("isNoop", false)
@@ -154,6 +154,7 @@ class exports.Animation extends BaseClass
 
 		# Add the callbacks
 		@on(Events.AnimationStart, @options.onStart) if _.isFunction(@options.onStart)
+		@on(Events.AnimationHalt, @options.onHalt) if _.isFunction(@options.onHalt)
 		@on(Events.AnimationStop, @options.onStop) if _.isFunction(@options.onStop)
 		@on(Events.AnimationEnd, @options.onEnd) if _.isFunction(@options.onEnd)
 
@@ -161,7 +162,7 @@ class exports.Animation extends BaseClass
 		# Todo: more repeat behaviours:
 		# 1) add (from end position) 2) reverse (loop between a and b)
 		@once "end", =>
-			if @_repeatCounter > 0 || @looping
+			if @_repeatCounter > 0 or @looping
 				@restart()
 				if not @looping
 					@_repeatCounter--
@@ -192,7 +193,7 @@ class exports.Animation extends BaseClass
 			@_delayTimer = null
 
 		@layer.context.removeAnimation(@)
-
+		@emit(Events.AnimationHalt) if emit
 		@emit(Events.AnimationStop) if emit
 		Framer.Loop.off("update", @_update)
 

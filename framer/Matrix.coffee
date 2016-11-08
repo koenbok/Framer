@@ -8,7 +8,7 @@ WebKitCSSMatrix::skew = (skew) ->
 	return @multiply(m)
 
 WebKitCSSMatrix::point = (point = {}) ->
-	{x, y, z} = _.defaults(point, {x:0, y:0, z:0})
+	{x, y, z} = _.defaults(point, {x: 0, y: 0, z: 0})
 	w = @m14 * x + @m24 * y + @m34 * z + @m44
 	w = w or 1
 	return point =

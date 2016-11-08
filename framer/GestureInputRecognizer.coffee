@@ -76,9 +76,9 @@ class exports.GestureInputRecognizer
 
 		if event.touches?
 			if Utils.isTouch()
-				return unless (event.touches.length == 0)
+				return unless (event.touches.length is 0)
 			else
-				return unless (event.touches.length == event.changedTouches.length)
+				return unless (event.touches.length is event.changedTouches.length)
 
 		@em.wrap(window).removeEventListener("mousemove", @touchmove)
 		@em.wrap(window).removeEventListener("mouseup", @touchend)
@@ -298,10 +298,10 @@ class exports.GestureInputRecognizer
 		# Detect pinch, rotate and scale events
 
 		# Stop panning if we go from 2 to 1 finger
-		if @session.started.pinch and event.fingers == 1
+		if @session.started.pinch and event.fingers is 1
 			@pinchend(event)
 		# If we did not start yet and get two fingers, start
-		else if not @session.started.pinch and event.fingers == 2
+		else if not @session.started.pinch and event.fingers is 2
 			@pinchstart(event)
 		# If we did start send pinch events
 		else if @session.started.pinch
@@ -322,7 +322,7 @@ class exports.GestureInputRecognizer
 
 	_getEventPoint: (event) ->
 		return @_getTouchPoint(event, 0) if event.touches?.length
-		return {x:event.pageX, y:event.pageY}
+		return {x: event.pageX, y: event.pageY}
 
 	_getGestureEvent: (event) ->
 
@@ -337,22 +337,22 @@ class exports.GestureInputRecognizer
 			start: eventPoint # Start point √
 			previous: eventPoint # Previous point √
 
-			offset: {x:0, y:0} # Offset since start √
+			offset: {x: 0, y: 0} # Offset since start √
 			offsetTime: 0 # Time since start √
 			offsetAngle: 0 # Angle from start √
 			offsetDirection: null # Direction from start (up, down, left, right) √
 
-			delta: {x:0, y:0} # Offset since last event √
+			delta: {x: 0, y: 0} # Offset since last event √
 			deltaTime: 0 # Time since last event √
 			deltaAngle: 0 # Angle from last event √
 			deltaDirection: null # Direction from last event √
 
 			force: 0, # 3d touch or force touch, iOS/Mac only √
-			velocity: {x:0, y:0} # Velocity average over the last few events √
+			velocity: {x: 0, y: 0} # Velocity average over the last few events √
 
 			fingers: event.touches?.length or 0 # Number of fingers used √
 			touchCenter: eventPoint # Center between two fingers √
-			touchOffset: {x:0, y:0} # Offset between two fingers √
+			touchOffset: {x: 0, y: 0} # Offset between two fingers √
 			touchDistance: 0 # Distance between two fingers √
 			scale: 1 # Scale value from two fingers √
 			scaleDirection: null # Direction for scale: up or down √
@@ -406,10 +406,10 @@ class exports.GestureInputRecognizer
 		# For delta we switch to center-compare if there are two fingers
 		if @session?.lastEvent
 			# If we just switched fingers, we skip the delta event entirely
-			if event.fingers isnt @session.lastEvent.fingers == 2
-				event.delta = {x:0, y:0}
+			if event.fingers isnt @session.lastEvent.fingers is 2
+				event.delta = {x: 0, y: 0}
 			# If we are having two finger events, we use the touchCenter as base for delta
-			if event.fingers == 2 and @session.lastEvent.fingers == 2
+			if event.fingers is 2 and @session.lastEvent.fingers is 2
 				event.delta = Utils.pointSubtract(event.touchCenter, @session.lastEvent.touchCenter)
 
 		# Force touch
@@ -480,7 +480,7 @@ class exports.GestureInputRecognizer
 
 	_getVelocity: (events) ->
 
-		return {x:0, y:0} if events.length < 2
+		return {x: 0, y: 0} if events.length < 2
 
 		current = events[events.length - 1]
 		first = events[0]
