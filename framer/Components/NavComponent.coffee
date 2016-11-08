@@ -105,14 +105,13 @@ class exports.NavComponent extends Layer
 		# Run the transition and update the history
 		@_runTransition(transition, "forward", options.animate, @current, layer)
 
-
 		@_stack.push({layer:layer, transition:transition})
 
 
-	show: (layer, options={}) ->
+	showNext: (layer, options={}) ->
 		@transition(layer, Transitions.show, options)
 
-	back: (options={}) =>
+	showPrevious: (options={}) =>
 		return unless @previous
 		return if @isTransitioning
 		options = _.defaults({}, {animate: true})
@@ -146,7 +145,7 @@ class exports.NavComponent extends Layer
 			{animate: true, scroll: false, modal: false}))
 
 	_handleOverlayTap: =>
-		@back() if not @isModal
+		@showPrevious() if not @isModal
 
 	_wrapLayer: (layer) ->
 
