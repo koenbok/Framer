@@ -198,13 +198,6 @@ class exports.NavComponent extends Layer
 
 	_runTransition: (transition, direction, animate, from, to) =>
 
-		# @_runningTransition =
-		# 	transition: transition
-		# 	direction: direction
-		# 	animate: animate
-		# 	from: from
-		# 	to: to
-
 		@emit(Events.TransitionStart, from, to, {direction: direction, modal: @isModal})
 
 		# Start the transition with a small delay added so it only runs after all
@@ -213,7 +206,6 @@ class exports.NavComponent extends Layer
 
 		Utils.delay 0, =>
 			transition[direction] animate, =>
-				# @_runningTransition = null
 				@emit(Events.TransitionEnd, from, to, {direction: direction, modal: @isModal})
 
 	_buildTransition: (transitionFunction, layerA, layerB, overlay) ->
@@ -224,27 +216,6 @@ class exports.NavComponent extends Layer
 		# # Buld a new transtition object with empty states
 		transition = {}
 
-		# seen = @_seen
-
-		# layers =
-		# 	layerA: layerA
-		# 	layerB: layerB
-		# 	overlay: overlay
-
-		# for layerName, layer of layers
-
-		# 	continue unless (layer and template[layerName])
-
-		# 	throw Error("NavComponent.transition: #{layerName} needs a 'show' state") unless template[layerName].show
-		# 	throw Error("NavComponent.transition: #{layerName} needs a 'hide' state") unless template[layerName].hide
-
-		# 	transition.states[layerName] = new LayerStates(layer)
-		# 	transition.states[layerName].show = template[layerName].show
-		# 	transition.states[layerName].hide = template[layerName].hide
-
-		# 	delete transition.states[layerName].initial
-
-
 		# Add the forward function for this state to transition forward
 		transition.forward = (animate=true, callback) =>
 
@@ -252,13 +223,14 @@ class exports.NavComponent extends Layer
 			options = {instant:!animate}
 
 			if overlay and template.overlay
-				overlay.ignoreEvents = false
 				overlay.visible = true
+				overlay.ignoreEvents = false
 				overlay.placeBehind(layerB)
 				overlay.props = template.overlay.hide
 				animations.push(new Animation(overlay, template.overlay.show, options))
 
 			if layerA and template.layerA
+				layerA.visible = true
 				animations.push(new Animation(layerA, template.layerA.hide, options))
 			
 			if layerB and template.layerB
@@ -269,23 +241,34 @@ class exports.NavComponent extends Layer
 			group = new AnimationGroup(animations)
 			group.start()
 
+			group.once Events.AnimationEnd, ->
+				if layerA and template.layerA and not (overlay and template.overlay)
+					layerA.visible = false
+
 		transition.back = (animate=true, callback) ->
 
 			animations = []
 			options = {instant:!animate}
 
+			if overlay and template.overlay
+				overlay.visible = true
+				overlay.ignoreEvents = true
+				animations.push(new Animation(overlay, template.overlay.hide, options))
+
 			if layerA and template.layerA
+				layerA.visible = true
 				animations.push(new Animation(layerA, template.layerA.show, options))
 			
 			if layerB and template.layerB
+				layerB.visible = true
 				animations.push(new Animation(layerB, template.layerB.hide, options))
-
-			if overlay and template.overlay
-				animations.push(new Animation(overlay, template.overlay.hide, options))
-				overlay.ignoreEvents = true
 
 			group = new AnimationGroup(animations)
 			group.start()
+
+			group.once Events.AnimationEnd, ->
+				if layerB and template.layerB
+					layerB.visible = false
 
 		return transition
 
