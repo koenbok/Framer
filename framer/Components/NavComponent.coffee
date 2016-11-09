@@ -4,7 +4,7 @@ Utils = require "../Utils"
 {Events} = require "../Events"
 {LayerStates} = require "../LayerStates"
 {LayerStateMachine} = require "../LayerStateMachine"
-# Transitions = require "./NavComponentTransitions"
+{AnimationGroup} = require "../AnimationGroup"
 
 NavComponentLayerScrollKey = "_navComponentWrapped"
 
@@ -221,131 +221,71 @@ class exports.NavComponent extends Layer
 		# Get the executed template data by passing in the layers for this transition
 		template = transitionFunction(@, layerA, layerB, overlay)
 
-		# Buld a new transtition object with empty states
-		transition =
-			states: {}
+		# # Buld a new transtition object with empty states
+		transition = {}
 
-		seen = @_seen
+		# seen = @_seen
 
-		layers =
-			layerA: layerA
-			layerB: layerB
-			overlay: overlay
+		# layers =
+		# 	layerA: layerA
+		# 	layerB: layerB
+		# 	overlay: overlay
 
-		for layerName, layer of layers
+		# for layerName, layer of layers
 
-			continue unless (layer and template[layerName])
+		# 	continue unless (layer and template[layerName])
 
-			throw Error("NavComponent.transition: #{layerName} needs a 'show' state") unless template[layerName].show
-			throw Error("NavComponent.transition: #{layerName} needs a 'hide' state") unless template[layerName].hide
+		# 	throw Error("NavComponent.transition: #{layerName} needs a 'show' state") unless template[layerName].show
+		# 	throw Error("NavComponent.transition: #{layerName} needs a 'hide' state") unless template[layerName].hide
 
-			transition.states[layerName] = new LayerStates(layer)
-			transition.states[layerName].show = template[layerName].show
-			transition.states[layerName].hide = template[layerName].hide
+		# 	transition.states[layerName] = new LayerStates(layer)
+		# 	transition.states[layerName].show = template[layerName].show
+		# 	transition.states[layerName].hide = template[layerName].hide
 
-			delete transition.states[layerName].initial
+		# 	delete transition.states[layerName].initial
 
 
 		# Add the forward function for this state to transition forward
 		transition.forward = (animate=true, callback) =>
 
-			# If this transition build on a overlay we need it to be
-			# visible and at the right index, just behind the layerB.
-			if transition.states.overlay
-				overlay.size = @size
-				overlay.point = Utils.pointZero()
+			animations = []
+			options = {instant:!animate}
+
+			if overlay and template.overlay
 				overlay.ignoreEvents = false
 				overlay.visible = true
 				overlay.placeBehind(layerB)
+				overlay.props = template.overlay.hide
+				animations.push(new Animation(overlay, template.overlay.show, options))
 
-			# If not, we make sure the overlay layer is not visible, and
-			# we want the dissapearing layer to ge invisible after the
-			# transition stops.
-			else
-				# overlay.ignoreEvents = true
-				overlay.visible = false
-
-			animationCount = 0
-
-			onTransitionEnd = ->
-				animationCount--
-				return unless animationCount is 0
-				callback?()
-
-				# TODO: We should only hide it if the transition is fully finished
-				# if not transition.states.overlay and layerA
-				# 	layerA.visible = false
-
-			if transition.states.layerB
-				animationCount++
-
-				# We only need to set the initial push if we have never seen this layer
-				# before, because it might be in a half-transition from goin back, and
-				# then we don't want to mess with it.
-				if layerB in @_seen is false
-					@_seen.push(layerB)
-					transition.states.layerB.machine.switchInstant("hide")
-
+			if layerA and template.layerA
+				animations.push(new Animation(layerA, template.layerA.hide, options))
+			
+			if layerB and template.layerB
 				layerB.visible = true
-				# layerB.ignoreEvents = true
-				# layerB.bringToFront()
-				transition.states.layerB.machine.switchTo("show", {instant: !animate})
-				transition.states.layerB.machine.once(Events.StateSwitchEnd, onTransitionEnd)
+				layerB.props = template.layerB.hide
+				animations.push(new Animation(layerB, template.layerB.show, options))
 
-
-			if transition.states.layerA
-				animationCount++
-				transition.states.layerA.machine.switchTo("hide", {instant: !animate})
-				layerA.visible = true
-				# layerB.ignoreEvents = false
-				transition.states.layerA.machine.once(Events.StateSwitchEnd, onTransitionEnd)
-
-			if transition.states.overlay
-				animationCount++
-				transition.states.overlay.machine.switchInstant("hide")
-				overlay.visible = true
-				transition.states.overlay.machine.switchTo("show", {instant: !animate})
-				transition.states.overlay.machine.once(Events.StateSwitchEnd, onTransitionEnd)
-
+			group = new AnimationGroup(animations)
+			group.start()
 
 		transition.back = (animate=true, callback) ->
 
-			# If this transition build on a overlay we need it to be
-			# visible and at the right index, just behind the layerB.
-			if transition.states.overlay
+			animations = []
+			options = {instant:!animate}
+
+			if layerA and template.layerA
+				animations.push(new Animation(layerA, template.layerA.show, options))
+			
+			if layerB and template.layerB
+				animations.push(new Animation(layerB, template.layerB.hide, options))
+
+			if overlay and template.overlay
+				animations.push(new Animation(overlay, template.overlay.hide, options))
 				overlay.ignoreEvents = true
 
-			animationCount = 0
-
-			onTransitionEnd = ->
-				animationCount--
-				callback?() if animationCount is 0
-
-				if not transition.states.overlay and layerB
-					layerB.visible = false
-
-			if transition.states.layerB
-				animationCount++
-				transition.states.layerB.machine.switchTo("hide", {instant: !animate})
-				transition.states.layerB.machine.once(Events.AnimationStop, onTransitionEnd)
-				layerB.visible = true
-				# layerB.ignoreEvents = true
-
-			if transition.states.layerA
-				animationCount++
-				layerA.visible = true
-				# layerA.ignoreEvents = false
-				# layerA.bringToFront()
-				transition.states.layerA.machine.switchTo("show", {instant: !animate})
-				transition.states.layerA.machine.once(Events.AnimationStop, onTransitionEnd)
-
-
-			if transition.states.overlay
-				animationCount++
-				transition.states.overlay.machine.switchInstant("show")
-				transition.states.overlay.machine.switchTo("hide", {instant: !animate})
-				transition.states.overlay.machine.once(Events.AnimationStop, onTransitionEnd)
-				overlay.visible = true
+			group = new AnimationGroup(animations)
+			group.start()
 
 		return transition
 
@@ -367,8 +307,8 @@ Transitions.overlayCenter = (nav, layerA, layerB, overlay) ->
 			show: {options: {curve: "spring(800, 30, 0)"}, x:Align.center, y:Align.center, scale:1.0, opacity:1}
 			hide: {options: {curve: "spring(800, 30, 0)"}, x:Align.center, y:Align.center, scale:0.5, opacity:0}
 		overlay:
-			show: {options: {time: 0.1}, opacity: 0.3}
-			hide: {options: {time: 0.1}, opacity: 0}
+			show: {options: {time: 0.1}, opacity: .5, x: 0, y: 0, size: nav.size}
+			hide: {options: {time: 0.1}, opacity:  0, x: 0, y: 0, size: nav.size}
 
 Transitions.overlayLeft = (nav, layerA, layerB, overlay) ->
 	transition =
@@ -376,8 +316,8 @@ Transitions.overlayLeft = (nav, layerA, layerB, overlay) ->
 			show: {options: {curve: "spring(300, 35, 0)"}, y: 0, x: 0}
 			hide: {options: {curve: "spring(300, 35, 0)"}, y: 0, x: 0 - layerB?.width}
 		overlay:
-			show: {options: {time: 0.1}, opacity: .5}
-			hide: {options: {time: 0.1}, opacity: 0}
+			show: {options: {time: 0.1}, opacity: .5, x: 0, y: 0, size: nav.size}
+			hide: {options: {time: 0.1}, opacity:  0, x: 0, y: 0, size: nav.size}
 
 Transitions.overlayRight = (nav, layerA, layerB, overlay) ->
 	transition =
@@ -385,8 +325,8 @@ Transitions.overlayRight = (nav, layerA, layerB, overlay) ->
 			show: {options: {curve: "spring(300, 35, 0)"}, y: 0, x: nav?.width - layerB?.width}
 			hide: {options: {curve: "spring(300, 35, 0)"}, y: 0, x: nav?.width}
 		overlay:
-			show: {options: {time: 0.1}, opacity: .5}
-			hide: {options: {time: 0.1}, opacity: 0}
+			show: {options: {time: 0.1}, opacity: .5, x: 0, y: 0, size: nav.size}
+			hide: {options: {time: 0.1}, opacity:  0, x: 0, y: 0, size: nav.size}
 
 Transitions.overlayTop = (nav, layerA, layerB, overlay) ->
 	transition =
@@ -394,8 +334,8 @@ Transitions.overlayTop = (nav, layerA, layerB, overlay) ->
 			show: {options: {curve: "spring(300, 35, 0)"}, x: Align.center, y: 0}
 			hide: {options: {curve: "spring(300, 35, 0)"}, x: Align.center, maxY: 0}
 		overlay:
-			show: {options: {time: 0.1}, opacity: .5}
-			hide: {options: {time: 0.1}, opacity: 0}
+			show: {options: {time: 0.1}, opacity: .5, x: 0, y: 0, size: nav.size}
+			hide: {options: {time: 0.1}, opacity:  0, x: 0, y: 0, size: nav.size}
 
 Transitions.overlayBottom = (nav, layerA, layerB, overlay) ->
 	transition =
@@ -403,5 +343,5 @@ Transitions.overlayBottom = (nav, layerA, layerB, overlay) ->
 			show: {options: {curve: "spring(300, 35, 0)"}, x: Align.center, y: nav?.height - layerB?.height}
 			hide: {options: {curve: "spring(300, 35, 0)"}, x: Align.center, y: nav?.height}
 		overlay:
-			show: {options: {time: 0.1}, opacity: .5}
-			hide: {options: {time: 0.1}, opacity: 0}
+			show: {options: {time: 0.1}, opacity: .5, x: 0, y: 0, size: nav.size}
+			hide: {options: {time: 0.1}, opacity:  0, x: 0, y: 0, size: nav.size}

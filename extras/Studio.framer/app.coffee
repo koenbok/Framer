@@ -1,16 +1,33 @@
-layerA = new Layer
-layerB = new Layer
+# Project Info
+# This info is presented in a widget when you share.
+# http://framerjs.com/docs/#info.info
 
-layerA.states.open = x: 500
-layerB.states.open = y: 500
+Framer.Info =
+	title: "NavComponent Example"
+	author: "Koen Bok"
+	twitter: "koenbok"
+	description: "A super simple email app NavComponent example. Still very beta©."
+# Framer.Extras.Hints.enable()
 
-ag = new AnimationStateGroup(layerA, layerB)
+sketch = Framer.Importer.load("imported/Mail@2x")
 
-ag.onStart -> print "start"
-ag.onHalt -> print "halt"
-ag.onStop -> print "stop"
-ag.onEnd -> print "end", @
+# Set up the component and add the initial view
+nav = new NavComponent
+nav.showNext(sketch.inbox)
 
-ag.stateCycle()
+# On a hamburger tap, we show the menu
+sketch.hamburger.onTap ->
+	nav.showOverlayLeft(sketch.menu)
 
-print ag.states
+# If we tap on a few rows, show the mail
+for row in sketch.yesterday.children
+	row.onTap -> nav.showNext(sketch.mail)
+
+# If we tap on the mail, we go back again
+sketch.mail.onTap -> nav.showPrevious()
+
+# Set up menu bar (not so interesting)
+sketch.status.parent = null
+sketch.status.point = 0
+sketch.status.bringToFront()
+

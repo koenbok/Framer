@@ -6,7 +6,7 @@ class AnimationGroup extends BaseClass
 
 	constructor: (args...) ->
 		super
-		@_animations = args
+		@_animations = _.flatten(args)
 		@stop()
 	
 	start: ->
@@ -25,7 +25,7 @@ class AnimationGroup extends BaseClass
 		@_onStart()
 		
 		animations.map (animation) =>
-		
+			
 			animation.start()
 			@_started.push(animation)
 
@@ -67,7 +67,7 @@ class AnimationStateGroup extends AnimationGroup
 
 	constructor: (layers...) ->
 		super
-		@_layers = layers
+		@_layers = _.flatten(layers)
 		@_state = "default"
 
 	animate: (state) ->
