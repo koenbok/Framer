@@ -15,6 +15,7 @@ Framer.Events = (require "./Events").Events
 Framer.Gestures = (require "./Gestures").Gestures
 Framer.Animation = (require "./Animation").Animation
 Framer.AnimationGroup = (require "./AnimationGroup").AnimationGroup
+Framer.AnimationStateGroup = (require "./AnimationGroup").AnimationStateGroup
 Framer.Screen = (require "./Screen").Screen
 Framer.Align = (require "./Align").Align
 Framer.print = (require "./Print").print
