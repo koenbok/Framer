@@ -100,8 +100,5 @@ class AnimationStateGroup extends AnimationGroup
 		states = @states if not states.length
 		@animate(Utils.arrayNext(states, @state))
 
-
-
-
 exports.AnimationGroup = AnimationGroup
 exports.AnimationStateGroup = AnimationStateGroup
