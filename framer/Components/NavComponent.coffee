@@ -9,6 +9,7 @@ Utils = require "../Utils"
 NavComponentLayerScrollKey = "_navComponentWrapped"
 
 Events.TransitionStart = "transitionstart"
+Events.TransitionHalt = "transitionhalt"
 Events.TransitionStop = "transitionstop"
 Events.TransitionEnd = "transitionend"
 
@@ -40,8 +41,8 @@ class exports.NavComponent extends Layer
 
 		@overlay.onTap(@_handleOverlayTap)
 
-	@define "isTransitioning",
-		get: -> @_runningTransition
+	# @define "isTransitioning",
+	# 	get: -> @_runningTransition
 
 	@define "isModal",
 		get: -> @_isModal
@@ -133,10 +134,6 @@ class exports.NavComponent extends Layer
 	showOverlayLeft: (layer, options={}) ->
 		@_showOverlay(layer, Transitions.overlayLeft, options)
 
-	# emit: (args...) ->
-	# 	super
-	# 	print args
-
 	##############################################################
 	# Internal methods
 
@@ -216,6 +213,12 @@ class exports.NavComponent extends Layer
 		# # Buld a new transtition object with empty states
 		transition = {}
 
+		forwardEvents = (group, direction) =>
+			group.once Events.AnimationStart, => @emit(Events.TransitionStart, layerA, layerB, direction)
+			group.once Events.AnimationHalt, => @emit(Events.TransitionHalt, layerA, layerB, direction)
+			group.once Events.AnimationStop, => @emit(Events.TransitionStop, layerA, layerB, direction)
+			group.once Events.AnimationEnd, => @emit(Events.TransitionEnd, layerA, layerB, direction)
+
 		# Add the forward function for this state to transition forward
 		transition.forward = (animate=true, callback) =>
 
@@ -239,13 +242,16 @@ class exports.NavComponent extends Layer
 				animations.push(new Animation(layerB, template.layerB.show, options))
 
 			group = new AnimationGroup(animations)
-			group.start()
+			forwardEvents(group, "forward")
 
+			group.once(Events.AnimationStop, callback)
 			group.once Events.AnimationEnd, ->
 				if layerA and template.layerA and not (overlay and template.overlay)
 					layerA.visible = false
 
-		transition.back = (animate=true, callback) ->
+			group.start()
+
+		transition.back = (animate=true, callback) =>
 
 			animations = []
 			options = {instant:!animate}
@@ -264,13 +270,29 @@ class exports.NavComponent extends Layer
 				animations.push(new Animation(layerB, template.layerB.hide, options))
 
 			group = new AnimationGroup(animations)
-			group.start()
+			forwardEvents(group, "back")
 
+			group.once(Events.AnimationStop, callback)
 			group.once Events.AnimationEnd, ->
 				if layerB and template.layerB
 					layerB.visible = false
 
+			group.start()
+
 		return transition
+
+	##############################################################
+	# Event helpers
+
+	onTransitionStart: (cb) -> @on(Events.TransitionStart, cb)
+	onTransitionHalt: (cb) -> @on(Events.TransitionHalt, cb)
+	onTransitionStop: (cb) -> @on(Events.TransitionStop, cb)
+	onTransitionEnd: (cb) -> @on(Events.TransitionEnd, cb)
+
+	onStart: (cb) -> @onTransitionStart(cb)
+	onHalt: (cb) -> @onTransitionHalt(cb)
+	onStop: (cb) -> @onTransitionStop(cb)
+	onEnd: (cb) -> @onTransitionEnd(cb)
 
 Transitions = {}
 

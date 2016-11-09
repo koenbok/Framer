@@ -7,7 +7,7 @@ Framer.Info =
 	author: "Koen Bok"
 	twitter: "koenbok"
 	description: "A super simple email app NavComponent example. Still very beta©."
-# Framer.Extras.Hints.enable()
+Framer.Extras.Hints.enable()
 
 sketch = Framer.Importer.load("imported/Mail@2x")
 
@@ -25,6 +25,8 @@ for row in sketch.yesterday.children
 
 # If we tap on the mail, we go back again
 sketch.mail.onTap -> nav.showPrevious()
+
+nav.onHalt -> print "halt"
 
 # Set up menu bar (not so interesting)
 sketch.status.parent = null
