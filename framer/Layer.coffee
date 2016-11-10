@@ -1373,10 +1373,13 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## DESCRIPTOR
 
+	toName: ->
+		return name if @name
+		return @__framerInstanceInfo?.name or ""
+
 	toInspect: (constructor) ->
 		constructor ?= @constructor.name
 		name = if @name then "name:#{@name} " else ""
-		variablename = @__framerInstanceInfo?.name or ""
-		return "<#{constructor} #{variablename} id:#{@id} #{name}
+		return "<#{constructor} #{@toName()} id:#{@id} #{name}
 			(#{Utils.roundWhole(@x)}, #{Utils.roundWhole(@y)})
 			#{Utils.roundWhole(@width)}x#{Utils.roundWhole(@height)}>"

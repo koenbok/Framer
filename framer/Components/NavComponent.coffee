@@ -65,6 +65,7 @@ class exports.NavComponent extends Layer
 		set: (layer) ->
 			return unless layer instanceof Layer 
 			@_header = layer
+			@_header.name = "header"
 			@_header.parent = @
 			@_header.x = Align.center
 			@_header.y = Align.top
@@ -75,6 +76,7 @@ class exports.NavComponent extends Layer
 		set: (layer) ->
 			return unless layer instanceof Layer
 			@_footer = layer
+			@_footer.name = "footer"
 			@_footer.parent = @
 			@_footer.x = Align.center
 			@_footer.y = Align.bottom
@@ -213,12 +215,12 @@ class exports.NavComponent extends Layer
 
 		if not scroll
 			scroll = new ScrollComponent
-			scroll.name = "scroll: #{layer.name}"
+			scroll.name = "scroll"
 			scroll.backgroundColor = @backgroundColor
 			layer[NavComponentLayerScrollKey] = scroll
 			layer.parent = scroll.content
 
-
+		scroll.parent = @
 		scroll.size = @size
 		# scroll.width = Math.min(layer.width, @width)
 		# scroll.height = Math.min(layer.height, @height)
@@ -268,12 +270,7 @@ class exports.NavComponent extends Layer
 			animations = []
 			options = {instant:!animate}
 
-			if overlay and template.overlay
-				overlay.visible = true
-				overlay.ignoreEvents = false
-				overlay.placeBehind(layerB)
-				overlay.props = template.overlay.hide
-				animations.push(new Animation(overlay, template.overlay.show, options))
+
 
 			if layerA and template.layerA
 				layerA.visible = true
@@ -281,10 +278,18 @@ class exports.NavComponent extends Layer
 			
 			if layerB and template.layerB
 				layerB.visible = true
+				layerB.bringToFront()
 				layerB.props = template.layerB.hide
 				animations.push(new Animation(layerB, template.layerB.show, options))
 
-			# Set the right layer indexes for the header and footer if they are there
+			if overlay and template.overlay
+				overlay.visible = true
+				overlay.ignoreEvents = false
+				overlay.placeBehind(layerB)
+				overlay.props = template.overlay.hide
+				animations.push(new Animation(overlay, template.overlay.show, options))
+
+			# Set the right layer indexes for the header and footer if they are there.
 			if overlay and template.overlay
 				@header.placeBehind(overlay) if @header
 				@footer.placeBehind(overlay) if @footer

@@ -1,40 +1,26 @@
-# Project Info
-# This info is presented in a widget when you share.
-# http://framerjs.com/docs/#info.info
+# Card
+class Card extends Layer
+	constructor: (options={}) ->
+		options.size ?= Screen
+		options.backgroundColor ?= Utils.randomColor()
+		options.visible = false
+		super options
+		Utils.labelLayer(@, "Card #{@id}")
 
-Framer.Info =
-	title: "NavComponent Example"
-	author: "Koen Bok"
-	twitter: "koenbok"
-	description: "A super simple email app NavComponent example. Still very beta©."
-Framer.Extras.Hints.enable()
+c1 = new Card()
+c2 = new Card()
+c3 = new Card(size: 400)
 
-sketch = Framer.Importer.load("imported/Mail@2x")
-
-# Set up the component and add the initial view
 nav = new NavComponent
-nav.showNext(sketch.inbox)
+nav.showNext(c1)
 
 nav.header = new Layer
-	backgroundColor: "red"
-	width: Screen.width
 	height: 80
-
-nav.footer = new Layer
-	backgroundColor: "blue"
 	width: Screen.width
-	height: 80
 
-# On a hamburger tap, we show the menu
-sketch.hamburger.onTap ->
-	nav.showOverlayLeft(sketch.menu)
-
-# If we tap on a few rows, show the mail
-for row in sketch.yesterday.children
-	row.onTap -> nav.showNext(sketch.mail)
-
-# If we tap on the mail, we go back again
-sketch.mail.onTap -> nav.showPrevious()
+nav.header.onClick -> nav.showPrevious()
 
 Utils.labelLayer(nav.header, "Header")
-Utils.labelLayer(nav.footer, "Footer")
+
+c1.onClick -> nav.showNext(c2)
+c2.onClick -> nav.showOverlayCenter(c3)
