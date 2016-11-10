@@ -133,15 +133,6 @@ class exports.NavComponent extends Layer
 		# transition, current and new layer, and optionally a background.
 		transition = @_buildTransition(template, layerA, layerB, overlay)
 
-		# Make sure we keep the header and footer on top, but only if this transition
-		# does not use an overlay.
-		if template.overlay
-			@header.placeBehind(overlay) if @header
-			@footer.placeBehind(overlay) if @footer
-		else
-			@header.bringToFront() if @header
-			@footer.bringToFront() if @footer
-
 		# Run the transition and update the history
 		@_runTransition(transition, "forward", options.animate, @current, layer)
 		@_stack.push({layer:layer, transition:transition})
@@ -292,6 +283,14 @@ class exports.NavComponent extends Layer
 				layerB.visible = true
 				layerB.props = template.layerB.hide
 				animations.push(new Animation(layerB, template.layerB.show, options))
+
+			# Set the right layer indexes for the header and footer if they are there
+			if overlay and template.overlay
+				@header.placeBehind(overlay) if @header
+				@footer.placeBehind(overlay) if @footer
+			else
+				@header.bringToFront() if @header
+				@footer.bringToFront() if @footer
 
 			group = new AnimationGroup(animations)
 			forwardEvents(group, "forward")
