@@ -58,6 +58,29 @@ class exports.NavComponent extends Layer
 
 
 	##############################################################
+	# Header and footer
+
+	@define "header",
+		get: -> @_header
+		set: (layer) ->
+			return unless layer instanceof Layer 
+			@_header = layer
+			@_header.parent = @
+			@_header.x = Align.center
+			@_header.y = Align.top
+			@_wrapLayer(@current) if @current
+
+	@define "footer",
+		get: -> @_footer
+		set: (layer) ->
+			return unless layer instanceof Layer
+			@_footer = layer
+			@_footer.parent = @
+			@_footer.x = Align.center
+			@_footer.y = Align.bottom
+			@_wrapLayer(@current) if @current
+
+	##############################################################
 	# Transitions
 
 	transition: (layer, transitionFunction, options={}) ->
@@ -98,14 +121,29 @@ class exports.NavComponent extends Layer
 		wrappedLayer.parent = @
 		wrappedLayer.visible = false
 
+
+		layerA = @_wrappedLayer(@current)
+		layerB = wrappedLayer
+		overlay = @overlay
+
+		# Get the executed template data by passing in the layers for this transition
+		template = transitionFunction(@, layerA, layerB, overlay)
+
 		# Build the transition function to setup all the states, using the
 		# transition, current and new layer, and optionally a background.
-		transition = @_buildTransition(transitionFunction,
-			@_wrappedLayer(@current), wrappedLayer, @overlay)
+		transition = @_buildTransition(template, layerA, layerB, overlay)
+
+		# Make sure we keep the header and footer on top, but only if this transition
+		# does not use an overlay.
+		if template.overlay
+			@header.placeBehind(overlay) if @header
+			@footer.placeBehind(overlay) if @footer
+		else
+			@header.bringToFront() if @header
+			@footer.bringToFront() if @footer
 
 		# Run the transition and update the history
 		@_runTransition(transition, "forward", options.animate, @current, layer)
-
 		@_stack.push({layer:layer, transition:transition})
 
 
@@ -152,40 +190,57 @@ class exports.NavComponent extends Layer
 
 		# TODO: what about NavComponent changing size, do we need to account?
 
+		scroll = null
+
+		# Calculate the available width and height based on header and footer
+		width = @width
+
+		height = @height 
+		height =- @header.height if @header
+		height =- @footer.height if @footer
+
 		# If we already created a scroll, we can use that one
 		if layer[NavComponentLayerScrollKey]
-			return layer[NavComponentLayerScrollKey]
+			scroll = layer[NavComponentLayerScrollKey]
 
 		# If the layer size is exactly equal to the size of the NavComponent
 		# we can just use it directly.
-		if layer.width is @width and layer.height is @height
+		else if layer.width is @width and layer.height is height
 			return layer
 
 		# If the layer size is smaller then the size of the NavComponent we
 		# still need to add a backgound layer so it covers up the background.
 		# TODO: Implement this
-		if layer.width < @width and layer.height < @height
+		else if layer.width < @width and layer.height < height
 			return layer
 
 		# If this layer is a ScrollComponent we do not have to add another one
 		if layer instanceof ScrollComponent
-			return layer
+			scroll = layer
 
 		layer.point = Utils.pointZero()
 
-		scroll = new ScrollComponent
-		scroll.name = "scroll: #{layer.name}"
+		if not scroll
+			scroll = new ScrollComponent
+			scroll.name = "scroll: #{layer.name}"
+			scroll.backgroundColor = @backgroundColor
+			layer[NavComponentLayerScrollKey] = scroll
+			layer.parent = scroll.content
+
+
 		scroll.size = @size
 		# scroll.width = Math.min(layer.width, @width)
 		# scroll.height = Math.min(layer.height, @height)
-		scroll.backgroundColor = @backgroundColor
-		scroll.scrollHorizontal = layer.width > @width
-		scroll.scrollVertical = layer.height > @height
-		layer.parent = scroll.content
+		scroll.scrollHorizontal = layer.width > width
+		scroll.scrollVertical = layer.height > height
 
-		layer[NavComponentLayerScrollKey] = scroll
+		contentInset = {}
+		contentInset.top = @header.height if @header
+		contentInset.bottom = @footer.height if @footer
+		scroll.contentInset = contentInset
 
 		return scroll
+
 
 	_wrappedLayer: (layer) ->
 		# Get the ScrollComponent for a layer if it was wrapped,
@@ -205,10 +260,7 @@ class exports.NavComponent extends Layer
 			transition[direction] animate, =>
 				@emit(Events.TransitionEnd, from, to, {direction: direction, modal: @isModal})
 
-	_buildTransition: (transitionFunction, layerA, layerB, overlay) ->
-
-		# Get the executed template data by passing in the layers for this transition
-		template = transitionFunction(@, layerA, layerB, overlay)
+	_buildTransition: (template, layerA, layerB, overlay) ->
 
 		# # Buld a new transtition object with empty states
 		transition = {}

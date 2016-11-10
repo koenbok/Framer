@@ -15,6 +15,16 @@ sketch = Framer.Importer.load("imported/Mail@2x")
 nav = new NavComponent
 nav.showNext(sketch.inbox)
 
+nav.header = new Layer
+	backgroundColor: "red"
+	width: Screen.width
+	height: 80
+
+nav.footer = new Layer
+	backgroundColor: "blue"
+	width: Screen.width
+	height: 80
+
 # On a hamburger tap, we show the menu
 sketch.hamburger.onTap ->
 	nav.showOverlayLeft(sketch.menu)
@@ -26,10 +36,5 @@ for row in sketch.yesterday.children
 # If we tap on the mail, we go back again
 sketch.mail.onTap -> nav.showPrevious()
 
-nav.onHalt -> print "halt"
-
-# Set up menu bar (not so interesting)
-sketch.status.parent = null
-sketch.status.point = 0
-sketch.status.bringToFront()
-
+Utils.labelLayer(nav.header, "Header")
+Utils.labelLayer(nav.footer, "Footer")
