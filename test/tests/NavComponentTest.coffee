@@ -18,9 +18,9 @@ describe "NavComponent", ->
 		cardB = new Layer size: 100
 
 		nav.showNext(cardA)
-		nav.showNext(cardB, animate:false)
+		nav.showNext(cardB, animate: false)
 		nav.stack.should.eql [cardA, cardB]
-		nav.showPrevious(animate:false)
+		nav.showPrevious(animate: false)
 		nav.current.should.equal cardA
 
 	it "should allow constructor options", ->
@@ -69,7 +69,7 @@ describe "NavComponent", ->
 			nav = new NavComponent size: 100
 			cardA = new Layer width: 200, height: 200
 
-			nav.showNext(cardA, scroll:true)
+			nav.showNext(cardA, scroll: true)
 			nav.children[1].constructor.name.should.equal "ScrollComponent"
 			nav.children[1].scrollHorizontal.should.equal true
 			nav.children[1].scrollVertical.should.equal true
@@ -79,7 +79,7 @@ describe "NavComponent", ->
 			nav = new NavComponent size: 100
 			cardA = new Layer width: 200, height: 100
 
-			nav.showNext(cardA, scroll:true)
+			nav.showNext(cardA, scroll: true)
 			nav.children[1].constructor.name.should.equal "ScrollComponent"
 			nav.children[1].scrollHorizontal.should.equal true
 			nav.children[1].scrollVertical.should.equal false
@@ -89,7 +89,7 @@ describe "NavComponent", ->
 			nav = new NavComponent size: 100
 			cardA = new Layer width: 100, height: 200
 
-			nav.showNext(cardA, scroll:true)
+			nav.showNext(cardA, scroll: true)
 			nav.children[1].constructor.name.should.equal "ScrollComponent"
 			nav.children[1].scrollHorizontal.should.equal false
 			nav.children[1].scrollVertical.should.equal true
@@ -99,7 +99,7 @@ describe "NavComponent", ->
 			nav = new NavComponent size: 100
 			cardA = new Layer width: 100, height: 200
 
-			nav.showNext(cardA, scroll:false)
+			nav.showNext(cardA, scroll: false)
 			nav.children[1].constructor.name.should.not.equal "ScrollComponent"
 
 	describe "Events", ->

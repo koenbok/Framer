@@ -71,7 +71,7 @@ class exports.NavComponent extends Layer
 	@define "header",
 		get: -> @_header
 		set: (layer) ->
-			return unless layer instanceof Layer 
+			return unless layer instanceof Layer
 			@_header = layer
 			@_header.name = "header"
 			@_header.parent = @
@@ -145,7 +145,7 @@ class exports.NavComponent extends Layer
 
 		# Run the transition and update the history
 		@_runTransition(transition, "forward", options.animate, @current, layer)
-		@_stack.push({layer:layer, transition:transition})
+		@_stack.push({layer: layer, transition: transition})
 
 
 	showNext: (layer, options={}) ->
@@ -196,7 +196,7 @@ class exports.NavComponent extends Layer
 		# Calculate the available width and height based on header and footer
 		width = @width
 
-		height = @height 
+		height = @height
 		height =- @header.height if @header
 		height =- @footer.height if @footer
 
@@ -276,14 +276,14 @@ class exports.NavComponent extends Layer
 		transition.forward = (animate=true, callback) =>
 
 			animations = []
-			options = {instant:!animate}
+			options = {instant: not animate}
 
 
 
 			if layerA and template.layerA
 				layerA.visible = true
 				animations.push(new Animation(layerA, template.layerA.hide, options))
-			
+
 			if layerB and template.layerB
 				layerB.visible = true
 				layerB.bringToFront()
@@ -315,10 +315,10 @@ class exports.NavComponent extends Layer
 
 			group.start()
 
-		transition.back = (animate=true, callback) =>
+		transition.back = (animate=true, callback) ->
 
 			animations = []
-			options = {instant:!animate}
+			options = {instant: not animate}
 
 			if overlay and template.overlay
 				overlay.visible = true
@@ -328,7 +328,7 @@ class exports.NavComponent extends Layer
 			if layerA and template.layerA
 				layerA.visible = true
 				animations.push(new Animation(layerA, template.layerA.show, options))
-			
+
 			if layerB and template.layerB
 				layerB.visible = true
 				animations.push(new Animation(layerB, template.layerB.hide, options))
@@ -365,7 +365,7 @@ Transitions.show = (nav, layerA, layerB, overlay) ->
 	transition =
 		layerA:
 			show: {options: options, x: 0, y: 0}
-			hide: {options: options, x: 0 - layerA?.width / 2, y:0}
+			hide: {options: options, x: 0 - layerA?.width / 2, y: 0}
 		layerB:
 			show: {options: options, x: 0}
 			hide: {options: options, x: layerB.width}
@@ -373,11 +373,11 @@ Transitions.show = (nav, layerA, layerB, overlay) ->
 Transitions.overlayCenter = (nav, layerA, layerB, overlay) ->
 	transition =
 		layerB:
-			show: {options: {curve: "spring(800, 30, 0)"}, x:Align.center, y:Align.center, scale:1.0, opacity:1}
-			hide: {options: {curve: "spring(800, 30, 0)"}, x:Align.center, y:Align.center, scale:0.5, opacity:0}
+			show: {options: {curve: "spring(800, 30, 0)"}, x: Align.center, y: Align.center, scale: 1.0, opacity: 1}
+			hide: {options: {curve: "spring(800, 30, 0)"}, x: Align.center, y: Align.center, scale: 0.5, opacity: 0}
 		overlay:
 			show: {options: {time: 0.1}, opacity: .5, x: 0, y: 0, size: nav.size}
-			hide: {options: {time: 0.1}, opacity:  0, x: 0, y: 0, size: nav.size}
+			hide: {options: {time: 0.1}, opacity: 0, x: 0, y: 0, size: nav.size}
 
 Transitions.overlayLeft = (nav, layerA, layerB, overlay) ->
 	transition =
@@ -386,7 +386,7 @@ Transitions.overlayLeft = (nav, layerA, layerB, overlay) ->
 			hide: {options: {curve: "spring(300, 35, 0)"}, y: 0, x: 0 - layerB?.width}
 		overlay:
 			show: {options: {time: 0.1}, opacity: .5, x: 0, y: 0, size: nav.size}
-			hide: {options: {time: 0.1}, opacity:  0, x: 0, y: 0, size: nav.size}
+			hide: {options: {time: 0.1}, opacity: 0, x: 0, y: 0, size: nav.size}
 
 Transitions.overlayRight = (nav, layerA, layerB, overlay) ->
 	transition =
@@ -395,7 +395,7 @@ Transitions.overlayRight = (nav, layerA, layerB, overlay) ->
 			hide: {options: {curve: "spring(300, 35, 0)"}, y: 0, x: nav?.width}
 		overlay:
 			show: {options: {time: 0.1}, opacity: .5, x: 0, y: 0, size: nav.size}
-			hide: {options: {time: 0.1}, opacity:  0, x: 0, y: 0, size: nav.size}
+			hide: {options: {time: 0.1}, opacity: 0, x: 0, y: 0, size: nav.size}
 
 Transitions.overlayTop = (nav, layerA, layerB, overlay) ->
 	transition =
@@ -404,7 +404,7 @@ Transitions.overlayTop = (nav, layerA, layerB, overlay) ->
 			hide: {options: {curve: "spring(300, 35, 0)"}, x: Align.center, maxY: 0}
 		overlay:
 			show: {options: {time: 0.1}, opacity: .5, x: 0, y: 0, size: nav.size}
-			hide: {options: {time: 0.1}, opacity:  0, x: 0, y: 0, size: nav.size}
+			hide: {options: {time: 0.1}, opacity: 0, x: 0, y: 0, size: nav.size}
 
 Transitions.overlayBottom = (nav, layerA, layerB, overlay) ->
 	transition =
@@ -413,4 +413,4 @@ Transitions.overlayBottom = (nav, layerA, layerB, overlay) ->
 			hide: {options: {curve: "spring(300, 35, 0)"}, x: Align.center, y: nav?.height}
 		overlay:
 			show: {options: {time: 0.1}, opacity: .5, x: 0, y: 0, size: nav.size}
-			hide: {options: {time: 0.1}, opacity:  0, x: 0, y: 0, size: nav.size}
+			hide: {options: {time: 0.1}, opacity: 0, x: 0, y: 0, size: nav.size}
