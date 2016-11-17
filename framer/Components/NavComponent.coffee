@@ -15,7 +15,15 @@ Events.TransitionEnd = "transitionend"
 
 class exports.NavComponent extends Layer
 
-	constructor: (options={}) ->
+	constructor: (layerOrOptions={}, options={}) ->
+
+		layer = null
+
+		if layerOrOptions instanceof Layer
+			layer = layerOrOptions
+			options = options
+		else
+			options = layerOrOptions
 
 		options = _.defaults {}, options,
 			backgroundColor: "black"
@@ -25,7 +33,6 @@ class exports.NavComponent extends Layer
 			options.height ?= Screen.height
 
 		super options
-
 
 		@_stack = []
 		@_seen = []
@@ -40,6 +47,7 @@ class exports.NavComponent extends Layer
 			visible: false
 
 		@overlay.onTap(@_handleOverlayTap)
+		@showNext(layer) if layer
 
 	# @define "isTransitioning",
 	# 	get: -> @_runningTransition

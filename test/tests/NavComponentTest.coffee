@@ -23,6 +23,45 @@ describe "NavComponent", ->
 		nav.showPrevious(animate:false)
 		nav.current.should.equal cardA
 
+	it "should allow constructor options", ->
+		nav = new NavComponent size: 100
+		nav.width.should.equal 100
+		nav.height.should.equal 100
+
+	it "should allow constructor options with initial layer", ->
+		cardA = new Layer size: 100
+		nav = new NavComponent(cardA, size: 100)
+		nav.width.should.equal 100
+		nav.height.should.equal 100
+		nav.current.should.equal cardA
+
+	describe.only "Header Footer", ->
+
+		it "should add header", ->
+
+			nav = new NavComponent size: 200
+			nav.header = new Layer width: 200, height: 20
+			nav.showNext new Layer width: 200, height: 200
+
+			nav.children[1].should.equal nav.header
+			nav.children[2].constructor.name.should.equal "ScrollComponent"
+			nav.children[2].scrollHorizontal.should.equal false
+			nav.children[2].scrollVertical.should.equal true
+			nav.children[2].contentInset.should.eql {top: 20, right: 0, bottom: 0, left: 0}
+
+		it "should add footer", ->
+
+			nav = new NavComponent size: 200
+			nav.footer = new Layer width: 200, height: 20
+			nav.showNext new Layer width: 200, height: 200
+
+			nav.children[1].should.equal nav.footer
+			nav.children[2].constructor.name.should.equal "ScrollComponent"
+			nav.children[2].scrollHorizontal.should.equal false
+			nav.children[2].scrollVertical.should.equal true
+			nav.children[2].contentInset.should.eql {top: 0, right: 0, bottom: 20, left: 0}
+
+
 	describe "Scroll", ->
 
 		it "should make views scrollable", ->
