@@ -47,7 +47,14 @@ class exports.NavComponent extends Layer
 			visible: false
 
 		@overlay.onTap(@_handleOverlayTap)
-		@showNext(layer) if layer
+		
+		if layer
+			@showNext(layer)
+		else
+			@_tempScroll = new ScrollComponent
+				parent: @
+				width: @width
+				height: @height
 
 	# @define "isTransitioning",
 	# 	get: -> @_runningTransition
@@ -102,6 +109,9 @@ class exports.NavComponent extends Layer
 		throw new Error "NavComponent.transition expects transitionFunction" unless transitionFunction
 
 		return if layer is @current
+
+		# Remove the temporary scroll component when the first layer gets added
+		@_tempScroll?.destroy()
 
 		# Set the default values so we get some expected results (visibility,
 		# correct parent, events, wrapping, etcetera).

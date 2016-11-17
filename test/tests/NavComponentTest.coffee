@@ -35,7 +35,7 @@ describe "NavComponent", ->
 		nav.height.should.equal 100
 		nav.current.should.equal cardA
 
-	describe.only "Header Footer", ->
+	describe "Header Footer", ->
 
 		it "should add header", ->
 
