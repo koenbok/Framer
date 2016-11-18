@@ -11,8 +11,7 @@ c1 = new Card()
 c2 = new Card()
 c3 = new Card(size: 400)
 
-nav = new NavComponent
-nav.showNext(c1)
+nav = new NavComponent(c1)
 
 nav.header = new Layer
 	height: 80

@@ -238,6 +238,14 @@ class exports.NavComponent extends Layer
 			layer[NavComponentLayerScrollKey] = scroll
 			layer.parent = scroll.content
 
+			# Forward the events to the wrapped layer so we can listen on it for
+			# scroll events. This is not "pure". But you don't really have a way
+			# to access the magically created scroll component.
+			_addListener = layer.addListener
+			layer.on = (event, args...) ->
+				scroll.addListener(event, args...)
+				_addListener.apply(layer, [event, args...])
+
 		scroll.parent = @
 		scroll.size = @size
 		# scroll.width = Math.min(layer.width, @width)
