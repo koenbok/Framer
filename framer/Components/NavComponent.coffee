@@ -47,7 +47,7 @@ class exports.NavComponent extends Layer
 			visible: false
 
 		@overlay.onTap(@_handleOverlayTap)
-		
+
 		if layer
 			@showNext(layer)
 		else
@@ -391,8 +391,8 @@ Transitions.show = (nav, layerA, layerB, overlay) ->
 Transitions.overlayCenter = (nav, layerA, layerB, overlay) ->
 	transition =
 		layerB:
-			show: {options: {curve: "spring(800, 30, 0)"}, x: Align.center, y: Align.center, scale: 1.0, opacity: 1}
-			hide: {options: {curve: "spring(800, 30, 0)"}, x: Align.center, y: Align.center, scale: 0.5, opacity: 0}
+			show: {options: {curve: "spring(500, 35, 0)"}, x: Align.center, y: Align.center, scale: 1.0, opacity: 1}
+			hide: {options: {curve: "spring(500, 35, 0)"}, x: Align.center, y: Align.center, scale: 0.5, opacity: 0}
 		overlay:
 			show: {options: {time: 0.1}, opacity: .5, x: 0, y: 0, size: nav.size}
 			hide: {options: {time: 0.1}, opacity: 0, x: 0, y: 0, size: nav.size}
