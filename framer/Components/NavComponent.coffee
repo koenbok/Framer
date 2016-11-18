@@ -377,8 +377,8 @@ Transitions.show = (nav, layerA, layerB, overlay) ->
 			show: {options: options, x: 0, y: 0}
 			hide: {options: options, x: 0 - layerA?.width / 2, y: 0}
 		layerB:
-			show: {options: options, x: 0}
-			hide: {options: options, x: layerB.width}
+			show: {options: options, x: 0, y: 0}
+			hide: {options: options, x: layerB.width, y: 0}
 
 Transitions.overlayCenter = (nav, layerA, layerB, overlay) ->
 	transition =
