@@ -22,7 +22,7 @@
     "coffee-loader": "^0.7.2",
     "coffee-script": "^1.9.1",
     "coverage-capture": "./test/coverage-capture",
-    "eventemitter3": "^1.1.1",
+    "eventemitter3": "^1.2.0",
     "gulp": "^3.8.11",
     "gulp-coffeelint": "^0.6.0",
     "gulp-mocha-phantomjs": "^0.11.0",
