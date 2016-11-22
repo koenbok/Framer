@@ -73,4 +73,4 @@ site-upload: bootstrap site-build
 # Resources
 
 resources:
-	python scripts/resources-optimize.py
+	scripts/resources-optimize.sh
