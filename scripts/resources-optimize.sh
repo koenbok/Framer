@@ -17,7 +17,7 @@ cd "extras"
 SOURCE_PATH=DeviceResources
 TARGET_PATH=resources.framerjs.com/static/DeviceResources
 
-JP2_QUALITY=25
+JP2_QUALITY=16
 JP2_QUALITY_SMALL=100
 WEBP_QUALITY=90
 SMALL_PIXEL_LIMIT=400000
