@@ -224,6 +224,9 @@ class exports.Layer extends BaseClass
 	# Default animation options for every animation of this layer
 	@define "animationOptions", @simpleProperty("animationOptions", {})
 
+	# Behaviour properties
+	@define "ignoreEvents", layerProperty(@, "ignoreEvents", "pointerEvents", true, _.isBoolean)
+
 	# Css properties
 	@define "width",  layerProperty(@, "width", "width", 100, _.isNumber, null, {}, (layer, value) ->
 		return if not layer.constraintValues? or layer.isLayouting
@@ -255,9 +258,6 @@ class exports.Layer extends BaseClass
 	@define "scroll",
 		get: -> @scrollHorizontal is true or @scrollVertical is true
 		set: (value) -> @scrollHorizontal = @scrollVertical = value
-
-	# Behaviour properties
-	@define "ignoreEvents", layerProperty(@, "ignoreEvents", "pointerEvents", true, _.isBoolean)
 
 	# Matrix properties
 	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber,
