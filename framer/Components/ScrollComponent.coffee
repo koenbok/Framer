@@ -401,9 +401,13 @@ class exports.ScrollComponent extends Layer
 
 		@content.point = point
 
+		# make sure _lastEvent is set on our draggable, and that it has a delta.{x,y}
+		event.delta = {x: deltaX, y: deltaY}
+		@content.draggable._lastEvent = event
 		@content.emit(Events.Move, point)
 		@emit(Events.Scroll, event)
 		@_onMouseWheelEnd(event)
+		@content.draggable._lastEvent = null
 
 	# Because there is no real scroll end event on a mousewheel, we use a timeout to see if
 	# events stop coming in, and throw a scroll event after. Better than nothing.

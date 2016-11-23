@@ -80,10 +80,14 @@ describe "ScrollComponent", ->
 					parent: scroll.content
 				scroll.mouseWheelEnabled = true
 				scroll.on Events.Move, (event) ->
+					if event.y is 0
+						scroll.direction.should.equal "up"
+						return done()
 					event.x.should.equal -75
 					event.y.should.equal -150
-					done()
+					scroll.direction.should.equal "down"
 				scroll.emit(Events.MouseWheel, {wheelDeltaX: -75, wheelDeltaY: -150})
+				scroll.emit(Events.MouseWheel, {wheelDeltaX: 0, wheelDeltaY: 150})
 
 		describe "scrolling with touch events", ->
 			it "should have direction", (done) ->
