@@ -306,6 +306,8 @@ class exports.Animation extends BaseClass
 				animatableProperties[k] = v
 			else if Color.isValidColorProperty(k, v)
 				animatableProperties[k] = new Color(v)
+			else if k in ["frame", "size", "point"] # Derived properties
+				_.defaults(animatableProperties, v)
 
 
 		return animatableProperties
