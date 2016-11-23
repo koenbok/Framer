@@ -266,6 +266,18 @@ describe "LayerAnimation", ->
 				layer.height.should.equal 500
 				done()
 
+		it "should work with using objects that have more properties", (done) ->
+			layer = new Layer
+			animation = layer.animate
+				x: 300
+				size: Screen
+
+			animation.onAnimationEnd ->
+				layer.x.should.equal 300
+				layer.width.should.equal Screen.width
+				layer.height.should.equal Screen.height
+				done()
+
 	describe "Context", ->
 
 		it "should list running animations", ->
