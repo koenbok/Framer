@@ -95,7 +95,7 @@ describe "LayerStates Backwards compatibility", ->
 	it "should still support layer.states.animationOptions and fall back", ->
 		# This used to crash: https://www.facebook.com/groups/framerjs/permalink/987570871369984/
 		shoes = new Layer
-		shoes.states.stateA = scale: 1		
+		shoes.states.stateA = scale: 1
 		shoes.states.stateB = scale: 0.8
 		shoes.states.animationOptions =
 			curve: "spring (300,20,0)"
