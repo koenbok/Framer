@@ -302,18 +302,21 @@ class exports.Animation extends BaseClass
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			if @isAnimatable(v)
-				animatableProperties[k] = v
-			else if Color.isValidColorProperty(k, v)
-				animatableProperties[k] = new Color(v)
-			else if k in ["frame", "size", "point"] # Derived properties
+			if k in ["frame", "size", "point"] # Derived properties
 				switch k
 					when "frame" then derivedKeys = ["x", "y", "width", "height"]
 					when "size" then derivedKeys = ["width", "height"]
 					when "point" then derivedKeys = ["x", "y"]
 					else derivedKeys = []
-				_.defaults(animatableProperties, _.pick(v, derivedKeys))
-
+				if _.isObject(v)
+					_.defaults(animatableProperties, _.pick(v, derivedKeys))
+				else if _.isNumber(v)
+					for derivedKey in derivedKeys
+						animatableProperties[derivedKey] = v
+			else if @isAnimatable(v)
+				animatableProperties[k] = v
+			else if Color.isValidColorProperty(k, v)
+				animatableProperties[k] = new Color(v)
 
 		return animatableProperties
 

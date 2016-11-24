@@ -278,6 +278,18 @@ describe "LayerAnimation", ->
 				layer.height.should.equal Screen.height
 				done()
 
+		it "should work with a single number for derived properties", (done) ->
+			layer = new Layer
+			animation = layer.animate
+				x: 300
+				size: 400
+
+			animation.onAnimationEnd ->
+				layer.x.should.equal 300
+				layer.width.should.equal 400
+				layer.height.should.equal 400
+				done()
+
 	describe "Context", ->
 
 		it "should list running animations", ->
