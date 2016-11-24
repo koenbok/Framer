@@ -1,6 +1,7 @@
 [![wercker status](https://app.wercker.com/status/8e5d02248bfd387acebdf177fba5f6b1/s/master "wercker status")](https://app.wercker.com/project/bykey/8e5d02248bfd387acebdf177fba5f6b1)
 
 # Framer.js
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/koenbok/Framer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 **Framer.js** is an open source JavaScript framework for rapid prototyping.
 Framer.js allows you to define animations and interactions, complete with filters, spring physics, 3D effects and more. It's bundled with **Framer Generator**, an application that allows you to import layers directly out of Photoshop and Sketch.
