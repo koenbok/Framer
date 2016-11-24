@@ -1160,9 +1160,9 @@ class exports.Layer extends BaseClass
 	onAnimationStart: (cb) -> @on(Events.AnimationStart, cb)
 	onAnimationStop: (cb) -> @on(Events.AnimationStop, cb)
 	onAnimationEnd: (cb) -> @on(Events.AnimationEnd, cb)
-	onAnimationDidStart: (cb) -> @on(Events.AnimationDidStart, cb)
-	onAnimationDidStop: (cb) -> @on(Events.AnimationDidStop, cb)
-	onAnimationDidEnd: (cb) -> @on(Events.AnimationDidEnd, cb)
+	onAnimationDidStart: (cb) -> @on(Events.AnimationDidStart, cb) # Deprecated
+	onAnimationDidStop: (cb) -> @on(Events.AnimationDidStop, cb) # Deprecated
+	onAnimationDidEnd: (cb) -> @on(Events.AnimationDidEnd, cb) # Deprecated
 
 	onImageLoaded: (cb) -> @on(Events.ImageLoaded, cb)
 	onImageLoadError: (cb) -> @on(Events.ImageLoadError, cb)
