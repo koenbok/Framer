@@ -189,3 +189,6 @@ exports.addImage = (url) ->
 
 exports.setLogo = (url) ->
 	Framer.Preloader?.setLogo(url)
+
+exports.setTimeout = (timeout) ->
+	Framer.Preloader?.timeout = timeout
