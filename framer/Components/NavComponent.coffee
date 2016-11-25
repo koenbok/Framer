@@ -243,8 +243,18 @@ class exports.NavComponent extends Layer
 			# to access the magically created scroll component.
 			_addListener = layer.addListener
 			layer.on = (event, args...) ->
-				scroll.addListener(event, args...)
+				
 				_addListener.apply(layer, [event, args...])
+				
+				# But only the actual scroll events
+				if event in [
+					Events.ScrollStart,
+					Events.Scroll,
+					Events.ScrollMove,
+					Events.ScrollEnd,
+					Events.ScrollAnimationDidStart,
+					Events.ScrollAnimationDidEnd]
+						scroll.addListener(event, args...)
 
 		scroll.parent = @
 		scroll.size = @size
