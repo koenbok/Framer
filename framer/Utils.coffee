@@ -184,8 +184,10 @@ Utils.defineEnum = (names = [], offset = 0, geometric = 0) ->
 
 Utils.labelLayer = (layer, text, style={}) ->
 
+	fontSize = Math.max(Math.min(48, parseInt(layer.height / 3.2)), 14)
+
 	style = _.extend({
-		font: "10px/1em Menlo"
+		font: "#{fontSize}px/1em Menlo"
 		lineHeight: "#{layer.height}px"
 		textAlign: "center"
 		color: "#fff"
@@ -960,6 +962,14 @@ Utils.frameCenterPoint = (frame) ->
 	return point =
 		x: Utils.frameGetMidX(frame)
 		y: Utils.frameGetMidY(frame)
+
+Utils.frameInFrame = (frameA, frameB) ->
+	
+	for point in Utils.pointsFromFrame(frameA)
+		return false unless Utils.pointInFrame(point, frameB)
+
+	return true
+
 
 # Rotation
 

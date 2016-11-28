@@ -740,6 +740,8 @@ class exports.Layer extends BaseClass
 
 			return if layer is @_parent
 
+			throw Error("Layer.parent: a layer cannot be it's own parent.") if layer is @
+
 			# Check the type
 			if not layer instanceof Layer
 				throw Error "Layer.parent needs to be a Layer object"
@@ -905,6 +907,8 @@ class exports.Layer extends BaseClass
 			options = options.options if options.options?
 
 			return @states.machine.switchTo(stateName, options)
+		# We need to clone the properties so we don't modify them unexpectedly
+		properties = _.clone(properties)
 
 		# Support the old properties syntax, we add all properties top level and
 		# move the options into an options property.
@@ -920,7 +924,7 @@ class exports.Layer extends BaseClass
 			delete properties.options
 
 		# Merge the animation options with the default animation options for this layer
-		options = _.defaults(options, @animationOptions)
+		options = _.defaults({}, options, @animationOptions)
 		options.start ?= true
 
 		animation = new Animation(@, properties, options)
@@ -1076,17 +1080,17 @@ class exports.Layer extends BaseClass
 
 					parentDraggableLayer = @_parentDraggableLayer()
 
-				if parentDraggableLayer
+					if parentDraggableLayer
 
-					# If we had a reasonable scrolling offset we cancel the click
-					offset = parentDraggableLayer.draggable.offset
-					return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
-					return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
+						# If we had a reasonable scrolling offset we cancel the click
+						offset = parentDraggableLayer.draggable.offset
+						return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
+						return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
 
-					# If there is still some velocity (scroll is moving) we cancel the click
-					velocity = parentDraggableLayer.draggable.velocity
-					return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
-					return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
+						# If there is still some velocity (scroll is moving) we cancel the click
+						velocity = parentDraggableLayer.draggable.velocity
+						return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
+						return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
 
 		# Always scope the event this to the layer and pass the layer as
 		# last argument for every event.
@@ -1350,6 +1354,14 @@ class exports.Layer extends BaseClass
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 3
 
+		# Only show outlines for draggables
+		if @_draggable
+			layer.backgroundColor = null
+
+		# Only show outlines if a highlight is fullscreen
+		if Utils.frameInFrame(@context.canvasFrame, highlightFrame)
+			layer.backgroundColor = null
+
 		animation = layer.animate
 			properties: {opacity: 0}
 			curve: "ease-out"
@@ -1361,10 +1373,13 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## DESCRIPTOR
 
+	toName: ->
+		return name if @name
+		return @__framerInstanceInfo?.name or ""
+
 	toInspect: (constructor) ->
 		constructor ?= @constructor.name
 		name = if @name then "name:#{@name} " else ""
-		variablename = @__framerInstanceInfo?.name or ""
-		return "<#{constructor} #{variablename} id:#{@id} #{name}
+		return "<#{constructor} #{@toName()} id:#{@id} #{name}
 			(#{Utils.roundWhole(@x)}, #{Utils.roundWhole(@y)})
 			#{Utils.roundWhole(@width)}x#{Utils.roundWhole(@height)}>"

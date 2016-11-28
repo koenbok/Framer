@@ -38,7 +38,14 @@ class exports.Animation extends BaseClass
 		if arguments.length is 3
 			layer = args[0]
 			properties = args[1]
-			options = args[2]
+
+			options = {}
+
+			if properties.options?
+				options = _.clone(properties.options)
+
+			if args[2]
+				options = _.extend({}, options, args[2])
 
 		# Mix of current and old api
 		if arguments.length is 2
