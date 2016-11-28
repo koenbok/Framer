@@ -252,6 +252,44 @@ describe "LayerAnimation", ->
 					delay: 1
 			animation.finish.should.not.throw()
 
+		it "should work with derived properties like size", (done) ->
+			layer = new Layer
+			animation = layer.animate
+				x: 300
+				size:
+					width: 400
+					height: 500
+
+			animation.onAnimationEnd ->
+				layer.x.should.equal 300
+				layer.width.should.equal 400
+				layer.height.should.equal 500
+				done()
+
+		it "should work with using objects that have more properties", (done) ->
+			layer = new Layer
+			animation = layer.animate
+				x: 300
+				size: Screen
+
+			animation.onAnimationEnd ->
+				layer.x.should.equal 300
+				layer.width.should.equal Screen.width
+				layer.height.should.equal Screen.height
+				done()
+
+		it "should work with a single number for derived properties", (done) ->
+			layer = new Layer
+			animation = layer.animate
+				x: 300
+				size: 400
+
+			animation.onAnimationEnd ->
+				layer.x.should.equal 300
+				layer.width.should.equal 400
+				layer.height.should.equal 400
+				done()
+
 	describe "Context", ->
 
 		it "should list running animations", ->
