@@ -7,6 +7,7 @@ class AnimationGroup extends BaseClass
 	constructor: (args...) ->
 		super
 		@_animations = _.flatten(args)
+		@stopAnimations = true
 		@stop()
 	
 	start: ->
@@ -45,6 +46,7 @@ class AnimationGroup extends BaseClass
 
 	_stop: ->
 		return unless @_started
+		return unless @stopAnimations is true
 		@_started.map (a) -> a.stop() if a.isAnimating
 	
 	_onStart: -> @emit(Events.AnimationStart)

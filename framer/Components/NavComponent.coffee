@@ -128,7 +128,7 @@ class exports.NavComponent extends Layer
 		# If this is the first layer we navigate to, we skip the animation
 
 		options = _.defaults {}, options,
-			animate: if @_stack.length then true else false
+			animate: if @_firstTransition is true then true else false
 			scroll: true
 			modal: false
 
@@ -279,7 +279,6 @@ class exports.NavComponent extends Layer
 
 		return scroll
 
-
 	_wrappedLayer: (layer) ->
 		# Get the ScrollComponent for a layer if it was wrapped,
 		# or just the layer itself if it was not.
@@ -295,6 +294,7 @@ class exports.NavComponent extends Layer
 		# ignoreEvents to be false at the moment of a click.
 
 		Utils.delay 0, =>
+			@_firstTransition = true
 			transition[direction] animate, =>
 				@emit(Events.TransitionEnd, from, to, {direction: direction, modal: @isModal})
 
@@ -314,8 +314,6 @@ class exports.NavComponent extends Layer
 
 			animations = []
 			options = {instant: not animate}
-
-
 
 			if layerA and template.layerA
 				layerA.visible = true
@@ -371,6 +369,8 @@ class exports.NavComponent extends Layer
 				animations.push(new Animation(layerB, template.layerB.hide, options))
 
 			group = new AnimationGroup(animations)
+			group.stopAnimations = false
+
 			forwardEvents(group, "back")
 
 			group.once(Events.AnimationStop, callback)
