@@ -51,7 +51,7 @@ class exports.NavComponent extends Layer
 			@showNext(layer)
 		else
 			@_tempScroll = new ScrollComponent
-				name: "scroll"
+				name: "scrollComponent"
 				parent: @
 				width: @width
 				height: @height
@@ -81,6 +81,8 @@ class exports.NavComponent extends Layer
 	@define "previous",
 		get: -> return @_stack[@_stack.length - 2]?.layer
 
+	@define "scrollComponent",
+		get: -> return @_stack[@_stack.length - 1]?
 
 	##############################################################
 	# Header and footer
@@ -243,7 +245,7 @@ class exports.NavComponent extends Layer
 
 		if not scroll
 			scroll = new ScrollComponent
-			scroll.name = "scroll"
+			scroll.name = "scrollComponent"
 			scroll.backgroundColor = @backgroundColor
 			layer[NavComponentLayerScrollKey] = scroll
 			layer.parent = scroll.content
