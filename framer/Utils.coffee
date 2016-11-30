@@ -186,6 +186,7 @@ Utils.labelLayer = (layer, text, style={}) ->
 
 	return unless text
 	return if text is ""
+	return unless typeof(text) is "string"
 
 	fontSize = Math.max(Math.min(48, parseInt(layer.height / 3.2)), 14)
 
