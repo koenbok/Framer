@@ -32,6 +32,8 @@ class exports.NavComponent extends Layer
 			options.width ?= Screen.width
 			options.height ?= Screen.height
 
+		options.clip ?= true
+
 		super options
 
 		@reset()
