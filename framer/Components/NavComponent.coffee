@@ -81,9 +81,6 @@ class exports.NavComponent extends Layer
 	@define "previous",
 		get: -> return @_stack[@_stack.length - 2]?.layer
 
-	@define "scrollComponent",
-		get: -> return @_stack[@_stack.length - 1]?
-
 	##############################################################
 	# Header and footer
 
