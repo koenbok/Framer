@@ -34,10 +34,7 @@ class exports.NavComponent extends Layer
 
 		super options
 
-		@_stack = []
-		@_seen = []
-		@_current = null
-		@_isModal = false
+		@reset()
 
 		@overlay = new Layer
 			name: "overlay"
@@ -55,6 +52,15 @@ class exports.NavComponent extends Layer
 				parent: @
 				width: @width
 				height: @height
+
+	reset: ->
+		
+		@_stack = []
+		@_seen = []
+		@_current = null
+		@_isModal = false
+
+		@showNext(@_initial) if @_initial
 
 	# @define "isTransitioning",
 	# 	get: -> @_runningTransition
@@ -159,6 +165,7 @@ class exports.NavComponent extends Layer
 
 
 	showNext: (layer, options={}) ->
+		@_initial ?= layer
 		@transition(layer, Transitions.show, options)
 
 	showPrevious: (options={}) =>
