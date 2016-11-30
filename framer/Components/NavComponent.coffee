@@ -51,9 +51,11 @@ class exports.NavComponent extends Layer
 			@showNext(layer)
 		else
 			@_tempScroll = new ScrollComponent
+				name: "scroll"
 				parent: @
 				width: @width
 				height: @height
+
 
 	reset: ->
 		
@@ -148,7 +150,6 @@ class exports.NavComponent extends Layer
 		wrappedLayer = @_wrapLayer(layer) if options.scroll
 		wrappedLayer.parent = @
 		wrappedLayer.visible = false
-
 
 		layerA = @_wrappedLayer(@current)
 		layerB = wrappedLayer
