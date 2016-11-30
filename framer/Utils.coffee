@@ -184,10 +184,13 @@ Utils.defineEnum = (names = [], offset = 0, geometric = 0) ->
 
 Utils.labelLayer = (layer, text, style={}) ->
 
+	return unless text
+	return if text is ""
+
 	fontSize = Math.max(Math.min(48, parseInt(layer.height / 3.2)), 14)
 
 	style = _.extend({
-		font: "#{fontSize}px/1em Menlo"
+		font: "#{fontSize}px/1em #{Utils.deviceFont()}"
 		lineHeight: "#{layer.height}px"
 		textAlign: "center"
 		color: "#fff"

@@ -140,6 +140,9 @@ class exports.Layer extends BaseClass
 
 		@_context.emit("layer:create", @)
 
+		# Make sure the layer is always centered
+		@label = @label
+
 		delete @__constructor
 
 	##############################################################
@@ -147,6 +150,12 @@ class exports.Layer extends BaseClass
 
 	# Readonly context property
 	@define "context", get: -> @_context
+
+	@define "label",
+		get: -> @_label
+		set: (value="") -> 
+			@_label = value
+			Utils.labelLayer(@, @_label)
 
 	# A placeholder for layer bound properties defined by the user:
 	@define "custom", @simpleProperty("custom", undefined)
