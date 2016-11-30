@@ -9,7 +9,7 @@ class Card extends Layer
 
 c1 = new Card()
 c2 = new Card()
-c3 = new Card(size: 400)
+c3 = new Card()
 
 nav = new NavComponent(c1)
 
@@ -17,9 +17,12 @@ nav.header = new Layer
 	height: 80
 	width: Screen.width
 
-nav.header.onClick -> nav.showPrevious()
+nav.header.onClick -> 
+	nav.showPrevious(animate: false)
 
 Utils.labelLayer(nav.header, "Header")
 
 c1.onClick -> nav.showNext(c2)
-c2.onClick -> nav.showOverlayCenter(c3)
+c2.onClick -> nav.showNext(c3)
+
+c3.onTap -> nav.showPrevious(count: 2)
