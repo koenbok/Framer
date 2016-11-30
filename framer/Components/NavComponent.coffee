@@ -173,7 +173,7 @@ class exports.NavComponent extends Layer
 	showPrevious: (options={}) =>
 		return unless @previous
 		return if @isTransitioning
-		options = _.defaults({}, {animate: true})
+		options = _.defaults({}, options, {animate: true})
 		previous = @_stack.pop()
 		@_runTransition(previous?.transition, "back", options.animate, @current, previous.layer)
 
