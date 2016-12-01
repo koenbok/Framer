@@ -161,9 +161,6 @@ class exports.DeviceComponent extends BaseClass
 
 	_shouldRenderFullScreen: ->
 
-		if Utils.isInsideIframe()
-			return false
-
 		if not @_device
 			return true
 
@@ -172,6 +169,9 @@ class exports.DeviceComponent extends BaseClass
 
 		if @deviceType is "fullscreen"
 			return true
+
+		if Utils.isInsideIframe()
+			return false
 
 		if Utils.deviceType() is "phone" and Utils.deviceType() is @_device.deviceType
 			return true
