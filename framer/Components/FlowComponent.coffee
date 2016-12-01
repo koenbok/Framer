@@ -6,14 +6,14 @@ Utils = require "../Utils"
 {LayerStateMachine} = require "../LayerStateMachine"
 {AnimationGroup} = require "../AnimationGroup"
 
-NavComponentLayerScrollKey = "_navComponentWrapped"
+FlowComponentLayerScrollKey = "_flowComponentWrapped"
 
 Events.TransitionStart = "transitionstart"
 Events.TransitionHalt = "transitionhalt"
 Events.TransitionStop = "transitionstop"
 Events.TransitionEnd = "transitionend"
 
-class exports.NavComponent extends Layer
+class exports.FlowComponent extends Layer
 
 	constructor: (layerOrOptions={}, options={}) ->
 
@@ -118,8 +118,8 @@ class exports.NavComponent extends Layer
 		# Transition over to a new layer using a specific transtition function.
 
 		# Some basic error checking
-		throw new Error "NavComponent.transition expects a layer" unless layer
-		throw new Error "NavComponent.transition expects transitionFunction" unless transitionFunction
+		throw new Error "FlowComponent.transition expects a layer" unless layer
+		throw new Error "FlowComponent.transition expects transitionFunction" unless transitionFunction
 
 		return if layer is @current
 
@@ -214,10 +214,10 @@ class exports.NavComponent extends Layer
 	_wrapLayer: (layer) ->
 
 		# Wrap the layer in a ScrollComponent if the size exceeds the size of
-		# the NavComponent. Also set the horizontal/vertical scrollin if only
+		# the FlowComponent. Also set the horizontal/vertical scrollin if only
 		# one of the sizes exceeds.
 
-		# TODO: what about NavComponent changing size, do we need to account?
+		# TODO: what about FlowComponent changing size, do we need to account?
 
 		scroll = null
 
@@ -229,15 +229,15 @@ class exports.NavComponent extends Layer
 		height =- @footer.height if @footer
 
 		# If we already created a scroll, we can use that one
-		if layer[NavComponentLayerScrollKey]
-			scroll = layer[NavComponentLayerScrollKey]
+		if layer[FlowComponentLayerScrollKey]
+			scroll = layer[FlowComponentLayerScrollKey]
 
-		# If the layer size is exactly equal to the size of the NavComponent
+		# If the layer size is exactly equal to the size of the FlowComponent
 		# we can just use it directly.
 		else if layer.width is @width and layer.height is height
 			return layer
 
-		# If the layer size is smaller then the size of the NavComponent we
+		# If the layer size is smaller then the size of the FlowComponent we
 		# still need to add a backgound layer so it covers up the background.
 		# TODO: Implement this
 		else if layer.width < @width and layer.height < height
@@ -253,7 +253,7 @@ class exports.NavComponent extends Layer
 			scroll = new ScrollComponent
 			scroll.name = "scrollComponent"
 			scroll.backgroundColor = @backgroundColor
-			layer[NavComponentLayerScrollKey] = scroll
+			layer[FlowComponentLayerScrollKey] = scroll
 			layer.parent = scroll.content
 
 			# Forward the events to the wrapped layer so we can listen on it for
@@ -292,7 +292,7 @@ class exports.NavComponent extends Layer
 		# Get the ScrollComponent for a layer if it was wrapped,
 		# or just the layer itself if it was not.
 		return null unless layer
-		return layer[NavComponentLayerScrollKey] or layer
+		return layer[FlowComponentLayerScrollKey] or layer
 
 	_runTransition: (transition, direction, animate, from, to) =>
 

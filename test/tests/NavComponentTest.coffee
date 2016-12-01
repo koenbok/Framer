@@ -1,10 +1,10 @@
 assert = require "assert"
 
-describe "NavComponent", ->
+describe "FlowComponent", ->
 
 	it "should not animate first show", ->
 
-		nav = new NavComponent size: 100
+		nav = new FlowComponent size: 100
 		cardA = new Layer size: 100
 		cardB = new Layer size: 100
 
@@ -13,7 +13,7 @@ describe "NavComponent", ->
 
 	it "should go back", ->
 
-		nav = new NavComponent size: 100
+		nav = new FlowComponent size: 100
 		cardA = new Layer size: 100
 		cardB = new Layer size: 100
 
@@ -24,13 +24,13 @@ describe "NavComponent", ->
 		nav.current.should.equal cardA
 
 	it "should allow constructor options", ->
-		nav = new NavComponent size: 100
+		nav = new FlowComponent size: 100
 		nav.width.should.equal 100
 		nav.height.should.equal 100
 
 	it "should allow constructor options with initial layer", ->
 		cardA = new Layer size: 100
-		nav = new NavComponent(cardA, size: 100)
+		nav = new FlowComponent(cardA, size: 100)
 		nav.width.should.equal 100
 		nav.height.should.equal 100
 		nav.current.should.equal cardA
@@ -39,7 +39,7 @@ describe "NavComponent", ->
 
 		it "should add header", ->
 
-			nav = new NavComponent size: 200
+			nav = new FlowComponent size: 200
 			nav.header = new Layer width: 200, height: 20
 			nav.showNext new Layer width: 200, height: 200
 
@@ -51,7 +51,7 @@ describe "NavComponent", ->
 
 		it "should add footer", ->
 
-			nav = new NavComponent size: 200
+			nav = new FlowComponent size: 200
 			nav.footer = new Layer width: 200, height: 20
 			nav.showNext new Layer width: 200, height: 200
 
@@ -66,7 +66,7 @@ describe "NavComponent", ->
 
 		it "should make views scrollable", ->
 
-			nav = new NavComponent size: 100
+			nav = new FlowComponent size: 100
 			cardA = new Layer width: 200, height: 200
 
 			nav.showNext(cardA, scroll: true)
@@ -76,7 +76,7 @@ describe "NavComponent", ->
 
 		it "should make views scrollable horizontal", ->
 
-			nav = new NavComponent size: 100
+			nav = new FlowComponent size: 100
 			cardA = new Layer width: 200, height: 100
 
 			nav.showNext(cardA, scroll: true)
@@ -86,7 +86,7 @@ describe "NavComponent", ->
 
 		it "should make views scrollable vertical", ->
 
-			nav = new NavComponent size: 100
+			nav = new FlowComponent size: 100
 			cardA = new Layer width: 100, height: 200
 
 			nav.showNext(cardA, scroll: true)
@@ -96,7 +96,7 @@ describe "NavComponent", ->
 
 		it "should not make views scrollable", ->
 
-			nav = new NavComponent size: 100
+			nav = new FlowComponent size: 100
 			cardA = new Layer width: 100, height: 200
 
 			nav.showNext(cardA, scroll: false)
@@ -111,7 +111,7 @@ describe "NavComponent", ->
 			cardA = new Layer name: "cardA", size: 100
 			cardB = new Layer name: "cardB", size: 100
 
-			nav = new NavComponent()
+			nav = new FlowComponent()
 			nav.showNext(cardA)
 			nav.current.should.equal cardA
 
