@@ -59,12 +59,16 @@ class exports.NavComponent extends Layer
 
 	reset: ->
 		
+		if @_stack
+			for item in @_stack
+				item.layer.visible = false unless item.layer is @_initial
+
 		@_stack = []
 		@_seen = []
 		@_current = null
 		@_isModal = false
 
-		@showNext(@_initial) if @_initial
+		@showNext(@_initial, animate: false) if @_initial
 
 	# @define "isTransitioning",
 	# 	get: -> @_runningTransition
@@ -148,7 +152,7 @@ class exports.NavComponent extends Layer
 		wrappedLayer = layer
 		wrappedLayer = @_wrapLayer(layer) if options.scroll
 		wrappedLayer.parent = @
-		wrappedLayer.visible = false
+		wrappedLayer.visible = not options.animate
 
 		layerA = @_wrappedLayer(@current)
 		layerB = wrappedLayer
@@ -330,9 +334,9 @@ class exports.NavComponent extends Layer
 				animations.push(new Animation(layerA, template.layerA.hide, options))
 
 			if layerB and template.layerB
-				layerB.visible = true
+				layerB.props = template.layerB.hide if animate
 				layerB.bringToFront()
-				layerB.props = template.layerB.hide
+				layerB.visible = true
 				animations.push(new Animation(layerB, template.layerB.show, options))
 
 			if overlay and template.overlay
@@ -384,7 +388,6 @@ class exports.NavComponent extends Layer
 
 			group = new AnimationGroup(animations)
 			group.stopAnimations = false
-
 			forwardEvents(group, "back")
 
 			group.once(Events.AnimationStop, callback) if callback
