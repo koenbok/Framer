@@ -328,7 +328,7 @@ class exports.Animation extends BaseClass
 		return animatableProperties
 
 	toInspect: ->
-		return "<#{@constructor.name} id:#{@id} isAnimating:#{@isAnimating} [#{_.keys(@properties)}]>"
+		return "<#{@constructor.name} id:#{@id} layer:#{@layer?.toName()} [#{_.keys(@properties).join(", ")}] isAnimating:#{@isAnimating}>"
 
 
 	##############################################################
