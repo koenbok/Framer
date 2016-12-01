@@ -292,7 +292,14 @@ class exports.NavComponent extends Layer
 
 	_runTransition: (transition, direction, animate, from, to) =>
 
-		@emit(Events.TransitionStart, from, to, {direction: direction, modal: @isModal})
+		if direction is "forward"
+			a = from
+			b = to
+		else
+			a = to
+			b = from
+
+		@emit(Events.TransitionStart, a, b, direction)
 
 		# Start the transition with a small delay added so it only runs after all
 		# js has been processed. It's also important for hints, as they rely on
@@ -301,21 +308,19 @@ class exports.NavComponent extends Layer
 		Utils.delay 0, =>
 			@_firstTransition = true
 			transition[direction] animate, =>
-				@emit(Events.TransitionEnd, from, to, {direction: direction, modal: @isModal})
+				@emit(Events.TransitionEnd, a, b, direction)
 
 	_buildTransition: (template, layerA, layerB, overlay) ->
 
 		# # Buld a new transtition object with empty states
 		transition = {}
 
-		forwardEvents = (group, direction) =>
-			group.once Events.AnimationStart, => @emit(Events.TransitionStart, layerA, layerB, direction)
-			group.once Events.AnimationHalt, => @emit(Events.TransitionHalt, layerA, layerB, direction)
-			group.once Events.AnimationStop, => @emit(Events.TransitionStop, layerA, layerB, direction)
-			group.once Events.AnimationEnd, => @emit(Events.TransitionEnd, layerA, layerB, direction)
-
 		# Add the forward function for this state to transition forward
 		transition.forward = (animate=true, callback) =>
+
+			forwardEvents = (group, direction) =>
+				group.once Events.AnimationHalt, => @emit(Events.TransitionHalt, layerA, layerB, direction)
+				group.once Events.AnimationStop, => @emit(Events.TransitionStop, layerA, layerB, direction)
 
 			animations = []
 			options = {instant: not animate}
@@ -348,14 +353,18 @@ class exports.NavComponent extends Layer
 			group = new AnimationGroup(animations)
 			forwardEvents(group, "forward")
 
-			group.once(Events.AnimationStop, callback)
+			group.once(Events.AnimationStop, callback) if callback
 			group.once Events.AnimationEnd, ->
 				if layerA and template.layerA and not (overlay and template.overlay)
 					layerA.visible = false
 
 			group.start()
 
-		transition.back = (animate=true, callback) ->
+		transition.back = (animate=true, callback) =>
+
+			forwardEvents = (group, direction) =>
+				group.once Events.AnimationHalt, => @emit(Events.TransitionHalt, layerB, layerA, direction)
+				group.once Events.AnimationStop, => @emit(Events.TransitionStop, layerB, layerA, direction)
 
 			animations = []
 			options = {instant: not animate}
@@ -378,7 +387,7 @@ class exports.NavComponent extends Layer
 
 			forwardEvents(group, "back")
 
-			group.once(Events.AnimationStop, callback)
+			group.once(Events.AnimationStop, callback) if callback
 			group.once Events.AnimationEnd, ->
 				if layerB and template.layerB
 					layerB.visible = false

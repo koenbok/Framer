@@ -1,17 +1,19 @@
 {
+  "orientation" : 0,
+  "updateDelay" : 0.3,
+  "contentScale" : 1,
+  "fullScreen" : false,
+  "sharedPrototype" : 1,
   "propertyPanelToggleStates" : {
     "Filters" : false
   },
-  "deviceOrientation" : 0,
-  "sharedPrototype" : 1,
-  "contentScale" : 1,
   "deviceType" : "apple-iphone-7-silver",
+  "shareServer" : "https:\/\/store.framerjs.com",
+  "projectId" : "69CDD578-9E6C-4069-B6D8-422FB93C6F23",
+  "deviceOrientation" : 0,
   "selectedHand" : "",
-  "updateDelay" : 0.3,
-  "deviceScale" : "fit",
   "foldedCodeRanges" : [
     "{0, 215}"
   ],
-  "orientation" : 0,
-  "fullScreen" : false
+  "deviceScale" : "fit"
 }

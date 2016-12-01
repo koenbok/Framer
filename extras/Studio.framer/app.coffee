@@ -13,16 +13,8 @@ c3 = new Card()
 
 nav = new NavComponent(c1)
 
-nav.header = new Layer
-	height: 80
-	width: Screen.width
+c1.onTap -> nav.showNext(c2)
+c2.onTap -> nav.showPrevious()
 
-nav.header.onClick -> 
-	nav.showPrevious(animate: false)
-
-Utils.labelLayer(nav.header, "Header")
-
-c1.onClick -> nav.showNext(c2)
-c2.onClick -> nav.showNext(c3)
-
-c3.onTap -> nav.showPrevious(count: 2)
+nav.onTransitionEnd (args...) ->
+	print "end", @, args

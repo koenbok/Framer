@@ -106,6 +106,8 @@ describe "NavComponent", ->
 
 		it "should throw the right events", (done) ->
 
+			events = []
+
 			cardA = new Layer name: "cardA", size: 100
 			cardB = new Layer name: "cardB", size: 100
 
@@ -113,17 +115,14 @@ describe "NavComponent", ->
 			nav.showNext(cardA)
 			nav.current.should.equal cardA
 
+			nav.onTransitionStart (args...) ->
+				events.push(Events.TransitionStart)
 
-			# nav.once Events.TransitionStart, (args...) ->
-			# 	print Events.TransitionStart, args
-			# 	#events.push(Events.TransitionStart)
-
-			nav.once Events.TransitionEnd, (args...) ->
-				# print Events.TransitionEnd, args
-				# print nav.current, nav._stack
-				nav.current.should.equal cardB
-				done()
-				#events.push(Events.TransitionEnd)
+			nav.onTransitionEnd (args...) ->
+				events.push(Events.TransitionEnd)
 
 			nav.showNext(cardB)
-			# nav.back()
+
+			nav.onTransitionEnd (args...) ->
+				events.should.eql ["transitionstart", "transitionend"]
+				done()
