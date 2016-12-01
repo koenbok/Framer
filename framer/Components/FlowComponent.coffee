@@ -177,6 +177,10 @@ class exports.FlowComponent extends Layer
 	showPrevious: (options={}) =>
 		return unless @previous
 		return if @isTransitioning
+
+		# Maybe people (Jorn) pass in a layer accidentally
+		options = {} if options instanceof(Framer.Layer)
+		
 		options = _.defaults({}, options, {count: 1, animate: true})
 		
 		if options.count > 1
