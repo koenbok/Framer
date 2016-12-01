@@ -2,7 +2,7 @@ Framer.Extras.Hints.enable()
 
 sketch = Framer.Importer.load("imported/Mail2@2x")
 
-nav = new NavComponent
+nav = new FlowComponent
 nav.push(sketch.inbox)
 
 sketch.hamburger.onTap -> nav.modal(sketch.menu)

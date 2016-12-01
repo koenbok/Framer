@@ -1,20 +1,18 @@
-# Card
-class Card extends Layer
-	constructor: (options={}) ->
-		options.size ?= Screen
-		options.backgroundColor ?= Utils.randomColor()
-		options.visible = false
-		super options
-		Utils.labelLayer(@, "Card #{@id}")
-
-c1 = new Card()
-c2 = new Card()
-c3 = new Card()
-
-nav = new NavComponent(c1)
-
-c1.onTap -> nav.showNext(c2)
-c2.onTap -> nav.showPrevious()
-
-nav.onTransitionEnd (args...) ->
-	print "end", @, args
+# Create layers 
+layerA = new Layer
+	size: Screen.size
+	backgroundColor: "#00AAFF"
+ 
+layerB = new Layer
+	size: Screen.size
+	backgroundColor: "#FFCC33"
+ 
+# Create FlowComponent and show layer 
+flow = new FlowComponent
+flow.showNext(layerA)
+ 
+# Instantly show layerB on click 
+layerA.onClick ->
+	flow.showNext(layerB)
+layerB.onClick ->
+	flow.showPrevious(layerA)

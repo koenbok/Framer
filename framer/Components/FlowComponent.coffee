@@ -179,7 +179,7 @@ class exports.FlowComponent extends Layer
 		return if @isTransitioning
 
 		# Maybe people (Jorn) pass in a layer accidentally
-		options = {} if options instanceof(Framer.Layer)
+		options = {} if options instanceof(Framer._Layer)
 		
 		options = _.defaults({}, options, {count: 1, animate: true})
 		
