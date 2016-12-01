@@ -112,17 +112,16 @@ describe "FlowComponent", ->
 			cardB = new Layer name: "cardB", size: 100
 
 			nav = new FlowComponent()
-			nav.showNext(cardA)
-			nav.current.should.equal cardA
-
+			
 			nav.onTransitionStart (args...) ->
 				events.push(Events.TransitionStart)
 
 			nav.onTransitionEnd (args...) ->
 				events.push(Events.TransitionEnd)
 
-			nav.showNext(cardB)
-
 			nav.onTransitionEnd (args...) ->
 				events.should.eql ["transitionstart", "transitionend"]
 				done()
+
+			nav.showNext(cardA)
+			nav.current.should.equal cardA

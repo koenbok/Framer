@@ -27,7 +27,6 @@ class AnimationGroup extends BaseClass
 		
 		animations.map (animation) =>
 			
-			animation.start()
 			@_started.push(animation)
 
 			animation.onAnimationHalt =>
@@ -43,6 +42,8 @@ class AnimationGroup extends BaseClass
 			animation.onAnimationEnd =>
 				@_ended.push(animation)
 				@_onEnd() if @_ended.length is @_started.length
+
+			animation.start()
 
 	_stop: ->
 		return unless @_started

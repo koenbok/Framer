@@ -311,8 +311,7 @@ class exports.FlowComponent extends Layer
 
 		Utils.delay 0, =>
 			@_firstTransition = true
-			transition[direction] animate, =>
-				@emit(Events.TransitionEnd, a, b, direction)
+			transition[direction](animate)
 
 	_buildTransition: (template, layerA, layerB, overlay) ->
 
@@ -325,6 +324,7 @@ class exports.FlowComponent extends Layer
 			forwardEvents = (group, direction) =>
 				group.once Events.AnimationHalt, => @emit(Events.TransitionHalt, layerA, layerB, direction)
 				group.once Events.AnimationStop, => @emit(Events.TransitionStop, layerA, layerB, direction)
+				group.once Events.AnimationEnd, => @emit(Events.TransitionEnd, layerA, layerB, direction)
 
 			animations = []
 			options = {instant: not animate}
@@ -334,7 +334,8 @@ class exports.FlowComponent extends Layer
 				animations.push(new Animation(layerA, template.layerA.hide, options))
 
 			if layerB and template.layerB
-				layerB.props = template.layerB.hide if animate
+				layerB.props = template.layerB.hide
+				# layerB.props = template.layerB.hide if animate # This breaks events now
 				layerB.bringToFront()
 				layerB.visible = true
 				animations.push(new Animation(layerB, template.layerB.show, options))
@@ -357,7 +358,6 @@ class exports.FlowComponent extends Layer
 			group = new AnimationGroup(animations)
 			forwardEvents(group, "forward")
 
-			group.once(Events.AnimationStop, callback) if callback
 			group.once Events.AnimationEnd, ->
 				if layerA and template.layerA and not (overlay and template.overlay)
 					layerA.visible = false
@@ -369,6 +369,7 @@ class exports.FlowComponent extends Layer
 			forwardEvents = (group, direction) =>
 				group.once Events.AnimationHalt, => @emit(Events.TransitionHalt, layerB, layerA, direction)
 				group.once Events.AnimationStop, => @emit(Events.TransitionStop, layerB, layerA, direction)
+				group.once Events.AnimationEnd, => @emit(Events.TransitionEnd, layerB, layerA, direction)
 
 			animations = []
 			options = {instant: not animate}
@@ -390,7 +391,6 @@ class exports.FlowComponent extends Layer
 			group.stopAnimations = false
 			forwardEvents(group, "back")
 
-			group.once(Events.AnimationStop, callback) if callback
 			group.once Events.AnimationEnd, ->
 				if layerB and template.layerB
 					layerB.visible = false
