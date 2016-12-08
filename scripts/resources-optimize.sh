@@ -10,6 +10,14 @@ if [ -z "`which cwebp`" ]; then
     brew install webp
 fi
 
+if [ -z "`which convert`" ]; then
+    brew install imagemagick
+fi
+
+if [ -z "`which opj_compress`" ]; then
+    brew install openjpeg
+fi
+
 SCRIPT_PATH="$( cd "$( dirname "$0" )" && pwd )"
 
 cd "extras"
@@ -17,8 +25,8 @@ cd "extras"
 SOURCE_PATH=DeviceResources
 TARGET_PATH=resources.framerjs.com/static/DeviceResources
 
-JP2_QUALITY=16
-JP2_QUALITY_SMALL=100
+JP2_COMPRESSION=100
+JP2_COMPRESSION_SMALL=10
 WEBP_QUALITY=90
 SMALL_PIXEL_LIMIT=400000
 
@@ -48,7 +56,7 @@ webp: \$(WEBP_FILES)
 	optipng -clobber \$< -out \$@
 
 \$(JP2_FILES): %.jp2: %.unoptim.png
-	$SCRIPT_PATH/jp2-convert.sh \$< \$@ $JP2_QUALITY $SMALL_PIXEL_LIMIT $JP2_QUALITY_SMALL    
+	$SCRIPT_PATH/jp2-convert.sh \$< \$@ $JP2_COMPRESSION $SMALL_PIXEL_LIMIT $JP2_COMPRESSION_SMALL    
 
 \$(WEBP_FILES): %.webp: %.unoptim.png
 	cwebp -q $WEBP_QUALITY \$< -o \$@

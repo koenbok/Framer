@@ -2,17 +2,21 @@
 
 INPUT=$1
 OUTPUT=$2
-STANDARD_QUALITY=$3
+STANDARD_COMPRESSION=$3
 SMALL_PIXEL_LIMIT=$4
-SMALL_QUALITY=$5
+SMALL_COMPRESSION=$5
 
 # ---
 
 XPATH_SCRIPT="number(//key[text()='pixelWidth']/following-sibling::integer[1]) * number(//key[text()='pixelHeight']/following-sibling::integer[1]) < $SMALL_PIXEL_LIMIT"
 
-QUALITY=$STANDARD_QUALITY
+COMPRESSION=$STANDARD_COMPRESSION
 if [ -n "`sips -g allxml "$INPUT" | xmllint --xpath "$XPATH_SCRIPT" - | grep true`" ]; then
-    QUALITY=$SMALL_QUALITY
+    COMPRESSION=$SMALL_COMPRESSION
 fi
 
-sips -s format jp2 "$INPUT" -s formatOptions $QUALITY --out "$OUTPUT"
+SEMIOUTPUT=$OUTPUT.bmp
+
+convert "$INPUT" "$SEMIOUTPUT"
+opj_compress -i "$SEMIOUTPUT" -o "$OUTPUT" -r $COMPRESSION
+rm "$SEMIOUTPUT"
