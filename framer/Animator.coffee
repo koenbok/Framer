@@ -1,6 +1,9 @@
+{computeDerivedCurveOptions} = require "./Animators/SpringCurveValueConverter"
+
 AnimatorClasses = {}
 
 AnimatorClassBezierPresets = ["ease", "ease-in", "ease-out", "ease-in-out"]
+
 
 class exports.Animator
 
@@ -74,9 +77,16 @@ class exports.Animator
 				curveOptions.values = parsedCurve.args.map (v) -> parseFloat(v) or 0
 
 			if animatorClass is SpringRK4Animator
-				for k, i in ["tension", "friction", "velocity", "tolerance"]
-					value = parseFloat parsedCurve.args[i]
-					curveOptions[k] = value if value
+				if animatorClassName is "spring-dd"
+					dampingRatio = parseFloat parsedCurve.args[0] ? 0
+					duration = options.time ? 1
+					mass = parseFloat parsedCurve.args[1] ? 1
+					velocity = parseFloat parsedCurve.args[2] ? 0
+					curveOptions = computeDerivedCurveOptions(dampingRatio, duration, velocity, mass)
+				else
+					for k, i in ["tension", "friction", "velocity", "tolerance"]
+						value = parseFloat parsedCurve.args[i]
+						curveOptions[k] = value if value
 
 			if animatorClass is SpringDHOAnimator
 				for k, i in ["stiffness", "damping", "mass", "tolerance"]
@@ -94,6 +104,7 @@ class exports.Animator
 AnimatorClasses["linear"] = LinearAnimator
 AnimatorClasses["bezier-curve"] = BezierCurveAnimator
 AnimatorClasses["spring-rk4"] = SpringRK4Animator
+AnimatorClasses["spring-dd"] = SpringRK4Animator
 AnimatorClasses["spring-dho"] = SpringDHOAnimator
 
 AnimatorClasses["spring"] = AnimatorClasses["spring-rk4"]
