@@ -17,6 +17,10 @@ framer/**/*.js.map
 test/tests/**/*.js
 test/tests/**/*.js.map
 
+# Discard changes in Studio.framer
+extras/Studio.framer/app.coffee
+extras/Studio.framer/framer/config.json
+
 # Discard version changes
 framer/Version.coffee
 
