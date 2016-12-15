@@ -878,20 +878,21 @@ describe "Layer", ->
 			layerC = new Layer superLayer: layerB
 			layerC.ancestors().should.eql [layerB, layerA]
 
-	describe "Select", ->
+	describe "Select Layer", ->
+
 		beforeEach ->
 			Framer.CurrentContext.reset()
 
 		it "should select the layer named B", ->
 			layerA = new Layer name: 'A'
 			layerB = new Layer name: 'B', parent: layerA
-			layerA.select('B').should.equal layerB
+			layerA.selectChild('B').should.equal layerB
 
 		it "should select the layer named C", ->
 			layerA = new Layer name: 'A'
 			layerB = new Layer name: 'B', parent: layerA
 			layerC = new Layer name: 'C', parent: layerB
-			layerA.select('B > *').should.equal layerC
+			layerA.selectChild('B > *').should.equal layerC
 
 		it "should have a static method `select`", ->
 			layerA = new Layer name: 'A'
