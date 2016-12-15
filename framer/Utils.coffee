@@ -284,6 +284,12 @@ Utils.uuid = ->
 
 	output.join ""
 
+Utils.findLayer = (layers, selector) ->
+	_.find layers, (layer) -> Utils.layerMatchesSelector(layer, selector)
+
+Utils.filterLayers = (layers, selector) ->
+	_.filter layers, (layer) -> Utils.layerMatchesSelector(layer, selector)
+
 Utils.layerMatchesSelector = (layer, selector) ->
 	getHierarchyString = (l) ->
 		# create a string of the hierarchy so we can run regex on it
