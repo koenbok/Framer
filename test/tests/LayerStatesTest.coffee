@@ -510,6 +510,20 @@ describe "LayerStates", ->
 						layer.states.current.name.should.equal "test"
 						done()
 
+		it "should not touch the options object", (done) ->
+			layer = new Layer
+			layer.states.test = {x: 200}
+			options = {time: 0.1}
+			layer.stateCycle(options)
+			layer.once Events.StateDidSwitch, ->
+				layer.x.should.equal 200
+				layer.states.current.name.should.equal "test"
+				layer.stateCycle(options)
+				layer.once Events.StateDidSwitch, ->
+					layer.x.should.equal 0
+					layer.states.current.name.should.equal "default"
+					done()
+
 		it "should cycle three with options", (done) ->
 			layer = new Layer
 			layer.animationOptions.time = 0.1
