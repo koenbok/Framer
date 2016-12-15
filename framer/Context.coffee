@@ -150,8 +150,11 @@ class exports.Context extends BaseClass
 		return layer if layer
 		return @layerForElement(element.parentNode)
 
-	selectLayers: (selector) ->
-		return _.filter @_layers, (layer) -> Utils.layerMatchesSelector(layer, selector)
+	selectLayer: (selector) ->
+		Utils.findLayer(@_layers, selector)
+
+	selectAllLayers: (selector) ->
+		Utils.filterLayers(@_layers, selector)
 
 	layout: =>
 		@rootLayers.map (l) -> l.layout()
