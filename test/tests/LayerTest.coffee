@@ -900,12 +900,12 @@ describe "Layer", ->
 			layerC = new Layer name: 'C', parent: layerB
 			Layer.select('B > *').should.equal layerC
 
-		it "should have a method `selectAll`", ->
+		it "should have a method `selectAllChildren`", ->
 			layerA = new Layer name: 'A'
 			layerB = new Layer name: 'B', parent: layerA
 			layerC = new Layer name: 'C', parent: layerB
 			layerD = new Layer name: 'D', parent: layerB
-			layerA.selectAll('B > *').should.eql [layerC, layerD]
+			layerA.selectAllChildren('B > *').should.eql [layerC, layerD]
 
 		it "should have a static method `selectAll`", ->
 			layerA = new Layer name: 'A'
