@@ -18,6 +18,7 @@ class exports.GestureInputRecognizer
 		@em = new DOMEventManager()
 		@em.wrap(window).addEventListener("mousedown", @startMouse)
 		@em.wrap(window).addEventListener("touchstart", @startTouch)
+		@session = null
 
 	destroy: ->
 		@em.removeAllListeners()
@@ -84,8 +85,7 @@ class exports.GestureInputRecognizer
 		@em.wrap(window).removeEventListener("mouseup", @touchend)
 		@em.wrap(window).removeEventListener("touchmove", @touchmove)
 		@em.wrap(window).removeEventListener("touchend", @touchend)
-
-		@em.wrap(window).addEventListener("webkitmouseforcechanged", @_updateMacForce)
+		@em.wrap(window).removeEventListener("webkitmouseforcechanged", @_updateMacForce)
 
 		event = @_getGestureEvent(event)
 
@@ -102,6 +102,10 @@ class exports.GestureInputRecognizer
 
 		@tapend(event)
 		@cancel()
+
+	reset: =>
+		return unless @session
+		@touchend(@session.lastEvent)
 
 	# Tap
 
