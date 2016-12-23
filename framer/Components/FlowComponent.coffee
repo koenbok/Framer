@@ -58,7 +58,7 @@ class exports.FlowComponent extends Layer
 
 
 	reset: ->
-		
+
 		if @_stack
 			for item in @_stack
 				item.layer.visible = false unless item.layer is @_initial
@@ -180,9 +180,9 @@ class exports.FlowComponent extends Layer
 
 		# Maybe people (Jorn) pass in a layer accidentally
 		options = {} if options instanceof(Framer._Layer)
-		
+
 		options = _.defaults({}, options, {count: 1, animate: true})
-		
+
 		if options.count > 1
 			count = options.count
 			@showPrevious(animate: false, count: 1) for n in [2..count]
@@ -250,6 +250,7 @@ class exports.FlowComponent extends Layer
 		# If this layer is a ScrollComponent we do not have to add another one
 		if layer instanceof ScrollComponent
 			scroll = layer
+			scroll._originalContentInset ?= scroll.contentInset
 
 		layer.point = Utils.pointZero()
 
@@ -265,9 +266,9 @@ class exports.FlowComponent extends Layer
 			# to access the magically created scroll component.
 			_addListener = layer.addListener
 			layer.on = (event, args...) ->
-				
+
 				_addListener.apply(layer, [event, args...])
-				
+
 				# But only the actual scroll events
 				if event in [
 					Events.ScrollStart,
@@ -285,9 +286,11 @@ class exports.FlowComponent extends Layer
 		scroll.scrollHorizontal = layer.width > width
 		scroll.scrollVertical = layer.height > height
 
-		contentInset = {}
-		contentInset.top = @header.height if @header
-		contentInset.bottom = @footer.height if @footer
+		contentInset =
+			top: scroll._originalContentInset?.top ? 0
+			bottom: scroll._originalContentInset?.bottom ? 0
+		contentInset.top += @header.height if @header
+		contentInset.bottom += @footer.height if @footer
 		scroll.contentInset = contentInset
 
 		return scroll
