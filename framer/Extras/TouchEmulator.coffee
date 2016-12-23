@@ -232,3 +232,10 @@ exports.disable = ->
 	touchEmulator.destroy()
 	touchEmulator = null
 	Events.enableEmulatedTouchEvents(false)
+
+# resets the emulator, useful if the webview can loose/regain focus without being aware
+# in such scenarios it can miss mouseup, mouseout events and such
+# it can also be fixed by checking event.buttons in mousemove, but that is not available on safari
+exports.reset = ->
+	return unless touchEmulator
+	touchEmulator.endMultiTouch()
