@@ -11,6 +11,7 @@ Framer._Layer = Framer.Layer # So it won't be overridden by MobileScrollFix
 Framer.BackgroundLayer = (require "./BackgroundLayer").BackgroundLayer
 Framer.VideoLayer = (require "./VideoLayer").VideoLayer
 Framer.SVGLayer = (require "./SVGLayer").SVGLayer
+Framer.CanvasLayer = (require "./CanvasLayer").CanvasLayer
 Framer.Events = (require "./Events").Events
 Framer.Gestures = (require "./Gestures").Gestures
 Framer.Animation = (require "./Animation").Animation
