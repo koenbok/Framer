@@ -13,14 +13,12 @@ class exports.CircularProgressComponent extends SVGLayer
 		@circle = @addShape("circle")
 		@circle.setAttribute("fill", "transparent")
 		
-		@strokeWidth = 1
+		@strokeWidth = 8
 		@progress = 0
 		
-		@railsColor = Color.grey(.2)
-		@progressColor = Color.grey(1)
+		@railsColor = Color.grey(0, .2)
+		@progressColor = Color.grey(0, .6)
 		
-		@svg.appendChild(@rails)
-		@svg.appendChild(@circle)
 		@_element.appendChild(@svg)
 
 	@define "radius",
