@@ -184,15 +184,16 @@ class exports.SliderComponent extends Layer
 
 	@define "min",
 		get: -> @_min or 0
-		set: (value) -> @_min = value
+		set: (value) -> @_min = value if _.isFinite(value)
 
 	@define "max",
 		get: -> @_max or 1
-		set: (value) -> @_max = value
+		set: (value) -> @_max = value if _.isFinite(value)
 
 	@define "value",
 		get: -> return @_value
 		set: (value) ->
+			return unless _.isFinite(value)
 
 			@_value = Utils.clamp(value, @min, @max)
 
@@ -244,6 +245,7 @@ class exports.SliderComponent extends Layer
 				return Utils.modulate(value, [0, @height], [@min, @max], true)
 
 	animateToValue: (value, animationOptions={curve: "spring(300, 25, 0)"}) ->
+		return unless _.isFinite(value)
 		if @width > @height
 			animationOptions.properties = {x: @pointForValue(value) - (@knob.width/2)}
 		else
