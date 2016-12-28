@@ -56,12 +56,12 @@ class exports.AnimationLoop extends EventEmitter
 		tick = (timestamp) ->
 
 			if animationLoop.raf
-				update()
 				window.requestAnimationFrame(tick)
+				update()
 			else
 				window.setTimeout ->
-					update()
 					window.requestAnimationFrame(tick)
+					update()
 				, 0
 
 		tick()
