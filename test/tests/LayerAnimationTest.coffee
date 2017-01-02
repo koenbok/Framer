@@ -584,6 +584,40 @@ describe "LayerAnimation", ->
 			@layer = new Layer x: 0, y: 0, width: 80, height: 80
 
 		describe "Parsing Animation Options", ->
+			describe "Curve function", ->
+				it "should handle Bezier curve functions", ->
+					animation = new Animation @layer,
+						x: 100
+						options:
+							curve: Bezier(0, 0, 0.58, 1)
+							time: 2
+
+					animation.start()
+					animation._animator.options.time.should.equal 2
+					animation._animator.options.values.should.eql [0, 0, .58, 1]
+
+				it "should handle Spring curve functions", ->
+					animation = new Animation @layer,
+						x: 100
+						options:
+							curve: Spring(0.5)
+							time: 0.5
+					animation.start()
+					animation._animator.options.time.should.equal 0.5
+					animation._animator.options.tension.should.equal 646.8780063665112
+					animation._animator.options.friction.should.equal 25.43379653859233
+					animation._animator.options.velocity.should.equal 0
+
+				it "should handle Spring curve functions", ->
+					animation = new Animation @layer,
+						x: 100
+						options:
+							curve: Spring.tfv(6, 3, 1)
+					animation.start()
+					assert.equal(animation._animator.options.time, null)
+					animation._animator.options.tension.should.equal 6
+					animation._animator.options.friction.should.equal 3
+					animation._animator.options.velocity.should.equal 1
 
 			describe "BezierCurveAnimator", ->
 

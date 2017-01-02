@@ -83,7 +83,8 @@ class exports.Animation extends BaseClass
 		if properties.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
-		@options.curveOptions = Animator.curveOptionsFor(@options)
+		if not _.isFunction @options.curve
+			@options.curveOptions = Animator.curveOptionsFor(@options)
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
 
@@ -292,6 +293,8 @@ class exports.Animation extends BaseClass
 		return _.pick(@layer, _.keys(@properties))
 
 	@_createAnimator: (options) ->
+		if _.isFunction options.curve
+			return options.curve(options)
 		AnimatorClass = Animator.classForCurve(options.curve)
 		return null if not AnimatorClass?
 		curveOptions = options.curveOptions ? Animator.curveOptionsFor(options)
