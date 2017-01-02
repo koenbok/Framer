@@ -17,6 +17,25 @@ angularFrequency = (undampedFrequency, dampingRatio) ->
 computeDampingRatio = (tension, friction, mass = 1) ->
 	friction / (2 * Math.sqrt(mass * tension))
 
+# Tries to compute the duration of a spring,
+# but can't for certain velocities and if dampingRatio >= 1
+# In those cases it will return null
+computeDuration = (tension, friction, velocity = 0) ->
+	dampingRatio = computeDampingRatio(tension, friction)
+	undampedFrequency = Math.sqrt(tension / mass)
+	# This is basically duration extracted out of the envelope functions
+	if dampingRatio < 1
+		a = Math.sqrt(1 - Math.pow(dampingRatio, 2))
+		b = velocity / (a * undampedFrequency)
+		c = dampingRatio / a
+		d = - ((b - c) / epsilon)
+		if d <= 0
+			return null
+		duration = Math.log(d) / (dampingRatio * undampedFrequency)
+	else
+		return null
+	return duration
+
 computeDerivedCurveOptions = (dampingRatio, duration, velocity = 0, mass = 1) ->
 	dampingRatio = Math.max(Math.min(dampingRatio, maxDamping), minDamping)
 	duration = Math.max(Math.min(duration, maxDuration), minDuration)
@@ -63,3 +82,4 @@ computeDerivedCurveOptions = (dampingRatio, duration, velocity = 0, mass = 1) ->
 	return result
 
 exports.computeDerivedCurveOptions = computeDerivedCurveOptions
+exports.computeDuration = computeDuration
