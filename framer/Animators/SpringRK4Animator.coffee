@@ -9,7 +9,7 @@ class exports.SpringRK4Animator extends Animator
 			tension: 250
 			friction: 25
 			velocity: 0
-			tolerance: 1/100
+			tolerance: 1 / 100
 			time: null # Hack
 
 		@_time = 0
