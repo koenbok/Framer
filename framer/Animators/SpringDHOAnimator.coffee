@@ -1,4 +1,4 @@
-{Animator} = require "../Animator"
+{Animator} = require "./Animator"
 
 class exports.SpringDHOAnimator extends Animator
 

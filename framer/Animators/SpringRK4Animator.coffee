@@ -1,4 +1,4 @@
-{Animator} = require "../Animator"
+{Animator} = require "./Animator"
 {Integrator} = require "../Integrator"
 
 class exports.SpringRK4Animator extends Animator

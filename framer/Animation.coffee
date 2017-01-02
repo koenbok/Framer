@@ -5,7 +5,7 @@ Utils = require "./Utils"
 {Config} = require "./Config"
 {Defaults} = require "./Defaults"
 {BaseClass} = require "./BaseClass"
-{Animator} = require "./Animator"
+{Animator} = require "./Animators/Animator"
 {LinearAnimator} = require "./Animators/LinearAnimator"
 
 numberRE = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/

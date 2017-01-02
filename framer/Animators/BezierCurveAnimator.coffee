@@ -1,4 +1,4 @@
-{Animator} = require "../Animator"
+{Animator} = require "./Animator"
 
 BezierCurveDefaults =
 	"linear": [0, 0, 1, 1]

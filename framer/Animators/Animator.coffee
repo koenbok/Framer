@@ -1,4 +1,4 @@
-{computeDerivedCurveOptions} = require "./Animators/SpringCurveValueConverter"
+{computeDerivedCurveOptions} = require "./SpringCurveValueConverter"
 
 AnimatorClasses = {}
 
@@ -97,10 +97,10 @@ class exports.Animator
 	# start: -> Framer.Loop.on("update", )
 	# stop: -> AnimationLoop.remove @
 
-{LinearAnimator} = require "./Animators/LinearAnimator"
-{BezierCurveAnimator} = require "./Animators/BezierCurveAnimator"
-{SpringRK4Animator} = require "./Animators/SpringRK4Animator"
-{SpringDHOAnimator} = require "./Animators/SpringDHOAnimator"
+{LinearAnimator} = require "./LinearAnimator"
+{BezierCurveAnimator} = require "./BezierCurveAnimator"
+{SpringRK4Animator} = require "./SpringRK4Animator"
+{SpringDHOAnimator} = require "./SpringDHOAnimator"
 AnimatorClasses["linear"] = LinearAnimator
 AnimatorClasses["bezier-curve"] = BezierCurveAnimator
 AnimatorClasses["spring-rk4"] = SpringRK4Animator
