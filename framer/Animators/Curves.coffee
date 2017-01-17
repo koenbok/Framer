@@ -44,8 +44,49 @@ Spring.computeDuration = computeDerivedCurveOptions
 
 exports.Spring = Spring
 exports.Bezier = Bezier
+fromFunction = (string) ->
+	return null unless _.isString string
+
+	regex = /.*(Spring|Bezier)(?:\(([a-zA-Z\d:\s,.]*)\)|\.(\w+))?/
+	matches = regex.exec(string)
+	return null unless matches?
+
+	[match, type, args, prop] = matches
+	curve = Framer.Curves[type]
+	if not curve?
+		return null
+	if prop?
+		return curve[prop]
+	if not args?
+		return curve
+	if args.length is 0
+		return curve()
+
+	argumentsRegex = /\s*([a-zA-Z]+)\s*:\s*([\d.]+)\s*,?/g
+	argumentObject = {}
+	while matches = argumentsRegex.exec(args)
+		[match, property, value] = matches
+		value = parseFloat(value)
+		if not isNaN(value)
+			argumentObject[property] = value
+	if _.size(argumentObject) > 0
+		return curve(argumentObject)
+
+	numbersRegex = /\s*([.\d]+)\s*/g
+	numbers = []
+	while matches = numbersRegex.exec(args)
+		[match, value] = matches
+		value = parseFloat(value)
+		numbers.push(value)
+	return curve(numbers...)
+
+
+exports.fromFunction = fromFunction
 exports.fromString = (string) ->
 	return null unless _.isString string
+	func = fromFunction(string)
+	if func?
+		return func
 	func = Utils.parseFunction(string)
 	args = func.args.map(parseFloat)
 	switch func.name

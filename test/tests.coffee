@@ -24,6 +24,7 @@ window.print = (args...) ->
 	console.log "\n»", args.map((obj) -> Utils.inspect(obj)).join(", ")
 
 require "./tests/AlignTest"
+require "./tests/CurvesTest"
 require "./tests/EventEmitterTest"
 require "./tests/UtilsTest"
 require "./tests/BaseClassTest"
