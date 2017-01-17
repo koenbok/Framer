@@ -619,99 +619,28 @@ describe "LayerAnimation", ->
 					animation._animator.options.friction.should.equal 3
 					animation._animator.options.velocity.should.equal 1
 
-			describe "BezierCurveAnimator", ->
-
-				it "should create animation with bezier curve defined by values array and time in curveOptions", ->
+			describe "Spring Animator", ->
+				it "should create an animator with the default spring", ->
 					animation = new Animation @layer,
 						x: 100
 						options:
-							curve: "cubic-bezier"
-							curveOptions:
-								time: 2
-								values: [0, 0, 0.58, 1]
+							curve: "spring"
 
 					animation.start()
-					animation._animator.options.time.should.equal 2
-					animation._animator.options.values.should.eql [0, 0, .58, 1]
+					animatorOptions = animation._animator.options
+					animatorOptions.tension.should.equal 250
+					animatorOptions.friction.should.equal 25
+					animatorOptions.velocity.should.equal 0
 
-				it "should create animation with bezier curve defined by named bezier curve in values and time in curveOptions", ->
-					animation = new Animation @layer,
-						x: 100
-						options:
-							curve: "cubic-bezier"
-							curveOptions:
-								time: 2
-								values: "ease-out"
-
-					animation.start()
-					animation._animator.options.time.should.equal 2
-					animation._animator.options.values.should.eql [0, 0, .58, 1]
-
-				it "should create animation with named bezier curve", ->
-					animation = new Animation @layer,
-						x: 100
-						options:
-							curve: "cubic-bezier"
-							curveOptions: "ease-out"
-
-					animation.start()
-					animation._animator.options.time.should.equal 1
-					animation._animator.options.values.should.eql [0, 0, .58, 1]
-
-				it "should create animation with named bezier curve and time", ->
-					animation = new Animation @layer,
-						x: 100
-						options:
-							time: 2
-							curve: "cubic-bezier"
-							curveOptions: "ease-out"
-
-					animation.start()
-					animation._animator.options.time.should.equal 2
-					animation._animator.options.values.should.eql [0, 0, .58, 1]
-
-				it "should create animation with bezier curve function passed in as a string and time", ->
-					animation = new Animation @layer,
-						x: 100
-						options:
-							time: 2
-							curve: "cubic-bezier(0, 0, 0.58, 1)"
-
-					animation.start()
-					animation._animator.options.time.should.equal 2
-					animation._animator.options.values.should.eql [0, 0, .58, 1]
-
-				it "should create animation with bezier curve defined by an array and time", ->
-					animation = new Animation @layer,
-						x: 100
-						options:
-							time: 2
-							curve: "cubic-bezier"
-							curveOptions: [0, 0, 0.58, 1]
-
-					animation.start()
-					animation._animator.options.time.should.equal 2
-					animation._animator.options.values.should.eql [0, 0, .58, 1]
 
 		describe "LinearAnimator", ->
 
-			it "should create linear animation with time defined outside of curveOptions", ->
+			it "should create linear animation with time defined", ->
 				animation = new Animation @layer,
 					x: 100
 					options:
 						curve: "linear"
 						time: 2
-
-				animation.start()
-				animation._animator.options.time.should.equal 2
-
-			it "should create linear animation with time defined inside curveOptions", ->
-				animation = new Animation @layer,
-					x: 100
-					options:
-						curve: "linear"
-						curveOptions:
-							time: 2
 
 				animation.start()
 				animation._animator.options.time.should.equal 2
@@ -866,20 +795,6 @@ describe "LayerAnimation", ->
 				animation.on Events.AnimationEnd, ->
 					layer.x.should.equal 10
 					done()
-
-			it "should support properties with options that have undefined curveOptions as object", (done) ->
-				layer = new Layer
-				layer.animationOptions = time: AnimationTime
-				animation = layer.animate
-					x: 10
-					options:
-						curve: "linear"
-						curveOptions: undefined
-
-				animation.options.curve.should.equal Bezier.linear
-				animation.on Events.AnimationEnd, ->
-					layer.x.should.equal 10
-				done()
 
 			it "should support states", (done) ->
 				layer = new Layer
