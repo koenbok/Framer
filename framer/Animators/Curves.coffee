@@ -1,5 +1,5 @@
 {BezierCurveAnimator} = require "./BezierCurveAnimator"
-{computeDerivedCurveOptions} = require "./SpringCurveValueConverter"
+{computeDerivedCurveOptions, computeDuration} = require "./SpringCurveValueConverter"
 {SpringRK4Animator} = require "./SpringRK4Animator"
 
 console.log BezierCurveAnimator
@@ -38,6 +38,8 @@ SpringVariants =
 
 _.assign Bezier, BezierDefaults
 _.assign Spring, SpringVariants
+Spring.computeDerivedCurveOptions = computeDerivedCurveOptions
+Spring.computeDuration = computeDerivedCurveOptions
 
 exports.Spring = Spring
 exports.Bezier = Bezier
