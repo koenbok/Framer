@@ -15,21 +15,28 @@ BezierDefaults =
 	easeInOut: Bezier(.42, 0, .58, 1)
 
 
-Spring = (dampingRatio, mass = 1, velocity = 0) ->
-	(options) ->
-		duration = options.time ? 1
-		options = _.defaults computeDerivedCurveOptions(dampingRatio, duration, velocity, mass), options
-		new SpringRK4Animator(options)
-
-SpringVariants =
-	tfv: (tension, friction, velocity = 0, tolerance = 1/100) ->
-		(options) ->
-			new SpringRK4Animator
-				tension: tension
-				friction: friction
-				velocity: velocity
-				tolerance: tolerance
-	timed: Spring
+Spring = (dampingRatio = 0.5, mass = 1, velocity = 0) ->
+	if not _.isFinite(dampingRatio) and typeof dampingRatio is 'object'
+		argumentObject = dampingRatio
+		dampingRatio = null
+		if (argumentObject.damping? or argumentObject.dampingRatio?)
+			dampingRatio = argumentObject.dampingRatio ? argumentObject.damping
+		if argumentObject.mass?
+			mass = argumentObject.mass
+		if argumentObject.velocity?
+			velocity = argumentObject.velocity
+	return (options) ->
+		if dampingRatio?
+			duration = options?.time ? 1
+			derivedOptions = computeDerivedCurveOptions(dampingRatio, duration, velocity, mass)
+		else
+			delete options?.time
+			derivedOptions = argumentObject
+		options = _.defaults derivedOptions, options
+		animator = new SpringRK4Animator(options)
+		if duration?
+			animator.time = duration
+		animator
 
 _.assign Bezier, BezierDefaults
 Spring.computeDerivedCurveOptions = computeDerivedCurveOptions

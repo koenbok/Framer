@@ -612,7 +612,7 @@ describe "LayerAnimation", ->
 					animation = new Animation @layer,
 						x: 100
 						options:
-							curve: Spring.tfv(6, 3, 1)
+							curve: Spring(tension: 6, friction: 3, velocity: 1)
 					animation.start()
 					assert.equal(animation._animator.options.time, null)
 					animation._animator.options.tension.should.equal 6
