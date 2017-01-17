@@ -61,11 +61,11 @@ Originals =
 		velocityScale: 890
 	FrictionSimulator:
 		friction: 2
-		tolerance: 1/10
+		tolerance: 1 / 10
 	SpringSimulator:
 		tension: 500
 		friction: 10
-		tolerance: 1/10000
+		tolerance: 1 / 10000
 	MomentumBounceSimulator:
 		momentum:
 			friction: 2
