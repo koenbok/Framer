@@ -1,5 +1,5 @@
 assert = require "assert"
-{expect} = require "chai"
+
 
 initialStateName = "default"
 
@@ -168,15 +168,15 @@ describe "LayerStates Backwards compatibility", ->
 			layer.states.add "test", {x: 123}
 			animation = layer.states.switch "test"
 
-			animation.options.curve.should.equal Framer.Defaults.Animation.curve
+			animation.options.curve.should.equal Framer.Curves.fromString(Framer.Defaults.Animation.curve)
 
 			Framer.Defaults.Animation =
-				curve: "spring(1, 2, 3)"
+				curve: "ease-out"
 
 			layer = new Layer
 			layer.states.add "test", {x: 456}
 			animation = layer.states.switch "test"
 
-			animation.options.curve.should.equal "spring(1, 2, 3)"
+			animation.options.curve.should.equal Framer.Curves.Bezier.easeOut
 
 			Framer.resetDefaults()

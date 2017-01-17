@@ -10,12 +10,12 @@ describe "LayerAnimation", ->
 		it "should use defaults", ->
 
 			Framer.Defaults.Animation =
-				curve: "spring(1, 2, 3)"
+				curve: "ease-in"
 
 			animation = new Animation new Layer(),
 				x: 50
 
-			animation.options.curve.should.equal "spring(1, 2, 3)"
+			animation.options.curve.should.equal Bezier.easeIn
 
 			Framer.resetDefaults()
 
@@ -26,7 +26,7 @@ describe "LayerAnimation", ->
 			animation = new Animation new Layer(),
 				x: 50
 
-			animation.options.curve.should.equal "ease"
+			animation.options.curve.should.equal Bezier.ease
 			animation.options.time.should.equal 1
 
 	describe "Properties", ->
@@ -56,11 +56,11 @@ describe "LayerAnimation", ->
 				properties = {}
 				properties[p] = 100
 				options =
-					curve: "linear"
+					curve: Bezier.easeInOut
 					time: AnimationTime
 
 				animation = layer.animate properties, options
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.easeInOut
 				layer.on "end", ->
 					layer[p].should.equal 100
 					done()
@@ -71,11 +71,11 @@ describe "LayerAnimation", ->
 				properties = {}
 				properties[p] = 100
 				properties.options =
-					curve: "linear"
+					curve: Bezier.linear
 					time: AnimationTime
 
 				animation = layer.animate properties
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 
 				layer.on "end", ->
 					layer[p].should.equal 100
@@ -815,7 +815,7 @@ describe "LayerAnimation", ->
 
 				animation.layer.should.equal layer
 				animation.properties.should.eql {x: 50}
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 				animation.options.time.should.equal 0.1
 
 			it "should support the original api variation 1", ->
@@ -831,7 +831,7 @@ describe "LayerAnimation", ->
 
 				animation.layer.should.equal layer
 				animation.properties.should.eql {x: 50}
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 				animation.options.time.should.equal 0.1
 
 
@@ -849,7 +849,7 @@ describe "LayerAnimation", ->
 				layer = new Layer
 				layer.animationOptions = time: AnimationTime
 				animation = layer.animate({x: 10}, {curve: "linear"})
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 				animation.on Events.AnimationEnd, ->
 					layer.x.should.equal 10
 					done()
@@ -862,7 +862,7 @@ describe "LayerAnimation", ->
 					options:
 						curve: "linear"
 
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 				animation.on Events.AnimationEnd, ->
 					layer.x.should.equal 10
 					done()
@@ -876,7 +876,7 @@ describe "LayerAnimation", ->
 						curve: "linear"
 						curveOptions: undefined
 
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 				animation.on Events.AnimationEnd, ->
 					layer.x.should.equal 10
 				done()
@@ -895,7 +895,7 @@ describe "LayerAnimation", ->
 				layer.animationOptions = time: AnimationTime
 				layer.states.test = {x: 10}
 				animation = layer.animate("test", {curve: "linear"})
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 				animation.on Events.AnimationEnd, ->
 					layer.x.should.equal 10
 					done()
@@ -908,7 +908,7 @@ describe "LayerAnimation", ->
 					options:
 						curve: "linear"
 
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 				animation.on Events.AnimationEnd, ->
 					layer.x.should.equal 10
 					done()

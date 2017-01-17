@@ -2,15 +2,10 @@
 {computeDerivedCurveOptions, computeDuration} = require "./SpringCurveValueConverter"
 {SpringRK4Animator} = require "./SpringRK4Animator"
 
-console.log BezierCurveAnimator
-
-SpringDefaults =
-
 Bezier = (values...) ->
-	(options) ->
+	(options = {}) ->
 		options.values = values
 		new BezierCurveAnimator(options)
-
 
 BezierDefaults =
 	linear: Bezier(0, 0, 1, 1)
@@ -37,10 +32,28 @@ SpringVariants =
 	timed: Spring
 
 _.assign Bezier, BezierDefaults
-_.assign Spring, SpringVariants
 Spring.computeDerivedCurveOptions = computeDerivedCurveOptions
 Spring.computeDuration = computeDerivedCurveOptions
 
 exports.Spring = Spring
 exports.Bezier = Bezier
 exports.fromString = (string) ->
+	return null unless _.isString string
+	func = Utils.parseFunction(string)
+	args = func.args.map(parseFloat)
+	switch func.name
+		when "linear" then Bezier.linear
+		when "ease" then Bezier.ease
+		when "ease-in" then Bezier.easeIn
+		when "ease-out" then Bezier.easeOut
+		when "ease-in-out" then Bezier.easeInOut
+		when "bezier-curve", "cubic-bezier"
+			Bezier(args...)
+		when "spring", "spring-rk4", "spring-tfv"
+			pairs = _.zip(["tension", "friction", "velocity", "tolerance"], args)
+			object = _.fromPairs(pairs)
+			Spring(object)
+		when "spring-dd"
+			Spring(args...)
+		else
+			return Bezier.linear

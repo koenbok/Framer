@@ -7,6 +7,7 @@ Utils = require "./Utils"
 {BaseClass} = require "./BaseClass"
 {Animator} = require "./Animators/Animator"
 {LinearAnimator} = require "./Animators/LinearAnimator"
+Curves = require "./Animators/Curves"
 
 numberRE = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/
 relativePropertyRE = new RegExp("^(?:([+-])=|)(" + numberRE.source + ")([a-z%]*)$", "i")
@@ -83,8 +84,10 @@ class exports.Animation extends BaseClass
 		if properties.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
-		if not _.isFunction @options.curve
-			@options.curveOptions = Animator.curveOptionsFor(@options)
+		if _.isString @options.curve
+			@options.curve = Curves.fromString(@options.curve)
+		if @options.curve is Curves.Spring
+			@options.curve = @options.curve.call()
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
 
@@ -106,8 +109,7 @@ class exports.Animation extends BaseClass
 	@define "isNoop", @simpleProperty("isNoop", false)
 
 	start: =>
-
-		@_animator = Animation._createAnimator(@options) ? new LinearAnimator(@options.curveOptions)
+		@_animator = @options.curve(@options)
 		@_target = @layer
 		@_stateA = @_currentState()
 		@_stateB = {}
@@ -291,17 +293,6 @@ class exports.Animation extends BaseClass
 
 	_currentState: ->
 		return _.pick(@layer, _.keys(@properties))
-
-	@_createAnimator: (options) ->
-		if _.isFunction options.curve
-			return options.curve(options)
-		AnimatorClass = Animator.classForCurve(options.curve)
-		return null if not AnimatorClass?
-		curveOptions = options.curveOptions ? Animator.curveOptionsFor(options)
-		if options.debug
-			console.log "Animation.start #{AnimatorClass.name}", curveOptions
-
-		return new AnimatorClass curveOptions
 
 	@isAnimatable = (v) ->
 		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v)
