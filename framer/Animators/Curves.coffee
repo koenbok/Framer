@@ -44,23 +44,22 @@ Spring.computeDuration = computeDerivedCurveOptions
 
 exports.Spring = Spring
 exports.Bezier = Bezier
-fromFunction = (string) ->
+parseFunction = (string) ->
 	return null unless _.isString string
 
-	regex = /.*(Spring|Bezier)(?:\(([a-zA-Z\d:\s,.]*)\)|\.(\w+))?/
+	regex = /.*(Spring|Bezier)(?:\(\s*{?([a-zA-Z\d:\s,.]*)}?\s*\)|\.(\w+))?/
 	matches = regex.exec(string)
 	return null unless matches?
-
 	[match, type, args, prop] = matches
-	curve = Framer.Curves[type]
-	if not curve?
-		return null
+	result = {name: type, property: null, arguments: null}
 	if prop?
-		return curve[prop]
+		result.property = prop
+		return result
 	if not args?
-		return curve
+		return result
 	if args.length is 0
-		return curve()
+		result.arguments = []
+
 
 	argumentsRegex = /\s*([a-zA-Z]+)\s*:\s*([\d.]+)\s*,?/g
 	argumentObject = {}
@@ -70,7 +69,8 @@ fromFunction = (string) ->
 		if not isNaN(value)
 			argumentObject[property] = value
 	if _.size(argumentObject) > 0
-		return curve(argumentObject)
+		result.arguments = argumentObject
+		return result
 
 	numbersRegex = /\s*([.\d]+)\s*/g
 	numbers = []
@@ -78,13 +78,29 @@ fromFunction = (string) ->
 		[match, value] = matches
 		value = parseFloat(value)
 		numbers.push(value)
-	return curve(numbers...)
+	result.arguments = numbers
+	return result
 
+fromDefinition = (definition) ->
+	return null unless definition?
+	curve = Framer.Curves[definition.name]
+	return null unless curve?
 
-exports.fromFunction = fromFunction
+	if definition.property?
+		return curve[definition.property]
+	if not definition.arguments?
+		return curve
+
+	if _.isArray(definition.arguments)
+		return curve(definition.arguments...)
+
+	return curve(definition.arguments)
+
+exports.parseFunction = parseFunction
+exports.fromDefinition = fromDefinition
 exports.fromString = (string) ->
 	return null unless _.isString string
-	func = fromFunction(string)
+	func = fromDefinition(parseFunction(string))
 	if func?
 		return func
 	func = Utils.parseFunction(string)
