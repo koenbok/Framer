@@ -1,1 +1,0 @@
-A module that captures coverage data from PhantomJS and saves it to build/coverage/jscoverage.json

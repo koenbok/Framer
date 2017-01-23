@@ -1,53 +1,13 @@
 {
-  "name": "framerjs",
-  "version": "3.0.0",
-  "description": "Modern Prototyping Framework",
-  "main": "lib/Framer.js",
-  "directories": {
-    "doc": "docs",
-    "test": "test"
-  },
-  "scripts": {
-    "test": "make test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/koenbok/Framer.git"
-  },
-  "devDependencies": {
-    "async": "^2.0.1",
-    "bower": "^1.3.12",
-    "chai": "^3.4.1",
-    "coffee-coverage": "^1.0.1",
-    "coffee-loader": "^0.7.2",
-    "coffee-script": "^1.9.1",
-    "eventemitter3": "^1.1.1",
-    "gulp": "^3.8.11",
-    "gulp-coffeelint": "^0.6.0",
-    "gulp-mocha-phantomjs": "^0.11.0",
-    "gulp-plumber": "^1.0.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-template": "^4.0.0",
-    "gulp-util": "^3.0.7",
-    "husl": "6.0.1",
-    "knox": "^0.9.2",
-    "lodash": "^4.14.1",
-    "mime": "^1.3.4",
-    "mocha": "^3.0.0",
-    "mocha-phantomjs": "^4.0.1",
-    "mustache": "^2.0.0",
-    "simulate": "^0.0.5",
-    "webpack": "^1.7.3",
-    "webpack-dev-server": "^1.14.1",
-    "webpack-stream": "^3.0.1"
-  },
-  "keywords": [
-    "prototyping"
-  ],
-  "author": "Koen Bok",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/koenbok/Framer/issues"
-  },
-  "homepage": "http://framerjs.com"
+  "dependencies": {
+    "git-repo-info": "^1.4.0",
+    "jest": "^18.1.0",
+    "json-loader": "^0.5.4",
+    "lodash": "^4.17.4",
+    "react": "^15.4.2",
+    "ts-loader": "^2.0.0",
+    "typescript": "^2.1.5",
+    "webpack": "^1.14.0",
+    "webpack-dev-server": "^1.16.2"
+  }
 }

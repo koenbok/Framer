@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "es2015",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "allowJs": true,
+        "noImplicitAny": false,
+        "strictNullChecks": true,
+        "declaration": false,
+        "noEmitOnError": false
+    },
+    "exclude": [
+        "node_modules",
+        "build",
+        "chrome/tools"
+    ],
+    "filesGlob": [
+      "**/*.ts"
+    ]
+}

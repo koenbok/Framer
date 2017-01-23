@@ -1,76 +1,25 @@
-# Configuration
-
-BIN = $(CURDIR)/node_modules/.bin
-
-DEFAULT_TARGET = extras/Studio.framer
-TARGET ?= $(DEFAULT_TARGET)
-TARGET_EXPANDED = $(shell echo $(TARGET)) # For ~ in paths, gulp needs this
-
-.PHONY: watch test debug release
-
-default: lazy_bootstrap lazy_build test
-
-# Utilities
+default: dev
 
 bootstrap:
-	npm install
+	@yarn || (echo "Install yarn first – https://yarnpkg.com/" && exit 1)
 
-lazy_bootstrap: ; @test -d ./node_modules || make bootstrap
+test: bootstrap
+	yarn test
 
-unbootstrap:
-	rm -Rf node_modules
+build: bootstrap
+	./node_modules/.bin/webpack \
+		--hide-modules \
+		--config webpack/webpack.build.js
 
-
+dev: bootstrap
+	./node_modules/.bin/webpack-dev-server \
+		--config webpack/webpack.dev.js \
+		--content-base ./static \
+		--no-info \
+		--port 8008 \
+		--open
 
 clean:
 	rm -rf build
-	rm -Rf node_modules
 
-
-# Building and testing
-
-watch: lazy_bootstrap
-	-cp $(DEFAULT_TARGET)/index.html $(TARGET)
-	TARGET='$(strip $(TARGET_EXPANDED))' $(BIN)/gulp watch
-
-build: lazy_bootstrap
-	$(BIN)/gulp webpack:debug
-
-lazy_build: ; @test -f ./build/framer.debug.js || make build
-
-test: lazy_build
-	$(BIN)/gulp test
-
-lint: lazy_build
-	$(BIN)/gulp lint
-
-
-release: lazy_bootstrap
-	$(BIN)/gulp webpack:release
-
-
-# Framer Studio
-
-studio:
-	open -a "Framer Beta" ${TARGET}
-	make watch
-
-perf: debug
-	open -a "Framer Beta" extras/Perf.framer
-
-
-# Distribution
-
-dist: release
-	scripts/dist.sh
-
-site-build: dist
-	scripts/site-build.sh
-
-site-upload: bootstrap site-build
-	$(BIN)/coffee scripts/site.coffee upload
-
-# Resources
-
-resources:
-	scripts/resources-optimize.sh
+.PHONY: test bootstrap clean build
