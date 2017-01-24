@@ -37,10 +37,10 @@ class Preloader extends BaseClass
 		@brand.style["background-image"] = "url('#{url}')" if @brand
 
 	addImagesFromContext: (context) ->
-		_.pluck(context.layers, "image").map(@addImage)
+		_.map(context.layers, "image").map(@addImage)
 
 	addPlayersFromContext: (context) ->
-		_.pluck(context.layers, "player").map(@addPlayer)
+		_.map(context.layers, "player").map(@addPlayer)
 
 	addImage: (image) =>
 		if image and image not in @_media
