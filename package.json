@@ -1,13 +1,31 @@
 {
   "dependencies": {
+    "@types/mocha": "^2.2.38",
+    "@types/node": "^7.0.3",
     "git-repo-info": "^1.4.0",
     "jest": "^18.1.0",
     "json-loader": "^0.5.4",
     "lodash": "^4.17.4",
+    "mocha": "^3.2.0",
     "react": "^15.4.2",
+    "ts-jest": "^18.0.1",
     "ts-loader": "^2.0.0",
     "typescript": "^2.1.5",
     "webpack": "^1.14.0",
     "webpack-dev-server": "^1.16.2"
+  },
+  "jest": {
+    "globals": {
+      "__TS_CONFIG__": "tsconfig.json"
+    },
+    "transform": {
+      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ]
   }
 }

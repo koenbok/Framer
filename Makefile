@@ -4,7 +4,7 @@ bootstrap:
 	@yarn || (echo "Install yarn first – https://yarnpkg.com/" && exit 1)
 
 test: bootstrap
-	yarn test
+	./node_modules/.bin/jest --watch
 
 build: bootstrap
 	./node_modules/.bin/webpack \

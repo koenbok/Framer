@@ -7,7 +7,11 @@
         "noImplicitAny": false,
         "strictNullChecks": true,
         "declaration": false,
-        "noEmitOnError": false
+        "noEmitOnError": false,
+        "types": [
+            "mocha",
+            "node"
+        ]
     },
     "exclude": [
         "node_modules",
