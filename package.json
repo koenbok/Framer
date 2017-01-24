@@ -1,13 +1,16 @@
 {
   "dependencies": {
+    "@types/lodash": "^4.14.50",
     "@types/mocha": "^2.2.38",
     "@types/node": "^7.0.3",
+    "@types/react": "^15.0.2",
     "git-repo-info": "^1.4.0",
     "jest": "^18.1.0",
     "json-loader": "^0.5.4",
     "lodash": "^4.17.4",
     "mocha": "^3.2.0",
     "react": "^15.4.2",
+    "react-dom": "^15.4.2",
     "ts-jest": "^18.0.1",
     "ts-loader": "^2.0.0",
     "typescript": "^2.1.5",

@@ -1,6 +1,8 @@
+import * as _ from "lodash"
+
 export class BaseClass {
 
-	private _dirty = {}
+	private _dirty = new Set()
 
 	emit(name, value) {
 		// TODO: Emitter
@@ -8,16 +10,18 @@ export class BaseClass {
 
 	_updateProperty(name: string, value: any) {
 		this.emit(`change:${name}`, value)
-		this._dirty[name] = value
+		this._dirty.add(name)
 	}
 
 	isDirty() {
-		return Object.keys(this._dirty).length > 0
+		return this._dirty.size > 0
+	}
+
+	dirtyValues() {
+		return _.pick(this, Array.from(this._dirty))
 	}
 
 	flush() {
-		const result = this._dirty
-		this._dirty = {}
-		return result
+		this._dirty.clear()
 	}
 }

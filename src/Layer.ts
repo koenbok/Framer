@@ -1,13 +1,15 @@
 import {BaseClass} from "./BaseClass"
-import {Context} from "./Context"
+import {Context, DefaultContext, CurrentContext} from "./Context"
 
 interface LayerOptions {
+		context?: Context
 		parent?: Layer|Context|null,
 		x?: number,
 		y?: number,
 		width?: number,
 		height?: number,
-		backgroundColor?: string
+		backgroundColor?: string,
+		opacity?: number
 }
 
 export class Layer extends BaseClass {
@@ -18,7 +20,8 @@ export class Layer extends BaseClass {
 		y: 0,
 		width: 200,
 		height: 200,
-		backgroundColor: "rgba(255, 0, 0, 0.5)"
+		backgroundColor: "rgba(255, 0, 0, 0.5)",
+		opacity: 1
 	}
 
 	constructor(options: LayerOptions={}) {
@@ -60,6 +63,15 @@ export class Layer extends BaseClass {
 	set height(value) {
 		this._updateProperty("height", value)
 		this._properties.height = value
+	}
+
+	get backgroundColor() {
+		return this._properties.backgroundColor
+	}
+
+	set backgroundColor(value) {
+		this._updateProperty("backgroundColor", value)
+		this._properties.backgroundColor = value
 	}
 
 	animate(options={}) {
