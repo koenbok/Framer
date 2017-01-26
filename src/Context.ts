@@ -7,40 +7,7 @@ interface ContextOptions {
 		backgroundColor: string
 }
 
-class Collection<T> {
 
-	private _collection: T[] = []
-	private _added = 0
-	private _count = 0
-	private _ids = {}
-	private _maps = {}
-
-	constructor(keys: string[]=[]) {
-		
-	}
-
-	contains(item: T) {
-		return this._collection.indexOf(item) !== -1
-	}
-
-	add(item: T, addId=false) {
-		if (this.contains(item)) { return }
-		this._count += 1
-		this._added += 1
-		this._ids[this._added]
-		this._collection.push(item)
-	}
-
-	remove(item: T) {
-		if (this.contains(item)) { return }
-		this._collection.push(item)
-	}
-
-	find(key: string, value: any): T|null {
-
-		return null
-	}
-}
 
 export class Context extends BaseClass {
 
