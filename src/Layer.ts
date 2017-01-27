@@ -14,6 +14,7 @@ interface LayerOptions {
 
 export class Layer extends BaseClass {
 
+	private _id = -1
 	private _properties: LayerOptions = {
 		parent: null,
 		x: 0,
@@ -27,6 +28,41 @@ export class Layer extends BaseClass {
 	constructor(options: LayerOptions={}) {
 		super()
 		Object.assign(this, options)
+
+		this._id = this.context.addLayer(this)
+
+	}
+
+	get id() {
+		return this._id
+	}
+
+	get context(): Context {
+		return this._properties.context || CurrentContext
+	}
+
+	get parent() {
+		return this._properties.parent
+	}
+
+	set parent(value) {
+
+		if (this.parent === value) {
+			return
+		}
+
+		if (this.parent) {
+
+		}
+
+		this._updateProperty("parent", value)
+		this._properties.parent = value
+	}
+
+	get children(): Layer[] {
+		return this.context.layers.filter((layer) => {
+			return layer.parent === this
+		})
 	}
 
 	get x() {

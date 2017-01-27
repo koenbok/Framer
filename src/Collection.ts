@@ -1,8 +1,22 @@
 import * as _ from "lodash"
 
+const add = (array, item) => {
+	array = array.slice(0)
+	array.push(item)
+	Object.freeze(array)
+	return array
+}
+
+const remove = (array, item) => {
+	array = array.slice(0)
+	array.splice(array.indexOf(item), 1)
+	Object.freeze(array)
+	return array
+}
+
 export class Collection<T> {
 
-	private _collection: T[] = []
+	private _items: T[] = []
 	private _added = 0
 	private _count = 0
 	private _ids = {}
@@ -15,7 +29,7 @@ export class Collection<T> {
 	}
 
 	contains(item: T): boolean {
-		return this._collection.indexOf(item) !== -1
+		return this._items.indexOf(item) !== -1
 	}
 
 	add(item: T, addId=false): number {
@@ -27,7 +41,8 @@ export class Collection<T> {
 		this._count += 1
 		this._added += 1
 		this._ids[this._added] = item
-		this._collection.push(item)
+
+		this._items = add(this._items, item)
 
 		return this._added
 	}
@@ -35,9 +50,10 @@ export class Collection<T> {
 	remove(item: T): number {
 		if (!this.contains(item)) { return -1 }
 		let id = this.getId(item)
-		this._collection.splice(this._collection.indexOf(item), 1)
+
+		this._items = remove(this._items, item)
+
 		delete this._ids[id]
-		console.log(id, this._ids);
 
 		this._count--
 		return id
@@ -69,5 +85,9 @@ export class Collection<T> {
 
 	get count() {
 		return this._count
+	}
+
+	items() {
+		return this._items
 	}
 }

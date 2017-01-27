@@ -16,7 +16,7 @@ it("should have defaults", () => {
 it("should take defaults", () => {
 
 	let layer = new Layer({x: 500, y: 500})
-	
+
 	assert.equal(layer.x, 500)
 	assert.equal(layer.y, 500)
 })
@@ -24,7 +24,7 @@ it("should take defaults", () => {
 it("should set dirty", () => {
 
 	let layer = new Layer()
-	
+
 	layer.x = 500
 	layer.y = 500
 
@@ -36,7 +36,7 @@ it("should set dirty", () => {
 it("should flush", () => {
 
 	let layer = new Layer()
-	
+
 	layer.x = 500
 	layer.y = 500
 
@@ -46,6 +46,19 @@ it("should flush", () => {
 	layer.flush()
 
 	assert.equal(layer.isDirty(), false)
-	assert.deepEqual(layer.dirtyValues(), {})	
+	assert.deepEqual(layer.dirtyValues(), {})
+
+})
+
+it("should set parent", () => {
+
+	let layerA = new Layer()
+	let layerB = new Layer()
+
+	assert.equal(layerA.parent, null)
+
+	layerA.parent = layerB
+	assert.equal(layerA.parent, layerB)
+	assert.deepEqual(layerB.children, [layerA])
 
 })

@@ -1,17 +1,16 @@
 
 import {BaseClass} from "./BaseClass"
 import {Layer} from "./Layer"
+import {Collection} from "./Collection"
 
 interface ContextOptions {
 		parent: Layer|Context|null,
 		backgroundColor: string
 }
 
-
-
 export class Context extends BaseClass {
 
-	_layers: Layer[] = []
+	private _layers = new Collection<Layer>()
 
 	private _properties: ContextOptions = {
 		parent: null,
@@ -22,8 +21,12 @@ export class Context extends BaseClass {
 		super()
 	}
 
+	addLayer(layer: Layer) {
+		return this._layers.add(layer)
+	}
+
 	get layers() {
-		return this._layers
+		return this._layers.items()
 	}
 
 }

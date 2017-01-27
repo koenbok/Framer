@@ -24,3 +24,19 @@ it("should add and remove", () => {
 	assert.equal(layers.getId(layerA), -1)
 	assert.equal(layers.contains(layerA), false)
 })
+
+
+it("should freeze", () => {
+
+	let layers = new Collection<Layer>()
+	let layerA: Layer = {id: 0}
+
+	layerA.id = layers.add(layerA)
+	assert.deepEqual(layers.items(), [layerA])
+
+	assert.throws(() => {
+		let layerB: Layer = {id: 0}
+		layers.items().push(layerB)
+	}, Error)
+
+})
