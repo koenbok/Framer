@@ -475,6 +475,7 @@ Utils.mapRange = (value, fromLow, fromHigh, toLow, toHigh) ->
 	toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
 
 # Kind of similar as above but with a better syntax and a limiting option
+# Improve limiting option by adding array support for different settings on low and high range
 Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 
 	[fromLow, fromHigh] = rangeA
@@ -488,15 +489,27 @@ Utils.modulate = (value, rangeA, rangeB, limit=false) ->
 
 	result = toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
 
-	if limit is true
+	if limit is true or _.isEqual(limit, [true, true])
 		if toLow < toHigh
 			return toLow if result < toLow
 			return toHigh if result > toHigh
 		else
 			return toLow if result > toLow
 			return toHigh if result < toHigh
+	
+	if _.isEqual(limit, [true, false])
+		if toLow < toHigh
+			return toLow if result < toLow
+		else
+			return toLow if result > toLow
 
-	result
+	if _.isEqual(limit, [false, true])
+		if toLow < toHigh
+			return toHigh if result > toHigh
+		else
+			return toHigh if result < toHigh
+
+	return result
 
 
 
