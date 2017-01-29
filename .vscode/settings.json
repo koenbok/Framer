@@ -1,3 +1,6 @@
 {
-	"typescript.tsdk": "./node_modules/typescript/lib"
+	"typescript.tsdk": "./node_modules/typescript/lib",
+	"prettier.tabWidth": 4,
+    "prettier.formatOnSave": false,
+	"prettier.trailingComma": false
 }

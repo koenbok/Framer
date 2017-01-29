@@ -4,11 +4,19 @@ import {Layer} from "./Layer"
 import {Collection} from "./Collection"
 
 interface ContextOptions {
-		parent: Layer|Context|null,
-		backgroundColor: string
+	parent: Layer|Context|null,
+	backgroundColor: string
 }
 
 export class Context extends BaseClass {
+
+	static get Default() {
+		return DefaultContext
+	}
+
+	static get Current() {
+		return CurrentContext
+	}
 
 	private _layers = new Collection<Layer>()
 
@@ -27,6 +35,10 @@ export class Context extends BaseClass {
 
 	get layers() {
 		return this._layers.items()
+	}
+
+	get children() {
+		return this.layers.filter((layer) => { return !layer.parent })
 	}
 
 }
