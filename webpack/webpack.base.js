@@ -33,6 +33,7 @@ module.exports = function() {
 			// modules: [
 			// 	path.join(PROJECT_PATH, "node_modules"), 
 			// 	path.join(PROJECT_PATH, "src")],
+			root: [path.join(PROJECT_PATH, "src")],
 			extensions: ["", ".js", ".json", ".ts", ".tsx"],
 		},
 		// resolveLoader: {

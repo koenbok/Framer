@@ -12,37 +12,41 @@ interface Props {
 
 class Renderable extends React.Component<Props, {}> {
 
-	shouldComponentUpdate(nextProps: Props, nextState) {
+	// shouldComponentUpdate(nextProps: Props, nextState) {
 		
-		const update = ((this.props.layer === nextProps.layer) && this.props.layer.isDirty())
+	// 	const update = ((this.props.layer === nextProps.layer) && this.props.layer.isDirty())
 
-		// if (update) {
-		// 	console.log("update", this.props.layer);
-		// }
+	// 	// if (update) {
+	// 	// 	console.log("update", this.props.layer);
+	// 	// }
 
-		return update
-	}
+	// 	return update
+	// }
 
-	componentDidMount() {
-		console.log("mount", this.props.layer);
-	}
+	// componentDidMount() {
+	// 	console.log("mount", this.props.layer);
+	// 	// this.props.layer._element = 
+	// }
 
-	componentWillUnmount() {
-		console.log("unmount", this.props.layer);
-	}
+	// componentWillUnmount() {
+	// 	console.log("unmount", this.props.layer);
+	// }
 
 	render() {
-		return React.createElement("div", {style: getLayerStyles(this.props.layer)}, this.props.layer.children.map(renderLayer))
+
+		const layer = this.props.layer
+		const props = {
+			style: getLayerStyles(layer),
+			ref: (node) => { layer._element = node }
+		}
+		
+		return React.createElement("div", props, this.props.layer.children.map(renderLayer))
 	}
 }
 
 const renderLayer = (layer) => {
 	return React.createElement(Renderable, {layer: layer, key: layer.id}, layer.children.map(renderLayer))
 }
-
-// const renderLayers = (layers) => {
-// 	return React.createElement("div", )
-// }
 
 const FramerNode = document.createElement("div")
 

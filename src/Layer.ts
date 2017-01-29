@@ -25,12 +25,19 @@ export class Layer extends BaseClass {
 		opacity: 1
 	}
 
+	_element: HTMLElement
+
 	constructor(options: LayerOptions={}) {
 		super()
 		Object.assign(this, options)
 
 		this._id = this.context.addLayer(this)
+		this.context.renderer.updateStructure()
+	}
 
+	_updateProperty(name: string, value: any) {
+		super._updateProperty(name, value)
+		this.context.renderer.updateStyle(this, name, value)
 	}
 
 	get id() {
@@ -51,10 +58,7 @@ export class Layer extends BaseClass {
 			return
 		}
 
-		if (this.parent) {
-
-		}
-
+		this.context.renderer.updateStructure()
 		this._updateProperty("parent", value)
 		this._properties.parent = value
 	}

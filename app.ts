@@ -1,6 +1,6 @@
 import * as _ from "lodash"
 
-import {Layer, Framer, Loop} from "./src/Framer"
+import {Layer, Framer, Context, Loop} from "./src/Framer"
 
 import {render} from "./src/render/react/ReactRenderer"
 
@@ -9,20 +9,48 @@ let layer = new Layer()
 
 let layerB = new Layer()
 
-console.log(layer);
+layer.x = 400
+
+// setTimeout(() => { 
+//     layerB.y = 200
+//     layerB.backgroundColor = "blue"
+
+// }, 1000)
 
 
+const range = n => Array.from({length: n}, (value, key) => key)
 
-Loop.addEventListener("update", () => {
-    layer.x += 0.1
-})
+const run = () => {
+    Context.Default.reset()
 
-Loop.addEventListener("render", () => {
-    render(Framer.Context.Default)
-})
+    for (let i in range(10)) {
+        let layer = new Layer({
+            x: Math.round(Math.random()) * 500, 
+            y: Math.round(Math.random() * 500)})
+
+        setTimeout(() => {
+            layer.backgroundColor = "blue"
+        }, 1000)
+        
+    }
+
+}
+
+run()
+setInterval(run, 2000)
+
+// let layer = new Layer()
+
+
+// Loop.addEventListener("update", () => {
+//     layer.x += 0.1
+// })
+
+// Loop.addEventListener("render", () => {
+//     render(Framer.Context.Default)
+// })
 
 
 import {AnimationProperty} from "./src/AnimationProperty"
 import {AnimationCurve} from "./src/AnimationCurve"
 
-let p = new AnimationProperty(Loop, layer, "x", 0, 100, new AnimationCurve())

@@ -1,12 +1,10 @@
 import * as _ from "lodash"
+import {EventEmitter} from "events"
 
-export class BaseClass {
+export class BaseClass extends EventEmitter {
 
 	private _dirty = new Set()
 
-	emit(name, value) {
-		// TODO: Emitter
-	}
 
 	_updateProperty(name: string, value: any) {
 		this.emit(`change:${name}`, value)

@@ -7,18 +7,42 @@ export class AnimationLoop extends EventEmitter {
     private counter = 0
     private time = time()
 
+    static get Default() {
+        return DefaultAnimationLoop
+    }
+
     constructor() {
         super()
         this.start()
     }
 
     start() {
-        this.tick()
+        window.requestAnimationFrame(this.tick)
     }
 
-    addEventListener = (event: string | symbol, listener: Function) => {
+    // addEventListener = (event: string | symbol, listener: Function) => {
+    //     super.addListener(event, listener)
+    //     this.start()
+    // }
+
+    // on: () => {}
+
+    addListener(event: string | symbol, listener: Function) {
         super.addListener(event, listener)
         this.start()
+        return this
+    }
+
+    on(event: string | symbol, listener: Function) {
+        super.on(event, listener)
+        this.start()
+        return this
+    }
+
+    once(event: string | symbol, listener: Function) {
+        super.once(event, listener)
+        this.start()
+        return this
     }
 
     private tick = () => {
@@ -34,3 +58,5 @@ export class AnimationLoop extends EventEmitter {
         }
     }
 }
+
+export const DefaultAnimationLoop = new AnimationLoop()
