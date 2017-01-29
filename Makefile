@@ -15,7 +15,6 @@ dev: bootstrap
 	./node_modules/.bin/webpack-dev-server \
 		--config webpack/webpack.dev.js \
 		--content-base ./static \
-		--no-info \
 		--port 8008 \
 		--open
 

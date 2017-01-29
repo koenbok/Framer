@@ -11,8 +11,7 @@ module.exports = function() {
 		// context: path.join(__dirname, "..", "src"),
 		output: {
 			path: path.join(PROJECT_PATH, "build"),
-			filename: "[name].js",
-			// publicPath: path.join(PROJECT_PATH, "build")
+			filename: "[name].js"
 		},
 		// devServer: {
 		// 	inline: true
