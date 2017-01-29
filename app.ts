@@ -1,4 +1,5 @@
+import * as _ from "lodash"
 
-import * as React from  "react"
+import {Layer, Framer} from "./src/Framer"
 
-console.log("hello")
+let layer = new Layer()

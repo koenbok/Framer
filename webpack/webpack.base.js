@@ -12,12 +12,11 @@ module.exports = function() {
 		output: {
 			path: path.join(PROJECT_PATH, "build"),
 			filename: "[name].js",
-			publicPath: path.join(PROJECT_PATH, "build")
+			// publicPath: path.join(PROJECT_PATH, "build")
 		},
 		// devServer: {
 		// 	inline: true
 		// },
-		// devtool: "source-map",
 		devtool: "cheap-module-source-map",
 		// target: "web",
 		// externals: {
@@ -35,7 +34,7 @@ module.exports = function() {
 			// modules: [
 			// 	path.join(PROJECT_PATH, "node_modules"), 
 			// 	path.join(PROJECT_PATH, "src")],
-			extensions: [".js", ".json", ".ts", ".tsx"],
+			extensions: ["", ".js", ".json", ".ts", ".tsx"],
 		},
 		// resolveLoader: {
 		// 	root: path.join(PROJECT_PATH, "node_modules")
