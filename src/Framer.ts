@@ -6,6 +6,9 @@ export const Framer = {
 	Context: Context
 }
 
+export {Layer, Context}
+
+
 interface Window {
 	Framer: typeof Framer
 }

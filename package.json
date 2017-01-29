@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/lodash": "^4.14.50",
+    "@types/lodash": "^4.14.51",
     "@types/mocha": "^2.2.38",
     "@types/node": "^7.0.3",
     "@types/react": "^15.0.2",

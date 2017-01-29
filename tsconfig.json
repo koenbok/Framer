@@ -3,17 +3,18 @@
         "target": "es2015",
         "module": "commonjs",
         "moduleResolution": "node",
-        "allowJs": true,
+        "allowJs": false,
         "noImplicitAny": false,
         "strictNullChecks": true,
         "declaration": false,
-        "noEmitOnError": false,
+        "noEmitOnError": true,
         "types": [
             "mocha",
             "node"
         ]
     },
     "exclude": [
+        "**/*.js",
         "node_modules",
         "build",
         "chrome/tools"

@@ -1,9 +1,4 @@
-declare var Framer
 
-// const Layer = Framer.Layer
-// const Context = Framer.Context
+import * as React from  "react"
 
-// let layer = new Layer()
-
-
-console.log(Framer, "hello world")
+console.log("hello")

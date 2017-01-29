@@ -4,12 +4,12 @@ bootstrap:
 	@yarn || (echo "Install yarn first – https://yarnpkg.com/" && exit 1)
 
 test: bootstrap
-	./node_modules/.bin/jest --watch
+	./node_modules/.bin/jest --watchAll
 
 build: bootstrap
 	./node_modules/.bin/webpack \
 		--hide-modules \
-		--config webpack/webpack.build.js
+		--config webpack/webpack.dev.js
 
 dev: bootstrap
 	./node_modules/.bin/webpack-dev-server \
@@ -21,5 +21,8 @@ dev: bootstrap
 
 clean:
 	rm -rf build
+
+typescript:
+	./node_modules/.bin/tsc --noEmit --p ./tsconfig.json
 
 .PHONY: test bootstrap clean build
