@@ -11,6 +11,7 @@
     "mocha": "^3.2.0",
     "preact": "^7.1.0",
     "preact-compat": "^3.13.0",
+    "raf": "^3.3.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "ts-jest": "^18.0.1",
@@ -23,6 +24,9 @@
     "globals": {
       "__TS_CONFIG__": "tsconfig.json"
     },
+    "modulePaths": [
+      "<rootDir>/src"
+    ],
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },

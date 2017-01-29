@@ -1,6 +1,6 @@
 import * as assert from "assert"
 
-import {Collection} from "../Collection"
+import {Collection} from "Collection"
 
 interface Layer {
 	id: number|string

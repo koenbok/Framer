@@ -1,6 +1,13 @@
 import {EventEmitter} from "events"
+import * as raf from "raf"
 
-const time = () => window.performance.now()
+
+const performance = (window.performance || {
+    offset: Date.now(),
+    now: function now() { return Date.now() - this.offset }
+})
+
+const time = () => performance.now()
 
 export class AnimationLoop extends EventEmitter {
 
@@ -17,7 +24,7 @@ export class AnimationLoop extends EventEmitter {
     }
 
     start() {
-        window.requestAnimationFrame(this.tick)
+        raf(this.tick)
     }
 
     // addEventListener = (event: string | symbol, listener: Function) => {
@@ -54,7 +61,7 @@ export class AnimationLoop extends EventEmitter {
         this.counter++
         
         if (this.listenerCount("update") > 0 || this.listenerCount("render") > 0) {
-            window.requestAnimationFrame(this.tick)
+            raf(this.tick)
         }
     }
 }

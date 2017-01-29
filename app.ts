@@ -1,6 +1,6 @@
 import * as _ from "lodash"
 
-import {Layer, Framer, Context, Loop} from "./src/Framer"
+import {Layer, Framer, Context, Loop} from "Framer"
 
 import {render} from "./src/render/react/ReactRenderer"
 
@@ -19,20 +19,25 @@ layer.x = 400
 
 
 const range = n => Array.from({length: n}, (value, key) => key)
+const value = () => Math.round(Math.random() * 255)
+const randomColor = (alpha=1) => `rgba(${value()}, ${value()}, ${value()}, ${alpha})`
 
 const run = () => {
     Context.Default.reset()
 
-    for (let i in range(10)) {
-        let layer = new Layer({
-            x: Math.round(Math.random()) * 500, 
+    let layers = range(100).map(() => {
+        return new Layer({
+            x: Math.round(Math.random() * 500), 
             y: Math.round(Math.random() * 500)})
+    })
 
-        setTimeout(() => {
-            layer.backgroundColor = "blue"
-        }, 1000)
-        
-    }
+    setTimeout(() => {
+        layers.forEach((layer) => {
+            layer.backgroundColor = randomColor(0.5)
+        })
+    }, 1000)
+
+
 
 }
 

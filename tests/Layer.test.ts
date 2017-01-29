@@ -1,6 +1,6 @@
 import * as assert from "assert"
 
-import {Layer} from "../Layer"
+import {Layer} from "Layer"
 
 
 it("should have defaults", () => {
