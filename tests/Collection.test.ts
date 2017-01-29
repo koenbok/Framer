@@ -25,7 +25,6 @@ it("should add and remove", () => {
 	assert.equal(layers.contains(layerA), false)
 })
 
-
 it("should freeze", () => {
 
 	let layers = new Collection<Layer>()

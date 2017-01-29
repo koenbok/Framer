@@ -9,6 +9,8 @@ const performance = (window.performance || {
 
 const time = () => performance.now()
 
+type AnimationLoopListenerNames = "render" | "update"
+
 export class AnimationLoop extends EventEmitter {
 
     private counter = 0
@@ -27,29 +29,32 @@ export class AnimationLoop extends EventEmitter {
         raf(this.tick)
     }
 
-    // addEventListener = (event: string | symbol, listener: Function) => {
-    //     super.addListener(event, listener)
-    //     this.start()
-    // }
-
-    // on: () => {}
-
-    addListener(event: string | symbol, listener: Function) {
+    addListener(event: AnimationLoopListenerNames, listener: Function) {
         super.addListener(event, listener)
         this.start()
         return this
     }
 
-    on(event: string | symbol, listener: Function) {
+    on(event: AnimationLoopListenerNames, listener: Function) {
         super.on(event, listener)
         this.start()
         return this
     }
 
-    once(event: string | symbol, listener: Function) {
+    once(event: AnimationLoopListenerNames, listener: Function) {
         super.once(event, listener)
         this.start()
         return this
+    }
+    
+    /** Run this handler at most once until the event was emitted */
+    schedule(event: AnimationLoopListenerNames, listener: Function) {
+
+        for (let f of this.listeners(event)) {
+            if (f === listener) { return }
+        }
+        
+        this.once(event, listener)
     }
 
     private tick = () => {

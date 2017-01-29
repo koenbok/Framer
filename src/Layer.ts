@@ -3,7 +3,7 @@ import {Context, DefaultContext, CurrentContext} from "./Context"
 
 interface LayerOptions {
 		context?: Context
-		parent?: Layer|Context|null,
+		parent?: Layer|null,
 		x?: number,
 		y?: number,
 		width?: number,
@@ -14,9 +14,10 @@ interface LayerOptions {
 
 export class Layer extends BaseClass {
 
+	private _context: Context
+	private _parent: Layer|null
 	private _id = -1
-	private _properties: LayerOptions = {
-		parent: null,
+	private _properties = {
 		x: 0,
 		y: 0,
 		width: 200,
@@ -32,6 +33,12 @@ export class Layer extends BaseClass {
 		Object.assign(this, options)
 
 		this._id = this.context.addLayer(this)
+
+		// TODO: Maybe we store parent by id in properties?
+		if (options.parent) {
+			this.parent = options.parent
+		}
+
 		this.context.renderer.updateStructure()
 	}
 
@@ -45,11 +52,11 @@ export class Layer extends BaseClass {
 	}
 
 	get context(): Context {
-		return this._properties.context || CurrentContext
+		return this._context || CurrentContext
 	}
 
 	get parent() {
-		return this._properties.parent
+		return this._parent
 	}
 
 	set parent(value) {
@@ -60,7 +67,7 @@ export class Layer extends BaseClass {
 
 		this.context.renderer.updateStructure()
 		this._updateProperty("parent", value)
-		this._properties.parent = value
+		this._parent = value
 	}
 
 	get children(): Layer[] {

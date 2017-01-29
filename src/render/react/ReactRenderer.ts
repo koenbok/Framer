@@ -32,6 +32,11 @@ class Renderable extends React.Component<Props, {}> {
 	// 	console.log("unmount", this.props.layer);
 	// }
 
+	// componentDidUpdate(prevProps, prevState) {
+	// 	getLayerStyles(this.props.layer, this.props.layer._element.style as any)
+	// }
+	
+
 	render() {
 
 		const layer = this.props.layer
