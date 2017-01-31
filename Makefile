@@ -14,8 +14,13 @@ build: bootstrap
 dev: bootstrap
 	./node_modules/.bin/webpack-dev-server \
 		--config webpack/webpack.dev.js \
-		--content-base ./static \
 		--port 8008 \
+		--open
+
+perf: bootstrap
+	./node_modules/.bin/webpack-dev-server \
+		--config webpack/webpack.perf.js \
+		--port 8009 \
 		--open
 
 clean:

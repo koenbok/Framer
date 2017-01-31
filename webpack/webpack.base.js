@@ -1,6 +1,7 @@
 path = require("path")
 webpack = require("webpack")
 getRepoInfo = require("git-repo-info")
+HtmlWebpackPlugin = require("html-webpack-plugin")
 
 var GIT_INFO = getRepoInfo();
 var BUILD_TYPE = process.env.BUILD_TYPE || "debug"
@@ -18,12 +19,15 @@ module.exports = function() {
 		// },
 		devtool: "cheap-module-source-map",
 		// target: "web",
-		// externals: {
-		// 	"typescript": "ts",
-		// 	"fs": "fs",
-		// 	"module": "module"
-		// },
+		externals: {
+			// "typescript": "ts",
+			// "fs": "fs",
+			// "module": "module"
+		},
 		module: {
+			noParse: [
+				path.resolve(__dirname, "../node_modules/benchmark/benchmark.js"),
+			],
 			loaders: [
 				{ test: /\.ts(x?)$/, loader: "ts-loader" },
 				{ test: /\.json$/, loader: "json-loader" },
@@ -31,7 +35,7 @@ module.exports = function() {
 		},
 		resolve: {
 			// modules: [
-			// 	path.join(PROJECT_PATH, "node_modules"), 
+			// 	path.join(PROJECT_PATH, "node_modules"),
 			// 	path.join(PROJECT_PATH, "src")],
 			root: [path.join(PROJECT_PATH, "src")],
 			extensions: ["", ".js", ".json", ".ts", ".tsx"],
@@ -40,6 +44,7 @@ module.exports = function() {
 		// 	root: path.join(PROJECT_PATH, "node_modules")
 		// },
 		plugins: [
+			new HtmlWebpackPlugin(),
 			// new webpack.DefinePlugin({
 			// 	__BUILD_TYPE__: JSON.stringify(BUILD_TYPE),
 			// 	__BUILD_VERSION__: JSON.stringify(`${GIT_INFO.branch}/${GIT_INFO.abbreviatedSha}`),
