@@ -1,3 +1,8 @@
+enum Handler {
+	Original,
+	Wrapped,
+}
+
 export class EventEmitter<EventName> {
 
 	private _events: { [index: string]: [Function, Function][] } = {}
@@ -21,23 +26,25 @@ export class EventEmitter<EventName> {
 		return handler
 	}
 
-	removeEventListeners(eventName?: EventName, handler?: Function) {
+	removeEventListeners(eventName?: EventName, handler?: Function): void {
 
 		if (!eventName && !handler) {
-			return this._events = {}
+			this._events = {}
+			return
 		}
 
 		const name = eventName as any as string
 
 		if (eventName && !handler) {
-			return this._events[name] = []
+			this._events[name] = []
+			return
 		}
 
 		if (eventName && handler) {
-			return this._events[name] = this._events[name].filter((handlers) =>
-				handlers[0] === handler)
+			this._events[name] = this._events[name].filter(
+				(handlers) => handlers[Handler.Original] !== handler)
+			return
 		}
-
 	}
 
 	countEventListeners(eventName: EventName, handler?: Function): number {
@@ -64,13 +71,11 @@ export class EventEmitter<EventName> {
 
 		const name = eventName as any as string
 
-		if (!this._events[name]) {
-			return false
-		}
-
-		for (let handlers of this._events[name]) {
-			if (handlers[0] === handler) {
-				return false
+		if (this._events[name]) {
+			for (let handlers of this._events[name]) {
+				if (handlers[Handler.Original] === handler) {
+					return false
+				}
 			}
 		}
 
@@ -91,7 +96,7 @@ export class EventEmitter<EventName> {
 
 			handlers[1].apply(this, args)
 
-			if (handlers[0]["once"] == true) {
+			if (handlers[Handler.Original]["once"] == true) {
 				removes.push(index)
 			}
 		})
