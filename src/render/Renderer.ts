@@ -7,13 +7,32 @@ import {render} from "render/react/ReactRenderer"
 export class Renderer {
 
 	private _loop: AnimationLoop
+	private _context: Context
 	private _dirtyStructure = false
 	private _dirtyStyle: Set<Layer> = new Set()
 	private _renderStructureCount = 0
 	private _renderStyleCount = 0
+	private _element = document.createElement("div")
 
-	constructor(loop: AnimationLoop) {
+	constructor(context: Context, loop: AnimationLoop) {
+		this._context = context
 		this._loop = loop
+	}
+
+	get element() {
+		return this.element
+	}
+
+	get html() {
+		return this._element.innerHTML
+	}
+
+	get context() {
+		return this._context
+	}
+
+	get loop() {
+		return this._loop
 	}
 
 	get renderStructureCount() {
@@ -26,7 +45,7 @@ export class Renderer {
 
 	updateStructure() {
 		// if (this._dirtyStructure) { return }
-		this._loop.schedule("render", this.renderStructure)
+		this.context.renderer.loop.schedule("render", this.renderStructure)
 		// this._dirtyStructure = true
 	}
 
@@ -37,7 +56,7 @@ export class Renderer {
 
 
 		if (this._dirtyStyle.size == 0) {
-			this._loop.schedule("render", this.renderStyle)
+			this.context.renderer.loop.schedule("render", this.renderStyle)
 		}
 
 		this._dirtyStyle.add(layer)
@@ -45,11 +64,8 @@ export class Renderer {
 	}
 
 	renderStructure = () => {
-
 		this._renderStructureCount++
-		console.log("renderStructure", this.renderStructureCount);
-
-		render(Context.Default)
+		render(this.context, this._element)
 		// this._dirtyStructure = false
 		// this._dirtyStyle = new Set()
 

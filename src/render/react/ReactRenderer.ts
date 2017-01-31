@@ -53,12 +53,6 @@ const renderLayer = (layer) => {
 	return React.createElement(Renderable, {layer: layer, key: layer.id}, layer.children.map(renderLayer))
 }
 
-const FramerNode = document.createElement("div")
-
-document.addEventListener("DOMContentLoaded", () => {
-	document.body.appendChild(FramerNode)
-})
-
-export const render = (context: Context) => {
-	ReactDOM.render(React.createElement("div", {}, context.children.map(renderLayer)), FramerNode)
+export const render = (context: Context, root: HTMLElement) => {
+	ReactDOM.render(React.createElement("div", {}, context.children.map(renderLayer)), root)
 }

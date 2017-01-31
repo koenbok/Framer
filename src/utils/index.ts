@@ -10,3 +10,5 @@ export const randomColor = (alpha=1) => {
 }
 
 export const delay = (time: 0, f: Function) => setTimeout(f, time)
+
+

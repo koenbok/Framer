@@ -112,4 +112,8 @@ export class EventEmitter<EventName> {
 		removes.forEach((index) => this._events[name].splice(index, 1))
 	}
 
+	destroy() {
+		this.removeEventListeners()
+	}
+
 }

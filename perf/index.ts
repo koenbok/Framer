@@ -1,70 +1,40 @@
-import * as _ from "lodash"
-import * as process from "process"
-import * as BBenchmark from "benchmark"
-
 import {EventEmitter} from "EventEmitter"
+import {Utils} from "Framer"
 
-const Benchmark: BBenchmark = BBenchmark.runInContext({ _: _, process: process });
 
- (window as any).Benchmark = Benchmark
-
-var suite = new Benchmark.Suite;
-
-const log = (msg) => {
-	console.log(msg)
-	document.body.innerHTML += `<pre>${msg}</pre>`
+const test = (f: (done) => void, n=1000) => {
+	return (finish: (time: number, n: number) => void) => {
+		let count = 0
+		let start = performance.now()
+		const done = () => {
+			if (count >= n) {
+				finish(performance.now() - start, n)
+			} else {
+				count++
+				f(done)
+			}
+		}
+		f(done)
+	}
 }
 
-log("Running tests...")
 
-const addTest = (name: string, setup: Function) => {
-	suite.add(name, setup())
-}
+console.log("hello");
 
-addTest("emit", () => {
-	const em = new EventEmitter<"test">()
-	em.on("test", () => {})
-
-	return () => em.emit("test")
+const em = new EventEmitter<"test">()
+em.on("test", () => {})
+const a = test((done) => {
+	em.emit("test")
+	done()
 })
 
 
-// addTest("once", () => {
-// 	const em = new EventEmitter<"test">()
-
-// 	em.once("test", () => {})
-
-// 	return (done) => {
-// 		em.emit("test")
-// 		em.once("test", () => {})
-// 		done()
-// 	}
-// })
-
-// const em = new EventEmitter<"test">()
-// let count = 0
-// const f = () => count++
-// em.on("test", f)
-
-// // add tests
-// suite.add('EventEmitter#emit', function() {
-// 	em.emit("test")
-// })
-
-// suite.add('String#indexOf', function() {
-//   'Hello World!'.indexOf('o') > -1;
-// })
-
-// suite.add('String#match', function() {
-//   !!'Hello World!'.match(/o/);
-// })
-// add listeners
-suite.on('cycle', (event) => {
-	log(String(event.target));
+Utils.range(100).forEach(() => {
+	a((time, n) => {
+		console.log(`${Math.round(n / time)} ops/s`);
+	})
 })
 
 
 
-setTimeout(() => {
-	suite.run({ 'async': true });
-}, 100);
+
