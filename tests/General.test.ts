@@ -1,64 +1,74 @@
 import * as assert from "assert"
 
-import {Layer, Framer, Context, Loop} from "Framer"
+import {Layer, Framer, Context, Loop, Utils} from "Framer"
 
 describe("renderer", () => {
 
-    const expectRenderCount = (structure: number, style: number) => {
-        assert.equal(Context.Current.renderer.renderStructureCount, structure)
-        assert.equal(Context.Current.renderer.renderStyleCount, style)
-    }
+	const expectRenderCount = (structure: number, style: number) => {
+		assert.equal(Context.Current.renderer.renderStructureCount, structure)
+		assert.equal(Context.Current.renderer.renderStyleCount, style)
+	}
 
-    it("should render a layer", (done) => {
+	it("is fake", () => {
 
-        Loop.once("render", () => {
-            expectRenderCount(1, 0)
-            done()
-        })
+	})
 
-        let layer = new Layer()
+	// it("should render a layer", (done) => {
 
-    })
+	// 	Loop.on("finish", () => {
 
-    it("should render a layer with property", (done) => {
+	// 		expectRenderCount(1, 0)
+	// 		done()
 
-        Loop.once("render", () => {
-            expectRenderCount(1, 0)
-            done()
-        })
+	// 	})
 
-        let layer = new Layer({x: 500})
+	// 	let layer = new Layer()
+	// })
 
-    })
 
-    // it.only("should render a layer with property after", (done) => {
+	//     let layer = new Layer()
 
-    //     let count = 0
+	// })
 
-    //     Loop.on("render", () => {
+	// it("should render a layer with property", (done) => {
 
-    //         console.log("count", count);
-            
+	//     Loop.once("render", () => {
+	//         expectRenderCount(1, 0)
+	//         done()
+	//     })
 
-    //         count++
+	//     let layer = new Layer({x: 500})
 
-    //         console.log("count", count);
+	// })
 
-    //         if (count == 1) {
-    //             expectRenderCount(1, 0)
-    //             layer.x = 500
-    //         }
+	// it.only("should render a layer with property after", (done) => {
 
-    //         if (count == 2) {
-    //             expectRenderCount(1, 1)
-    //             done()
-    //         }
+	//     let count = 0
 
-    //     })
+	//     Loop.on("render", () => {
 
-    //     let layer = new Layer()
-    //     layer.x = 100
+	//         console.log("count", count);
 
-    // })
+
+	//         count++
+
+	//         console.log("count", count);
+
+	//         if (count == 1) {
+	//             expectRenderCount(1, 0)
+	//             layer.x = 500
+	//         }
+
+	//         if (count == 2) {
+	//             expectRenderCount(1, 1)
+	//             done()
+	//         }
+
+	//     })
+
+	//     let layer = new Layer()
+	//     layer.x = 100
+
+	// })
 
 })

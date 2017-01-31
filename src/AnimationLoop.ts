@@ -1,74 +1,65 @@
-import {EventEmitter} from "events"
+import {EventEmitter} from "EventEmitter"
 import * as raf from "raf"
 
 
 const performance = (window.performance || {
-    offset: Date.now(),
-    now: function now() { return Date.now() - this.offset }
+	offset: Date.now(),
+	now: function now() { return Date.now() - this.offset }
 })
 
 const time = () => performance.now()
 
-type AnimationLoopListenerNames = "render" | "update"
+type AnimationLoopEventNames = "render" | "update" | "finish"
+type AnimationLoopDeltaCallback = (this: AnimationLoop, delta: number, loop: AnimationLoop) => void
 
-export class AnimationLoop extends EventEmitter {
+export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 
-    private counter = 0
-    private time = time()
+	private _running = false
+	private _counter = 0
+	private _time = time()
 
-    static get Default() {
-        return DefaultAnimationLoop
-    }
+	static get Default() {
+		return DefaultAnimationLoop
+	}
 
-    constructor() {
-        super()
-        this.start()
-    }
+	get running() {
+		return this._running
+	}
 
-    start() {
-        raf(this.tick)
-    }
+	on(eventName: AnimationLoopEventNames, handler: Function, once=false) {
 
-    addListener(event: AnimationLoopListenerNames, listener: Function) {
-        super.addListener(event, listener)
-        this.start()
-        return this
-    }
+		super.on(eventName, handler, once)
 
-    on(event: AnimationLoopListenerNames, listener: Function) {
-        super.on(event, listener)
-        this.start()
-        return this
-    }
+		if (this._running === false) {
+			this._start()
+		}
+	}
 
-    once(event: AnimationLoopListenerNames, listener: Function) {
-        super.once(event, listener)
-        this.start()
-        return this
-    }
-    
-    /** Run this handler at most once until the event was emitted */
-    schedule(event: AnimationLoopListenerNames, listener: Function) {
+	private _start() {
+		this._running = true
+		raf(this.tick)
+	}
 
-        for (let f of this.listeners(event)) {
-            if (f === listener) { return }
-        }
-        
-        this.once(event, listener)
-    }
+	private _stop() {
+		this._running = false
+	}
 
-    private tick = () => {
+	private tick = () => {
 
-        this.emit("update", this, time() - this.time)
-        this.emit("render", this, time() - this.time)
+		this.emit("update", time() - this._time)
+		this.emit("render", time() - this._time)
 
-        this.time = time()
-        this.counter++
-        
-        if (this.listenerCount("update") > 0 || this.listenerCount("render") > 0) {
-            raf(this.tick)
-        }
-    }
+		this._time = time()
+		this._counter++
+
+		if (this.countEventListeners("update") > 0 || this.countEventListeners("render") > 0) {
+			raf(this.tick)
+		} else {
+			this._stop()
+		}
+
+		this.emit("finish", time() - this._time)
+	}
 }
 
 export const DefaultAnimationLoop = new AnimationLoop()
