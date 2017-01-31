@@ -134,6 +134,7 @@ it("should wrap", () => {
 
 	let wrapCounter = 0
 
+	// Create a custom class that wraps handler functions
 	class EventEmitterTest<EventName> extends EventEmitter<EventName> {
 		wrapEventListener(eventName: EventName, handler: Function) {
 			return () => {
@@ -161,5 +162,24 @@ it("should wrap", () => {
 	em.emit("test")
 	assert.equal(count.value(), 2)
 	assert.equal(wrapCounter, 2)
+
+})
+
+it("should once per emitter", () => {
+
+	const em1 = new EventEmitter<"test">()
+	const em2 = new EventEmitter<"test">()
+
+	const count = counter()
+	em1.once("test", count.add)
+	em2.on("test", count.add)
+
+	em1.emit("test")
+	em2.emit("test")
+	assert.equal(count.value(), 2)
+
+	em1.emit("test")
+	em2.emit("test")
+	assert.equal(count.value(), 3)
 
 })

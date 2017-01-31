@@ -12,7 +12,13 @@ interface LayerOptions {
 		opacity?: number
 }
 
-export class Layer extends BaseClass {
+type LayerEventTypes =
+	"change:x" |
+	"change:y" |
+	"change:width" |
+	"change:height"
+
+export class Layer extends BaseClass<LayerEventTypes> {
 
 	private _context: Context
 	private _parent: Layer|null

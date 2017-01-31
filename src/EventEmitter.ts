@@ -7,7 +7,7 @@ export class EventEmitter<EventName> {
 
 	private _events: { [index: string]: [Function, Function][] } = {}
 
-	on(eventName: EventName, handler: Function) {
+	on(eventName: EventName, handler: Function, once=false) {
 
 		const name = eventName as any as string
 
@@ -15,7 +15,16 @@ export class EventEmitter<EventName> {
 			this._events[name] = []
 		}
 
-		this._events[name].push([handler, this.wrapEventListener(eventName, handler)])
+		let actualHandler = handler
+
+		if (once) {
+			actualHandler = (...args) => {
+				handler(...args)
+				this.off(eventName, handler)
+			}
+		}
+
+		this._events[name].push([handler, this.wrapEventListener(eventName, actualHandler)])
 	}
 
 	off(eventName: EventName, handler: Function) {
@@ -63,8 +72,7 @@ export class EventEmitter<EventName> {
 	}
 
 	once(eventName: EventName, handler: Function) {
-		handler["once"] = true
-		this.on(eventName, handler)
+		this.on(eventName, handler, true)
 	}
 
 	schedule(eventName: EventName, handler: Function): boolean {
@@ -94,7 +102,7 @@ export class EventEmitter<EventName> {
 
 		this._events[name].forEach((handlers, index) => {
 
-			handlers[1].apply(this, args)
+			handlers[Handler.Wrapped].apply(this, args)
 
 			if (handlers[Handler.Original]["once"] == true) {
 				removes.push(index)

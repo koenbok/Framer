@@ -10,7 +10,10 @@ interface ContextOptions {
 	backgroundColor: string
 }
 
-export class Context extends BaseClass {
+type ContextEventTypes =
+	"reset"
+
+export class Context extends BaseClass<ContextEventTypes> {
 
 	static get Default() {
 		return DefaultContext
