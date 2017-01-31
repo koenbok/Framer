@@ -1,4 +1,4 @@
-class EventEmitter<EventName> {
+export class EventEmitter<EventName> {
 
 	private _events: { [index: string]: [Function, Function][] } = {}
 
