@@ -1,5 +1,6 @@
 import {Layer} from "./Layer"
 import {Context} from "./Context"
+import {Renderer} from "./render/Renderer"
 import {AnimationLoop} from "./AnimationLoop"
 import * as Utils from "utils/index"
 
@@ -10,7 +11,7 @@ export const Framer = {
 
 export const Loop = new AnimationLoop()
 
-export {Layer, Context, Utils}
+export {Layer, Context, Utils, Renderer}
 
 
 interface Window {

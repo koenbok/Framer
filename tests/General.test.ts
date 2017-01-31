@@ -1,6 +1,11 @@
 import * as assert from "assert"
 
-import {Layer, Framer, Context, Loop, Utils} from "Framer"
+import {Layer, Framer, Context, Loop, Utils, Renderer} from "Framer"
+
+
+const run = (f: (context: Context) => void) => {
+	const context = new Context(new Renderer(new AnimationLoop()))
+}
 
 describe("renderer", () => {
 
@@ -13,17 +18,25 @@ describe("renderer", () => {
 
 	})
 
-	// it("should render a layer", (done) => {
+	it("should render a layer", (done) => {
 
-	// 	Loop.on("finish", () => {
 
-	// 		expectRenderCount(1, 0)
-	// 		done()
+		Loop.on("render", () => {
 
-	// 	})
+			console.log("render");
 
-	// 	let layer = new Layer()
-	// })
+
+		})
+
+		Loop.on("finish", () => {
+
+			expectRenderCount(1, 0)
+			done()
+
+		})
+
+		let layer = new Layer()
+	})
 
 
 	//     let layer = new Layer()
