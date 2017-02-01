@@ -32,7 +32,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		opacity: 1
 	}
 
-	_element: HTMLElement
+	_element: HTMLElement | null
 
 	constructor(options: LayerOptions={}) {
 		super()
@@ -46,6 +46,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		}
 
 		this.context.renderer.updateStructure()
+		this.context.renderer.updateStyle(this, "a", "b")
 	}
 
 	_updateProperty(name: string, value: any) {

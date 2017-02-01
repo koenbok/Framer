@@ -19,44 +19,42 @@ setTimeout(() => {
 
 
 
-// const run = () => {
-
-// 	Context.Default.reset()
-
-// 	let layers = Utils.range(100).map(() => {
-// 		return new Layer({
-// 			x: Math.round(Math.random() * 500),
-// 			y: Math.round(Math.random() * 500)})
-// 	})
-
-// 	setTimeout(() => {
-// 		layers.forEach((layer) => {
-// 			layer.backgroundColor = Utils.randomColor(0.5)
-// 		})
-// 	}, 1000)
-
-
-
-// }
-
-
 const run = () => {
-
-	console.log("run");
 
 	Context.Default.reset()
 
-	let layer = new Layer()
-	console.log(layer.backgroundColor);
-
+	let layers = Utils.range(100).map(() => {
+		return new Layer({
+			x: Math.round(Math.random() * 500),
+			y: Math.round(Math.random() * 500)})
+	})
 
 	setTimeout(() => {
-		layer.backgroundColor = Utils.randomColor(0.5)
+		layers.forEach((layer) => {
+			layer.backgroundColor = Utils.randomColor(0.5)
+		})
 	}, 1000)
 
 
 
 }
+
+
+// const run = () => {
+
+// 	console.log("run");
+
+// 	Context.Default.reset()
+
+// 	let layer = new Layer()
+// 	console.log(layer.backgroundColor);
+
+
+// 	setTimeout(() => {
+// 		layer.backgroundColor = Utils.randomColor(0.5)
+// 	}, 1000)
+
+// }
 
 run()
 setInterval(run, 2000)

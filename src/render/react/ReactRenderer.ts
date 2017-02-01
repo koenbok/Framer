@@ -1,8 +1,8 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
 
-import {Layer} from "../../Layer"
-import {Context} from "../../Context"
+import {Layer} from "Layer"
+import {Context} from "Context"
 
 import {getLayerStyles} from "../css"
 
@@ -12,35 +12,24 @@ interface Props {
 
 class Renderable extends React.Component<Props, {}> {
 
-	// shouldComponentUpdate(nextProps: Props, nextState) {
-
-	// 	const update = ((this.props.layer === nextProps.layer) && this.props.layer.isDirty())
-
-	// 	// if (update) {
-	// 	// 	console.log("update", this.props.layer);
-	// 	// }
-
-	// 	return update
-	// }
-
 	componentDidMount() {
 		this.props.layer._element = this.refs["node"] as HTMLElement
 	}
 
-	// componentWillUnmount() {
-	// 	console.log("unmount", this.props.layer);
-	// }
+	componentWillUnmount() {
+		this.props.layer._element = null
+	}
 
-	// componentDidUpdate(prevProps, prevState) {
-	// 	getLayerStyles(this.props.layer, this.props.layer._element.style as any)
-	// }
+	componentDidUpdate(prevProps, prevState) {
+		this.props.layer._element = this.refs["node"] as HTMLElement
+	}
 
 
 	render() {
 
 		const layer = this.props.layer
 		const props = {
-			style: getLayerStyles(layer),
+			// style: getLayerStyles(layer),
 			ref: "node"
 		}
 

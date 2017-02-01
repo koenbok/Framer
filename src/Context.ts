@@ -55,7 +55,6 @@ export class Context extends BaseClass<ContextEventTypes> {
 	reset() {
 		this._layers = new Collection<Layer>()
 		this.renderer.updateStructure()
-		//this.renderer.render()
 	}
 
 	run(f: Function) {

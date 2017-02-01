@@ -57,10 +57,6 @@ export class Renderer {
 
 	updateStyle(layer: Layer, key, value) {
 
-		if (this._dirtyStructure) {
-			return
-		}
-
 		if (this._dirtyStyle.size == 0) {
 			if (!this.manual) { this.loop.schedule("render", this.render) }
 		}
@@ -79,7 +75,7 @@ export class Renderer {
 	render = () => {
 
 		if (this.dirtyStructure) {
-			return this.renderStructure()
+			this.renderStructure()
 		}
 
 		if (this.dirtyStyle) {
@@ -92,20 +88,17 @@ export class Renderer {
 		this._renderStructureCount++
 		render(this.context, this._element)
 		this._dirtyStructure = false
-		this._dirtyStyle = new Set()
+
 	}
 
 	renderStyle = () => {
 		this._renderStyleCount++
 
 		for (let layer of this._dirtyStyle) {
-			// getLayerStyles(layer, layer._element.style as any)
-
 			if (layer._element) {
-				// TODO: Maybe not all the styles?
-				console.log("snif");
-
 				getLayerStyles(layer, layer._element.style as any)
+			} else {
+				console.log("renderer.renderStyle: could not update layer", layer.id)
 			}
 		}
 		this._dirtyStyle = new Set()
