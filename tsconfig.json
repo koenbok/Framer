@@ -10,7 +10,7 @@
         "declaration": false,
         "noEmitOnError": true,
         "types": [
-            "mocha",
+            "jest",
             "node"
         ]
     },
