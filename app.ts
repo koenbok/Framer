@@ -3,17 +3,6 @@ import * as _ from "lodash"
 import {Layer, Framer, Context, Loop, Utils} from "Framer"
 
 
-let layer = new Layer()
-
-let layerB = new Layer()
-
-layer.x = 400
-
-setTimeout(() => {
-	layerB.y = 200
-	layerB.backgroundColor = Utils.randomColor()
-
-}, 1000)
 
 
 
@@ -54,8 +43,8 @@ const run = () => {
 
 // }
 
-run()
-setInterval(run, 2000)
+// run()
+// setInterval(run, 2000)
 
 // let layer = new Layer()
 
@@ -68,7 +57,13 @@ setInterval(run, 2000)
 //     render(Framer.Context.Default)
 // })
 
-
+import {AnimationLoop} from "./src/AnimationLoop"
 import {AnimationProperty} from "./src/AnimationProperty"
-import {AnimationCurve} from "./src/AnimationCurve"
+import {AnimationCurveLinear} from "./src/AnimationCurve"
 
+let layerC = new Layer()
+let curve = new AnimationCurveLinear({time: 10})
+
+let ap = new AnimationProperty(AnimationLoop.Default, layerC, "x", 0, 500, curve)
+
+ap.start()

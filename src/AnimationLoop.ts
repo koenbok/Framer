@@ -7,7 +7,7 @@ const performance = (window.performance || {
 	now: function now() { return Date.now() - this.offset }
 })
 
-const time = () => performance.now()
+const time = () => performance.now() / 1000
 
 type AnimationLoopEventNames = "render" | "update" | "finish"
 type AnimationLoopDeltaCallback = (this: AnimationLoop, delta: number, loop: AnimationLoop) => void

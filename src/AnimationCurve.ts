@@ -3,19 +3,35 @@ interface LinearCurveOptions {
 }
 
 export abstract class AnimationCurve {
-
+	abstract value(time: number): number
+	abstract done(time: number): boolean
 }
 
-export class Linear extends AnimationCurve {
 
-	private _time: number
 
-    constructor(time=1) {
+type AnimationCurveLinearOptions = {
+	time: number
+}
+
+let AnimationCurveLinearDefaultOptions: AnimationCurveLinearOptions = {
+	time: 1
+}
+
+export class AnimationCurveLinear extends AnimationCurve {
+	
+	private _options: AnimationCurveLinearOptions
+	
+	constructor(options=AnimationCurveLinearDefaultOptions) {
 		super()
-		this._time = time
+		this._options = options
 	}
 
-	value(time: number) {
-		return time * this._time
+	value(time) {
+		return time / this._options.time
 	}
+
+	done(time) {
+		return time >= this._options.time
+	}
+
 }
