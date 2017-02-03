@@ -1,4 +1,4 @@
-import * as Utils from "Utils"
+import * as Utils from "utils"
 import {AnimationLoop} from "AnimationLoop"
 import {Context} from "Context"
 import {Layer} from "Layer"
