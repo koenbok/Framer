@@ -1,5 +1,6 @@
 import {EventEmitter} from "EventEmitter"
 import * as raf from "raf"
+import * as utils from "utils"
 
 
 const performance = (window.performance || {
@@ -46,6 +47,7 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 
 	private tick = () => {
 
+		
 		this.emit("update", time() - this._time)
 		this.emit("render", time() - this._time)
 

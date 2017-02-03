@@ -2,7 +2,7 @@ import * as _ from "lodash"
 
 import {Layer, Framer, Context, Loop, Utils} from "Framer"
 
-
+import {Linear} from "AnimationCurve"
 
 
 
@@ -62,8 +62,5 @@ import {AnimationProperty} from "./src/AnimationProperty"
 import {AnimationCurveLinear} from "./src/AnimationCurve"
 
 let layerC = new Layer()
-let curve = new AnimationCurveLinear({time: 10})
 
-let ap = new AnimationProperty(AnimationLoop.Default, layerC, "x", 0, 500, curve)
-
-ap.start()
+layerC.animate({x: 500, options: {curve: Linear(200)}})

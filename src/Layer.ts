@@ -1,5 +1,8 @@
-import {BaseClass} from "./BaseClass"
-import {Context, DefaultContext, CurrentContext} from "./Context"
+import {BaseClass} from "BaseClass"
+import {Context, DefaultContext, CurrentContext} from "Context"
+import {AnimatablePropertiesWithOptions} from "AnimationProperty"
+import {Animation} from "Animation"
+import {Linear} from "AnimationCurve"
 
 interface LayerOptions {
 		context?: Context
@@ -128,8 +131,15 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		this._properties.backgroundColor = value
 	}
 
-	animate(options={}) {
+	animate(properties: AnimatablePropertiesWithOptions) {
+	
+		let options = properties.options || {}
+		let curve = options.curve || Linear(1)
+		delete properties.options
 
+		let animation = new Animation(this, properties, curve)
+		animation.start()
+		return animation
 	}
 
 

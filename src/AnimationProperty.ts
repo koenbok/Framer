@@ -5,9 +5,6 @@ import {AnimationCurve, AnimationCurveLinear} from "./AnimationCurve"
 
 import {Color} from "./Color"
 
-
-
-
 type AnimatablePropertyType = number | Color
 
 export interface AnimatableProperties {
@@ -24,9 +21,13 @@ export interface AnimatableProperties {
 	maxY?: number
 }
 
-type AnimatablePropertyName = "x" | "y" | "width" | "height" | "backgroundColor" |
-	"minX" | "midX" | "maxX" |
-	"minY" | "midY" | "maxY"
+export interface AnimatablePropertiesWithOptions extends AnimatableProperties {
+	options?: {
+		curve?: AnimationCurve
+	}
+}
+
+type AnimatablePropertyName = keyof AnimatableProperties
 
 // export let PropertyMap: {[key in AnimatablePropertyList]: string };
 

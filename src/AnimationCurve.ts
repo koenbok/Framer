@@ -35,3 +35,7 @@ export class AnimationCurveLinear extends AnimationCurve {
 	}
 
 }
+
+export const Linear = (time: number) => {
+	return new AnimationCurveLinear({time: time})
+}
