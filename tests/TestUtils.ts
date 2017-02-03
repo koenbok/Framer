@@ -20,7 +20,7 @@ const createDone = (done: jest.DoneCallback, f: Function): jest.DoneCallback => 
 
 export const isolated = (description: string, f: (context: Context, done: jest.DoneCallback) => void) => {
 	it(description, (jestDone) => {
-		const context = new Context(new AnimationLoop())
+		const context = new Context("test", new AnimationLoop())
 		const finish = createDone(jestDone, () => { context.destroy() })
 		context.run(() => { f(context, finish) })
 	})

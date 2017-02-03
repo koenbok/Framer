@@ -1,8 +1,9 @@
+import * as Utils from "Utils"
 import {AnimationLoop} from "AnimationLoop"
 import {Context} from "Context"
 import {Layer} from "Layer"
 import {getLayerStyles} from "render/css"
-import {render} from "render/react/ReactRenderer"
+import {render} from "render/PreactRenderer"
 
 export class Renderer {
 
@@ -19,10 +20,15 @@ export class Renderer {
 	constructor(context: Context, loop: AnimationLoop) {
 		this._context = context
 		this._loop = loop
+		this._element.className = "context"
 
-		document.addEventListener("DOMContentLoaded", () => {
+		Utils.dom.whenReady(() => {
 			document.body.appendChild(this.element)
 		})
+	}
+
+	destroy() {
+		Utils.dom.detach(this._element)
 	}
 
 	get element() {

@@ -18,9 +18,6 @@ const test = (f: (done) => void, n=1000) => {
 	}
 }
 
-
-console.log("hello");
-
 const em = new EventEmitter<"test">()
 em.on("test", () => {})
 const a = test((done) => {

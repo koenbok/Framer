@@ -13,7 +13,7 @@ export const CSS = {
     Layer: LayerStyles
 }
 
-export const getLayerStyles = (layer: Layer, styles: React.CSSProperties = {}) => {
+export const getLayerStyles = (layer: Layer, styles = {}) => {
 
     for (const name in LayerStyles) {
         styles[name] = LayerStyles[name](layer)

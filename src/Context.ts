@@ -23,6 +23,7 @@ export class Context extends BaseClass<ContextEventTypes> {
 		return CurrentContext
 	}
 
+	private _name: string
 	private _layers = new Collection<Layer>()
 	private _renderer: Renderer
 
@@ -31,8 +32,9 @@ export class Context extends BaseClass<ContextEventTypes> {
 		backgroundColor: "rgba(255, 0, 0, 0.5)"
 	}
 
-	constructor(loop: AnimationLoop, options: ContextOptions|{}={}) {
+	constructor(name: string, loop: AnimationLoop, options: ContextOptions|{}={}) {
 		super()
+		this._name = name
 		this._renderer = new Renderer(this, loop)
 	}
 
@@ -57,6 +59,10 @@ export class Context extends BaseClass<ContextEventTypes> {
 		this.renderer.updateStructure()
 	}
 
+	destroy() {
+		this.renderer.destroy()
+	}
+
 	run(f: Function) {
 		let context = CurrentContext
 		CurrentContext = this
@@ -67,5 +73,5 @@ export class Context extends BaseClass<ContextEventTypes> {
 }
 
 
-export const DefaultContext = new Context(AnimationLoop.Default)
+export const DefaultContext = new Context("default", AnimationLoop.Default)
 export let CurrentContext = DefaultContext

@@ -1,3 +1,7 @@
+import * as dom from "utils/dom"
+
+export {dom}
+
 /** Generate an Array with a range of n. */
 export const range = n => Array.from({length: n}, (value, key) => key)
 

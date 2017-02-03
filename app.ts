@@ -2,8 +2,6 @@ import * as _ from "lodash"
 
 import {Layer, Framer, Context, Loop, Utils} from "Framer"
 
-import {render} from "./src/render/react/ReactRenderer"
-
 
 let layer = new Layer()
 
