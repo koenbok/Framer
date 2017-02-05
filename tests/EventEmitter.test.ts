@@ -183,3 +183,25 @@ it("should once per emitter", () => {
 	assert.equal(count.value(), 3)
 
 })
+
+it("should only once per emitter", () => {
+
+	let counter = 0
+	const f = () => counter++
+
+	const a = new EventEmitter<"test">()
+	const b = new EventEmitter<"test">()
+
+	a.once("test", f)
+	b.on("test", f)
+
+	a.emit("test")
+	expect(counter).toBe(1)
+	a.emit("test")
+	expect(counter).toBe(1)
+
+	b.emit("test")
+	b.emit("test")
+	b.emit("test")
+	expect(counter).toBe(4)
+})
