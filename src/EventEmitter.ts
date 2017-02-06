@@ -1,3 +1,5 @@
+type wrappedFunction = Function
+
 interface EE {
 	fn: Function
 	handler: Function
@@ -10,7 +12,7 @@ export class EventEmitter<EventName> {
 	private _events: { [index: string]: EE[] } = {}
 	private _eventCount = 0
 
-	on(eventName: EventName, fn: Function, once=false) {
+	on(eventName: EventName, fn: Function, context: any, once=false) {
 
 		const name = eventName as any as string
 
@@ -21,7 +23,7 @@ export class EventEmitter<EventName> {
 		this._events[name].push({
 			fn: fn,
 			handler: this.wrapEventListener(eventName, fn),
-			context: this,
+			context: context,
 			once: once
 		})
 
@@ -54,9 +56,11 @@ export class EventEmitter<EventName> {
 		}
 
 		// Remove a specific handler for an event
-		this._events[name] = this._events[name].filter((handlers) => {
-			if (handlers.fn !== fn) {
+		this._events[name] = this._events[name].filter((handler: EE) => {
+			if (handler.fn === fn) {
 				this._eventCount -= 1
+				return false
+			} else {
 				return true
 			}
 		})
@@ -93,7 +97,7 @@ export class EventEmitter<EventName> {
 		// Don't add this event if it already exists
 		if (this._events[name]) {
 			for (let handler of this._events[name]) {
-				if (handler.handler === fn) {
+				if (handler.fn === fn) {
 					return false
 				}
 			}

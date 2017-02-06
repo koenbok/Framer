@@ -21,30 +21,7 @@ export interface AnimatableProperties {
 	maxY?: number
 }
 
-export interface AnimatablePropertiesWithOptions extends AnimatableProperties {
-	options?: {
-		curve?: AnimationCurve
-	}
-}
-
 type AnimatablePropertyName = keyof AnimatableProperties
-
-// export let PropertyMap: {[key in AnimatablePropertyList]: string };
-
-// PropertyMap = {
-//     x: "number",
-//     y: "number",
-//     width: "number",
-//     height: "number",
-//     backgroundColor: "color",
-//     minX: "number",
-//     midX: "number",
-//     maxX: "number",
-//     minY: "number",
-//     midY: "number",
-//     maxY: "number",
-// }
-
 
 export class AnimationProperty {
 
@@ -56,8 +33,11 @@ export class AnimationProperty {
 	private _curve: AnimationCurve
 	private _running = false
 	private _time = 0
+	private _finishedCallback?: Function
 
-	constructor(loop: AnimationLoop, target: Layer, key: AnimatablePropertyName, from: AnimatablePropertyType, to: AnimatablePropertyType , curve: AnimationCurve, converter:null|Function=null) {
+	constructor(loop: AnimationLoop, target: Layer,
+		key: AnimatablePropertyName, from: AnimatablePropertyType, to: AnimatablePropertyType ,
+		curve: AnimationCurve, converter:null|Function=null, finishedCallback?: Function) {
 
 		this._target = target
 		this._key = key
@@ -65,6 +45,7 @@ export class AnimationProperty {
 		this._from = from as number
 		this._to = to as number
 		this._curve = curve
+		this._finishedCallback = finishedCallback
 
 	}
 
@@ -97,13 +78,22 @@ export class AnimationProperty {
 	}
 
 	private _stop() {
+
+		console.log("AnimationProperty._stop");
+
 		this._loop.off("update", this._update)
+		if (this._finishedCallback) {
+			this._finishedCallback(this)
+		}
 	}
 
 	private _update = (delta: number) => {
 
+		console.log("_update", this._time);
+
+
 		this._target[this._key] = this._value(this._curve.value(this._time))
-		
+
 		if (this._curve.done(this._time)) {
 			this.stop()
 		}

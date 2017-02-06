@@ -18,19 +18,22 @@ let AnimationCurveLinearDefaultOptions: AnimationCurveLinearOptions = {
 }
 
 export class AnimationCurveLinear extends AnimationCurve {
-	
+
 	private _options: AnimationCurveLinearOptions
-	
+
 	constructor(options=AnimationCurveLinearDefaultOptions) {
 		super()
-		this._options = options
+
+		this._options = Object.assign({}, options)
 	}
 
-	value(time) {
+	value(time: number) {
 		return time / this._options.time
 	}
 
-	done(time) {
+	done(time: number) {
+		// console.log(time, this._options.time, time >= this._options.time);
+
 		return time >= this._options.time
 	}
 

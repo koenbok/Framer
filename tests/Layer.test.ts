@@ -1,6 +1,8 @@
 import * as assert from "assert"
-
+import * as utils from "Utils"
+import {isolated} from "./TestUtils"
 import {Layer} from "Layer"
+import {Linear} from "AnimationCurve"
 
 
 it("should have defaults", () => {
@@ -60,5 +62,28 @@ it("should set parent", () => {
 	layerA.parent = layerB
 	assert.equal(layerA.parent, layerB)
 	assert.deepEqual(layerB.children, [layerA])
+
+})
+
+isolated("should animate", (context, done) => {
+
+	let count = 0
+
+	context.renderer.loop.on("finish", () => {
+		console.log(count, layerA.x);
+		count++
+
+
+
+	})
+
+	let layerA = new Layer()
+
+	layerA.animate({x: 100}, Linear(1), () => {
+		done()
+	})
+
+
+
 
 })

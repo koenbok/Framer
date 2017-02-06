@@ -61,4 +61,7 @@ const run = () => {
 
 let layerC = new Layer()
 
-layerC.animate({x: 500, y: 500, options: {curve: Linear(10)}})
+// layerC.animate({x: 50, y: 50, options: {curve: Linear(1)}})
+
+
+layerC.animate({x: 500, y: 500}, Linear(1))
