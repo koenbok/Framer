@@ -41,8 +41,15 @@ it("should remove by handler", () => {
 	em.emit("testB")
 	expect(countA.value()).toBe(1)
 	expect(countB.value()).toBe(1)
+	expect(em.countEventListeners()).toBe(2)
+	expect(em.countEventListeners("testA")).toBe(1)
+	expect(em.countEventListeners("testB")).toBe(1)
 
-	em.removeEventListeners("testA", countA.add)
+	em.off("testA", countA.add)
+	expect(em.countEventListeners()).toBe(1)
+	expect(em.countEventListeners("testA")).toBe(0)
+	expect(em.countEventListeners("testB")).toBe(1)
+
 
 	em.emit("testA")
 	em.emit("testB")
@@ -124,6 +131,35 @@ it("should schuedlue", () => {
 	expect(em.schedule("test", count.add)).toBe(true)
 	expect(em.schedule("test", count.add)).toBe(false)
 	expect(em.schedule("test", count.add)).toBe(false)
+
+	em.emit("test")
+	expect(count.value()).toBe(1)
+
+	em.emit("test")
+	expect(count.value()).toBe(1)
+
+})
+
+it("should schuedlue with wrapped", () => {
+
+	// Create a custom class that wraps handler functions
+	class EventEmitterTest<EventName> extends EventEmitter<EventName> {
+		wrapEventListener(eventName: EventName, handler: Function) {
+			return () => {
+				handler()
+			}
+		}
+	}
+
+	const em = new EventEmitterTest<"test">()
+	const count = counter()
+
+	expect(em.schedule("test", count.add)).toBe(true)
+	expect(em.schedule("test", count.add)).toBe(false)
+	expect(em.schedule("test", count.add)).toBe(false)
+
+	em.emit("test")
+	expect(count.value()).toBe(1)
 
 	em.emit("test")
 	expect(count.value()).toBe(1)
