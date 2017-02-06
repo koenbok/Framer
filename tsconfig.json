@@ -5,7 +5,7 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "allowJs": false,
-        "noImplicitAny": false,
+        "noImplicitAny": true,
         "strictNullChecks": true,
         "declaration": false,
         "noEmitOnError": true,

@@ -3,11 +3,19 @@ enum Handler {
 	Wrapped,
 }
 
+interface EE {
+	fn: Function
+	handler: Function
+	context: any
+	once: boolean
+}
+
 export class EventEmitter<EventName> {
 
-	private _events: { [index: string]: [Function, Function][] } = {}
+	private _events: { [index: string]: EE[] } = {}
+	private _eventCount = 0
 
-	on(eventName: EventName, handler: Function, once=false) {
+	on(eventName: EventName, fn: Function, once=false) {
 
 		const name = eventName as any as string
 
@@ -15,53 +23,59 @@ export class EventEmitter<EventName> {
 			this._events[name] = []
 		}
 
-		let actualHandler = handler
+		this._events[name].push({
+			fn: fn,
+			handler: this.wrapEventListener(eventName, fn),
+			context: this,
+			once: once
+		})
 
-		if (once) {
-			actualHandler = (...args) => {
-				handler(...args)
-				this.off(eventName, handler)
-			}
-		}
-
-		this._events[name].push([handler, this.wrapEventListener(eventName, actualHandler)])
+		this._eventCount++
 	}
 
-	off(eventName: EventName, handler: Function) {
-		this.removeEventListeners(eventName, handler)
+	off(eventName: EventName, fn: Function) {
+		this.removeEventListeners(eventName, fn)
 	}
 
-	wrapEventListener(eventName: EventName, handler: Function) {
-		return handler
+	wrapEventListener(eventName: EventName, fn: Function) {
+		return fn
 	}
 
-	removeEventListeners(eventName?: EventName, handler?: Function): void {
+	removeEventListeners(eventName?: EventName, fn?: Function): void {
 
-		if (!eventName && !handler) {
-			this._events = {}
+		// Remove all the event listeners at once
+		if (!eventName && !fn) {
+			this.removeAllEventListeners()
 			return
 		}
 
 		const name = eventName as any as string
 
-		if (eventName && !handler) {
+		// Remove all event listeners for an event
+		if (eventName && !fn) {
+			this._eventCount -= this._events[name].length
 			this._events[name] = []
 			return
 		}
 
-		if (eventName && handler) {
-			this._events[name] = this._events[name].filter(
-				(handlers) => handlers[Handler.Original] !== handler)
-			return
-		}
+		// Remove a specific handler for an event
+
+		this._events[name] = this._events[name].filter(
+			(handlers) => handlers.handler !== fn)
+
 	}
 
-	countEventListeners(eventName: EventName, handler?: Function): number {
+	removeAllEventListeners() {
+		this._events = {}
+		this._eventCount = 0
+	}
+
+	countEventListeners(eventName?: EventName, handler?: Function): number {
 
 		const name = eventName as any as string
 
-		if (!this._events[name]) {
-			return 0
+		if (!eventName) {
+			return this._eventCount
 		}
 
 		if (!this._events[name]) {
@@ -75,41 +89,41 @@ export class EventEmitter<EventName> {
 		this.on(eventName, handler, true)
 	}
 
-	schedule(eventName: EventName, handler: Function): boolean {
+	schedule(eventName: EventName, fn: Function): boolean {
 
 		const name = eventName as any as string
 
 		if (this._events[name]) {
-			for (let handlers of this._events[name]) {
-				if (handlers[Handler.Original] === handler) {
+			for (let handler of this._events[name]) {
+				if (handler.handler === fn) {
 					return false
 				}
 			}
 		}
 
 		this.once(eventName, handler)
+
 		return true
 	}
 
-	emit(eventName: EventName, ...args) {
+	emit(eventName: EventName, ...args: any[]) {
 
 		const name = eventName as any as string
-		let removes: number[] = []
 
 		if (!this._events[name]) {
 			return
 		}
 
-		this._events[name].forEach((handlers, index) => {
+		for (let i=0, len=this._events[name].length; i<len; i++) {
+			const handler = this._events[name][i]
 
-			handlers[Handler.Wrapped].apply(this, args)
+			handler.handler.apply(handler.context, args)
 
-			if (handlers[Handler.Original]["once"] == true) {
-				removes.push(index)
+			if (handler.once) {
+				delete this._events[name][i]
+				this._eventCount--
 			}
-		})
-
-		removes.forEach((index) => this._events[name].splice(index, 1))
+		}
 	}
 
 	destroy() {
