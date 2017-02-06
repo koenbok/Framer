@@ -19,13 +19,13 @@ it("should emit", () => {
 	em.on("test", count.add)
 
 	em.emit("test")
-	assert.equal(count.value(), 1)
+	expect(count.value()).toBe(1)
 
 	em.emit("test")
-	assert.equal(count.value(), 2)
+	expect(count.value()).toBe(2)
 
 	em.emit("test")
-	assert.equal(count.value(), 3)
+	expect(count.value()).toBe(3)
 })
 
 it("should remove by handler", () => {
@@ -39,15 +39,15 @@ it("should remove by handler", () => {
 
 	em.emit("testA")
 	em.emit("testB")
-	assert.equal(countA.value(), 1)
-	assert.equal(countB.value(), 1)
+	expect(countA.value()).toBe(1)
+	expect(countB.value()).toBe(1)
 
 	em.removeEventListeners("testA", countA.add)
 
 	em.emit("testA")
 	em.emit("testB")
-	assert.equal(countA.value(), 1)
-	assert.equal(countB.value(), 2)
+	expect(countA.value()).toBe(1)
+	expect(countB.value()).toBe(2)
 
 })
 
@@ -63,15 +63,15 @@ it("should remove by name", () => {
 
 	em.emit("testA")
 	em.emit("testB")
-	assert.equal(countA.value(), 1)
-	assert.equal(countB.value(), 1)
+	expect(countA.value()).toBe(1)
+	expect(countB.value()).toBe(1)
 
 	em.removeEventListeners("testA")
 
 	em.emit("testA")
 	em.emit("testB")
-	assert.equal(countA.value(), 1)
-	assert.equal(countB.value(), 2)
+	expect(countA.value()).toBe(1)
+	expect(countB.value()).toBe(2)
 
 })
 
@@ -87,15 +87,15 @@ it("should remove all", () => {
 
 	em.emit("testA")
 	em.emit("testB")
-	assert.equal(countA.value(), 1)
-	assert.equal(countB.value(), 1)
+	expect(countA.value()).toBe(1)
+	expect(countB.value()).toBe(1)
 
 	em.removeEventListeners()
 
 	em.emit("testA")
 	em.emit("testB")
-	assert.equal(countA.value(), 1)
-	assert.equal(countB.value(), 1)
+	expect(countA.value()).toBe(1)
+	expect(countB.value()).toBe(1)
 
 })
 
@@ -107,13 +107,13 @@ it("should once", () => {
 	em.once("test", count.add)
 
 	em.emit("test")
-	assert.equal(count.value(), 1)
+	expect(count.value()).toBe(1)
 
 	em.emit("test")
-	assert.equal(count.value(), 1)
+	expect(count.value()).toBe(1)
 
 	em.emit("test")
-	assert.equal(count.value(), 1)
+	expect(count.value()).toBe(1)
 })
 
 it("should schuedlue", () => {
@@ -121,12 +121,12 @@ it("should schuedlue", () => {
 	const em = new EventEmitter<"test">()
 	const count = counter()
 
-	assert.equal(em.schedule("test", count.add), true)
-	assert.equal(em.schedule("test", count.add), false)
-	assert.equal(em.schedule("test", count.add), false)
+	expect(em.schedule("test", count.add)).toBe(true)
+	expect(em.schedule("test", count.add)).toBe(false)
+	expect(em.schedule("test", count.add)).toBe(false)
 
 	em.emit("test")
-	assert.equal(count.value(), 1)
+	expect(count.value()).toBe(1)
 
 })
 
@@ -150,18 +150,18 @@ it("should wrap", () => {
 	em.on("test", count.add)
 
 	em.emit("test")
-	assert.equal(count.value(), 1)
-	assert.equal(wrapCounter, 1)
+	expect(count.value()).toBe(1)
+	expect(wrapCounter).toBe(1)
 
 	em.emit("test")
-	assert.equal(count.value(), 2)
-	assert.equal(wrapCounter, 2)
+	expect(count.value()).toBe(2)
+	expect(wrapCounter).toBe(2)
 
 	em.removeEventListeners("test", count.add)
 
 	em.emit("test")
-	assert.equal(count.value(), 2)
-	assert.equal(wrapCounter, 2)
+	expect(count.value()).toBe(2)
+	expect(wrapCounter).toBe(2)
 
 })
 
@@ -176,11 +176,11 @@ it("should once per emitter", () => {
 
 	em1.emit("test")
 	em2.emit("test")
-	assert.equal(count.value(), 2)
+	expect(count.value()).toBe(2)
 
 	em1.emit("test")
 	em2.emit("test")
-	assert.equal(count.value(), 3)
+	expect(count.value()).toBe(3)
 
 })
 
@@ -204,4 +204,42 @@ it("should only once per emitter", () => {
 	b.emit("test")
 	b.emit("test")
 	expect(counter).toBe(4)
+
+})
+
+
+it("should count total events", () => {
+
+	let counter = 0
+
+	const f = () => counter++
+	const em = new EventEmitter<"testA" | "testB">()
+
+	em.on("testA", f)
+	expect(em.countEventListeners()).toBe(1)
+	em.on("testA", f)
+	expect(em.countEventListeners()).toBe(2)
+
+	em.on("testB", f)
+	expect(em.countEventListeners()).toBe(3)
+
+	em.removeEventListeners("testA")
+	expect(em.countEventListeners()).toBe(1)
+
+	em.removeEventListeners()
+	expect(em.countEventListeners()).toBe(0)
+})
+
+it("should count total events for once", () => {
+
+	let counter = 0
+
+	const f = () => counter++
+	const em = new EventEmitter<"testA">()
+
+	em.once("testA", f)
+	expect(em.countEventListeners()).toBe(1)
+	em.emit("testA")
+	expect(counter).toBe(1)
+	expect(em.countEventListeners()).toBe(0)
 })

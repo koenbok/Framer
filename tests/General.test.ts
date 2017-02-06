@@ -92,10 +92,8 @@ isolated("should reset context", (context, done) => {
 	context.renderer.render()
 	assert.equal(document.body.children.length, elementCount)
 	expect(context.children.length).toEqual(0)
-	console.log(document.body.innerHTML);
-	
 	expect(context.renderer.html).toEqual(`<div data-reactroot=""></div>`)
-	
+
 
 	done()
 

@@ -59,10 +59,12 @@ export class EventEmitter<EventName> {
 		}
 
 		// Remove a specific handler for an event
-
-		this._events[name] = this._events[name].filter(
-			(handlers) => handlers.handler !== fn)
-
+		this._events[name] = this._events[name].filter((handlers) => {
+			if (handlers.fn !== fn) {
+				this._eventCount -= 1
+				return true
+			}
+		})
 	}
 
 	removeAllEventListeners() {
@@ -93,6 +95,7 @@ export class EventEmitter<EventName> {
 
 		const name = eventName as any as string
 
+		// Don't add this event if it already exists
 		if (this._events[name]) {
 			for (let handler of this._events[name]) {
 				if (handler.handler === fn) {
@@ -101,7 +104,7 @@ export class EventEmitter<EventName> {
 			}
 		}
 
-		this.once(eventName, handler)
+		this.once(eventName, fn)
 
 		return true
 	}
@@ -114,15 +117,21 @@ export class EventEmitter<EventName> {
 			return
 		}
 
+		let events = []
+
 		for (let i=0, len=this._events[name].length; i<len; i++) {
 			const handler = this._events[name][i]
 
 			handler.handler.apply(handler.context, args)
 
-			if (handler.once) {
-				delete this._events[name][i]
-				this._eventCount--
+			if (!handler.once) {
+				events.push(handler)
 			}
+		}
+
+		if (events.length !== this._events[name].length) {
+			this._eventCount += events.length - this._events[name].length
+			this._events[name] = events
 		}
 	}
 
