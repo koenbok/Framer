@@ -117,7 +117,7 @@ export class EventEmitter<EventName> {
 			return
 		}
 
-		let events = []
+		let events: EE[] = []
 
 		for (let i=0, len=this._events[name].length; i<len; i++) {
 			const handler = this._events[name][i]

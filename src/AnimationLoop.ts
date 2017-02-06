@@ -31,9 +31,12 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 
 		super.on(eventName, handler, once)
 
-		if (this._running === false) {
-			this._start()
+		if (eventName === "render" || eventName === "update") {
+			if (this._running === false) {
+				this._start()
+			}
 		}
+
 	}
 
 	private _start() {
@@ -47,18 +50,17 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 
 	private tick = () => {
 
-		
-		this.emit("update", time() - this._time)
-		this.emit("render", time() - this._time)
-
-		this._time = time()
-		this._counter++
-
 		if (this.countEventListeners("update") > 0 || this.countEventListeners("render") > 0) {
 			raf(this.tick)
 		} else {
 			this._stop()
 		}
+
+		this.emit("update", time() - this._time)
+		this.emit("render", time() - this._time)
+
+		this._time = time()
+		this._counter++
 
 		this.emit("finish", time() - this._time)
 	}
