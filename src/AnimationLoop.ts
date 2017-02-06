@@ -2,7 +2,6 @@ import {EventEmitter} from "EventEmitter"
 import * as raf from "raf"
 import * as utils from "utils"
 
-
 const performance = (window.performance || {
 	offset: Date.now(),
 	now: function now() { return Date.now() - this.offset }
@@ -13,8 +12,11 @@ const time = () => performance.now() / 1000
 type AnimationLoopEventNames = "render" | "update" | "finish"
 type AnimationLoopDeltaCallback = (this: AnimationLoop, delta: number, loop: AnimationLoop) => void
 
+let AnimationLoopCounter = 0
+
 export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 
+	private _id = -1
 	private _running = false
 	private _counter = 0
 	private _time = time()
@@ -25,6 +27,15 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 
 	get running() {
 		return this._running
+	}
+
+	get id() {
+		return this._id
+	}
+
+	constructor() {
+		super()
+		this._id = AnimationLoopCounter++
 	}
 
 	on(eventName: AnimationLoopEventNames, handler: Function, once=false) {

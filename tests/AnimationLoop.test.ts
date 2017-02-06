@@ -3,9 +3,47 @@ import * as assert from "assert"
 import {AnimationLoop} from "AnimationLoop"
 import {Utils} from "Framer"
 
+it("should stop", (done) => {
+
+	const loop = new AnimationLoop()
+	const frameCount = 10
+	let count = 0
+
+	const onFinish = () => {
+
+		loop.removeEventListeners("render")
+
+		try {
+			expect(count).toBe(frameCount + 1)
+		} catch (error) {
+			done.fail(error)
+		}
+
+		done()
+	}
+
+	const onRender = () => {
+		try {
+			expect(loop.running).toBeTruthy()
+			expect(count).toBeLessThanOrEqual(frameCount)
+		} catch (error) {
+			done.fail(error)
+		}
+
+		if (count == frameCount) {
+			loop.on("finish", onFinish)
+		}
+
+		count++
+	}
+
+	loop.on("render", onRender)
+
+})
+
 it("should emit finish", (done) => {
 
-	let loop = new AnimationLoop()
+	const loop = new AnimationLoop()
 	let count = 0
 	const f = () => count++
 
@@ -16,7 +54,7 @@ it("should emit finish", (done) => {
 
 it("should emit in the right order", (done) => {
 
-	let loop = new AnimationLoop()
+	const loop = new AnimationLoop()
 	let names: string[] = []
 
 	loop.on("update", () => { names.push("update") })
@@ -30,7 +68,7 @@ it("should emit in the right order", (done) => {
 
 it("should emit finish after", (done) => {
 
-	let loop = new AnimationLoop()
+	const loop = new AnimationLoop()
 
 	loop.once("render", () => {
 		loop.on("finish", () => {
@@ -41,7 +79,7 @@ it("should emit finish after", (done) => {
 
 it("should start", (done) => {
 
-	let loop = new AnimationLoop()
+	const loop = new AnimationLoop()
 	let count = 0
 	const f = () => count++
 
@@ -59,7 +97,7 @@ it("should start", (done) => {
 
 it("should schedule", () => {
 
-	let loop = new AnimationLoop()
+	const loop = new AnimationLoop()
 	let count = 0
 	const f = () => count++
 

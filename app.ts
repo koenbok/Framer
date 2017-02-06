@@ -57,10 +57,8 @@ const run = () => {
 //     render(Framer.Context.Default)
 // })
 
-import {AnimationLoop} from "./src/AnimationLoop"
-import {AnimationProperty} from "./src/AnimationProperty"
-import {AnimationCurveLinear} from "./src/AnimationCurve"
+
 
 let layerC = new Layer()
 
-layerC.animate({x: 500, options: {curve: Linear(200)}})
+layerC.animate({x: 500, y: 500, options: {curve: Linear(10)}})

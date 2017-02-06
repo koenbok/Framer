@@ -1,8 +1,3 @@
-enum Handler {
-	Original,
-	Wrapped,
-}
-
 interface EE {
 	fn: Function
 	handler: Function
@@ -117,17 +112,10 @@ export class EventEmitter<EventName> {
 			return
 		}
 
-		let events: EE[] = []
-
-		for (let i=0, len=this._events[name].length; i<len; i++) {
-			const handler = this._events[name][i]
-
+		let events: EE[] = this._events[name].filter((handler) => {
 			handler.handler.apply(handler.context, args)
-
-			if (!handler.once) {
-				events.push(handler)
-			}
-		}
+			return !handler.once
+		})
 
 		if (events.length !== this._events[name].length) {
 			this._eventCount += events.length - this._events[name].length
