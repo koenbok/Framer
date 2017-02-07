@@ -17,33 +17,29 @@ BezierDefaults =
 
 
 Spring = (dampingRatio, mass, velocity) ->
-	defaults = {}
+	curveOptions = {}
 	if dampingRatio?
-		defaults.dampingRatio = dampingRatio
+		curveOptions.dampingRatio = dampingRatio
 	if mass?
-		defaults.mass = mass
+		curveOptions.mass = mass
 	if velocity?
-		defaults.velocity = velocity
-	{dampingRatio, mass, velocity} = Defaults.getDefaults "Spring", defaults
+		curveOptions.velocity = velocity
+	curveOptions = Defaults.getDefaults "Spring", curveOptions
 
 	if dampingRatio? and not _.isFinite(dampingRatio) and typeof dampingRatio is 'object'
-		argumentObject = dampingRatio
+		curveOptions = dampingRatio
 		dampingRatio = null
-		if (argumentObject.damping? or argumentObject.dampingRatio?)
-			dampingRatio = argumentObject.dampingRatio ? argumentObject.damping
-		if argumentObject.mass?
-			mass = argumentObject.mass
-		if argumentObject.velocity?
-			velocity = argumentObject.velocity
+		if curveOptions.damping? and not curveOptions.dampingRatio?
+			curveOptions.dampingRatio = curveOptions.damping
 
 	return (options) ->
-		if dampingRatio?
+		if curveOptions.dampingRatio?
 			duration = options?.time ? 1
-			derivedOptions = computeDerivedCurveOptions(dampingRatio, duration, velocity, mass)
+			derivedOptions = computeDerivedCurveOptions(curveOptions.dampingRatio, duration, curveOptions.velocity, curveOptions.mass)
+			curveOptions = _.defaults derivedOptions, curveOptions
 		else
 			delete options?.time
-			derivedOptions = argumentObject
-		options = _.defaults derivedOptions, options
+		options = _.defaults curveOptions, options
 		animator = new SpringRK4Animator(options)
 		if duration?
 			animator.time = duration

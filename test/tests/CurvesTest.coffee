@@ -9,10 +9,10 @@ animatorEquals = (actual, expected) ->
 describe "Curves", ->
 	describe "defaults", ->
 		it "should have correct defaults", ->
-			Spring()(time: 1).options.should.eql {tension: 161.7195015916278, friction: 12.716898269296165, velocity: 0, time: 1, tolerance: 0.01}
+			Spring()(time: 1).options.should.eql {tension: 161.7195015916278, friction: 12.716898269296165, velocity: 0, time: 1, tolerance: 0.01, dampingRatio: 0.5, mass: 1}
 		it "should listen to setting Framer Defaults", ->
 			Framer.Defaults.Spring.dampingRatio = 0.3
-			Spring()(time: 1).options.should.eql {tension: 367.4809527222421, friction: 11.501875628783644, velocity: 0, time: 1, tolerance: 0.01}
+			Spring()(time: 1).options.should.eql {tension: 367.4809527222421, friction: 11.501875628783644, velocity: 0, time: 1, tolerance: 0.01, dampingRatio: 0.3, mass: 1}
 
 	describe "fromString", ->
 		it "should parse Spring", ->
