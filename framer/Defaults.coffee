@@ -61,6 +61,10 @@ Originals =
 	FrictionSimulator:
 		friction: 2
 		tolerance: 1 / 10
+	Spring:
+		dampingRatio: 0.5
+		mass: 1
+		velocity: 0
 	SpringSimulator:
 		tension: 500
 		friction: 10

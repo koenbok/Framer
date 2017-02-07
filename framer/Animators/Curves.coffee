@@ -1,6 +1,7 @@
 {BezierCurveAnimator} = require "./BezierCurveAnimator"
 {computeDerivedCurveOptions, computeDuration} = require "./SpringCurveValueConverter"
 {SpringRK4Animator} = require "./SpringRK4Animator"
+{Defaults} = require "../Defaults"
 
 Bezier = (values...) ->
 	(options = {}) ->
@@ -15,8 +16,17 @@ BezierDefaults =
 	easeInOut: Bezier(.42, 0, .58, 1)
 
 
-Spring = (dampingRatio = 0.5, mass = 1, velocity = 0) ->
-	if not _.isFinite(dampingRatio) and typeof dampingRatio is 'object'
+Spring = (dampingRatio, mass, velocity) ->
+	defaults = {}
+	if dampingRatio?
+		defaults.dampingRatio = dampingRatio
+	if mass?
+		defaults.mass = mass
+	if velocity?
+		defaults.velocity = velocity
+	{dampingRatio, mass, velocity} = Defaults.getDefaults "Spring", defaults
+
+	if dampingRatio? and not _.isFinite(dampingRatio) and typeof dampingRatio is 'object'
 		argumentObject = dampingRatio
 		dampingRatio = null
 		if (argumentObject.damping? or argumentObject.dampingRatio?)
@@ -25,6 +35,7 @@ Spring = (dampingRatio = 0.5, mass = 1, velocity = 0) ->
 			mass = argumentObject.mass
 		if argumentObject.velocity?
 			velocity = argumentObject.velocity
+
 	return (options) ->
 		if dampingRatio?
 			duration = options?.time ? 1
