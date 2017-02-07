@@ -14,7 +14,7 @@ approximateRoot = (func, derivative, initialGuess, times=12) ->
 angularFrequency = (undampedFrequency, dampingRatio) ->
 	undampedFrequency * Math.sqrt(1 - Math.pow(dampingRatio, 2))
 
-computeDampingRatio = (tension, friction, mass = 1) ->
+exports.computeDampingRatio = computeDampingRatio = (tension, friction, mass = 1) ->
 	friction / (2 * Math.sqrt(mass * tension))
 
 # Tries to compute the duration of a spring,

@@ -1,5 +1,5 @@
 {BezierCurveAnimator} = require "./BezierCurveAnimator"
-{computeDerivedCurveOptions, computeDuration} = require "./SpringCurveValueConverter"
+{computeDerivedCurveOptions, computeDuration, computeDampingRatio} = require "./SpringCurveValueConverter"
 {SpringRK4Animator} = require "./SpringRK4Animator"
 {Defaults} = require "../Defaults"
 
@@ -47,7 +47,9 @@ Spring = (dampingRatio, mass, velocity) ->
 
 _.assign Bezier, BezierDefaults
 Spring.computeDerivedCurveOptions = computeDerivedCurveOptions
-Spring.computeDuration = computeDerivedCurveOptions
+Spring.computeDuration = computeDuration
+Spring.computeDampingRatio = computeDampingRatio
+
 
 exports.Spring = Spring
 exports.Bezier = Bezier
