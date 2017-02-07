@@ -35,7 +35,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		opacity: 1
 	}
 
-	_element: HTMLElement | null
+	_element?: HTMLElement
 
 	constructor(options: LayerOptions={}) {
 		super()
@@ -134,6 +134,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	animate(properties: AnimatableProperties, curve: AnimationCurve=Linear(1), callback?: Function) {
 		let animation = new Animation(this, properties, curve)
 		animation.start()
+		return animation
 	}
 
 

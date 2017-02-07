@@ -12,9 +12,13 @@ export class EventEmitter<EventName> {
 	private _events: { [index: string]: EE[] } = {}
 	private _eventCount = 0
 
-	on(eventName: EventName, fn: Function, context: any, once=false) {
+	on(eventName: EventName, fn: Function, context?: any, once=false) {
 
 		const name = eventName as any as string
+
+		if (name === "render") {
+			debugger
+		}
 
 		if (!this._events[name]) {
 			this._events[name] = []
@@ -23,7 +27,7 @@ export class EventEmitter<EventName> {
 		this._events[name].push({
 			fn: fn,
 			handler: this.wrapEventListener(eventName, fn),
-			context: context,
+			context: context || this,
 			once: once
 		})
 
@@ -86,11 +90,11 @@ export class EventEmitter<EventName> {
 		return this._events[name].length
 	}
 
-	once(eventName: EventName, handler: Function) {
-		this.on(eventName, handler, true)
+	once(eventName: EventName, fn: Function, context?: any) {
+		this.on(eventName, fn, context, true)
 	}
 
-	schedule(eventName: EventName, fn: Function): boolean {
+	schedule(eventName: EventName, fn: Function, context?: any): boolean {
 
 		const name = eventName as any as string
 
@@ -103,7 +107,7 @@ export class EventEmitter<EventName> {
 			}
 		}
 
-		this.once(eventName, fn)
+		this.once(eventName, fn, context)
 
 		return true
 	}
@@ -112,7 +116,12 @@ export class EventEmitter<EventName> {
 
 		const name = eventName as any as string
 
-		if (!this._events[name]) {
+		if (name === "update") {
+			console.log("emit", name, this.countEventListeners(eventName));
+			console.log(this._events[name]);
+		}
+
+		if (!this._events[name] || this._events[name].length === 0) {
 			return
 		}
 

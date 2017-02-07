@@ -47,7 +47,7 @@ export const render = (context: Context, root: HTMLElement) => {
 	}
 
 	Preact.render(
-		Preact.h("div", {"data-reactroot": ""}, 
-		context.children.map(renderLayer)), 
+		Preact.h("div", {},
+		context.children.map(renderLayer)),
 		root, previousNode)
 }

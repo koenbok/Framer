@@ -5,7 +5,11 @@ import {AnimatableProperties, AnimationProperty} from "AnimationProperty"
 import {Layer} from "Layer"
 
 
-type AnimationEventTypes = "start" | "stop" | "end"
+type AnimationEventTypes =
+	"AnimationStart" |
+	"AnimationStop" |
+	"AnimationHalt" |
+	"AnimationEnd"
 
 export class Animation extends EventEmitter<AnimationEventTypes> {
 
@@ -15,21 +19,17 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 	private _loop: AnimationLoop
 	private _running: AnimationProperty[] = []
 	private _finished: AnimationProperty[] = []
-	private _finishedCallback?: Function
 
-	constructor(layer: Layer, properties: AnimatableProperties, curve: AnimationCurve, finishedCallback?: Function, loop=AnimationLoop.Default) {
+	constructor(layer: Layer, properties: AnimatableProperties, curve: AnimationCurve, loop=AnimationLoop.Default) {
 		super()
 
 		this._layer = layer
 		this._curve = curve
 		this._properties = properties
 		this._loop = loop
-		this._finishedCallback = finishedCallback
 	}
 
-	start() {
-
-
+	readonly start = () => {
 
 		// Is there anything to animate
 
@@ -50,18 +50,22 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 			animationProperty.start()
 		}
 
-		//
-
-		// this._loop.on("update", this._update)
 	}
 
+	readonly onStart = (fn: Function) => { this.on("AnimationStart", fn); return this }
+	readonly onHalt = (fn: Function) => { this.on("AnimationHalt", fn); return this }
+	readonly onStop = (fn: Function) => { this.on("AnimationStop", fn); return this }
+	readonly onEnd = (fn: Function) => { this.on("AnimationEnd", fn); return this }
+
 	private _onAnimationPropertyFinished(animationProperty: AnimationProperty) {
+
+		debugger
+
 		this._finished.push(animationProperty)
 
-		if (this._finishedCallback) {
-			if (this._running.length === this._finished.length) {
-				this._finishedCallback()
-			}
+		if (this._running.length === this._finished.length) {
+			this.emit("AnimationStop")
+			this.emit("AnimationEnd")
 		}
 	}
 

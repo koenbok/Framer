@@ -42,11 +42,9 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 
 		super.on(eventName, handler, once)
 
-		if (eventName === "update") {
-			debugger
-		}
 
 		if (eventName === "render" || eventName === "update") {
+
 			if (this._running === false) {
 				this._start()
 			}

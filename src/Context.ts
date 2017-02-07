@@ -23,6 +23,10 @@ export class Context extends BaseClass<ContextEventTypes> {
 		return CurrentContext
 	}
 
+	static set Current(context: Context) {
+		CurrentContext = context
+	}
+
 	private _name: string
 	private _layers = new Collection<Layer>()
 	private _renderer: Renderer

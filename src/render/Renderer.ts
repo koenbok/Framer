@@ -20,7 +20,13 @@ export class Renderer {
 	constructor(context: Context, loop: AnimationLoop) {
 		this._context = context
 		this._loop = loop
+
 		this._element.className = "context"
+		this._element.style.position = "absolute"
+		this._element.style.top = "0px"
+		this._element.style.right = "0px"
+		this._element.style.bottom = "0px"
+		this._element.style.left = "0px"
 
 		Utils.dom.whenReady(() => {
 			document.body.appendChild(this.element)

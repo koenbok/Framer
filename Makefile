@@ -3,8 +3,13 @@ default: dev
 bootstrap:
 	@yarn || (echo "Install yarn first – https://yarnpkg.com/" && exit 1)
 
+# test: bootstrap
+# 	./node_modules/.bin/jest --watchAll
+
 test: bootstrap
-	./node_modules/.bin/jest --watchAll
+	./node_modules/.bin/webpack-dev-server \
+		--config webpack/webpack.tests.js \
+		--open
 
 build: bootstrap
 	./node_modules/.bin/webpack \

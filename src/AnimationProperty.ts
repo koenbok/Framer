@@ -79,17 +79,19 @@ export class AnimationProperty {
 
 	private _stop() {
 
-		console.log("AnimationProperty._stop");
+		debugger
+		console.log(this._loop.countEventListeners("update"));
 
 		this._loop.off("update", this._update)
-		if (this._finishedCallback) {
-			this._finishedCallback(this)
-		}
+		console.log(this._loop.countEventListeners("update"));
+
+
 	}
 
 	private _update = (delta: number) => {
 
-		console.log("_update", this._time);
+		// console.log("_update", this._time);
+		// console.log(this._loop.countEventListeners("render"), this._loop.countEventListeners("update"))
 
 
 		this._target[this._key] = this._value(this._curve.value(this._time))
