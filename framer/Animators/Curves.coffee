@@ -18,19 +18,19 @@ BezierDefaults =
 
 Spring = (dampingRatio, mass, velocity) ->
 	curveOptions = {}
-	if dampingRatio?
+	if dampingRatio? and _.isFinite(dampingRatio)
 		curveOptions.dampingRatio = dampingRatio
 	if mass?
 		curveOptions.mass = mass
 	if velocity?
 		curveOptions.velocity = velocity
-	curveOptions = Defaults.getDefaults "Spring", curveOptions
-
-	if dampingRatio? and not _.isFinite(dampingRatio) and typeof dampingRatio is 'object'
+	if not _.isFinite(dampingRatio) and typeof dampingRatio is 'object'
 		curveOptions = dampingRatio
-		dampingRatio = null
 		if curveOptions.damping? and not curveOptions.dampingRatio?
 			curveOptions.dampingRatio = curveOptions.damping
+	if not curveOptions.tension? and not curveOptions.friction?
+		curveOptions = Defaults.getDefaults "Spring", curveOptions
+
 
 	return (options) ->
 		if curveOptions.dampingRatio?
@@ -121,7 +121,7 @@ exports.fromString = (string) ->
 		when "bezier-curve", "cubic-bezier"
 			Bezier(args...)
 		when "spring", "spring-rk4", "spring-tfv"
-			pairs = _.zip(["tension", "friction", "velocity", "tolerance"], args)
+			pairs = _.zipWith(["tension", "friction", "velocity", "tolerance"], args, [250, 25, 0, 1 / 100], (key, value, defaults) -> [key, value ? defaults])
 			object = _.fromPairs(pairs)
 			Spring(object)
 		when "spring-dd"
