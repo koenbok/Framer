@@ -12,13 +12,32 @@ export class EventEmitter<EventName> {
 	private _events: { [index: string]: EE[] } = {}
 	private _eventCount = 0
 
-	on(eventName: EventName, fn: Function, context?: any, once=false) {
+	eventListeners() {
+
+		const listeners = {}
+
+		for (let key in this._events) {
+			listeners[key] = this._events[key].map((listener) => listener.fn)
+		}
+
+		return listeners
+	}
+
+	on(eventName: EventName, fn: Function) {
+		this.addEventListener(eventName, fn, false, this)
+	}
+
+	once(eventName: EventName, fn: Function) {
+		this.addEventListener(eventName, fn, true, this)
+	}
+
+	off(eventName: EventName, fn: Function) {
+		this.removeEventListeners(eventName, fn)
+	}
+
+	addEventListener(eventName: EventName, fn: Function, once: boolean, context: Object) {
 
 		const name = eventName as any as string
-
-		if (name === "render") {
-			debugger
-		}
 
 		if (!this._events[name]) {
 			this._events[name] = []
@@ -27,16 +46,14 @@ export class EventEmitter<EventName> {
 		this._events[name].push({
 			fn: fn,
 			handler: this.wrapEventListener(eventName, fn),
-			context: context || this,
+			context: context,
 			once: once
 		})
 
 		this._eventCount++
 	}
 
-	off(eventName: EventName, fn: Function) {
-		this.removeEventListeners(eventName, fn)
-	}
+
 
 	wrapEventListener(eventName: EventName, fn: Function) {
 		return fn
@@ -90,11 +107,9 @@ export class EventEmitter<EventName> {
 		return this._events[name].length
 	}
 
-	once(eventName: EventName, fn: Function, context?: any) {
-		this.on(eventName, fn, context, true)
-	}
 
-	schedule(eventName: EventName, fn: Function, context?: any): boolean {
+
+	schedule(eventName: EventName, fn: Function): boolean {
 
 		const name = eventName as any as string
 
@@ -107,7 +122,7 @@ export class EventEmitter<EventName> {
 			}
 		}
 
-		this.once(eventName, fn, context)
+		this.once(eventName, fn)
 
 		return true
 	}
@@ -121,11 +136,14 @@ export class EventEmitter<EventName> {
 			return
 		}
 
-		this._events[name].forEach((handlers, index) => {
+		this._events[name].forEach((listener, index) => {
 
-			handlers.handler.apply(this, args)
+			listener.handler.apply(this, args)
 
-			if (handlers.once == true) {
+			if (listener.once == true) {
+
+				console.log("remove", eventName, listener);
+
 				this._eventCount--
 				removes.push(index)
 			}

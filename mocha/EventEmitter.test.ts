@@ -269,7 +269,7 @@ describe("EventEmitter", () => {
 		expect(em.countEventListeners()).to.equal(0)
 	})
 
-	it("should count total events for once", () => {
+	it("should count events for once", () => {
 
 		let counter = 0
 
@@ -292,16 +292,20 @@ describe("EventEmitter", () => {
 
 		em.once("testA", f)
 		expect(em.countEventListeners()).to.equal(1)
+		expect(em.countEventListeners("testA")).to.equal(1)
+
 		em.emit("testA")
 		expect(counter).to.equal(1)
-
-		expect(em.countEventListeners("testA")).to.equal(0)
 		expect(em.countEventListeners()).to.equal(0)
+		expect(em.countEventListeners("testA")).to.equal(0)
 
 		em.emit("testA")
 		em.emit("testA")
 		em.emit("testA")
 		expect(counter).to.equal(1)
+		expect(em.countEventListeners()).to.equal(0)
+		expect(em.countEventListeners("testA")).to.equal(0)
+
 	})
 
 })

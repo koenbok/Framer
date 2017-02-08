@@ -38,13 +38,10 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 		this._id = AnimationLoopCounter++
 	}
 
-	on(eventName: AnimationLoopEventNames, handler: Function, once=false) {
-
-		super.on(eventName, handler, once)
-
+	addEventListener(eventName: AnimationLoopEventNames, fn: Function, once: boolean, context: Object) {
+		super.addEventListener(eventName, fn, once, this)
 
 		if (eventName === "render" || eventName === "update") {
-
 			if (this._running === false) {
 				this._start()
 			}

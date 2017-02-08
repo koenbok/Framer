@@ -59,7 +59,7 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 
 	private _onAnimationPropertyFinished(animationProperty: AnimationProperty) {
 
-		debugger
+
 
 		this._finished.push(animationProperty)
 

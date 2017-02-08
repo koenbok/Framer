@@ -79,11 +79,10 @@ export class AnimationProperty {
 
 	private _stop() {
 
-		debugger
-		console.log(this._loop.countEventListeners("update"));
+		// console.log(this._loop.countEventListeners("update"));
 
 		this._loop.off("update", this._update)
-		console.log(this._loop.countEventListeners("update"));
+		// console.log(this._loop.countEventListeners("update"));
 
 
 	}
