@@ -115,25 +115,35 @@ export class EventEmitter<EventName> {
 	emit(eventName: EventName, ...args: any[]) {
 
 		const name = eventName as any as string
+		let removes: number[] = []
 
-		if (name === "update") {
-			console.log("emit", name, this.countEventListeners(eventName));
-			console.log(this._events[name]);
-		}
-
-		if (!this._events[name] || this._events[name].length === 0) {
+		if (!this._events[name]) {
 			return
 		}
 
-		let events: EE[] = this._events[name].filter((handler) => {
-			handler.handler.apply(handler.context, args)
-			return !handler.once
+		this._events[name].forEach((handlers, index) => {
+
+			handlers.handler.apply(this, args)
+
+			if (handlers.once == true) {
+				this._eventCount--
+				removes.push(index)
+			}
 		})
 
-		if (events.length !== this._events[name].length) {
-			this._eventCount += events.length - this._events[name].length
-			this._events[name] = events
-		}
+		removes.forEach((index) => this._events[name].splice(index, 1))
+
+		// this._events[name] = this._events[name].filter((handler) => {
+
+		// 	handler.handler.apply(this, args)
+
+		// 	if (handler.once) {
+		// 		this._eventCount--
+		// 		return false
+		// 	} else {
+		// 		return true
+		// 	}
+		// })
 	}
 
 	destroy() {

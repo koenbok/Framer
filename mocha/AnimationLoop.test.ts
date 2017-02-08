@@ -1,6 +1,6 @@
-// import * as assert from "assert"
+import {expect} from "chai"
 
-// import {AnimationLoop} from "AnimationLoop"
+import {AnimationLoop} from "AnimationLoop"
 // import {Utils} from "Framer"
 
 // it("should stop", (done) => {
@@ -95,20 +95,20 @@
 
 // })
 
-// it("should schedule", () => {
+it("should schedule", () => {
 
-// 	const loop = new AnimationLoop()
-// 	let count = 0
-// 	const f = () => count++
+	const loop = new AnimationLoop()
+	let count = 0
+	const f = () => count++
 
-// 	loop.schedule("render", f)
-// 	loop.schedule("render", f)
-// 	loop.schedule("render", f)
+	loop.schedule("render", f)
+	loop.schedule("render", f)
+	loop.schedule("render", f)
 
-// 	assert.equal(loop.countEventListeners("render"), 1)
+	expect(loop.countEventListeners("render")).to.equal(1)
 
-// 	loop.emit("render")
-// 	loop.emit("render")
+	loop.emit("render")
+	loop.emit("render")
 
-// 	assert.equal(count, 1)
-// })
+	expect(count).to.equal(1)
+})
