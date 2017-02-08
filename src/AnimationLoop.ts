@@ -50,17 +50,19 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 	}
 
 	private _start() {
+		console.log("_start");
 		this._running = true
 		raf(this.tick)
 	}
 
 	private _stop() {
+		console.log("_stop");
 		this._running = false
 	}
 
 	private tick = () => {
 
-		// console.log("AnimationLoop.tick", this.id, this._counter);
+		console.log("AnimationLoop.tick", this.id, this._counter, this.eventListeners());
 
 		if (this.countEventListeners("update") > 0 || this.countEventListeners("render") > 0) {
 			raf(this.tick)

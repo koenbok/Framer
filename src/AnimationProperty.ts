@@ -1,11 +1,18 @@
-import {Layer} from "./Layer"
-import {AnimationLoop} from "./AnimationLoop"
-import {AnimationCurve, AnimationCurveLinear} from "./AnimationCurve"
+import {EventEmitter} from "EventEmitter"
+import {Layer} from "Layer"
+import {AnimationLoop} from "AnimationLoop"
+import {AnimationCurve, AnimationCurveLinear} from "AnimationCurve"
 
 
 import {Color} from "./Color"
 
 type AnimatablePropertyType = number | Color
+
+type PropertyAnimationEventTypes =
+	"PropertyAnimationStart" |
+	"PropertAnimationStop" |
+	"PropertAnimationHalt" |
+	"PropertAnimationEnd"
 
 export interface AnimatableProperties {
 	x?: number
@@ -23,7 +30,7 @@ export interface AnimatableProperties {
 
 type AnimatablePropertyName = keyof AnimatableProperties
 
-export class AnimationProperty {
+export class AnimationProperty extends EventEmitter<PropertyAnimationEventTypes> {
 
 	private _target: Layer
 	private _key: AnimatablePropertyName
@@ -33,11 +40,17 @@ export class AnimationProperty {
 	private _curve: AnimationCurve
 	private _running = false
 	private _time = 0
-	private _finishedCallback?: Function
 
-	constructor(loop: AnimationLoop, target: Layer,
-		key: AnimatablePropertyName, from: AnimatablePropertyType, to: AnimatablePropertyType ,
-		curve: AnimationCurve, converter:null|Function=null, finishedCallback?: Function) {
+	constructor(
+		loop: AnimationLoop,
+		target: Layer,
+		key: AnimatablePropertyName,
+		from: AnimatablePropertyType,
+		to: AnimatablePropertyType ,
+		curve: AnimationCurve,
+		converter:null|Function=null) {
+
+		super()
 
 		this._target = target
 		this._key = key
@@ -45,7 +58,6 @@ export class AnimationProperty {
 		this._from = from as number
 		this._to = to as number
 		this._curve = curve
-		this._finishedCallback = finishedCallback
 
 	}
 
@@ -78,13 +90,13 @@ export class AnimationProperty {
 	}
 
 	private _stop() {
-
-		// console.log(this._loop.countEventListeners("update"));
-
+		this.emit("PropertAnimationStop")
 		this._loop.off("update", this._update)
-		// console.log(this._loop.countEventListeners("update"));
+	}
 
-
+	private _end() {
+		this._stop()
+		this.emit("PropertAnimationEnd")
 	}
 
 	private _update = (delta: number) => {
@@ -96,7 +108,7 @@ export class AnimationProperty {
 		this._target[this._key] = this._value(this._curve.value(this._time))
 
 		if (this._curve.done(this._time)) {
-			this.stop()
+			this._end()
 		}
 
 		this._time += delta

@@ -21,6 +21,7 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 	private _finished: AnimationProperty[] = []
 
 	constructor(layer: Layer, properties: AnimatableProperties, curve: AnimationCurve, loop=AnimationLoop.Default) {
+
 		super()
 
 		this._layer = layer
@@ -42,11 +43,11 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 
 			const animationProperty = new AnimationProperty(
 				this._loop, this._layer, key as any,
-				this._layer[key], this._properties[key], this._curve,
-				this._onAnimationPropertyFinished)
+				this._layer[key], this._properties[key], this._curve)
 
 			this._running.push(animationProperty)
 
+			animationProperty.once("PropertAnimationEnd", this._onAnimationPropertyEnd)
 			animationProperty.start()
 		}
 
@@ -57,9 +58,7 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 	readonly onStop = (fn: Function) => { this.on("AnimationStop", fn); return this }
 	readonly onEnd = (fn: Function) => { this.on("AnimationEnd", fn); return this }
 
-	private _onAnimationPropertyFinished(animationProperty: AnimationProperty) {
-
-
+	private _onAnimationPropertyEnd = (animationProperty: AnimationProperty) => {
 
 		this._finished.push(animationProperty)
 
