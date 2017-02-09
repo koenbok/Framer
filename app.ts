@@ -1,8 +1,6 @@
 import * as _ from "lodash"
 
-import {Layer, Framer, Context, Loop, Utils} from "Framer"
-
-import {Linear} from "AnimationCurve"
+import {Layer, Framer, Context, Loop, Utils, Curve} from "Framer"
 
 
 
@@ -64,4 +62,4 @@ let layerC = new Layer()
 // layerC.animate({x: 50, y: 50, options: {curve: Linear(1)}})
 
 
-layerC.animate({x: 500, y: 500}, Linear(1))
+layerC.animate({x: 500, y: 500}, Curve.linear(1))

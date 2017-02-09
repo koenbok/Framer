@@ -1,7 +1,7 @@
 import {EventEmitter} from "EventEmitter"
 import {Layer} from "Layer"
 import {AnimationLoop} from "AnimationLoop"
-import {AnimationCurve, AnimationCurveLinear} from "AnimationCurve"
+import {AnimationCurve} from "AnimationCurve"
 
 
 import {Color} from "./Color"

@@ -12,6 +12,7 @@ const time = () => performance.now() / 1000
 type AnimationLoopEventNames = "render" | "update" | "finish"
 type AnimationLoopDeltaCallback = (this: AnimationLoop, delta: number, loop: AnimationLoop) => void
 
+let AnimationLoopTimeStep = 1 / 60
 let AnimationLoopCounter = 0
 
 export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
@@ -23,6 +24,14 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 
 	static get Default() {
 		return DefaultAnimationLoop
+	}
+
+	static set TimeStep(value: number) {
+		AnimationLoopTimeStep = value
+	}
+
+	static get TimeStep() {
+		return AnimationLoopTimeStep
 	}
 
 	get running() {
@@ -62,7 +71,7 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 
 	private tick = () => {
 
-		console.log("AnimationLoop.tick", this.id, this._counter, this.eventListeners());
+		// console.log("AnimationLoop.tick", this.id, this._counter, this.eventListeners());
 
 		if (this.countEventListeners("update") > 0 || this.countEventListeners("render") > 0) {
 			raf(this.tick)
@@ -70,13 +79,13 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 			this._stop()
 		}
 
-		this.emit("update", time() - this._time)
-		this.emit("render", time() - this._time)
+		this.emit("update", AnimationLoopTimeStep, time() - this._time)
+		this.emit("render", AnimationLoopTimeStep, time() - this._time)
 
-		this._time = time()
+		this._time = AnimationLoopTimeStep
 		this._counter++
 
-		this.emit("finish", time() - this._time)
+		this.emit("finish", AnimationLoopTimeStep, time() - this._time)
 	}
 }
 
