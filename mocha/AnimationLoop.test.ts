@@ -111,7 +111,6 @@ describe("AnimationLoop", () => {
 		expect(loop.countEventListeners("render")).to.equal(1)
 
 		loop.emit("render")
-		console.log(loop.eventListeners())
 
 		expect(loop.countEventListeners()).to.equal(0)
 		expect(loop.countEventListeners("render")).to.equal(0)

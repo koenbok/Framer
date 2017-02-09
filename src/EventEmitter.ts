@@ -141,9 +141,6 @@ export class EventEmitter<EventName> {
 			listener.handler.apply(this, args)
 
 			if (listener.once == true) {
-
-				console.log("remove", eventName, listener);
-
 				this._eventCount--
 				removes.push(index)
 			}
