@@ -10,12 +10,11 @@ let AnimationCurveLinearDefaultOptions: AnimationCurveLinearOptions = {
 
 export class AnimationCurveLinear extends AnimationCurve {
 
-	private _options: AnimationCurveLinearOptions
+	private _options = AnimationCurveLinearDefaultOptions
 
 	constructor(options=AnimationCurveLinearDefaultOptions) {
 		super()
-
-		this._options = Object.assign({}, options)
+		Object.assign(this._options, options)
 	}
 
 	value(time: number) {
