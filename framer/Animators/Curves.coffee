@@ -56,7 +56,8 @@ exports.Bezier = Bezier
 parseFunction = (string) ->
 	return null unless _.isString string
 
-	regex = /.*(Spring|Bezier)(?:\(\s*{?([a-zA-Z\d:\s,.]*)}?\s*\)|\.(\w+))?/
+	# This parses functions with or without arguments like Bezier(0.1, 0.2, 0.3, 0.4) and Spring(damping: 0.5)
+	regex = /.*(Spring|Bezier)(?:\(\s*{?([\w:\s,.]*)}?\s*\)|\.(\w+))?/
 	matches = regex.exec(string)
 	return null unless matches?
 	[match, type, args, prop] = matches
@@ -70,7 +71,7 @@ parseFunction = (string) ->
 		result.arguments = []
 
 
-	argumentsRegex = /\s*([a-zA-Z]+)\s*:\s*([\d.]+)\s*,?/g
+	argumentsRegex = /\s*([\w]+)\s*:\s*([\d.]+)\s*,?/g
 	argumentObject = {}
 	while matches = argumentsRegex.exec(args)
 		[match, property, value] = matches
