@@ -2,7 +2,7 @@ import * as assert from "assert"
 
 import {Collection} from "Collection"
 
-interface Layer {
+export interface Layer {
 	id: number|string
 }
 

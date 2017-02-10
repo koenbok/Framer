@@ -1,4 +1,4 @@
-type wrappedFunction = Function
+export type wrappedFunction = Function
 
 interface EE {
 	fn: Function

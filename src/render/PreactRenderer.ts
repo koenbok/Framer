@@ -4,7 +4,7 @@ import {Layer} from "Layer"
 import {Context} from "Context"
 import {getLayerStyles} from "render/css"
 
-interface Props extends Preact.PreactHTMLAttributes {
+export interface Props extends Preact.PreactHTMLAttributes {
 	layer: Layer,
 }
 
@@ -37,7 +37,7 @@ class Renderable extends Preact.Component<Props, {}> {
 		for (let eventName in layer.eventListeners()) {;
 			if (Utils.dom.validEvent("div", eventName)) {
 				console.log(eventName);
-				
+
 				props[`on${eventName}`] = (event) => layer.emit(eventName as any, event)
 			}
 		}

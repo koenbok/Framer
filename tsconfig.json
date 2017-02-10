@@ -8,17 +8,21 @@
         "noImplicitAny": false,
         "strictNullChecks": true,
         "declaration": false,
+        "outFile": "./build/framer.js",
         "noEmitOnError": true,
         "types": [
             "mocha",
             "node"
         ]
     },
+    "include": [
+        "src/**/*.ts"
+    ],
     "exclude": [
         "**/*.js",
         "node_modules",
-        "build",
-        "chrome/tools"
+        "chrome/tools",
+        "build"
     ],
     "filesGlob": [
       "**/*.ts"

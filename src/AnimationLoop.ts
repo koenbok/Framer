@@ -9,8 +9,8 @@ const performance = (window.performance || {
 
 const time = () => performance.now() / 1000
 
-type AnimationLoopEventNames = "render" | "update" | "finish"
-type AnimationLoopDeltaCallback = (this: AnimationLoop, delta: number, loop: AnimationLoop) => void
+export type AnimationLoopEventNames = "render" | "update" | "finish"
+export type AnimationLoopDeltaCallback = (this: AnimationLoop, delta: number, loop: AnimationLoop) => void
 
 let AnimationLoopTimeStep = 1 / 60
 let AnimationLoopCounter = 0

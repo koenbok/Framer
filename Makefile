@@ -28,6 +28,9 @@ perf: bootstrap
 		--port 8009 \
 		--open
 
+dts:
+	./node_modules/.bin/tsc --declaration --module system
+
 clean:
 	rm -rf build
 

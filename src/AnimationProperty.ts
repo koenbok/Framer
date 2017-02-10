@@ -6,9 +6,9 @@ import {AnimationCurve} from "AnimationCurve"
 
 import {Color} from "./Color"
 
-type AnimatablePropertyType = number | Color
+export type AnimatablePropertyType = number | Color
 
-type PropertyAnimationEventTypes =
+export type PropertyAnimationEventTypes =
 	"PropertyAnimationStart" |
 	"PropertAnimationStop" |
 	"PropertAnimationHalt" |
@@ -28,7 +28,7 @@ export interface AnimatableProperties {
 	maxY?: number
 }
 
-type AnimatablePropertyName = keyof AnimatableProperties
+export type AnimatablePropertyName = keyof AnimatableProperties
 
 export class AnimationProperty extends EventEmitter<PropertyAnimationEventTypes> {
 
@@ -46,7 +46,7 @@ export class AnimationProperty extends EventEmitter<PropertyAnimationEventTypes>
 		target: Layer,
 		key: AnimatablePropertyName,
 		from: AnimatablePropertyType,
-		to: AnimatablePropertyType ,
+		to: AnimatablePropertyType,
 		curve: AnimationCurve,
 		converter: null|Function= null) {
 

@@ -1,4 +1,4 @@
-interface LinearCurveOptions {
+export interface LinearCurveOptions {
 	time: number
 }
 

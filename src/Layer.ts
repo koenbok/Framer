@@ -5,7 +5,7 @@ import {Animation, AnimationEventTypes} from "Animation"
 import {AnimationCurve} from "AnimationCurve"
 import {Curve} from "Curve"
 
-interface LayerOptions {
+export interface LayerOptions {
 		context?: Context
 		parent?: Layer|null,
 		x?: number,
@@ -16,13 +16,13 @@ interface LayerOptions {
 		opacity?: number
 }
 
-type LayerEventPropertyTypes =
+export type LayerEventPropertyTypes =
 	"change:x" |
 	"change:y" |
 	"change:width" |
 	"change:height"
 
-type LayerEventUserTypes =
+export type LayerEventUserTypes =
 	"click" |
 	"doubleclick" |
 	"mouseup" |
@@ -32,7 +32,7 @@ type LayerEventUserTypes =
 	"mousemove" |
 	"mousewheel"
 
-type LayerEventTypes =
+export type LayerEventTypes =
 	LayerEventPropertyTypes |
 	LayerEventUserTypes |
 	AnimationEventTypes

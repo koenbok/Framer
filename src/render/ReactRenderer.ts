@@ -6,7 +6,7 @@
 
 // import {getLayerStyles} from "render/css"
 
-// interface Props {
+// export interface Props {
 // 	layer: Layer
 // }
 

@@ -1,6 +1,6 @@
 import {AnimationCurve} from "AnimationCurve"
 
-type AnimationCurveLinearOptions = {
+export type AnimationCurveLinearOptions = {
 	time: number
 }
 

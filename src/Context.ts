@@ -5,12 +5,12 @@ import {Collection} from "Collection"
 import {AnimationLoop} from "AnimationLoop"
 import {Renderer} from "render/Renderer"
 
-interface ContextOptions {
+export interface ContextOptions {
 	parent: Layer|Context|null,
 	backgroundColor: string
 }
 
-type ContextEventTypes =
+export type ContextEventTypes =
 	"reset"
 
 export class Context extends BaseClass<ContextEventTypes> {

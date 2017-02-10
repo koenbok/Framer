@@ -15,7 +15,7 @@ export const Loop = new AnimationLoop()
 export {Layer, Context, Utils, Renderer, Curve}
 
 
-interface Window {
+export interface Window {
 	Framer: typeof Framer
 }
 

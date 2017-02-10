@@ -1,7 +1,7 @@
 import {Integrator, Vector, VectorDelta} from "Integrator"
 import {AnimationCurve} from "AnimationCurve"
 
-type AnimationCurveSpringRK4Options = {
+export type AnimationCurveSpringRK4Options = {
 	tension?: number
 	friction?: number
 	velocity?: number
