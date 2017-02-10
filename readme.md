@@ -1,8 +1,6 @@
-### Framer 5
+#### Framer 5
 
 A complete rewrite of the core, with everything on top.
-
-#### Big things
 
 - Completely move over to TypeScript for faster development, automated autocomplete and documentation.
 - Virtual DOM based rendering while retaining fast performance, especially on mobile.
