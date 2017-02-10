@@ -2,7 +2,8 @@ path = require("path")
 config = require("./webpack.base")()
 
 config.entry = {
-	perf: path.join(__dirname, "../app"),
+	app: path.join(__dirname, "../app"),
 }
+config.plugins.push(new HtmlWebpackPlugin())
 
 module.exports = config

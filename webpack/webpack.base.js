@@ -1,81 +1,87 @@
 path = require("path")
 webpack = require("webpack")
 getRepoInfo = require("git-repo-info")
-HtmlWebpackPlugin = require("html-webpack-plugin")
+UglifyJsPlugin = require("webpack-uglify-harmony")
+Visualizer = require("webpack-visualizer-plugin")
 
 var GIT_INFO = getRepoInfo();
 var BUILD_TYPE = process.env.BUILD_TYPE || "debug"
-var PROJECT_PATH = path.join(__dirname, "..")
+var VISUALIZE = process.env.VISUALIZE || false
+
+console.log("BUILD_TYPE:", BUILD_TYPE)
 
 module.exports = function() {
 	var config = {
-		// context: path.join(__dirname, "..", "src"),
 		output: {
-			path: path.join(PROJECT_PATH, "build"),
-			filename: "[name].js"
+			path: path.join(__dirname, "..", "build"),
+			filename: "[name].js",
 		},
-		// devServer: {
-		// 	inline: true
-		// },
-		devtool: "cheap-module-source-map",
-		// target: "web",
-		externals: {
-			// "typescript": "ts",
-			// "fs": "fs",
-			// "module": "module"
-		},
+		devtool: "#cheap-module-source-map",
+		target: "web",
+		stats: "errors-only",
 		module: {
-			noParse: [
-				path.resolve(__dirname, "../node_modules/benchmark/benchmark.js"),
-			],
 			loaders: [
-				{ test: /\.ts(x?)$/, loader: "ts-loader" },
-				{ test: /\.json$/, loader: "json-loader" },
+				{ test: /\.ts(x?)$/, loader: "ts-loader", exclude: /__tests__/ },
+				{ test: /\.json$/, loader: "json-loader" }
 			]
 		},
+		// externals: {typescript: "ts"},
+		// devServer: {inline: true},
 		resolve: {
-			// modules: [
-			// 	path.join(PROJECT_PATH, "node_modules"),
-			// 	path.join(PROJECT_PATH, "src")],
-			root: [path.join(PROJECT_PATH, "src")],
-			extensions: ["", ".js", ".json", ".ts", ".tsx"],
+			modules: ["node_modules", path.resolve("./src")],
+			extensions: [".js", ".json", ".ts", ".tsx"],
 		},
-		// resolveLoader: {
-		// 	root: path.join(PROJECT_PATH, "node_modules")
-		// },
+		performance: {
+			hints: false
+		},
+		node: {
+			fs: "empty",
+			module: "empty"
+		},
 		plugins: [
-			new HtmlWebpackPlugin(),
-			// new webpack.DefinePlugin({
-			// 	__BUILD_TYPE__: JSON.stringify(BUILD_TYPE),
-			// 	__BUILD_VERSION__: JSON.stringify(`${GIT_INFO.branch}/${GIT_INFO.abbreviatedSha}`),
-			// 	__BUILD_DATE__: JSON.stringify(new Date().toISOString()),
-			// 	"process.env": {'NODE_ENV': JSON.stringify(BUILD_TYPE)},
-			// }),
-		],
-
+			new webpack.DefinePlugin({
+				__BUILD_TYPE__: JSON.stringify(BUILD_TYPE),
+				__BUILD_VERSION__: JSON.stringify(`${GIT_INFO.branch}/${GIT_INFO.abbreviatedSha}`),
+				__BUILD_DATE__: JSON.stringify(new Date().toISOString()),
+				"process.env.NODE_ENV": JSON.stringify(BUILD_TYPE)
+			})
+		]
 	}
 
-	// if (BUILD_TYPE === "production") {
+	if (BUILD_TYPE === "production") {
+		config.devtool = "source-map"
+		config.plugins.push(
+			new webpack.LoaderOptionsPlugin({
+				minimize: true,
+				debug: false
+			}),
+			new UglifyJsPlugin({
+				compress: {
+					warnings: false,
+					screw_ie8: true,
+					conditionals: true,
+					unused: true,
+					comparisons: true,
+					sequences: true,
+					dead_code: true,
+					evaluate: true,
+					if_return: true,
+					join_vars: true,
+				},
+				output: {
+					comments: false,
+				},
+				mangle: false,
+				sourceMap: true
+			})
+		)
+	}
 
-	// 	config.devtool = "source-map"
-
-	// 	config.plugins.push(
-	// 		new webpack.LoaderOptionsPlugin({
-	// 			minimize: true,
-	// 			debug: false
-	// 		})
-	// 	)
-
-	// 	config.plugins.push(
-	// 		new webpack.optimize.UglifyJsPlugin({
-	// 			compress: {
-	// 				warnings: true
-	// 			},
-	// 			mangle: false
-	// 		}),
-	// 		new webpack.optimize.DedupePlugin()
-	// 	)
-	// }
+	if (VISUALIZE) {
+		console.log("*** Visualizing")
+		config.plugins.push(new Visualizer())
+	}
 
 	return config
 }
+

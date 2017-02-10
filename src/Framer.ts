@@ -1,9 +1,9 @@
-import {Layer} from "./Layer"
-import {Context} from "./Context"
-import {Renderer} from "./render/Renderer"
-import {AnimationLoop} from "./AnimationLoop"
-import {Curve} from "./Curve"
-import * as Utils from "utils/index"
+import * as Utils from "Utils"
+import {Layer} from "Layer"
+import {Context} from "Context"
+import {Renderer} from "render/Renderer"
+import {AnimationLoop} from "AnimationLoop"
+import {Curve} from "Curve"
 
 export const Framer = {
 	Layer: Layer,

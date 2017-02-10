@@ -61,3 +61,4 @@ _projects
 Icon
 /extras/resources.framerjs.com/static/DeviceResources/.*
 /yarn.lock
+/yarn-error.log
