@@ -312,7 +312,7 @@ Utils.callAfterCount = (total, callback) ->
 # ENVIROMENT FUNCTIONS
 
 Utils.isWebKit = ->
-	window.WebKitCSSMatrix isnt undefined
+	window.WebKitCSSMatrix isnt undefined and not Utils.isEdge()
 
 Utils.webkitVersion = ->
 	version = -1
@@ -326,6 +326,9 @@ Utils.isChrome = ->
 
 Utils.isSafari = ->
 	return /Safari/.test(navigator.userAgent) and /Apple Computer/.test(navigator.vendor)
+
+Utils.isEdge = ->
+	return /Edge/.test(navigator.userAgent)
 
 Utils.isAndroid = ->
 	return /(android)/i.test(navigator.userAgent)
@@ -968,7 +971,7 @@ Utils.frameCenterPoint = (frame) ->
 		y: Utils.frameGetMidY(frame)
 
 Utils.frameInFrame = (frameA, frameB) ->
-	
+
 	for point in Utils.pointsFromFrame(frameA)
 		return false unless Utils.pointInFrame(point, frameB)
 
