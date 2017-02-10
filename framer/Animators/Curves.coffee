@@ -122,11 +122,9 @@ exports.fromString = (string) ->
 		when "ease-in-out" then Bezier.easeInOut
 		when "bezier-curve", "cubic-bezier"
 			Bezier(args...)
-		when "spring", "spring-rk4", "spring-tfv"
+		when "spring", "spring-rk4", "spring-dho"
 			pairs = _.zipWith(["tension", "friction", "velocity", "tolerance"], args, [250, 25, 0, 1 / 100], (key, value, defaults) -> [key, value ? defaults])
 			object = _.fromPairs(pairs)
 			Spring(object)
-		when "spring-dd"
-			Spring(args...)
 		else
 			return Bezier.linear
