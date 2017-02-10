@@ -1,4 +1,4 @@
-{Animator} = require "../Animator"
+{Animator} = require "./Animator"
 
 BezierCurveDefaults =
 	"linear": [0, 0, 1, 1]
@@ -26,7 +26,7 @@ class exports.BezierCurveAnimator extends Animator
 		@options = _.defaults options,
 			values: BezierCurveDefaults["ease-in-out"]
 			time: 1
-			precision: 1/1000
+			precision: 1 / 1000
 
 		@_unitBezier = new UnitBezier \
 			@options.values[0],

@@ -15,7 +15,6 @@ Originals =
 	Animation:
 		# curve: "spring(400, 40, 0)" # Or, the Cemre-Curve
 		curve: "ease"
-		curveOptions: {}
 		time: 1
 		repeat: 0
 		delay: 0
@@ -61,11 +60,15 @@ Originals =
 		velocityScale: 890
 	FrictionSimulator:
 		friction: 2
-		tolerance: 1/10
+		tolerance: 1 / 10
+	Spring:
+		dampingRatio: 0.5
+		mass: 1
+		velocity: 0
 	SpringSimulator:
 		tension: 500
 		friction: 10
-		tolerance: 1/10000
+		tolerance: 1 / 10000
 	MomentumBounceSimulator:
 		momentum:
 			friction: 2

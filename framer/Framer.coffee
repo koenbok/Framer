@@ -46,6 +46,10 @@ Framer.SpringDHOAnimator = (require "./Animators/SpringDHOAnimator").SpringDHOAn
 Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4Animator
 Framer.LayerDraggable = (require "./LayerDraggable").LayerDraggable
 
+Framer.Curves = require "./Animators/Curves"
+window.Bezier = Framer.Curves.Bezier
+window.Spring = Framer.Curves.Spring
+
 Framer.Importer = (require "./Importer").Importer
 Framer.Extras = require "./Extras/Extras"
 

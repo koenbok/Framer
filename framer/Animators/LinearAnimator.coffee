@@ -1,4 +1,4 @@
-{Animator} = require "../Animator"
+{Animator} = require "./Animator"
 
 class exports.LinearAnimator extends Animator
 
@@ -6,7 +6,7 @@ class exports.LinearAnimator extends Animator
 
 		@options = _.defaults options,
 			time: 1
-			precision: 1/1000
+			precision: 1 / 1000
 
 		@_time = 0
 

@@ -87,7 +87,7 @@ describe "LayerStates", ->
 			layer.states.test = {x: 123}
 			animation = layer.animate "test"
 
-			animation.options.curve.should.equal Framer.Defaults.Animation.curve
+			animation.options.curve.should.equal Framer.Curves.fromString(Framer.Defaults.Animation.curve)
 
 			Framer.Defaults.Animation =
 				curve: "spring(1, 2, 3)"
@@ -96,7 +96,10 @@ describe "LayerStates", ->
 			layer.states.test = {x: 456}
 			animation = layer.animate "test"
 
-			animation.options.curve.should.equal "spring(1, 2, 3)"
+			animator = animation.options.curve()
+			animator.options.tension.should.equal 1
+			animator.options.friction.should.equal 2
+			animator.options.velocity.should.equal 3
 
 			Framer.resetDefaults()
 
@@ -441,8 +444,8 @@ describe "LayerStates", ->
 				stateA: x: 300
 				stateB: y: 300
 			animation = layer.stateCycle ["stateA", "stateB"],
-				curve: "linear"
-			animation.options.curve.should.equal "linear"
+				curve: Bezier.linear
+			animation.options.curve.should.equal Bezier.linear
 
 		it "should correctly switch to next state without using an array stateCycle", ->
 			layer = new Layer
@@ -460,8 +463,8 @@ describe "LayerStates", ->
 			layer = new Layer
 			layer.states.test = x: 300
 			animation = layer.stateCycle
-				curve: "linear"
-			animation.options.curve.should.equal "linear"
+				curve: "ease-in-out"
+			animation.options.curve.should.equal Bezier.easeInOut
 
 		# it "should throw an error when you try to override a special state", ->
 		# 	layer = new Layer
@@ -615,7 +618,7 @@ describe "LayerStates", ->
 		it "should listen to animationOptions defined in a state", (done) ->
 			layer = new Layer
 			layer.animationOptions.time = 0.1
-			layer.states.testA = {x: 200, animationOptions: curve: "spring"}
+			layer.states.testA = {x: 200, animationOptions: curve: Bezier.easeOut}
 			cycle = layer.stateCycle onEnd: ->
 				layer.states.current.name.should.equal "testA"
 				cycle2 = layer.stateCycle onEnd: ->
@@ -623,11 +626,11 @@ describe "LayerStates", ->
 					cycle3 = layer.stateCycle onEnd: ->
 						layer.states.current.name.should.equal "testA"
 						done()
-					cycle3.options.curve.should.equal "spring"
+					cycle3.options.curve.should.equal Bezier.easeOut
 					layer.animationOptions.should.eql {time: 0.1}
-				cycle2.options.curve.should.equal "ease"
+				cycle2.options.curve.should.equal Bezier.ease
 				layer.animationOptions.should.eql {time: 0.1}
-			cycle.options.curve.should.equal "spring"
+			cycle.options.curve.should.equal Bezier.easeOut
 			layer.animationOptions.should.eql {time: 0.1}
 
 	describe "Switch", ->
