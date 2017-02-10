@@ -6,10 +6,10 @@ export const linear = (time: number) => {
 }
 
 export const springrk4 = (
-    friction=300, 
-    tension=30, 
-    velocity=0, 
-    tolerance=1/100
+    friction= 300,
+    tension= 30,
+    velocity= 0,
+    tolerance= 1 / 100
     ) => {
 
 	// return new AnimationCurveSpringRK4()

@@ -2,7 +2,7 @@ import {EventEmitter} from "EventEmitter"
 import {Utils} from "Framer"
 
 
-const test = (f: (done) => void, n=1000) => {
+const test = (f: (done) => void, n= 1000) => {
 	return (finish: (time: number, n: number) => void) => {
 		let count = 0
 		let start = performance.now()

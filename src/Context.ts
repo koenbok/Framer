@@ -36,7 +36,7 @@ export class Context extends BaseClass<ContextEventTypes> {
 		backgroundColor: "rgba(255, 0, 0, 0.5)"
 	}
 
-	constructor(name: string, loop: AnimationLoop, options: ContextOptions|{}={}) {
+	constructor(name: string, loop: AnimationLoop, options: ContextOptions|{}= {}) {
 		super()
 		this._name = name
 		this._renderer = new Renderer(this, loop)

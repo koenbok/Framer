@@ -22,7 +22,7 @@ export class Collection<T> {
 	private _ids = {}
 	private _maps = {}
 
-	constructor(keys: string[]=[]) {
+	constructor(keys: string[]= []) {
 		keys.forEach((key) => {
 			this._maps[key] = {}
 		})
@@ -32,7 +32,7 @@ export class Collection<T> {
 		return this._items.indexOf(item) !== -1
 	}
 
-	add(item: T, addId=false): number {
+	add(item: T, addId= false): number {
 
 		if (this.contains(item)) {
 			return this.getId(item)

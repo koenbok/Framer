@@ -7,7 +7,7 @@ export class EventEmitter<EventName> {
 
 	private _events: { [index: string]: [Function, Function][] } = {}
 
-	on(eventName: EventName, handler: Function, once=false) {
+	on(eventName: EventName, handler: Function, once= false) {
 
 		const name = eventName as any as string
 

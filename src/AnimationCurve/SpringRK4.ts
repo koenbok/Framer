@@ -15,7 +15,7 @@ let AnimationCurveSpringRK4DefaultOptions = {
 	tolerance: 1 / 100
 }
 
-let SpringRKAnimationCurveTimeStep = 1/60
+let SpringRKAnimationCurveTimeStep = 1 / 60
 
 export class AnimationCurveSpringRK4 extends AnimationCurve {
 
@@ -27,7 +27,7 @@ export class AnimationCurveSpringRK4 extends AnimationCurve {
 	private _integrator: Integrator
 	private _values: number[]
 
-	constructor(options: AnimationCurveSpringRK4Options={}) {
+	constructor(options: AnimationCurveSpringRK4Options= {}) {
 		super()
 
 		Object.assign(this._options, options)
