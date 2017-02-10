@@ -23,8 +23,8 @@ export class Integrator {
 		let c = this._evaluateStateWithDerivative(state, dt * 0.5, b);
 		let d = this._evaluateStateWithDerivative(state, dt, c);
 
-		let dxdt = (1.0/6.0) * (a.dx + (2.0 * (b.dx + c.dx)) + d.dx);
-		let dvdt = (1.0/6.0) * (a.dv + (2.0 * (b.dv + c.dv)) + d.dv);
+		let dxdt = (1.0 / 6.0) * (a.dx + (2.0 * (b.dx + c.dx)) + d.dx);
+		let dvdt = (1.0 / 6.0) * (a.dv + (2.0 * (b.dv + c.dv)) + d.dv);
 
 		state.x = state.x + (dxdt * dt);
 		state.v = state.v + (dvdt * dt);

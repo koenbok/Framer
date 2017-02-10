@@ -48,7 +48,7 @@ export class AnimationProperty extends EventEmitter<PropertyAnimationEventTypes>
 		from: AnimatablePropertyType,
 		to: AnimatablePropertyType ,
 		curve: AnimationCurve,
-		converter:null|Function=null) {
+		converter: null|Function= null) {
 
 		super()
 

@@ -34,4 +34,7 @@ clean:
 typescript:
 	./node_modules/.bin/tsc --noEmit --p ./tsconfig.json
 
-.PHONY: test bootstrap clean build
+lint:
+	./node_modules/.bin/tslint src/**/*.ts
+
+.PHONY: test bootstrap clean build lint

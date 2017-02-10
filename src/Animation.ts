@@ -20,7 +20,7 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 	private _running: AnimationProperty[] = []
 	private _finished: AnimationProperty[] = []
 
-	constructor(layer: Layer, properties: AnimatableProperties, curve: AnimationCurve, loop=AnimationLoop.Default) {
+	constructor(layer: Layer, properties: AnimatableProperties, curve: AnimationCurve, loop= AnimationLoop.Default) {
 
 		super()
 
@@ -56,6 +56,7 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 	readonly onStart = (fn: Function) => { this.on("AnimationStart", fn); return this }
 	readonly onHalt = (fn: Function) => { this.on("AnimationHalt", fn); return this }
 	readonly onStop = (fn: Function) => { this.on("AnimationStop", fn); return this }
+	/** Call function when the animation is fully complete */
 	readonly onEnd = (fn: Function) => { this.on("AnimationEnd", fn); return this }
 
 	private _onAnimationPropertyEnd = (animationProperty: AnimationProperty) => {

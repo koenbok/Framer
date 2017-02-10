@@ -21,6 +21,7 @@
     "react-dom": "^15.4.2",
     "ts-loader": "^2.0.0",
     "ts-node": "^2.0.0",
+    "tslint": "^4.4.2",
     "typescript": "^2.1.5",
     "webpack": "^1.14.0",
     "webpack-dev-server": "^1.16.2"

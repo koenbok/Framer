@@ -54,7 +54,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 
 	_element?: HTMLElement
 
-	constructor(options: LayerOptions={}) {
+	constructor(options: LayerOptions= {}) {
 		super()
 		Object.assign(this, options)
 
@@ -148,7 +148,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		this._properties.backgroundColor = value
 	}
 
-	animate(properties: AnimatableProperties, curve: AnimationCurve=Curve.linear(1), callback?: Function) {
+	animate(properties: AnimatableProperties, curve: AnimationCurve= Curve.linear(1), callback?: Function) {
 		let animation = new Animation(this, properties, curve)
 		animation.start()
 		return animation

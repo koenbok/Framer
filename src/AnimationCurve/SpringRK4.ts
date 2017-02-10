@@ -92,6 +92,4 @@ export class AnimationCurveSpringRK4 extends AnimationCurve {
 	finished() {
 		return this._stopSpring;
 	}
-
-	
-};
+}

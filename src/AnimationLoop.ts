@@ -4,7 +4,7 @@ import * as utils from "utils"
 
 const performance = (window.performance || {
 	offset: Date.now(),
-	now: function now() { return Date.now() - this.offset }
+	now: () => { return Date.now() - this.offset }
 })
 
 const time = () => performance.now() / 1000

@@ -12,7 +12,7 @@ export class AnimationCurveLinear extends AnimationCurve {
 
 	private _options = AnimationCurveLinearDefaultOptions
 
-	constructor(options=AnimationCurveLinearDefaultOptions) {
+	constructor(options= AnimationCurveLinearDefaultOptions) {
 		super()
 		Object.assign(this._options, options)
 	}
