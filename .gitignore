@@ -1,39 +1,10 @@
 .DS_Store
-node_modules
-test/init.js
-test/lib/framer.js
-*.swp
-build/template
-build
-lib
-.build
-.deploy
-*.pyc
-npm-debug.log
-test/phantomjs/tests.js
-test/phantomjs/tests.js.map
-framer/**/*.js
-framer/**/*.js.map
-test/tests/**/*.js
-test/tests/**/*.js.map
-
-# Discard changes in Studio.framer
-extras/Studio.framer/app.coffee
-extras/Studio.framer/framer/config.json
-
-# Discard version changes
-framer/Version.coffee
-
-.DS_Store
 .AppleDouble
 .LSOverride
 
 # Icon must end with two \r
 Icon
 
-
-# Thumbnails
-._*
 
 # Files that might appear in the root of a volume
 .DocumentRevisions-V100
@@ -50,15 +21,10 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# Docker
-_cache
-_steps
-_builds
-_projects
-
-# Ed
 .idea
-Icon
-/extras/resources.framerjs.com/static/DeviceResources/.*
-/yarn.lock
-/yarn-error.log
+node_modules
+build
+npm-debug.log
+yarn-error.log
+
+
