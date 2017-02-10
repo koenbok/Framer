@@ -1,4 +1,4 @@
-import * as _ from "lodash"
+import {findKey} from "lodash-es"
 
 const add = (array, item) => {
 	array = array.slice(0)
@@ -71,7 +71,7 @@ export class Collection<T> {
 			return -1
 		}
 
-		return parseInt(_.findKey(this._ids, item))
+		return parseInt(findKey(this._ids, item))
 	}
 
 	find(key: string, value: any): T[] {

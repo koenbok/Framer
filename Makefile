@@ -49,7 +49,7 @@ typescript:
 	$(NODE_BIN)/tsc --noEmit
 
 visualize: bootstrap
-	BUILD_TYPE=production VISUALIZE=1 make build
+	VISUALIZE=1 make dist
 	open build/stats.html
 
 .PHONY: test bootstrap clean build lint

@@ -1,4 +1,4 @@
-import * as _ from "lodash"
+import {pick} from "lodash-es"
 import {EventEmitter} from "EventEmitter"
 
 export class BaseClass<EventType> extends EventEmitter<EventType> {
@@ -15,7 +15,7 @@ export class BaseClass<EventType> extends EventEmitter<EventType> {
 	}
 
 	dirtyValues() {
-		return _.pick(this, Array.from(this._dirty))
+		return pick(this, Array.from(this._dirty))
 	}
 
 	flush() {

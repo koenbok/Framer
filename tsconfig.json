@@ -2,7 +2,7 @@
     "compilerOptions": {
         "baseUrl": "./src",
         "target": "es2015",
-        "module": "commonjs",
+        "module": "es2015",
         "moduleResolution": "node",
         "allowJs": false,
         "noImplicitAny": false,

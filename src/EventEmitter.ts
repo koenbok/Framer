@@ -1,5 +1,3 @@
-export type wrappedFunction = Function
-
 interface EE {
 	fn: Function
 	handler: Function
