@@ -1,7 +1,7 @@
 import {BaseClass} from "BaseClass"
 import {Context, DefaultContext, CurrentContext} from "Context"
 import {AnimatableProperties} from "AnimationProperty"
-import {Animation} from "Animation"
+import {Animation, AnimationEventTypes} from "Animation"
 import {AnimationCurve} from "AnimationCurve"
 import {Curve} from "Curve"
 
@@ -16,11 +16,27 @@ interface LayerOptions {
 		opacity?: number
 }
 
-type LayerEventTypes =
+type LayerEventPropertyTypes =
 	"change:x" |
 	"change:y" |
 	"change:width" |
 	"change:height"
+
+type LayerEventUserTypes =
+	"click" |
+	"doubleclick" |
+	"mouseup" |
+	"mousedown" |
+	"mouseover" |
+	"mouseout" |
+	"mousemove" |
+	"mousewheel"
+
+type LayerEventTypes =
+	LayerEventPropertyTypes |
+	LayerEventUserTypes |
+	AnimationEventTypes
+
 
 export class Layer extends BaseClass<LayerEventTypes> {
 
@@ -138,7 +154,16 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		return animation
 	}
 
+	onClick = (handler: Function) => { this.on("click", handler) }
+	onDoubleClick = (handler: Function) => { this.on("doubleclick", handler) }
+
+	onMouseUp = (handler: Function) => { this.on("mouseup", handler) }
+	onMouseDown = (handler: Function) => { this.on("mousedown", handler) }
+	onMouseOver = (handler: Function) => { this.on("mouseover", handler) }
+	onMouseOut = (handler: Function) => { this.on("mouseout", handler) }
+	onMouseMove = (handler: Function) => { this.on("mousemove", handler) }
+	onMouseWheel = (handler: Function) => { this.on("mousewheel", handler) }
+
 
 }
-
 

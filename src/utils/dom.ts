@@ -28,5 +28,28 @@ export const detach = (node: Element) => {
 	}
 }
 
-// Utils.domCompleteCancel = (f) ->
-// 	__domComplete = _.without(__domComplete, f)
+let _validEventCache = {}
+let _validEventCacheElements = {}
+/** Returns if  certain event is a valid dome event for this element type. */
+export const validEvent = (tagName: string, eventName: string) => {
+
+	if (_validEventCache[tagName]) {
+		return true
+	}
+
+	if (eventName in ["touchstart", "touchmove", "touchend"]) {
+		return true
+	}
+
+	let element = _validEventCacheElements[tagName]
+
+	if (!element) {
+		element = document.createElement(tagName)
+		_validEventCacheElements[tagName] = element
+	}
+
+	let result = (typeof element[`on${eventName.toLowerCase()}`] !== undefined)
+	_validEventCache[tagName] = result
+
+	return result
+}

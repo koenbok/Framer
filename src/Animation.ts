@@ -5,7 +5,7 @@ import {AnimatableProperties, AnimationProperty} from "AnimationProperty"
 import {Layer} from "Layer"
 
 
-type AnimationEventTypes =
+export type AnimationEventTypes =
 	"AnimationStart" |
 	"AnimationStop" |
 	"AnimationHalt" |

@@ -59,10 +59,14 @@ const run = () => {
 
 let layerC = new Layer()
 
+layerC.onMouseOver(event => console.log("uuuh"))
+layerC.onMouseMove(event => console.log("move"))
+
+layerC.animate({x: 200}, Curve.springrk4(300, 1))
+
+
 // layerC.animate({x: 50, y: 50, options: {curve: Linear(1)}})
 
-
-layerC.animate({x: 500, y: 500}, Curve.springrk4(300, 1))
 
 
 

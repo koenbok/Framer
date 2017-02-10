@@ -38,6 +38,8 @@ export class AnimationCurveSpringRK4 extends AnimationCurve {
 			return (- this._options.tension * state.x) - (this._options.friction * state.v);
 		})
 
+		// FIXME: This is not great.
+
 		let count = 0
 		let values: number[] = []
 

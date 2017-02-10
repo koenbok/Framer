@@ -1,4 +1,5 @@
 import * as Preact from "preact"
+import * as Utils from "Utils"
 import {Layer} from "Layer"
 import {Context} from "Context"
 import {getLayerStyles} from "render/css"
@@ -6,6 +7,9 @@ import {getLayerStyles} from "render/css"
 interface Props extends Preact.PreactHTMLAttributes {
 	layer: Layer,
 }
+
+
+
 
 class Renderable extends Preact.Component<Props, {}> {
 
@@ -21,13 +25,21 @@ class Renderable extends Preact.Component<Props, {}> {
 	// 	this.props.layer._element = this.refs["node"] as HTMLElement
 	// }
 
-
 	render() {
 
 		const layer = this.props.layer
 		const props = {
 			// style: getLayerStyles(layer),
 			ref: (ref: HTMLElement) => { layer._element = ref }
+		}
+
+		// FIXME: Again there might not be a layer here
+		for (let eventName in layer.eventListeners()) {;
+			if (Utils.dom.validEvent("div", eventName)) {
+				console.log(eventName);
+				
+				props[`on${eventName}`] = (event) => layer.emit(eventName as any, event)
+			}
 		}
 
 		return Preact.h("div", props, this.props.layer.children.map(renderLayer))
