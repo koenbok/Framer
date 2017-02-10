@@ -20,7 +20,7 @@ exports.computeDampingRatio = computeDampingRatio = (tension, friction, mass = 1
 # Tries to compute the duration of a spring,
 # but can't for certain velocities and if dampingRatio >= 1
 # In those cases it will return null
-exports.computeDuration = (tension, friction, velocity = 0) ->
+exports.computeDuration = (tension, friction, velocity = 0, mass = 1) ->
 	dampingRatio = computeDampingRatio(tension, friction)
 	undampedFrequency = Math.sqrt(tension / mass)
 	# This is basically duration extracted out of the envelope functions
