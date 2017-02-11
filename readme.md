@@ -9,3 +9,7 @@ A complete rewrite of the core, with everything on top.
 - A better way to deal with groups of states for multiple layers at the same time.
 - Use points everywhere, without adding to the complexity by default.
 - Better testing setup with replayable events for interaction testing.
+
+
+#### Changes
+

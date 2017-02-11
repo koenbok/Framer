@@ -1,4 +1,5 @@
 import {BaseClass} from "BaseClass"
+import {Collection} from "Collection"
 import {Context, DefaultContext, CurrentContext} from "Context"
 import {AnimatableProperties} from "AnimationProperty"
 import {Animation, AnimationEventTypes} from "Animation"
@@ -53,6 +54,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	}
 
 	_element?: HTMLElement
+	_animations = new Collection<Animation>()
 
 	constructor(options: LayerOptions= {}) {
 		super()
@@ -148,10 +150,17 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		this._properties.backgroundColor = value
 	}
 
-	animate(properties: AnimatableProperties, curve: AnimationCurve= Curve.linear(1), callback?: Function) {
+	animate = (
+		properties: AnimatableProperties,
+		curve: AnimationCurve= Curve.linear(1)
+	) => {
 		let animation = new Animation(this, properties, curve)
 		animation.start()
 		return animation
+	}
+
+	get animations() {
+		return this._animations.items()
 	}
 
 	onClick = (handler: Function) => { this.on("click", handler) }

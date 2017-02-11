@@ -20,7 +20,12 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 	private _running: AnimationProperty[] = []
 	private _finished: AnimationProperty[] = []
 
-	constructor(layer: Layer, properties: AnimatableProperties, curve: AnimationCurve, loop= AnimationLoop.Default) {
+	constructor(
+		layer: Layer,
+		properties: AnimatableProperties,
+		curve: AnimationCurve,
+		loop= AnimationLoop.Default
+	) {
 
 		super()
 
@@ -30,27 +35,31 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 		this._loop = loop
 	}
 
+	/** Start this animation. */
 	readonly start = () => {
 
 		// Is there anything to animate
-
-		// Start a property animation for each one
-		this._running = []
-		this._finished = []
-
-
-		for (let key in this._properties) {
-
-			const animationProperty = new AnimationProperty(
-				this._loop, this._layer, key as any,
-				this._layer[key], this._properties[key], this._curve)
-
-			this._running.push(animationProperty)
-
-			animationProperty.once("PropertAnimationEnd", this._onAnimationPropertyEnd)
-			animationProperty.start()
+		if (!Object.keys(this._properties).length) {
+			return false
 		}
 
+		return this._start()
+	}
+
+	/** Stop this animation. */
+	readonly stop = () => {
+
+		if (!this.running) {
+			return
+		}
+
+		this._halt()
+		this._stop()
+	}
+
+	/** Is this animation currently running. */
+	get running() {
+		return this._running.length > 0 && (this._running.length !== this._finished.length)
 	}
 
 	readonly onStart = (fn: Function) => { this.on("AnimationStart", fn); return this }
@@ -59,15 +68,85 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 	/** Call function when the animation is fully complete */
 	readonly onEnd = (fn: Function) => { this.on("AnimationEnd", fn); return this }
 
+	private _reset  = () => {
+		this._running = []
+		this._finished = []
+	}
+
+	private _start = (): boolean => {
+
+		// Stop all other animations with conflicting properties
+		for (let animation of this._layer.animations) {
+			console.log(animation);
+			for (let key in this._properties) {
+				console.log(key);
+				
+				if (key in Object.keys(animation._properties)) {
+					animation.stop()
+
+					
+				}
+			}
+		}
+
+		this._reset()
+
+		for (let key in this._properties) {
+
+			let a = this._layer[key]
+			let b = this._properties[key]
+
+			if (a === b) {
+				continue
+			}
+
+			const animationProperty = new AnimationProperty(
+				this._loop,
+				this._layer,
+				key as any, a, b,
+				this._curve
+			)
+
+			this._running.push(animationProperty)
+
+			animationProperty.once("PropertAnimationEnd", this._onAnimationPropertyEnd)
+			animationProperty.start()
+		}
+
+		let started = this._running.length > 0
+
+		if (this.running) {
+			this._layer._animations.add(this)
+			this.emit("AnimationStart")
+		}
+
+		return started
+	}
+
+	private _halt = () => {
+		this.emit("AnimationHalt")
+	}
+
+	private _stop = () => {
+
+		this.emit("AnimationStop")
+
+		for (let animationProperty of this._running) {
+			animationProperty.stop()
+		}
+
+		this._layer._animations.remove(this)
+		this._reset()
+	}
+
 	private _onAnimationPropertyEnd = (animationProperty: AnimationProperty) => {
 
 		this._finished.push(animationProperty)
 
-		if (this._running.length === this._finished.length) {
-			this.emit("AnimationStop")
+		if (!this.running) {
+			this._stop()
 			this.emit("AnimationEnd")
 		}
 	}
 
-	// private _update(delta)
 }
