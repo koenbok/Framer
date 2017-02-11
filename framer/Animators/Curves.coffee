@@ -15,7 +15,6 @@ BezierDefaults =
 	easeOut: Bezier(0, 0, .58, 1)
 	easeInOut: Bezier(.42, 0, .58, 1)
 
-
 Spring = (dampingRatio, mass, velocity) ->
 	curveOptions = {}
 	if dampingRatio? and _.isFinite(dampingRatio)
