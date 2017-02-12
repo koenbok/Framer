@@ -4,7 +4,6 @@ import {isolated} from "./TestUtils"
 import {Layer, Curve, Utils} from "Framer"
 
 
-
 describe("Layer", () => {
 
 	isolated("should animate a layer", (context, done) => {

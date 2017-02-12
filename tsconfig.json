@@ -15,9 +15,10 @@
             "node"
         ]
     },
-    "include": [
-        "src/**/*.ts"
-    ],
+    // "include": [
+    //     "src/**/*.ts",
+    //     "mocha/**/*.ts"
+    // ],
     "exclude": [
         "**/*.js",
         "node_modules",
