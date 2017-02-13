@@ -22,8 +22,6 @@ export class AnimationCurveLinear extends AnimationCurve {
 	}
 
 	done(time: number) {
-		// console.log(time, this._options.time, time >= this._options.time);
-
 		return time >= this._options.time
 	}
 

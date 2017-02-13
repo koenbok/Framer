@@ -36,8 +36,6 @@ class Renderable extends Preact.Component<Props, {}> {
 		// FIXME: Again there might not be a layer here
 		for (let eventName in layer.eventListeners()) {;
 			if (Utils.dom.validEvent("div", eventName)) {
-				console.log(eventName);
-
 				props[`on${eventName}`] = (event) => layer.emit(eventName as any, event)
 			}
 		}
