@@ -1,10 +1,14 @@
 import {EventEmitter} from "EventEmitter"
-import * as raf from "raf"
+import * as Utils from "Utils"
 
 const performance = (window.performance || {
 	offset: Date.now(),
 	now: () => { return Date.now() - this.offset }
 })
+
+const raf = (f) => setTimeout(f, 0)
+// const raf = requestAnimationFrame
+// const raf = (f) => setTimeout(f, 0)
 
 const time = () => performance.now() / 1000
 
@@ -20,6 +24,7 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 	private _running = false
 	private _counter = 0
 	private _time = time()
+	private _last = time()
 
 	static get Default() {
 		return DefaultAnimationLoop
@@ -70,7 +75,9 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 
 	private tick = () => {
 
-		// console.log("AnimationLoop.tick", this.id, this._counter, this.eventListeners());
+		if (this._counter % 30 === 0) {
+			console.log("tick", this._counter, 1 / (time() - this._last))
+		}
 
 		if (this.countEventListeners("update") > 0 || this.countEventListeners("render") > 0) {
 			raf(this.tick)
@@ -81,6 +88,7 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 		this.emit("update", AnimationLoopTimeStep, time() - this._time)
 		this.emit("render", AnimationLoopTimeStep, time() - this._time)
 
+		this._last = time()
 		this._time = AnimationLoopTimeStep
 		this._counter++
 
