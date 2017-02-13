@@ -101,22 +101,25 @@ export class AnimationProperty extends EventEmitter<PropertyAnimationEventTypes>
 
 	private _update = (delta: number) => {
 
-		// console.log("_update", this._time);
-		// console.log(this._loop.countEventListeners("render"), this._loop.countEventListeners("update"))
-
-
-		this._target[this._key] = this._value(this._curve.value(this._time))
-
-		if (this._curve.done(this._time)) {
-			this._end()
-		}
-
 		this._time += delta
+
+		this._target[this._key] = this._value(
+			this._curve.value(this._time))
+
+		// When we reach the end we stop the animation and
+		// set it to the exact end value.
+		if (this._curve.done(this._time)) {
+			this._target[this._key] = this._to
+			this._end()
+		} else {
+			this._target[this._key] = this._value(
+			this._curve.value(this._time))
+		}
 
 	}
 
 	private _value(value) {
-		return value * (this._from + (this._to - this._from))
+		return this._from + (value * (this._to - this._from))
 	}
 
 }
