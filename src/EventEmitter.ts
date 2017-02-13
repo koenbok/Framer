@@ -134,11 +134,13 @@ export class EventEmitter<EventName> {
 			return
 		}
 
+
+
 		this._events[name].forEach((listener, index) => {
 
 			listener.handler.apply(this, args)
 
-			if (listener.once == true) {
+			if (listener.once === true) {
 				this._eventCount--
 				removes.push(index)
 			}
