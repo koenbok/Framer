@@ -1,5 +1,5 @@
 import * as Utils from "Utils"
-import {EventEmitter} from "EventEmitter"
+import {BaseClass} from "BaseClass"
 import {AnimationLoop} from "AnimationLoop"
 import {AnimationCurve} from "AnimationCurve"
 import {AnimatableProperties, AnimationProperty} from "AnimationProperty"
@@ -11,7 +11,7 @@ export type AnimationEventTypes =
 	"AnimationHalt" |
 	"AnimationEnd"
 
-export class Animation extends EventEmitter<AnimationEventTypes> {
+export class Animation extends BaseClass<AnimationEventTypes> {
 
 	private _layer: Layer
 	private _curve: AnimationCurve
@@ -102,9 +102,6 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 			if (a === b) {
 				continue
 			}
-
-			console.log("key", a, b);
-
 
 			const animationProperty = new AnimationProperty(
 				this._loop,

@@ -44,7 +44,6 @@ export class Layer extends BaseClass<LayerEventTypes> {
 
 	private _context: Context
 	private _parent: Layer|null
-	private _id = -1
 	private _properties = {
 		x: 0,
 		y: 0,
@@ -62,24 +61,15 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		super()
 		Object.assign(this, options)
 
-		this._id = this.context.addLayer(this)
+		this._setId(this.context.addLayer(this))
 
 		// TODO: Maybe we store parent by id in properties?
 		if (options.parent) {
 			this.parent = options.parent
 		}
 
-		this.context.renderer.updateStructure()
+		this._updateStructure()
 		this.context.renderer.updateStyle(this, "a", "b")
-	}
-
-	_updateProperty(name: string, value: any) {
-		super._updateProperty(name, value)
-		this.context.renderer.updateStyle(this, name, value)
-	}
-
-	get id() {
-		return this._id
 	}
 
 	get context(): Context {
@@ -96,7 +86,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 			return
 		}
 
-		this.context.renderer.updateStructure()
+		this._updateStructure()
 		this._updateProperty("parent", value)
 		this._parent = value
 	}
@@ -186,6 +176,32 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	onAnimationStop = (handler: Function) => { this.on("AnimationStop", handler) }
 	onAnimationHalt = (handler: Function) => { this.on("AnimationHalt", handler) }
 	onAnimationEnd = (handler: Function) => { this.on("AnimationEnd", handler) }
+
+	// private _dirty = new Set()
+
+	private _updateStyle(name: string, value: any) {
+		this.context.renderer.updateStyle(this, name, value)
+	}
+	private _updateStructure() {
+		this.context.renderer.updateStructure(this)
+	}
+
+	private _updateProperty(name: string, value: any) {
+		(this.emit as any)(`change:${name}`, value)
+		// this._dirty.add(name)
+	}
+
+	// isDirty() {
+	// 	return this._dirty.size > 0
+	// }
+
+	// dirtyValues() {
+	// 	return pick(this, Array.from(this._dirty))
+	// }
+
+	// flush() {
+	// 	this._dirty.clear()
+	// }
 
 }
 

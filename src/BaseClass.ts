@@ -1,24 +1,49 @@
 import {pick} from "lodash-es"
 import {EventEmitter} from "EventEmitter"
 
+let BaseClassCounter = 0
+let BaseClassCounters = {}
+
+const getGlobalId = () => {
+	return BaseClassCounter++
+}
+
+const getObjectId = (obj: Object) => {
+
+	const className = obj.constructor.name
+
+	if (!BaseClassCounters[className]) {
+		BaseClassCounters[className] = 0
+	}
+
+	return BaseClassCounters[className]++
+}
+
 export class BaseClass<EventType> extends EventEmitter<EventType> {
 
-	private _dirty = new Set()
+	private _id = -1
+	private _globalId = -1
 
-	_updateProperty(name: string, value: any) {
-		(this.emit as any)(`change:${name}`, value)
-		this._dirty.add(name)
+	constructor() {
+		super()
+		this._globalId = getGlobalId()
+		this._id = getObjectId(this)
 	}
 
-	isDirty() {
-		return this._dirty.size > 0
+	get id() {
+		return this._id
 	}
 
-	dirtyValues() {
-		return pick(this, Array.from(this._dirty))
+	get globalId() {
+		return this._globalId
 	}
 
-	flush() {
-		this._dirty.clear()
+	_setId = (id: number) => {
+		this._id = id
 	}
+
+	describe() {
+		return `<${this.constructor.name} ${this.id}>`
+	}
+
 }
