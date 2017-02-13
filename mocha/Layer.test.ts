@@ -48,5 +48,17 @@ describe("Layer", () => {
 		done()
 	})
 
+	isolated("should not cancel animations on a different property", (context, done) => {
+
+		const layer = new Layer()
+		const animationA = layer.animate({x: 100}, Curve.linear(0.1))
+		const animationB = layer.animate({y: 100}, Curve.linear(0.1))
+
+		expect(animationA.running).to.be.true
+		expect(animationB.running).to.be.true
+		expect(layer.animations).to.eql([animationA, animationB])
+		done()
+	})
+
 })
 
