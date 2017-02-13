@@ -1,6 +1,17 @@
 {
 	"typescript.tsdk": "./node_modules/typescript/lib",
 	"prettier.tabWidth": 4,
-    "prettier.formatOnSave": false,
-	"prettier.trailingComma": false
+	"prettier.formatOnSave": false,
+	"prettier.trailingComma": false,
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/.DS_Store": true,
+		"node_modules": true,
+		"build": true,
+		".vscode": true
+	},
+	"editor.detectIndentation": false,
+	"editor.insertSpaces": false
 }
