@@ -6,7 +6,45 @@ import {Layer, Curve, Utils} from "Framer"
 
 describe("Layer", () => {
 
-	isolated("should have start event", (context, done) => {
+	isolated.test("should set property on create", (context, done) => {
+		const layer = new Layer({x: 500})
+		expect(layer.x).to.equal(500)
+		done()
+	})
+
+	isolated.test("should set property after create", (context, done) => {
+		const layer = new Layer()
+		layer.x = 500
+		expect(layer.x).to.equal(500)
+		done()
+	})
+
+	isolated.test("should emit change event", (context, done) => {
+		const layer = new Layer()
+		layer.onChange("x", e => {
+			expect(layer.x).to.equal(500)
+			done()
+		})
+		layer.x = 500
+	})
+
+	isolated.test("should not emit change event on same value", (context, done) => {
+		let counter = 0
+		const layer = new Layer()
+		layer.onChange("x", e => counter++)
+
+		layer.x = 500
+		layer.x = 500
+		layer.x = 500
+		layer.x = 500
+
+		expect(layer.x).to.equal(500)
+		expect(counter).to.equal(1)
+
+		done()
+	})
+
+	isolated.test("should have start event", (context, done) => {
 
 		let events: string[] = []
 
@@ -24,7 +62,7 @@ describe("Layer", () => {
 			})
 	})
 
-	isolated("should list animations", (context, done) => {
+	isolated.test("should list animations", (context, done) => {
 
 		const layer = new Layer()
 		const animation = layer.animate({x: 100}, Curve.linear(0.1))
@@ -36,7 +74,7 @@ describe("Layer", () => {
 		expect(layer.animations).to.eql([animation])
 	})
 
-	isolated("should cancel animations on same property", (context, done) => {
+	isolated.test("should cancel animations on same property", (context, done) => {
 
 		const layer = new Layer()
 		const animationA = layer.animate({x: 100}, Curve.linear(0.1))
@@ -48,7 +86,7 @@ describe("Layer", () => {
 		done()
 	})
 
-	isolated("should not cancel animations on a different property", (context, done) => {
+	isolated.test("should not cancel animations on a different property", (context, done) => {
 
 		const layer = new Layer()
 		const animationA = layer.animate({x: 100}, Curve.linear(0.1))
@@ -60,7 +98,7 @@ describe("Layer", () => {
 		done()
 	})
 
-	isolated("should move between values", (context, done) => {
+	isolated.test("should move between values", (context, done) => {
 
 		const layer = new Layer({x: 100})
 		const animationA = layer.animate({x: 200}, Curve.linear(0.1)).onEnd(done)
@@ -72,7 +110,7 @@ describe("Layer", () => {
 	})
 
 
-	isolated("should recieve animation events", (context, done) => {
+	isolated.test("should recieve animation events", (context, done) => {
 
 		let events: string[] = []
 

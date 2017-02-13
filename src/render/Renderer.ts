@@ -2,7 +2,7 @@ import * as Utils from "Utils"
 import {AnimationLoop} from "AnimationLoop"
 import {Context} from "Context"
 import {Layer} from "Layer"
-import {getLayerStyles} from "render/css"
+import {getLayerStyles, updateLayerStyles} from "render/css"
 import {render} from "render/PreactRenderer"
 
 export class Renderer {
@@ -11,6 +11,8 @@ export class Renderer {
 	private _context: Context
 	private _dirtyStructure = false
 	private _dirtyStyle: Set<Layer> = new Set()
+	private _updateStructureCount = 0
+	private _updateStyleCount = 0
 	private _renderStructureCount = 0
 	private _renderStyleCount = 0
 	private _element = document.createElement("div")
@@ -53,6 +55,14 @@ export class Renderer {
 		return this._loop
 	}
 
+	get updateStyleCount() {
+		return this._updateStyleCount
+	}
+
+	get updateStructureCount() {
+		return this._updateStructureCount
+	}
+
 	get renderStructureCount() {
 		return this._renderStructureCount
 	}
@@ -61,7 +71,19 @@ export class Renderer {
 		return this._renderStyleCount
 	}
 
+	getDirtyStyles = (layer: Layer) => {
+		if (!layer["_dirty"]) { layer["_dirty"] = {} }
+		return layer["_dirty"]
+	}
+
+	flushDirtyStyles = (layer: Layer) => {
+		layer["_dirty"] = {}
+	}
+
 	updateStructure(layer: Layer | Context) {
+
+		this._updateStructureCount++
+
 		if (this._dirtyStructure) { return }
 		if (!this.manual) { this.loop.schedule("render", this.render) }
 		this._dirtyStructure = true
@@ -69,9 +91,16 @@ export class Renderer {
 
 	updateStyle(layer: Layer, key, value) {
 
+		this._updateStyleCount++
+
 		if (this._dirtyStyle.size === 0) {
 			if (!this.manual) { this.loop.schedule("render", this.render) }
 		}
+
+		let styles = this.getDirtyStyles(layer)
+		updateLayerStyles(layer, key, styles)
+
+		// this._dirtyStyles.push({layer, key, value})
 
 		this._dirtyStyle.add(layer)
 	}
@@ -106,16 +135,12 @@ export class Renderer {
 	renderStyle = () => {
 		this._renderStyleCount++
 
-		console.log("renderStyle");
-
 
 		for (let layer of this._dirtyStyle) {
-			if (layer._element) {
-				getLayerStyles(layer, layer._element.style as any)
-			} else {
-				console.log("renderer.renderStyle: could not update layer", layer.id)
-			}
+			Utils.dom.setStyle(layer._element, this.getDirtyStyles(layer))
+			this.flushDirtyStyles(layer)
 		}
+
 		this._dirtyStyle = new Set()
 	}
 }

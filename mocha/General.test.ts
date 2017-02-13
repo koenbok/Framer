@@ -6,8 +6,7 @@ import {Layer, Framer, Utils, Context} from "Framer"
 describe("General", () => {
 
 
-
-	isolated("should reset well", (context, done) => {
+	isolated.test("should reset well", (context, done) => {
 
 		context.renderer.manual = true
 
@@ -22,7 +21,7 @@ describe("General", () => {
 		// assert.equal(context.renderer.renderStructureCount, 1)
 		// assert.equal(context.renderer.renderStyleCount, 1)
 		assert.equal(context.renderer.element.children[0].childElementCount, 1)
-		assert.equal(layer._element!.style.width, "500px")
+		assert.equal(layer._element.style.width, "500px")
 
 		context.reset()
 		context.renderer.render()
@@ -38,7 +37,7 @@ describe("General", () => {
 	})
 
 
-	isolated("should reset context", (context, done) => {
+	isolated.test("should reset context", (context, done) => {
 
 		context.renderer.manual = true
 		let layer: Layer
@@ -69,7 +68,7 @@ describe("General", () => {
 
 	})
 
-	isolated("should diff structure", (context, done) => {
+	isolated.test("should diff structure", (context, done) => {
 
 		context.renderer.manual = true
 

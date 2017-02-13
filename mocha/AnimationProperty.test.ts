@@ -5,7 +5,7 @@ import {Layer} from "Layer"
 import {Curve} from "Curve"
 import {AnimationProperty} from "AnimationProperty"
 
-isolated("it should set the right value", (context, done) => {
+isolated.test("it should set the right value", (context, done) => {
 
 	context.renderer.loop.pause = true
 

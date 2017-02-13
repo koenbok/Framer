@@ -18,6 +18,8 @@ export interface LayerOptions {
 		image?: string|null
 }
 
+type LayerProperties = keyof LayerOptions
+
 export type LayerEventPropertyTypes =
 	"change:x" |
 	"change:y" |
@@ -54,12 +56,12 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		image: null
 	}
 
-	_element?: HTMLElement
+	_forceUpdate = false
+	_element: HTMLElement
 	_animations = new Collection<Animation>()
 
 	constructor(options: LayerOptions= {}) {
 		super()
-		Object.assign(this, options)
 
 		this._setId(this.context.addLayer(this))
 
@@ -68,8 +70,10 @@ export class Layer extends BaseClass<LayerEventTypes> {
 			this.parent = options.parent
 		}
 
+		Object.assign(this._properties, options)
+
 		this._updateStructure()
-		this.context.renderer.updateStyle(this, "a", "b")
+		this._forceFullUpdate()
 	}
 
 	get context(): Context {
@@ -86,9 +90,10 @@ export class Layer extends BaseClass<LayerEventTypes> {
 			return
 		}
 
+		this._parent = value
 		this._updateStructure()
 		this._updateProperty("parent", value)
-		this._parent = value
+
 	}
 
 	get children(): Layer[] {
@@ -102,9 +107,10 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	}
 
 	set x(value) {
+		if (!this._shouldUpdate("x", value)) { return }
+		this._properties.x = value
 		this._updateProperty("x", value)
 		this._updateStyle("x", value)
-		this._properties.x = value
 	}
 
 	get y() {
@@ -112,9 +118,10 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	}
 
 	set y(value) {
+		if (!this._shouldUpdate("y", value)) { return }
+		this._properties.y = value
 		this._updateProperty("y", value)
 		this._updateStyle("y", value)
-		this._properties.y = value
 	}
 
 	get width() {
@@ -122,9 +129,10 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	}
 
 	set width(value) {
+		if (!this._shouldUpdate("width", value)) { return }
+		this._properties.width = value
 		this._updateProperty("width", value)
 		this._updateStyle("width", value)
-		this._properties.width = value
 	}
 
 	get height() {
@@ -132,9 +140,10 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	}
 
 	set height(value) {
+		if (!this._shouldUpdate("height", value)) { return }
+		this._properties.height = value
 		this._updateProperty("height", value)
 		this._updateStyle("height", value)
-		this._properties.height = value
 	}
 
 	get backgroundColor() {
@@ -142,9 +151,10 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	}
 
 	set backgroundColor(value) {
+		if (!this._shouldUpdate("backgroundColor", value)) { return }
+		this._properties.backgroundColor = value
 		this._updateProperty("backgroundColor", value)
 		this._updateStyle("backgroundColor", value)
-		this._properties.backgroundColor = value
 	}
 
 	// Animations
@@ -181,6 +191,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	onAnimationStop = (handler: Function) => { this.on("AnimationStop", handler) }
 	onAnimationHalt = (handler: Function) => { this.on("AnimationHalt", handler) }
 	onAnimationEnd = (handler: Function) => { this.on("AnimationEnd", handler) }
+	onChange = (property: LayerProperties, handler: Function) => { this.on(`change:${property}` as any, handler) }
 
 	// private _dirty = new Set()
 
@@ -194,6 +205,16 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	private _updateProperty(name: string, value: any) {
 		(this.emit as any)(`change:${name}`, value)
 		// this._dirty.add(name)
+	}
+
+	private _forceFullUpdate() {
+		this._forceUpdate = true
+		Object.assign(this, this._properties)
+		this._forceUpdate = false
+	}
+
+	private _shouldUpdate(property, value) {
+		return this._forceUpdate || this._properties[property] !== value
 	}
 
 	// isDirty() {

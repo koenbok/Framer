@@ -53,3 +53,8 @@ export const validEvent = (tagName: string, eventName: string) => {
 
 	return result
 }
+
+export const setStyle = (element: HTMLElement, style: Object) => {
+	// TODO: Find fastest way to update css
+	Object.assign(element.style, style)
+}
