@@ -7,4 +7,8 @@ config.entry = {
 }
 config.plugins.push(new HtmlWebpackPlugin())
 
+config.plugins.push(new webpack.DefinePlugin({
+	"process.env.TEST": JSON.stringify(true)
+}))
+
 module.exports = config

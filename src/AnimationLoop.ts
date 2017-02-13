@@ -6,9 +6,13 @@ const performance = (window.performance || {
 	now: () => { return Date.now() - this.offset }
 })
 
-const raf = (f) => setTimeout(f, 0)
-// const raf = requestAnimationFrame
-// const raf = (f) => setTimeout(f, 0)
+let raf
+
+if (process.env.TEST) {
+	raf = (f) => setTimeout(f, 0)
+} else {
+	raf = requestAnimationFrame
+}
 
 const time = () => performance.now() / 1000
 
