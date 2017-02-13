@@ -229,5 +229,9 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	// 	this._dirty.clear()
 	// }
 
+	describe() {
+		return `<Layer ${this.id} (${this.x}, ${this.y}) ${this.width} x ${this.height}>`
+	}
+
 }
 

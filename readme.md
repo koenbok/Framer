@@ -12,8 +12,10 @@ A complete rewrite of the core, with everything on top.
 
 #### Todo
 
-- Change css updates to be in renderer
-- Add print and describe in base, take rest out
++ Change css updates to be in renderer
++ Add print and describe in base, take rest out
+- Add renderer _createdLayers for full css updates inc position
+- Print
 
 #### Changes
 
