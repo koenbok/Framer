@@ -23,7 +23,8 @@
         "**/*.js",
         "node_modules",
         "chrome/tools",
-        "build"
+        "build",
+        "extras"
     ],
     "filesGlob": [
       "**/*.ts"

@@ -4,7 +4,7 @@ NODE_BIN = ./node_modules/.bin
 BUILD_PATH = ./build
 
 bootstrap:
-	@yarn install --prefer-offline || (echo "Install yarn first – https://yarnpkg.com/" && exit 1)
+	# @yarn install --prefer-offline || (echo "Install yarn first – https://yarnpkg.com/" && exit 1)
 
 # test: bootstrap
 # 	./node_modules/.bin/jest --watchAll
@@ -34,7 +34,7 @@ perf: bootstrap
 		--open
 
 dts:
-	$(NODE_BIN)/tsc --declaration --module system --outFile $(BUILD_PATH)/framer.js
+	$(NODE_BIN)/tsc --declaration --module amd --outFile $(BUILD_PATH)/framer.js
 
 clean:
 	rm -rf build

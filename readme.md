@@ -10,6 +10,10 @@ A complete rewrite of the core, with everything on top.
 - Use points everywhere, without adding to the complexity by default.
 - Better testing setup with replayable events for interaction testing.
 
+#### Todo
+
+- Change css updates to be in renderer
+- Add print and describe in base, take rest out
 
 #### Changes
 
