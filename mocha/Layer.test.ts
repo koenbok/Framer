@@ -60,5 +60,16 @@ describe("Layer", () => {
 		done()
 	})
 
+	isolated("should move between values", (context, done) => {
+
+		const layer = new Layer({x: 100})
+		const animationA = layer.animate({x: 200}, Curve.linear(0.1)).onEnd(done)
+
+		context.renderer.loop.on("finish", () => {
+			expect(layer.x >= 100).to.be.true
+			expect(layer.x <= 200).to.be.true
+		})
+	})
+
 })
 
