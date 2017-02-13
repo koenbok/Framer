@@ -29,6 +29,7 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 	private _counter = 0
 	private _time = time()
 	private _last = time()
+	private _pause = false
 
 	static get Default() {
 		return DefaultAnimationLoop
@@ -50,9 +51,28 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 		return this._id
 	}
 
+	get pause() {
+		return this._pause
+	}
+
+	set pause(value: boolean) {
+		this._pause = value
+	}
+
 	constructor() {
 		super()
 		this._id = AnimationLoopCounter++
+	}
+
+	next(n= 1) {
+
+		if (!this.pause) {
+			throw Error("Loop is not paused")
+		}
+
+		for (let i = 0; i < n; i++) {
+			this.tick()
+		}
 	}
 
 	addEventListener(eventName: AnimationLoopEventNames, fn: Function, once: boolean, context: Object) {
@@ -83,10 +103,14 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 			console.log("tick", this._counter, 1 / (time() - this._last))
 		}
 
-		if (this.countEventListeners("update") > 0 || this.countEventListeners("render") > 0) {
-			raf(this.tick)
-		} else {
-			this._stop()
+		if (!this.pause) {
+			if (
+				this.countEventListeners("update") > 0 ||
+				this.countEventListeners("render") > 0) {
+				raf(this.tick)
+			} else {
+				this._stop()
+			}
 		}
 
 		this.emit("update", AnimationLoopTimeStep, time() - this._time)
