@@ -6,20 +6,47 @@ import {Layer, Curve, Utils} from "Framer"
 
 describe("Layer", () => {
 
-	isolated("should animate a layer", (context, done) => {
+	isolated("should have start event", (context, done) => {
+
+		let events: string[] = []
+
 		const layer = new Layer()
-
-		layer.animate({x: 100}, Curve.linear(0.2))
-			.onEnd(() => {
-				Utils.delay(0.1, () => {
-					expect(context.renderer.loop.running).to.be.false
-					// expect(context.renderer.loop.countEventListeners("render")).to.equal(0)
-					// expect(context.renderer.loop.countEventListeners("render")).to.equal(0)
-					done()
-				})
+		const animation = layer.animate({x: 100}, Curve.linear(0.1))
+			.onStart(e => events.push("AnimationStart"))
+			.onStop(e => events.push("AnimationStop"))
+			.onEnd(e => events.push("AnimationEnd"))
+			.onEnd(e => {
+				expect(events).to.eql([
+					"AnimationStart",
+					"AnimationStop",
+					"AnimationEnd"])
+				done()
 			})
-
-
 	})
+
+	isolated("should list animations", (context, done) => {
+
+		const layer = new Layer()
+		const animation = layer.animate({x: 100}, Curve.linear(0.1))
+			.onStart(e => expect(layer.animations).to.eql([animation]))
+			.onStop(e => expect(layer.animations).to.eql([]))
+			.onEnd(e => expect(layer.animations).to.eql([]))
+			.onEnd(done)
+
+		expect(layer.animations).to.eql([animation])
+	})
+
+	isolated("should cancel animations on same property", (context, done) => {
+
+		const layer = new Layer()
+		const animationA = layer.animate({x: 100}, Curve.linear(0.1))
+		const animationB = layer.animate({x: 100}, Curve.linear(0.1))
+
+		expect(animationA.running).to.be.false
+		expect(animationB.running).to.be.true
+		expect(layer.animations).to.eql([animationB])
+		done()
+	})
+
 })
 

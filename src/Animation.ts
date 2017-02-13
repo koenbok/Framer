@@ -1,9 +1,9 @@
+import * as Utils from "Utils"
 import {EventEmitter} from "EventEmitter"
 import {AnimationLoop} from "AnimationLoop"
 import {AnimationCurve} from "AnimationCurve"
 import {AnimatableProperties, AnimationProperty} from "AnimationProperty"
 import {Layer} from "Layer"
-
 
 export type AnimationEventTypes =
 	"AnimationStart" |
@@ -77,14 +77,10 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 
 		// Stop all other animations with conflicting properties
 		for (let animation of this._layer.animations) {
-			console.log(animation);
 			for (let key in this._properties) {
-				console.log(key);
-				
-				if (key in Object.keys(animation._properties)) {
+				if (animation._properties.hasOwnProperty(key)) {
 					animation.stop()
-
-					
+					continue
 				}
 			}
 		}
@@ -117,7 +113,7 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 
 		if (this.running) {
 			this._layer._animations.add(this)
-			this.emit("AnimationStart")
+			Utils.delay(0, () => this.emit("AnimationStart"))
 		}
 
 		return started
@@ -129,13 +125,13 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 
 	private _stop = () => {
 
-		this.emit("AnimationStop")
-
 		for (let animationProperty of this._running) {
 			animationProperty.stop()
 		}
 
 		this._layer._animations.remove(this)
+
+		this.emit("AnimationStop")
 		this._reset()
 	}
 
