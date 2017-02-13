@@ -61,7 +61,7 @@ export class Renderer {
 		return this._renderStyleCount
 	}
 
-	updateStructure() {
+	updateStructure(layer: Layer | Context) {
 		if (this._dirtyStructure) { return }
 		if (!this.manual) { this.loop.schedule("render", this.render) }
 		this._dirtyStructure = true
@@ -69,7 +69,7 @@ export class Renderer {
 
 	updateStyle(layer: Layer, key, value) {
 
-		if (this._dirtyStyle.size == 0) {
+		if (this._dirtyStyle.size === 0) {
 			if (!this.manual) { this.loop.schedule("render", this.render) }
 		}
 
@@ -105,6 +105,9 @@ export class Renderer {
 
 	renderStyle = () => {
 		this._renderStyleCount++
+
+		console.log("renderStyle");
+
 
 		for (let layer of this._dirtyStyle) {
 			if (layer._element) {

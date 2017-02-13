@@ -103,6 +103,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 
 	set x(value) {
 		this._updateProperty("x", value)
+		this._updateStyle("x", value)
 		this._properties.x = value
 	}
 
@@ -112,6 +113,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 
 	set y(value) {
 		this._updateProperty("y", value)
+		this._updateStyle("y", value)
 		this._properties.y = value
 	}
 
@@ -121,6 +123,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 
 	set width(value) {
 		this._updateProperty("width", value)
+		this._updateStyle("width", value)
 		this._properties.width = value
 	}
 
@@ -130,6 +133,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 
 	set height(value) {
 		this._updateProperty("height", value)
+		this._updateStyle("height", value)
 		this._properties.height = value
 	}
 
@@ -139,6 +143,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 
 	set backgroundColor(value) {
 		this._updateProperty("backgroundColor", value)
+		this._updateStyle("backgroundColor", value)
 		this._properties.backgroundColor = value
 	}
 
