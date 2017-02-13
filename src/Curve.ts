@@ -6,22 +6,22 @@ export const linear = (time: number) => {
 }
 
 export const springrk4 = (
-    friction= 300,
-    tension= 30,
-    velocity= 0,
-    tolerance= 1 / 100
-    ) => {
+	friction= 300,
+	tension= 30,
+	velocity= 0,
+	tolerance= 1 / 100
+	) => {
 
 	// return new AnimationCurveSpringRK4()
 	return new AnimationCurveSpringRK4({
-        tension: friction,
-        friction: tension,
-        velocity: velocity,
-        tolerance: tolerance
-    })
+		tension: friction,
+		friction: tension,
+		velocity: velocity,
+		tolerance: tolerance
+	})
 }
 
 export const Curve = {
-    linear: linear,
-    springrk4: springrk4
+	linear: linear,
+	springrk4: springrk4
 }
