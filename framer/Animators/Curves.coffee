@@ -8,12 +8,15 @@ Bezier = (values...) ->
 		options.values = values
 		new BezierCurveAnimator(options)
 
+# We define each in a seperate function here
+# so they become named functions
+# and Framer.Curves.Bezier.ease.name is set
 BezierDefaults =
-	linear: Bezier(0, 0, 1, 1)
-	ease: Bezier(.25, .1, .25, 1)
-	easeIn: Bezier(.42, 0, 1, 1)
-	easeOut: Bezier(0, 0, .58, 1)
-	easeInOut: Bezier(.42, 0, .58, 1)
+	linear: (options = {}) -> Bezier(0, 0, 1, 1)(options)
+	ease: (options = {}) -> Bezier(.25, .1, .25, 1)(options)
+	easeIn: (options = {}) -> Bezier(.42, 0, 1, 1)(options)
+	easeOut: (options = {}) -> Bezier(0, 0, .58, 1)(options)
+	easeInOut: (options = {}) -> Bezier(.42, 0, .58, 1)(options)
 
 Spring = (dampingRatio, mass, velocity) ->
 	curveOptions = {}
