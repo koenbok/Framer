@@ -24,7 +24,7 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 		layer: Layer,
 		properties: AnimatableProperties,
 		curve: AnimationCurve,
-		loop= AnimationLoop.Default
+		loop: AnimationLoop | null= null
 	) {
 
 		super()
@@ -32,7 +32,7 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 		this._layer = layer
 		this._curve = curve
 		this._properties = properties
-		this._loop = loop
+		this._loop = loop || this._layer.context.renderer.loop
 	}
 
 	/** Start this animation. */
@@ -68,12 +68,19 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 	/** Call function when the animation is fully complete */
 	readonly onEnd = (fn: Function) => { this.on("AnimationEnd", fn); return this }
 
+	emit(eventName: AnimationEventTypes, ...args: any[]) {
+		super.emit(eventName, ...args)
+		this._layer.emit(eventName, args)
+	}
+
 	private _reset  = () => {
 		this._running = []
 		this._finished = []
 	}
 
 	private _start = (): boolean => {
+
+		// TODO: Delay, Repeat
 
 		// Stop all other animations with conflicting properties
 		for (let animation of this._layer.animations) {
@@ -95,6 +102,9 @@ export class Animation extends EventEmitter<AnimationEventTypes> {
 			if (a === b) {
 				continue
 			}
+
+			console.log("key", a, b);
+
 
 			const animationProperty = new AnimationProperty(
 				this._loop,

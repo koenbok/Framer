@@ -71,5 +71,25 @@ describe("Layer", () => {
 		})
 	})
 
+
+	isolated("should recieve animation events", (context, done) => {
+
+		let events: string[] = []
+
+		const layer = new Layer()
+
+		layer.animate({x: 100}, Curve.linear(0.1))
+		layer.onAnimationStart(e => events.push("AnimationStart"))
+		layer.onAnimationStop(e => events.push("AnimationStop"))
+		layer.onAnimationEnd(e => events.push("AnimationEnd"))
+
+		layer.onAnimationEnd(e => {
+			expect(events).to.eql([
+				"AnimationStart",
+				"AnimationStop",
+				"AnimationEnd"])
+			done()
+		})
+	})
 })
 

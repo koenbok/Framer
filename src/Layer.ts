@@ -8,13 +8,14 @@ import {Curve} from "Curve"
 
 export interface LayerOptions {
 		context?: Context
-		parent?: Layer|null,
-		x?: number,
-		y?: number,
-		width?: number,
-		height?: number,
-		backgroundColor?: string,
+		parent?: Layer|null
+		x?: number
+		y?: number
+		width?: number
+		height?: number
+		backgroundColor?: string
 		opacity?: number
+		image?: string|null
 }
 
 export type LayerEventPropertyTypes =
@@ -50,7 +51,8 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		width: 200,
 		height: 200,
 		backgroundColor: "rgba(255, 0, 0, 0.5)",
-		opacity: 1
+		opacity: 1,
+		image: null
 	}
 
 	_element?: HTMLElement
@@ -150,6 +152,9 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		this._properties.backgroundColor = value
 	}
 
+	// Animations
+
+	/** Start an animation. */
 	animate = (
 		properties: AnimatableProperties,
 		curve: AnimationCurve= Curve.linear(1)
@@ -159,9 +164,13 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		return animation
 	}
 
+	/** List of current running animations. */
 	get animations() {
 		return this._animations.items()
 	}
+
+
+	// Events
 
 	onClick = (handler: Function) => { this.on("click", handler) }
 	onDoubleClick = (handler: Function) => { this.on("doubleclick", handler) }
@@ -173,6 +182,10 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	onMouseMove = (handler: Function) => { this.on("mousemove", handler) }
 	onMouseWheel = (handler: Function) => { this.on("mousewheel", handler) }
 
+	onAnimationStart = (handler: Function) => { this.on("AnimationStart", handler) }
+	onAnimationStop = (handler: Function) => { this.on("AnimationStop", handler) }
+	onAnimationHalt = (handler: Function) => { this.on("AnimationHalt", handler) }
+	onAnimationEnd = (handler: Function) => { this.on("AnimationEnd", handler) }
 
 }
 

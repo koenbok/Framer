@@ -60,9 +60,23 @@ const run = () => {
 let layerC = new Layer()
 
 layerC.onClick(event => {
-	layerC.animate({x: 200}, Curve.springrk4(300, 20))
-		.onEnd(event => layerC.x = 0)
+	layerC.animate({x: 200}, Curve.springrk4(300, 10))
+		.onEnd(event => {layerC.x = 0})
 })
+
+// layerC.on("change:x", event => {
+// 	if (layerC.x === 0) {
+// 		debugger
+// 	}
+// })
+
+
+
+// const layer = new Layer()
+
+// const animation = layer.animate({x: 400}, Curve.linear(10))
+
+// animation.on("AnimationStart", () => console.log("AnimationStart"))
 
 
 
