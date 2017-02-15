@@ -86,7 +86,7 @@ class exports.Animation extends BaseClass
 
 		if _.isString @options.curve
 			@options.curve = Curves.fromString(@options.curve)
-		if @options.curve is Curves.Spring
+		if @options.curve is Curves.Spring or @options.curve is Curves.Bezier
 			@options.curve = @options.curve.call()
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
