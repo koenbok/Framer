@@ -24,7 +24,7 @@ class exports.BezierCurveAnimator extends Animator
 			options = {values: options}
 
 		@options = _.defaults options,
-			values: BezierCurveDefaults["ease-in-out"]
+			values: BezierCurveDefaults["ease"]
 			time: 1
 			precision: 1 / 1000
 
