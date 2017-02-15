@@ -38,4 +38,4 @@ describe "Curves", ->
 		it "should parse Bezier.linear", ->
 			animatorEquals(Framer.Curves.fromString("Bezier.linear"), Framer.Curves.Bezier.linear)
 		it "should parse depricated springs", ->
-			animatorEquals(Framer.Curves.fromString("spring(200, 30, 0)"), Framer.Curves.Spring(tension: 200, friction: 30, velocity: 0))
+			animatorEquals(Framer.Curves.fromString("spring(200, 30, 0)"), Framer.Curves.Spring(tension: 200, friction: 30, velocity: 0, tolerance: 0.01))
