@@ -5,7 +5,8 @@
 
 Bezier = (values...) ->
 	(options = {}) ->
-		options.values = values
+		if values.length > 0
+			options.values = values
 		new BezierCurveAnimator(options)
 
 # We define each in a seperate function here
