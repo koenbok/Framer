@@ -57,6 +57,7 @@ class exports.TextLayer extends Layer
 			fontWeight: @fontWeight
 			lineHeight: @lineHeight
 			letterSpacing: @letterSpacing
+			wordSpacing: @wordSpacing
 			textAlign: @textAlign
 			textTransform: @textTransform
 			textDecoration: @textDecoration
@@ -110,6 +111,12 @@ class exports.TextLayer extends Layer
 		set: (value) ->
 			@style.letterSpacing = "#{value}px"
 			@emit("change:letterSpacing", value)
+
+	@define "wordSpacing",
+		get: -> @style.wordSpacing
+		set: (value) ->
+			@style.wordSpacing = "#{value}px"
+			@emit("change:wordSpacing", value)
 
 	@define "textAlign",
 		get: -> @style.textAlign
