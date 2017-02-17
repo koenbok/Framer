@@ -61,6 +61,7 @@ class exports.TextLayer extends Layer
 			textAlign: @textAlign
 			textTransform: @textTransform
 			textDecoration: @textDecoration
+			textIndent: @textIndent
 
 		# Set width and height based on style
 		constraints = width: @width
@@ -135,6 +136,12 @@ class exports.TextLayer extends Layer
 		set: (value) ->
 			@style.textDecoration = value
 			@emit("change:textDecoration", value)
+
+	@define "textIndent",
+		get: -> @style.textIndent
+		set: (value) ->
+			@style.textIndent = "#{value}px"
+			@emit("change:textIndent", value)
 
 	@define "autoWidth", @simpleProperty("autoWidth", false)
 	@define "autoHeight", @simpleProperty("autoHeight", false)
