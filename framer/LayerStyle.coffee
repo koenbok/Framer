@@ -168,6 +168,16 @@ exports.LayerStyle =
 
 		return "#{layer._properties.shadowX}px #{layer._properties.shadowY}px #{layer._properties.shadowBlur}px #{layer._properties.shadowSpread}px #{layer._properties.shadowColor}"
 
+	textShadow: (layer) ->
+
+		props = layer._properties
+
+		if not props.shadowColor
+			return ""
+		else if props.shadowX is 0 and props.shadowY is 0 and props.shadowBlur is 0 and props.shadowSpread is 0
+			return ""
+
+		return "#{layer._properties.shadowX}px #{layer._properties.shadowY}px #{layer._properties.shadowBlur}px #{layer._properties.shadowColor}"
 
 	backgroundColor: (layer) ->
 		return layer._properties.backgroundColor

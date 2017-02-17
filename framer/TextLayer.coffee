@@ -1,5 +1,8 @@
-{Layer} = require "./Layer"
+{Layer, layerProperty} = require "./Layer"
+{LayerStyle} = require "./LayerStyle"
+{Color} = require "./Color"
 {Events} = require "./Events"
+
 
 class exports.TextLayer extends Layer
 
@@ -142,6 +145,11 @@ class exports.TextLayer extends Layer
 		set: (value) ->
 			@style.textIndent = "#{value}px"
 			@emit("change:textIndent", value)
+
+	@define "shadowX", layerProperty(@, "shadowX", "textShadow", 0, _.isNumber)
+	@define "shadowY", layerProperty(@, "shadowY", "textShadow", 0, _.isNumber)
+	@define "shadowBlur", layerProperty(@, "shadowBlur", "textShadow", 0, _.isNumber)
+	@define "textShadowColor", layerProperty(@, "textShadowColor", "textShadow", "", Color.validColorValue, Color.toColor)
 
 	@define "autoWidth", @simpleProperty("autoWidth", false)
 	@define "autoHeight", @simpleProperty("autoHeight", false)

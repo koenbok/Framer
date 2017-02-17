@@ -63,6 +63,8 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 	result = _.extend(result, options)
 
+exports.layerProperty = layerProperty
+
 layerPropertyPointTransformer = (value, layer, property) ->
 	if _.isFunction(value)
 		value = value(layer, property)
