@@ -103,7 +103,11 @@ exports.Defaults =
 		defaults = _.cloneDeep Originals[className]
 		# Copy over the user defined options
 		for k, v of Framer.Defaults[className]
-			defaults[k] = if _.isFunction(v) then v() else v
+			# Make an exception for curve functions
+			if _.isFunction(v) and not (className is "Animation" and k is "curve")
+				defaults[k] = v()
+			else
+				defaults[k] = v
 
 		# Then copy over the default keys to the options
 		for k, v of defaults

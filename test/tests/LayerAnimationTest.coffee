@@ -19,6 +19,20 @@ describe "LayerAnimation", ->
 
 			Framer.resetDefaults()
 
+		it "should handle default spring curves correctly", ->
+
+			Framer.Defaults.Animation =
+				curve: Spring(0.5)
+
+			layer = new Layer
+			animation = layer.animate
+				x: 50
+
+			animation._animator.constructor.name.should.equal "SpringRK4Animator"
+
+			Framer.resetDefaults()
+
+
 		it "should use linear", ->
 
 			# We shouldn't change the linear default, people rely on it
