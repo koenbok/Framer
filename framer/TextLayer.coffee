@@ -3,7 +3,6 @@
 {Color} = require "./Color"
 {Events} = require "./Events"
 
-
 class exports.TextLayer extends Layer
 
 	constructor: (options={}) ->
@@ -146,10 +145,12 @@ class exports.TextLayer extends Layer
 			@style.textIndent = "#{value}px"
 			@emit("change:textIndent", value)
 
+	# Map shadow properties to text shadow
 	@define "shadowX", layerProperty(@, "shadowX", "textShadow", 0, _.isNumber)
 	@define "shadowY", layerProperty(@, "shadowY", "textShadow", 0, _.isNumber)
 	@define "shadowBlur", layerProperty(@, "shadowBlur", "textShadow", 0, _.isNumber)
 	@define "textShadowColor", layerProperty(@, "textShadowColor", "textShadow", "", Color.validColorValue, Color.toColor)
 
+	# Set width and height automatically
 	@define "autoWidth", @simpleProperty("autoWidth", false)
 	@define "autoHeight", @simpleProperty("autoHeight", false)
