@@ -68,14 +68,14 @@ describe "Utils", ->
 		it "should work", ->
 
 			Utils.sizeMax([
-				{width:100, height:100},
-				{width:100, height:100},
-			]).should.eql {width:100, height:100}
+				{width: 100, height: 100},
+				{width: 100, height: 100},
+			]).should.eql {width: 100, height: 100}
 
 			Utils.sizeMax([
-				{width:1000, height:1000},
-				{width:100, height:100},
-			]).should.eql {width:1000, height:1000}
+				{width: 1000, height: 1000},
+				{width: 100, height: 100},
+			]).should.eql {width: 1000, height: 1000}
 
 	describe "pathJoin", ->
 
@@ -88,21 +88,21 @@ describe "Utils", ->
 		it "should work", ->
 
 			Utils.sizeMin([
-				{width:100, height:100},
-				{width:100, height:100},
-			]).should.eql {width:100, height:100}
+				{width: 100, height: 100},
+				{width: 100, height: 100},
+			]).should.eql {width: 100, height: 100}
 
 			Utils.sizeMin([
-				{width:1000, height:1000},
-				{width:100, height:100},
-			]).should.eql {width:100, height:100}
+				{width: 1000, height: 1000},
+				{width: 100, height: 100},
+			]).should.eql {width: 100, height: 100}
 
 
 	describe "points", ->
 
 		it "should get points from frame", ->
 
-			frame = {x:200, y:-60, width:200, height:200}
+			frame = {x: 200, y: -60, width: 200, height: 200}
 			points = Utils.pointsFromFrame(frame)
 
 			points.length.should.eql 4
@@ -112,7 +112,7 @@ describe "Utils", ->
 
 		it "should get frame from points", ->
 
-			points = [{x:200, y:-60}, {x:200, y:140}, {x:400, y:140}, {x:400, y:-60}]
+			points = [{x: 200, y: -60}, {x: 200, y: 140}, {x: 400, y: 140}, {x: 400, y: -60}]
 			frame = Utils.frameFromPoints(points)
 
 			frame.x.should.eql 200
@@ -130,24 +130,24 @@ describe "Utils", ->
 					frame[p].should.equal result[p], p
 
 			compare [
-				{x:0, y:0, width:100, height:100},
-				{x:0, y:0, width:100, height:100},
-			],  {x:0, y:0, width:100, height:100}
+				{x: 0, y: 0, width: 100, height: 100},
+				{x: 0, y: 0, width: 100, height: 100},
+			],  {x: 0, y: 0, width: 100, height: 100}
 
 			compare [
-				{x:0, y:0, width:100, height:100},
-				{x:0, y:0, width:500, height:500},
-			],  {x:0, y:0, width:500, height:500}
+				{x: 0, y: 0, width: 100, height: 100},
+				{x: 0, y: 0, width: 500, height: 500},
+			],  {x: 0, y: 0, width: 500, height: 500}
 
 			compare [
-				{x:0, y:0, width:100, height:100},
-				{x:100, y:100, width:500, height:500},
-			],  {x:0, y:0, width:600, height:600}
+				{x: 0, y: 0, width: 100, height: 100},
+				{x: 100, y: 100, width: 500, height: 500},
+			],  {x: 0, y: 0, width: 600, height: 600}
 
 			compare [
-				{x:100, y:100, width:100, height:100},
-				{x:100, y:100, width:500, height:500},
-			],  {x:100, y:100, width:500, height:500}
+				{x: 100, y: 100, width: 100, height: 100},
+				{x: 100, y: 100, width: 500, height: 500},
+			],  {x: 100, y: 100, width: 500, height: 500}
 
 			# Bla bla. This works. Doing a visual comparison is so much easier
 			# Start the cactus project and go to /test.html
@@ -155,14 +155,14 @@ describe "Utils", ->
 	describe "framePointForOrigin", ->
 
 		it "should work", ->
-			Utils.framePointForOrigin({x:100, y:100, width:100, height:100}, 0, 0).should.eql(
-				{x:100, y:100, width:100, height:100})
-			Utils.framePointForOrigin({x:100, y:100, width:100, height:100}, 0, 0).should.eql(
-				{x:100, y:100, width:100, height:100})
-			Utils.framePointForOrigin({x:100, y:100, width:100, height:100}, 0, 0).should.eql(
-				{x:100, y:100, width:100, height:100})
-			Utils.framePointForOrigin({x:100, y:100, width:100, height:100}, 0, 0).should.eql(
-				{x:100, y:100, width:100, height:100})
+			Utils.framePointForOrigin({x: 100, y: 100, width: 100, height: 100}, 0, 0).should.eql(
+				{x: 100, y: 100, width: 100, height: 100})
+			Utils.framePointForOrigin({x: 100, y: 100, width: 100, height: 100}, 0, 0).should.eql(
+				{x: 100, y: 100, width: 100, height: 100})
+			Utils.framePointForOrigin({x: 100, y: 100, width: 100, height: 100}, 0, 0).should.eql(
+				{x: 100, y: 100, width: 100, height: 100})
+			Utils.framePointForOrigin({x: 100, y: 100, width: 100, height: 100}, 0, 0).should.eql(
+				{x: 100, y: 100, width: 100, height: 100})
 
 
 
@@ -222,35 +222,35 @@ describe "Utils", ->
 			# Todo: for some reason these don't work reliable in phantomjs
 
 			text  = "Hello Koen Bok"
-			style = {font:"20px/1em Menlo"}
+			style = {font: "20px/1em Menlo"}
 
 			# it "should return the right size", ->
-			# 	Utils.textSize(text, style).should.eql({width:168, height:20})
+			# 	Utils.textSize(text, style).should.eql({width: 168, height: 20})
 
 			# it "should return the right size with width constraint", ->
-			# 	Utils.textSize(text, style, {width:100}).should.eql({width:100, height:40})
+			# 	Utils.textSize(text, style, {width: 100}).should.eql({width: 100, height: 40})
 
 			# it "should return the right size with height constraint", ->
-			# 	Utils.textSize(text, style, {height:100}).should.eql(width:168, height:100)
+			# 	Utils.textSize(text, style, {height: 100}).should.eql(width: 168, height: 100)
 
 
 	describe "frameSortByAbsoluteDistance", ->
 
 		it "should sort x", ->
 
-			layerA = new Layer x:300, y:100
-			layerB = new Layer x:100, y:100
-			layerC = new Layer x:200, y:100
+			layerA = new Layer x: 300, y: 100
+			layerB = new Layer x: 100, y: 100
+			layerC = new Layer x: 200, y: 100
 
-			Utils.frameSortByAbsoluteDistance({x:0, y:0}, [layerA, layerB, layerC]).should.eql([layerB, layerC, layerA])
+			Utils.frameSortByAbsoluteDistance({x: 0, y: 0}, [layerA, layerB, layerC]).should.eql([layerB, layerC, layerA])
 
 		it "should sort", ->
 
-			layerA = new Layer x:500, y:500
-			layerB = new Layer x:300, y:300
-			layerC = new Layer x:100, y:100
+			layerA = new Layer x: 500, y: 500
+			layerB = new Layer x: 300, y: 300
+			layerC = new Layer x: 100, y: 100
 
-			Utils.frameSortByAbsoluteDistance({x:0, y:0}, [layerA, layerB, layerC]).should.eql([layerC, layerB, layerA])
+			Utils.frameSortByAbsoluteDistance({x: 0, y: 0}, [layerA, layerB, layerC]).should.eql([layerC, layerB, layerA])
 
 
 	describe "inspect", ->
@@ -274,7 +274,7 @@ describe "Utils", ->
 			Utils.inspect(["a", 1, ["b", "c"]]).should.equal("[\"a\", 1, [\"b\", \"c\"]]")
 
 		it "should work for objects", ->
-			Utils.inspect({a:1, b:[1, 2, 3]}).should.equal("{a:1, b:[1, 2, 3]}")
+			Utils.inspect({a: 1, b: [1, 2, 3]}).should.equal("{a:1, b:[1, 2, 3]}")
 
 		it "should work for functions", ->
 			test = -> return "a"
@@ -286,7 +286,9 @@ describe "Utils", ->
 
 		it "should work for named functions", ->
 			# There are no named function in coffee script
+			# coffeelint: disable=no_backticks
 			`function test(a) { return "a"; }`
+			# coffeelint: enable=no_backticks
 			Utils.inspect(test).should.equal("<Function test(a) { return \"a\"; }>")
 
 		it "should work for long functions", ->
@@ -401,7 +403,7 @@ describe "Utils", ->
 			Utils.isFileUrl("file:///Users/koen/Desktop/index.html").should.equal(true)
 			Utils.isFileUrl("http://apple.com/index.html").should.equal(false)
 			Utils.isFileUrl("https://apple.com/index.html").should.equal(false)
-			
+
 	describe "isDataUrl", ->
 		it "should work", ->
 			dataUrlGif = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"

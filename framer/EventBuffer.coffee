@@ -32,7 +32,7 @@ class exports.EventBuffer extends BaseClass
 
 	@define "offset",
 		get: ->
-			return {x:0, y:0} if events.length < 2
+			return {x: 0, y: 0} if events.length < 2
 			current = events[events.length - 1]
 			first   = events[0]
 			offset =
@@ -42,7 +42,7 @@ class exports.EventBuffer extends BaseClass
 	@define "events",
 		get: ->
 			timeout = Date.now() - @options.velocityTimeout
-			return _.filter @_events, (event) => event.t > timeout
+			return _.filter @_events, (event) -> event.t > timeout
 
 	@define "angle",
 		get: ->
@@ -50,13 +50,13 @@ class exports.EventBuffer extends BaseClass
 			return 0 if events.length < 2
 			p1 = events[0]
 			p2 = events[1]
-			return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+			return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI
 
 	@define "velocity",
 		get: ->
 			events = @events
 
-			return {x:0, y:0} if events.length < 2
+			return {x: 0, y: 0} if events.length < 2
 
 			current = events[events.length - 1]
 			first   = events[0]

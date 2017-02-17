@@ -34,7 +34,7 @@ exports.enable = ->
 
 			# Only do this for bare layers, it messes with the
 			# Scroll and Page Component for now.
-			if @constructor.name == "Layer"
+			if @constructor.name is "Layer"
 				@on "change:scrollVertical", @_updateScrollListeners
 				@_updateScrollListeners()
 
@@ -52,6 +52,7 @@ exports.enable = ->
 				super "Layer"
 			else
 				super
+
 
 	# Override the standard window Layer with this patched one
 	window.Layer = window.Framer.Layer = MobileScrollFixLayer

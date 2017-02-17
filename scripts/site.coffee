@@ -29,7 +29,7 @@ main = ->
 
 	COMMANDS =
 		"upload": -> uploadDir Config.output
-		"build":  -> build()
+		"build": -> build()
 
 	command = process.argv[2]
 
@@ -50,7 +50,7 @@ build = ->
 	indexData = fs.readFileSync "#{Config.input}/index.html", "utf8"
 
 	# Build up a context
-	context = commits:[]
+	context = commits: []
 
 	exec "git log --pretty=format:\"%h\t%an\t%ad\t%s\" --first-parent master", (err, output) ->
 		throw err if err

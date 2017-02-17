@@ -140,6 +140,9 @@ class exports.Layer extends BaseClass
 
 		@_context.emit("layer:create", @)
 
+		# Make sure the layer is always centered
+		@label = @label
+
 		delete @__constructor
 
 	##############################################################
@@ -147,6 +150,12 @@ class exports.Layer extends BaseClass
 
 	# Readonly context property
 	@define "context", get: -> @_context
+
+	@define "label",
+		get: -> @_label
+		set: (value="") ->
+			@_label = value
+			Utils.labelLayer(@, @_label)
 
 	# A placeholder for layer bound properties defined by the user:
 	@define "custom", @simpleProperty("custom", undefined)
@@ -160,7 +169,7 @@ class exports.Layer extends BaseClass
 
 	@define "visible", layerProperty(@, "visible", "display", true, _.isBoolean)
 	@define "opacity", layerProperty(@, "opacity", "opacity", 1, _.isNumber)
-	@define "index", layerProperty(@, "index", "zIndex", 0, _.isNumber, null, {importable:false, exportable:false})
+	@define "index", layerProperty(@, "index", "zIndex", 0, _.isNumber, null, {importable: false, exportable: false})
 	@define "clip", layerProperty(@, "clip", "overflow", false, _.isBoolean)
 
 	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBoolean, null, {}, (layer, value) ->
@@ -435,7 +444,7 @@ class exports.Layer extends BaseClass
 			@frame = Utils.convertFrameFromContext(frame, @, false, false)
 
 	contentFrame: ->
-		return {x:0, y:0, width:0, height:0} unless @children.length
+		return {x: 0, y: 0, width: 0, height: 0} unless @children.length
 		return Utils.frameMerge(_.map(@children, "frame"))
 
 	totalFrame: ->
@@ -522,7 +531,7 @@ class exports.Layer extends BaseClass
 		frame =
 			x: 0
 			y: 0
-			width:  @width  * @screenScaleX()
+			width: @width  * @screenScaleX()
 			height: @height * @screenScaleY()
 
 		layers = @ancestors(context=true)
@@ -610,8 +619,8 @@ class exports.Layer extends BaseClass
 			# then we turn off ignoreEvents so buttons etc will work.
 
 			# if not (
-			# 	@_elementHTML.childNodes.length == 1 and
-			# 	@_elementHTML.childNodes[0].nodeName == "#text")
+			# 	@_elementHTML.childNodes.length is 1 and
+			# 	@_elementHTML.childNodes[0].nodeName is "#text")
 			# 	@ignoreEvents = false
 
 			@emit "change:html"
@@ -671,7 +680,7 @@ class exports.Layer extends BaseClass
 
 			currentValue = @_getPropertyValue "image"
 
-			if currentValue == value
+			if currentValue is value
 				return @emit "load"
 
 			# Unset the background color only if it’s the default color
@@ -740,6 +749,8 @@ class exports.Layer extends BaseClass
 
 			return if layer is @_parent
 
+			throw Error("Layer.parent: a layer cannot be it's own parent.") if layer is @
+
 			# Check the type
 			if not layer instanceof Layer
 				throw Error "Layer.parent needs to be a Layer object"
@@ -751,15 +762,15 @@ class exports.Layer extends BaseClass
 			if @_parent
 				@_parent._children = _.without @_parent._children, @
 				@_parent._element.removeChild @_element
-				@_parent.emit "change:children", {added:[], removed:[@]}
-				@_parent.emit "change:subLayers", {added:[], removed:[@]}
+				@_parent.emit "change:children", {added: [], removed: [@]}
+				@_parent.emit "change:subLayers", {added: [], removed: [@]}
 
 			# Either insert the element to the new parent element or into dom
 			if layer
 				layer._element.appendChild @_element
 				layer._children.push @
-				layer.emit "change:children", {added:[@], removed:[]}
-				layer.emit "change:subLayers", {added:[@], removed:[]}
+				layer.emit "change:children", {added: [@], removed: []}
+				layer.emit "change:subLayers", {added: [@], removed: []}
 			else
 				@_insertElement()
 
@@ -817,10 +828,10 @@ class exports.Layer extends BaseClass
 		layer.parent = null
 
 	childrenWithName: (name) ->
-		_.filter @children, (layer) -> layer.name == name
+		_.filter @children, (layer) -> layer.name is name
 
 	siblingsWithName: (name) ->
-		_.filter @siblingLayers, (layer) -> layer.name == name
+		_.filter @siblingLayers, (layer) -> layer.name is name
 
 	ancestors: (context=false) ->
 
@@ -905,6 +916,8 @@ class exports.Layer extends BaseClass
 			options = options.options if options.options?
 
 			return @states.machine.switchTo(stateName, options)
+		# We need to clone the properties so we don't modify them unexpectedly
+		properties = _.clone(properties)
 
 		# Support the old properties syntax, we add all properties top level and
 		# move the options into an options property.
@@ -920,7 +933,7 @@ class exports.Layer extends BaseClass
 			delete properties.options
 
 		# Merge the animation options with the default animation options for this layer
-		options = _.defaults(options, @animationOptions)
+		options = _.defaults({}, options, @animationOptions)
 		options.start ?= true
 
 		animation = new Animation(@, properties, options)
@@ -938,9 +951,9 @@ class exports.Layer extends BaseClass
 		unless stateName?
 			throw new Error("Missing required argument 'stateName' in stateSwitch()")
 		return @animate(stateName, options) if options.animate is true
-		return @animate(stateName, _.defaults({}, options, {instant:true}))
+		return @animate(stateName, _.defaults({}, options, {instant: true}))
 
-	animations: (includePending=false)->
+	animations: (includePending=false) ->
 		# Current running animations on this layer
 		_.filter @_context.animations, (animation) =>
 			return false unless (animation.layer is @)
@@ -1074,19 +1087,19 @@ class exports.Layer extends BaseClass
 				Events.Click, Events.Tap, Events.TapStart, Events.TapEnd,
 				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
 
-				parentDraggableLayer = @_parentDraggableLayer()
+					parentDraggableLayer = @_parentDraggableLayer()
 
-				if parentDraggableLayer
+					if parentDraggableLayer
 
-					# If we had a reasonable scrolling offset we cancel the click
-					offset = parentDraggableLayer.draggable.offset
-					return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
-					return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
+						# If we had a reasonable scrolling offset we cancel the click
+						offset = parentDraggableLayer.draggable.offset
+						return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
+						return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
 
-					# If there is still some velocity (scroll is moving) we cancel the click
-					velocity = parentDraggableLayer.draggable.velocity
-					return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
-					return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
+						# If there is still some velocity (scroll is moving) we cancel the click
+						velocity = parentDraggableLayer.draggable.velocity
+						return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
+						return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
 
 		# Always scope the event this to the layer and pass the layer as
 		# last argument for every event.
@@ -1160,9 +1173,9 @@ class exports.Layer extends BaseClass
 	onAnimationStart: (cb) -> @on(Events.AnimationStart, cb)
 	onAnimationStop: (cb) -> @on(Events.AnimationStop, cb)
 	onAnimationEnd: (cb) -> @on(Events.AnimationEnd, cb)
-	onAnimationDidStart: (cb) -> @on(Events.AnimationDidStart, cb)
-	onAnimationDidStop: (cb) -> @on(Events.AnimationDidStop, cb)
-	onAnimationDidEnd: (cb) -> @on(Events.AnimationDidEnd, cb)
+	onAnimationDidStart: (cb) -> @on(Events.AnimationDidStart, cb) # Deprecated
+	onAnimationDidStop: (cb) -> @on(Events.AnimationDidStop, cb) # Deprecated
+	onAnimationDidEnd: (cb) -> @on(Events.AnimationDidEnd, cb) # Deprecated
 
 	onImageLoaded: (cb) -> @on(Events.ImageLoaded, cb)
 	onImageLoadError: (cb) -> @on(Events.ImageLoadError, cb)
@@ -1189,66 +1202,66 @@ class exports.Layer extends BaseClass
 	# Gestures
 
 	# Tap
-	onTap:(cb) -> @on(Events.Tap, cb)
-	onTapStart:(cb) -> @on(Events.TapStart, cb)
-	onTapEnd:(cb) -> @on(Events.TapEnd, cb)
-	onDoubleTap:(cb) -> @on(Events.DoubleTap, cb)
+	onTap: (cb) -> @on(Events.Tap, cb)
+	onTapStart: (cb) -> @on(Events.TapStart, cb)
+	onTapEnd: (cb) -> @on(Events.TapEnd, cb)
+	onDoubleTap: (cb) -> @on(Events.DoubleTap, cb)
 
 	# Force Tap
-	onForceTap:(cb) -> @on(Events.ForceTap, cb)
-	onForceTapChange:(cb) -> @on(Events.ForceTapChange, cb)
-	onForceTapStart:(cb) -> @on(Events.ForceTapStart, cb)
-	onForceTapEnd:(cb) -> @on(Events.ForceTapEnd, cb)
+	onForceTap: (cb) -> @on(Events.ForceTap, cb)
+	onForceTapChange: (cb) -> @on(Events.ForceTapChange, cb)
+	onForceTapStart: (cb) -> @on(Events.ForceTapStart, cb)
+	onForceTapEnd: (cb) -> @on(Events.ForceTapEnd, cb)
 
 	# Press
-	onLongPress:(cb) -> @on(Events.LongPress, cb)
-	onLongPressStart:(cb) -> @on(Events.LongPressStart, cb)
-	onLongPressEnd:(cb) -> @on(Events.LongPressEnd, cb)
+	onLongPress: (cb) -> @on(Events.LongPress, cb)
+	onLongPressStart: (cb) -> @on(Events.LongPressStart, cb)
+	onLongPressEnd: (cb) -> @on(Events.LongPressEnd, cb)
 
 	# Swipe
-	onSwipe:(cb) -> @on(Events.Swipe, cb)
-	onSwipeStart:(cb) -> @on(Events.SwipeStart, cb)
-	onSwipeEnd:(cb) -> @on(Events.SwipeEnd, cb)
+	onSwipe: (cb) -> @on(Events.Swipe, cb)
+	onSwipeStart: (cb) -> @on(Events.SwipeStart, cb)
+	onSwipeEnd: (cb) -> @on(Events.SwipeEnd, cb)
 
-	onSwipeUp:(cb) -> @on(Events.SwipeUp, cb)
-	onSwipeUpStart:(cb) -> @on(Events.SwipeUpStart, cb)
-	onSwipeUpEnd:(cb) -> @on(Events.SwipeUpEnd, cb)
+	onSwipeUp: (cb) -> @on(Events.SwipeUp, cb)
+	onSwipeUpStart: (cb) -> @on(Events.SwipeUpStart, cb)
+	onSwipeUpEnd: (cb) -> @on(Events.SwipeUpEnd, cb)
 
-	onSwipeDown:(cb) -> @on(Events.SwipeDown, cb)
-	onSwipeDownStart:(cb) -> @on(Events.SwipeDownStart, cb)
-	onSwipeDownEnd:(cb) -> @on(Events.SwipeDownEnd, cb)
+	onSwipeDown: (cb) -> @on(Events.SwipeDown, cb)
+	onSwipeDownStart: (cb) -> @on(Events.SwipeDownStart, cb)
+	onSwipeDownEnd: (cb) -> @on(Events.SwipeDownEnd, cb)
 
-	onSwipeLeft:(cb) -> @on(Events.SwipeLeft, cb)
-	onSwipeLeftStart:(cb) -> @on(Events.SwipeLeftStart, cb)
-	onSwipeLeftEnd:(cb) -> @on(Events.SwipeLeftEnd, cb)
+	onSwipeLeft: (cb) -> @on(Events.SwipeLeft, cb)
+	onSwipeLeftStart: (cb) -> @on(Events.SwipeLeftStart, cb)
+	onSwipeLeftEnd: (cb) -> @on(Events.SwipeLeftEnd, cb)
 
-	onSwipeRight:(cb) -> @on(Events.SwipeRight, cb)
-	onSwipeRightStart:(cb) -> @on(Events.SwipeRightStart, cb)
-	onSwipeRightEnd:(cb) -> @on(Events.SwipeRightEnd, cb)
+	onSwipeRight: (cb) -> @on(Events.SwipeRight, cb)
+	onSwipeRightStart: (cb) -> @on(Events.SwipeRightStart, cb)
+	onSwipeRightEnd: (cb) -> @on(Events.SwipeRightEnd, cb)
 
 	# Pan
-	onPan:(cb) -> @on(Events.Pan, cb)
-	onPanStart:(cb) -> @on(Events.PanStart, cb)
-	onPanEnd:(cb) -> @on(Events.PanEnd, cb)
-	onPanLeft:(cb) -> @on(Events.PanLeft, cb)
-	onPanRight:(cb) -> @on(Events.PanRight, cb)
-	onPanUp:(cb) -> @on(Events.PanUp, cb)
-	onPanDown:(cb) -> @on(Events.PanDown, cb)
+	onPan: (cb) -> @on(Events.Pan, cb)
+	onPanStart: (cb) -> @on(Events.PanStart, cb)
+	onPanEnd: (cb) -> @on(Events.PanEnd, cb)
+	onPanLeft: (cb) -> @on(Events.PanLeft, cb)
+	onPanRight: (cb) -> @on(Events.PanRight, cb)
+	onPanUp: (cb) -> @on(Events.PanUp, cb)
+	onPanDown: (cb) -> @on(Events.PanDown, cb)
 
 	# Pinch
-	onPinch:(cb) -> @on(Events.Pinch, cb)
-	onPinchStart:(cb) -> @on(Events.PinchStart, cb)
-	onPinchEnd:(cb) -> @on(Events.PinchEnd, cb)
+	onPinch: (cb) -> @on(Events.Pinch, cb)
+	onPinchStart: (cb) -> @on(Events.PinchStart, cb)
+	onPinchEnd: (cb) -> @on(Events.PinchEnd, cb)
 
 	# Scale
-	onScale:(cb) -> @on(Events.Scale, cb)
-	onScaleStart:(cb) -> @on(Events.ScaleStart, cb)
-	onScaleEnd:(cb) -> @on(Events.ScaleEnd, cb)
+	onScale: (cb) -> @on(Events.Scale, cb)
+	onScaleStart: (cb) -> @on(Events.ScaleStart, cb)
+	onScaleEnd: (cb) -> @on(Events.ScaleEnd, cb)
 
 	# Rotate
-	onRotate:(cb) -> @on(Events.Rotate, cb)
-	onRotateStart:(cb) -> @on(Events.RotateStart, cb)
-	onRotateEnd:(cb) -> @on(Events.RotateEnd, cb)
+	onRotate: (cb) -> @on(Events.Rotate, cb)
+	onRotateStart: (cb) -> @on(Events.RotateStart, cb)
+	onRotateEnd: (cb) -> @on(Events.RotateEnd, cb)
 
 
 	##############################################################
@@ -1271,7 +1284,7 @@ class exports.Layer extends BaseClass
 
 		for parent in @ancestors(context=true)
 			if parent.clip
-				 frame = Utils.frameIntersection(frame, parent.canvasFrame)
+				frame = Utils.frameIntersection(frame, parent.canvasFrame)
 			if not frame
 				return
 
@@ -1350,6 +1363,14 @@ class exports.Layer extends BaseClass
 			borderRadius: @borderRadius * Utils.average([@canvasScaleX(), @canvasScaleY()])
 			borderWidth: 3
 
+		# Only show outlines for draggables
+		if @_draggable
+			layer.backgroundColor = null
+
+		# Only show outlines if a highlight is fullscreen
+		if Utils.frameInFrame(@context.canvasFrame, highlightFrame)
+			layer.backgroundColor = null
+
 		animation = layer.animate
 			properties: {opacity: 0}
 			curve: "ease-out"
@@ -1361,10 +1382,13 @@ class exports.Layer extends BaseClass
 	##############################################################
 	## DESCRIPTOR
 
+	toName: ->
+		return name if @name
+		return @__framerInstanceInfo?.name or ""
+
 	toInspect: (constructor) ->
 		constructor ?= @constructor.name
 		name = if @name then "name:#{@name} " else ""
-		variablename = @__framerInstanceInfo?.name or ""
-		return "<#{constructor} #{variablename} id:#{@id} #{name}
+		return "<#{constructor} #{@toName()} id:#{@id} #{name}
 			(#{Utils.roundWhole(@x)}, #{Utils.roundWhole(@y)})
 			#{Utils.roundWhole(@width)}x#{Utils.roundWhole(@height)}>"

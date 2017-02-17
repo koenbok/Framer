@@ -12,8 +12,8 @@ describe "LayerStates", ->
 
 		beforeEach ->
 			@layer = new Layer()
-			@layer.states.a = {x:100, y:100}
-			@layer.states.b = {x:200, y:200}
+			@layer.states.a = {x: 100, y: 100}
+			@layer.states.b = {x: 200, y: 200}
 
 		it "should emit StateSwitchStart when switching", (done) ->
 
@@ -87,7 +87,7 @@ describe "LayerStates", ->
 			layer.states.test = {x: 123}
 			animation = layer.animate "test"
 
-			animation.options.curve.should.equal Framer.Defaults.Animation.curve
+			animation.options.curve.should.equal Framer.Curves.fromString(Framer.Defaults.Animation.curve)
 
 			Framer.Defaults.Animation =
 				curve: "spring(1, 2, 3)"
@@ -96,7 +96,10 @@ describe "LayerStates", ->
 			layer.states.test = {x: 456}
 			animation = layer.animate "test"
 
-			animation.options.curve.should.equal "spring(1, 2, 3)"
+			animator = animation.options.curve()
+			animator.options.tension.should.equal 1
+			animator.options.friction.should.equal 2
+			animator.options.velocity.should.equal 3
 
 			Framer.resetDefaults()
 
@@ -146,9 +149,9 @@ describe "LayerStates", ->
 			layer = new Layer
 			layer.states =
 				stateA:
-					x:123
+					x: 123
 				stateB:
-					y:123
+					y: 123
 					options:
 						instant: true
 
@@ -169,7 +172,7 @@ describe "LayerStates", ->
 
 		it "should switch non animatable properties", ->
 			layer = new Layer
-			layer.states.stateA = {x: 100, image:"static/test2.png"}
+			layer.states.stateA = {x: 100, image: "static/test2.png"}
 			layer.animate "stateA", instant: true
 			layer.x.should.equal 100
 			layer.image.should.equal "static/test2.png"
@@ -234,8 +237,8 @@ describe "LayerStates", ->
 
 			layer = new Layer
 			layer.states =
-				stateA: {x:100, rotation: 90, options: time: 0.05}
-				stateB: {x:200, rotation: 180, options: time: 0.05}
+				stateA: {x: 100, rotation: 90, options: time: 0.05}
+				stateB: {x: 200, rotation: 180, options: time: 0.05}
 
 			layer.x.should.equal 0
 
@@ -269,7 +272,7 @@ describe "LayerStates", ->
 
 			count = 0
 			ready = (animation, layer) ->
-				if count == 4
+				if count is 4
 					done()
 					return
 				count++
@@ -324,7 +327,7 @@ describe "LayerStates", ->
 
 			layer = new Layer
 			layer.states =
-				stateA: {scroll:true, backgroundColor:"red"}
+				stateA: {scroll: true, backgroundColor: "red"}
 
 			layer.scroll.should.equal false
 
@@ -339,7 +342,7 @@ describe "LayerStates", ->
 
 			layer = new Layer
 			layer.states =
-				stateA: {x:200, backgroundColor:"red"}
+				stateA: {x: 200, backgroundColor: "red"}
 
 			# layer.scroll.should.equal false
 			layer.x.should.equal 0
@@ -350,13 +353,13 @@ describe "LayerStates", ->
 				layer.style.backgroundColor.should.equal new Color("red").toString()
 				done()
 
-			layer.animate "stateA", {curve:"linear", time:0.1}
+			layer.animate "stateA", {curve: "linear", time: 0.1}
 
 		it "should restore the initial state when using non exportable properties", ->
 
 			layer = new Layer
 			layer.states =
-				stateA: {midX:200}
+				stateA: {midX: 200}
 
 			layer.x.should.equal 0
 
@@ -441,8 +444,8 @@ describe "LayerStates", ->
 				stateA: x: 300
 				stateB: y: 300
 			animation = layer.stateCycle ["stateA", "stateB"],
-				curve: "linear"
-			animation.options.curve.should.equal "linear"
+				curve: Bezier.linear
+			animation.options.curve.should.equal Bezier.linear
 
 		it "should correctly switch to next state without using an array stateCycle", ->
 			layer = new Layer
@@ -460,8 +463,8 @@ describe "LayerStates", ->
 			layer = new Layer
 			layer.states.test = x: 300
 			animation = layer.stateCycle
-				curve: "linear"
-			animation.options.curve.should.equal "linear"
+				curve: "ease-in-out"
+			animation.options.curve.should.equal Bezier.easeInOut
 
 		# it "should throw an error when you try to override a special state", ->
 		# 	layer = new Layer
@@ -509,6 +512,20 @@ describe "LayerStates", ->
 						layer.x.should.equal 200
 						layer.states.current.name.should.equal "test"
 						done()
+
+		it "should not touch the options object", (done) ->
+			layer = new Layer
+			layer.states.test = {x: 200}
+			options = {time: 0.1}
+			layer.stateCycle(options)
+			layer.once Events.StateDidSwitch, ->
+				layer.x.should.equal 200
+				layer.states.current.name.should.equal "test"
+				layer.stateCycle(options)
+				layer.once Events.StateDidSwitch, ->
+					layer.x.should.equal 0
+					layer.states.current.name.should.equal "default"
+					done()
 
 		it "should cycle three with options", (done) ->
 			layer = new Layer
@@ -601,7 +618,7 @@ describe "LayerStates", ->
 		it "should listen to animationOptions defined in a state", (done) ->
 			layer = new Layer
 			layer.animationOptions.time = 0.1
-			layer.states.testA = {x: 200, animationOptions: curve: "spring"}
+			layer.states.testA = {x: 200, animationOptions: curve: Bezier.easeOut}
 			cycle = layer.stateCycle onEnd: ->
 				layer.states.current.name.should.equal "testA"
 				cycle2 = layer.stateCycle onEnd: ->
@@ -609,11 +626,11 @@ describe "LayerStates", ->
 					cycle3 = layer.stateCycle onEnd: ->
 						layer.states.current.name.should.equal "testA"
 						done()
-					cycle3.options.curve.should.equal "spring"
+					cycle3.options.curve.should.equal Bezier.easeOut
 					layer.animationOptions.should.eql {time: 0.1}
-				cycle2.options.curve.should.equal "ease"
+				cycle2.options.curve.should.equal Bezier.ease
 				layer.animationOptions.should.eql {time: 0.1}
-			cycle.options.curve.should.equal "spring"
+			cycle.options.curve.should.equal Bezier.easeOut
 			layer.animationOptions.should.eql {time: 0.1}
 
 	describe "Switch", ->

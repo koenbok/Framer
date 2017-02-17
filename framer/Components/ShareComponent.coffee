@@ -102,7 +102,7 @@ class ShareComponent
 			id: projectId
 
 		# See if a state is set
-		@state = localStorage.getItem("framerShareSheetState-#{@options.id}")
+		@state = localStorage?.getItem("framerShareSheetState-#{@options.id}")
 		@options.fixed = if not @state then false else true
 
 		@_checkData()
@@ -260,7 +260,7 @@ class ShareComponent
 			style:
 				textAlign: "center"
 				color: "#00AAFF"
-				padding: 0;
+				padding: 0
 
 	# Render info section
 	_renderInfo: ->
@@ -571,7 +571,7 @@ class ShareComponent
 			@sheet.height = @sheet.maxHeight
 
 			if @options.truncatedDescription
- 				@description.height = @descriptionTruncatedSize.height
+				@description.height = @descriptionTruncatedSize.height
 			else
 				@description.height = @descriptionSize.height
 
@@ -593,7 +593,7 @@ class ShareComponent
 		@close.onClick =>
 			@_closeSheet()
 			@options.fixed = true
-			localStorage.setItem("framerShareSheetState-#{@options.id}", "closed")
+			localStorage?.setItem("framerShareSheetState-#{@options.id}", "closed")
 
 		# Disable events propagating up to block unintented interactions
 		@sheet.onTouchStart (event) -> event.stopPropagation()
@@ -604,7 +604,7 @@ class ShareComponent
 			event.stopPropagation()
 			@_openSheet()
 			@options.fixed = true
-			localStorage.setItem("framerShareSheetState-#{@options.id}", "open")
+			localStorage?.setItem("framerShareSheetState-#{@options.id}", "open")
 
 		# When the window resizes evaluate if the sheet needs to be hidden
 		Canvas.onResize =>

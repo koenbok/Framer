@@ -16,6 +16,7 @@ Framer.Events = (require "./Events").Events
 Framer.Gestures = (require "./Gestures").Gestures
 Framer.Animation = (require "./Animation").Animation
 Framer.AnimationGroup = (require "./AnimationGroup").AnimationGroup
+Framer.AnimationStateGroup = (require "./AnimationGroup").AnimationStateGroup
 Framer.Screen = (require "./Screen").Screen
 Framer.Align = (require "./Align").Align
 Framer.print = (require "./Print").print
@@ -26,7 +27,7 @@ Framer.PageComponent = (require "./Components/PageComponent").PageComponent
 Framer.SliderComponent = (require "./Components/SliderComponent").SliderComponent
 Framer.DeviceComponent = (require "./Components/DeviceComponent").DeviceComponent
 Framer.GridComponent = (require "./Components/GridComponent").GridComponent
-Framer.NavComponent = (require "./Components/NavComponent").NavComponent
+Framer.FlowComponent = (require "./Components/FlowComponent").FlowComponent
 Framer.CircularProgressComponent = (require "./Components/CircularProgressComponent").CircularProgressComponent
 Framer.MIDIComponent = (require "./Components/MIDIComponent").MIDIComponent
 Framer.DeviceView = Framer.DeviceComponent # Compat
@@ -45,6 +46,10 @@ Framer.BezierCurveAnimator = (require "./Animators/BezierCurveAnimator").BezierC
 Framer.SpringDHOAnimator = (require "./Animators/SpringDHOAnimator").SpringDHOAnimator
 Framer.SpringRK4Animator = (require "./Animators/SpringRK4Animator").SpringRK4Animator
 Framer.LayerDraggable = (require "./LayerDraggable").LayerDraggable
+
+Framer.Curves = require "./Animators/Curves"
+window.Bezier = Framer.Curves.Bezier
+window.Spring = Framer.Curves.Spring
 
 Framer.Importer = (require "./Importer").Importer
 Framer.Extras = require "./Extras/Extras"
@@ -65,7 +70,7 @@ Framer.resetDefaults = Defaults.reset
 
 # Create the default context, set it to invisble by default so
 # the preloader can pick it up if it needs to.
-Framer.DefaultContext = new Framer.Context(name:"Default")
+Framer.DefaultContext = new Framer.Context(name: "Default")
 Framer.DefaultContext.backgroundColor = "white"
 Framer.DefaultContext.visible = false
 Framer.CurrentContext = Framer.DefaultContext

@@ -4,7 +4,7 @@ class Hints
 
 	constructor: ->
 
-		@_context = new Framer.Context(name:"Hints")
+		@_context = new Framer.Context(name: "Hints")
 		@_context.index = 10000
 
 		@_context.run =>
@@ -45,7 +45,7 @@ class Hints
 
 	showHints: ->
 		context = Framer.CurrentContext
-		@_context.run => _.invokeMap(context.rootLayers, "_showHint")
+		@_context.run -> _.invokeMap(context.rootLayers, "_showHint")
 
 	destroy: ->
 		@_context.destroy()

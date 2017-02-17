@@ -1,7 +1,7 @@
 Utils = require "../Utils"
 {BaseClass} = require "../BaseClass"
 
-createTouch = (event, identifier, offset={x:0, y:0}) ->
+createTouch = (event, identifier, offset={x: 0, y: 0}) ->
 	return touch =
 		identifier: identifier
 		target: event.target
@@ -42,12 +42,12 @@ class TouchEmulator extends BaseClass
 		@touchPointerImage = "url('framer/images/cursor@2x.png')"
 		@touchPointerImageActive = "url('framer/images/cursor-active@2x.png')"
 		@touchPointerImageSize = 64
-		@touchPointerInitialOffset = {x:0, y:0}
+		@touchPointerInitialOffset = {x: 0, y: 0}
 
 		@keyPinchCode = 18 # Alt
 		@keyPanCode = 91 # Command
 
-		@context = new Framer.Context(name:"TouchEmulator")
+		@context = new Framer.Context(name: "TouchEmulator")
 		@context._element.style.zIndex = 10000
 		@wrap = @context.domEventManager.wrap
 
@@ -232,3 +232,10 @@ exports.disable = ->
 	touchEmulator.destroy()
 	touchEmulator = null
 	Events.enableEmulatedTouchEvents(false)
+
+# resets the emulator, useful if the webview can loose/regain focus without being aware
+# in such scenarios it can miss mouseup, mouseout events and such
+# it can also be fixed by checking event.buttons in mousemove, but that is not available on safari
+exports.reset = ->
+	return unless touchEmulator
+	touchEmulator.endMultiTouch()

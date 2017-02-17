@@ -27,7 +27,7 @@ class MIDIInput extends BaseClass
 
 	# Failure handlers
 
-	_requestRejected: (error) =>
+	_requestRejected: (error) ->
 		throw Error "Requesting MIDI access failed: #{error ? "not supported by browser"}"
 
 	# Event handlers

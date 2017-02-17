@@ -36,6 +36,7 @@ Events.Click = Events.TouchEnd
 
 # Animation events
 Events.AnimationStart = "start"
+Events.AnimationHalt = "halt"
 Events.AnimationStop = "stop"
 Events.AnimationEnd = "end"
 

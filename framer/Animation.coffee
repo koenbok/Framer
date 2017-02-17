@@ -5,8 +5,9 @@ Utils = require "./Utils"
 {Config} = require "./Config"
 {Defaults} = require "./Defaults"
 {BaseClass} = require "./BaseClass"
-{Animator} = require "./Animator"
+{Animator} = require "./Animators/Animator"
 {LinearAnimator} = require "./Animators/LinearAnimator"
+Curves = require "./Animators/Curves"
 
 numberRE = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/
 relativePropertyRE = new RegExp("^(?:([+-])=|)(" + numberRE.source + ")([a-z%]*)$", "i")
@@ -38,7 +39,14 @@ class exports.Animation extends BaseClass
 		if arguments.length is 3
 			layer = args[0]
 			properties = args[1]
-			options = args[2]
+
+			options = {}
+
+			if properties.options?
+				options = _.clone(properties.options)
+
+			if args[2]
+				options = _.extend({}, options, args[2])
 
 		# Mix of current and old api
 		if arguments.length is 2
@@ -76,7 +84,10 @@ class exports.Animation extends BaseClass
 		if properties.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
 
-		@options.curveOptions = Animator.curveOptionsFor(@options)
+		if _.isString @options.curve
+			@options.curve = Curves.fromString(@options.curve)
+		if @options.curve is Curves.Spring or @options.curve is Curves.Bezier
+			@options.curve = @options.curve.call()
 		@_originalState = @_currentState()
 		@_repeatCounter = @options.repeat
 
@@ -92,14 +103,13 @@ class exports.Animation extends BaseClass
 		get: -> @options.looping
 		set: (value) ->
 			@options?.looping = value
-			if @options?.looping and @layer? and !@isAnimating
+			if @options?.looping and @layer? and not @isAnimating
 				@restart()
 
 	@define "isNoop", @simpleProperty("isNoop", false)
 
 	start: =>
-
-		@_animator = Animation._createAnimator(@options) ? new LinearAnimator(@options.curveOptions)
+		@_animator = @options.curve(@options)
 		@_target = @layer
 		@_stateA = @_currentState()
 		@_stateB = {}
@@ -140,13 +150,13 @@ class exports.Animation extends BaseClass
 				@_stateA.hasOwnProperty("minX") or
 				@_stateA.hasOwnProperty("midX") or
 				@_stateA.hasOwnProperty("maxX"))
-				animation.stop()
+					animation.stop()
 
 			if property is "y" and (
 				@_stateA.hasOwnProperty("minY") or
 				@_stateA.hasOwnProperty("midY") or
 				@_stateA.hasOwnProperty("maxY"))
-				animation.stop()
+					animation.stop()
 
 		if @options.debug
 			console.log "Animation.start"
@@ -154,6 +164,7 @@ class exports.Animation extends BaseClass
 
 		# Add the callbacks
 		@on(Events.AnimationStart, @options.onStart) if _.isFunction(@options.onStart)
+		@on(Events.AnimationHalt, @options.onHalt) if _.isFunction(@options.onHalt)
 		@on(Events.AnimationStop, @options.onStop) if _.isFunction(@options.onStop)
 		@on(Events.AnimationEnd, @options.onEnd) if _.isFunction(@options.onEnd)
 
@@ -161,7 +172,7 @@ class exports.Animation extends BaseClass
 		# Todo: more repeat behaviours:
 		# 1) add (from end position) 2) reverse (loop between a and b)
 		@once "end", =>
-			if @_repeatCounter > 0 || @looping
+			if @_repeatCounter > 0 or @looping
 				@restart()
 				if not @looping
 					@_repeatCounter--
@@ -192,7 +203,7 @@ class exports.Animation extends BaseClass
 			@_delayTimer = null
 
 		@layer.context.removeAnimation(@)
-
+		@emit(Events.AnimationHalt) if emit
 		@emit(Events.AnimationStop) if emit
 		Framer.Loop.off("update", @_update)
 
@@ -283,15 +294,6 @@ class exports.Animation extends BaseClass
 	_currentState: ->
 		return _.pick(@layer, _.keys(@properties))
 
-	@_createAnimator: (options) ->
-		AnimatorClass = Animator.classForCurve(options.curve)
-		return null if not AnimatorClass?
-		curveOptions = options.curveOptions ? Animator.curveOptionsFor(options)
-		if options.debug
-			console.log "Animation.start #{AnimatorClass.name}", curveOptions
-
-		return new AnimatorClass curveOptions
-
 	@isAnimatable = (v) ->
 		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v)
 
@@ -301,22 +303,33 @@ class exports.Animation extends BaseClass
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			if @isAnimatable(v)
+			if k in ["frame", "size", "point"] # Derived properties
+				switch k
+					when "frame" then derivedKeys = ["x", "y", "width", "height"]
+					when "size" then derivedKeys = ["width", "height"]
+					when "point" then derivedKeys = ["x", "y"]
+					else derivedKeys = []
+				if _.isObject(v)
+					_.defaults(animatableProperties, _.pick(v, derivedKeys))
+				else if _.isNumber(v)
+					for derivedKey in derivedKeys
+						animatableProperties[derivedKey] = v
+			else if @isAnimatable(v)
 				animatableProperties[k] = v
 			else if Color.isValidColorProperty(k, v)
 				animatableProperties[k] = new Color(v)
 
-
 		return animatableProperties
 
 	toInspect: ->
-		return "<#{@constructor.name} id:#{@id} isAnimating:#{@isAnimating} [#{_.keys(@properties)}]>"
+		return "<#{@constructor.name} id:#{@id} layer:#{@layer?.toName()} [#{_.keys(@properties).join(", ")}] isAnimating:#{@isAnimating}>"
 
 
 	##############################################################
 	## EVENT HELPERS
 
 	onAnimationStart: (cb) -> @on(Events.AnimationStart, cb)
+	onAnimationHalt: (cb) -> @on(Events.AnimationHalt, cb)
 	onAnimationStop: (cb) -> @on(Events.AnimationStop, cb)
 	onAnimationEnd: (cb) -> @on(Events.AnimationEnd, cb)
 	onAnimationDidStart: (cb) -> @on(Events.AnimationDidStart, cb)

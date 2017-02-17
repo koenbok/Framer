@@ -13,7 +13,7 @@ center = (layer, property, offset=0) ->
 
 	return x if property is "x"
 	return y if property is "y"
-	return {x:x, y:y} if property is "point"
+	return {x: x, y: y} if property is "point"
 	return 0
 
 left = (layer, property, offset=0) ->

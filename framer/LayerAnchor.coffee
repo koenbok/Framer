@@ -6,7 +6,7 @@ top, right, bottom, left, centerX, centerY, center
 
 calculateFrame = (layer, rules) ->
 
-	val = (rule) =>
+	val = (rule) ->
 		value = rules[rule]
 		value = value() if _.isFunction(value)
 		return value
@@ -44,7 +44,6 @@ calculateFrame = (layer, rules) ->
 		frame.y = (parentSize.height / 2) - (frame.height / 2) + val("centerY")
 
 	return frame
-
 
 
 class LayerAnchor extends EventEmitter
@@ -87,7 +86,8 @@ class LayerAnchor extends EventEmitter
 	_setNeedsUpdate: =>
 		@layer.frame = calculateFrame(@layer, @rules)
 
-	_parseRules: =>
+	_parseRules: ->
 		return Utils.parseRect(Utils.arrayFromArguments(arguments))
+
 
 exports.LayerAnchor = LayerAnchor

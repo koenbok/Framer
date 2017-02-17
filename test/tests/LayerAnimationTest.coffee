@@ -10,12 +10,12 @@ describe "LayerAnimation", ->
 		it "should use defaults", ->
 
 			Framer.Defaults.Animation =
-				curve: "spring(1, 2, 3)"
+				curve: "ease-in"
 
 			animation = new Animation new Layer(),
-				x:50
+				x: 50
 
-			animation.options.curve.should.equal "spring(1, 2, 3)"
+			animation.options.curve.should.equal Bezier.easeIn
 
 			Framer.resetDefaults()
 
@@ -24,9 +24,9 @@ describe "LayerAnimation", ->
 			# We shouldn't change the linear default, people rely on it
 
 			animation = new Animation new Layer(),
-				x:50
+				x: 50
 
-			animation.options.curve.should.equal "ease"
+			animation.options.curve.should.equal Bezier.ease
 			animation.options.time.should.equal 1
 
 	describe "Properties", ->
@@ -56,11 +56,11 @@ describe "LayerAnimation", ->
 				properties = {}
 				properties[p] = 100
 				options =
-					curve: "linear"
+					curve: Bezier.easeInOut
 					time: AnimationTime
 
 				animation = layer.animate properties, options
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.easeInOut
 				layer.on "end", ->
 					layer[p].should.equal 100
 					done()
@@ -71,11 +71,11 @@ describe "LayerAnimation", ->
 				properties = {}
 				properties[p] = 100
 				properties.options =
-					curve: "linear"
+					curve: Bezier.linear
 					time: AnimationTime
 
 				animation = layer.animate properties
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 
 				layer.on "end", ->
 					layer[p].should.equal 100
@@ -252,6 +252,44 @@ describe "LayerAnimation", ->
 					delay: 1
 			animation.finish.should.not.throw()
 
+		it "should work with derived properties like size", (done) ->
+			layer = new Layer
+			animation = layer.animate
+				x: 300
+				size:
+					width: 400
+					height: 500
+
+			animation.onAnimationEnd ->
+				layer.x.should.equal 300
+				layer.width.should.equal 400
+				layer.height.should.equal 500
+				done()
+
+		it "should work with using objects that have more properties", (done) ->
+			layer = new Layer
+			animation = layer.animate
+				x: 300
+				size: Screen
+
+			animation.onAnimationEnd ->
+				layer.x.should.equal 300
+				layer.width.should.equal Screen.width
+				layer.height.should.equal Screen.height
+				done()
+
+		it "should work with a single number for derived properties", (done) ->
+			layer = new Layer
+			animation = layer.animate
+				x: 300
+				size: 400
+
+			animation.onAnimationEnd ->
+				layer.x.should.equal 300
+				layer.width.should.equal 400
+				layer.height.should.equal 400
+				done()
+
 	describe "Context", ->
 
 		it "should list running animations", ->
@@ -352,7 +390,7 @@ describe "LayerAnimation", ->
 			layer = new Layer()
 
 			animation = new Animation layer,
-				x:50
+				x: 50
 				options:
 					curve: "linear"
 					time: AnimationTime
@@ -373,13 +411,13 @@ describe "LayerAnimation", ->
 			layer = new Layer()
 
 			animation = new Animation layer,
-				x:50
+				x: 50
 				options:
 					curve: "linear"
 					time: AnimationTime
 
 			count = 0
-			test = -> count++; done() if count == 2
+			test = -> count++; done() if count is 2
 
 			animation.on "end", test
 			layer.on "end", test
@@ -392,13 +430,13 @@ describe "LayerAnimation", ->
 			layer = new Layer()
 
 			animation = new Animation layer,
-				x:50
+				x: 50
 				options:
 					curve: "linear"
 					time: AnimationTime * 2
 
 			count = 0
-			test = -> count++; done() if count == 2
+			test = -> count++; done() if count is 2
 
 			animation.on "stop", test
 			layer.on "stop", test
@@ -415,7 +453,7 @@ describe "LayerAnimation", ->
 			layer = new Layer()
 
 			animation = new Animation layer,
-				x:50
+				x: 50
 				options:
 					curve: "linear"
 					time: AnimationTime
@@ -432,7 +470,7 @@ describe "LayerAnimation", ->
 		it "should stop when stopped before delay ends", (done) ->
 			layer = new Layer()
 			animation = new Animation layer,
-				properties: {x:50}
+				properties: {x: 50}
 				curve: "linear"
 				time: 0.5
 				delay: 0.3
@@ -499,24 +537,24 @@ describe "LayerAnimation", ->
 
 		it "should only stop when all animations are done", (done) ->
 
-			layerA = new Layer width:80, height:80
+			layerA = new Layer width: 80, height: 80
 			layerA.name = "layerA"
 			layerA.animate
-				y:300
+				y: 300
 				options:
 					time: 2 * AnimationTime
 
-			layerB = new Layer width:80, height:80, x:100, backgroundColor:"red"
+			layerB = new Layer width: 80, height: 80, x: 100, backgroundColor: "red"
 			layerB.name = "layerB"
 			layerB.animate
-				y:300
+				y: 300
 				options:
 					time: 5 * AnimationTime
 
-			layerC = new Layer width:80, height:80, x:200, backgroundColor:"orange"
+			layerC = new Layer width: 80, height: 80, x: 200, backgroundColor: "orange"
 			layerC.name = "layerC"
 			layerC.animate
-				y:300
+				y: 300
 				options:
 					time: 2 * AnimationTime
 					curve: "cubic-bezier"
@@ -546,100 +584,63 @@ describe "LayerAnimation", ->
 			@layer = new Layer x: 0, y: 0, width: 80, height: 80
 
 		describe "Parsing Animation Options", ->
-
-			describe "BezierCurveAnimator", ->
-
-				it "should create animation with bezier curve defined by values array and time in curveOptions", ->
+			describe "Curve function", ->
+				it "should handle Bezier curve functions", ->
 					animation = new Animation @layer,
 						x: 100
 						options:
-							curve: "cubic-bezier"
-							curveOptions:
-								time: 2
-								values: [0, 0, 0.58, 1]
-
-					animation.start()
-					animation._animator.options.time.should.equal 2
-					animation._animator.options.values.should.eql [0, 0, .58, 1]
-
-				it "should create animation with bezier curve defined by named bezier curve in values and time in curveOptions", ->
-					animation = new Animation @layer,
-						x: 100
-						options:
-							curve: "cubic-bezier"
-							curveOptions:
-								time: 2
-								values: "ease-out"
-
-					animation.start()
-					animation._animator.options.time.should.equal 2
-					animation._animator.options.values.should.eql [0, 0, .58, 1]
-
-				it "should create animation with named bezier curve", ->
-					animation = new Animation @layer,
-						x: 100
-						options:
-							curve: "cubic-bezier"
-							curveOptions: "ease-out"
-
-					animation.start()
-					animation._animator.options.time.should.equal 1
-					animation._animator.options.values.should.eql [0, 0, .58, 1]
-
-				it "should create animation with named bezier curve and time", ->
-					animation = new Animation @layer,
-						x: 100
-						options:
+							curve: Bezier(0, 0, 0.58, 1)
 							time: 2
-							curve: "cubic-bezier"
-							curveOptions: "ease-out"
 
 					animation.start()
 					animation._animator.options.time.should.equal 2
 					animation._animator.options.values.should.eql [0, 0, .58, 1]
 
-				it "should create animation with bezier curve function passed in as a string and time", ->
+				it "should handle Spring curve functions", ->
 					animation = new Animation @layer,
 						x: 100
 						options:
-							time: 2
-							curve: "cubic-bezier(0, 0, 0.58, 1)"
-
+							curve: Spring(0.5)
+							time: 0.5
 					animation.start()
-					animation._animator.options.time.should.equal 2
-					animation._animator.options.values.should.eql [0, 0, .58, 1]
+					animation._animator.options.time.should.equal 0.5
+					animation._animator.options.tension.should.equal 646.8780063665112
+					animation._animator.options.friction.should.equal 25.43379653859233
+					animation._animator.options.velocity.should.equal 0
 
-				it "should create animation with bezier curve defined by an array and time", ->
+				it "should handle Spring curve functions", ->
 					animation = new Animation @layer,
 						x: 100
 						options:
-							time: 2
-							curve: "cubic-bezier"
-							curveOptions: [0, 0, 0.58, 1]
+							curve: Spring(tension: 6, friction: 3, velocity: 1)
+					animation.start()
+					assert.equal(animation._animator.options.time, null)
+					animation._animator.options.tension.should.equal 6
+					animation._animator.options.friction.should.equal 3
+					animation._animator.options.velocity.should.equal 1
+
+			describe "Spring Animator", ->
+				it "should create an animator with the default spring", ->
+					animation = new Animation @layer,
+						x: 100
+						options:
+							curve: "spring"
 
 					animation.start()
-					animation._animator.options.time.should.equal 2
-					animation._animator.options.values.should.eql [0, 0, .58, 1]
+					animatorOptions = animation._animator.options
+					animatorOptions.tension.should.equal 250
+					animatorOptions.friction.should.equal 25
+					animatorOptions.velocity.should.equal 0
+
 
 		describe "LinearAnimator", ->
 
-			it "should create linear animation with time defined outside of curveOptions", ->
+			it "should create linear animation with time defined", ->
 				animation = new Animation @layer,
 					x: 100
 					options:
 						curve: "linear"
 						time: 2
-
-				animation.start()
-				animation._animator.options.time.should.equal 2
-
-			it "should create linear animation with time defined inside curveOptions", ->
-				animation = new Animation @layer,
-					x: 100
-					options:
-						curve: "linear"
-						curveOptions:
-							time: 2
 
 				animation.start()
 				animation._animator.options.time.should.equal 2
@@ -693,17 +694,27 @@ describe "LayerAnimation", ->
 				layer.animate
 					x: 100
 					options:
-						time: 0.1
+						time: AnimationTime
 						onStart: ->
 							layer.x.should.eql 0
 							done()
+
+			it "should call halt", (done) ->
+				layer = new Layer
+				layer.animate
+					x: 100
+					options:
+						time: AnimationTime
+						onHalt: ->
+							done()
+				layer.animateStop()
 
 			it "should call stop", (done) ->
 				layer = new Layer
 				layer.animate
 					x: 100
 					options:
-						time: 0.1
+						time: AnimationTime
 						onStop: ->
 							layer.x.should.eql 100
 							done()
@@ -713,7 +724,7 @@ describe "LayerAnimation", ->
 				layer.animate
 					x: 100
 					options:
-						time: 0.1
+						time: AnimationTime
 						onEnd: ->
 							layer.x.should.eql 100
 							done()
@@ -733,7 +744,7 @@ describe "LayerAnimation", ->
 
 				animation.layer.should.equal layer
 				animation.properties.should.eql {x: 50}
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 				animation.options.time.should.equal 0.1
 
 			it "should support the original api variation 1", ->
@@ -749,7 +760,7 @@ describe "LayerAnimation", ->
 
 				animation.layer.should.equal layer
 				animation.properties.should.eql {x: 50}
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 				animation.options.time.should.equal 0.1
 
 
@@ -767,7 +778,7 @@ describe "LayerAnimation", ->
 				layer = new Layer
 				layer.animationOptions = time: AnimationTime
 				animation = layer.animate({x: 10}, {curve: "linear"})
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 				animation.on Events.AnimationEnd, ->
 					layer.x.should.equal 10
 					done()
@@ -780,24 +791,10 @@ describe "LayerAnimation", ->
 					options:
 						curve: "linear"
 
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 				animation.on Events.AnimationEnd, ->
 					layer.x.should.equal 10
 					done()
-
-			it "should support properties with options that have undefined curveOptions as object", (done) ->
-				layer = new Layer
-				layer.animationOptions = time: AnimationTime
-				animation = layer.animate
-					x: 10
-					options:
-						curve: "linear"
-						curveOptions: undefined
-
-				animation.options.curve.should.equal "linear"
-				animation.on Events.AnimationEnd, ->
-					layer.x.should.equal 10
-				done()
 
 			it "should support states", (done) ->
 				layer = new Layer
@@ -813,7 +810,7 @@ describe "LayerAnimation", ->
 				layer.animationOptions = time: AnimationTime
 				layer.states.test = {x: 10}
 				animation = layer.animate("test", {curve: "linear"})
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 				animation.on Events.AnimationEnd, ->
 					layer.x.should.equal 10
 					done()
@@ -826,7 +823,7 @@ describe "LayerAnimation", ->
 					options:
 						curve: "linear"
 
-				animation.options.curve.should.equal "linear"
+				animation.options.curve.should.equal Bezier.linear
 				animation.on Events.AnimationEnd, ->
 					layer.x.should.equal 10
 					done()

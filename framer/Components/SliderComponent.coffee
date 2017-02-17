@@ -175,7 +175,7 @@ class exports.SliderComponent extends Layer
 			@_hitArea
 		set: (value) ->
 			@_hitArea = value
-			if @width > @height			
+			if @width > @height
 				@sliderOverlay.width = @width + @hitArea
 				@sliderOverlay.height = @hitArea
 			else
@@ -184,15 +184,16 @@ class exports.SliderComponent extends Layer
 
 	@define "min",
 		get: -> @_min or 0
-		set: (value) -> @_min = value
+		set: (value) -> @_min = value if _.isFinite(value)
 
 	@define "max",
 		get: -> @_max or 1
-		set: (value) -> @_max = value
+		set: (value) -> @_max = value if _.isFinite(value)
 
 	@define "value",
 		get: -> return @_value
 		set: (value) ->
+			return unless _.isFinite(value)
 
 			@_value = Utils.clamp(value, @min, @max)
 
@@ -212,7 +213,7 @@ class exports.SliderComponent extends Layer
 			@value = @valueForPoint(@knob.midY)
 
 	_updateValue: =>
-		
+
 		return if @_lastUpdatedValue is @value
 
 		@_lastUpdatedValue = @value
@@ -243,7 +244,8 @@ class exports.SliderComponent extends Layer
 			else
 				return Utils.modulate(value, [0, @height], [@min, @max], true)
 
-	animateToValue: (value, animationOptions={curve:"spring(300, 25, 0)"}) ->
+	animateToValue: (value, animationOptions={curve: "spring(300, 25, 0)"}) ->
+		return unless _.isFinite(value)
 		if @width > @height
 			animationOptions.properties = {x: @pointForValue(value) - (@knob.width/2)}
 		else

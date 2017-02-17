@@ -1,24 +1,24 @@
 assert = require "assert"
-{expect} = require "chai"
+
 
 initialStateName = "default"
 
 describe "LayerStates Backwards compatibility", ->
 
 	it "should still support layer.states.add", ->
-			layer = new Layer
-			layer.states.add
-				stateA: x: 200
-				stateB: scale: 0.5
-			assert.deepEqual layer.stateNames, [initialStateName, "stateA", "stateB"]
-			assert.deepEqual layer.states.stateA, x: 200
-			assert.deepEqual layer.states.stateB, scale: 0.5
+		layer = new Layer
+		layer.states.add
+			stateA: x: 200
+			stateB: scale: 0.5
+		assert.deepEqual layer.stateNames, [initialStateName, "stateA", "stateB"]
+		assert.deepEqual layer.states.stateA, x: 200
+		assert.deepEqual layer.states.stateB, scale: 0.5
 
 	it "should still support layer.states.add single", ->
-			layer = new Layer
-			layer.states.add("stateA", x: 200)
-			assert.deepEqual layer.stateNames, [initialStateName, "stateA"]
-			assert.deepEqual layer.states.stateA, x: 200
+		layer = new Layer
+		layer.states.add("stateA", x: 200)
+		assert.deepEqual layer.stateNames, [initialStateName, "stateA"]
+		assert.deepEqual layer.states.stateA, x: 200
 
 	it "should still support layer.states.remove", ->
 		layer = new Layer
@@ -92,6 +92,16 @@ describe "LayerStates Backwards compatibility", ->
 		animation = layer.animate "stateA"
 		animation.options.time.should.equal 4
 
+	it "should still support layer.states.animationOptions and fall back", ->
+		# This used to crash: https://www.facebook.com/groups/framerjs/permalink/987570871369984/
+		shoes = new Layer
+		shoes.states.stateA = scale: 1
+		shoes.states.stateB = scale: 0.8
+		shoes.states.animationOptions =
+			curve: "spring (300,20,0)"
+		shoes.states.next()
+
+
 	# it "should work when using one of the deprecated methods as statename", ->
 	# 	layer = new Layer
 	# 	layer.states =
@@ -124,8 +134,8 @@ describe "LayerStates Backwards compatibility", ->
 
 		beforeEach ->
 			@layer = new Layer()
-			@layer.states.add("a", {x:100, y:100})
-			@layer.states.add("b", {x:200, y:200})
+			@layer.states.add("a", {x: 100, y: 100})
+			@layer.states.add("b", {x: 200, y: 200})
 
 		it "should emit StateWillSwitch when switching", (done) ->
 
@@ -155,18 +165,18 @@ describe "LayerStates Backwards compatibility", ->
 		it "should set defaults", ->
 
 			layer = new Layer
-			layer.states.add "test", {x:123}
+			layer.states.add "test", {x: 123}
 			animation = layer.states.switch "test"
 
-			animation.options.curve.should.equal Framer.Defaults.Animation.curve
+			animation.options.curve.should.equal Framer.Curves.fromString(Framer.Defaults.Animation.curve)
 
 			Framer.Defaults.Animation =
-				curve: "spring(1, 2, 3)"
+				curve: "ease-out"
 
 			layer = new Layer
-			layer.states.add "test", {x:456}
+			layer.states.add "test", {x: 456}
 			animation = layer.states.switch "test"
 
-			animation.options.curve.should.equal "spring(1, 2, 3)"
+			animation.options.curve.should.equal Framer.Curves.Bezier.easeOut
 
 			Framer.resetDefaults()
