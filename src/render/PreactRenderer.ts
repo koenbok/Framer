@@ -2,7 +2,7 @@ import * as Preact from "preact"
 import * as Utils from "Utils"
 import {Layer} from "Layer"
 import {Context} from "Context"
-import {getLayerStyles} from "render/css"
+import {getStyles} from "render/css"
 
 export interface Props extends Preact.PreactHTMLAttributes {
 	layer: Layer,

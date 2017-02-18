@@ -1,6 +1,6 @@
 
 
-import {Layer, Framer, Context, Loop, Utils, Curve} from "Framer"
+import {Layer, Framer, Context, Utils, Curve} from "Framer"
 
 
 
@@ -10,12 +10,14 @@ const run = () => {
 
 	let layers = Utils.range(100).map(() => {
 		return new Layer({
-			x: Math.round(Math.random() * 500),
-			y: Math.round(Math.random() * 500)})
+			x: Math.round(Math.random() * 200),
+			y: Math.round(Math.random() * 200)})
 	})
 
 	setTimeout(() => {
 		layers.forEach((layer) => {
+			console.log(layer.describe());
+
 			layer.backgroundColor = Utils.randomColor(0.5)
 		})
 	}, 1000)
@@ -57,12 +59,12 @@ const run = () => {
 
 
 
-let layerC = new Layer()
+// let layerC = new Layer()
 
-layerC.onClick(event => {
-	layerC.animate({x: 200}, Curve.springrk4(300, 10))
-		.onEnd(event => {layerC.x = 0})
-})
+// layerC.onClick(event => {
+// 	layerC.animate({x: 200}, Curve.springrk4(300, 10))
+// 		.onEnd(event => {layerC.x = 0})
+// })
 
 // layerC.on("change:x", event => {
 // 	if (layerC.x === 0) {
@@ -72,11 +74,11 @@ layerC.onClick(event => {
 
 
 
-// const layer = new Layer()
+const layer = new Layer()
 
-// const animation = layer.animate({x: 400}, Curve.linear(10))
+const animation = layer.animate({x: 400}, Curve.springrk4(100, 10))
 
-// animation.on("AnimationStart", () => console.log("AnimationStart"))
+animation.on("AnimationStart", () => console.log("AnimationStart"))
 
 
 

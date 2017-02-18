@@ -2,7 +2,7 @@ import * as Utils from "Utils"
 import {AnimationLoop} from "AnimationLoop"
 import {Context} from "Context"
 import {Layer} from "Layer"
-import {getLayerStyles, updateLayerStyles} from "render/css"
+import {getStyles, getFullStyles} from "render/css"
 import {render} from "render/PreactRenderer"
 
 export class Renderer {
@@ -98,7 +98,7 @@ export class Renderer {
 		}
 
 		let styles = this.getDirtyStyles(layer)
-		updateLayerStyles(layer, key, styles)
+		getStyles(layer, [key], styles)
 
 		// this._dirtyStyles.push({layer, key, value})
 
