@@ -8,7 +8,7 @@ type DoneType = (context: Context, done: MochaDone) => void
 const tester = (it: any, description: string, f: DoneType) => {
 	it(description, (mochaDone) => {
 
-		const context = new Context("test", new AnimationLoop())
+		const context = new Context("test", {loop: new AnimationLoop()})
 
 		Context.Default.renderer.element.style.left = `${window.innerWidth}px`
 		context.renderer.element.style.left = `${window.innerWidth}px`

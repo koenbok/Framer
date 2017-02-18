@@ -6,8 +6,10 @@ import {AnimationLoop} from "AnimationLoop"
 import {Renderer} from "render/Renderer"
 
 export interface ContextOptions {
-	parent: Layer|Context|null,
-	backgroundColor: string
+	name?: string,
+	parent?: Layer|Context|null,
+	backgroundColor?: string,
+	loop?: AnimationLoop
 }
 
 export type ContextEventTypes =
@@ -27,19 +29,24 @@ export class Context extends BaseClass<ContextEventTypes> {
 		CurrentContext = context
 	}
 
-	private _name: string
 	private _layers = new Collection<Layer>()
 	private _renderer: Renderer
 
-	private _properties: ContextOptions = {
+	private _properties = {
+		name: "",
 		parent: null,
-		backgroundColor: "rgba(255, 0, 0, 0.5)"
+		backgroundColor: "rgba(255, 0, 0, 0.5)",
+		loop: AnimationLoop.Default
 	}
 
-	constructor(name: string, loop: AnimationLoop, options: ContextOptions|{}= {}) {
+	constructor(name: string, options: ContextOptions= {}) {
 		super()
-		this._name = name
-		this._renderer = new Renderer(this, loop)
+		Object.assign(this._properties, options)
+		this._renderer = new Renderer(this, this._properties.loop)
+	}
+
+	get name() {
+		return this._properties.name
 	}
 
 	addLayer(layer: Layer) {
