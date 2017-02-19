@@ -16,7 +16,7 @@ module.exports = function() {
 			path: path.join(__dirname, "..", "build"),
 			filename: "[name].js",
 		},
-		devtool: "#cheap-module-source-map",
+		devtool: "source-map",
 		target: "web",
 		stats: "errors-only",
 		module: {
