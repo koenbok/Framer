@@ -149,7 +149,7 @@ class exports.TextLayer extends Layer
 	@define "shadowX", layerProperty(@, "shadowX", "textShadow", 0, _.isNumber)
 	@define "shadowY", layerProperty(@, "shadowY", "textShadow", 0, _.isNumber)
 	@define "shadowBlur", layerProperty(@, "shadowBlur", "textShadow", 0, _.isNumber)
-	@define "textShadowColor", layerProperty(@, "textShadowColor", "textShadow", "", Color.validColorValue, Color.toColor)
+	@define "shadowColor", layerProperty(@, "shadowColor", "textShadow", "", Color.validColorValue, Color.toColor)
 
 	# Set width and height automatically
 	@define "autoWidth", @simpleProperty("autoWidth", false)
