@@ -15,7 +15,8 @@ class exports.TextLayer extends Layer
 		super options
 
 		# Set default width
-		@width = if @parent? then @parent.width else Screen.width
+		if not options.width
+			@width = if @parent? then @parent.width else Screen.width
 
 		# Set type defaults
 		if not @fontFamily
