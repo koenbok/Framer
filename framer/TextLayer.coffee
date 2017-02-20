@@ -9,12 +9,13 @@ class exports.TextLayer extends Layer
 
 		_.defaults options,
 			backgroundColor: "transparent"
-			width: 300
-			height: 50
 			html: "Add text"
 			color: "#888"
 
 		super options
+
+		# Set default width
+		@width = if @parent? then @parent.width else Screen.width
 
 		# Set type defaults
 		if not @fontFamily
