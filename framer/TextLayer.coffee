@@ -64,6 +64,7 @@ class exports.TextLayer extends Layer
 			textTransform: @textTransform
 			textDecoration: @textDecoration
 			textIndent: @textIndent
+			direction: @direction
 
 		# Set width and height based on style
 		constraints = width: @width
@@ -144,6 +145,12 @@ class exports.TextLayer extends Layer
 		set: (value) ->
 			@style.textIndent = "#{value}px"
 			@emit("change:textIndent", value)
+
+	@define "direction",
+		get: -> @style.direction
+		set: (value) ->
+			@style.direction = value
+			@emit("change:direction", value)
 
 	# Map shadow properties to text shadow
 	@define "shadowX", layerProperty(@, "shadowX", "textShadow", 0, _.isNumber)
