@@ -14,6 +14,9 @@ class exports.TextLayer extends Layer
 
 		super options
 
+		# Set padding
+		@_padding = options.padding or Utils.rectZero()
+
 		# Set default width
 		if not options.width
 			@width = if @parent? then @parent.width else Screen.width
@@ -89,11 +92,22 @@ class exports.TextLayer extends Layer
 			@html = value
 			@emit("change:text", value)
 
+	# @define "padding",
+	# 	get: -> @style.padding
+	# 	set: (value) ->
+	# 		@style.padding = "#{value}px"
+	# 		@emit("change:padding", value)
+
 	@define "padding",
-		get: -> @style.padding
-		set: (value) ->
-			@style.padding = "#{value}px"
-			@emit("change:padding", value)
+		get: ->
+			_.clone(@_padding)
+			
+		set: (padding) ->
+			@_padding = Utils.rectZero(Utils.parseRect(padding))
+
+			# Top, Right, Bottom, Left
+			@style.padding =
+				"#{@_padding.top}px #{@_padding.right}px #{@_padding.bottom}px #{@_padding.left}px"
 
 	@define "fontFamily",
 		get: -> @style.fontFamily
@@ -149,7 +163,7 @@ class exports.TextLayer extends Layer
 				@style.textAlign = "right"
 			else
 				@style.textAlign = value
-				
+
 			@emit("change:textAlign", value)
 
 	@define "textTransform",
