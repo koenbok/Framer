@@ -57,6 +57,7 @@ class exports.TextLayer extends Layer
 			fontFamily: @fontFamily
 			fontSize: @fontSize
 			fontWeight: @fontWeight
+			fontStyle: @fontStyle
 			lineHeight: @lineHeight
 			letterSpacing: @letterSpacing
 			wordSpacing: @wordSpacing
@@ -86,6 +87,12 @@ class exports.TextLayer extends Layer
 			@html = value
 			@emit("change:text", value)
 
+	@define "padding",
+		get: -> @style.padding
+		set: (value) ->
+			@style.padding = "#{value}px"
+			@emit("change:padding", value)
+
 	@define "fontFamily",
 		get: -> @style.fontFamily
 		set: (value) ->
@@ -103,6 +110,12 @@ class exports.TextLayer extends Layer
 		set: (value) ->
 			@style.fontWeight = "#{value}"
 			@emit("change:fontWeight", value)
+
+	@define "fontStyle",
+		get: -> @style.fontStyle
+		set: (value) ->
+			@style.fontStyle = value
+			@emit("change:fontStyle", value)
 
 	@define "lineHeight",
 		get: -> @style.lineHeight or 1.25
@@ -149,7 +162,16 @@ class exports.TextLayer extends Layer
 	@define "direction",
 		get: -> @style.direction
 		set: (value) ->
-			@style.direction = value
+
+			if value is "right-to-left"
+				@style.direction = "rtl"
+
+			if value is "left-to-right"
+				@style.direction = "ltr"
+
+			else
+				@style.direction = value
+
 			@emit("change:direction", value)
 
 	# Map shadow properties to text shadow
