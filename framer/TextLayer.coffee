@@ -140,7 +140,16 @@ class exports.TextLayer extends Layer
 	@define "textAlign",
 		get: -> @style.textAlign
 		set: (value) ->
-			@style.textAlign = value
+
+			if value is Align.left
+				@style.textAlign = "left"
+			if value is Align.center
+				@style.textAlign = "center"
+			if value is Align.right
+				@style.textAlign = "right"
+			else
+				@style.textAlign = value
+				
 			@emit("change:textAlign", value)
 
 	@define "textTransform",
