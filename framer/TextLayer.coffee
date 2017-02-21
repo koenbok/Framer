@@ -5,6 +5,8 @@
 
 class exports.TextLayer extends Layer
 
+	explicitWidth: false
+
 	constructor: (options={}) ->
 
 		_.defaults options,
@@ -18,35 +20,38 @@ class exports.TextLayer extends Layer
 		@_padding = options.padding or Utils.rectZero()
 
 		# Set default width
-		if not options.width
-			@width = if @parent? then @parent.width else Screen.width
+		@explicitWidth = options.width?
 
 		# Set type defaults
-		if not @fontFamily or not @font
-
-			currentDevice = Framer.Device.deviceType
-
-			# Apple Device: SF UI
-			if currentDevice.indexOf("apple") > -1
-				@_setDefaults("-apple-system, SF UI Text, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
-
-			# Google Device: Roboto
-			if currentDevice.indexOf("google") > -1
-				@_setDefaults("Roboto, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
-
-			# Microsoft Device: Segoe UI
-			if currentDevice.indexOf("microsoft") > -1
-				@_setDefaults("Segoe UI, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
-
-			# General default: macOS
-			else
-				@_setDefaults("-apple-system, SF UI Text, Helvetica Neue", @fontSize, @fontWeight, @lineHeight)
+		if not @fontFamily and not @font
+			@fontFamily = @defaultFont()
 
 		# Reset width and height
-		@_setSize(@autoWidth, @autoHeight)
+		@autoSize()
+
+		@on "change:parent", =>
+			@autoSize()
 
 		@on "change:text", =>
-			@_setSize(@autoWidth, @autoHeight)
+			@autoSize()
+
+	defaultFont: ->
+		# Android Device: Roboto
+		if Utils.isAndroid()
+			return "Roboto, Helvetica Neue"
+		# Edge Device: Segoe UI
+		if Utils.isEdge?()
+			return "Segoe UI, Helvetica Neue"
+		# General default: macOS, SF UI
+		return "-apple-system, SF UI Text, Helvetica Neue"
+
+	autoSize: ->
+		constraints = {}
+		if @explicitWidth
+			constraints.width = @width
+		else
+			constraints.width = if @parent? then @parent.width else Screen.width
+		@size = Utils.textSize(@text, _.clone(@style), constraints)
 
 		# Calculate new height on font property changes
 		@_fontProperties = [
