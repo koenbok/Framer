@@ -444,13 +444,18 @@ Utils.deviceFont = (os) ->
 # Load fonts from Google Web Fonts
 _loadedFonts = []
 
-Utils.loadWebFont = (font) ->
+Utils.loadWebFont = (font, weight) ->
 
 	if font in _loadedFonts
 		return font
 
 	link = document.createElement("link")
-	link.href = "https://fonts.googleapis.com/css?family=#{font}"
+
+	if weight
+		link.href = "https://fonts.googleapis.com/css?family=#{font}:#{weight}"
+	else
+		link.href = "https://fonts.googleapis.com/css?family=#{font}"
+		
 	link.rel = "stylesheet"
 	document.getElementsByTagName("head")[0].appendChild(link)
 
@@ -985,7 +990,7 @@ Utils.frameCenterPoint = (frame) ->
 		y: Utils.frameGetMidY(frame)
 
 Utils.frameInFrame = (frameA, frameB) ->
-	
+
 	for point in Utils.pointsFromFrame(frameA)
 		return false unless Utils.pointInFrame(point, frameB)
 

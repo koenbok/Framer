@@ -48,6 +48,25 @@ class exports.TextLayer extends Layer
 		@on "change:text", =>
 			@_setSize(@autoWidth, @autoHeight)
 
+		# Calculate new height on font property changes
+		@_fontProperties = [
+			"fontFamily"
+			"fontSize"
+			"fontWeight"
+			"fontStyle"
+			"lineHeight"
+			"letterSpacing"
+			"wordSpacing"
+			"textAlign"
+			"textTransform"
+			"textDecoration"
+			"textIndent"
+		]
+
+		for property in @_fontProperties
+			@on "change:#{property}", =>
+				@_setSize(@autoWidth, @autoHeight)
+
 	_setDefaults: (fontFamily, fontSize, fontWeight, lineHeight) =>
 		@style =
 			fontFamily: fontFamily
