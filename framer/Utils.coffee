@@ -1096,7 +1096,7 @@ Utils.boundingFrame = (layer, rootContext=true) ->
 Utils.perspectiveProjectionMatrix = (element) ->
 	p = element.perspective
 	m = new Matrix()
-	m.m34 = -1/p if p? and p isnt 0
+	m.m34 = -1 / p if p? and p isnt 0
 	return m
 
 # matrix of perspective projection with perspective origin applied
