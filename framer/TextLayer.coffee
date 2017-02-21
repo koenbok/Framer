@@ -46,12 +46,17 @@ class exports.TextLayer extends Layer
 		return "-apple-system, SF UI Text, Helvetica Neue"
 
 	autoSize: ->
-		constraints = {}
+		constraints =
+			max: true
 		if @explicitWidth
 			constraints.width = @width
 		else
 			constraints.width = if @parent? then @parent.width else Screen.width
-		@size = Utils.textSize(@text, _.clone(@style), constraints)
+		size = Utils.textSize(@text, _.clone(@style), constraints)
+		if size.width isnt @width
+			@width = size.width
+		if size.height isnt @height
+			@height = size.height
 
 		# Calculate new height on font property changes
 		@_fontProperties = [
