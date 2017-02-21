@@ -22,12 +22,7 @@ class exports.TextLayer extends Layer
 			@width = if @parent? then @parent.width else Screen.width
 
 		# Set type defaults
-		# if not @font
-		# 	print "yes font"
-
 		if not @fontFamily or not @font
-			print "no fontFam"
-			print "no font"
 
 			currentDevice = Framer.Device.deviceType
 
