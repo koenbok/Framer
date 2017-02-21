@@ -92,16 +92,10 @@ class exports.TextLayer extends Layer
 			@html = value
 			@emit("change:text", value)
 
-	# @define "padding",
-	# 	get: -> @style.padding
-	# 	set: (value) ->
-	# 		@style.padding = "#{value}px"
-	# 		@emit("change:padding", value)
-
 	@define "padding",
 		get: ->
 			_.clone(@_padding)
-			
+
 		set: (padding) ->
 			@_padding = Utils.rectZero(Utils.parseRect(padding))
 
