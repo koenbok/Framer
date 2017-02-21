@@ -455,7 +455,7 @@ Utils.loadWebFont = (font, weight) ->
 		link.href = "https://fonts.googleapis.com/css?family=#{font}:#{weight}"
 	else
 		link.href = "https://fonts.googleapis.com/css?family=#{font}"
-		
+
 	link.rel = "stylesheet"
 	document.getElementsByTagName("head")[0].appendChild(link)
 
@@ -1162,9 +1162,12 @@ Utils.textSize = (text, style={}, constraints={}) ->
 	delete style.bottom
 	delete style.right
 
-	style.width = "#{constraints.width}px" if constraints.width
-	style.height = "#{constraints.height}px" if constraints.height
-
+	if constraints.max
+		style.maxWidth = "#{constraints.width}px" if constraints.width
+		style.maxHeight = "#{constraints.height}px" if constraints.height
+	else
+		style.width = "#{constraints.width}px" if constraints.width
+		style.height = "#{constraints.height}px" if constraints.height
 	_.extend(_textSizeNode.style, style)
 
 	if shouldCreateNode
