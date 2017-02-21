@@ -22,7 +22,12 @@ class exports.TextLayer extends Layer
 			@width = if @parent? then @parent.width else Screen.width
 
 		# Set type defaults
-		if not @fontFamily
+		# if not @font
+		# 	print "yes font"
+
+		if not @fontFamily or not @font
+			print "no fontFam"
+			print "no font"
 
 			currentDevice = Framer.Device.deviceType
 
@@ -192,6 +197,19 @@ class exports.TextLayer extends Layer
 				@style.direction = value
 
 			@emit("change:direction", value)
+
+	@define "font",
+		get: -> @style.font
+		set: (value) ->
+
+			# Check if value contains number. We then assume proper use of font.
+			# Otherwise, we default to setting the fontFamily.
+			if /\d/.test(value)
+				@style.font = value
+			else
+				@style.fontFamily = value
+
+			@emit("change:font", value)
 
 	# Map shadow properties to text shadow
 	@define "shadowX", layerProperty(@, "shadowX", "textShadow", 0, _.isNumber)
