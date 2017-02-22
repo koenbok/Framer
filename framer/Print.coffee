@@ -23,7 +23,7 @@ class Printer
 			@_printLayer.ignoreEvents = false
 			@_printLayer.html = ""
 			@_printLayer.style =
-				"font": "12px/1.35em Menlo"
+				"font": "12px/1.35em Menlo, Consolas, monospace"
 				"color": "rgba(0, 0, 0, .7)"
 				"padding": "8px"
 				"padding-bottom": "30px"
