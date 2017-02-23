@@ -97,9 +97,9 @@ class exports.TextLayer extends Layer
 		@explicitHeight = true
 
 	@define "text",
-		get: -> @html
+		get: -> @_element.textContent
 		set: (value) ->
-			@html = value
+			@_element.textContent = value
 			@emit("change:text", value)
 
 	@define "padding",
