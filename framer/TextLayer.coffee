@@ -2,8 +2,26 @@
 {LayerStyle} = require "./LayerStyle"
 {Color} = require "./Color"
 {Events} = require "./Events"
+Utils = require "./Utils"
 
 class exports.TextLayer extends Layer
+
+	@_textProperties = [
+		"text"
+		"fontFamily"
+		"fontSize"
+		"fontWeight"
+		"fontStyle"
+		"lineHeight"
+		"letterSpacing"
+		"wordSpacing"
+		"textAlign"
+		"textTransform"
+		"textIndent"
+		"textDecoration"
+		"direction"
+		"font"
+	]
 
 	explicitWidth: false
 
@@ -13,107 +31,68 @@ class exports.TextLayer extends Layer
 			backgroundColor: "transparent"
 			html: "Add text"
 			color: "#888"
+			fontSize: 40
+			fontWeight: 400
+			lineHeight: 1.25
 
 		super options
 
 		# Set padding
 		@_padding = options.padding or Utils.rectZero()
 
-		# Set default width
+		# Keeps track if the width or height are explicitly set, so we shouldn't update it afterwards
 		@explicitWidth = options.width?
-
-		# Set type defaults
-		if not @fontFamily and not @font
-			@fontFamily = @defaultFont()
+		@explicitHeight = options.height?
 
 		# Reset width and height
 		@autoSize()
 
-		@on "change:parent", =>
-			@autoSize()
+		# Calculate new height on font property changes
 
-		@on "change:text", =>
-			@autoSize()
+		for property in @constructor._textProperties
+			@on "change:#{property}", =>
+				@autoSize()
 
-	defaultFont: ->
+		@on "change:parent", @autoSize
+
+		@on "change:width", @updateExplicitWidth
+		@on "change:height", @updateExplicitHeight
+
+	@defaultFont: ->
 		# Android Device: Roboto
 		if Utils.isAndroid()
 			return "Roboto, Helvetica Neue"
 		# Edge Device: Segoe UI
-		if Utils.isEdge?()
+		if Utils.isEdge()
 			return "Segoe UI, Helvetica Neue"
 		# General default: macOS, SF UI
 		return "-apple-system, SF UI Text, Helvetica Neue"
 
-	autoSize: ->
+	autoSize: =>
 		constraints =
 			max: true
 		if @explicitWidth
 			constraints.width = @width
 		else
 			constraints.width = if @parent? then @parent.width else Screen.width
-		size = Utils.textSize(@text, _.clone(@style), constraints)
-		if size.width isnt @width
-			@width = size.width
-		if size.height isnt @height
-			@height = size.height
 
-		# Calculate new height on font property changes
-		@_fontProperties = [
-			"fontFamily"
-			"fontSize"
-			"fontWeight"
-			"fontStyle"
-			"lineHeight"
-			"letterSpacing"
-			"wordSpacing"
-			"textAlign"
-			"textTransform"
-			"textDecoration"
-			"textIndent"
-		]
+		style = _.pick @style, @constructor._textProperties
+		size = Utils.textSize(@text, style, constraints)
+		newWidth = Math.ceil(size.width)
+		newHeight = Math.ceil(size.height)
+		@disableExplicitUpdating = true
+		@width = newWidth if @width isnt newWidth and not @explicitWidth
+		@height = newHeight if @height isnt newHeight and not @explicitHeight
+		@disableExplicitUpdating = false
 
-		for property in @_fontProperties
-			@on "change:#{property}", =>
-				@_setSize(@autoWidth, @autoHeight)
 
-	_setDefaults: (fontFamily, fontSize, fontWeight, lineHeight) =>
-		@style =
-			fontFamily: fontFamily
-			fontSize: "#{fontSize}px"
-			fontWeight: "#{fontWeight}"
-			lineHeight: "#{lineHeight}"
+	updateExplicitWidth: (value) =>
+		return if @enableExplicitUpdating
+		@explicitWidth = true
 
-	_setSize: (autoWidth, autoHeight) =>
-
-		# Get current style
-		currentStyle =
-			fontFamily: @fontFamily
-			fontSize: @fontSize
-			fontWeight: @fontWeight
-			fontStyle: @fontStyle
-			lineHeight: @lineHeight
-			letterSpacing: @letterSpacing
-			wordSpacing: @wordSpacing
-			textAlign: @textAlign
-			textTransform: @textTransform
-			textDecoration: @textDecoration
-			textIndent: @textIndent
-			direction: @direction
-
-		# Set width and height based on style
-		constraints = width: @width
-
-		if autoWidth and not autoHeight
-			@width = Utils.textSize(@text, currentStyle).width
-
-		if autoHeight and not autoWidth
-			@height = Utils.textSize(@text, currentStyle, constraints).height
-
-		if autoWidth and autoHeight
-			@size = Utils.textSize(@text, currentStyle)
-
-		@emit("change:size")
+	updateExplicitHeight: (value) =>
+		return if @disableExplicitUpdating
+		@explicitHeight = true
 
 	@define "text",
 		get: -> @html
@@ -132,115 +111,33 @@ class exports.TextLayer extends Layer
 			@style.padding =
 				"#{@_padding.top}px #{@_padding.right}px #{@_padding.bottom}px #{@_padding.left}px"
 
-	@define "fontFamily",
-		get: -> @style.fontFamily
-		set: (value) ->
-			@style.fontFamily = value
-			@emit("change:fontFamily", value)
+	@define "fontFamily", layerProperty(@, "fontFamily", "fontFamily", @defaultFont(), _.isString)
+	@define "fontSize", layerProperty(@, "fontSize", "fontSize", null, _.isNumber)
+	@define "fontWeight", layerProperty(@, "fontWeight", "fontWeight")
+	@define "fontStyle", layerProperty(@, "fontStyle", "fontStyle", "normal", _.isString)
+	@define "lineHeight", layerProperty(@, "lineHeight", "lineHeight", null, _.isNumber)
+	@define "letterSpacing", layerProperty(@, "letterSpacing", "letterSpacing", null, _.isNumber)
+	@define "wordSpacing", layerProperty(@, "wordSpacing", "wordSpacing", null, _.isNumber)
+	@define "textAlign", layerProperty(@, "textAlign", "textAlign")
+	@define "textTransform", layerProperty(@, "textTransform", "textTransform", "none", _.isString)
+	@define "textIndent", layerProperty(@, "textIndent", "textIndent", null, _.isNumber)
+	@define "textDecoration", layerProperty(@, "textDecoration", "textDecoration", null, _.isString)
+	@define "direction", layerProperty(@, "direction", "direction", null, _.isString)
 
-	@define "fontSize",
-		get: -> @style.fontSize or 40
-		set: (value) ->
-			@style.fontSize = "#{value}px"
-			@emit("change:fontSize", value)
+	@define "font", layerProperty @, "font", null, null, _.isString, null, {}, (layer, value) ->
+		# Check if value contains number. We then assume proper use of font.
+		# Otherwise, we default to setting the fontFamily.
+		if /\d/.test(value)
+			layer.style.font = value
+		else
+			layer.fontFamily = value
 
-	@define "fontWeight",
-		get: -> @style.fontWeight or 400
-		set: (value) ->
-			@style.fontWeight = "#{value}"
-			@emit("change:fontWeight", value)
-
-	@define "fontStyle",
-		get: -> @style.fontStyle
-		set: (value) ->
-			@style.fontStyle = value
-			@emit("change:fontStyle", value)
-
-	@define "lineHeight",
-		get: -> @style.lineHeight or 1.25
-		set: (value) ->
-			@style.lineHeight = "#{value}"
-			@emit("change:lineHeight", value)
-
-	@define "letterSpacing",
-		get: -> @style.letterSpacing
-		set: (value) ->
-			@style.letterSpacing = "#{value}px"
-			@emit("change:letterSpacing", value)
-
-	@define "wordSpacing",
-		get: -> @style.wordSpacing
-		set: (value) ->
-			@style.wordSpacing = "#{value}px"
-			@emit("change:wordSpacing", value)
-
-	@define "textAlign",
-		get: -> @style.textAlign
-		set: (value) ->
-
-			if value is Align.left
-				@style.textAlign = "left"
-			if value is Align.center
-				@style.textAlign = "center"
-			if value is Align.right
-				@style.textAlign = "right"
-			else
-				@style.textAlign = value
-
-			@emit("change:textAlign", value)
-
-	@define "textTransform",
-		get: -> @style.textTransform
-		set: (value) ->
-			@style.textTransform = value
-			@emit("change:textTransform", value)
-
-	@define "textDecoration",
-		get: -> @style.textDecoration
-		set: (value) ->
-			@style.textDecoration = value
-			@emit("change:textDecoration", value)
-
-	@define "textIndent",
-		get: -> @style.textIndent
-		set: (value) ->
-			@style.textIndent = "#{value}px"
-			@emit("change:textIndent", value)
-
-	@define "direction",
-		get: -> @style.direction
-		set: (value) ->
-
-			if value is "right-to-left"
-				@style.direction = "rtl"
-
-			if value is "left-to-right"
-				@style.direction = "ltr"
-
-			else
-				@style.direction = value
-
-			@emit("change:direction", value)
-
-	@define "font",
-		get: -> @style.font
-		set: (value) ->
-
-			# Check if value contains number. We then assume proper use of font.
-			# Otherwise, we default to setting the fontFamily.
-			if /\d/.test(value)
-				@style.font = value
-			else
-				@style.fontFamily = value
-
-			@emit("change:font", value)
+	@define "textDirection",
+		get: -> @direction
+		set: (value) -> @direction = value
 
 	# Map shadow properties to text shadow
 	@define "shadowX", layerProperty(@, "shadowX", "textShadow", 0, _.isNumber)
 	@define "shadowY", layerProperty(@, "shadowY", "textShadow", 0, _.isNumber)
 	@define "shadowBlur", layerProperty(@, "shadowBlur", "textShadow", 0, _.isNumber)
 	@define "shadowColor", layerProperty(@, "shadowColor", "textShadow", "", Color.validColorValue, Color.toColor)
-
-	# Set width and height automatically
-	@define "autoWidth", @simpleProperty("autoWidth", false)
-	@define "autoHeight", @simpleProperty("autoHeight", false)

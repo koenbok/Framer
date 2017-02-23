@@ -195,3 +195,33 @@ exports.LayerStyle =
 
 	border: (layer) ->
 		return "#{layer._properties.borderWidth}px solid #{layer._properties.borderColor}"
+
+	fontSize: (layer) ->
+		return layer._properties.fontSize + "px"
+
+	letterSpacing: (layer) ->
+		return layer._properties.letterSpacing + "px"
+
+	wordSpacing: (layer) ->
+		return layer._properties.wordSpacing + "px"
+
+	textIndent: (layer) ->
+		return layer._properties.textIndent + "px"
+
+	textAlign: (layer) ->
+		value = layer._properties.textAlign
+		if value is Align.left
+			return "left"
+		if value is Align.center
+			return "center"
+		if value is Align.right
+			return "right"
+		else
+			return value
+
+	direction: (layer) ->
+		value = layer._properties.direction
+		switch value
+			when "right-to-left" then return "rtl"
+			when "left-to-right" then return "ltr"
+			else return value
