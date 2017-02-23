@@ -136,7 +136,6 @@ class exports.TextLayer extends Layer
 
 	@define "textStyle",
 		get: ->
-			print TextLayer._textStyleProperties
 			_.pick @, TextLayer._textStyleProperties
 		set: (values) ->
 			for key, prop in _.pick values, TextLayer._textStyleProperties
