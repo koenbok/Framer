@@ -23,11 +23,13 @@ class exports.TextLayer extends Layer
 		"font"
 	]
 
+	@_textStyleProperties = _.pull(_.clone(TextLayer._textProperties), "text").concat(["color", "shadowX", "shadowY", "shadowBlur", "shadowColor"])
+
 	explicitWidth: false
 
 	constructor: (options={}) ->
 
-		_.defaults options,
+		_.defaults options, options.textStyle,
 			backgroundColor: "transparent"
 			html: "Add text"
 			color: "#888"
@@ -131,6 +133,15 @@ class exports.TextLayer extends Layer
 			layer.style.font = value
 		else
 			layer.fontFamily = value
+
+	@define "textStyle",
+		get: ->
+			print TextLayer._textStyleProperties
+			_.pick @, TextLayer._textStyleProperties
+		set: (values) ->
+			for key, prop in _.pick values, TextLayer._textStyleProperties
+				@[key] = prop
+
 
 	@define "textDirection",
 		get: -> @direction
