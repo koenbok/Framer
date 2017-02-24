@@ -92,3 +92,12 @@ describe "TextLayer", ->
 				text.size.should.eql width: 400, height: 2750
 				done()
 			text.text = longText
+
+	describe "Padding", ->
+		it "should have no padding initially"
+		it "should all padding when given a numeric value"
+		it "should set horizontal padding"
+		it "should set vertical padding"
+		it "should set top, left, right and left padding"
+		it "should keep padding 0 when not explicity set"
+		it "should have a preference for more specific padding definitions"
