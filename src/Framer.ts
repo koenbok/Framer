@@ -4,13 +4,18 @@ import {Context} from "Context"
 import {Renderer} from "render/Renderer"
 import {AnimationLoop} from "AnimationLoop"
 import {Curve} from "Curve"
+import {Printer} from "Printer"
 
 export const Framer = {
 	Layer: Layer,
 	Context: Context
 }
 
+// TODO: Is this needed?
 export const Loop = new AnimationLoop()
+
+const printer = new Printer()
+export const print = printer.print
 
 export {Layer, Context, Utils, Renderer, Curve}
 
