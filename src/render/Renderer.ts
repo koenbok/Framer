@@ -1,11 +1,16 @@
 import * as Utils from "Utils"
+import * as Types from "Types"
+
 import {AnimationLoop} from "AnimationLoop"
 import {Context} from "Context"
 import {Layer} from "Layer"
-import {CSSStyles} from "Types"
 import {assignStyles, assignAllStyles} from "render/css"
 import {render} from "render/PreactRenderer"
 
+interface Renderable {
+	_element: HTMLElement
+	styles: Types.CSSStyles
+}
 
 const createRendererElement = () => {
 
@@ -31,7 +36,7 @@ export class Renderer {
 	private _loop: AnimationLoop
 	private _context: Context
 	private _hasDirtyStructure = false
-	private _dirtyStyleItems: Set<Layer> = new Set()
+	private _dirtyStyleItems: Set<Renderable> = new Set()
 	private counters = {
 		updateKeyStyle: 0,
 		updateCustomStyles: 0,
@@ -72,14 +77,14 @@ export class Renderer {
 		return this._loop
 	}
 
-	getDirtyStyles = (layer: Layer) => {
-		if (!layer["_dirty"]) { layer["_dirty"] = {} }
-		return layer["_dirty"]
+	getDirtyStyles = (item: Renderable) => {
+		if (!item["_dirty"]) { item["_dirty"] = {} }
+		return item["_dirty"]
 	}
 
-	flushDirtyStyles = (layer: Layer) => {
-		let dirtyStyles = this.getDirtyStyles(layer)
-		layer["_dirty"] = {}
+	flushDirtyStyles = (item: Renderable) => {
+		let dirtyStyles = this.getDirtyStyles(item)
+		item["_dirty"] = {}
 		return dirtyStyles
 	}
 
@@ -101,25 +106,25 @@ export class Renderer {
 
 	// Update
 
-	updateStructure(layer: Layer | Context) {
+	updateStructure(item?: Renderable) {
 		this.counters.updateStructure++
 		if (this._hasDirtyStructure) { return }
 		this._hasDirtyStructure = true
 		this.requestRender()
 	}
 
-	updateKeyStyle(layer: Layer, key, value) {
+	updateKeyStyle(item: Renderable, key, value) {
 		this.counters.updateKeyStyle++
-		let styles = this.getDirtyStyles(layer)
-		assignStyles(layer, [key], styles)
-		this._dirtyStyleItems.add(layer)
+		let styles = this.getDirtyStyles(item)
+		assignStyles(item as Layer, [key], styles)
+		this._dirtyStyleItems.add(item)
 		this.requestRender()
 	}
 
-	updateCustomStyles(layer: Layer, styles: CSSStyles) {
+	updateCustomStyles(item: Renderable, styles: Types.CSSStyles) {
 		this.counters.updateCustomStyles++
-		Object.assign(this.getDirtyStyles(layer), styles)
-		this._dirtyStyleItems.add(layer)
+		Object.assign(this.getDirtyStyles(item), styles)
+		this._dirtyStyleItems.add(item)
 		this.requestRender()
 	}
 
