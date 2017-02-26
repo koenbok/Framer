@@ -76,7 +76,10 @@ const run = () => {
 
 const layer = new Layer()
 
-layer.onClick(event => layer.animate({x: 400}, Curve.springrk4(100, 10)))
+layer.onClick(event => {
+	layer.animate({x: 500}, Curve.springrk4())
+		.onEnd(event => layer.x = 0)
+})
 
 
 

@@ -16,6 +16,8 @@ class RenderableComponent extends Preact.Component<Props, {}> {
 
 	componentDidMount() {
 		this.props.renderable._element = this.base
+		console.log(this.base.onclick);
+
 		this.props.renderable.context.renderer.componentDidMount(this.props.renderable)
 	}
 
@@ -30,29 +32,21 @@ class RenderableComponent extends Preact.Component<Props, {}> {
 
 	render() {
 
-		const props = {}
-
-		// Add all event handlers to the dom element
-		for (let eventName in this.props.renderable.eventListeners()) {;
-
-			// Don't listen to animation events for now. Unfortunately they
-			// are the same as css events :-(
-			// TODO: Account for touch events?
-			if (
-				eventName === "AnimationStart" ||
-				eventName === "AnimationStop" ||
-				eventName === "AnimationEnd") {
-					continue
-				}
-
-			// See if any of the events is a valid dom event and attach it
-			if (utils.dom.validEvent("div", eventName)) {
-				props[`on${eventName}`] = (event) => this.props.renderable.emit(eventName as any, event)
-			}
-
+		let props = {
+			key: this.props.renderable.id.toString()
 		}
 
-		return Preact.h("div", props, this.props.renderable.children.map(renderLayer))
+		// Add all event handlers to the dom element
+		for (let eventName of utils.dom.getDOMEventKeys(this.props.renderable)) {
+			props[`on${eventName}`] = (event) => {
+				this.props.renderable.emit(eventName as any, event)
+			}
+		}
+
+		return Preact.h(
+			"div",
+			props,
+			this.props.renderable.children.map(renderLayer))
 	}
 }
 

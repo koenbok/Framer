@@ -14,7 +14,8 @@ const createRendererElement = () => {
 	element.classList.add("renderer")
 
 	utils.dom.assignStyles(element, {
-		position: "absolute",
+		position: "fixed",
+		"pointer-events": "none",
 		top: "0px",
 		right: "0px",
 		bottom: "0px",

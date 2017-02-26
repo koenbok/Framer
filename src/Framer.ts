@@ -1,4 +1,8 @@
+import * as GlobalEventListener from "hacks/GlobalEventListener"
+// GlobalEventListener.setup()
+
 import * as utils from "utils"
+
 import {Layer} from "Layer"
 import {Context} from "Context"
 import {Renderer} from "render/Renderer"

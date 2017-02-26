@@ -10,7 +10,7 @@ export const randomColor = (alpha= 1) => {
 	return `rgba(${randomColorValue()}, ${randomColorValue()}, ${randomColorValue()}, ${alpha})`
 }
 
-export const delay = (time= 0, f: Function) => { setTimeout(f, time) }
+export const delay = (time= 0, f: Function) => { setTimeout(f, time * 1000) }
 
 export const orderedForEach = (
 	obj: Object,

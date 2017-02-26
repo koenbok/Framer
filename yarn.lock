@@ -2711,7 +2711,7 @@ preact-transition-group@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/preact-transition-group/-/preact-transition-group-1.1.0.tgz#97d0beff0790d721faecd2560c02cd30d5426f23"
 
-preact@beta:
+preact@^7.2.0:
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/preact/-/preact-7.2.0.tgz#8aacc97465a65509bc556604a7750d48e2fa7ad1"
 

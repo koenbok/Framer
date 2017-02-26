@@ -15,7 +15,7 @@
     "mocha": "^3.2.0",
     "mocha-loader": "^1.1.0",
     "mocha-typescript": "^1.0.18",
-    "preact": "beta",
+    "preact": "^7.2.0",
     "preact-compat": "^3.13.0",
     "raf": "^3.3.0",
     "ts-loader": "^2.0.0",

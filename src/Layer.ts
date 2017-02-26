@@ -14,6 +14,7 @@ import {Curve} from "Curve"
 export interface LayerOptions {
 	context?: Context
 	parent?: Layer|null
+	ignoreEvents?: boolean
 	x?: number
 	y?: number
 	z?: number
@@ -57,6 +58,7 @@ export class Layer extends Renderable<LayerEventTypes> {
 	private _context: Context
 	private _parent: Layer|null
 	private _properties = {
+		ignoreEvents: true,
 		x: 0,
 		y: 0,
 		z: 0,
@@ -117,6 +119,17 @@ export class Layer extends Renderable<LayerEventTypes> {
 		return this.context.layers.filter((layer) => {
 			return layer.parent === this
 		})
+	}
+
+	get ignoreEvents() {
+		return this._properties.ignoreEvents
+	}
+
+	set ignoreEvents(value) {
+		if (!this._shouldChangeKey("ignoreEvents", value)) { return }
+		this._properties.ignoreEvents = value
+		this._didChangeKey("ignoreEvents", value)
+		this.context.renderer.updateKeyStyle(this, "ignoreEvents", value)
 	}
 
 	get x() {
@@ -266,6 +279,10 @@ export class Layer extends Renderable<LayerEventTypes> {
 
 	addEventListener(eventName: LayerEventTypes, fn: Function, once: boolean, context: Object) {
 		super.addEventListener(eventName, fn, once, context)
+
+		// If we added a dom event listener, turn off ignoreEvents
+		if (utils.dom.getDOMEventKeys(this).length) { this.ignoreEvents = false }
+
 		this.context.renderer.updateStructure()
 	}
 

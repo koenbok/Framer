@@ -87,20 +87,20 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 	}
 
 	private _start() {
-		console.log("_start");
+		console.log("AnimationLoop._start");
 		this._running = true
 		raf(this.tick)
 	}
 
 	private _stop() {
-		console.log("_stop");
+		console.log("AnimationLoop._stop");
 		this._running = false
 	}
 
 	private tick = () => {
 
 		if (this._counter % 30 === 0) {
-			console.log("tick", this._counter, 1 / (time() - this._last))
+			console.log("AnimationLoop.tick", this._counter, Math.round(1 / (time() - this._last)))
 		}
 
 		if (!this.pause) {

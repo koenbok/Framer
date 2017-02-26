@@ -1,5 +1,5 @@
 import {expect} from "chai"
-import {utils} from "Framer"
+import {utils, Layer} from "Framer"
 
 describe("utils", () => {
 
@@ -26,7 +26,7 @@ describe("utils", () => {
 		})
 	})
 
-	describe("validEvent", () => {
+	describe("dom.validEvent", () => {
 
 		it("should work on click", () => {
 			expect(utils.dom.validEvent("div", "click")).to.be.true
@@ -46,6 +46,34 @@ describe("utils", () => {
 
 		it("should not work on touch events", () => {
 			expect(utils.dom.validEvent("div", "touchstart")).to.be.false
+		})
+
+	})
+
+	describe("dom.getDOMEventKeys", () => {
+
+		it("should be empty on default", () => {
+			const layer = new Layer()
+			expect(utils.dom.getDOMEventKeys(layer)).to.eql([])
+		})
+
+		it("should work for click but not change", () => {
+			const layer = new Layer()
+			layer.onClick((event) => {})
+			layer.onChange("x", (event) => {})
+			expect(utils.dom.getDOMEventKeys(layer)).to.eql(["click"])
+		})
+
+		it("should work for touch on desktop", () => {
+			const layer = new Layer()
+			layer.on("touchend" as any, () => {})
+			expect(utils.dom.getDOMEventKeys(layer)).to.eql(["touchend"])
+		})
+
+		it("should not work for animation events", () => {
+			const layer = new Layer()
+			layer.on("animationstart" as any, () => {})
+			expect(utils.dom.getDOMEventKeys(layer)).to.eql([])
 		})
 
 	})

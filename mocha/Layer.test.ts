@@ -156,5 +156,15 @@ describe("Layer", () => {
 			done()
 		})
 	})
+
+	isolated.test("should not ignore events when dom event added", (context, done) => {
+
+		const layer = new Layer()
+		expect(layer.ignoreEvents).to.be.true
+
+		layer.onClick(event => {})
+		expect(layer.ignoreEvents).to.be.false
+		done()
+	})
 })
 
