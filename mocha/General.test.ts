@@ -1,7 +1,7 @@
 import {expect, assert} from "chai"
 // import * as assert from "assert"
 import {isolated} from "./Testutils"
-import {Layer, Framer, utils, Context} from "Framer"
+import {Layer, utils} from "Framer"
 
 describe("General", () => {
 

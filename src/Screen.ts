@@ -8,7 +8,7 @@ type ScreenEventTypes =
 	"change:size" |
 	"change:frame"
 
-class Screen extends BaseClass<ScreenEventTypes> {
+class ScreenClass extends BaseClass<ScreenEventTypes> {
 
 	constructor() {
 		super()
@@ -38,3 +38,5 @@ class Screen extends BaseClass<ScreenEventTypes> {
 		this.emit("change:frame")
 	}
 }
+
+export const Screen = new ScreenClass()

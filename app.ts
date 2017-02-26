@@ -1,6 +1,6 @@
 
 
-import {Layer, Framer, Context, utils, Curve} from "Framer"
+import {utils, Layer, Curve, Context} from "Framer"
 
 
 const rnd = () => Math.round(Math.random() * 800)
