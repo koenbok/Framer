@@ -1,5 +1,5 @@
 
-import {BaseClass} from "BaseClass"
+import {Renderable} from "Renderable"
 import {Layer} from "Layer"
 import {Collection} from "Collection"
 import {AnimationLoop} from "AnimationLoop"
@@ -15,7 +15,7 @@ export interface ContextOptions {
 export type ContextEventTypes =
 	"reset"
 
-export class Context extends BaseClass<ContextEventTypes> {
+export class Context extends Renderable<ContextEventTypes> {
 
 	static get Default() {
 		return DefaultContext

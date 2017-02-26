@@ -1,16 +1,11 @@
 import * as Utils from "Utils"
 import * as Types from "Types"
 
+import {Renderable} from "Renderable"
 import {AnimationLoop} from "AnimationLoop"
 import {Context} from "Context"
-import {Layer} from "Layer"
 import {assignStyles, assignAllStyles} from "render/css"
 import {render} from "render/PreactRenderer"
-
-interface Renderable {
-	_element: HTMLElement
-	styles: Types.CSSStyles
-}
 
 const createRendererElement = () => {
 
@@ -36,7 +31,7 @@ export class Renderer {
 	private _loop: AnimationLoop
 	private _context: Context
 	private _hasDirtyStructure = false
-	private _dirtyStyleItems: Set<Renderable> = new Set()
+	private _dirtyStyleItems: Set<Renderable<any>> = new Set()
 	private _counters = {
 		updateKeyStyle: 0,
 		updateCustomStyles: 0,
@@ -81,12 +76,12 @@ export class Renderer {
 		return this._loop
 	}
 
-	getDirtyStyles = (item: Renderable) => {
+	getDirtyStyles = (item: Renderable<any>) => {
 		if (!item["_dirty"]) { item["_dirty"] = {} }
 		return item["_dirty"]
 	}
 
-	flushDirtyStyles = (item: Renderable) => {
+	flushDirtyStyles = (item: Renderable<any>) => {
 		let dirtyStyles = this.getDirtyStyles(item)
 		item["_dirty"] = {}
 		return dirtyStyles
@@ -110,22 +105,22 @@ export class Renderer {
 
 	// Update
 
-	updateStructure(item?: Renderable) {
+	updateStructure(item?: Renderable<any>) {
 		this._counters.updateStructure++
 		if (this._hasDirtyStructure) { return }
 		this._hasDirtyStructure = true
 		this.requestRender()
 	}
 
-	updateKeyStyle(item: Renderable, key, value) {
+	updateKeyStyle(item: Renderable<any>, key, value) {
 		this._counters.updateKeyStyle++
 		let styles = this.getDirtyStyles(item)
-		assignStyles(item as Layer, [key], styles)
+		assignStyles(item as any, [key], styles)
 		this._dirtyStyleItems.add(item)
 		this.requestRender()
 	}
 
-	updateCustomStyles(item: Renderable, styles: Types.CSSStyles) {
+	updateCustomStyles(item: Renderable<any>, styles: Types.CSSStyles) {
 		this._counters.updateCustomStyles++
 		Object.assign(this.getDirtyStyles(item), styles)
 		this._dirtyStyleItems.add(item)
@@ -152,12 +147,6 @@ export class Renderer {
 
 	renderStyle = () => {
 
-		// We always need to have structure before we can apply style.
-		// if (this.renderStructureCount === 0) {
-		// 	this.renderStructure()
-		// 	return
-		// }
-
 		this._counters.renderStyle++
 
 		for (let layer of this._dirtyStyleItems) {
@@ -168,17 +157,21 @@ export class Renderer {
 	}
 
 
-	componentWillMount(layer: Layer) {
+	componentWillMount(item: Renderable<any>) {
 
 	}
 
-	componentDidMount(layer: Layer) {
+	componentDidMount(item: Renderable<any>) {
 		// On a full mount we want all styles to be applied to the dom node
-		Utils.dom.assignStyles(layer._element, assignAllStyles(layer))
-		Utils.dom.assignStyles(layer._element, layer.styles)
+		Utils.dom.assignStyles(item._element, assignAllStyles(item as any))
+		Utils.dom.assignStyles(item._element, item.styles)
 	}
 
-	componentWillUnmount(layer: Layer) {
+	componentWillUnmount(item: Renderable<any>) {
+
+	}
+
+	componentDidUpdate(item: Renderable<any>) {
 
 	}
 }

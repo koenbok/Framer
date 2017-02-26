@@ -1,57 +1,57 @@
 import * as Preact from "preact"
 import * as Utils from "Utils"
-import {Layer} from "Layer"
+import {Renderable} from "Renderable"
 import {Context} from "Context"
 import {assignStyles, assignAllStyles} from "render/css"
 
 export interface Props extends Preact.PreactHTMLAttributes {
-	layer: Layer,
+	renderable: Renderable<any>,
 }
 
-
-
-
-class Renderable extends Preact.Component<Props, {}> {
+class RenderableComponent extends Preact.Component<Props, {}> {
 
 	componentWillMount() {
-		this.props.layer.context.renderer.componentWillMount(this.props.layer)
+		this.props.renderable.context.renderer.componentWillMount(this.props.renderable)
 	}
 
 	componentDidMount() {
-		this.props.layer._element = this.base
-		this.props.layer.context.renderer.componentDidMount(this.props.layer)
+		this.props.renderable._element = this.base
+		this.props.renderable.context.renderer.componentDidMount(this.props.renderable)
 	}
 
 	componentWillUnmount() {
-		this.props.layer.context.renderer.componentWillUnmount(this.props.layer)
+		this.props.renderable.context.renderer.componentWillUnmount(this.props.renderable)
 	}
 
-	// componentDidUpdate(prevProps, prevState) {
-	// 	this.props.layer._element = this.refs["node"] as HTMLElement
-	// }
+	componentDidUpdate(prevProps, prevState) {
+		this.props.renderable._element = this.base
+		this.props.renderable.context.renderer.componentDidUpdate(this.props.renderable)
+	}
 
 	render() {
 
-		const layer = this.props.layer
 		const props = {}
 
 		// FIXME: Again there might not be a layer here
 
 		// Add all event handlers to the dom element
-		for (let eventName in layer.eventListeners()) {;
+		for (let eventName in this.props.renderable.eventListeners()) {;
 
 			// See if any of the events is a valid dom event and attach it
 			if (Utils.dom.validEvent("div", eventName)) {
-				props[`on${eventName}`] = (event) => layer.emit(eventName as any, event)
+				props[`on${eventName}`] = (event) => this.props.renderable.emit(eventName as any, event)
 			}
 		}
 
-		return Preact.h("div", props, this.props.layer.children.map(renderLayer))
+		return Preact.h("div", props, this.props.renderable.children.map(renderLayer))
 	}
 }
 
-const renderLayer = (layer) => {
-	return Preact.h<Props>(Renderable, {layer: layer, key: layer.id}, layer.children.map(renderLayer))
+const renderLayer = (renderable: Renderable<any>) => {
+	return Preact.h<Props>(RenderableComponent, {
+		renderable: renderable,
+		key: renderable.id.toString()},
+		renderable.children.map(renderLayer))
 }
 
 export const render = (context: Context, root: HTMLElement) => {

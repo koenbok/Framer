@@ -1,8 +1,8 @@
 import * as _ from "lodash-es"
-import * as types from "Types"
+import * as Types from "Types"
 import * as Utils from "Utils"
 
-import {BaseClass} from "BaseClass"
+import {Renderable} from "Renderable"
 import {Collection} from "Collection"
 import {Context, DefaultContext, CurrentContext} from "Context"
 import {AnimatableProperties} from "AnimationProperty"
@@ -20,12 +20,12 @@ export interface LayerOptions {
 	width?: number
 	height?: number
 	backgroundColor?: string
-	point?: types.Point,
-	size?: types.Size,
-	frame?: types.Frame,
+	point?: Types.Point,
+	size?: Types.Size,
+	frame?: Types.Frame,
 	opacity?: number
 	image?: string|null,
-	style?: types.CSSStyles,
+	style?: Types.CSSStyles,
 }
 
 type LayerProperties = keyof LayerOptions
@@ -52,7 +52,7 @@ export type LayerEventTypes =
 	AnimationEventTypes
 
 
-export class Layer extends BaseClass<LayerEventTypes> {
+export class Layer extends Renderable<LayerEventTypes> {
 
 	private _context: Context
 	private _parent: Layer|null
@@ -174,23 +174,23 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		this.context.renderer.updateKeyStyle(this, "height", value)
 	}
 
-	get point(): types.Point {
+	get point(): Types.Point {
 		return {x: this.x, y: this.y}
 	}
 
-	set point(point: types.Point) {
+	set point(point: Types.Point) {
 		Object.assign(this, point)
 	}
 
-	get size(): types.Size {
+	get size(): Types.Size {
 		return {width: this.width, height: this.height}
 	}
 
-	set size(size: types.Size) {
+	set size(size: Types.Size) {
 		Object.assign(this, size)
 	}
 
-	get frame(): types.Frame {
+	get frame(): Types.Frame {
 		return {
 			x: this.width,
 			y: this.height,
@@ -199,7 +199,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		}
 	}
 
-	set frame(frame: types.Frame) {
+	set frame(frame: Types.Frame) {
 		Object.assign(this, frame)
 	}
 
@@ -218,11 +218,11 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		return this._properties.styles
 	}
 
-	set styles(styles: types.CSSStyles) {
+	set styles(styles: Types.CSSStyles) {
 		this.updateStyles(styles)
 	}
 
-	readonly updateStyles = (styles: types.CSSStyles) => {
+	readonly updateStyles = (styles: Types.CSSStyles) => {
 		if (_.isEmpty(styles)) { return }
 		Object.assign(this._properties.styles, styles)
 		this.context.renderer.updateCustomStyles(this, styles)
