@@ -12,7 +12,6 @@ lib
 npm-debug.log
 test/phantomjs/tests.js
 test/phantomjs/tests.js.map
-framer/**/*.js
 framer/**/*.js.map
 test/tests/**/*.js
 test/tests/**/*.js.map
