@@ -32,15 +32,24 @@ class RenderableComponent extends Preact.Component<Props, {}> {
 
 		const props = {}
 
-		// FIXME: Again there might not be a layer here
-
 		// Add all event handlers to the dom element
 		for (let eventName in this.props.renderable.eventListeners()) {;
+
+			// Don't listen to animation events for now. Unfortunately they
+			// are the same as css events :-(
+			// TODO: Account for touch events?
+			if (
+				eventName === "AnimationStart" ||
+				eventName === "AnimationStop" ||
+				eventName === "AnimationEnd") {
+					continue
+				}
 
 			// See if any of the events is a valid dom event and attach it
 			if (Utils.dom.validEvent("div", eventName)) {
 				props[`on${eventName}`] = (event) => this.props.renderable.emit(eventName as any, event)
 			}
+
 		}
 
 		return Preact.h("div", props, this.props.renderable.children.map(renderLayer))

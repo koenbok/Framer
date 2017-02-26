@@ -1,3 +1,5 @@
+import * as _ from "lodash-es"
+
 const __domCompleteState = "interactive"
 let __domComplete: Function[] = []
 let __domReady = false
@@ -28,31 +30,13 @@ export const detach = (node: Element) => {
 	}
 }
 
-let _validEventCache = {}
-let _validEventCacheElements = {}
-/** Returns if  certain event is a valid dome event for this element type. */
+
 export const validEvent = (tagName: string, eventName: string) => {
-
-	if (_validEventCache[tagName]) {
-		return true
-	}
-
-	if (eventName in ["touchstart", "touchmove", "touchend"]) {
-		return true
-	}
-
-	let element = _validEventCacheElements[tagName]
-
-	if (!element) {
-		element = document.createElement(tagName)
-		_validEventCacheElements[tagName] = element
-	}
-
-	let result = (typeof element[`on${eventName.toLowerCase()}`] !== undefined)
-	_validEventCache[tagName] = result
-
-	return result
+	let element = document.createElement(tagName)
+	return element[`on${eventName.toLowerCase()}`] !== undefined
 }
+
+// export const validEvent = _.memoize(_validEvent)
 
 export const assignStyles = (element: HTMLElement, style: Object) => {
 

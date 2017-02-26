@@ -264,6 +264,11 @@ export class Layer extends Renderable<LayerEventTypes> {
 	onAnimationEnd = (handler: Function) => { this.on("AnimationEnd", handler) }
 	onChange = (property: LayerProperties, handler: Function) => { this.on(`change:${property}` as any, handler) }
 
+	addEventListener(eventName: LayerEventTypes, fn: Function, once: boolean, context: Object) {
+		super.addEventListener(eventName, fn, once, context)
+		this.context.renderer.updateStructure()
+	}
+
 
 	// Properties
 

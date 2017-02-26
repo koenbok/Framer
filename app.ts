@@ -3,21 +3,22 @@
 import {Layer, Framer, Context, Utils, Curve} from "Framer"
 
 
-
+const rnd = () => Math.round(Math.random() * 800)
 const run = () => {
 
 	Context.Default.reset()
 
 	let layers = Utils.range(100).map(() => {
 		return new Layer({
-			x: Math.round(Math.random() * 200),
-			y: Math.round(Math.random() * 200)})
+			x: rnd(),
+			y: rnd()
+		})
 	})
 
 	setTimeout(() => {
 		layers.forEach((layer) => {
 			layer.backgroundColor = Utils.randomColor(0.5)
-			layer.animate({x: 0, y: 0})
+			layer.animate({x: rnd(), y: rnd()}, Curve.springrk4(100, 50))
 		})
 	}, 1000)
 
@@ -73,11 +74,10 @@ const run = () => {
 
 
 
-// const layer = new Layer()
+const layer = new Layer()
 
-// const animation = layer.animate({x: 400}, Curve.springrk4(100, 10))
+layer.onClick(event => layer.animate({x: 400}, Curve.springrk4(100, 10)))
 
-// animation.on("AnimationStart", () => console.log("AnimationStart"))
 
 
 
@@ -86,6 +86,6 @@ const run = () => {
 
 
 
-let layer = new Layer()
+// let layer = new Layer()
 
 

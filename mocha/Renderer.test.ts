@@ -56,4 +56,22 @@ describe("Renderer", () => {
 
 	})
 
+	isolated.test("should add dom events", (context, done) => {
+
+		context.renderer.loop.pause = true
+
+		const layer = new Layer()
+		const handler = (event) => {}
+		context.renderer.loop.next()
+
+		layer.onClick(handler)
+		context.renderer.loop.next()
+
+		console.log(context.renderer.element.childNodes[0].childNodes[0])
+
+
+
+		done()
+	})
+
 })
