@@ -10,9 +10,9 @@ bootstrap:
 # 	./node_modules/.bin/jest --watchAll
 
 test: bootstrap
-	$(NODE_BIN)/webpack-dev-server \
-		--config webpack/webpack.tests.js \
-		--open
+	open "http://localhost:8080/webpack-dev-server/" & \
+		$(NODE_BIN)/webpack-dev-server --config webpack/webpack.tests.js
+
 
 build: bootstrap
 	$(NODE_BIN)/webpack \
