@@ -1,60 +1,59 @@
-// import {expect, assert} from "chai"
-// // import * as assert from "assert"
-// import {isolated} from "./TestUtils"
-// import {Layer, Framer, Utils, Context} from "Framer"
-
-// const expectCounts = (context: Context, a, b, c, d) => {
-// 	expect(context.renderer.updateStructureCount).to.equal(a)
-// 	expect(context.renderer.updateStyleCount).to.equal(b)
-// 	expect(context.renderer.renderStructureCount).to.equal(c)
-// 	expect(context.renderer.renderStyleCount).to.equal(d)
-// }
+import {expect, assert} from "chai"
+import {isolated} from "./TestUtils"
+import {Layer, Framer, Utils, Context} from "Framer"
 
 
-// describe("Renderer", () => {
 
-// 	isolated.test("should mark dirty properties", (context, done) => {
+describe("Renderer", () => {
 
-// 		context.renderer.loop.pause = true
+	isolated.test("should mark dirty properties", (context, done) => {
 
-// 		const layer = new Layer()
-// 		expect(context.renderer.updateStyleCount).to.equal(5)
-// 		expect(context.renderer.updateStructureCount).to.equal(1)
-// 		expect(context.renderer.renderStyleCount).to.equal(0)
-// 		expect(context.renderer.renderStructureCount).to.equal(0)
-// 		expect(layer._element).to.be.undefined
+		context.renderer.loop.pause = true
 
-// 		context.renderer.loop.next()
-// 		expect(context.renderer.updateStyleCount).to.equal(5)
-// 		expect(context.renderer.updateStructureCount).to.equal(1)
-// 		expect(context.renderer.renderStyleCount).to.equal(1)
-// 		expect(context.renderer.renderStructureCount).to.equal(1)
-// 		expect(layer._element).to.be.instanceof(HTMLElement)
+		const layer = new Layer()
 
-// 		context.renderer.loop.next()
-// 		expect(context.renderer.updateStyleCount).to.equal(5)
-// 		expect(context.renderer.updateStructureCount).to.equal(1)
-// 		expect(context.renderer.renderStyleCount).to.equal(1)
-// 		expect(context.renderer.renderStructureCount).to.equal(1)
+		expect(context.renderer.counters.updateStructure).to.equal(1)
+		expect(context.renderer.counters.updateKeyStyle).to.equal(0)
+		expect(context.renderer.counters.updateCustomStyles).to.equal(0)
+		expect(context.renderer.counters.renderStructure).to.equal(0)
+		expect(context.renderer.counters.renderStyle).to.equal(0)
+		expect(layer._element).to.be.undefined
 
-// 		layer.x = 500
+		context.renderer.loop.next()
+		expect(context.renderer.counters.updateStructure).to.equal(1)
+		expect(context.renderer.counters.updateKeyStyle).to.equal(0)
+		expect(context.renderer.counters.updateCustomStyles).to.equal(0)
+		expect(context.renderer.counters.renderStructure).to.equal(1)
+		expect(context.renderer.counters.renderStyle).to.equal(0)
+		expect(layer._element).to.be.instanceof(HTMLElement)
 
-// 		context.renderer.loop.next()
-// 		expect(context.renderer.updateStyleCount).to.equal(6)
-// 		expect(context.renderer.updateStructureCount).to.equal(1)
-// 		expect(context.renderer.renderStyleCount).to.equal(2)
-// 		expect(context.renderer.renderStructureCount).to.equal(1)
+		context.renderer.loop.next()
+		expect(context.renderer.counters.updateStructure).to.equal(1)
+		expect(context.renderer.counters.updateKeyStyle).to.equal(0)
+		expect(context.renderer.counters.updateCustomStyles).to.equal(0)
+		expect(context.renderer.counters.renderStructure).to.equal(1)
+		expect(context.renderer.counters.renderStyle).to.equal(0)
 
-// 		layer.parent = new Layer()
+		layer.x = 500
 
-// 		context.renderer.loop.next()
-// 		expect(context.renderer.updateStyleCount).to.equal(11)
-// 		expect(context.renderer.updateStructureCount).to.equal(3)
-// 		expect(context.renderer.renderStyleCount).to.equal(3)
-// 		expect(context.renderer.renderStructureCount).to.equal(2)
+		context.renderer.loop.next()
+		expect(context.renderer.counters.updateStructure).to.equal(1)
+		expect(context.renderer.counters.updateKeyStyle).to.equal(1)
+		expect(context.renderer.counters.updateCustomStyles).to.equal(0)
+		expect(context.renderer.counters.renderStructure).to.equal(1)
+		expect(context.renderer.counters.renderStyle).to.equal(1)
 
-// 		done()
+		layer.parent = new Layer()
 
-// 	})
+		context.renderer.loop.next()
+		expect(context.renderer.counters.updateStructure).to.equal(3)
+		expect(context.renderer.counters.updateKeyStyle).to.equal(1)
+		expect(context.renderer.counters.updateCustomStyles).to.equal(0)
+		expect(context.renderer.counters.renderStructure).to.equal(2)
+		expect(context.renderer.counters.renderStyle).to.equal(1)
 
-// })
+		done()
+
+	})
+
+})

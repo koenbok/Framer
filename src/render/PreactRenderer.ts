@@ -18,6 +18,7 @@ class Renderable extends Preact.Component<Props, {}> {
 	}
 
 	componentDidMount() {
+		this.props.layer._element = this.base
 		this.props.layer.context.renderer.componentDidMount(this.props.layer)
 	}
 
@@ -32,9 +33,7 @@ class Renderable extends Preact.Component<Props, {}> {
 	render() {
 
 		const layer = this.props.layer
-		const props = {
-			ref: (ref: HTMLElement) => { layer._element = ref }
-		}
+		const props = {}
 
 		// FIXME: Again there might not be a layer here
 

@@ -37,7 +37,7 @@ export class Renderer {
 	private _context: Context
 	private _hasDirtyStructure = false
 	private _dirtyStyleItems: Set<Renderable> = new Set()
-	private counters = {
+	private _counters = {
 		updateKeyStyle: 0,
 		updateCustomStyles: 0,
 		updateStructure: 0,
@@ -63,6 +63,10 @@ export class Renderer {
 
 	get element() {
 		return this._element
+	}
+
+	get counters() {
+		return Object.assign({}, this._counters)
 	}
 
 	get html() {
@@ -107,14 +111,14 @@ export class Renderer {
 	// Update
 
 	updateStructure(item?: Renderable) {
-		this.counters.updateStructure++
+		this._counters.updateStructure++
 		if (this._hasDirtyStructure) { return }
 		this._hasDirtyStructure = true
 		this.requestRender()
 	}
 
 	updateKeyStyle(item: Renderable, key, value) {
-		this.counters.updateKeyStyle++
+		this._counters.updateKeyStyle++
 		let styles = this.getDirtyStyles(item)
 		assignStyles(item as Layer, [key], styles)
 		this._dirtyStyleItems.add(item)
@@ -122,7 +126,7 @@ export class Renderer {
 	}
 
 	updateCustomStyles(item: Renderable, styles: Types.CSSStyles) {
-		this.counters.updateCustomStyles++
+		this._counters.updateCustomStyles++
 		Object.assign(this.getDirtyStyles(item), styles)
 		this._dirtyStyleItems.add(item)
 		this.requestRender()
@@ -141,7 +145,7 @@ export class Renderer {
 	}
 
 	renderStructure = () => {
-		this.counters.renderStructure++
+		this._counters.renderStructure++
 		render(this.context, this._element)
 		this._hasDirtyStructure = false
 	}
@@ -154,7 +158,7 @@ export class Renderer {
 		// 	return
 		// }
 
-		this.counters.renderStyle++
+		this._counters.renderStyle++
 
 		for (let layer of this._dirtyStyleItems) {
 			Utils.dom.assignStyles(layer._element, this.flushDirtyStyles(layer))

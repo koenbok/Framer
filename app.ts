@@ -42,8 +42,8 @@ const run = () => {
 
 // }
 
-run()
-setInterval(run, 2000)
+// run()
+// setInterval(run, 2000)
 
 // let layer = new Layer()
 
@@ -86,6 +86,6 @@ setInterval(run, 2000)
 
 
 
-
+let layer = new Layer()
 
 
