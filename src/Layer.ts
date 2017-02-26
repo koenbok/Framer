@@ -16,6 +16,7 @@ export interface LayerOptions {
 	parent?: Layer|null
 	x?: number
 	y?: number
+	z?: number
 	width?: number
 	height?: number
 	backgroundColor?: string
@@ -58,6 +59,7 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	private _properties = {
 		x: 0,
 		y: 0,
+		z: 0,
 		width: 200,
 		height: 200,
 		backgroundColor: "rgba(255, 0, 0, 0.5)",
@@ -137,6 +139,17 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		this._properties.y = value
 		this._didChangeKey("y", value)
 		this.context.renderer.updateKeyStyle(this, "y", value)
+	}
+
+	get z() {
+		return this._properties.z
+	}
+
+	set z(value) {
+		if (!this._shouldChangeKey("z", value)) { return }
+		this._properties.y = value
+		this._didChangeKey("z", value)
+		this.context.renderer.updateKeyStyle(this, "z", value)
 	}
 
 	get width() {

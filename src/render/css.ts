@@ -2,7 +2,7 @@ import {Layer, LayerOptions} from "../Layer"
 
 const getStyle = {
 	position: (layer: Layer) => "absolute",
-	transform: (layer: Layer) => `translate(${layer.x}px, ${layer.y}px)`,
+	transform: (layer: Layer) => `translate3d(${layer.x}px, ${layer.y}px, ${layer.z}px)`,
 	width: (layer: Layer) => `${layer.width}px`,
 	height: (layer: Layer) => `${layer.height}px`,
 	backgroundColor: (layer: Layer) => layer.backgroundColor
