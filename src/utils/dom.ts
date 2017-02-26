@@ -54,7 +54,13 @@ export const validEvent = (tagName: string, eventName: string) => {
 	return result
 }
 
-export const setStyle = (element: HTMLElement, style: Object) => {
+export const assignStyles = (element: HTMLElement, style: Object) => {
+
+	// if (!element) {
+	// 	console.warn("Woops could not set style.")
+	// 	return
+	// }
+
 	// TODO: Find fastest way to update css
 	Object.assign(element.style, style)
 }

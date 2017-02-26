@@ -16,9 +16,8 @@ const run = () => {
 
 	setTimeout(() => {
 		layers.forEach((layer) => {
-			console.log(layer.describe());
-
 			layer.backgroundColor = Utils.randomColor(0.5)
+			layer.animate({x: 0, y: 0})
 		})
 	}, 1000)
 
@@ -43,8 +42,8 @@ const run = () => {
 
 // }
 
-// run()
-// setInterval(run, 2000)
+run()
+setInterval(run, 2000)
 
 // let layer = new Layer()
 
@@ -74,11 +73,11 @@ const run = () => {
 
 
 
-const layer = new Layer()
+// const layer = new Layer()
 
-const animation = layer.animate({x: 400}, Curve.springrk4(100, 10))
+// const animation = layer.animate({x: 400}, Curve.springrk4(100, 10))
 
-animation.on("AnimationStart", () => console.log("AnimationStart"))
+// animation.on("AnimationStart", () => console.log("AnimationStart"))
 
 
 

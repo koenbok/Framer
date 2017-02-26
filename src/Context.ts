@@ -41,6 +41,9 @@ export class Context extends BaseClass<ContextEventTypes> {
 
 	constructor(name: string, options: ContextOptions= {}) {
 		super()
+
+		options.name = name
+
 		Object.assign(this._properties, options)
 		this._renderer = new Renderer(this, this._properties.loop)
 	}

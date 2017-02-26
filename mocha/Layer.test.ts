@@ -6,9 +6,25 @@ import {Layer, Curve, Utils} from "Framer"
 
 describe("Layer", () => {
 
+
+
 	isolated.test("should set property on create", (context, done) => {
 		const layer = new Layer({x: 500})
 		expect(layer.x).to.equal(500)
+		done()
+	})
+
+	isolated.test("should set point", (context, done) => {
+		const layer = new Layer({point: {x: 500, y: 500}})
+		expect(layer.x).to.equal(500)
+		expect(layer.y).to.equal(500)
+		done()
+	})
+
+	isolated.test("should override point if x is set", (context, done) => {
+		const layer = new Layer({point: {x: 500, y: 500}, x: 200})
+		expect(layer.x).to.equal(200)
+		expect(layer.y).to.equal(500)
 		done()
 	})
 
@@ -16,6 +32,17 @@ describe("Layer", () => {
 		const layer = new Layer()
 		layer.x = 500
 		expect(layer.x).to.equal(500)
+		done()
+	})
+
+	isolated.test("should not emit on creation", (context, done) => {
+		const layer = new Layer()
+		let count = 0
+		layer.onChange("x", e => {
+			count++
+
+		})
+		expect(count).to.equal(0)
 		done()
 	})
 

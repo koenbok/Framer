@@ -2,33 +2,50 @@ import * as Utils from "Utils"
 import {AnimationLoop} from "AnimationLoop"
 import {Context} from "Context"
 import {Layer} from "Layer"
-import {getStyles, getFullStyles} from "render/css"
+import {CSSStyles} from "Types"
+import {assignStyles, assignAllStyles} from "render/css"
 import {render} from "render/PreactRenderer"
+
+
+const createRendererElement = () => {
+
+	const element = document.createElement("div")
+
+	element.classList.add("renderer")
+
+	Utils.dom.assignStyles(element, {
+		position: "absolute",
+		top: "0px",
+		right: "0px",
+		bottom: "0px",
+		left: "0px",
+	})
+
+	return element
+}
 
 export class Renderer {
 
-	private _loop: AnimationLoop
-	private _context: Context
-	private _dirtyStructure = false
-	private _dirtyStyle: Set<Layer> = new Set()
-	private _updateStructureCount = 0
-	private _updateStyleCount = 0
-	private _renderStructureCount = 0
-	private _renderStyleCount = 0
-	private _element = document.createElement("div")
-
 	manual = false
 
+	private _loop: AnimationLoop
+	private _context: Context
+	private _hasDirtyStructure = false
+	private _dirtyStyleItems: Set<Layer> = new Set()
+	private counters = {
+		updateKeyStyle: 0,
+		updateCustomStyles: 0,
+		updateStructure: 0,
+		renderStyle: 0,
+		renderStructure: 0
+	}
+
+	private _element = createRendererElement()
+
 	constructor(context: Context, loop: AnimationLoop) {
+
 		this._context = context
 		this._loop = loop
-
-		this._element.className = "context"
-		this._element.style.position = "absolute"
-		this._element.style.top = "0px"
-		this._element.style.right = "0px"
-		this._element.style.bottom = "0px"
-		this._element.style.left = "0px"
 
 		Utils.dom.whenReady(() => {
 			document.body.appendChild(this.element)
@@ -55,92 +72,104 @@ export class Renderer {
 		return this._loop
 	}
 
-	get updateStyleCount() {
-		return this._updateStyleCount
-	}
-
-	get updateStructureCount() {
-		return this._updateStructureCount
-	}
-
-	get renderStructureCount() {
-		return this._renderStructureCount
-	}
-
-	get renderStyleCount() {
-		return this._renderStyleCount
-	}
-
 	getDirtyStyles = (layer: Layer) => {
 		if (!layer["_dirty"]) { layer["_dirty"] = {} }
 		return layer["_dirty"]
 	}
 
 	flushDirtyStyles = (layer: Layer) => {
+		let dirtyStyles = this.getDirtyStyles(layer)
 		layer["_dirty"] = {}
+		return dirtyStyles
 	}
+
+
+	get hasDirtyStructure() {
+		return this._hasDirtyStructure
+	}
+
+	get hasDirtyStyleItems() {
+		return this._dirtyStyleItems.size > 0
+	}
+
+	requestRender = () => {
+		if (this.manual) { return }
+		if (this.hasDirtyStyleItems || this.hasDirtyStructure) {
+			this.loop.schedule("render", this.render)
+		}
+	}
+
+	// Update
 
 	updateStructure(layer: Layer | Context) {
-
-		this._updateStructureCount++
-
-		if (this._dirtyStructure) { return }
-		if (!this.manual) { this.loop.schedule("render", this.render) }
-		this._dirtyStructure = true
+		this.counters.updateStructure++
+		if (this._hasDirtyStructure) { return }
+		this._hasDirtyStructure = true
+		this.requestRender()
 	}
 
-	updateStyle(layer: Layer, key, value) {
-
-		this._updateStyleCount++
-
-		if (this._dirtyStyle.size === 0) {
-			if (!this.manual) { this.loop.schedule("render", this.render) }
-		}
-
+	updateKeyStyle(layer: Layer, key, value) {
+		this.counters.updateKeyStyle++
 		let styles = this.getDirtyStyles(layer)
-		getStyles(layer, [key], styles)
-
-		// this._dirtyStyles.push({layer, key, value})
-
-		this._dirtyStyle.add(layer)
+		assignStyles(layer, [key], styles)
+		this._dirtyStyleItems.add(layer)
+		this.requestRender()
 	}
 
-	get dirtyStructure() {
-		return this._dirtyStructure
-	}
-
-	get dirtyStyle() {
-		return this._dirtyStyle.size > 0
+	updateCustomStyles(layer: Layer, styles: CSSStyles) {
+		this.counters.updateCustomStyles++
+		Object.assign(this.getDirtyStyles(layer), styles)
+		this._dirtyStyleItems.add(layer)
+		this.requestRender()
 	}
 
 	render = () => {
 
-		if (this.dirtyStructure) {
+		if (this.hasDirtyStructure) {
 			this.renderStructure()
 		}
 
-		if (this.dirtyStyle) {
+		if (this.hasDirtyStyleItems) {
 			return this.renderStyle()
 		}
 
 	}
 
 	renderStructure = () => {
-		this._renderStructureCount++
+		this.counters.renderStructure++
 		render(this.context, this._element)
-		this._dirtyStructure = false
-
+		this._hasDirtyStructure = false
 	}
 
 	renderStyle = () => {
-		this._renderStyleCount++
 
+		// We always need to have structure before we can apply style.
+		// if (this.renderStructureCount === 0) {
+		// 	this.renderStructure()
+		// 	return
+		// }
 
-		for (let layer of this._dirtyStyle) {
-			Utils.dom.setStyle(layer._element, this.getDirtyStyles(layer))
-			this.flushDirtyStyles(layer)
+		this.counters.renderStyle++
+
+		for (let layer of this._dirtyStyleItems) {
+			Utils.dom.assignStyles(layer._element, this.flushDirtyStyles(layer))
 		}
 
-		this._dirtyStyle = new Set()
+		this._dirtyStyleItems.clear()
+	}
+
+
+	componentWillMount(layer: Layer) {
+
+	}
+
+	componentDidMount(layer: Layer) {
+		// On a full mount we want all styles to be applied to the dom node
+		Utils.dom.assignStyles(layer._element, assignAllStyles(layer))
+		Utils.dom.assignStyles(layer._element, layer.styles)
+	}
+
+	componentWillUnmount(layer: Layer) {
+
 	}
 }

@@ -5,6 +5,7 @@
     "@types/mocha": "^2.2.38",
     "@types/node": "^7.0.3",
     "chai": "^3.5.0",
+    "dts-builder": "^1.1.0",
     "git-repo-info": "^1.4.0",
     "html-webpack-plugin": "^2.28.0",
     "json-loader": "^0.5.4",

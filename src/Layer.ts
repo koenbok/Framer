@@ -1,3 +1,7 @@
+import * as _ from "lodash-es"
+import * as types from "Types"
+import * as Utils from "Utils"
+
 import {BaseClass} from "BaseClass"
 import {Collection} from "Collection"
 import {Context, DefaultContext, CurrentContext} from "Context"
@@ -6,16 +10,21 @@ import {Animation, AnimationEventTypes} from "Animation"
 import {AnimationCurve} from "AnimationCurve"
 import {Curve} from "Curve"
 
+
 export interface LayerOptions {
-		context?: Context
-		parent?: Layer|null
-		x?: number
-		y?: number
-		width?: number
-		height?: number
-		backgroundColor?: string
-		opacity?: number
-		image?: string|null
+	context?: Context
+	parent?: Layer|null
+	x?: number
+	y?: number
+	width?: number
+	height?: number
+	backgroundColor?: string
+	point?: types.Point,
+	size?: types.Size,
+	frame?: types.Frame,
+	opacity?: number
+	image?: string|null,
+	style?: types.CSSStyles,
 }
 
 type LayerProperties = keyof LayerOptions
@@ -53,10 +62,11 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		height: 200,
 		backgroundColor: "rgba(255, 0, 0, 0.5)",
 		opacity: 1,
-		image: null
+		image: null,
+		styles: {}
 	}
 
-	_forceUpdate = false
+	_initialized = false
 	_element: HTMLElement
 	_animations = new Collection<Animation>()
 
@@ -70,10 +80,15 @@ export class Layer extends BaseClass<LayerEventTypes> {
 			this.parent = options.parent
 		}
 
-		Object.assign(this._properties, options)
+		Utils.assignOrdered(this, options, ["frame", "size", "point"])
 
-		this._updateStructure()
-		this._forceFullUpdate()
+		this._initialized = true
+		this.context.renderer.updateStructure(this)
+
+	}
+
+	get initialized() {
+		return this._initialized
 	}
 
 	get context(): Context {
@@ -91,8 +106,8 @@ export class Layer extends BaseClass<LayerEventTypes> {
 		}
 
 		this._parent = value
-		this._updateStructure()
-		this._updateProperty("parent", value)
+		this.context.renderer.updateStructure(this)
+		this._didChangeKey("parent", value)
 
 	}
 
@@ -107,10 +122,10 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	}
 
 	set x(value) {
-		if (!this._shouldUpdate("x", value)) { return }
+		if (!this._shouldChangeKey("x", value)) { return }
 		this._properties.x = value
-		this._updateProperty("x", value)
-		this._updateStyle("x", value)
+		this._didChangeKey("x", value)
+		this.context.renderer.updateKeyStyle(this, "x", value)
 	}
 
 	get y() {
@@ -118,10 +133,10 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	}
 
 	set y(value) {
-		if (!this._shouldUpdate("y", value)) { return }
+		if (!this._shouldChangeKey("y", value)) { return }
 		this._properties.y = value
-		this._updateProperty("y", value)
-		this._updateStyle("y", value)
+		this._didChangeKey("y", value)
+		this.context.renderer.updateKeyStyle(this, "y", value)
 	}
 
 	get width() {
@@ -129,10 +144,10 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	}
 
 	set width(value) {
-		if (!this._shouldUpdate("width", value)) { return }
+		if (!this._shouldChangeKey("width", value)) { return }
 		this._properties.width = value
-		this._updateProperty("width", value)
-		this._updateStyle("width", value)
+		this._didChangeKey("width", value)
+		this.context.renderer.updateKeyStyle(this, "width", value)
 	}
 
 	get height() {
@@ -140,10 +155,39 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	}
 
 	set height(value) {
-		if (!this._shouldUpdate("height", value)) { return }
+		if (!this._shouldChangeKey("height", value)) { return }
 		this._properties.height = value
-		this._updateProperty("height", value)
-		this._updateStyle("height", value)
+		this._didChangeKey("height", value)
+		this.context.renderer.updateKeyStyle(this, "height", value)
+	}
+
+	get point(): types.Point {
+		return {x: this.x, y: this.y}
+	}
+
+	set point(point: types.Point) {
+		Object.assign(this, point)
+	}
+
+	get size(): types.Size {
+		return {width: this.width, height: this.height}
+	}
+
+	set size(size: types.Size) {
+		Object.assign(this, size)
+	}
+
+	get frame(): types.Frame {
+		return {
+			x: this.width,
+			y: this.height,
+			width: this.width,
+			height: this.height
+		}
+	}
+
+	set frame(frame: types.Frame) {
+		Object.assign(this, frame)
 	}
 
 	get backgroundColor() {
@@ -151,10 +195,24 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	}
 
 	set backgroundColor(value) {
-		if (!this._shouldUpdate("backgroundColor", value)) { return }
+		if (!this._shouldChangeKey("backgroundColor", value)) { return }
 		this._properties.backgroundColor = value
-		this._updateProperty("backgroundColor", value)
-		this._updateStyle("backgroundColor", value)
+		this._didChangeKey("backgroundColor", value)
+		this.context.renderer.updateKeyStyle(this, "backgroundColor", value)
+	}
+
+	get styles() {
+		return this._properties.styles
+	}
+
+	set styles(styles: types.CSSStyles) {
+		this.updateStyles(styles)
+	}
+
+	readonly updateStyles = (styles: types.CSSStyles) => {
+		if (_.isEmpty(styles)) { return }
+		Object.assign(this._properties.styles, styles)
+		this.context.renderer.updateCustomStyles(this, styles)
 	}
 
 	// Animations
@@ -193,41 +251,16 @@ export class Layer extends BaseClass<LayerEventTypes> {
 	onAnimationEnd = (handler: Function) => { this.on("AnimationEnd", handler) }
 	onChange = (property: LayerProperties, handler: Function) => { this.on(`change:${property}` as any, handler) }
 
-	// private _dirty = new Set()
 
-	private _updateStyle(name: string, value: any) {
-		this.context.renderer.updateStyle(this, name, value)
-	}
-	private _updateStructure() {
-		this.context.renderer.updateStructure(this)
+	// Properties
+
+	private _shouldChangeKey(key, value) {
+		return this._properties[key] !== value
 	}
 
-	private _updateProperty(name: string, value: any) {
-		(this.emit as any)(`change:${name}`, value)
-		// this._dirty.add(name)
+	private _didChangeKey(key: string, value: any) {
+		(this.emit as any)(`change:${key}`, value)
 	}
-
-	private _forceFullUpdate() {
-		this._forceUpdate = true
-		Object.assign(this, this._properties)
-		this._forceUpdate = false
-	}
-
-	private _shouldUpdate(property, value) {
-		return this._forceUpdate || this._properties[property] !== value
-	}
-
-	// isDirty() {
-	// 	return this._dirty.size > 0
-	// }
-
-	// dirtyValues() {
-	// 	return pick(this, Array.from(this._dirty))
-	// }
-
-	// flush() {
-	// 	this._dirty.clear()
-	// }
 
 	describe() {
 		return `<Layer ${this.id} (${this.x}, ${this.y}) ${this.width} x ${this.height}>`

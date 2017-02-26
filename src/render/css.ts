@@ -16,7 +16,7 @@ const styleMap = {
 	backgroundColor: ["backgroundColor"]
 }
 
-export const getStyles = (
+export const assignStyles = (
 	layer: Layer,
 	properties: (keyof LayerOptions)[],
 	styles= {}) => {
@@ -30,6 +30,11 @@ export const getStyles = (
 	return styles
 }
 
-export const getFullStyles = (layer: Layer, styles= {}) => {
-	return getStyles(layer, Object.keys(styleMap) as (keyof LayerOptions)[], styles)
+export const assignAllStyles = (layer: Layer, styles= {}) => {
+
+	for (let property in getStyle) {
+		styles[property] = getStyle[property](layer)
+	}
+
+	return styles
 }

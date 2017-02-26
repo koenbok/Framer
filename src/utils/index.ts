@@ -1,3 +1,5 @@
+import * as _ from "lodash-es"
+
 import * as dom from "utils/dom"
 
 export {dom}
@@ -13,3 +15,28 @@ export const randomColor = (alpha= 1) => {
 }
 
 export const delay = (time= 0, f: Function) => { setTimeout(f, time) }
+
+export const orderedForEach = (
+	obj: Object,
+	order: string[],
+	f: (key: string, value: any) => void) => {
+
+	const rest = _.difference(Object.keys(obj), order)
+
+	for (let key of order) {
+		f(key, obj[key])
+	}
+
+	for (let key of rest) {
+		f(key, obj[key])
+	}
+}
+
+export const assignOrdered = (
+	target: Object,
+	options: Object,
+	order: string[]= []) => {
+	orderedForEach(options, order, (key, value) => {
+		target[key] = value
+	})
+}
