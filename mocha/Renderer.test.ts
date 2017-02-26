@@ -1,6 +1,6 @@
 import {expect, assert} from "chai"
-import {isolated} from "./TestUtils"
-import {Layer, Framer, Utils, Context} from "Framer"
+import {isolated} from "./Testutils"
+import {Layer, Framer, utils, Context} from "Framer"
 
 
 

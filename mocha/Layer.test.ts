@@ -1,7 +1,7 @@
 import {expect} from "chai"
-import {isolated} from "./TestUtils"
+import {isolated} from "./Testutils"
 
-import {Layer, Curve, Utils} from "Framer"
+import {Layer, Curve, utils} from "Framer"
 
 
 describe("Layer", () => {

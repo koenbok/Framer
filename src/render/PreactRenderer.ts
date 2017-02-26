@@ -1,5 +1,5 @@
 import * as Preact from "preact"
-import * as Utils from "Utils"
+import * as utils from "utils"
 import {Renderable} from "Renderable"
 import {Context} from "Context"
 import {assignStyles, assignAllStyles} from "render/css"
@@ -46,7 +46,7 @@ class RenderableComponent extends Preact.Component<Props, {}> {
 				}
 
 			// See if any of the events is a valid dom event and attach it
-			if (Utils.dom.validEvent("div", eventName)) {
+			if (utils.dom.validEvent("div", eventName)) {
 				props[`on${eventName}`] = (event) => this.props.renderable.emit(eventName as any, event)
 			}
 

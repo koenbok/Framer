@@ -1,7 +1,7 @@
 import {expect} from "chai"
-import {Utils} from "Framer"
+import {utils} from "Framer"
 
-describe("Utils", () => {
+describe("utils", () => {
 
 	describe("orderedForEach", () => {
 
@@ -13,15 +13,15 @@ describe("Utils", () => {
 			expect(Object.keys(obj)).to.eql(["a", "b", "c"])
 
 			results = []
-			Utils.orderedForEach(obj, [], f)
+			utils.orderedForEach(obj, [], f)
 			expect(results).to.eql([1, 2, 3])
 
 			results = []
-			Utils.orderedForEach(obj, ["b", "c"], f)
+			utils.orderedForEach(obj, ["b", "c"], f)
 			expect(results).to.eql([2, 3, 1])
 
 			results = []
-			Utils.orderedForEach(obj, ["c"], f)
+			utils.orderedForEach(obj, ["c"], f)
 			expect(results).to.eql([3, 1, 2])
 		})
 	})
@@ -29,23 +29,23 @@ describe("Utils", () => {
 	describe("validEvent", () => {
 
 		it("should work on click", () => {
-			expect(Utils.dom.validEvent("div", "click")).to.be.true
+			expect(utils.dom.validEvent("div", "click")).to.be.true
 		})
 
 		it("should not work on random", () => {
-			expect(Utils.dom.validEvent("div", "dkjdhkhd")).to.be.false
+			expect(utils.dom.validEvent("div", "dkjdhkhd")).to.be.false
 		})
 
 		it("should not work on change events", () => {
-			expect(Utils.dom.validEvent("div", "change:x")).to.be.false
+			expect(utils.dom.validEvent("div", "change:x")).to.be.false
 		})
 
 		it("should work on animation events", () => {
-			expect(Utils.dom.validEvent("div", "animationstart")).to.be.false
+			expect(utils.dom.validEvent("div", "animationstart")).to.be.false
 		})
 
 		it("should not work on touch events", () => {
-			expect(Utils.dom.validEvent("div", "touchstart")).to.be.false
+			expect(utils.dom.validEvent("div", "touchstart")).to.be.false
 		})
 
 	})

@@ -1,4 +1,5 @@
 import * as _ from "lodash-es"
+import * as utils from "./utils"
 
 const __domCompleteState = "interactive"
 let __domComplete: Function[] = []
@@ -30,21 +31,14 @@ export const detach = (node: Element) => {
 	}
 }
 
-
-export const validEvent = (tagName: string, eventName: string) => {
+export const _validEvent = (tagName: string, eventName: string) => {
 	let element = document.createElement(tagName)
 	return element[`on${eventName.toLowerCase()}`] !== undefined
 }
 
-// export const validEvent = _.memoize(_validEvent)
+export const validEvent = utils.memoize(_validEvent)
 
 export const assignStyles = (element: HTMLElement, style: Object) => {
-
-	// if (!element) {
-	// 	console.warn("Woops could not set style.")
-	// 	return
-	// }
-
 	// TODO: Find fastest way to update css
 	Object.assign(element.style, style)
 }

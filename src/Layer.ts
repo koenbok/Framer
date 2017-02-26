@@ -1,6 +1,6 @@
 import * as _ from "lodash-es"
 import * as Types from "Types"
-import * as Utils from "Utils"
+import * as utils from "utils"
 
 import {Renderable} from "Renderable"
 import {Collection} from "Collection"
@@ -82,7 +82,7 @@ export class Layer extends Renderable<LayerEventTypes> {
 			this.parent = options.parent
 		}
 
-		Utils.assignOrdered(this, options, ["frame", "size", "point"])
+		utils.assignOrdered(this, options, ["frame", "size", "point"])
 
 		this._initialized = true
 		this.context.renderer.updateStructure(this)

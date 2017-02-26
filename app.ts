@@ -1,6 +1,6 @@
 
 
-import {Layer, Framer, Context, Utils, Curve} from "Framer"
+import {Layer, Framer, Context, utils, Curve} from "Framer"
 
 
 const rnd = () => Math.round(Math.random() * 800)
@@ -8,7 +8,7 @@ const run = () => {
 
 	Context.Default.reset()
 
-	let layers = Utils.range(100).map(() => {
+	let layers = utils.range(100).map(() => {
 		return new Layer({
 			x: rnd(),
 			y: rnd()
@@ -17,7 +17,7 @@ const run = () => {
 
 	setTimeout(() => {
 		layers.forEach((layer) => {
-			layer.backgroundColor = Utils.randomColor(0.5)
+			layer.backgroundColor = utils.randomColor(0.5)
 			layer.animate({x: rnd(), y: rnd()}, Curve.springrk4(100, 50))
 		})
 	}, 1000)
@@ -38,7 +38,7 @@ const run = () => {
 
 
 // 	setTimeout(() => {
-// 		layer.backgroundColor = Utils.randomColor(0.5)
+// 		layer.backgroundColor = utils.randomColor(0.5)
 // 	}, 1000)
 
 // }

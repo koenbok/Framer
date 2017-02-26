@@ -1,5 +1,5 @@
 import {EventEmitter} from "EventEmitter"
-import {Utils} from "Framer"
+import {utils} from "Framer"
 
 
 const test = (f: (done) => void, n= 1000) => {
@@ -26,7 +26,7 @@ const a = test((done) => {
 })
 
 
-Utils.range(100).forEach(() => {
+utils.range(100).forEach(() => {
 	a((time, n) => {
 		console.log(`${Math.round(n / time)} ops/s`);
 	})

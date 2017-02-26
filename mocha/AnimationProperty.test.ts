@@ -1,5 +1,5 @@
 import {expect} from "chai"
-import {isolated} from "./TestUtils"
+import {isolated} from "./Testutils"
 
 import {Layer} from "Layer"
 import {Curve} from "Curve"

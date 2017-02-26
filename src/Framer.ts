@@ -1,4 +1,4 @@
-import * as Utils from "Utils"
+import * as utils from "utils"
 import {Layer} from "Layer"
 import {Context} from "Context"
 import {Renderer} from "render/Renderer"
@@ -17,7 +17,7 @@ export const Loop = new AnimationLoop()
 const printer = new Printer()
 export const print = printer.print
 
-export {Layer, Context, Utils, Renderer, Curve}
+export {utils, Layer, Context, Renderer, Curve}
 
 
 export interface Window {

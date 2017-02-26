@@ -1,4 +1,4 @@
-import * as Utils from "Utils"
+import * as utils from "utils"
 import * as Types from "Types"
 
 import {Renderable} from "Renderable"
@@ -13,7 +13,7 @@ const createRendererElement = () => {
 
 	element.classList.add("renderer")
 
-	Utils.dom.assignStyles(element, {
+	utils.dom.assignStyles(element, {
 		position: "absolute",
 		top: "0px",
 		right: "0px",
@@ -47,13 +47,13 @@ export class Renderer {
 		this._context = context
 		this._loop = loop
 
-		Utils.dom.whenReady(() => {
+		utils.dom.whenReady(() => {
 			document.body.appendChild(this.element)
 		})
 	}
 
 	destroy() {
-		Utils.dom.detach(this._element)
+		utils.dom.detach(this._element)
 	}
 
 	get element() {
@@ -150,7 +150,7 @@ export class Renderer {
 		this._counters.renderStyle++
 
 		for (let layer of this._dirtyStyleItems) {
-			Utils.dom.assignStyles(layer._element, this.flushDirtyStyles(layer))
+			utils.dom.assignStyles(layer._element, this.flushDirtyStyles(layer))
 		}
 
 		this._dirtyStyleItems.clear()
@@ -163,8 +163,8 @@ export class Renderer {
 
 	componentDidMount(item: Renderable<any>) {
 		// On a full mount we want all styles to be applied to the dom node
-		Utils.dom.assignStyles(item._element, assignAllStyles(item as any))
-		Utils.dom.assignStyles(item._element, item.styles)
+		utils.dom.assignStyles(item._element, assignAllStyles(item as any))
+		utils.dom.assignStyles(item._element, item.styles)
 	}
 
 	componentWillUnmount(item: Renderable<any>) {

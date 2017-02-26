@@ -1,4 +1,4 @@
-import * as Utils from "Utils"
+import * as utils from "utils"
 import {BaseClass} from "BaseClass"
 import {AnimationLoop} from "AnimationLoop"
 import {AnimationCurve} from "AnimationCurve"
@@ -120,7 +120,7 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 
 		if (this.running) {
 			this._layer._animations.add(this)
-			Utils.delay(0, () => this.emit("AnimationStart"))
+			utils.delay(0, () => this.emit("AnimationStart"))
 		}
 
 		return started
