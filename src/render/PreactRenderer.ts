@@ -10,14 +10,16 @@ export interface Props extends Preact.PreactHTMLAttributes {
 
 class RenderableComponent extends Preact.Component<Props, {}> {
 
+	updateElement() {
+		this.props.renderable._element = this.base
+	}
+
 	componentWillMount() {
 		this.props.renderable.context.renderer.componentWillMount(this.props.renderable)
 	}
 
 	componentDidMount() {
-		this.props.renderable._element = this.base
-		console.log(this.base.onclick);
-
+		this.updateElement()
 		this.props.renderable.context.renderer.componentDidMount(this.props.renderable)
 	}
 
@@ -26,14 +28,14 @@ class RenderableComponent extends Preact.Component<Props, {}> {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		this.props.renderable._element = this.base
+		this.updateElement()
 		this.props.renderable.context.renderer.componentDidUpdate(this.props.renderable)
 	}
 
 	render() {
 
 		let props = {
-			key: this.props.renderable.id.toString()
+			key: `${this.props.renderable.context.id}.${this.props.renderable.id}`
 		}
 
 		// Add all event handlers to the dom element
@@ -43,9 +45,7 @@ class RenderableComponent extends Preact.Component<Props, {}> {
 			}
 		}
 
-		return Preact.h(
-			"div",
-			props,
+		return Preact.h("div", props,
 			this.props.renderable.children.map(renderLayer))
 	}
 }
@@ -61,7 +61,6 @@ export const render = (context: Context, root: HTMLElement) => {
 
 	let previousNode: Element | undefined = undefined
 
-
 	// TODO: Dom lookup in each render call
 	if (root.firstChild) {
 		previousNode = root.firstChild as Element
@@ -71,4 +70,5 @@ export const render = (context: Context, root: HTMLElement) => {
 		Preact.h("div", {},
 		context.children.map(renderLayer)),
 		root, previousNode)
+
 }

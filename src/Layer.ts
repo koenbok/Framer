@@ -66,8 +66,8 @@ export type LayerEventTypes =
 
 export class Layer extends Renderable<LayerEventTypes> {
 
-	private _context: Context
-	private _parent: Layer|null
+	private _context: Context = CurrentContext
+	private _parent: Layer|null = null
 	private _properties = {
 		ignoreEvents: true,
 		x: 0,
@@ -88,12 +88,10 @@ export class Layer extends Renderable<LayerEventTypes> {
 	constructor(options: LayerOptions= {}) {
 		super()
 
+		if (options.context) { this._context = options.context }
 		this._setId(this.context.addLayer(this))
 
-		// TODO: Maybe we store parent by id in properties?
-		if (options.parent) {
-			this.parent = options.parent
-		}
+		if (options.parent) { this.parent = options.parent }
 
 		utils.assignOrdered(this, options, [
 			"frame", "size", "point",
@@ -112,17 +110,25 @@ export class Layer extends Renderable<LayerEventTypes> {
 	}
 
 	get context(): Context {
-		return this._context || CurrentContext
+		return this._context
 	}
 
 	get parent() {
 		return this._parent
 	}
 
-	set parent(value) {
+	set parent(value: Layer | null) {
 
 		if (this.parent === value) {
 			return
+		}
+
+		if (value === this) {
+			throw Error("A parent cannot be itself.")
+		}
+
+		if (value && (value.context !== this.context)) {
+			throw Error("A parent has to have the same context.")
 		}
 
 		this._parent = value
@@ -132,9 +138,7 @@ export class Layer extends Renderable<LayerEventTypes> {
 	}
 
 	get children(): Layer[] {
-		return this.context.layers.filter((layer) => {
-			return layer.parent === this
-		})
+		return this.context.layers.filter(layer => layer.parent === this)
 	}
 
 	get ignoreEvents() {

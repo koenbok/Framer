@@ -79,7 +79,7 @@ export class Context extends Renderable<ContextEventTypes> {
 	}
 
 	get children() {
-		return this.layers.filter((layer) => { return !layer.parent })
+		return this.layers.filter((layer) => { return layer.parent === null })
 	}
 
 	get renderer() {
@@ -106,6 +106,10 @@ export class Context extends Renderable<ContextEventTypes> {
 	// get y() { return 0 }
 	// get width() { return Screen.width }
 	// get height() { return Screen.height }
+
+	describe() {
+		return `<Context id=${this.id} name=${this.name}>`
+	}
 
 }
 

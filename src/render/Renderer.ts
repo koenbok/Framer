@@ -135,7 +135,7 @@ export class Renderer {
 		}
 
 		if (this.hasDirtyStyleItems) {
-			return this.renderStyle()
+			this.renderStyle()
 		}
 
 	}

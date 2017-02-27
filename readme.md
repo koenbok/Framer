@@ -14,9 +14,9 @@ A complete rewrite of the core, with everything on top.
 
 + Change css updates to be in renderer
 + Add print and describe in base, take rest out
-- Add renderer _createdLayers for full css updates inc position
++ Add renderer _createdLayers for full css updates inc position
 - Print
-- A general system for multiple resolutions
++ A general system for multiple resolutions
 
 - Port inspect tests
 

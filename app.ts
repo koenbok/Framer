@@ -1,6 +1,5 @@
-
-
-import {utils, Layer, Curve, Context} from "Framer"
+import {expect} from "chai"
+import {print, utils, Layer, Curve, Context} from "Framer"
 
 
 const rnd = () => Math.round(Math.random() * 800)
@@ -74,13 +73,16 @@ const run = () => {
 
 
 
-const layer = new Layer()
+const layerA = new Layer()
 
-layer.onClick(event => {
-	layer.animate({x: 500}, Curve.springrk4())
-		.onEnd(event => layer.x = 0)
+layerA.onClick(event => {
+	layerA.animate({x: 500}, Curve.springrk4())
+		.onEnd(event => layerA.x = 0)
 })
 
+const layerB = new Layer({parent: layerA})
+
+// print("hello")
 
 
 
@@ -91,4 +93,32 @@ layer.onClick(event => {
 
 // let layer = new Layer()
 
+const ctx = new Context("whoop")
+let background: Layer
+
+const setup = () => {
+
+	console.log("START");
+
+	background = new Layer({})
+
+	const layer = new Layer({
+		parent: background,
+		frame: background.frame
+	})
+
+	expect(layerA.context).to.not.equal(ctx)
+	expect(Context.Default).to.not.equal(ctx)
+	expect(Context.Default).to.not.equal(Context.Current)
+
+	// assert.equal(ctx, layer.context)
+	// assert.deepEqual(background.children, [layer])
+
+	console.log("DONE");
+
+}
+
+
+
+ctx.run(setup)
 

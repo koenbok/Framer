@@ -16,7 +16,7 @@ export class Printer extends BaseClass<null> {
 	}
 
 
-	readonly print = () => {
+	readonly print = (...args) => {
 
 		if (!this._layer) {
 			this._context.run(this._setup)
@@ -39,5 +39,6 @@ export class Printer extends BaseClass<null> {
 			parent: background,
 			frame: background.frame
 		})
+
 	}
 }
