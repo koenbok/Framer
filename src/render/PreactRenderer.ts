@@ -34,19 +34,24 @@ class RenderableComponent extends Preact.Component<Props, {}> {
 
 	render() {
 
+		const renderable = this.props.renderable
+
 		let props = {
-			key: `${this.props.renderable.context.id}.${this.props.renderable.id}`
+			key: `${renderable.context.id}.${renderable.id}`
 		}
 
 		// Add all event handlers to the dom element
-		for (let eventName of utils.dom.getDOMEventKeys(this.props.renderable)) {
+		for (let eventName of utils.dom.getDOMEventKeys(renderable)) {
 			props[`on${eventName}`] = (event) => {
-				this.props.renderable.emit(eventName as any, event)
+				renderable.emit(eventName as any, event)
 			}
 		}
 
-		return Preact.h("div", props,
-			this.props.renderable.children.map(renderLayer))
+		let children = renderable.children.map(renderLayer)
+
+		if (renderable.text) { children.push(Preact.h("span", {}, renderable.text))}
+
+		return Preact.h("div", props, children)
 	}
 }
 

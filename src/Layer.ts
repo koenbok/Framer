@@ -37,7 +37,8 @@ export interface LayerOptions {
 	frame?: Types.Frame,
 	opacity?: number
 	image?: string|null,
-	style?: Types.CSSStyles,
+	styles?: Types.CSSStyles,
+	text?: string
 }
 
 type LayerProperties = keyof LayerOptions
@@ -78,7 +79,8 @@ export class Layer extends Renderable<LayerEventTypes> {
 		backgroundColor: "rgba(255, 0, 0, 0.5)",
 		opacity: 1,
 		image: null,
-		styles: {}
+		styles: {},
+		text: ""
 	}
 
 	_initialized = false
@@ -291,6 +293,17 @@ export class Layer extends Renderable<LayerEventTypes> {
 		if (_.isEmpty(styles)) { return }
 		Object.assign(this._properties.styles, styles)
 		this.context.renderer.updateCustomStyles(this, styles)
+	}
+
+	get text() {
+		return this._properties.text
+	}
+
+	set text(value) {
+		if (!this._shouldChangeKey("text", value)) { return }
+		this._properties.text = value
+		this._didChangeKey("text", value)
+		this.context.renderer.updateStructure(this)
 	}
 
 	// Animations

@@ -19,7 +19,13 @@ const getStyle = {
 	},
 	width: (layer: Layer) => `${layer.context.dpr(layer.width)}px`,
 	height: (layer: Layer) => `${layer.context.dpr(layer.height)}px`,
-	backgroundColor: (layer: Layer) => layer.backgroundColor
+	backgroundColor: (layer: Layer) => layer.backgroundColor,
+	backgroundRepeat: (layer: Layer) => "no-repeat",
+	backgroundPosition: (layer: Layer) => "center",
+	backgroundSize: (layer: Layer) => "cover",
+	"-webkit-overflow-scrolling": (layer: Layer) => "touch",
+	"-webkit-box-sizing": (layer: Layer) => "border-box",
+	"-webkit-user-select": (layer: Layer) => "none"
 }
 
 const styleMap = {

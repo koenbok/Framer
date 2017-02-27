@@ -37,7 +37,7 @@ export const inspectObjectType = (item: any) => {
 	return "Object"
 }
 
-export const inspect = (item: any, max= 5, level= 0): string =>  {
+export const inspect = (item: any, max= 5, level= 0): string => {
 
 	if (item === null) { return "null" }
 	if (item === undefined) { return "undefined" }
@@ -93,6 +93,10 @@ export const inspect = (item: any, max= 5, level= 0): string =>  {
 
 	return "#{item}"
 
+}
+
+export const inspectAll = (...args): string => {
+	return args.map(item => inspect(item)).join(" ")
 }
 
 

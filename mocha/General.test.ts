@@ -94,4 +94,25 @@ describe("General", () => {
 
 	})
 
+	isolated.test("should set style", (context, done) => {
+
+		context.renderer.manual = true
+
+		const layer = new Layer({
+			styles: {
+				right: "100%"
+			}
+		})
+
+		assert.equal(layer.styles["right"], "100%")
+
+		context.renderer.render()
+
+		assert.equal(context.renderer.element.children[0].childElementCount, 1)
+		assert.equal(layer._element.style.right, "100%")
+
+		done()
+
+	})
+
 })

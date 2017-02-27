@@ -9,5 +9,6 @@ export abstract class Renderable<EventTypes> extends BaseClass<EventTypes> {
 	children: Renderable<any>[]
 	context: Context
 	styles: Types.CSSStyles
+	text: string
 	_element: HTMLElement
 }

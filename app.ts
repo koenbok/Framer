@@ -73,17 +73,27 @@ const run = () => {
 
 
 
-const layerA = new Layer()
+const layerA = new Layer({
+	text: "KONE",
+	styles: {
+		font: "12px/1.3em Menlo"
+	}
+})
 
 layerA.onClick(event => {
 	layerA.animate({x: 500}, Curve.springrk4())
 		.onEnd(event => layerA.x = 0)
 })
 
-const layerB = new Layer({parent: layerA})
-
 // print("hello")
 
+const addLines = () => {
+	for (let i = 0; i < 100; i++) {
+		print(layerA, performance.now())
+	}
+}
+addLines()
+// setInterval(addLines, 1000)
 
 
 
@@ -93,32 +103,4 @@ const layerB = new Layer({parent: layerA})
 
 // let layer = new Layer()
 
-const ctx = new Context("whoop")
-let background: Layer
-
-const setup = () => {
-
-	console.log("START");
-
-	background = new Layer({})
-
-	const layer = new Layer({
-		parent: background,
-		frame: background.frame
-	})
-
-	expect(layerA.context).to.not.equal(ctx)
-	expect(Context.Default).to.not.equal(ctx)
-	expect(Context.Default).to.not.equal(Context.Current)
-
-	// assert.equal(ctx, layer.context)
-	// assert.deepEqual(background.children, [layer])
-
-	console.log("DONE");
-
-}
-
-
-
-ctx.run(setup)
 
