@@ -57,3 +57,41 @@ export const getMaxY = (frame: Types.Frame) => {
 export const setMaxY = (frame: Types.Frame, value: number) => {
 	frame.y = frame.height === 0 ? 0 : value - frame.height
 }
+
+
+
+
+export const getTop = (frame: Types.Frame, parent: Types.Frame) => {
+	return frame.y
+}
+
+export const setTop = (frame: Types.Frame, parent: Types.Frame, value: number) => {
+	frame.y = value
+}
+
+
+export const getRight = (frame: Types.Frame, parent: Types.Frame) => {
+	return parent.width - getMaxX(frame)
+}
+
+export const setRight = (frame: Types.Frame, parent: Types.Frame, value: number) => {
+	setMaxX(frame, parent.width)
+}
+
+
+export const getBottom = (frame: Types.Frame, parent: Types.Frame) => {
+	return parent.height - getMaxY(frame)
+}
+
+export const setBottom = (frame: Types.Frame, parent: Types.Frame, value: number) => {
+	setMaxX(frame, parent.height)
+}
+
+
+export const getLeft = (frame: Types.Frame, parent: Types.Frame) => {
+	return frame.x
+}
+
+export const setLeft = (frame: Types.Frame, parent: Types.Frame, value: number) => {
+	frame.x = value
+}

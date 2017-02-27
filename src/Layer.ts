@@ -3,6 +3,7 @@ import * as Types from "Types"
 import * as utils from "utils"
 
 import {Renderable} from "Renderable"
+import {Screen} from "Screen"
 import {Collection} from "Collection"
 import {Context, DefaultContext, CurrentContext} from "Context"
 import {AnimatableProperties} from "AnimationProperty"
@@ -18,6 +19,16 @@ export interface LayerOptions {
 	x?: number
 	y?: number
 	z?: number
+	minX?: number
+	midX?: number
+	maxX?: number
+	minY?: number
+	midY?: number
+	maxY?: number
+	top?: number
+	right?: number
+	bottom?: number
+	left?: number
 	width?: number
 	height?: number
 	backgroundColor?: string
@@ -86,6 +97,7 @@ export class Layer extends Renderable<LayerEventTypes> {
 
 		utils.assignOrdered(this, options, [
 			"frame", "size", "point",
+			"top", "right", "bottom", "left",
 			"minX", "midX", "maxX",
 			"minY", "midY", "maxY"
 		])
@@ -237,6 +249,20 @@ export class Layer extends Renderable<LayerEventTypes> {
 
 	get maxY() { return utils.frame.getMaxY(this) }
 	set maxY(value) { utils.frame.setMaxY(this, value) }
+
+
+	get top() { return utils.frame.getTop(this, this.parent ? this.parent : Screen) }
+	set top(value) { utils.frame.setTop(this, this.parent ? this.parent : Screen, value) }
+
+	get right() { return utils.frame.getRight(this, this.parent ? this.parent : Screen) }
+	set right(value) { utils.frame.setRight(this, this.parent ? this.parent : Screen, value) }
+
+	get bottom() { return utils.frame.getBottom(this, this.parent ? this.parent : Screen) }
+	set bottom(value) { utils.frame.setBottom(this, this.parent ? this.parent : Screen, value) }
+
+	get left() { return utils.frame.getLeft(this, this.parent ? this.parent : Screen) }
+	set left(value) { utils.frame.setLeft(this, this.parent ? this.parent : Screen, value) }
+
 
 	get backgroundColor() {
 		return this._properties.backgroundColor

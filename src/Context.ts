@@ -4,6 +4,7 @@ import {Layer} from "Layer"
 import {Collection} from "Collection"
 import {AnimationLoop} from "AnimationLoop"
 import {Renderer} from "render/Renderer"
+import {Screen} from "Screen"
 
 export interface ContextOptions {
 	name?: string,
@@ -100,6 +101,11 @@ export class Context extends Renderable<ContextEventTypes> {
 		f()
 		CurrentContext = context
 	}
+
+	// get x() { return 0 }
+	// get y() { return 0 }
+	// get width() { return Screen.width }
+	// get height() { return Screen.height }
 
 }
 

@@ -15,6 +15,14 @@ class ScreenClass extends BaseClass<ScreenEventTypes> {
 		window.addEventListener("resize", this._onResize)
 	}
 
+	get x() {
+		return 0
+	}
+
+	get y() {
+		return 0
+	}
+
 	get width() {
 		return window.innerWidth
 	}
