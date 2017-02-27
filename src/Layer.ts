@@ -84,7 +84,11 @@ export class Layer extends Renderable<LayerEventTypes> {
 			this.parent = options.parent
 		}
 
-		utils.assignOrdered(this, options, ["frame", "size", "point"])
+		utils.assignOrdered(this, options, [
+			"frame", "size", "point",
+			"minX", "midX", "maxX",
+			"minY", "midY", "maxY"
+		])
 
 		this._initialized = true
 		this.context.renderer.updateStructure(this)
@@ -215,6 +219,24 @@ export class Layer extends Renderable<LayerEventTypes> {
 	set frame(frame: Types.Frame) {
 		Object.assign(this, frame)
 	}
+
+	get minX() { return utils.frame.getMinX(this) }
+	set minX(value) { utils.frame.setMinX(this, value) }
+
+	get midX() { return utils.frame.getMidX(this) }
+	set midX(value) { utils.frame.setMidX(this, value) }
+
+	get maxX() { return utils.frame.getMaxX(this) }
+	set maxX(value) { utils.frame.setMaxX(this, value) }
+
+	get minY() { return utils.frame.getMinY(this) }
+	set minY(value) { utils.frame.setMinY(this, value) }
+
+	get midY() { return utils.frame.getMidY(this) }
+	set midY(value) { utils.frame.setMidY(this, value) }
+
+	get maxY() { return utils.frame.getMaxY(this) }
+	set maxY(value) { utils.frame.setMaxY(this, value) }
 
 	get backgroundColor() {
 		return this._properties.backgroundColor

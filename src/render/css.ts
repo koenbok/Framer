@@ -1,6 +1,9 @@
-import {Layer, LayerOptions} from "../Layer"
+import {Config} from "Config"
+import {Layer, LayerOptions} from "Layer"
+
 
 const getStyle = {
+	position: (layer: Layer) => "absolute",
 	pointerEvents: (layer: Layer) => {
 		if (layer.ignoreEvents) {
 			return "none"
@@ -8,10 +11,14 @@ const getStyle = {
 			return "auto"
 		}
 	},
-	position: (layer: Layer) => "absolute",
-	transform: (layer: Layer) => `translate3d(${layer.x}px, ${layer.y}px, ${layer.z}px)`,
-	width: (layer: Layer) => `${layer.width}px`,
-	height: (layer: Layer) => `${layer.height}px`,
+	transform: (layer: Layer) => {
+		return `translate3d(
+			${layer.context.dpr(layer.x)}px,
+			${layer.context.dpr(layer.y)}px,
+			${layer.context.dpr(layer.z)}px)`
+	},
+	width: (layer: Layer) => `${layer.context.dpr(layer.width)}px`,
+	height: (layer: Layer) => `${layer.context.dpr(layer.height)}px`,
 	backgroundColor: (layer: Layer) => layer.backgroundColor
 }
 

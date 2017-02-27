@@ -3,10 +3,7 @@ import {isolated} from "./Testutils"
 
 import {Layer, Curve, utils} from "Framer"
 
-
 describe("Layer", () => {
-
-
 
 	isolated.test("should set property on create", (context, done) => {
 		const layer = new Layer({x: 500})

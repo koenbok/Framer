@@ -9,7 +9,8 @@ export interface ContextOptions {
 	name?: string,
 	parent?: Layer|Context|null,
 	backgroundColor?: string,
-	loop?: AnimationLoop
+	loop?: AnimationLoop,
+	pixelRatio?: number
 }
 
 export type ContextEventTypes =
@@ -36,7 +37,8 @@ export class Context extends Renderable<ContextEventTypes> {
 		name: "",
 		parent: null,
 		backgroundColor: "rgba(255, 0, 0, 0.5)",
-		loop: AnimationLoop.Default
+		loop: AnimationLoop.Default,
+		pixelRatio: 1
 	}
 
 	constructor(name: string, options: ContextOptions= {}) {
@@ -50,6 +52,21 @@ export class Context extends Renderable<ContextEventTypes> {
 
 	get name() {
 		return this._properties.name
+	}
+
+	get pixelRatio() {
+		return this._properties.pixelRatio
+	}
+
+	set pixelRatio(value) {
+		if (value === this._properties.pixelRatio) { return }
+		this._properties.pixelRatio = value
+		if (this.renderer.counters.renderStructure === 0) { return }
+		this.layers.map(this.renderer.forceRenderAllStyles)
+	}
+
+	dpr = (value: number) => {
+		return this.pixelRatio * value
 	}
 
 	addLayer(layer: Layer) {

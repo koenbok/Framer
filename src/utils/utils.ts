@@ -17,15 +17,12 @@ export const orderedForEach = (
 	order: string[],
 	f: (key: string, value: any) => void) => {
 
-	const rest = _.difference(Object.keys(obj), order)
+	const keys = Object.keys(obj)
+	const ordr = _.intersection(keys, order)
+	const rest = _.difference(keys, order)
 
-	for (let key of order) {
-		f(key, obj[key])
-	}
-
-	for (let key of rest) {
-		f(key, obj[key])
-	}
+	for (let key of ordr) { f(key, obj[key]) }
+	for (let key of rest) { f(key, obj[key]) }
 }
 
 export const assignOrdered = (
@@ -39,7 +36,7 @@ export const assignOrdered = (
 
 const hasher = (x) => {
 	if (arguments.length <= 1) {
-		return x;
+		return x
 	} else {
 		return Array.prototype.slice.call(arguments);
 	}

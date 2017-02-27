@@ -3,8 +3,23 @@ import {expect, assert} from "chai"
 import {isolated} from "./Testutils"
 import {Layer, utils} from "Framer"
 
-// describe("Context", () => {
+describe("Context", () => {
 
+	isolated.test("should use pixelRatio", (context, done) => {
+
+		context.renderer.manual = true
+		const layer = new Layer({width: 500})
+
+		context.pixelRatio = 1
+		context.renderer.render()
+		expect(layer._element.style.width).to.equal("500px")
+
+		context.pixelRatio = 2
+		context.renderer.render()
+		expect(layer._element.style.width).to.equal("1000px")
+
+		done()
+	})
 
 // 	it.only("should reset well", (done) => {
 
@@ -48,4 +63,4 @@ import {Layer, utils} from "Framer"
 // 	background.styles = {
 // 		border: "10px solid orange"
 // 	}
-// })
+})

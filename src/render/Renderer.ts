@@ -157,6 +157,11 @@ export class Renderer {
 		this._dirtyStyleItems.clear()
 	}
 
+	forceRenderAllStyles = (item: Renderable<any>) => {
+		utils.dom.assignStyles(item._element, assignAllStyles(item as any))
+		utils.dom.assignStyles(item._element, item.styles)
+	}
+
 
 	componentWillMount(item: Renderable<any>) {
 
@@ -164,8 +169,7 @@ export class Renderer {
 
 	componentDidMount(item: Renderable<any>) {
 		// On a full mount we want all styles to be applied to the dom node
-		utils.dom.assignStyles(item._element, assignAllStyles(item as any))
-		utils.dom.assignStyles(item._element, item.styles)
+		this.forceRenderAllStyles(item)
 	}
 
 	componentWillUnmount(item: Renderable<any>) {
