@@ -100,7 +100,7 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 	private tick = () => {
 
 		if (this._counter % 30 === 0) {
-			console.log("AnimationLoop.tick", this._counter, Math.round(1 / (time() - this._last)))
+			console.log(`AnimationLoop.tick frame:${this._counter} fps:${Math.round(1 / (time() - this._last))}`)
 		}
 
 		if (!this.pause) {

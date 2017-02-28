@@ -128,13 +128,12 @@ export class EventEmitter<EventName> {
 	emit(eventName: EventName, ...args: any[]) {
 
 		const name = eventName as any as string
-		let removes: number[] = []
 
 		if (!this._events[name]) {
 			return
 		}
 
-
+		let removes: number[] = []
 
 		this._events[name].forEach((listener, index) => {
 

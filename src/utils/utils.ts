@@ -1,7 +1,12 @@
 import * as _ from "lodash-es"
 
 /** Generate an Array with a range of n. */
-export const range = n => Array.from({length: n}, (value, key) => key)
+export const range = (a: number, b?: number) => {
+	let start, end
+	if (_.isNumber(a) && _.isNumber(b)) { start = a; end = b}
+	else { start = 0; end = a}
+	return Array.from({length: end}, (value, key) => key + start)
+}
 
 const randomColorValue = () => Math.round(Math.random() * 255)
 

@@ -73,34 +73,27 @@ const run = () => {
 
 
 
-const layerA = new Layer({
-	text: "KONE",
-	styles: {
-		font: "12px/1.3em Menlo"
-	}
-})
+// let layer = new Layer({width: 300})
 
-layerA.onClick(event => {
-	layerA.animate({x: 500}, Curve.springrk4())
-		.onEnd(event => layerA.x = 0)
-})
+// // layer.onClick((event) => {
+// // 	layer.animate({y: 500}, Curve.springrk4())
+// // })
 
-// print("hello")
 
-const addLines = () => {
-	for (let i = 0; i < 100; i++) {
-		print(layerA, performance.now())
+// layer.animate({y: 500}, Curve.linear(10))
+// 	.onEnd(event => layer.y = 0)
+// 	.onEnd(event => layer.y = 0)
+
+const randomPoint = () => {
+	return {
+		x: Math.random() * 500,
+		y: Math.random() * 500
 	}
 }
-addLines()
-// setInterval(addLines, 1000)
 
+for (let i in utils.range(0, 100)) {
 
+	let layer = new Layer(randomPoint())
 
-// layerC.animate({x: 50, y: 50, options: {curve: Linear(1)}})
-
-
-
-// let layer = new Layer()
-
-
+	layer.animate(randomPoint(), Curve.linear(10))
+}

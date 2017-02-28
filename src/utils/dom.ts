@@ -64,7 +64,10 @@ export const getDOMEventKeys = (item: Renderable<any>): string[] => {
 		})
 }
 
-export const assignStyles = (element: HTMLElement, style: Object) => {
-	// TODO: Find fastest way to update css
+// interface HTMLElement extends HTMLElement {
+// 	style: CSSStyleDeclaration;
+// }
+
+export const assignStyles = (element: HTMLElement, style: any) => {
 	Object.assign(element.style, style)
 }
