@@ -37,9 +37,10 @@ perf: bootstrap
 
 dts: bootstrap
 	$(NODE_BIN)/tsc --declaration --module amd --outFile $(BUILD_PATH)/framer.js
-	mv $(BUILD_PATH)/framer.d.ts $(BUILD_PATH)/framer.original.d.ts
-	awk -f extras/dts.awk < $(BUILD_PATH)/framer.original.d.ts > $(BUILD_PATH)/framer.d.ts
-	rm $(BUILD_PATH)/framer.original.d.ts
+	# mv $(BUILD_PATH)/framer.d.ts $(BUILD_PATH)/framer.original.d.ts
+	# awk -f extras/dts.awk < $(BUILD_PATH)/framer.original.d.ts > $(BUILD_PATH)/framer.d.ts
+	# cat extras/framer.global.d.ts >> $(BUILD_PATH)/framer.d.ts
+	# rm $(BUILD_PATH)/framer.original.d.ts
 
 clean:
 	rm -rf build
