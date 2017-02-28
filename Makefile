@@ -4,15 +4,11 @@ NODE_BIN = ./node_modules/.bin
 BUILD_PATH = ./build
 
 bootstrap:
-	# @yarn install --prefer-offline || (echo "Install yarn first – https://yarnpkg.com/" && exit 1)
-
-# test: bootstrap
-# 	./node_modules/.bin/jest --watchAll
+	@yarn install --prefer-offline || (echo "Install yarn first – https://yarnpkg.com/" && exit 1)
 
 test: bootstrap
 	open "http://localhost:8080/webpack-dev-server/" & \
 		$(NODE_BIN)/webpack-dev-server --config webpack/webpack.tests.js
-
 
 build: bootstrap
 	$(NODE_BIN)/webpack \
@@ -33,13 +29,17 @@ perf: bootstrap
 		--port 8009 \
 		--open
 
-$(BUILD_PATH)/framer.d.ts $(BUID_PATH)/framer.js: tsconfig.json Makefile **/*.ts
+# $(BUILD_PATH)/framer.d.ts $(BUID_PATH)/framer.js: tsconfig.json Makefile **/*.ts
+# 	$(NODE_BIN)/tsc --declaration --module amd --outFile $(BUILD_PATH)/framer.js
+
+# $(BUILD_PATH)/framer-global.d.ts: $(BUILD_PATH)/framer.d.ts
+# 	awk -f rewrite-framer-dts.awk < $ (BUILD_PATH)/framer.d.ts > $(BUILD_PATH)/framer-global.d.ts
+
+dts: bootstrap
 	$(NODE_BIN)/tsc --declaration --module amd --outFile $(BUILD_PATH)/framer.js
-
-$(BUILD_PATH)/framer-global.d.ts: $(BUILD_PATH)/framer.d.ts
-	awk -f rewrite-framer-dts.awk < $(BUILD_PATH)/framer.d.ts > $(BUILD_PATH)/framer-global.d.ts
-
-dts: $(BUILD_PATH)/framer-global.d.ts
+	mv $(BUILD_PATH)/framer.d.ts $(BUILD_PATH)/framer.original.d.ts
+	awk -f extras/dts.awk < $(BUILD_PATH)/framer.original.d.ts > $(BUILD_PATH)/framer.d.ts
+	rm $(BUILD_PATH)/framer.original.d.ts
 
 clean:
 	rm -rf build
