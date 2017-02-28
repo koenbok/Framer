@@ -2,13 +2,13 @@ import * as Types from "Types"
 
 import {BaseClass} from "BaseClass"
 
-type ScreenEventTypes =
+export type ScreenEventTypes =
 	"change:width" |
 	"change:height" |
 	"change:size" |
 	"change:frame"
 
-class ScreenClass extends BaseClass<ScreenEventTypes> {
+export class ScreenClass extends BaseClass<ScreenEventTypes> {
 
 	constructor() {
 		super()

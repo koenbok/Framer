@@ -1,3 +1,5 @@
-/// <reference path="../build/framer.global.d.ts" />
+/// <reference path="../build/framer-global.d.ts" />
 
-let layer = new Layer
+Selection
+let layer = new Layer({x: 42})
+layer.animate

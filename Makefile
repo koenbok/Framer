@@ -33,8 +33,13 @@ perf: bootstrap
 		--port 8009 \
 		--open
 
-dts:
+$(BUILD_PATH)/framer.d.ts $(BUID_PATH)/framer.js: tsconfig.json Makefile **/*.ts
 	$(NODE_BIN)/tsc --declaration --module amd --outFile $(BUILD_PATH)/framer.js
+
+$(BUILD_PATH)/framer-global.d.ts: $(BUILD_PATH)/framer.d.ts
+	awk -f rewrite-framer-dts.awk < $(BUILD_PATH)/framer.d.ts > $(BUILD_PATH)/framer-global.d.ts
+
+dts: $(BUILD_PATH)/framer-global.d.ts
 
 clean:
 	rm -rf build
