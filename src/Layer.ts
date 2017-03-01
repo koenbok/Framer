@@ -41,7 +41,7 @@ export interface LayerOptions {
 	text?: string
 }
 
-type LayerProperties = keyof LayerOptions
+export type LayerProperties = keyof LayerOptions
 
 export type LayerEventPropertyTypes =
 	"change:x" |
