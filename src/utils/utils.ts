@@ -1,4 +1,4 @@
-import * as _ from "lodash-es"
+import * as _ from "lodash"
 
 /** Generate an Array with a range of n. */
 export const range = (a: number, b?: number) => {

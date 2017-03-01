@@ -1,7 +1,7 @@
 // import * as GlobalEventListener from "hacks/GlobalEventListener"
 // GlobalEventListener.setup()
 
-import * as lodash from "lodash-es"
+import * as lodash from "lodash"
 import * as utils from "utils"
 
 import {Config} from "Config"

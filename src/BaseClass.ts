@@ -1,4 +1,4 @@
-import {pick} from "lodash-es"
+import {pick} from "lodash"
 import {EventEmitter} from "EventEmitter"
 
 let BaseClassCounter = 0

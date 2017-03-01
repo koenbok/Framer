@@ -40,6 +40,7 @@ describe("EventEmitter", () => {
 		em.on("testA", countA.add)
 		em.on("testB", countB.add)
 
+
 		em.emit("testA")
 		em.emit("testB")
 		expect(countA.value()).to.equal(1)
@@ -169,40 +170,40 @@ describe("EventEmitter", () => {
 
 	})
 
-	it("should wrap", () => {
+	// it("should wrap", () => {
 
-		let wrapCounter = 0
+	// 	let wrapCounter = 0
 
-		// Create a custom class that wraps handler functions
-		class EventEmitterTest<EventName> extends EventEmitter<EventName> {
-			wrapEventListener(eventName: EventName, handler: Function) {
-				return () => {
-					wrapCounter++
-					handler()
-				}
-			}
-		}
+	// 	// Create a custom class that wraps handler functions
+	// 	class EventEmitterTest<EventName> extends EventEmitter<EventName> {
+	// 		wrapEventListener(eventName: EventName, handler: Function) {
+	// 			return () => {
+	// 				wrapCounter++
+	// 				handler()
+	// 			}
+	// 		}
+	// 	}
 
-		const em = new EventEmitterTest<"test">()
-		const count = counter()
+	// 	const em = new EventEmitterTest<"test">()
+	// 	const count = counter()
 
-		em.on("test", count.add)
+	// 	em.on("test", count.add)
 
-		em.emit("test")
-		expect(count.value()).to.equal(1)
-		expect(wrapCounter).to.equal(1)
+	// 	em.emit("test")
+	// 	expect(count.value()).to.equal(1)
+	// 	expect(wrapCounter).to.equal(1)
 
-		em.emit("test")
-		expect(count.value()).to.equal(2)
-		expect(wrapCounter).to.equal(2)
+	// 	em.emit("test")
+	// 	expect(count.value()).to.equal(2)
+	// 	expect(wrapCounter).to.equal(2)
 
-		em.removeEventListeners("test", count.add)
+	// 	em.removeEventListeners("test", count.add)
 
-		em.emit("test")
-		expect(count.value()).to.equal(2)
-		expect(wrapCounter).to.equal(2)
+	// 	em.emit("test")
+	// 	expect(count.value()).to.equal(2)
+	// 	expect(wrapCounter).to.equal(2)
 
-	})
+	// })
 
 	it("should once per emitter", () => {
 
@@ -284,6 +285,31 @@ describe("EventEmitter", () => {
 	})
 
 	it("should count total events for once", () => {
+
+		let counter = 0
+
+		const f = () => counter++
+		const em = new EventEmitter<"testA">()
+
+		em.once("testA", f)
+		expect(em.countEventListeners()).to.equal(1)
+		expect(em.countEventListeners("testA")).to.equal(1)
+
+		em.emit("testA")
+		expect(counter).to.equal(1)
+		expect(em.countEventListeners()).to.equal(0)
+		expect(em.countEventListeners("testA")).to.equal(0)
+
+		em.emit("testA")
+		em.emit("testA")
+		em.emit("testA")
+		expect(counter).to.equal(1)
+		expect(em.countEventListeners()).to.equal(0)
+		expect(em.countEventListeners("testA")).to.equal(0)
+
+	})
+
+	it("should report all listeners", () => {
 
 		let counter = 0
 

@@ -1,4 +1,4 @@
-import {findKey} from "lodash-es"
+import {findKey} from "lodash"
 
 const add = (array, item) => {
 	array = array.slice(0)

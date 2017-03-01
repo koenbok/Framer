@@ -24,8 +24,8 @@
         "node_modules",
         "chrome/tools",
         "build",
-        "extras",
-        "mocha/*.ts"
+        "extras"
+        // "mocha/*.ts"
     ],
     "filesGlob": [
       "**/*.ts"

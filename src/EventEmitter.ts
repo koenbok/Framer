@@ -1,21 +1,15 @@
-interface EE {
-	fn: Function
-	handler: Function
-	context: any
-	once: boolean
-}
+import {EventEmitter as EventEmitter3} from "eventemitter3"
 
 export class EventEmitter<EventName> {
 
-	private _events: { [index: string]: EE[] } = {}
-	private _eventCount = 0
+	private _em = new EventEmitter3()
 
 	eventListeners() {
 
 		const listeners = {}
 
-		for (let key in this._events) {
-			listeners[key] = this._events[key].map((listener) => listener.fn)
+		for (let eventName of this._em.eventNames()) {
+			listeners[eventName] = this._em.listeners(eventName)
 		}
 
 		return listeners
@@ -34,90 +28,49 @@ export class EventEmitter<EventName> {
 	}
 
 	addEventListener(eventName: EventName, fn: Function, once: boolean, context: Object) {
-
-		const name = eventName as any as string
-
-		if (!this._events[name]) {
-			this._events[name] = []
+		if (once === true) {
+			this._em.once(eventName as any, fn as any, context)
+		} else {
+			this._em.addListener(eventName as any, fn as any, context)
 		}
-
-		this._events[name].push({
-			fn: fn,
-			handler: this.wrapEventListener(eventName, fn),
-			context: context,
-			once: once
-		})
-
-		this._eventCount++
 	}
 
-
-
-	wrapEventListener(eventName: EventName, fn: Function) {
-		return fn
-	}
+	// wrapEventListener(eventName: EventName, fn: Function) {
+	// 	return fn
+	// }
 
 	removeEventListeners(eventName?: EventName, fn?: Function): void {
-
-		// Remove all the event listeners at once
-		if (!eventName && !fn) {
+		if (eventName) {
+			this._em.removeListener(eventName as any, fn as any)
+		} else {
 			this.removeAllEventListeners()
-			return
 		}
-
-		const name = eventName as any as string
-
-		// Remove all event listeners for an event
-		if (eventName && !fn) {
-			this._eventCount -= this._events[name].length
-			this._events[name] = []
-			return
-		}
-
-		// Remove a specific handler for an event
-		this._events[name] = this._events[name].filter((handler: EE) => {
-			if (handler.fn === fn) {
-				this._eventCount -= 1
-				return false
-			} else {
-				return true
-			}
-		})
 	}
 
 	removeAllEventListeners() {
-		this._events = {}
-		this._eventCount = 0
+		this._em.removeAllListeners()
 	}
 
 	countEventListeners(eventName?: EventName, handler?: Function): number {
 
-		const name = eventName as any as string
+		if (eventName) {
+			return this._em.listeners(eventName as any).length
+		} else {
 
-		if (!eventName) {
-			return this._eventCount
+			let count = 0
+
+			for (let eventName of this._em.eventNames()) {
+				count += this._em.listeners(eventName).length
+			}
+
+			return count
 		}
-
-		if (!this._events[name]) {
-			return 0
-		}
-
-		return this._events[name].length
 	}
-
-
 
 	schedule(eventName: EventName, fn: Function): boolean {
 
-		const name = eventName as any as string
-
-		// Don't add this event if it already exists
-		if (this._events[name]) {
-			for (let handler of this._events[name]) {
-				if (handler.fn === fn) {
-					return false
-				}
-			}
+		for (let handler of this._em.listeners(eventName as any)) {
+			if (handler === fn) { return false }
 		}
 
 		this.once(eventName, fn)
@@ -126,38 +79,7 @@ export class EventEmitter<EventName> {
 	}
 
 	emit(eventName: EventName, ...args: any[]) {
-
-		const name = eventName as any as string
-
-		if (!this._events[name]) {
-			return
-		}
-
-		let removes: number[] = []
-
-		this._events[name].forEach((listener, index) => {
-
-			listener.handler.apply(this, args)
-
-			if (listener.once === true) {
-				this._eventCount--
-				removes.push(index)
-			}
-		})
-
-		removes.forEach((index) => this._events[name].splice(index, 1))
-
-		// this._events[name] = this._events[name].filter((handler) => {
-
-		// 	handler.handler.apply(this, args)
-
-		// 	if (handler.once) {
-		// 		this._eventCount--
-		// 		return false
-		// 	} else {
-		// 		return true
-		// 	}
-		// })
+		this._em.emit(eventName as any, ...args)
 	}
 
 	destroy() {
