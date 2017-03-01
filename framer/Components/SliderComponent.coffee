@@ -70,6 +70,9 @@ class exports.SliderComponent extends Layer
 		else
 			@fill.width = @width
 
+		# Set initial value
+		if not @value then @value = 0.5
+
 		@fill.borderRadius = @sliderOverlay.borderRadius = @borderRadius
 
 		@knob.draggable.enabled = true
