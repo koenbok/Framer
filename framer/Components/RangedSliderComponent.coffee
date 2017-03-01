@@ -28,9 +28,9 @@ class Knob extends Layer
 	constructor: (options={}) ->
 		_.defaults options,
 			backgroundColor: "#fff"
-			shadowY: 1,
-			shadowBlur: 3
-			shadowColor: "rgba(0, 0, 0, 0.35)"
+			shadowY: 2
+			shadowBlur: 4
+			shadowColor: "rgba(0, 0, 0, 0.2)"
 
 		super options
 
@@ -43,7 +43,7 @@ class exports.RangedSliderComponent extends Layer
 			borderRadius: 50
 			clip: false
 			width: 300
-			height: 10
+			height: 6
 			value: 0
 			knobSize: 30
 
