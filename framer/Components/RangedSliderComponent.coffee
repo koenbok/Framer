@@ -119,7 +119,15 @@ class exports.RangedSliderComponent extends Layer
 				@leftKnob.draggable._touchStart(event)
 
 		else
-			@value = @valueForPoint(Events.touchEvent(event).clientY - @screenScaledFrame().y) / @canvasScaleY() - offsetY
+			clickedValue = @valueForPoint(Events.touchEvent(event).clientY - @screenScaledFrame().y) / @canvasScaleY() - offsetY
+
+			if clickedValue > @maxValue
+				@maxValue = clickedValue
+				@rightKnob.draggable._touchStart(event)
+
+			if clickedValue < @minValue
+				@minValue = clickedValue
+				@leftKnob.draggable._touchStart(event)
 
 		@_updateValue()
 
@@ -142,11 +150,10 @@ class exports.RangedSliderComponent extends Layer
 
 		else
 			@fill.y = @leftKnob.midY
-			@fill.height =  @rightKnob.midY - @leftKnob.midY
+			@fill.height = @rightKnob.midY - @leftKnob.midY
 
 	_updateKnob: =>
 		if @width > @height
-
 			@leftKnob.midX = @fill.x
 			@leftKnob.centerY()
 
@@ -185,13 +192,13 @@ class exports.RangedSliderComponent extends Layer
 
 		if @width > @height
 			@fill.height = @height
-
 			@leftKnob.midX = @pointForValue(@minValue)
 			@rightKnob.midX = @pointForValue(@maxValue)
 			@leftKnob.centerY()
 		else
 			@fill.width = @width
-			@leftKnob.midY = @pointForValue(@value)
+			@leftKnob.midY = @pointForValue(@minValue)
+			@rightKnob.midY = @pointForValue(@maxValue)
 			@leftKnob.centerX()
 
 		if @width > @height
@@ -233,7 +240,6 @@ class exports.RangedSliderComponent extends Layer
 				@sliderOverlay.width = @hitArea
 				@sliderOverlay.height = @height + @hitArea
 
-
 	@define "min",
 		get: -> @_min or 0
 		set: (value) -> @_min = value if _.isFinite(value)
@@ -273,25 +279,16 @@ class exports.RangedSliderComponent extends Layer
 
 	_knobDidMove: =>
 		if @width > @height
-
 			@minValue = @valueForPoint(@leftKnob.midX)
 			@maxValue = @valueForPoint(@rightKnob.midX)
 		else
-			@value = @valueForPoint(@leftKnob.midY)
+			@minValue = @valueForPoint(@leftKnob.midY)
+			@maxValue = @valueForPoint(@rightKnob.midY)
 
 	_updateValue: =>
-
-		# return if @_lastUpdatedMinValue is @minValue or @_lastUpdatedMaxValue is @maxValue
-		#
-		# @_lastUpdatedMinValue = @minValue
-		# @_lastUpdatedMaxValue = @maxValue
-
-		# @_range = [@minValue, @maxValue]
-
 		@emit(Events.SliderValueChange)
 		@emit(Events.SliderMinValueChange, @minValue)
 		@emit(Events.SliderMaxValueChange, @maxValue)
-
 
 	pointForValue: (value) ->
 		for knob in [@leftKnob, @rightKnob]
@@ -336,6 +333,7 @@ class exports.RangedSliderComponent extends Layer
 			animationOptions.properties = {y: @pointForValue(value) - (@rightKnob.height/2)}
 
 		@rightKnob.animate(animationOptions)
+		
 	##############################################################
 	## EVENT HELPERS
 
