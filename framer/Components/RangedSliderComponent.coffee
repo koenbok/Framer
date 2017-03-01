@@ -141,7 +141,8 @@ class exports.RangedSliderComponent extends Layer
 			@fill.width = @rightKnob.midX - @leftKnob.midX
 
 		else
-			@fill.height = @leftKnob.midY
+			@fill.y = @leftKnob.midY
+			@fill.height =  @rightKnob.midY - @leftKnob.midY
 
 	_updateKnob: =>
 		if @width > @height
@@ -153,8 +154,11 @@ class exports.RangedSliderComponent extends Layer
 			@rightKnob.centerY()
 
 		else
-			@leftKnob.midY = @fill.height
+			@leftKnob.midY = @fill.y
 			@leftKnob.centerX()
+
+			@rightKnob.midY = @fill.y + @fill.height
+			@rightKnob.centerX()
 
 	_updateFrame: =>
 
