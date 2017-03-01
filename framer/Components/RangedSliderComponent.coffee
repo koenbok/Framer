@@ -5,12 +5,15 @@ Utils = require "../Utils"
 """
 RangedSliderComponent
 
-knob <layer>
+minKnob <layer>
+maxKnob <layer>
 knobSize <width, height>
 fill <layer>
+
 min <number>
 max <number>
-ranged <boolean>
+minValue <number>
+maxValue <number>
 
 pointForValue(<n>)
 valueForPoint(<n>)
