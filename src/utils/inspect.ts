@@ -1,4 +1,4 @@
-import * as _ from "lodash"
+import * as _ from "lodash/core"
 
 const extractObjectName = (str: string) => {
 	if (!str) { return null }
