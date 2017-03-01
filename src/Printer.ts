@@ -20,7 +20,7 @@ export class Printer extends BaseClass<null> {
 		prefix: "» "
 	}
 
-	readonly print = (...args) => {
+	print(...args) {
 
 		if (!this._layer) {
 			this._context.run(this._setup)
@@ -45,7 +45,7 @@ export class Printer extends BaseClass<null> {
 
 	}
 
-	private _setup = () => {
+	private _setup() {
 
 		const background = new Layer({
 			x: 0,

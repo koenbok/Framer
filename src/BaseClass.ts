@@ -38,7 +38,7 @@ export class BaseClass<EventType> extends EventEmitter<EventType> {
 		return this._globalId
 	}
 
-	_setId = (id: number) => {
+	_setId(id: number) {
 		this._id = id
 	}
 

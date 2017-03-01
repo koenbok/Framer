@@ -77,12 +77,12 @@ export class Renderer {
 		return this._loop
 	}
 
-	getDirtyStyles = (item: Renderable<any>) => {
+	getDirtyStyles(item: Renderable<any>) {
 		if (!item["_dirty"]) { item["_dirty"] = {} }
 		return item["_dirty"]
 	}
 
-	flushDirtyStyles = (item: Renderable<any>) => {
+	flushDirtyStyles(item: Renderable<any>) {
 		let dirtyStyles = this.getDirtyStyles(item)
 		item["_dirty"] = {}
 		return dirtyStyles
@@ -97,7 +97,7 @@ export class Renderer {
 		return this._dirtyStyleItems.size > 0
 	}
 
-	requestRender = () => {
+	requestRender() {
 		if (this.manual) { return }
 		if (this.hasDirtyStyleItems || this.hasDirtyStructure) {
 			this.loop.schedule("render", this.render)
@@ -140,13 +140,13 @@ export class Renderer {
 
 	}
 
-	renderStructure = () => {
+	renderStructure() {
 		this._counters.renderStructure++
 		render(this.context, this._element)
 		this._hasDirtyStructure = false
 	}
 
-	renderStyle = () => {
+	renderStyle() {
 
 		this._counters.renderStyle++
 
@@ -157,7 +157,7 @@ export class Renderer {
 		this._dirtyStyleItems.clear()
 	}
 
-	forceRenderAllStyles = (item: Renderable<any>) => {
+	forceRenderAllStyles(item: Renderable<any>) {
 		utils.dom.assignStyles(item._element, assignAllStyles(item as any))
 		utils.dom.assignStyles(item._element, item.styles)
 	}

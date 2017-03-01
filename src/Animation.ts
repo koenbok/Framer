@@ -36,7 +36,7 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 	}
 
 	/** Start this animation. */
-	readonly start = () => {
+	start() {
 
 		// Is there anything to animate
 		if (!Object.keys(this._properties).length) {
@@ -47,7 +47,7 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 	}
 
 	/** Stop this animation. */
-	readonly stop = () => {
+	stop() {
 
 		if (!this.running) {
 			return
@@ -62,23 +62,23 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 		return this._running.length > 0 && (this._running.length !== this._finished.length)
 	}
 
-	readonly onStart = (fn: Function) => { this.on("AnimationStart", fn); return this }
-	readonly onHalt = (fn: Function) => { this.on("AnimationHalt", fn); return this }
-	readonly onStop = (fn: Function) => { this.on("AnimationStop", fn); return this }
+	onStart(fn: Function) { this.on("AnimationStart", fn); return this }
+	onHalt(fn: Function) { this.on("AnimationHalt", fn); return this }
+	onStop(fn: Function) { this.on("AnimationStop", fn); return this }
 	/** Call function when the animation is fully complete */
-	readonly onEnd = (fn: Function) => { this.on("AnimationEnd", fn); return this }
+	onEnd(fn: Function) { this.on("AnimationEnd", fn); return this }
 
 	emit(eventName: AnimationEventTypes, ...args: any[]) {
 		super.emit(eventName, ...args)
 		this._layer.emit(eventName, args)
 	}
 
-	private _reset  = () => {
+	private _reset() {
 		this._running = []
 		this._finished = []
 	}
 
-	private _start = (): boolean => {
+	private _start(): boolean {
 
 		// TODO: Delay, Repeat
 
@@ -126,11 +126,11 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 		return started
 	}
 
-	private _halt = () => {
+	private _halt() {
 		this.emit("AnimationHalt")
 	}
 
-	private _stop = () => {
+	private _stop() {
 
 		for (let animationProperty of this._running) {
 			animationProperty.stop()

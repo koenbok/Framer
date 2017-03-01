@@ -2,6 +2,7 @@ path = require("path")
 config = require("./webpack.base")()
 HtmlWebpackPlugin = require("html-webpack-plugin")
 
+config.devtool = "cheap-module-eval-source-map"
 config.entry = {
 	tests: path.join(__dirname, "../mocha/index"),
 }

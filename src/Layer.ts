@@ -289,7 +289,7 @@ export class Layer extends Renderable<LayerEventTypes> {
 		this.updateStyles(styles)
 	}
 
-	readonly updateStyles = (styles: Types.CSSStyles) => {
+	updateStyles(styles: Types.CSSStyles) {
 		if (_.isEmpty(styles)) { return }
 		Object.assign(this._properties.styles, styles)
 		this.context.renderer.updateCustomStyles(this, styles)
@@ -309,10 +309,10 @@ export class Layer extends Renderable<LayerEventTypes> {
 	// Animations
 
 	/** Start an animation. */
-	animate = (
+	animate(
 		properties: AnimatableProperties,
 		curve: AnimationCurve= Curve.linear(1)
-	) => {
+	) {
 		let animation = new Animation(this, properties, curve)
 		animation.start()
 		return animation
@@ -326,21 +326,21 @@ export class Layer extends Renderable<LayerEventTypes> {
 
 	// Events
 
-	onClick = (handler: Function) => { this.on("click", handler) }
-	onDoubleClick = (handler: Function) => { this.on("doubleclick", handler) }
+	onClick(handler: Function) { this.on("click", handler) }
+	onDoubleClick(handler: Function) { this.on("doubleclick", handler) }
 
-	onMouseUp = (handler: Function) => { this.on("mouseup", handler) }
-	onMouseDown = (handler: Function) => { this.on("mousedown", handler) }
-	onMouseOver = (handler: Function) => { this.on("mouseover", handler) }
-	onMouseOut = (handler: Function) => { this.on("mouseout", handler) }
-	onMouseMove = (handler: Function) => { this.on("mousemove", handler) }
-	onMouseWheel = (handler: Function) => { this.on("mousewheel", handler) }
+	onMouseUp(handler: Function) { this.on("mouseup", handler) }
+	onMouseDown(handler: Function) { this.on("mousedown", handler) }
+	onMouseOver(handler: Function) { this.on("mouseover", handler) }
+	onMouseOut(handler: Function) { this.on("mouseout", handler) }
+	onMouseMove(handler: Function) { this.on("mousemove", handler) }
+	onMouseWheel(handler: Function) { this.on("mousewheel", handler) }
 
-	onAnimationStart = (handler: Function) => { this.on("AnimationStart", handler) }
-	onAnimationStop = (handler: Function) => { this.on("AnimationStop", handler) }
-	onAnimationHalt = (handler: Function) => { this.on("AnimationHalt", handler) }
-	onAnimationEnd = (handler: Function) => { this.on("AnimationEnd", handler) }
-	onChange = (property: LayerProperties, handler: Function) => { this.on(`change:${property}` as any, handler) }
+	onAnimationStart(handler: Function) { this.on("AnimationStart", handler) }
+	onAnimationStop(handler: Function) { this.on("AnimationStop", handler) }
+	onAnimationHalt(handler: Function) { this.on("AnimationHalt", handler) }
+	onAnimationEnd (handler: Function) { this.on("AnimationEnd", handler) }
+	onChange(property: LayerProperties, handler: Function) { this.on(`change:${property}` as any, handler) }
 
 	addEventListener(eventName: LayerEventTypes, fn: Function, once: boolean, context: Object) {
 		super.addEventListener(eventName, fn, once, context)

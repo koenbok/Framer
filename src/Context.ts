@@ -66,7 +66,7 @@ export class Context extends Renderable<ContextEventTypes> {
 		this.layers.map(this.renderer.forceRenderAllStyles)
 	}
 
-	dpr = (value: number) => {
+	dpr(value: number) {
 		return this.pixelRatio * value
 	}
 
