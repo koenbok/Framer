@@ -100,8 +100,6 @@ class exports.RangedSliderComponent extends Layer
 		@sliderOverlay.on(Events.TapStart, @_touchStart)
 		@sliderOverlay.on(Events.TapEnd, @_touchEnd)
 
-	@define "constrained", @simpleProperty("constrained", false)
-
 	_touchStart: (event) =>
 		event.preventDefault()
 
@@ -210,6 +208,8 @@ class exports.RangedSliderComponent extends Layer
 	_setRadius: =>
 		radius = @borderRadius
 		@fill.style.borderRadius = "#{radius}px 0 0 #{radius}px"
+
+	@define "constrained", @simpleProperty("constrained", false)
 
 	@define "knobSize",
 		get: -> @_knobSize
