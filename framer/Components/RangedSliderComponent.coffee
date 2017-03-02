@@ -287,26 +287,35 @@ class exports.RangedSliderComponent extends Layer
 		@emit(Events.SliderMinValueChange, @minValue)
 		@emit(Events.SliderMaxValueChange, @maxValue)
 
+	# Retrieve the point (x or y coordinate) of a certain numeric value.
 	pointForValue: (value) ->
 		for knob in [@minKnob, @maxKnob]
+
+			# For horizontal (default) sliders.
 			if @width > @height
 				if @constrained
 					return Utils.modulate(value, [@min, @max], [0 + (knob.width / 2), @width - (knob.width / 2)], true)
 				else
 					return Utils.modulate(value, [@min, @max], [0 , @width], true)
+
+			# For vertical sliders.
 			else
 				if @constrained
 					return Utils.modulate(value, [@min, @max], [0 + (knob.height / 2), @height - (knob.height / 2)], true)
 				else
 					return Utils.modulate(value, [@min, @max], [0, @height], true)
 
+	# Retrieve the numeric value of a certain point (x or y coordinate).
 	valueForPoint: (value) ->
 		for knob in [@minKnob, @maxKnob]
+			# For horizontal (default) sliders.
 			if @width > @height
 				if @constrained
 					return Utils.modulate(value, [0 + (knob.width / 2), @width - (knob.width / 2)], [@min, @max], true)
 				else
 					return Utils.modulate(value, [0, @width], [@min, @max], true)
+
+			# For vertical sliders.
 			else
 				if @constrained
 					return Utils.modulate(value, [0 + (knob.height / 2), @height - (knob.height / 2)], [@min, @max], true)
