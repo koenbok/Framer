@@ -112,10 +112,12 @@ class exports.RangedSliderComponent extends Layer
 			if clickedValue > @maxValue
 				@maxValue = clickedValue
 				@maxKnob.draggable._touchStart(event)
+				@emit(Events.SliderMaxValueChange, @maxValue)
 
 			if clickedValue < @minValue
 				@minValue = clickedValue
 				@minKnob.draggable._touchStart(event)
+				@emit(Events.SliderMinValueChange, @minValue)
 
 		else
 			clickedValue = @valueForPoint(Events.touchEvent(event).clientY - @screenScaledFrame().y) / @canvasScaleY() - offsetY
@@ -123,10 +125,12 @@ class exports.RangedSliderComponent extends Layer
 			if clickedValue > @maxValue
 				@maxValue = clickedValue
 				@maxKnob.draggable._touchStart(event)
+				@emit(Events.SliderMaxValueChange, @maxValue)
 
 			if clickedValue < @minValue
 				@minValue = clickedValue
 				@minKnob.draggable._touchStart(event)
+				@emit(Events.SliderMinValueChange, @minValue)
 
 		@_updateValue()
 
@@ -284,8 +288,12 @@ class exports.RangedSliderComponent extends Layer
 
 	_updateValue: =>
 		@emit(Events.SliderValueChange)
-		@emit(Events.SliderMinValueChange, @minValue)
-		@emit(Events.SliderMaxValueChange, @maxValue)
+
+		if @minKnob.draggable.isMoving
+			@emit(Events.SliderMinValueChange, @minValue)
+
+		if @maxKnob.draggable.isMoving
+			@emit(Events.SliderMaxValueChange, @maxValue)
 
 	# Retrieve the point (x or y coordinate) of a certain numeric value.
 	pointForValue: (value) ->
