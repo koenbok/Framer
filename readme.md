@@ -23,11 +23,13 @@ A complete rewrite of the core, with everything on top.
 #### Changes
 
 - .toInspect() became .describe()
+- .properties are now named keys everywhere. So with `layer.x`, `x` is a key.
 
 
 #### Questions
 
 - Should we move from `properties` to a more friendly `keys` and `values` everywhere?
+- What should we do with capitalization like `Utils.x`, `Align.left`, `Framer.CurrentContext`.
 
 ---
 
