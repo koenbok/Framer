@@ -15,7 +15,7 @@ export class Printer extends BaseClass<null> {
 	private _context = new Context("print")
 	private _layer?: Layer
 	private _lines: string[] = []
-	private _properties = {
+	private _keys = {
 		height: 300,
 		prefix: "» "
 	}
@@ -29,7 +29,7 @@ export class Printer extends BaseClass<null> {
 		this._context.run(() => {
 			const line = new Layer({
 				parent: this._layer,
-				text: this._properties.prefix + utils.inspect.inspectAll(...args),
+				text: this._keys.prefix + utils.inspect.inspectAll(...args),
 				styles: {
 					position: "relative",
 					display: "block-inline",
@@ -49,9 +49,9 @@ export class Printer extends BaseClass<null> {
 
 		const background = new Layer({
 			x: 0,
-			y: window.innerHeight - this._properties.height,
+			y: window.innerHeight - this._keys.height,
 			width: window.innerWidth,
-			height: this._properties.height,
+			height: this._keys.height,
 			backgroundColor: "white",
 			styles: {
 				"font": "12px/1.35em Menlo, Consolas, monospace",
@@ -64,7 +64,7 @@ export class Printer extends BaseClass<null> {
 		this._layer = new Layer({
 			parent: background,
 			width: window.innerWidth,
-			height: this._properties.height,
+			height: this._keys.height,
 			styles: {
 				overflow: "scroll",
 				height: "auto"

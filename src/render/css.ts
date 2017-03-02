@@ -39,11 +39,11 @@ const styleMap = {
 
 export const assignStyles = (
 	layer: Layer,
-	properties: (keyof LayerOptions)[],
+	keys: (keyof LayerOptions)[],
 	styles= {}) => {
 
-	for (let property of properties) {
-		for (let cssProperty of styleMap[property]) {
+	for (let key of keys) {
+		for (let cssProperty of styleMap[key]) {
 			styles[cssProperty] = getStyle[cssProperty](layer)
 		}
 	}

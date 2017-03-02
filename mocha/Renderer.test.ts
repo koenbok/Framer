@@ -6,7 +6,7 @@ import {Layer, utils} from "Framer"
 
 describe("Renderer", () => {
 
-	isolated.test("should mark dirty properties", (context, done) => {
+	isolated.test("should mark dirty keys", (context, done) => {
 
 		context.renderer.loop.pause = true
 

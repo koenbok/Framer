@@ -34,7 +34,7 @@ export class Context extends Renderable<ContextEventTypes> {
 	private _layers = new Collection<Layer>()
 	private _renderer: Renderer
 
-	private _properties = {
+	private _keys = {
 		name: "",
 		parent: null,
 		backgroundColor: "rgba(255, 0, 0, 0.5)",
@@ -47,21 +47,21 @@ export class Context extends Renderable<ContextEventTypes> {
 
 		options.name = name
 
-		Object.assign(this._properties, options)
-		this._renderer = new Renderer(this, this._properties.loop)
+		Object.assign(this._keys, options)
+		this._renderer = new Renderer(this, this._keys.loop)
 	}
 
 	get name() {
-		return this._properties.name
+		return this._keys.name
 	}
 
 	get pixelRatio() {
-		return this._properties.pixelRatio
+		return this._keys.pixelRatio
 	}
 
 	set pixelRatio(value) {
-		if (value === this._properties.pixelRatio) { return }
-		this._properties.pixelRatio = value
+		if (value === this._keys.pixelRatio) { return }
+		this._keys.pixelRatio = value
 		if (this.renderer.counters.renderStructure === 0) { return }
 		this.layers.map(this.renderer.forceRenderAllStyles)
 	}

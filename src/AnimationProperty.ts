@@ -14,7 +14,7 @@ export type PropertyAnimationEventTypes =
 	"PropertAnimationHalt" |
 	"PropertAnimationEnd"
 
-export interface AnimatableProperties {
+export interface AnimatableKeys {
 	x?: number
 	y?: number
 	width?: number,
@@ -28,7 +28,7 @@ export interface AnimatableProperties {
 	maxY?: number
 }
 
-export type AnimatablePropertyName = keyof AnimatableProperties
+export type AnimatablePropertyName = keyof AnimatableKeys
 
 export class AnimationProperty extends EventEmitter<PropertyAnimationEventTypes> {
 

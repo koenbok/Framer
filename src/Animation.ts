@@ -2,7 +2,7 @@ import * as utils from "utils"
 import {BaseClass} from "BaseClass"
 import {AnimationLoop} from "AnimationLoop"
 import {AnimationCurve} from "AnimationCurve"
-import {AnimatableProperties, AnimationProperty} from "AnimationProperty"
+import {AnimatableKeys, AnimationProperty} from "AnimationProperty"
 import {Layer} from "Layer"
 
 export type AnimationEventTypes =
@@ -15,14 +15,14 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 
 	private _layer: Layer
 	private _curve: AnimationCurve
-	private _properties: AnimatableProperties
+	private _keys: AnimatableKeys
 	private _loop: AnimationLoop
 	private _running: AnimationProperty[] = []
 	private _finished: AnimationProperty[] = []
 
 	constructor(
 		layer: Layer,
-		properties: AnimatableProperties,
+		keys: AnimatableKeys,
 		curve: AnimationCurve,
 		loop: AnimationLoop | null= null
 	) {
@@ -31,7 +31,7 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 
 		this._layer = layer
 		this._curve = curve
-		this._properties = properties
+		this._keys = keys
 		this._loop = loop || this._layer.context.renderer.loop
 	}
 
@@ -39,7 +39,7 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 	start() {
 
 		// Is there anything to animate
-		if (!Object.keys(this._properties).length) {
+		if (!Object.keys(this._keys).length) {
 			return false
 		}
 
@@ -82,10 +82,10 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 
 		// TODO: Delay, Repeat
 
-		// Stop all other animations with conflicting properties
+		// Stop all other animations with conflicting keys
 		for (let animation of this._layer.animations) {
-			for (let key in this._properties) {
-				if (animation._properties.hasOwnProperty(key)) {
+			for (let key in this._keys) {
+				if (animation._keys.hasOwnProperty(key)) {
 					animation.stop()
 					continue
 				}
@@ -94,10 +94,10 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 
 		this._reset()
 
-		for (let key in this._properties) {
+		for (let key in this._keys) {
 
 			let a = this._layer[key]
-			let b = this._properties[key]
+			let b = this._keys[key]
 
 			if (a === b) {
 				continue

@@ -6,7 +6,7 @@ import {Renderable} from "Renderable"
 import {Screen} from "Screen"
 import {Collection} from "Collection"
 import {Context, DefaultContext, CurrentContext} from "Context"
-import {AnimatableProperties} from "AnimationProperty"
+import {AnimatableKeys} from "AnimationProperty"
 import {Animation, AnimationEventTypes} from "Animation"
 import {AnimationCurve} from "AnimationCurve"
 import {Curve} from "Curve"
@@ -41,9 +41,9 @@ export interface LayerOptions {
 	text?: string
 }
 
-export type LayerProperties = keyof LayerOptions
+export type LayerKeys = keyof LayerOptions
 
-export type LayerEventPropertyTypes =
+export type LayerEventKeyTypes =
 	"change:x" |
 	"change:y" |
 	"change:width" |
@@ -60,7 +60,7 @@ export type LayerEventUserTypes =
 	"mousewheel"
 
 export type LayerEventTypes =
-	LayerEventPropertyTypes |
+	LayerEventKeyTypes |
 	LayerEventUserTypes |
 	AnimationEventTypes
 
@@ -69,7 +69,7 @@ export class Layer extends Renderable<LayerEventTypes> {
 
 	private _context: Context = CurrentContext
 	private _parent: Layer|null = null
-	private _properties = {
+	private _keys = {
 		ignoreEvents: true,
 		x: 0,
 		y: 0,
@@ -144,67 +144,67 @@ export class Layer extends Renderable<LayerEventTypes> {
 	}
 
 	get ignoreEvents() {
-		return this._properties.ignoreEvents
+		return this._keys.ignoreEvents
 	}
 
 	set ignoreEvents(value) {
 		if (!this._shouldChangeKey("ignoreEvents", value)) { return }
-		this._properties.ignoreEvents = value
+		this._keys.ignoreEvents = value
 		this._didChangeKey("ignoreEvents", value)
 		this.context.renderer.updateKeyStyle(this, "ignoreEvents", value)
 	}
 
 	get x() {
-		return this._properties.x
+		return this._keys.x
 	}
 
 	set x(value) {
 		if (!this._shouldChangeKey("x", value)) { return }
-		this._properties.x = value
+		this._keys.x = value
 		this._didChangeKey("x", value)
 		this.context.renderer.updateKeyStyle(this, "x", value)
 	}
 
 	get y() {
-		return this._properties.y
+		return this._keys.y
 	}
 
 	set y(value) {
 		if (!this._shouldChangeKey("y", value)) { return }
-		this._properties.y = value
+		this._keys.y = value
 		this._didChangeKey("y", value)
 		this.context.renderer.updateKeyStyle(this, "y", value)
 	}
 
 	get z() {
-		return this._properties.z
+		return this._keys.z
 	}
 
 	set z(value) {
 		if (!this._shouldChangeKey("z", value)) { return }
-		this._properties.y = value
+		this._keys.y = value
 		this._didChangeKey("z", value)
 		this.context.renderer.updateKeyStyle(this, "z", value)
 	}
 
 	get width() {
-		return this._properties.width
+		return this._keys.width
 	}
 
 	set width(value) {
 		if (!this._shouldChangeKey("width", value)) { return }
-		this._properties.width = value
+		this._keys.width = value
 		this._didChangeKey("width", value)
 		this.context.renderer.updateKeyStyle(this, "width", value)
 	}
 
 	get height() {
-		return this._properties.height
+		return this._keys.height
 	}
 
 	set height(value) {
 		if (!this._shouldChangeKey("height", value)) { return }
-		this._properties.height = value
+		this._keys.height = value
 		this._didChangeKey("height", value)
 		this.context.renderer.updateKeyStyle(this, "height", value)
 	}
@@ -271,18 +271,18 @@ export class Layer extends Renderable<LayerEventTypes> {
 
 
 	get backgroundColor() {
-		return this._properties.backgroundColor
+		return this._keys.backgroundColor
 	}
 
 	set backgroundColor(value) {
 		if (!this._shouldChangeKey("backgroundColor", value)) { return }
-		this._properties.backgroundColor = value
+		this._keys.backgroundColor = value
 		this._didChangeKey("backgroundColor", value)
 		this.context.renderer.updateKeyStyle(this, "backgroundColor", value)
 	}
 
 	get styles() {
-		return this._properties.styles
+		return this._keys.styles
 	}
 
 	set styles(styles: Types.CSSStyles) {
@@ -291,17 +291,17 @@ export class Layer extends Renderable<LayerEventTypes> {
 
 	updateStyles(styles: Types.CSSStyles) {
 		if (_.isEmpty(styles)) { return }
-		Object.assign(this._properties.styles, styles)
+		Object.assign(this._keys.styles, styles)
 		this.context.renderer.updateCustomStyles(this, styles)
 	}
 
 	get text() {
-		return this._properties.text
+		return this._keys.text
 	}
 
 	set text(value) {
 		if (!this._shouldChangeKey("text", value)) { return }
-		this._properties.text = value
+		this._keys.text = value
 		this._didChangeKey("text", value)
 		this.context.renderer.updateStructure(this)
 	}
@@ -310,10 +310,10 @@ export class Layer extends Renderable<LayerEventTypes> {
 
 	/** Start an animation. */
 	animate(
-		properties: AnimatableProperties,
+		keys: AnimatableKeys,
 		curve: AnimationCurve= Curve.linear(1)
 	) {
-		let animation = new Animation(this, properties, curve)
+		let animation = new Animation(this, keys, curve)
 		animation.start()
 		return animation
 	}
@@ -340,7 +340,7 @@ export class Layer extends Renderable<LayerEventTypes> {
 	onAnimationStop(handler: Function) { this.on("AnimationStop", handler) }
 	onAnimationHalt(handler: Function) { this.on("AnimationHalt", handler) }
 	onAnimationEnd (handler: Function) { this.on("AnimationEnd", handler) }
-	onChange(property: LayerProperties, handler: Function) { this.on(`change:${property}` as any, handler) }
+	onChange(property: LayerKeys, handler: Function) { this.on(`change:${property}` as any, handler) }
 
 	addEventListener(eventName: LayerEventTypes, fn: Function, once: boolean, context: Object) {
 		super.addEventListener(eventName, fn, once, context)
@@ -352,10 +352,10 @@ export class Layer extends Renderable<LayerEventTypes> {
 	}
 
 
-	// Properties
+	// Keys
 
 	private _shouldChangeKey(key, value) {
-		return this._properties[key] !== value
+		return this._keys[key] !== value
 	}
 
 	private _didChangeKey(key: string, value: any) {
