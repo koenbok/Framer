@@ -1,4 +1,4 @@
-import * as _ from "lodash/core"
+import * as _ from "lodash"
 import * as Types from "Types"
 import * as utils from "utils"
 

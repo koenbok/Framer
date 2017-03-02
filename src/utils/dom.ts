@@ -1,4 +1,4 @@
-import * as _ from "lodash/core"
+import * as _ from "lodash"
 import * as utils from "./utils"
 
 import {Renderable} from "Renderable"
