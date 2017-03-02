@@ -33,7 +33,7 @@ class Knob extends Layer
 			backgroundColor: "#fff"
 			shadowY: 2
 			shadowBlur: 4
-			shadowColor: "rgba(0, 0, 0, 0.2)"
+			shadowColor: "rgba(0, 0, 0, 0.3)"
 
 		super options
 
@@ -46,7 +46,7 @@ class exports.RangedSliderComponent extends Layer
 			borderRadius: 50
 			clip: false
 			width: 300
-			height: 6
+			height: 10
 			value: 0
 			knobSize: 30
 

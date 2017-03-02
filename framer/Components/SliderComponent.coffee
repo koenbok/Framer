@@ -47,7 +47,7 @@ class exports.SliderComponent extends Layer
 			backgroundColor: "#fff"
 			shadowY: 2
 			shadowBlur: 4
-			shadowColor: "rgba(0, 0, 0, 0.2)"
+			shadowColor: "rgba(0, 0, 0, 0.3)"
 			name: "knob"
 
 		@fill = new Layer
@@ -69,9 +69,6 @@ class exports.SliderComponent extends Layer
 			@fill.height = @height
 		else
 			@fill.width = @width
-
-		# Set initial value
-		if not @value then @value = 0.5
 
 		@fill.borderRadius = @sliderOverlay.borderRadius = @borderRadius
 
