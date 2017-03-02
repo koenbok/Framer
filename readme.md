@@ -21,14 +21,13 @@ A complete rewrite of the core, with everything on top.
 - ScrollComponent / PageComponent
 - Importer
 - Color
-
 - Print
 - Port inspect tests
 
-+ ~~Change css updates to be in renderer~~
-+ ~~Add print and describe in base, take rest out~~
-+ ~~Add renderer _createdLayers for full css updates inc position~~
-+ ~~A general system for multiple resolutions~~
+- ~~Change css updates to be in renderer~~
+- ~~Add print and describe in base, take rest out~~
+- ~~Add renderer _createdLayers for full css updates inc position~~
+- ~~A general system for multiple resolutions~~
 
 #### Changes
 
