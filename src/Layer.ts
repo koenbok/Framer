@@ -6,7 +6,7 @@ import {Renderable} from "Renderable"
 import {Screen} from "Screen"
 import {Collection} from "Collection"
 import {Context, DefaultContext, CurrentContext} from "Context"
-import {AnimatableKeys} from "AnimationProperty"
+import {AnimatableKeys} from "AnimationKey"
 import {Animation, AnimationEventTypes} from "Animation"
 import {AnimationCurve} from "AnimationCurve"
 import {Curve} from "Curve"
@@ -340,7 +340,7 @@ export class Layer extends Renderable<LayerEventTypes> {
 	onAnimationStop(handler: Function) { this.on("AnimationStop", handler) }
 	onAnimationHalt(handler: Function) { this.on("AnimationHalt", handler) }
 	onAnimationEnd (handler: Function) { this.on("AnimationEnd", handler) }
-	onChange(property: LayerKeys, handler: Function) { this.on(`change:${property}` as any, handler) }
+	onChange(key: LayerKeys, handler: Function) { this.on(`change:${key}` as any, handler) }
 
 	addEventListener(eventName: LayerEventTypes, fn: Function, once: boolean, context: Object) {
 		super.addEventListener(eventName, fn, once, context)

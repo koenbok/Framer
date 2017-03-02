@@ -10,7 +10,8 @@
 		"**/.DS_Store": true,
 		"node_modules": true,
 		"build": true,
-		".vscode": true
+		".vscode": true,
+		"yarn*": true
 	},
 	"editor.detectIndentation": false,
 	"editor.insertSpaces": false

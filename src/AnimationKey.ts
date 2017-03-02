@@ -6,13 +6,13 @@ import {AnimationCurve} from "AnimationCurve"
 
 import {Color} from "./Color"
 
-export type AnimatablePropertyType = number | Color
+export type AnimatableKeyType = number | Color
 
-export type PropertyAnimationEventTypes =
-	"PropertyAnimationStart" |
-	"PropertAnimationStop" |
-	"PropertAnimationHalt" |
-	"PropertAnimationEnd"
+export type AnimationKeyEventTypes =
+	"AnimationKeyStart" |
+	"AnimationKeyStop" |
+	"AnimationKeyHalt" |
+	"AnimationKeyEnd"
 
 export interface AnimatableKeys {
 	x?: number
@@ -28,12 +28,12 @@ export interface AnimatableKeys {
 	maxY?: number
 }
 
-export type AnimatablePropertyName = keyof AnimatableKeys
+export type AnimatableKeyName = keyof AnimatableKeys
 
-export class AnimationProperty extends EventEmitter<PropertyAnimationEventTypes> {
+export class AnimationKey extends EventEmitter<AnimationKeyEventTypes> {
 
 	private _target: Layer
-	private _key: AnimatablePropertyName
+	private _key: AnimatableKeyName
 	private _loop: AnimationLoop
 	private _from: number
 	private _to: number
@@ -44,9 +44,9 @@ export class AnimationProperty extends EventEmitter<PropertyAnimationEventTypes>
 	constructor(
 		loop: AnimationLoop,
 		target: Layer,
-		key: AnimatablePropertyName,
-		from: AnimatablePropertyType,
-		to: AnimatablePropertyType,
+		key: AnimatableKeyName,
+		from: AnimatableKeyType,
+		to: AnimatableKeyType,
 		curve: AnimationCurve,
 		converter: null|Function= null) {
 
@@ -90,13 +90,13 @@ export class AnimationProperty extends EventEmitter<PropertyAnimationEventTypes>
 	}
 
 	private _stop() {
-		this.emit("PropertAnimationStop")
+		this.emit("AnimationKeyStop")
 		this._loop.off("update", this._update)
 	}
 
 	private _end() {
 		this._stop()
-		this.emit("PropertAnimationEnd")
+		this.emit("AnimationKeyEnd")
 	}
 
 	private _update = (delta: number) => {

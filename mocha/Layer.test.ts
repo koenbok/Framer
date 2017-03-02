@@ -5,7 +5,7 @@ import {Layer, Curve, utils} from "Framer"
 
 describe("Layer", () => {
 
-	isolated.test("should set property on create", (context, done) => {
+	isolated.test("should set key on create", (context, done) => {
 		const layer = new Layer({x: 500})
 		expect(layer.x).to.equal(500)
 		done()
@@ -25,7 +25,7 @@ describe("Layer", () => {
 		done()
 	})
 
-	isolated.test("should set property after create", (context, done) => {
+	isolated.test("should set key after create", (context, done) => {
 		const layer = new Layer()
 		layer.x = 500
 		expect(layer.x).to.equal(500)
@@ -98,7 +98,7 @@ describe("Layer", () => {
 		expect(layer.animations).to.eql([animation])
 	})
 
-	isolated.test("should cancel animations on same property", (context, done) => {
+	isolated.test("should cancel animations on same key", (context, done) => {
 
 		const layer = new Layer()
 		const animationA = layer.animate({x: 100}, Curve.linear(0.1))
@@ -110,7 +110,7 @@ describe("Layer", () => {
 		done()
 	})
 
-	isolated.test("should not cancel animations on a different property", (context, done) => {
+	isolated.test("should not cancel animations on a different key", (context, done) => {
 
 		const layer = new Layer()
 		const animationA = layer.animate({x: 100}, Curve.linear(0.1))

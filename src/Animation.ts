@@ -2,7 +2,7 @@ import * as utils from "utils"
 import {BaseClass} from "BaseClass"
 import {AnimationLoop} from "AnimationLoop"
 import {AnimationCurve} from "AnimationCurve"
-import {AnimatableKeys, AnimationProperty} from "AnimationProperty"
+import {AnimatableKeys, AnimationKey} from "AnimationKey"
 import {Layer} from "Layer"
 
 export type AnimationEventTypes =
@@ -17,8 +17,8 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 	private _curve: AnimationCurve
 	private _keys: AnimatableKeys
 	private _loop: AnimationLoop
-	private _running: AnimationProperty[] = []
-	private _finished: AnimationProperty[] = []
+	private _running: AnimationKey[] = []
+	private _finished: AnimationKey[] = []
 
 	constructor(
 		layer: Layer,
@@ -103,17 +103,17 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 				continue
 			}
 
-			const animationProperty = new AnimationProperty(
+			const animationKey = new AnimationKey(
 				this._loop,
 				this._layer,
 				key as any, a, b,
 				this._curve
 			)
 
-			this._running.push(animationProperty)
+			this._running.push(animationKey)
 
-			animationProperty.once("PropertAnimationEnd", this._onAnimationPropertyEnd)
-			animationProperty.start()
+			animationKey.once("AnimationKeyEnd", this._onKeyAnimationEnd)
+			animationKey.start()
 		}
 
 		let started = this._running.length > 0
@@ -132,8 +132,8 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 
 	private _stop() {
 
-		for (let animationProperty of this._running) {
-			animationProperty.stop()
+		for (let animationKey of this._running) {
+			animationKey.stop()
 		}
 
 		this._layer._animations.remove(this)
@@ -142,9 +142,9 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 		this._reset()
 	}
 
-	private _onAnimationPropertyEnd = (animationProperty: AnimationProperty) => {
+	private _onKeyAnimationEnd = (animationKey: AnimationKey) => {
 
-		this._finished.push(animationProperty)
+		this._finished.push(animationKey)
 
 		if (!this.running) {
 			this._stop()

@@ -12,13 +12,23 @@ A complete rewrite of the core, with everything on top.
 
 #### Todo
 
-+ Change css updates to be in renderer
-+ Add print and describe in base, take rest out
-+ Add renderer _createdLayers for full css updates inc position
-- Print
-+ A general system for multiple resolutions
+- Event system with gestures
+- DeviceComponent
+- Coordinate conversions
+- States
+- Align
+- Draggable
+- ScrollComponent / PageComponent
+- Importer
+- Color
 
+- Print
 - Port inspect tests
+
++ ~~Change css updates to be in renderer~~
++ ~~Add print and describe in base, take rest out~~
++ ~~Add renderer _createdLayers for full css updates inc position~~
++ ~~A general system for multiple resolutions~~
 
 #### Changes
 
@@ -28,8 +38,9 @@ A complete rewrite of the core, with everything on top.
 
 #### Questions
 
-- Should we move from `properties` to a more friendly `keys` and `values` everywhere?
+- `yes` ~~Should we move from `properties` to a more friendly `keys` and `values` everywhere?~~
 - What should we do with capitalization like `Utils.x`, `Align.left`, `Framer.CurrentContext`.
+- Should we add top level hacks for bad things like timers and events and hijack.
 
 ---
 

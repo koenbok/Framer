@@ -3,16 +3,16 @@ import {isolated} from "./Testutils"
 
 import {Layer} from "Layer"
 import {Curve} from "Curve"
-import {AnimationProperty} from "AnimationProperty"
+import {AnimationKey} from "AnimationKey"
 
-describe("AnimationProperty", () => {
+describe("AnimationKey", () => {
 
 	isolated.test("it should set the right value", (context, done) => {
 
 		context.renderer.loop.pause = true
 
 		const layer = new Layer()
-		const ap = new AnimationProperty(
+		const ap = new AnimationKey(
 			context.renderer.loop, layer, "x",
 			100, 160, Curve.linear(1))
 
