@@ -135,12 +135,14 @@ class exports.RangedSliderComponent extends Layer
 
 	_styleKnob: (knob) =>
 		knob.parent = @fill.parent = @sliderOverlay.parent = @
-		knob.draggable.enabled = true
-		knob.draggable.overdrag = false
-		knob.draggable.momentum = true
-		knob.draggable.momentumOptions = {friction: 5, tolerance: 0.25}
-		knob.draggable.bounce = false
 		knob.borderRadius = @knobSize / 2
+
+		_.extend knob.draggable,
+			enabled: true
+			overdrag: false
+			momentum: true
+			bounce: false
+			momentumOptions: {friction: 5, tolerance: 0.25}
 
 	_updateFill: =>
 		if @width > @height
