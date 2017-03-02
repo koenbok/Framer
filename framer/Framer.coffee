@@ -24,6 +24,7 @@ Framer.print = (require "./Print").print
 Framer.ScrollComponent = (require "./Components/ScrollComponent").ScrollComponent
 Framer.PageComponent = (require "./Components/PageComponent").PageComponent
 Framer.SliderComponent = (require "./Components/SliderComponent").SliderComponent
+Framer.RangedSliderComponent = (require "./Components/RangedSliderComponent").RangedSliderComponent
 Framer.DeviceComponent = (require "./Components/DeviceComponent").DeviceComponent
 Framer.GridComponent = (require "./Components/GridComponent").GridComponent
 Framer.FlowComponent = (require "./Components/FlowComponent").FlowComponent
