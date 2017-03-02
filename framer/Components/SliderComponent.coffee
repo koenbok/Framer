@@ -36,7 +36,7 @@ class exports.SliderComponent extends Layer
 			borderRadius: 50
 			clip: false
 			width: 300
-			height: 6
+			height: 10
 			value: 0
 			knobSize: 30
 
