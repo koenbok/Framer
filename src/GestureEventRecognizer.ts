@@ -7,15 +7,15 @@ import { Context } from "Context"
 import { Screen } from "Screen"
 
 
-let GestureInputLongPressTime = 0.5;
-let GestureInputDoubleTapTime = 0.25;
-let GestureInputSwipeThreshold = 30;
-let GestureInputEdgeSwipeDistance = 30;
-let GestureInputVelocityTime = 0.1;
+let GestureInputLongPressTime = 0.5
+let GestureInputDoubleTapTime = 0.25
+let GestureInputSwipeThreshold = 30
+let GestureInputEdgeSwipeDistance = 30
+let GestureInputVelocityTime = 0.1
 let GestureInputForceTapDesktop = MouseEvent["WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN"]
-let GestureInputForceTapMobile = 0.7;
-let GestureInputForceTapMobilePollTime = 1 / 30;
-let GestureInputMinimumFingerDistance = 30;
+let GestureInputForceTapMobile = 0.7
+let GestureInputForceTapMobilePollTime = 1 / 30
+let GestureInputMinimumFingerDistance = 30
 
 interface GestureEvent extends TouchEvent {
 
@@ -78,12 +78,12 @@ export class GestureEventRecognizer {
 	doubleTapTime?: number
 
 	constructor() {
-		this.em.wrap(window).addEventListener("mousedown", this.domMouseDown);
-		this.em.wrap(window).addEventListener("touchstart", this.domTouchStart);
+		this.em.wrap(window).addEventListener("mousedown", this.domMouseDown)
+		this.em.wrap(window).addEventListener("touchstart", this.domTouchStart)
 	}
 
 	destroy() {
-		// return this.em.removeAllListeners();
+		// return this.em.removeAllListeners()
 	}
 
 	cancel() {
@@ -97,28 +97,28 @@ export class GestureEventRecognizer {
 	// Mouse
 
 	domMouseDown = (event: MouseEvent) => {
-		if (this.session) { return; }
-		this.em.wrap(window).addEventListener("mousemove", this.domMouseMove);
-		this.em.wrap(window).addEventListener("mouseup", this.domMouseUp);
-		this.touchstart(this._getTouchEvent(event));
+		if (this.session) { return }
+		this.em.wrap(window).addEventListener("mousemove", this.domMouseMove)
+		this.em.wrap(window).addEventListener("mouseup", this.domMouseUp)
+		this.touchstart(this._getTouchEvent(event))
 	}
 
 	domMouseMove = (event: MouseEvent) => {
 		this.touchmove(this._getGestureEvent(this._getTouchEvent(event)))
 	}
 	domMouseUp = (event: MouseEvent) => {
-		this.em.wrap(window).removeEventListener("mousemove", this.domTouchMove);
-		this.em.wrap(window).removeEventListener("mouseup", this.domTouchEnd);
+		this.em.wrap(window).removeEventListener("mousemove", this.domTouchMove)
+		this.em.wrap(window).removeEventListener("mouseup", this.domTouchEnd)
 		this._process(this._getGestureEvent(this._getTouchEvent(event)))
 	}
 
 	// Touch
 
 	domTouchStart = (event: TouchEvent) => {
-		if (this.session) { return; }
-		this.em.wrap(window).addEventListener("touchmove", this.domTouchMove);
-		this.em.wrap(window).addEventListener("touchend", this.domTouchEnd);
-		this.touchstart(event);
+		if (this.session) { return }
+		this.em.wrap(window).addEventListener("touchmove", this.domTouchMove)
+		this.em.wrap(window).addEventListener("touchend", this.domTouchEnd)
+		this.touchstart(event)
 	}
 
 	domTouchMove = (event: TouchEvent) => {
@@ -132,15 +132,15 @@ export class GestureEventRecognizer {
 		// Only fire if there are no fingers left on the screen
 		if (event.touches != null) {
 			if (Utils.environment.isTouch()) {
-				if (event.touches.length !== 0) { return; }
+				if (event.touches.length !== 0) { return }
 			} else {
-				if (event.touches.length !== event.changedTouches.length) { return; }
+				if (event.touches.length !== event.changedTouches.length) { return }
 			}
 		}
 
-		this.em.wrap(window).removeEventListener("touchmove", this.domTouchMove);
-		this.em.wrap(window).removeEventListener("touchend", this.domTouchEnd);
-		this.em.wrap(window).removeEventListener("webkitmouseforcechanged", this._updateMacForce);
+		this.em.wrap(window).removeEventListener("touchmove", this.domTouchMove)
+		this.em.wrap(window).removeEventListener("touchend", this.domTouchEnd)
+		this.em.wrap(window).removeEventListener("webkitmouseforcechanged", this._updateMacForce)
 
 		this.touchend(this._getGestureEvent(event))
 	}
@@ -157,9 +157,9 @@ export class GestureEventRecognizer {
 	touchstart = (_event: TouchEvent) => {
 
 		// Only fire if we are not already in a session
-		if (this.session) { return; }
+		if (this.session) { return }
 
-		this.em.wrap(window).addEventListener("webkitmouseforcechanged", this._updateMacForce);
+		this.em.wrap(window).addEventListener("webkitmouseforcechanged", this._updateMacForce)
 
 		const event = this._getGestureEvent(_event)
 
@@ -172,17 +172,17 @@ export class GestureEventRecognizer {
 			started: {},
 			events: [],
 			eventCount: 0
-		};
-
-		this.tapstart(event);
-
-		if (this.doubleTapTime && (Date.now() - this.doubleTapTime) < (GestureInputDoubleTapTime * 1000)) {
-			this.doubletap(event);
-		} else {
-			this.doubleTapTime = Date.now();
 		}
 
-		this._process(event);
+		this.tapstart(event)
+
+		if (this.doubleTapTime && (Date.now() - this.doubleTapTime) < (GestureInputDoubleTapTime * 1000)) {
+			this.doubletap(event)
+		} else {
+			this.doubleTapTime = Date.now()
+		}
+
+		this._process(event)
 
 		if (Utils.environment.isTouch()) {
 			this._updateTouchForce()
@@ -195,56 +195,56 @@ export class GestureEventRecognizer {
 
 	touchend = (event: GestureEvent) => {
 
-		if (!this.session) { return; }
+		if (!this.session) { return }
 
 		for (let eventName in this.session.started) {
-			let value = this.session.started[eventName];
-			if (value) { this[`${eventName}end`](event); }
+			let value = this.session.started[eventName]
+			if (value) { this[`${eventName}end`](event) }
 		}
 
 		// We only want to fire a tap event if the original target is the same
 		// as the release target, so buttons work the way you expect if you
 		// release the mouse outside.
 		if (!(this.session != null ? this.session.startEvent : undefined)) {
-			this.tap(event);
+			this.tap(event)
 		} else if (this.session.startEvent.target === event.target) {
-			this.tap(event);
+			this.tap(event)
 		}
 
-		this.tapend(event);
-		this.cancel();
+		this.tapend(event)
+		this.cancel()
 	}
 
 	// Tap
 
 	tap = (event: GestureEvent) => {
-		return this._dispatchEvent("tap", event);
+		return this._dispatchEvent("tap", event)
 	}
 
 	tapstart = (event: GestureEvent) => {
-		return this._dispatchEvent("tapstart", event);
+		return this._dispatchEvent("tapstart", event)
 	}
 
 	tapend = (event: GestureEvent) => {
-		return this._dispatchEvent("tapend", event);
+		return this._dispatchEvent("tapend", event)
 	}
 
 	doubletap = (event: GestureEvent) => {
-		return this._dispatchEvent("doubletap", event);
+		return this._dispatchEvent("doubletap", event)
 	}
 
 	// Press
 
 	longpressstart = (event: GestureEvent) => {
-		if (!this.session) { return; }
-		if (this.session.started.longpress) { return; }
-		this.session.started.longpress = event;
-		this._dispatchEvent("longpressstart", event);
-		this._dispatchEvent("longpress", event);
+		if (!this.session) { return }
+		if (this.session.started.longpress) { return }
+		this.session.started.longpress = event
+		this._dispatchEvent("longpressstart", event)
+		this._dispatchEvent("longpress", event)
 	}
 
 	longpressend(event: GestureEvent) {
-		this._dispatchEvent("longpressend", event);
+		this._dispatchEvent("longpressend", event)
 	}
 
 	// ForceTap
@@ -255,142 +255,142 @@ export class GestureEventRecognizer {
 		if (!this.session.lastEvent.touches) { return }
 		if (!this.session.lastEvent.touches.length) { return }
 
-		this.session.force = this.session.lastEvent.touches[0]["force"] || 0;
-		let event = this._getGestureEvent(this.session.lastEvent);
-		this.forcetapchange(event);
+		this.session.force = this.session.lastEvent.touches[0]["force"] || 0
+		let event = this._getGestureEvent(this.session.lastEvent)
+		this.forcetapchange(event)
 
 		if (this.session.force && this.session.force >= GestureInputForceTapMobile) {
-			this.forcetapstart(event);
+			this.forcetapstart(event)
 		} else {
-			this.forcetapend(event);
+			this.forcetapend(event)
 		}
 
-		return setTimeout(this._updateTouchForce, GestureInputForceTapMobilePollTime);
+		return setTimeout(this._updateTouchForce, GestureInputForceTapMobilePollTime)
 	}
 
 	_updateMacForce(event) {
-		if (!this.session) { return; }
-		this.session.force = Utils.math.modulate(event.webkitForce, [0, 3], [0, 1]);
-		this.forcetapchange(this._getGestureEvent(event));
+		if (!this.session) { return }
+		this.session.force = Utils.math.modulate(event.webkitForce, [0, 3], [0, 1])
+		this.forcetapchange(this._getGestureEvent(event))
 
 		// Trigger a force touch if we reach the desktop threshold
 		if (event.webkitForce >= GestureInputForceTapDesktop) {
-			return this.forcetapstart(event);
+			return this.forcetapstart(event)
 		} else {
-			return this.forcetapend(event);
+			return this.forcetapend(event)
 		}
 	}
 
 	forcetapchange(event: GestureEvent) {
-		return this._dispatchEvent("forcetapchange", event);
+		return this._dispatchEvent("forcetapchange", event)
 	}
 
 	forcetapstart(event: GestureEvent) {
-		if (!this.session) { return; }
-		if (this.session.started.forcetap) { return; }
-		this.session.started.forcetap = event;
-		this._dispatchEvent("forcetapstart", event);
-		return this._dispatchEvent("forcetap", event);
+		if (!this.session) { return }
+		if (this.session.started.forcetap) { return }
+		this.session.started.forcetap = event
+		this._dispatchEvent("forcetapstart", event)
+		return this._dispatchEvent("forcetap", event)
 	}
 
 	forcetapend(event: GestureEvent) {
-		if (!this.session) { return; }
-		if (!this.session.started.forcetap) { return; }
-		delete this.session.started.forcetap;
-		return this._dispatchEvent("forcetapend", event);
+		if (!this.session) { return }
+		if (!this.session.started.forcetap) { return }
+		delete this.session.started.forcetap
+		return this._dispatchEvent("forcetapend", event)
 	}
 
 	// Pan
 
 	panstart(event: GestureEvent) {
-		if (!this.session) { return; }
-		this.session.started.pan = event;
-		return this._dispatchEvent("panstart", event, event.target);
+		if (!this.session) { return }
+		this.session.started.pan = event
+		return this._dispatchEvent("panstart", event, event.target)
 	}
 
 	pan(event: GestureEvent) {
-		if (!this.session || !this.session.started.pan) { return; }
-		this._dispatchEvent("pan", event, this.session.started.pan.target);
-		let direction = this._getDirection(event.delta);
-		if (direction) { return this[`pan${direction}`](event); }
+		if (!this.session || !this.session.started.pan) { return }
+		this._dispatchEvent("pan", event, this.session.started.pan.target)
+		let direction = this._getDirection(event.delta)
+		if (direction) { return this[`pan${direction}`](event) }
 	}
 
 	panend(event: GestureEvent) {
-		if (!this.session || !this.session.started.pan) { return; }
-		this._dispatchEvent("panend", event, this.session.started.pan.target);
-		delete this.session.started.pan;
+		if (!this.session || !this.session.started.pan) { return }
+		this._dispatchEvent("panend", event, this.session.started.pan.target)
+		delete this.session.started.pan
 	}
 
 	panup(event: GestureEvent) {
-		if (!this.session || !this.session.started.pan) { return; }
-		return this._dispatchEvent("panup", event, this.session.started.pan.target);
+		if (!this.session || !this.session.started.pan) { return }
+		return this._dispatchEvent("panup", event, this.session.started.pan.target)
 	}
 
 	pandown(event: GestureEvent) {
-		if (!this.session || !this.session.started.pan) { return; }
-		return this._dispatchEvent("pandown", event, this.session.started.pan.target);
+		if (!this.session || !this.session.started.pan) { return }
+		return this._dispatchEvent("pandown", event, this.session.started.pan.target)
 	}
 
 	panleft(event) {
-		if (!this.session || !this.session.started.pan) { return; }
-		return this._dispatchEvent("panleft", event, this.session.started.pan.target);
+		if (!this.session || !this.session.started.pan) { return }
+		return this._dispatchEvent("panleft", event, this.session.started.pan.target)
 	}
 
 	panright(event: GestureEvent) {
-		if (!this.session || !this.session.started.pan) { return; }
-		return this._dispatchEvent("panright", event, this.session.started.pan.target);
+		if (!this.session || !this.session.started.pan) { return }
+		return this._dispatchEvent("panright", event, this.session.started.pan.target)
 	}
 
 	// Pinch
 
 	pinchstart(event: GestureEvent) {
-		if (!this.session || !this.session.started.pan) { return; }
-		this.session.started.pinch = event;
-		this.scalestart(event);
-		this.rotatestart(event);
-		this._dispatchEvent("pinchstart", event);
+		if (!this.session || !this.session.started.pan) { return }
+		this.session.started.pinch = event
+		this.scalestart(event)
+		this.rotatestart(event)
+		this._dispatchEvent("pinchstart", event)
 	}
 
 	pinch(event: GestureEvent) {
 		if (!this.session) { return }
 		if (!this.session.started.pinch) { return }
-		this._dispatchEvent("pinch", event);
-		this.scale(event);
-		this.rotate(event);
+		this._dispatchEvent("pinch", event)
+		this.scale(event)
+		this.rotate(event)
 	}
 
 	pinchend(event: GestureEvent) {
 		if (!this.session) { return }
 		if (!this.session.started.pinch) { return }
-		this._dispatchEvent("pinchend", event);
-		this.scaleend(event);
-		this.rotateend(event);
-		delete this.session.started.pinch;
+		this._dispatchEvent("pinchend", event)
+		this.scaleend(event)
+		this.rotateend(event)
+		delete this.session.started.pinch
 	}
 
 
 	scalestart(event: GestureEvent) {
-		return this._dispatchEvent("scalestart", event);
+		return this._dispatchEvent("scalestart", event)
 	}
 
 	scale(event: GestureEvent) {
-		return this._dispatchEvent("scale", event);
+		return this._dispatchEvent("scale", event)
 	}
 
 	scaleend(event: GestureEvent) {
-		return this._dispatchEvent("scaleend", event);
+		return this._dispatchEvent("scaleend", event)
 	}
 
 	rotatestart(event: GestureEvent) {
-		return this._dispatchEvent("rotatestart", event);
+		return this._dispatchEvent("rotatestart", event)
 	}
 
 	rotate(event: GestureEvent) {
-		return this._dispatchEvent("rotate", event);
+		return this._dispatchEvent("rotate", event)
 	}
 
 	rotateend(event: GestureEvent) {
-		return this._dispatchEvent("rotateend", event);
+		return this._dispatchEvent("rotateend", event)
 	}
 
 	// Swipe
@@ -398,108 +398,108 @@ export class GestureEventRecognizer {
 	swipestart(event: GestureEvent) {
 		if (!this.session) { return }
 		if (!this.session.started.swipe) { return }
-		this._dispatchEvent("swipestart", event);
-		this.session.started.swipe = event;
-		return this.swipedirectionstart(event);
+		this._dispatchEvent("swipestart", event)
+		this.session.started.swipe = event
+		return this.swipedirectionstart(event)
 	}
 
 	swipe(event: GestureEvent) {
-		this._dispatchEvent("swipe", event);
-		return this.swipedirection(event);
+		this._dispatchEvent("swipe", event)
+		return this.swipedirection(event)
 	}
 
 	swipeend(event: GestureEvent) {
-		return this._dispatchEvent("swipeend", event);
+		return this._dispatchEvent("swipeend", event)
 	}
 
 	// Direction swipe
 
 	swipedirectionstart(event: GestureEvent) {
-		if (!event.offsetDirection) { return; }
+		if (!event.offsetDirection) { return }
 		if (!this.session) { return }
-		if (this.session.started.swipedirection) { return; }
-		this.session.started.swipedirection = event;
-		let direction = this.session.started.swipedirection.offsetDirection;
-		this._dispatchEvent(`swipe${direction}start`, event);
+		if (this.session.started.swipedirection) { return }
+		this.session.started.swipedirection = event
+		let direction = this.session.started.swipedirection.offsetDirection
+		this._dispatchEvent(`swipe${direction}start`, event)
 
-		let swipeEdge = this._edgeForSwipeDirection(direction);
+		let swipeEdge = this._edgeForSwipeDirection(direction)
 
 		if ((swipeEdge === "top") && 0 < event.start.y && event.start.y < GestureInputEdgeSwipeDistance) {
-			this.edgeswipedirectionstart(event);
+			this.edgeswipedirectionstart(event)
 		}
 
 		if ((swipeEdge === "right") && Screen.width - GestureInputEdgeSwipeDistance < event.start.x && event.start.x < Screen.width) {
-			this.edgeswipedirectionstart(event);
+			this.edgeswipedirectionstart(event)
 		}
 
 		if ((swipeEdge === "bottom") && Screen.height - GestureInputEdgeSwipeDistance < event.start.y && event.start.y < Screen.height) {
-			this.edgeswipedirectionstart(event);
+			this.edgeswipedirectionstart(event)
 		}
 
 		if ((swipeEdge === "left") && 0 < event.start.x && event.start.x < GestureInputEdgeSwipeDistance) {
-			return this.edgeswipedirectionstart(event);
+			return this.edgeswipedirectionstart(event)
 		}
 	}
 
 	swipedirection(event: GestureEvent) {
 		if (!this.session) { return }
-		if (!this.session.started.swipedirection) { return; }
-		let direction = this.session.started.swipedirection.offsetDirection;
-		this._dispatchEvent(`swipe${direction}`, event);
-		if (this.session.started.edgeswipedirection) { return this.edgeswipedirection(event); }
+		if (!this.session.started.swipedirection) { return }
+		let direction = this.session.started.swipedirection.offsetDirection
+		this._dispatchEvent(`swipe${direction}`, event)
+		if (this.session.started.edgeswipedirection) { return this.edgeswipedirection(event) }
 	}
 
 	swipedirectionend(event: GestureEvent) {
 		if (!this.session) { return }
-		if (!this.session.started.swipedirection) { return; }
-		let direction = this.session.started.swipedirection.offsetDirection;
-		return this._dispatchEvent(`swipe${direction}end`, event);
+		if (!this.session.started.swipedirection) { return }
+		let direction = this.session.started.swipedirection.offsetDirection
+		return this._dispatchEvent(`swipe${direction}end`, event)
 	}
 
 	// Edge swipe
 
 	edgeswipedirection(event: GestureEvent) {
 		if (!this.session) { return }
-		if (!this.session.started.edgeswipedirection) { return; }
-		let swipeEdge = this._edgeForSwipeDirection(this.session.started.edgeswipedirection.offsetDirection);
-		Screen.emit("edgeswipe", this._createEvent("edgeswipe", event));
-		Screen.emit(`edgeswipe${swipeEdge}` as any, this._createEvent(`edgeswipe${swipeEdge}`, event));
+		if (!this.session.started.edgeswipedirection) { return }
+		let swipeEdge = this._edgeForSwipeDirection(this.session.started.edgeswipedirection.offsetDirection)
+		Screen.emit("edgeswipe", this._createEvent("edgeswipe", event))
+		Screen.emit(`edgeswipe${swipeEdge}` as any, this._createEvent(`edgeswipe${swipeEdge}`, event))
 	}
 
 	edgeswipedirectionstart(event: GestureEvent) {
 		if (!this.session) { return }
-		if (this.session.started.edgeswipedirection) { return; }
-		this.session.started.edgeswipedirection = event;
-		let swipeEdge = this._edgeForSwipeDirection(this.session.started.edgeswipedirection.offsetDirection);
-		Screen.emit("edgeswipestart", this._createEvent("edgeswipestart", event));
-		Screen.emit(`edgeswipe${swipeEdge}start` as any, this._createEvent(`edgeswipe${swipeEdge}start` as any, event));
+		if (this.session.started.edgeswipedirection) { return }
+		this.session.started.edgeswipedirection = event
+		let swipeEdge = this._edgeForSwipeDirection(this.session.started.edgeswipedirection.offsetDirection)
+		Screen.emit("edgeswipestart", this._createEvent("edgeswipestart", event))
+		Screen.emit(`edgeswipe${swipeEdge}start` as any, this._createEvent(`edgeswipe${swipeEdge}start` as any, event))
 	}
 
 	edgeswipedirectionend(event: GestureEvent) {
 		if (!this.session) { return }
-		if (!this.session.started.edgeswipedirection) { return; }
-		let swipeEdge = this._edgeForSwipeDirection(this.session.started.edgeswipedirection.offsetDirection);
-		Screen.emit("edgeswipeend", this._createEvent("edgeswipeend", event));
-		Screen.emit(`edgeswipe${swipeEdge}end` as any, this._createEvent(`edgeswipe${swipeEdge}end`, event));
+		if (!this.session.started.edgeswipedirection) { return }
+		let swipeEdge = this._edgeForSwipeDirection(this.session.started.edgeswipedirection.offsetDirection)
+		Screen.emit("edgeswipeend", this._createEvent("edgeswipeend", event))
+		Screen.emit(`edgeswipe${swipeEdge}end` as any, this._createEvent(`edgeswipe${swipeEdge}end`, event))
 	}
 
 
 	// Utilities
 
 	_process(event: GestureEvent) {
-		if (!this.session) { return; }
+		if (!this.session) { return }
 
-		this.session.events.push(event);
-		event.eventCount = this.session.eventCount++;
+		this.session.events.push(event)
+		event.eventCount = this.session.eventCount++
 
 		// Detect pan events
 
 		// See if there was any movement
 		if ((Math.abs(event.delta.x) > 0) || (Math.abs(event.delta.y) > 0)) {
 			if (!this.session.started.pan) {
-				this.panstart(event);
+				this.panstart(event)
 			} else {
-				this.pan(event);
+				this.pan(event)
 			}
 		}
 
@@ -507,13 +507,13 @@ export class GestureEventRecognizer {
 
 		// Stop panning if we go from 2 to 1 finger
 		if (this.session.started.pinch && (event.fingers === 1)) {
-			this.pinchend(event);
+			this.pinchend(event)
 		// If we did not start yet and get two fingers, start
 		} else if (!this.session.started.pinch && (event.fingers === 2)) {
-			this.pinchstart(event);
+			this.pinchstart(event)
 		// If we did start send pinch events
 		} else if (this.session.started.pinch) {
-			this.pinch(event);
+			this.pinch(event)
 		}
 
 		// Detect swipe events
@@ -522,13 +522,13 @@ export class GestureEventRecognizer {
 		if (!this.session.started.swipe && (
 			(Math.abs(event.offset.x) > GestureInputSwipeThreshold) ||
 			(Math.abs(event.offset.y) > GestureInputSwipeThreshold))) {
-				this.swipestart(event);
+				this.swipestart(event)
 		// If we did start send swipe events
 		} else if (this.session.started.swipe) {
-			this.swipe(event);
+			this.swipe(event)
 		}
 
-		return this.session.lastEvent = event;
+		return this.session.lastEvent = event
 	}
 
 	_getTouchEvent(_event: MouseEvent): TouchEvent {
@@ -588,7 +588,7 @@ export class GestureEventRecognizer {
 			scale: 1, // Scale value from two fingers √
 			scaleDirection: null, // Direction for scale: up or down √
 			rotation: 0 // Rotation value from two fingers √
-		});
+		})
 
 		// Now we have all the keys, we are a gesture event
 		let event = _event as any as GestureEvent
@@ -601,31 +601,31 @@ export class GestureEventRecognizer {
 
 		// Properties relative to a start event
 		if (this.session && this.session.startEvent) {
-			event.start = this.session.startEvent.point;
-			event.offset = Utils.point.subtract(event.point, event.start);
-			event.offsetTime = event.time - this.session.startEvent.time;
-			event.offsetAngle = Utils.point.angle(this.session.startEvent.point, event.point);
-			event.offsetDirection = this._getDirection(event.offset);
-			event.touchCenterStart = this.session.startEvent.touchCenter;
+			event.start = this.session.startEvent.point
+			event.offset = Utils.point.subtract(event.point, event.start)
+			event.offsetTime = event.time - this.session.startEvent.time
+			event.offsetAngle = Utils.point.angle(this.session.startEvent.point, event.point)
+			event.offsetDirection = this._getDirection(event.offset)
+			event.touchCenterStart = this.session.startEvent.touchCenter
 		}
 
 		// Properties relative to the previous event
 		if (this.session && this.session.lastEvent) {
-			event.previous = this.session.lastEvent.point;
-			event.deltaTime = event.time - this.session.lastEvent.time;
-			event.delta = Utils.point.subtract(event.point, this.session.lastEvent.point);
-			event.deltaAngle = Utils.point.angle(event.point, this.session.lastEvent.point);
-			event.deltaDirection = this._getDirection(event.delta);
+			event.previous = this.session.lastEvent.point
+			event.deltaTime = event.time - this.session.lastEvent.time
+			event.delta = Utils.point.subtract(event.point, this.session.lastEvent.point)
+			event.deltaAngle = Utils.point.angle(event.point, this.session.lastEvent.point)
+			event.deltaDirection = this._getDirection(event.delta)
 		}
 
 		// Properties related to multi touch
 		if (event.fingers > 1) {
-			let touchPointA = this._getTouchPoint(event, 0);
-			let touchPointB = this._getTouchPoint(event, 1);
-			event.touchCenter = Utils.point.center(touchPointB, touchPointA);
-			event.touchOffset = Utils.point.subtract(touchPointB, touchPointA);
-			event.touchDistance = _.max([GestureInputMinimumFingerDistance, Utils.point.distance(touchPointA, touchPointB)]);
-			event.rotation = Utils.point.angle(touchPointA, touchPointB);
+			let touchPointA = this._getTouchPoint(event, 0)
+			let touchPointB = this._getTouchPoint(event, 1)
+			event.touchCenter = Utils.point.center(touchPointB, touchPointA)
+			event.touchOffset = Utils.point.subtract(touchPointB, touchPointA)
+			event.touchDistance = _.max([GestureInputMinimumFingerDistance, Utils.point.distance(touchPointA, touchPointB)])
+			event.rotation = Utils.point.angle(touchPointA, touchPointB)
 		}
 
 		// Special cases
@@ -633,24 +633,24 @@ export class GestureEventRecognizer {
 		// Velocity
 		if (this.session && this.session.events) {
 			let events = _.filter(this.session.events, function(e) {
-				if (e.eventCount === 0) { return false; }
-				return e.time > (event.time - (GestureInputVelocityTime * 1000));
-			});
+				if (e.eventCount === 0) { return false }
+				return e.time > (event.time - (GestureInputVelocityTime * 1000))
+			})
 
-			event.velocity = this._getVelocity(events);
+			event.velocity = this._getVelocity(events)
 		}
 
 		// Scale can only be set after we started a pinch session
 		if (this.session && this.session.started.pinch) {
 
-			event.scale = event.touchDistance / this.session.started.pinch.touchDistance;
+			event.scale = event.touchDistance / this.session.started.pinch.touchDistance
 
 			if (this.session && this.session.lastEvent) {
-				event.scaleDirection = this._getScaleDirection(event.scale - this.session.lastEvent.scale);
+				event.scaleDirection = this._getScaleDirection(event.scale - this.session.lastEvent.scale)
 
 				// If this is a pinch end event, there was no movement so we use the last one
 				if (!event.scaleDirection) {
-					event.scaleDirection = this.session.lastEvent.scaleDirection;
+					event.scaleDirection = this.session.lastEvent.scaleDirection
 				}
 			}
 		}
@@ -659,29 +659,29 @@ export class GestureEventRecognizer {
 		if (this.session && this.session.lastEvent) {
 			// If we just switched fingers, we skip the delta event entirely
 			if (event.fingers !== this.session.lastEvent.fingers && this.session.lastEvent.fingers === 2) {
-				event.delta = {x: 0, y: 0};
+				event.delta = {x: 0, y: 0}
 			}
 			// If we are having two finger events, we use the touchCenter as base for delta
 			if ((event.fingers === 2) && (this.session.lastEvent.fingers === 2)) {
-				event.delta = Utils.point.subtract(event.touchCenter, this.session.lastEvent.touchCenter);
+				event.delta = Utils.point.subtract(event.touchCenter, this.session.lastEvent.touchCenter)
 			}
 		}
 
 		// Force touch
 		if (this.session && this.session.lastEvent) {
 			if (this.session.force) {
-				event.force = this.session.force;
+				event.force = this.session.force
 			}
 		}
 
 		// Convert point style event properties to dom style:
 		// event.delta -> event.deltaX, event.deltaY
 		for (let pointKey of ["point", "start", "previous", "offset", "delta", "velocity", "touchCenter", "touchOffset"]) {
-			event[`${pointKey}X`] = event[pointKey].x;
-			event[`${pointKey}Y`] = event[pointKey].y;
+			event[`${pointKey}X`] = event[pointKey].x
+			event[`${pointKey}Y`] = event[pointKey].y
 		}
 
-		return event;
+		return event
 	}
 
 	_getTouchPoint(event: TouchEvent, index: number): Types.Point {
@@ -698,28 +698,28 @@ export class GestureEventRecognizer {
 
 	_getDirection(offset: Types.Point) {
 		if (Math.abs(offset.x) > Math.abs(offset.y)) {
-			if (offset.x > 0) { return "right"; }
-			if (offset.x < 0) { return "left"; }
+			if (offset.x > 0) { return "right" }
+			if (offset.x < 0) { return "left" }
 		}
 		if (Math.abs(offset.x) < Math.abs(offset.y)) {
-			if (offset.y < 0) { return "up"; }
-			if (offset.y > 0) { return "down"; }
+			if (offset.y < 0) { return "up" }
+			if (offset.y > 0) { return "down" }
 		}
-		return null;
+		return null
 	}
 
 	_edgeForSwipeDirection(direction: Types.Direction | null): null | Types.Edge {
-		if (direction === "down") { return "top"; }
-		if (direction === "left") { return "right"; }
-		if (direction === "up") { return "bottom"; }
-		if (direction === "right") { return "left"; }
-		return null;
+		if (direction === "down") { return "top" }
+		if (direction === "left") { return "right" }
+		if (direction === "up") { return "bottom" }
+		if (direction === "right") { return "left" }
+		return null
 	}
 
 	_getScaleDirection(offset: number): null | Types.VerticalDirection {
-		if (offset > 0) { return "up"; }
-		if (offset < 0) { return "down"; }
-		return null;
+		if (offset > 0) { return "up" }
+		if (offset < 0) { return "down" }
+		return null
 	}
 
 	_createEvent(type: string, _event: GestureEvent | TouchEvent | MouseEvent) {
@@ -734,13 +734,13 @@ export class GestureEventRecognizer {
 			event.ctrlKey, event.shiftKey, event.altKey, event.metaKey,
 			event.button, event.relatedTarget) as any as TouchEvent
 
-		touchEvent.touches = event["touches"];
-		touchEvent.changedTouches = event["touches"];
-		touchEvent.targetTouches = event["touches"];
+		touchEvent.touches = event["touches"]
+		touchEvent.changedTouches = event["touches"]
+		touchEvent.targetTouches = event["touches"]
 
 		for (let k in event) {
-			let v = event[k];
-			touchEvent[k] = v;
+			let v = event[k]
+			touchEvent[k] = v
 		}
 
 		return touchEvent as TouchEvent
@@ -751,7 +751,7 @@ export class GestureEventRecognizer {
 		event: GestureEvent,
 		target: EventTarget | null = null) {
 
-		let touchEvent = this._createEvent(type, event as any as MouseEvent);
+		let touchEvent = this._createEvent(type, event as any as MouseEvent)
 
 		// By default we want to send the event to the target at the beginning
 		// of this session, so we catch tap ends etc when the mouse is released
@@ -764,29 +764,25 @@ export class GestureEventRecognizer {
 			target = event.target
 		}
 
-		target.dispatchEvent(touchEvent);
+		target.dispatchEvent(touchEvent)
 	}
 
 	_getVelocity(events) {
 
-		if (events.length < 2) { return {x: 0, y: 0}; }
+		if (events.length < 2) { return {x: 0, y: 0} }
 
-		let current = events[events.length - 1];
-		let first = events[0];
-		let time = current.time - first.time;
+		let current = events[events.length - 1]
+		let first = events[0]
+		let time = current.time - first.time
 
 		let velocity = {
 			x: (current.point.x - first.point.x) / time,
 			y: (current.point.y - first.point.y) / time
-		};
+		}
 
-		if (velocity.x === Infinity) { velocity.x = 0; }
-		if (velocity.y === Infinity) { velocity.y = 0; }
+		if (velocity.x === Infinity) { velocity.x = 0 }
+		if (velocity.y === Infinity) { velocity.y = 0 }
 
-		return velocity;
+		return velocity
 	}
-};
-
-// function __guard__(value, transform) {
-//   return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
-// }
+}
