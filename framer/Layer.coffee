@@ -714,7 +714,8 @@ class exports.Layer extends BaseClass
 			# imageUrl = Config.baseUrl + imageUrl
 
 			if @_alwaysUseImageCache is false and Utils.isLocalAssetUrl(imageUrl)
-				imageUrl += "?nocache=#{NoCacheDateKey}"
+				imageUrl += if /\?/.test(imageUrl) then '&' else '?'
+				imageUrl += "nocache=#{NoCacheDateKey}"
 
 			# As an optimization, we will only use a loader
 			# if something is explicitly listening to the load event
