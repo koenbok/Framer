@@ -6,7 +6,7 @@ export class EventEmitter<EventName> {
 
 	eventListeners() {
 
-		const listeners = {}
+		const listeners: {[index: string]: EventEmitter.ListenerFn[]}= {}
 
 		for (let eventName of this._em.eventNames()) {
 			listeners[eventName] = this._em.listeners(eventName)

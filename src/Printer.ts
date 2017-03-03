@@ -20,7 +20,7 @@ export class Printer extends BaseClass<null> {
 		prefix: "» "
 	}
 
-	print(...args) {
+	print(...args: any[]) {
 
 		if (!this._layer) {
 			this._context.run(this._setup)

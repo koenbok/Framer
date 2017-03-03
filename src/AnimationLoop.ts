@@ -6,10 +6,10 @@ const performance = (window.performance || {
 	now: () => { return Date.now() - this.offset }
 })
 
-let raf
+let raf: Function
 
 if (process.env.TEST) {
-	raf = (f) => setTimeout(f, 0)
+	raf = (f: Function) => setTimeout(f, 0)
 } else {
 	raf = requestAnimationFrame
 }

@@ -30,9 +30,9 @@ export interface AnimatableKeys {
 
 export type AnimatableKeyName = keyof AnimatableKeys
 
-export class AnimationKey extends EventEmitter<AnimationKeyEventTypes> {
+export class AnimationKey<TargetType> extends EventEmitter<AnimationKeyEventTypes> {
 
-	private _target: Layer
+	private _target: TargetType
 	private _key: AnimatableKeyName
 	private _loop: AnimationLoop
 	private _from: number
@@ -43,7 +43,7 @@ export class AnimationKey extends EventEmitter<AnimationKeyEventTypes> {
 
 	constructor(
 		loop: AnimationLoop,
-		target: Layer,
+		target: TargetType,
 		key: AnimatableKeyName,
 		from: AnimatableKeyType,
 		to: AnimatableKeyType,
@@ -118,7 +118,7 @@ export class AnimationKey extends EventEmitter<AnimationKeyEventTypes> {
 
 	}
 
-	private _value(value) {
+	private _value(value: number) {
 		return this._from + (value * (this._to - this._from))
 	}
 

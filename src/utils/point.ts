@@ -6,19 +6,19 @@ import * as Utils from "Utils"
  * Create a new point from a point, single number, or nothing.
  * @param input a point, single number, or nothing
  */
-export const make = (input?: number | Types.Point): Types.Point => {
+// export const make = (input?: number | Types.Point): Types.Point => {
 
-	if (_.isNumber(input)) { return zero(input) }
-	if (!input) { return zero() }
+// 	if (_.isNumber(input)) { return zero(input) }
+// 	if (!input) { return zero() }
 
-	let result = zero()
+// 	let result = zero()
 
-	for (let k of ["x", "y"]) {
-		if (_.isNumber(input[k])) { result[k] = input[k] }
-	}
+// 	for (let k of ["x", "y"]) {
+// 		if (_.isNumber(input[k])) { result[k] = input[k] }
+// 	}
 
-	return result
-}
+// 	return result
+// }
 
 /**
  * Set the x and y of a point to zero or any other number,

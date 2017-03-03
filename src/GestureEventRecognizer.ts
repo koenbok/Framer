@@ -6,18 +6,21 @@ import { DOMEventManager } from "DOMEventManager"
 import { Context } from "Context"
 import { Screen } from "Screen"
 
-
 let GestureInputLongPressTime = 0.5
 let GestureInputDoubleTapTime = 0.25
 let GestureInputSwipeThreshold = 30
 let GestureInputEdgeSwipeDistance = 30
 let GestureInputVelocityTime = 0.1
-let GestureInputForceTapDesktop = MouseEvent["WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN"]
+let GestureInputForceTapDesktop = (MouseEvent as any)["WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN"]
 let GestureInputForceTapMobile = 0.7
 let GestureInputForceTapMobilePollTime = 1 / 30
 let GestureInputMinimumFingerDistance = 30
 
-interface GestureEvent extends TouchEvent {
+interface WebkitTouchEvent extends TouchEvent {
+	webkitForce?: number
+}
+
+interface GestureEvent extends WebkitTouchEvent {
 
 	eventCount: number
 
@@ -114,18 +117,18 @@ export class GestureEventRecognizer {
 
 	// Touch
 
-	domTouchStart = (event: TouchEvent) => {
+	domTouchStart = (event: WebkitTouchEvent) => {
 		if (this.session) { return }
 		this.em.wrap(window).addEventListener("touchmove", this.domTouchMove)
 		this.em.wrap(window).addEventListener("touchend", this.domTouchEnd)
 		this.touchstart(event)
 	}
 
-	domTouchMove = (event: TouchEvent) => {
+	domTouchMove = (event: WebkitTouchEvent) => {
 		this.touchmove(this._getGestureEvent(event))
 	}
 
-	domTouchEnd = (event: TouchEvent) => {
+	domTouchEnd = (event: WebkitTouchEvent) => {
 
 		if (!this.session) { return }
 
@@ -154,7 +157,7 @@ export class GestureEventRecognizer {
 
 	// Touch
 
-	touchstart = (_event: TouchEvent) => {
+	touchstart = (_event: WebkitTouchEvent) => {
 
 		// Only fire if we are not already in a session
 		if (this.session) { return }
@@ -197,10 +200,11 @@ export class GestureEventRecognizer {
 
 		if (!this.session) { return }
 
-		for (let eventName in this.session.started) {
-			let value = this.session.started[eventName]
-			if (value) { this[`${eventName}end`](event) }
-		}
+		this.session.started
+
+		_.forEach(this.session.started, (key, value) => {
+			if (value) { (this as any)[`${key}end`](event) }
+		})
 
 		// We only want to fire a tap event if the original target is the same
 		// as the release target, so buttons work the way you expect if you
@@ -255,7 +259,7 @@ export class GestureEventRecognizer {
 		if (!this.session.lastEvent.touches) { return }
 		if (!this.session.lastEvent.touches.length) { return }
 
-		this.session.force = this.session.lastEvent.touches[0]["force"] || 0
+		this.session.force = (this.session.lastEvent.touches[0] as any).force || 0
 		let event = this._getGestureEvent(this.session.lastEvent)
 		this.forcetapchange(event)
 
@@ -268,16 +272,20 @@ export class GestureEventRecognizer {
 		return setTimeout(this._updateTouchForce, GestureInputForceTapMobilePollTime)
 	}
 
-	_updateMacForce(event) {
+	_updateMacForce(_event: WebkitTouchEvent) {
 		if (!this.session) { return }
-		this.session.force = Utils.math.modulate(event.webkitForce, [0, 3], [0, 1])
+		if (!_event.webkitForce) { return }
+
+		this.session.force = Utils.math.modulate(_event.webkitForce, [0, 3], [0, 1])
+
+		const event = this._getGestureEvent(_event)
 		this.forcetapchange(this._getGestureEvent(event))
 
 		// Trigger a force touch if we reach the desktop threshold
-		if (event.webkitForce >= GestureInputForceTapDesktop) {
-			return this.forcetapstart(event)
+		if (_event.webkitForce >= GestureInputForceTapDesktop) {
+			this.forcetapstart(event)
 		} else {
-			return this.forcetapend(event)
+			this.forcetapend(event)
 		}
 	}
 
@@ -312,7 +320,7 @@ export class GestureEventRecognizer {
 		if (!this.session || !this.session.started.pan) { return }
 		this._dispatchEvent("pan", event, this.session.started.pan.target)
 		let direction = this._getDirection(event.delta)
-		if (direction) { return this[`pan${direction}`](event) }
+		if (direction) { return (this as any)[`pan${direction}`](event) }
 	}
 
 	panend(event: GestureEvent) {
@@ -331,7 +339,7 @@ export class GestureEventRecognizer {
 		return this._dispatchEvent("pandown", event, this.session.started.pan.target)
 	}
 
-	panleft(event) {
+	panleft(event: GestureEvent) {
 		if (!this.session || !this.session.started.pan) { return }
 		return this._dispatchEvent("panleft", event, this.session.started.pan.target)
 	}
@@ -531,7 +539,7 @@ export class GestureEventRecognizer {
 		return this.session.lastEvent = event
 	}
 
-	_getTouchEvent(_event: MouseEvent): TouchEvent {
+	_getTouchEvent(_event: MouseEvent): WebkitTouchEvent {
 
 		const event = Object.assign(_event, {
 			changedTouches: [] as any as TouchList,
@@ -553,7 +561,7 @@ export class GestureEventRecognizer {
 		return event
 	}
 
-	_getGestureEvent(_event: TouchEvent): GestureEvent {
+	_getGestureEvent(_event: WebkitTouchEvent): GestureEvent {
 
 		// Convert the point to the current context
 		// TODO: Handle within layer context, I think
@@ -677,14 +685,14 @@ export class GestureEventRecognizer {
 		// Convert point style event properties to dom style:
 		// event.delta -> event.deltaX, event.deltaY
 		for (let pointKey of ["point", "start", "previous", "offset", "delta", "velocity", "touchCenter", "touchOffset"]) {
-			event[`${pointKey}X`] = event[pointKey].x
-			event[`${pointKey}Y`] = event[pointKey].y
+			(event as any)[`${pointKey}X`] = (event as any)[pointKey].x
+			(event as any)[`${pointKey}Y`] = (event as any)[pointKey].y
 		}
 
 		return event
 	}
 
-	_getTouchPoint(event: TouchEvent, index: number): Types.Point {
+	_getTouchPoint(event: WebkitTouchEvent, index: number): Types.Point {
 
 		if (!event.touches[index]) {
 			return Utils.point.zero()
@@ -722,7 +730,7 @@ export class GestureEventRecognizer {
 		return null
 	}
 
-	_createEvent(type: string, _event: GestureEvent | TouchEvent | MouseEvent) {
+	_createEvent(type: string, _event: GestureEvent | WebkitTouchEvent | MouseEvent) {
 
 		let event = _event as any
 		let touchEvent = document.createEvent("MouseEvent") as any
@@ -732,7 +740,7 @@ export class GestureEventRecognizer {
 			event.detail, event.screenX, event.screenY,
 			event.clientX, event.clientY,
 			event.ctrlKey, event.shiftKey, event.altKey, event.metaKey,
-			event.button, event.relatedTarget) as any as TouchEvent
+			event.button, event.relatedTarget) as any as WebkitTouchEvent
 
 		touchEvent.touches = event["touches"]
 		touchEvent.changedTouches = event["touches"]
@@ -743,7 +751,7 @@ export class GestureEventRecognizer {
 			touchEvent[k] = v
 		}
 
-		return touchEvent as TouchEvent
+		return touchEvent as WebkitTouchEvent
 	}
 
 	_dispatchEvent(
@@ -767,7 +775,7 @@ export class GestureEventRecognizer {
 		target.dispatchEvent(touchEvent)
 	}
 
-	_getVelocity(events) {
+	_getVelocity(events: GestureEvent[]) {
 
 		if (events.length < 2) { return {x: 0, y: 0} }
 

@@ -1,6 +1,6 @@
 import * as _ from "lodash"
 
-export const isWebKit = () => (window["WebKitCSSMatrix"] !== undefined) && !isEdge();
+export const isWebKit = () => ((window as any)["WebKitCSSMatrix"] !== undefined) && !isEdge();
 
 export const webkitVersion = function() {
 	let version = -1;
@@ -38,21 +38,21 @@ export const isTablet = () => deviceType() === "tablet";
 
 export const isMobile = () => isPhone() || isTablet();
 
-export const isFileUrl = url => _.startsWith(url, "file://");
+export const isFileUrl = (url: string) => _.startsWith(url, "file://");
 
-export const isDataUrl = url => _.startsWith(url, "data:");
+export const isDataUrl = (url: string) => _.startsWith(url, "data:");
 
-export const isRelativeUrl = url => !/^([a-zA-Z]{1,8}:\/\/).*$/.test(url);
+export const isRelativeUrl = (url: string) => !/^([a-zA-Z]{1,8}:\/\/).*$/.test(url);
 
-export const isLocalServerUrl = url => (url.indexOf("127.0.0.1") !== -1) || (url.indexOf("localhost")  !== -1);
+export const isLocalServerUrl = (url: string) => (url.indexOf("127.0.0.1") !== -1) || (url.indexOf("localhost")  !== -1);
 
-export const isLocalUrl = function(url) {
+export const isLocalUrl = (url: string) => {
 	if (isFileUrl(url)) { return true; }
 	if (isLocalServerUrl(url)) { return true; }
 	return false;
 };
 
-export const isLocalAssetUrl = function(url, baseUrl) {
+export const isLocalAssetUrl = (url: string, baseUrl: string) => {
 	if (baseUrl == null) { baseUrl = window.location.href; }
 	if (isDataUrl(url)) { return false; }
 	if (isLocalUrl(url)) { return true; }

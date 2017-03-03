@@ -22,7 +22,9 @@ export class DOMEventManagerElement {
 
 export class DOMEventManager {
 
-	wrap(element): DOMEventManagerElement {
+	wrap(_element: EventTarget): DOMEventManagerElement {
+
+		const element = _element as any
 
 		if (!element["_domEventManager"]) {
 			element["_domEventManager"] = new DOMEventManagerElement(element)

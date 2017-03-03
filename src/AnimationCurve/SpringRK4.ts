@@ -34,7 +34,7 @@ export class AnimationCurveSpringRK4 extends AnimationCurve {
 		this._velocity = this._options.velocity
 
 
-		this._integrator = new Integrator((state) => {
+		this._integrator = new Integrator((state: Vector) => {
 			return (- this._options.tension * state.x) - (this._options.friction * state.v);
 		})
 
@@ -61,7 +61,7 @@ export class AnimationCurveSpringRK4 extends AnimationCurve {
 		return time > this._values.length * SpringRKAnimationCurveTimeStep
 	}
 
-	next(delta) {
+	next(delta: number) {
 
 		if (this.finished()) {
 			return 1;

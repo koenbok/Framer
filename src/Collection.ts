@@ -1,13 +1,13 @@
 import {findKey} from "lodash"
 
-const add = (array, item) => {
+const add = (array: any[], item: any) => {
 	array = array.slice(0)
 	array.push(item)
 	Object.freeze(array)
 	return array
 }
 
-const remove = (array, item) => {
+const remove = (array: any[], item: any) => {
 	array = array.slice(0)
 	array.splice(array.indexOf(item), 1)
 	Object.freeze(array)
@@ -19,14 +19,7 @@ export class Collection<T> {
 	private _items: T[] = []
 	private _added = 0
 	private _count = 0
-	private _ids = {}
-	private _maps = {}
-
-	constructor(keys: string[]= []) {
-		keys.forEach((key) => {
-			this._maps[key] = {}
-		})
-	}
+	private _ids: {[index: string]: T} = {}
 
 	contains(item: T): boolean {
 		return this._items.indexOf(item) !== -1
@@ -74,14 +67,14 @@ export class Collection<T> {
 		return parseInt(findKey(this._ids, item))
 	}
 
-	find(key: string, value: any): T[] {
+	// find(key: string, value: any): T[] {
 
-		if (this._maps[key]) {
-			return this._maps[key][value]
-		}
+	// 	if (this._maps[key]) {
+	// 		return this._maps[key][value]
+	// 	}
 
-		return []
-	}
+	// 	return []
+	// }
 
 	get count() {
 		return this._count

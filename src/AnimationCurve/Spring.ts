@@ -1,12 +1,11 @@
-let computeDampingRatio;
-let epsilon = 0.001;
-let minDuration = 0.01;
-let maxDuration = 10.0;
-let minDamping = Number.MIN_VALUE;
-let maxDamping = 1;
+const epsilon = 0.001;
+const minDuration = 0.01;
+const maxDuration = 10.0;
+const minDamping = Number.MIN_VALUE;
+const maxDamping = 1;
 
 // Newton's method
-let approximateRoot = (
+const approximateRoot = (
 	func: Function,
 	derivative: Function,
 	initialGuess: number,
@@ -23,11 +22,11 @@ let approximateRoot = (
 	return result;
 };
 
-let angularFrequency = (undampedFrequency: number, dampingRatio: number) => {
+const angularFrequency = (undampedFrequency: number, dampingRatio: number) => {
 	return undampedFrequency * Math.sqrt(1 - Math.pow(dampingRatio, 2));
 };
 
-let computeDampingRatio$1 = computeDampingRatio = (
+const computeDampingRatio = (
 	tension: number,
 	friction: number,
 	mass: number
@@ -50,7 +49,8 @@ export const computeDuration = (
 	if (velocity == null) {
 		velocity = 0;
 	}
-	let dampingRatio = computeDampingRatio(tension, friction);
+	// TODO: Mass?
+	let dampingRatio = computeDampingRatio(tension, friction, 1);
 	let undampedFrequency = Math.sqrt(tension / 1 /*mass*/);
 	// This is basically duration extracted out of the envelope functions
 	if (dampingRatio < 1) {
@@ -85,7 +85,7 @@ export const computeDerivedCurveOptions = (
 	duration = Math.max(Math.min(duration, maxDuration), minDuration);
 
 	if (dampingRatio < 1) {
-		envelope = function(undampedFrequency) {
+		envelope = function(undampedFrequency: number) {
 			let exponentialDecay = undampedFrequency * dampingRatio;
 			let currentDisplacement = exponentialDecay * duration;
 			let a = exponentialDecay - velocity;
@@ -94,7 +94,7 @@ export const computeDerivedCurveOptions = (
 			return epsilon - a / b * c;
 		};
 
-		derivative = function(undampedFrequency) {
+		derivative = function(undampedFrequency: number) {
 			let exponentialDecay = undampedFrequency * dampingRatio;
 			let currentDisplacement = exponentialDecay * duration;
 			let d = currentDisplacement * velocity + velocity;
@@ -110,13 +110,13 @@ export const computeDerivedCurveOptions = (
 			return factor * ((d - e) * f) / g;
 		};
 	} else {
-		envelope = function(undampedFrequency) {
+		envelope = function(undampedFrequency: number) {
 			let a = Math.exp((-undampedFrequency) * duration);
 			let b = (undampedFrequency - velocity) * duration + 1;
 			return -epsilon + a * b;
 		};
 
-		derivative = function(undampedFrequency) {
+		derivative = function(undampedFrequency: number) {
 			let a = Math.exp((-undampedFrequency) * duration);
 			let b = (velocity - undampedFrequency) * Math.pow(duration, 2);
 			return a * b;

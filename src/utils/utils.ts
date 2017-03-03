@@ -2,7 +2,7 @@ import * as _ from "lodash"
 
 /** Generate an Array with a range of n. */
 export const range = (a: number, b?: number) => {
-	let start, end
+	let start: number, end: number
 	if (_.isNumber(a) && _.isNumber(b)) { start = a; end = b}
 	else { start = 0; end = a}
 	return Array.from({length: end}, (value, key) => key + start)
@@ -18,7 +18,7 @@ export const randomColor = (alpha= 1) => {
 export const delay = (time= 0, f: Function) => { setTimeout(f, time * 1000) }
 
 export const orderedForEach = (
-	obj: Object,
+	obj: any,
 	order: string[],
 	f: (key: string, value: any) => void) => {
 
@@ -31,7 +31,7 @@ export const orderedForEach = (
 }
 
 export const assignOrdered = (
-	target: Object,
+	target: any,
 	options: Object,
 	order: string[]= []) => {
 	orderedForEach(options, order, (key, value) => {
@@ -39,7 +39,7 @@ export const assignOrdered = (
 	})
 }
 
-const hasher = (x) => {
+const hasher = (x: any) => {
 	if (arguments.length <= 1) {
 		return x
 	} else {
@@ -47,6 +47,6 @@ const hasher = (x) => {
 	}
 }
 /** memoize function that defaults to hashing all arguments */
-export const memoize = (fn) => {
+export const memoize = (fn: Function) => {
 	return _.memoize(fn, hasher)
 }

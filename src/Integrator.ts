@@ -16,7 +16,7 @@ export class Integrator {
 		this._accelerationForState = accelerationForState;
 	}
 
-	integrateState(state, dt) {
+	integrateState(state: Vector, dt: number) {
 
 		let a = this._evaluateState(state);
 		let b = this._evaluateStateWithDerivative(state, dt * 0.5, a);

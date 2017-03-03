@@ -77,12 +77,14 @@ export class Renderer {
 		return this._loop
 	}
 
-	getDirtyStyles(item: Renderable<any>) {
+	getDirtyStyles(_item: Renderable<any>) {
+		const item = _item as any
 		if (!item["_dirty"]) { item["_dirty"] = {} }
 		return item["_dirty"]
 	}
 
-	flushDirtyStyles(item: Renderable<any>) {
+	flushDirtyStyles(_item: Renderable<any>) {
+		const item = _item as any
 		let dirtyStyles = this.getDirtyStyles(item)
 		item["_dirty"] = {}
 		return dirtyStyles
@@ -113,10 +115,10 @@ export class Renderer {
 		this.requestRender()
 	}
 
-	updateKeyStyle(item: Renderable<any>, key, value) {
+	updateKeyStyle(item: Renderable<any>, key: string, value: any) {
 		this._counters.updateKeyStyle++
 		let styles = this.getDirtyStyles(item)
-		assignStyles(item as any, [key], styles)
+		assignStyles(item as any, [key] as any, styles)
 		this._dirtyStyleItems.add(item)
 		this.requestRender()
 	}

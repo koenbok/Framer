@@ -41,7 +41,7 @@ export interface LayerOptions {
 	text?: string
 }
 
-export type LayerKeys = keyof LayerOptions
+export type LayerKey = keyof LayerOptions
 
 export type LayerEventKeyTypes =
 	"change:x" |
@@ -340,7 +340,7 @@ export class Layer extends Renderable<LayerEventTypes> {
 	onAnimationStop(handler: Function) { this.on("AnimationStop", handler) }
 	onAnimationHalt(handler: Function) { this.on("AnimationHalt", handler) }
 	onAnimationEnd (handler: Function) { this.on("AnimationEnd", handler) }
-	onChange(key: LayerKeys, handler: Function) { this.on(`change:${key}` as any, handler) }
+	onChange(key: LayerKey, handler: Function) { this.on(`change:${key}` as any, handler) }
 
 	addEventListener(eventName: LayerEventTypes, fn: Function, once: boolean, context: Object) {
 		super.addEventListener(eventName, fn, once, context)
@@ -354,8 +354,8 @@ export class Layer extends Renderable<LayerEventTypes> {
 
 	// Keys
 
-	private _shouldChangeKey(key, value) {
-		return this._keys[key] !== value
+	private _shouldChangeKey(key: LayerKey, value: any) {
+		return (this._keys as any)[key] !== value
 	}
 
 	private _didChangeKey(key: string, value: any) {

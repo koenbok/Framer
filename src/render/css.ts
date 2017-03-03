@@ -40,21 +40,21 @@ const styleMap = {
 export const assignStyles = (
 	layer: Layer,
 	keys: (keyof LayerOptions)[],
-	styles= {}) => {
+	styles: any = {}) => {
 
 	for (let key of keys) {
-		for (let cssProperty of styleMap[key]) {
-			styles[cssProperty] = getStyle[cssProperty](layer)
+		for (let cssProperty of (styleMap as any)[key]) {
+			styles[cssProperty] = (getStyle as any)[cssProperty](layer)
 		}
 	}
 
 	return styles
 }
 
-export const assignAllStyles = (layer: Layer, styles= {}) => {
+export const assignAllStyles = (layer: Layer, styles: any = {}) => {
 
 	for (let property in getStyle) {
-		styles[property] = getStyle[property](layer)
+		styles[property] = (getStyle as any)[property](layer)
 	}
 
 	return styles

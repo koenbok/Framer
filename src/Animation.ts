@@ -11,9 +11,9 @@ export type AnimationEventTypes =
 	"AnimationHalt" |
 	"AnimationEnd"
 
-export class Animation extends BaseClass<AnimationEventTypes> {
+export class Animation<TargetType, TargetKey> extends BaseClass<AnimationEventTypes> {
 
-	private _layer: Layer
+	private _target: TargetType
 	private _curve: AnimationCurve
 	private _keys: AnimatableKeys
 	private _loop: AnimationLoop
@@ -21,7 +21,7 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 	private _finished: AnimationKey[] = []
 
 	constructor(
-		layer: Layer,
+		target: TargetType,
 		keys: AnimatableKeys,
 		curve: AnimationCurve,
 		loop: AnimationLoop | null= null
@@ -29,10 +29,10 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 
 		super()
 
-		this._layer = layer
+		this._target = target
 		this._curve = curve
 		this._keys = keys
-		this._loop = loop || this._layer.context.renderer.loop
+		this._loop = loop || (this._target as any).context.renderer.loop
 	}
 
 	/** Start this animation. */
@@ -70,7 +70,7 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 
 	emit(eventName: AnimationEventTypes, ...args: any[]) {
 		super.emit(eventName, ...args)
-		this._layer.emit(eventName, args)
+		this._target.emit(eventName, args)
 	}
 
 	private _reset() {
@@ -83,7 +83,7 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 		// TODO: Delay, Repeat
 
 		// Stop all other animations with conflicting keys
-		for (let animation of this._layer.animations) {
+		for (let animation of this._target.animations) {
 			for (let key in this._keys) {
 				if (animation._keys.hasOwnProperty(key)) {
 					animation.stop()
@@ -96,7 +96,7 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 
 		for (let key in this._keys) {
 
-			let a = this._layer[key]
+			let a = this._target[key]
 			let b = this._keys[key]
 
 			if (a === b) {
@@ -105,7 +105,7 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 
 			const animationKey = new AnimationKey(
 				this._loop,
-				this._layer,
+				this._target,
 				key as any, a, b,
 				this._curve
 			)
@@ -119,7 +119,7 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 		let started = this._running.length > 0
 
 		if (this.running) {
-			this._layer._animations.add(this)
+			this._target._animations.add(this)
 			utils.delay(0, () => this.emit("AnimationStart"))
 		}
 
@@ -136,7 +136,7 @@ export class Animation extends BaseClass<AnimationEventTypes> {
 			animationKey.stop()
 		}
 
-		this._layer._animations.remove(this)
+		this._target._animations.remove(this)
 
 		this.emit("AnimationStop")
 		this._reset()

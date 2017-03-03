@@ -27,7 +27,7 @@ class RenderableComponent extends Preact.Component<Props, {}> {
 		this.props.renderable.context.renderer.componentWillUnmount(this.props.renderable)
 	}
 
-	componentDidUpdate(prevProps, prevState) {
+	componentDidUpdate() {
 		this.updateElement()
 		this.props.renderable.context.renderer.componentDidUpdate(this.props.renderable)
 	}
@@ -42,7 +42,7 @@ class RenderableComponent extends Preact.Component<Props, {}> {
 
 		// Add all event handlers to the dom element
 		for (let eventName of utils.dom.getDOMEventKeys(renderable)) {
-			props[`on${eventName}`] = (event) => {
+			(props as any)[`on${eventName}`] = (event: Event) => {
 				renderable.emit(eventName as any, event)
 			}
 		}
@@ -55,7 +55,7 @@ class RenderableComponent extends Preact.Component<Props, {}> {
 	}
 }
 
-const renderLayer = (renderable: Renderable<any>) => {
+const renderLayer = (renderable: Renderable<any>): JSX.Element => {
 	return Preact.h<Props>(RenderableComponent, {
 		renderable: renderable,
 		key: renderable.id.toString()},

@@ -2,7 +2,7 @@ import {pick} from "lodash"
 import {EventEmitter} from "EventEmitter"
 
 let BaseClassCounter = 0
-let BaseClassCounters = {}
+let BaseClassCounters: {[index: string]: number} = {}
 
 const getGlobalId = () => {
 	return BaseClassCounter++

@@ -17,7 +17,7 @@ export const roundWhole = (value: number, decimals = 1) => {
 	return round(value, decimals);
 };
 
-export const clamp = (value, a, b) => {
+export const clamp = (value: number, a: number, b: number) => {
 
 	let min = Math.min(a, b);
 	let max = Math.max(a, b);
@@ -29,9 +29,9 @@ export const clamp = (value, a, b) => {
 
 // Taken from http://jsfiddle.net/Xz464/7/
 // Used by animation engine, needs to be very performant
-export const mapRange = (value, fromLow, fromHigh, toLow, toHigh) => {
-	return toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
-}
+// export const mapRange = (value, fromLow, fromHigh, toLow, toHigh) => {
+// 	return toLow + (((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow))
+// }
 
 // Kind of similar as above but with a better syntax and a limiting option
 export const modulate = (

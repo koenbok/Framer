@@ -54,7 +54,7 @@ export class ScreenClass extends BaseClass<ScreenEventTypes> {
 		return {x: 0, y: 0, width: this.width, height: this.height}
 	}
 
-	private _onResize = (event) => {
+	private _onResize = (event: Event) => {
 		this.emit("change:width")
 		this.emit("change:height")
 		this.emit("change:size")

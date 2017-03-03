@@ -61,7 +61,7 @@ describe("Renderer", () => {
 		context.renderer.loop.pause = true
 
 		const layer = new Layer()
-		const handler = (event) => {}
+		const handler = (event: Function) => {}
 		context.renderer.loop.next()
 
 		layer.onClick(handler)

@@ -95,7 +95,7 @@ export const inspect = (item: any, max= 5, level= 0): string => {
 
 }
 
-export const inspectAll = (...args): string => {
+export const inspectAll = (...args: any[]): string => {
 	return args.map(item => inspect(item)).join(" ")
 }
 

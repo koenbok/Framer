@@ -5,7 +5,7 @@
         "module": "es2015",
         "moduleResolution": "node",
         "allowJs": false,
-        "noImplicitAny": false,
+        "noImplicitAny": true,
         "strictNullChecks": true,
         "declaration": false,
         // "outFile": "./build/framer.js",
