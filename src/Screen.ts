@@ -6,7 +6,22 @@ export type ScreenEventTypes =
 	"change:width" |
 	"change:height" |
 	"change:size" |
-	"change:frame"
+	"change:frame" |
+	"edgeswipe" |
+	"edgeswipetop" |
+	"edgeswipestart" |
+	"edgeswipeend" |
+	"edgeswiperight" |
+	"edgeswiperightstart" |
+	"edgeswiperightend" |
+	"edgeswipebottom" |
+	"edgeswipebottomstart" |
+	"edgeswipebottomend" |
+	"edgeswipeleft" |
+	"edgeswipeleftstart" |
+	"edgeswipeleftend"
+
+
 
 export class ScreenClass extends BaseClass<ScreenEventTypes> {
 
