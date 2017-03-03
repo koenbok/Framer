@@ -1,13 +1,13 @@
 assert = require "assert"
 simulate = require "simulate"
 
-describe "RangedSliderComponent", ->
+describe "RangeSliderComponent", ->
 
 	describe "Defaults", ->
 
 		it "should set defaults", ->
 
-			slider = new RangedSliderComponent
+			slider = new RangeSliderComponent
 			slider.min.should.equal 0
 			slider.max.should.equal 1
 			slider.minValue.should.equal 0
@@ -20,7 +20,7 @@ describe "RangedSliderComponent", ->
 			initialMinValue = 0
 			initialMaxValue = 0.5
 
-			slider = new RangedSliderComponent
+			slider = new RangeSliderComponent
 			slider.minValue = initialMinValue
 			slider.maxValue = initialMaxValue
 			slider.width = 100

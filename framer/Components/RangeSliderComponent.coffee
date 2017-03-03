@@ -3,7 +3,7 @@ Utils = require "../Utils"
 {Events} = require "../Events"
 
 """
-RangedSliderComponent
+RangeSliderComponent
 
 minKnob <layer>
 maxKnob <layer>
@@ -37,7 +37,7 @@ class Knob extends Layer
 
 		super options
 
-class exports.RangedSliderComponent extends Layer
+class exports.RangeSliderComponent extends Layer
 
 	constructor: (options={}) ->
 
