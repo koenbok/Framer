@@ -55,6 +55,7 @@ class exports.TextLayer extends Layer
 			@on "change:#{property}", =>
 				@autoSize()
 
+		@on "change:size", @autoSize
 		@on "change:parent", @autoSize
 
 		@on "change:width", @updateExplicitWidth
