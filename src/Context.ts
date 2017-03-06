@@ -3,6 +3,7 @@ import {Renderable} from "Renderable"
 import {Layer} from "Layer"
 import {Collection} from "Collection"
 import {AnimationLoop} from "AnimationLoop"
+import {Animation, AnimationTargetInterface} from "Animation"
 import {Renderer} from "render/Renderer"
 import {Screen} from "Screen"
 
@@ -31,7 +32,9 @@ export class Context extends Renderable<ContextEventTypes> {
 		CurrentContext = context
 	}
 
-	private _layers = new Collection<Layer>()
+	_layers = new Collection<Layer>()
+	_animations = new Collection<Animation<any, any>>()
+
 	private _renderer: Renderer
 
 	private _keys = {
@@ -76,6 +79,16 @@ export class Context extends Renderable<ContextEventTypes> {
 
 	get layers() {
 		return this._layers.items()
+	}
+
+	get animations() {
+		return this._animations.items()
+	}
+
+	animationsForTarget(target: AnimationTargetInterface) {
+		return this.animations.filter((a: Animation<any, any>) => {
+			return a === a.target
+		})
 	}
 
 	get children() {

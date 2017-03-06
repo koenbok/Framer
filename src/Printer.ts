@@ -1,4 +1,4 @@
-import * as utils from "utils"
+import * as utils from "Utils"
 
 import {Layer} from "Layer"
 import {Context} from "Context"
@@ -10,7 +10,7 @@ type BaseClassOptions = {
 	prefix?: string
 }
 
-export class Printer extends BaseClass<null> {
+export class Printer extends BaseClass<null, any> {
 
 	private _context = new Context("print")
 	private _layer?: Layer

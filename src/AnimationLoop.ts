@@ -1,5 +1,5 @@
 import {EventEmitter} from "EventEmitter"
-import * as utils from "utils"
+import * as utils from "Utils"
 
 const performance = (window.performance || {
 	offset: Date.now(),

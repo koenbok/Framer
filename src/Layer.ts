@@ -1,16 +1,18 @@
 import * as _ from "lodash"
 import * as Types from "Types"
-import * as utils from "utils"
+import * as utils from "Utils"
 
 import {Renderable} from "Renderable"
 import {Screen} from "Screen"
 import {Collection} from "Collection"
 import {Context, DefaultContext, CurrentContext} from "Context"
-import {AnimatableKeys} from "AnimationKey"
 import {Animation, AnimationEventTypes} from "Animation"
 import {AnimationCurve} from "AnimationCurve"
 import {Curve} from "Curve"
+import {Color} from "Color"
+import {GestureEvent} from "GestureEventRecognizer"
 
+export type LayerCallbackHandler = (this: Layer, event: GestureEvent) => void
 
 export interface LayerOptions {
 	context?: Context
@@ -36,12 +38,26 @@ export interface LayerOptions {
 	size?: Types.Size,
 	frame?: Types.Frame,
 	opacity?: number
-	image?: string|null,
+	image?: string | null,
 	styles?: Types.CSSStyles,
 	text?: string
 }
 
 export type LayerKey = keyof LayerOptions
+
+export interface LayerAnimationKeys {
+	x?: number
+	y?: number
+	width?: number,
+	height?: number,
+	backgroundColor?: string | Color
+	minX?: number
+	midX?: number
+	maxX?: number
+	minY?: number
+	midY?: number
+	maxY?: number
+}
 
 export type LayerEventKeyTypes =
 	"change:x" |
@@ -85,7 +101,6 @@ export class Layer extends Renderable<LayerEventTypes> {
 
 	_initialized = false
 	_element: HTMLElement
-	_animations = new Collection<Animation>()
 
 	constructor(options: LayerOptions= {}) {
 		super()
@@ -310,39 +325,39 @@ export class Layer extends Renderable<LayerEventTypes> {
 
 	/** Start an animation. */
 	animate(
-		keys: AnimatableKeys,
+		keys: LayerAnimationKeys,
 		curve: AnimationCurve= Curve.linear(1)
 	) {
-		let animation = new Animation(this, keys, curve)
+		let animation = new Animation<Layer, LayerAnimationKeys>(this.context, this, keys, curve)
 		animation.start()
 		return animation
 	}
 
 	/** List of current running animations. */
 	get animations() {
-		return this._animations.items()
+		return this.context.animationsForTarget(this)
 	}
 
 
 	// Events
 
-	onClick(handler: Function) { this.on("click", handler) }
-	onDoubleClick(handler: Function) { this.on("doubleclick", handler) }
+	onClick(fn: LayerCallbackHandler) { this.on("click", fn) }
+	onDoubleClick(fn: LayerCallbackHandler) { this.on("doubleclick", fn) }
 
-	onMouseUp(handler: Function) { this.on("mouseup", handler) }
-	onMouseDown(handler: Function) { this.on("mousedown", handler) }
-	onMouseOver(handler: Function) { this.on("mouseover", handler) }
-	onMouseOut(handler: Function) { this.on("mouseout", handler) }
-	onMouseMove(handler: Function) { this.on("mousemove", handler) }
-	onMouseWheel(handler: Function) { this.on("mousewheel", handler) }
+	onMouseUp(fn: LayerCallbackHandler) { this.on("mouseup", fn) }
+	onMouseDown(fn: LayerCallbackHandler) { this.on("mousedown", fn) }
+	onMouseOver(fn: LayerCallbackHandler) { this.on("mouseover", fn) }
+	onMouseOut(fn: LayerCallbackHandler) { this.on("mouseout", fn) }
+	onMouseMove(fn: LayerCallbackHandler) { this.on("mousemove", fn) }
+	onMouseWheel(fn: LayerCallbackHandler) { this.on("mousewheel", fn) }
 
-	onAnimationStart(handler: Function) { this.on("AnimationStart", handler) }
-	onAnimationStop(handler: Function) { this.on("AnimationStop", handler) }
-	onAnimationHalt(handler: Function) { this.on("AnimationHalt", handler) }
-	onAnimationEnd (handler: Function) { this.on("AnimationEnd", handler) }
-	onChange(key: LayerKey, handler: Function) { this.on(`change:${key}` as any, handler) }
+	onAnimationStart(fn: LayerCallbackHandler) { this.on("AnimationStart", fn) }
+	onAnimationStop(fn: LayerCallbackHandler) { this.on("AnimationStop", fn) }
+	onAnimationHalt(fn: LayerCallbackHandler) { this.on("AnimationHalt", fn) }
+	onAnimationEnd (fn: LayerCallbackHandler) { this.on("AnimationEnd", fn) }
+	onChange(key: LayerKey, fn: LayerCallbackHandler) { this.on(`change:${key}` as any, fn) }
 
-	addEventListener(eventName: LayerEventTypes, fn: Function, once: boolean, context: Object) {
+	addEventListener(eventName: LayerEventTypes, fn: LayerCallbackHandler, once: boolean, context: Object) {
 		super.addEventListener(eventName, fn, once, context)
 
 		// If we added a dom event listener, turn off ignoreEvents

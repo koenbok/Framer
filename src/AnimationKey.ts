@@ -1,10 +1,9 @@
 import {EventEmitter} from "EventEmitter"
 import {Layer} from "Layer"
+import {AnimationTargetInterface} from "Animation"
 import {AnimationLoop} from "AnimationLoop"
 import {AnimationCurve} from "AnimationCurve"
-
-
-import {Color} from "./Color"
+import {Color} from "Color"
 
 export type AnimatableKeyType = number | Color
 
@@ -14,26 +13,10 @@ export type AnimationKeyEventTypes =
 	"AnimationKeyHalt" |
 	"AnimationKeyEnd"
 
-export interface AnimatableKeys {
-	x?: number
-	y?: number
-	width?: number,
-	height?: number,
-	backgroundColor?: string | Color
-	minX?: number
-	midX?: number
-	maxX?: number
-	minY?: number
-	midY?: number
-	maxY?: number
-}
-
-export type AnimatableKeyName = keyof AnimatableKeys
-
-export class AnimationKey<TargetType> extends EventEmitter<AnimationKeyEventTypes> {
+export class AnimationKey<TargetType extends AnimationTargetInterface, AnimationTargetKeys, AnimationCallbackHandler> extends EventEmitter<AnimationKeyEventTypes, AnimationCallbackHandler> {
 
 	private _target: TargetType
-	private _key: AnimatableKeyName
+	private _key: keyof AnimationTargetKeys
 	private _loop: AnimationLoop
 	private _from: number
 	private _to: number
@@ -44,7 +27,7 @@ export class AnimationKey<TargetType> extends EventEmitter<AnimationKeyEventType
 	constructor(
 		loop: AnimationLoop,
 		target: TargetType,
-		key: AnimatableKeyName,
+		key: keyof AnimationTargetKeys,
 		from: AnimatableKeyType,
 		to: AnimatableKeyType,
 		curve: AnimationCurve,
@@ -103,16 +86,18 @@ export class AnimationKey<TargetType> extends EventEmitter<AnimationKeyEventType
 
 		this._time += delta
 
-		this._target[this._key] = this._value(
+		const target = this._target as any
+
+		target[this._key] = this._value(
 			this._curve.value(this._time))
 
 		// When we reach the end we stop the animation and
 		// set it to the exact end value.
 		if (this._curve.done(this._time)) {
-			this._target[this._key] = this._to
+			target[this._key] = this._to
 			this._end()
 		} else {
-			this._target[this._key] = this._value(
+			target[this._key] = this._value(
 			this._curve.value(this._time))
 		}
 

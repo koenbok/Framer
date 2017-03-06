@@ -1,9 +1,17 @@
-import * as utils from "utils"
+import * as utils from "Utils"
 import {BaseClass} from "BaseClass"
+import {Context} from "Context"
+import {Color} from "Color"
 import {AnimationLoop} from "AnimationLoop"
 import {AnimationCurve} from "AnimationCurve"
-import {AnimatableKeys, AnimationKey} from "AnimationKey"
-import {Layer} from "Layer"
+import {AnimationKey} from "AnimationKey"
+import {LayerCallbackHandler} from "Layer"
+
+
+
+export interface AnimationTargetInterface {
+	emit: Function
+}
 
 export type AnimationEventTypes =
 	"AnimationStart" |
@@ -11,28 +19,36 @@ export type AnimationEventTypes =
 	"AnimationHalt" |
 	"AnimationEnd"
 
-export class Animation<TargetType, TargetKey> extends BaseClass<AnimationEventTypes> {
+export type AnimationKeyType = number | Color
 
-	private _target: TargetType
+export class Animation<AnimationTarget extends AnimationTargetInterface, AnimationTargetKeys> extends BaseClass<AnimationEventTypes, LayerCallbackHandler> {
+
+	private _context: Context
+	private _target: AnimationTarget
 	private _curve: AnimationCurve
-	private _keys: AnimatableKeys
-	private _loop: AnimationLoop
-	private _running: AnimationKey[] = []
-	private _finished: AnimationKey[] = []
+	private _keys: AnimationTargetKeys
+	// private _loop: AnimationLoop
+	private _running: AnimationKey<AnimationTarget, AnimationTargetKeys>[] = []
+	private _finished: AnimationKey<AnimationTarget, AnimationTargetKeys>[] = []
 
 	constructor(
-		target: TargetType,
-		keys: AnimatableKeys,
+		context: Context,
+		target: AnimationTarget,
+		keys: AnimationTargetKeys,
 		curve: AnimationCurve,
 		loop: AnimationLoop | null= null
 	) {
 
 		super()
 
+		this._context = context
 		this._target = target
 		this._curve = curve
 		this._keys = keys
-		this._loop = loop || (this._target as any).context.renderer.loop
+	}
+
+	get target() {
+		return this._target
 	}
 
 	/** Start this animation. */
@@ -62,11 +78,11 @@ export class Animation<TargetType, TargetKey> extends BaseClass<AnimationEventTy
 		return this._running.length > 0 && (this._running.length !== this._finished.length)
 	}
 
-	onStart(fn: Function) { this.on("AnimationStart", fn); return this }
-	onHalt(fn: Function) { this.on("AnimationHalt", fn); return this }
-	onStop(fn: Function) { this.on("AnimationStop", fn); return this }
+	onStart(fn: LayerCallbackHandler) { this.on("AnimationStart", fn); return this }
+	onHalt(fn: LayerCallbackHandler) { this.on("AnimationHalt", fn); return this }
+	onStop(fn: LayerCallbackHandler) { this.on("AnimationStop", fn); return this }
 	/** Call function when the animation is fully complete */
-	onEnd(fn: Function) { this.on("AnimationEnd", fn); return this }
+	onEnd(fn: LayerCallbackHandler) { this.on("AnimationEnd", fn); return this }
 
 	emit(eventName: AnimationEventTypes, ...args: any[]) {
 		super.emit(eventName, ...args)
@@ -82,8 +98,10 @@ export class Animation<TargetType, TargetKey> extends BaseClass<AnimationEventTy
 
 		// TODO: Delay, Repeat
 
+		const animations = this._context.animationsForTarget(this._target)
+
 		// Stop all other animations with conflicting keys
-		for (let animation of this._target.animations) {
+		for (let animation of animations) {
 			for (let key in this._keys) {
 				if (animation._keys.hasOwnProperty(key)) {
 					animation.stop()
@@ -96,17 +114,17 @@ export class Animation<TargetType, TargetKey> extends BaseClass<AnimationEventTy
 
 		for (let key in this._keys) {
 
-			let a = this._target[key]
-			let b = this._keys[key]
+			let a: AnimationKeyType = (this._target as any)[key]
+			let b: AnimationKeyType = (this._keys as any)[key]
 
 			if (a === b) {
 				continue
 			}
 
-			const animationKey = new AnimationKey(
-				this._loop,
+			const animationKey = new AnimationKey<AnimationTarget, AnimationTargetKeys>(
+				this._context.renderer.loop,
 				this._target,
-				key as any, a, b,
+				key, a, b,
 				this._curve
 			)
 
@@ -119,7 +137,7 @@ export class Animation<TargetType, TargetKey> extends BaseClass<AnimationEventTy
 		let started = this._running.length > 0
 
 		if (this.running) {
-			this._target._animations.add(this)
+			this._context._animations.add(this)
 			utils.delay(0, () => this.emit("AnimationStart"))
 		}
 
@@ -136,13 +154,13 @@ export class Animation<TargetType, TargetKey> extends BaseClass<AnimationEventTy
 			animationKey.stop()
 		}
 
-		this._target._animations.remove(this)
+		this._context._animations.remove(this)
 
 		this.emit("AnimationStop")
 		this._reset()
 	}
 
-	private _onKeyAnimationEnd = (animationKey: AnimationKey) => {
+	private _onKeyAnimationEnd = (animationKey: AnimationKey<AnimationTarget, AnimationTargetKeys>) => {
 
 		this._finished.push(animationKey)
 

@@ -8,7 +8,7 @@ describe("utils", () => {
 		it("should order", () => {
 			const obj = {a: 1, b: 2, c: 3}
 			let results: number[] = []
-			const f = (key, value) => results.push(value)
+			const f = (key: string, value: any) => results.push(value)
 
 			expect(Object.keys(obj)).to.eql(["a", "b", "c"])
 
@@ -59,8 +59,8 @@ describe("utils", () => {
 
 		it("should work for click but not change", () => {
 			const layer = new Layer()
-			layer.onClick((event) => {})
-			layer.onChange("x", (event) => {})
+			layer.onClick((event: Event) => {})
+			layer.onChange("x", (event: Event) => {})
 			expect(utils.dom.getDOMEventKeys(layer)).to.eql(["click"])
 		})
 

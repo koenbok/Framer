@@ -1,11 +1,11 @@
 import * as Preact from "preact"
-import * as utils from "utils"
+import * as utils from "Utils"
 import {Renderable} from "Renderable"
 import {Context} from "Context"
 import {assignStyles, assignAllStyles} from "render/css"
 
 export interface Props extends Preact.PreactHTMLAttributes {
-	renderable: Renderable<any>,
+	renderable: Renderable<any, any>,
 }
 
 class RenderableComponent extends Preact.Component<Props, {}> {

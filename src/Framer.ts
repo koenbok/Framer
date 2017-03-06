@@ -2,7 +2,7 @@
 // GlobalEventListener.setup()
 
 import * as lodash from "lodash"
-import * as utils from "utils"
+import * as utils from "Utils"
 
 import {Config} from "Config"
 import {Layer} from "Layer"

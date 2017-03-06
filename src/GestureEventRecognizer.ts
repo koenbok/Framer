@@ -20,7 +20,7 @@ interface WebkitTouchEvent extends TouchEvent {
 	webkitForce?: number
 }
 
-interface GestureEvent extends WebkitTouchEvent {
+export interface GestureEvent extends WebkitTouchEvent {
 
 	eventCount: number
 

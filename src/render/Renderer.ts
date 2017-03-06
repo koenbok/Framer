@@ -1,4 +1,4 @@
-import * as utils from "utils"
+import * as utils from "Utils"
 import * as Types from "Types"
 
 import {Renderable} from "Renderable"

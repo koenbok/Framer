@@ -6,7 +6,7 @@ type DoneType = (context: Context, done: MochaDone) => void
 
 
 const tester = (it: any, description: string, f: DoneType) => {
-	it(description, (mochaDone) => {
+	it(description, (mochaDone: MochaDone) => {
 
 		const context = new Context("test", {loop: new AnimationLoop()})
 
