@@ -109,10 +109,11 @@ export class GestureEventRecognizer {
 	domMouseMove = (event: MouseEvent) => {
 		this.touchmove(this._getGestureEvent(this._getTouchEvent(event)))
 	}
+
 	domMouseUp = (event: MouseEvent) => {
 		this.em.wrap(window).removeEventListener("mousemove", this.domTouchMove)
 		this.em.wrap(window).removeEventListener("mouseup", this.domTouchEnd)
-		this._process(this._getGestureEvent(this._getTouchEvent(event)))
+		this.touchend(this._getGestureEvent(this._getTouchEvent(event)))
 	}
 
 	// Touch
@@ -197,14 +198,19 @@ export class GestureEventRecognizer {
 	}
 
 	touchend = (event: GestureEvent) => {
-
 		if (!this.session) { return }
 
-		this.session.started
-
-		_.forEach(this.session.started, (key, value) => {
-			if (value) { (this as any)[`${key}end`](event) }
-		})
+		for (let eventName in this.session.started) {
+			switch (eventName) {
+				case "pinch": this.pinchend(event); break
+				case "forcetap": this.forcetapend(event); break
+				// case "longpress": this.longpress(event); break
+				case "pan": this.panend(event); break
+				case "swipe": this.swipeend(event); break
+				case "swipedirection": this.swipedirectionend(event); break
+				case "edgeswipedirection": this.edgeswipedirectionend(event); break
+			}
+		}
 
 		// We only want to fire a tap event if the original target is the same
 		// as the release target, so buttons work the way you expect if you
@@ -239,17 +245,18 @@ export class GestureEventRecognizer {
 
 	// Press
 
-	longpressstart = (event: GestureEvent) => {
+	// Started from a timer, so no event here
+	longpressstart = () => {
 		if (!this.session) { return }
 		if (this.session.started.longpress) { return }
-		this.session.started.longpress = event
-		this._dispatchEvent("longpressstart", event)
-		this._dispatchEvent("longpress", event)
+		this.session.started.longpress = this.session.startEvent
+		this._dispatchEvent("longpressstart", this.session.startEvent)
+		this._dispatchEvent("longpress", this.session.startEvent)
 	}
 
-	longpressend(event: GestureEvent) {
-		this._dispatchEvent("longpressend", event)
-	}
+	// longpressend(event: GestureEvent) {
+	// 	this._dispatchEvent("longpressend", event)
+	// }
 
 	// ForceTap
 
@@ -589,7 +596,7 @@ export class GestureEventRecognizer {
 			velocity: {x: 0, y: 0}, // Velocity average over the last few events √
 
 			fingers: 0, // Number of fingers used √
-			touchCenterStart: {x: 0, y:0},
+			touchCenterStart: {x: 0, y: 0},
 			touchCenter: eventPoint, // Center between two fingers √
 			touchOffset: {x: 0, y: 0}, // Offset between two fingers √
 			touchDistance: 0, // Distance between two fingers √
@@ -640,7 +647,7 @@ export class GestureEventRecognizer {
 
 		// Velocity
 		if (this.session && this.session.events) {
-			let events = _.filter(this.session.events, function(e) {
+			let events = _.filter(this.session.events, (e) => {
 				if (e.eventCount === 0) { return false }
 				return e.time > (event.time - (GestureInputVelocityTime * 1000))
 			})
@@ -684,10 +691,12 @@ export class GestureEventRecognizer {
 
 		// Convert point style event properties to dom style:
 		// event.delta -> event.deltaX, event.deltaY
-		for (let pointKey of ["point", "start", "previous", "offset", "delta", "velocity", "touchCenter", "touchOffset"]) {
-			(event as any)[`${pointKey}X`] = (event as any)[pointKey].x
-			(event as any)[`${pointKey}Y`] = (event as any)[pointKey].y
-		}
+		// const __event = event as any
+
+		// for (let pointKey of ["point", "start", "previous", "offset", "delta", "velocity", "touchCenter", "touchOffset"]) {
+		// 	if (!_.has(__event, `${pointKey}X`)) { __event[`${pointKey}X`] = __event[pointKey].x }
+		// 	if (!_.has(__event, `${pointKey}Y`)) { __event[`${pointKey}Y`] = __event[pointKey].y }
+		// }
 
 		return event
 	}
@@ -746,10 +755,10 @@ export class GestureEventRecognizer {
 		touchEvent.changedTouches = event["touches"]
 		touchEvent.targetTouches = event["touches"]
 
-		for (let k in event) {
-			let v = event[k]
-			touchEvent[k] = v
-		}
+		// for (let k in event) {
+		// 	let v = event[k]
+		// 	touchEvent[k] = v
+		// }
 
 		return touchEvent as WebkitTouchEvent
 	}
@@ -771,6 +780,8 @@ export class GestureEventRecognizer {
 		if (target == null) {
 			target = event.target
 		}
+
+		console.log("_dispatchEvent", type, target, touchEvent)
 
 		target.dispatchEvent(touchEvent)
 	}

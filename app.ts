@@ -84,16 +84,18 @@ const run = () => {
 // 	.onEnd(event => layer.y = 0)
 // 	.onEnd(event => layer.y = 0)
 
-const randomPoint = () => {
-	return {
-		x: Math.random() * 500,
-		y: Math.random() * 500
-	}
-}
+// const randomPoint = () => {
+// 	return {
+// 		x: Math.random() * 500,
+// 		y: Math.random() * 500
+// 	}
+// }
 
-for (let i in utils.range(0, 100)) {
+// for (let i in utils.range(0, 100)) {
 
-	let layer = new Layer(randomPoint())
+// 	let layer = new Layer(randomPoint())
 
-	layer.animate(randomPoint(), Curve.linear(10))
-}
+// 	layer.animate(randomPoint(), Curve.linear(10))
+// }
+
+let layer = new Layer()

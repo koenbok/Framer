@@ -11,6 +11,8 @@ import {Curve} from "Curve"
 import {print} from "Printer"
 import {Screen} from "Screen"
 import {Animation} from "Animation"
+import {GestureEventRecognizer} from "GestureEventRecognizer"
+const gestures = new GestureEventRecognizer()
 
 export {lodash as _, utils, print, Config, Screen, Layer, Curve, Context, Animation}
 
@@ -26,6 +28,8 @@ export const Framer = {
 
 Object.assign(window, Framer)
 Object.assign(window, { Framer: Framer })
+
+
 
 // These are needed to generate the d.ts file
 import {ScreenClass} from "Screen"
