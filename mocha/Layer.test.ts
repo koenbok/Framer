@@ -1,7 +1,7 @@
 import {expect} from "chai"
 import {isolated} from "./Testutils"
 
-import {Layer, Curve, utils} from "Framer"
+import {Layer, Curve, Animation, utils} from "Framer"
 
 describe("Layer", () => {
 
@@ -89,7 +89,7 @@ describe("Layer", () => {
 	isolated.test("should list animations", (context, done) => {
 
 		const layer = new Layer()
-		const animation = layer.animate({x: 100}, Curve.linear(0.1))
+		const animation: Animation<Layer, {x?: number}> = layer.animate({x: 100}, Curve.linear(0.1))
 			.onStart(e => expect(layer.animations).to.eql([animation]))
 			.onStop(e => expect(layer.animations).to.eql([]))
 			.onEnd(e => expect(layer.animations).to.eql([]))

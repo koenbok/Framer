@@ -10,7 +10,7 @@ type BaseClassOptions = {
 	prefix?: string
 }
 
-export class Printer extends BaseClass<null, any> {
+export class Printer extends BaseClass<null> {
 
 	private _context = new Context("print")
 	private _layer?: Layer

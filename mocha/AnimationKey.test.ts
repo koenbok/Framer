@@ -12,7 +12,7 @@ describe("AnimationKey", () => {
 		context.renderer.loop.pause = true
 
 		const layer = new Layer()
-		const ap = new AnimationKey(
+		const ap = new AnimationKey<Layer, {x: number}>(
 			context.renderer.loop, layer, "x",
 			100, 160, Curve.linear(1))
 

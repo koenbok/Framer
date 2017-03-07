@@ -7,8 +7,6 @@ import {AnimationCurve} from "AnimationCurve"
 import {AnimationKey} from "AnimationKey"
 import {LayerCallbackHandler} from "Layer"
 
-
-
 export interface AnimationTargetInterface {
 	emit: Function
 }
@@ -19,9 +17,9 @@ export type AnimationEventTypes =
 	"AnimationHalt" |
 	"AnimationEnd"
 
-export type AnimationKeyType = number | Color
+export type AnimationValueType = number | Color
 
-export class Animation<AnimationTarget extends AnimationTargetInterface, AnimationTargetKeys> extends BaseClass<AnimationEventTypes, LayerCallbackHandler> {
+export class Animation<AnimationTarget extends AnimationTargetInterface, AnimationTargetKeys> extends BaseClass<AnimationEventTypes> {
 
 	private _context: Context
 	private _target: AnimationTarget
@@ -114,8 +112,8 @@ export class Animation<AnimationTarget extends AnimationTargetInterface, Animati
 
 		for (let key in this._keys) {
 
-			let a: AnimationKeyType = (this._target as any)[key]
-			let b: AnimationKeyType = (this._keys as any)[key]
+			let a: AnimationValueType = (this._target as any)[key]
+			let b: AnimationValueType = (this._keys as any)[key]
 
 			if (a === b) {
 				continue

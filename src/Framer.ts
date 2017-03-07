@@ -10,8 +10,9 @@ import {Context} from "Context"
 import {Curve} from "Curve"
 import {print} from "Printer"
 import {Screen} from "Screen"
+import {Animation} from "Animation"
 
-export {lodash as _, utils, print, Config, Screen, Layer, Curve, Context}
+export {lodash as _, utils, print, Config, Screen, Layer, Curve, Context, Animation}
 
 export const Framer = {
 	_: lodash,

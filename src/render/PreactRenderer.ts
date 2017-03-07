@@ -5,7 +5,7 @@ import {Context} from "Context"
 import {assignStyles, assignAllStyles} from "render/css"
 
 export interface Props extends Preact.PreactHTMLAttributes {
-	renderable: Renderable<any, any>,
+	renderable: Renderable<any>,
 }
 
 class RenderableComponent extends Preact.Component<Props, {}> {

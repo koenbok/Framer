@@ -327,7 +327,7 @@ export class Layer extends Renderable<LayerEventTypes> {
 	animate(
 		keys: LayerAnimationKeys,
 		curve: AnimationCurve= Curve.linear(1)
-	) {
+	): Animation<Layer, LayerAnimationKeys> {
 		let animation = new Animation<Layer, LayerAnimationKeys>(this.context, this, keys, curve)
 		animation.start()
 		return animation

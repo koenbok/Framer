@@ -13,7 +13,7 @@ export type AnimationKeyEventTypes =
 	"AnimationKeyHalt" |
 	"AnimationKeyEnd"
 
-export class AnimationKey<TargetType extends AnimationTargetInterface, AnimationTargetKeys, AnimationCallbackHandler> extends EventEmitter<AnimationKeyEventTypes, AnimationCallbackHandler> {
+export class AnimationKey<TargetType extends AnimationTargetInterface, AnimationTargetKeys> extends EventEmitter<AnimationKeyEventTypes> {
 
 	private _target: TargetType
 	private _key: keyof AnimationTargetKeys

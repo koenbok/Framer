@@ -6,6 +6,6 @@ import {LayerCallbackHandler} from "Layer"
 export type AnimationGroupEvents =
 	"AnimationGroupStart"
 
-class AnimationGroup extends BaseClass<AnimationGroupEvents, LayerCallbackHandler> {
+class AnimationGroup extends BaseClass<AnimationGroupEvents> {
 
 }

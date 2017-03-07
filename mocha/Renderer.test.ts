@@ -1,5 +1,6 @@
 import {expect, assert} from "chai"
 import {isolated} from "./Testutils"
+import {GestureEvent} from "GestureEventRecognizer"
 import {Layer, utils} from "Framer"
 
 
@@ -61,7 +62,7 @@ describe("Renderer", () => {
 		context.renderer.loop.pause = true
 
 		const layer = new Layer()
-		const handler = (event: Function) => {}
+		const handler = (event: GestureEvent) => {}
 		context.renderer.loop.next()
 
 		layer.onClick(handler)
