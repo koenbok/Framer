@@ -36,6 +36,7 @@ describe "TextLayer", ->
 			text = new TextLayer
 				fontFamily: "Courier"
 				text: shortText
+			print text.style.font
 			text.size.should.eql width: 312, height: 50
 
 		it "should auto size the layer based on the Screen width", ->
