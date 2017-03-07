@@ -47,7 +47,10 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 			@_properties[name] = value
 
 			if cssProperty isnt null
-				@_element.style[cssProperty] = LayerStyle[cssProperty](@)
+				if name is cssProperty and not LayerStyle[cssProperty]?
+					@_element.style[cssProperty] = @_properties[name]
+				else
+					@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
 			set?(@, value)
 
@@ -62,6 +65,8 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 			@emit("change:rotation", value) if name in ["rotationZ"]
 
 	result = _.extend(result, options)
+
+exports.layerProperty = layerProperty
 
 layerPropertyPointTransformer = (value, layer, property) ->
 	if _.isFunction(value)

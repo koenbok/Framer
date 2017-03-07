@@ -168,6 +168,16 @@ exports.LayerStyle =
 
 		return "#{layer._properties.shadowX}px #{layer._properties.shadowY}px #{layer._properties.shadowBlur}px #{layer._properties.shadowSpread}px #{layer._properties.shadowColor}"
 
+	textShadow: (layer) ->
+
+		props = layer._properties
+
+		if not props.shadowColor
+			return ""
+		else if props.shadowX is 0 and props.shadowY is 0 and props.shadowBlur is 0 and props.shadowSpread is 0
+			return ""
+
+		return "#{layer._properties.shadowX}px #{layer._properties.shadowY}px #{layer._properties.shadowBlur}px #{layer._properties.shadowColor}"
 
 	backgroundColor: (layer) ->
 		return layer._properties.backgroundColor
@@ -185,3 +195,33 @@ exports.LayerStyle =
 
 	border: (layer) ->
 		return "#{layer._properties.borderWidth}px solid #{layer._properties.borderColor}"
+
+	fontSize: (layer) ->
+		return layer._properties.fontSize + "px"
+
+	letterSpacing: (layer) ->
+		return layer._properties.letterSpacing + "px"
+
+	wordSpacing: (layer) ->
+		return layer._properties.wordSpacing + "px"
+
+	textIndent: (layer) ->
+		return layer._properties.textIndent + "px"
+
+	textAlign: (layer) ->
+		value = layer._properties.textAlign
+		if value is Align.left
+			return "left"
+		if value is Align.center
+			return "center"
+		if value is Align.right
+			return "right"
+		else
+			return value
+
+	direction: (layer) ->
+		value = layer._properties.direction
+		switch value
+			when "right-to-left" then return "rtl"
+			when "left-to-right" then return "ltr"
+			else return value
