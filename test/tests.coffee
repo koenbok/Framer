@@ -45,6 +45,7 @@ require "./tests/VersionTest"
 require "./tests/ColorTest"
 require "./tests/DeviceComponentTest"
 require "./tests/SliderComponentTest"
+require "./tests/RangeSliderComponentTest"
 require "./tests/FlowComponentTest"
 
 mocha.run()

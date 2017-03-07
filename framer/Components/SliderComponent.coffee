@@ -45,8 +45,9 @@ class exports.SliderComponent extends Layer
 
 		@knob = new Knob
 			backgroundColor: "#fff"
-			shadowY: 1, shadowBlur: 3
-			shadowColor: "rgba(0, 0, 0, 0.35)"
+			shadowY: 2
+			shadowBlur: 4
+			shadowColor: "rgba(0, 0, 0, 0.3)"
 			name: "knob"
 
 		@fill = new Layer

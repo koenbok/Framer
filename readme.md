@@ -5,9 +5,9 @@
 **Framer.js** is an open source JavaScript framework for rapid prototyping.
 Framer.js allows you to define animations and interactions, complete with filters, spring physics, 3D effects and more. It's bundled with **Framer Generator**, an application that allows you to import layers directly out of Photoshop and Sketch.
 
-[Framer Studio](http://framerjs.com) is a prototyping app for Mac, based on Framer.js. Framer Studio includes an editor based on CoffeeScript, instant visual feedback and much more.
+[Framer](http://framer.com) is a prototyping app for Mac, based on Framer.js. Framer Studio includes an editor based on CoffeeScript, instant visual feedback and much more.
 
-[Join the group](https://www.facebook.com/groups/framerjs/) at Facebook for help, ideas and general prototyping talk. Also feel free to post your work.
+[Join the group](https://framergroup.com) at Facebook for help, ideas and general prototyping talk. Also feel free to post your work.
 
 ## Get Started
 

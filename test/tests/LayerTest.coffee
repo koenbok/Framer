@@ -1133,6 +1133,18 @@ describe "Layer", ->
 			boundingBox.width.should.eql 133
 			boundingBox.height.should.eql 144
 
+		it "should use Framer.Defaults when setting the screen frame", ->
+			Framer.Defaults.Layer.width = 300
+			Framer.Defaults.Layer.height = 400
+			box = new Layer
+				screenFrame:
+					x: 123
+			box.stateCycle()
+			box.x.should.equal 123
+			box.width.should.equal 300
+			box.height.should.equal 400
+			Framer.resetDefaults()
+
 		it "should have the correct canvas frame", ->
 
 			layer = new Layer

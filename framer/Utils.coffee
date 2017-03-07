@@ -1036,7 +1036,7 @@ Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLaye
 	return point
 
 Utils.convertFrameToContext = (frame = {}, layer, rootContext=false, includeLayer=true) ->
-	frame = _.defaults(frame, {x: 0, y: 0, width: 100, height: 100})
+	frame = _.defaults(frame, {x: 0, y: 0, width: Framer.Defaults.Layer.width, height: Framer.Defaults.Layer.height})
 	corners = Utils.pointsFromFrame(frame)
 	convertedCorners = corners.map (point) ->
 		return Utils.convertPointToContext(point, layer, rootContext, includeLayer)
@@ -1067,7 +1067,7 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 
 # convert a frame from the context level to a layer, with rootContext enabled you can make it start from the top context
 Utils.convertFrameFromContext = (frame = {}, layer, rootContext=false, includeLayer=true) ->
-	frame = _.defaults(frame, {x: 0, y: 0, width: 100, height: 100})
+	frame = _.defaults(frame, {x: 0, y: 0, width: Framer.Defaults.Layer.width, height: Framer.Defaults.Layer.height})
 	corners = Utils.pointsFromFrame(frame)
 	convertedCorners = corners.map (point) ->
 		return Utils.convertPointFromContext(point, layer, rootContext, includeLayer)
