@@ -86,8 +86,8 @@ export class Context extends Renderable<ContextEventTypes> {
 	}
 
 	animationsForTarget(target: AnimationTargetInterface) {
-		return this.animations.filter((a: Animation<any, any>) => {
-			return a === a.target
+		return this.animations.filter((a: Animation<Layer, any>) => {
+			return target === a.target
 		})
 	}
 
