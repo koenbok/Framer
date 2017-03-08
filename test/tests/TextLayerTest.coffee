@@ -30,24 +30,24 @@ describe "TextLayer", ->
 				font: "Monaco"
 			text.fontFamily.should.equal "Monaco"
 
-	describe.skip "Auto-sizing", ->
+	describe "Auto-sizing", ->
 
 		it "should auto size the layer the size of the text", ->
 			text = new TextLayer
-				fontFamily: "Courier"
+				fontFamily: "Courier, Liberation Mono"
 				text: shortText
 			text.size.should.eql width: 312, height: 50
 
 		it "should auto size the layer based on the Screen width", ->
 			text = new TextLayer
-				fontFamily: "Courier"
+				fontFamily: "Courier, Liberation Mono"
 				text: mediumText
 			text.width.should.equal Screen.width
 			text.height.should.equal 250
 
 		it "should auto size the layer if the width is set explicitly", ->
 			text = new TextLayer
-				fontFamily: "Courier"
+				fontFamily: "Courier, Liberation Mono"
 				text: mediumText
 				width: 100
 			text.width.should.equal 100
@@ -55,7 +55,7 @@ describe "TextLayer", ->
 
 		it "should not auto size the layer the size the layer if it is explictly set", ->
 			text = new TextLayer
-				fontFamily: "Courier"
+				fontFamily: "Courier, Liberation Mono"
 				text: mediumText
 				width: 123
 				height: 456
@@ -63,14 +63,14 @@ describe "TextLayer", ->
 
 		it "should not auto size the layer when changing text after explictly setting width", ->
 			text = new TextLayer
-				fontFamily: "Courier"
+				fontFamily: "Courier, Liberation Mono"
 			text.width = 123
 			text.text = longText
 			text.width.should.equal 123
 
 		it "should not auto size the layer when changing text after explictly setting height", ->
 			text = new TextLayer
-				fontFamily: "Courier"
+				fontFamily: "Courier, Liberation Mono"
 			text.height = 456
 			text.text = longText
 			text.height.should.equal 456
@@ -78,7 +78,7 @@ describe "TextLayer", ->
 		it "should auto size the layer based on it's parent", ->
 			layer = new Layer width: 150
 			text = new TextLayer
-				fontFamily: "Courier"
+				fontFamily: "Courier, Liberation Mono"
 				text: mediumText
 				parent: layer
 			text.width.should.equal 150
@@ -87,7 +87,7 @@ describe "TextLayer", ->
 		it "should auto size the layer when its parent is set afterwards", ->
 			layer = new Layer width: 150
 			text = new TextLayer
-				fontFamily: "Courier"
+				fontFamily: "Courier, Liberation Mono"
 				text: mediumText
 			text.parent = layer
 			text.width.should.equal 150
@@ -95,7 +95,7 @@ describe "TextLayer", ->
 
 		it "should adjust its size on when a new text is set", (done) ->
 			text = new TextLayer
-				fontFamily: "Courier"
+				fontFamily: "Courier, Liberation Mono"
 			text.on "change:height", ->
 				text.size.should.eql width: 400, height: 3500
 				done()
