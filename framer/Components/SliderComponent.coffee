@@ -24,9 +24,6 @@ class Knob extends Layer
 	constructor: (options) ->
 		super options
 
-	@define "constrained", @simpleProperty("constrained", false)
-
-
 class exports.SliderComponent extends Layer
 
 	constructor: (options={}) ->
@@ -130,7 +127,7 @@ class exports.SliderComponent extends Layer
 			width: @width + @knob.width
 			height: @height + @knob.height
 
-		if @knob.constrained
+		if @constrained
 			@knob.draggable.constraints =
 				x: 0
 				y: 0
@@ -160,6 +157,8 @@ class exports.SliderComponent extends Layer
 	_setRadius: =>
 		radius = @borderRadius
 		@fill.style.borderRadius = "#{radius}px 0 0 #{radius}px"
+
+	@define "constrained", @simpleProperty("constrained", false)
 
 	@define "knobSize",
 		get: -> @_knobSize
@@ -223,24 +222,24 @@ class exports.SliderComponent extends Layer
 
 	pointForValue: (value) ->
 		if @width > @height
-			if @knob.constrained
+			if @constrained
 				return Utils.modulate(value, [@min, @max], [0 + (@knob.width / 2), @width - (@knob.width / 2)], true)
 			else
 				return Utils.modulate(value, [@min, @max], [0 , @width], true)
 		else
-			if @knob.constrained
+			if @constrained
 				return Utils.modulate(value, [@min, @max], [0 + (@knob.height / 2), @height - (@knob.height / 2)], true)
 			else
 				return Utils.modulate(value, [@min, @max], [0, @height], true)
 
 	valueForPoint: (value) ->
 		if @width > @height
-			if @knob.constrained
+			if @constrained
 				return Utils.modulate(value, [0 + (@knob.width / 2), @width - (@knob.width / 2)], [@min, @max], true)
 			else
 				return Utils.modulate(value, [0, @width], [@min, @max], true)
 		else
-			if @knob.constrained
+			if @constrained
 				return Utils.modulate(value, [0 + (@knob.height / 2), @height - (@knob.height / 2)], [@min, @max], true)
 			else
 				return Utils.modulate(value, [0, @height], [@min, @max], true)
