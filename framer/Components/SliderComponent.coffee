@@ -24,6 +24,7 @@ class Knob extends Layer
 	constructor: (options) ->
 		super options
 
+
 class exports.SliderComponent extends Layer
 
 	constructor: (options={}) ->
