@@ -106,6 +106,41 @@ describe "TextLayer", ->
 				done()
 			text.text = longText
 
+		it "should take padding into account", ->
+			text = new TextLayer
+				fontFamily: "Courier, Liberation Mono"
+				text: shortText
+				padding: 10
+			text.size.should.eql width: 332, height: 70
+
+		it "should take border width into account", ->
+			text = new TextLayer
+				fontFamily: "Courier, Liberation Mono"
+				text: shortText
+				borderWidth: 5
+			text.size.should.eql width: 322, height: 60
+
+		it "should autosize with the right width when inside a parent", ->
+			text = new TextLayer
+				fontFamily: "Courier, Liberation Mono"
+				text: shortText
+				borderWidth: 5
+				padding: 3
+			parent = new Layer
+			text.parent = parent
+			text.size.should.eql width: 100, height: 116
+
+		it "should autosize with the right width when inside a parent with a border", ->
+			text = new TextLayer
+				fontFamily: "Courier, Liberation Mono"
+				text: shortText
+				borderWidth: 5
+				padding: 3
+			parent = new Layer
+				borderWidth: 10
+			text.parent = parent
+			text.size.should.eql width: 80, height: 116
+
 	describe "Padding", ->
 		it "should have no padding initially", ->
 			text = new TextLayer

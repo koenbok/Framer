@@ -21,6 +21,8 @@ class exports.TextLayer extends Layer
 		"textDecoration"
 		"direction"
 		"font"
+		"borderWidth"
+		"padding"
 	]
 
 	@_textStyleProperties = _.pull(_.clone(TextLayer._textProperties), "text").concat(["color", "shadowX", "shadowY", "shadowBlur", "shadowColor"])
@@ -74,18 +76,23 @@ class exports.TextLayer extends Layer
 	autoSize: =>
 		constraints =
 			max: true
+		borderOffset = @borderWidth * 2
+		parentBorder = (@parent?.borderWidth ? 0) * 2
 		if @explicitWidth
 			constraints.width = @width
 		else
-			constraints.width = if @parent? then @parent.width else Screen.width
-
+			constraints.width = if @parent? then @parent.width - borderOffset - parentBorder - @padding.left - @padding.right else Screen.width
 		style = _.pick @style, @constructor._textProperties
 		size = Utils.textSize(@text, style, constraints)
 		newWidth = Math.ceil(size.width)
 		newHeight = Math.ceil(size.height)
 		@disableExplicitUpdating = true
-		@width = newWidth if @width isnt newWidth and not @explicitWidth
-		@height = newHeight if @height isnt newHeight and not @explicitHeight
+		if not @explicitWidth
+			newWidth += borderOffset
+			@width = newWidth if @width isnt newWidth
+		if not @explicitHeight
+			newHeight += borderOffset
+			@height = newHeight if @height isnt newHeight
 		@disableExplicitUpdating = false
 
 
