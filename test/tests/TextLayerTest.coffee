@@ -30,6 +30,11 @@ describe "TextLayer", ->
 				font: "Monaco"
 			text.fontFamily.should.equal "Monaco"
 
+		it "should set the font property if the fontFamily property is set", ->
+			text = new TextLayer
+				fontFamily: "Monaco"
+			text.font.should.equal "Monaco"
+
 	describe "Auto-sizing", ->
 
 		it "should auto size the layer the size of the text", ->

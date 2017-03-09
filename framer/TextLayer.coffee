@@ -114,7 +114,7 @@ class exports.TextLayer extends Layer
 			@style.padding =
 				"#{@_padding.top}px #{@_padding.right}px #{@_padding.bottom}px #{@_padding.left}px"
 
-	@define "fontFamily", layerProperty(@, "fontFamily", "fontFamily", @defaultFont(), _.isString)
+	@define "fontFamily", layerProperty(@, "fontFamily", "fontFamily", @defaultFont(), _.isString, null, {}, (layer, value) -> layer.font = value)
 	@define "fontSize", layerProperty(@, "fontSize", "fontSize", null, _.isNumber)
 	@define "fontWeight", layerProperty(@, "fontWeight", "fontWeight")
 	@define "fontStyle", layerProperty(@, "fontStyle", "fontStyle", "normal", _.isString)
