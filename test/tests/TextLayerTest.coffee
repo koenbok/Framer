@@ -107,10 +107,76 @@ describe "TextLayer", ->
 			text.text = longText
 
 	describe "Padding", ->
-		it "should have no padding initially"
-		it "should all padding when given a numeric value"
-		it "should set horizontal padding"
-		it "should set vertical padding"
-		it "should set top, left, right and left padding"
-		it "should keep padding 0 when not explicity set"
-		it "should have a preference for more specific padding definitions"
+		it "should have no padding initially", ->
+			text = new TextLayer
+			text.style.padding.should.equal "0px"
+			text.padding.top.should.equal 0
+			text.padding.bottom.should.equal 0
+			text.padding.left.should.equal 0
+			text.padding.right.should.equal 0
+
+		it "should all padding when given a numeric value", ->
+			text = new TextLayer
+				padding: 10
+
+			text.style.padding.should.equal "10px"
+			text.padding.top.should.equal 10
+			text.padding.bottom.should.equal 10
+			text.padding.left.should.equal 10
+			text.padding.right.should.equal 10
+
+		it "should set horizontal padding", ->
+			text = new TextLayer
+				padding:
+					horizontal: 10
+			text.style.padding.should.equal "0px 10px"
+			text.padding.top.should.equal 0
+			text.padding.bottom.should.equal 0
+			text.padding.left.should.equal 10
+			text.padding.right.should.equal 10
+
+		it "should set vertical padding", ->
+			text = new TextLayer
+				padding:
+					vertical: 10
+			text.style.padding.should.equal "10px 0px"
+			text.padding.top.should.equal 10
+			text.padding.bottom.should.equal 10
+			text.padding.left.should.equal 0
+			text.padding.right.should.equal 0
+
+
+		it "should set top, left, right and left padding", ->
+			text = new TextLayer
+				padding:
+					top: 1
+					bottom: 2
+					left: 3
+					right: 4
+			text.style.padding.should.equal "1px 4px 2px 3px"
+			text.padding.top.should.equal 1
+			text.padding.bottom.should.equal 2
+			text.padding.left.should.equal 3
+			text.padding.right.should.equal 4
+
+		it "should keep padding 0 when not explicity set", ->
+			text = new TextLayer
+				padding:
+					horizontal: 3
+					bottom: 2
+			text.style.padding.should.equal "0px 3px 2px"
+			text.padding.top.should.equal 0
+			text.padding.bottom.should.equal 2
+			text.padding.left.should.equal 3
+			text.padding.right.should.equal 3
+
+		it "should have a preference for more specific padding definitions", ->
+			text = new TextLayer
+				padding:
+					horizontal: 3
+					right: 2
+			text.style.padding.should.equal "0px 2px 0px 3px"
+			text.padding.top.should.equal 0
+			text.padding.bottom.should.equal 0
+			text.padding.left.should.equal 3
+			text.padding.right.should.equal 2

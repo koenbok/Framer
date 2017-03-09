@@ -40,7 +40,7 @@ class exports.TextLayer extends Layer
 		super options
 
 		# Set padding
-		@_padding = options.padding or Utils.rectZero()
+		@padding = options.padding or Utils.rectZero()
 
 		# Keeps track if the width or height are explicitly set, so we shouldn't update it afterwards
 		@explicitWidth = options.width?
@@ -108,6 +108,11 @@ class exports.TextLayer extends Layer
 			_.clone(@_padding)
 
 		set: (padding) ->
+			if _.isObject(padding)
+				padding.left ?= padding.horizontal
+				padding.right ?= padding.horizontal
+				padding.top ?= padding.vertical
+				padding.bottom ?= padding.vertical
 			@_padding = Utils.rectZero(Utils.parseRect(padding))
 
 			# Top, Right, Bottom, Left
