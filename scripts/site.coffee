@@ -17,15 +17,17 @@ Config =
 	gzipExtensions: [".js", ".html", ".css", ".map"]
 	startAt: "2e97990"
 
-client = knox.createClient
-	key: process.env.AWS_ACCESS_KEY_ID
-	secret: process.env.AWS_SECRET_ACCESS_KEY
-	bucket: Config.bucket
-
 
 ###############################################################
 # Parse the command line
 main = ->
+	exec "git config --local --get remote.origin.url", (err, output) ->
+		output = output.trim()
+		if output != "git@github.com:koenbok/framer.git"
+			throw Error("Not the right repo!", output)
+		_main()
+
+_main = ->
 
 	COMMANDS =
 		"upload": -> uploadDir Config.output
@@ -55,6 +57,8 @@ build = ->
 	exec "git log --pretty=format:\"%h\t%an\t%ad\t%s\" --first-parent master", (err, output) ->
 		throw err if err
 
+		console.log output
+
 		start = false
 
 		for line in output.split "\n"
@@ -77,6 +81,11 @@ build = ->
 uploadFile = (path, remotePath="") ->
 
 	console.log "Upload #{path} -> #{remotePath}"
+
+	client = knox.createClient
+		key: process.env.AWS_ACCESS_KEY_ID
+		secret: process.env.AWS_SECRET_ACCESS_KEY
+		bucket: Config.bucket
 
 	buffer = fs.readFileSync path
 	headers =
