@@ -369,7 +369,7 @@ Utils.isRelativeUrl = (url) ->
 	not /^([a-zA-Z]{1,8}:\/\/).*$/.test(url)
 
 Utils.isLocalServerUrl = (url) ->
-	return url.indexOf("127.0.0.1") isnt -1 or url.indexOf("localhost")  isnt -1
+	return /[a-zA-Z]{1,8}:\/\/127\.0\.0\.1/.test(url) or /[a-zA-Z]{1,8}:\/\/localhost/.test(url)
 
 Utils.isLocalUrl = (url) ->
 	return true if Utils.isFileUrl(url)
