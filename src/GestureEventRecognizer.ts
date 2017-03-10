@@ -16,7 +16,7 @@ let GestureInputForceTapMobile = 0.7
 let GestureInputForceTapMobilePollTime = 1 / 30
 let GestureInputMinimumFingerDistance = 30
 
-interface WebkitTouchEvent extends TouchEvent {
+export interface WebkitTouchEvent extends TouchEvent {
 	webkitForce?: number
 }
 
@@ -54,7 +54,7 @@ export interface GestureEvent extends WebkitTouchEvent {
 
 }
 
-interface GestureEventSession {
+export interface GestureEventSession {
 	eventCount: number
 	startEvent: GestureEvent
 	lastEvent?: GestureEvent
