@@ -141,6 +141,15 @@ describe "TextLayer", ->
 			text.parent = parent
 			text.size.should.eql width: 80, height: 116
 
+		it "should work together with Align.center", ->
+			text = new TextLayer
+				fontFamily: "Courier, Liberation Mono"
+				fontSize: 5
+				x: Align.center
+				y: Align.center
+				text: shortText
+			text.point.should.eql x: 180, y: 147
+
 	describe "Padding", ->
 		it "should have no padding initially", ->
 			text = new TextLayer

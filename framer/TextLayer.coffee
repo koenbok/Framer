@@ -51,6 +51,10 @@ class exports.TextLayer extends Layer
 		# Reset width and height
 		@autoSize()
 
+		for key, value of options
+			if _.isFunction(value) and @[key]?
+				@[key] = value
+
 		# Calculate new height on font property changes
 
 		for property in @constructor._textProperties
