@@ -276,6 +276,23 @@ describe "Layer", ->
 			layer.style["background-image"].indexOf("data:").should.not.equal(-1)
 			layer.style["background-image"].indexOf("?nocache=").should.equal(-1)
 
+		
+		it "should append nocache with an ampersand if url params already exist", (done) ->
+			
+			prefix = "../"
+			imagePath = "static/test.png?param=foo"
+			fullPath = prefix + imagePath
+			layer = new Layer
+
+			layer.on Events.ImageLoaded, ->
+				layer.style["background-image"].indexOf(imagePath).should.not.equal(-1)
+				layer.style["background-image"].indexOf("file://").should.not.equal(-1)
+				layer.style["background-image"].indexOf("&nocache=").should.not.equal(-1)
+				done()
+
+			layer.image = fullPath
+			layer.image.should.equal fullPath
+
 
 		it "should cancel loading when setting image to null", (done) ->
 			prefix = "../"

@@ -430,6 +430,7 @@ describe "Utils", ->
 			Utils.isLocalServerUrl("https://127.0.0.1/index.html").should.equal(true)
 			Utils.isLocalServerUrl(".././Desktop/index.html").should.equal(false)
 			Utils.isLocalServerUrl("https://apple.com/index.html").should.equal(false)
+			Utils.isLocalServerUrl("https://apple.com/?url=http%3A%2F%2F127.0.0.1").should.equal(false)
 
 	describe "isLocalAssetUrl", ->
 		it "should work", ->
