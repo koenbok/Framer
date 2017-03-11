@@ -23,6 +23,7 @@ A complete rewrite of the core, with everything on top.
 - Color
 - Print
 - Port inspect tests
+- Refactor LayerOptions to use LayerDefaults with Partial
 
 - ~~Change css updates to be in renderer~~
 - ~~Add print and describe in base, take rest out~~
@@ -40,6 +41,8 @@ A complete rewrite of the core, with everything on top.
 - `yes` ~~Should we move from `properties` to a more friendly `keys` and `values` everywhere?~~
 - What should we do with capitalization like `Utils.x`, `Align.left`, `Framer.CurrentContext`.
 - Should we add top level hacks for bad things like timers and events and hijack.
+- Should we rethink enabling / disabling the extras
+- We should look into performance chars of TouchEmulator (on android) and avoid creating many new events
 
 ---
 

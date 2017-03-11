@@ -15,14 +15,30 @@ const getStyle = {
 		return `translate3d(
 			${layer.context.dpr(layer.x)}px,
 			${layer.context.dpr(layer.y)}px,
-			${layer.context.dpr(layer.z)}px)`
+			${layer.context.dpr(layer.z)}px scale(${layer.scale}))`
 	},
 	width: (layer: Layer) => `${layer.context.dpr(layer.width)}px`,
 	height: (layer: Layer) => `${layer.context.dpr(layer.height)}px`,
 	backgroundColor: (layer: Layer) => layer.backgroundColor,
+	backgroundImage: (layer: Layer) => {
+		const image = layer.image
+		if (image) {
+			if (image.startsWith("url(")) {
+				return image
+			} else {
+				return `url(${image})`
+			}
+		}
+		return null
+	},
 	backgroundRepeat: (layer: Layer) => "no-repeat",
 	backgroundPosition: (layer: Layer) => "center",
 	backgroundSize: (layer: Layer) => "cover",
+	opacity: (layer: Layer) => layer.opacity,
+	visibility: (layer: Layer) => {
+		if (layer.visible) { return "visible" }
+		else { return "hidden" }
+	},
 	"-webkit-overflow-scrolling": (layer: Layer) => "touch",
 	"-webkit-box-sizing": (layer: Layer) => "border-box",
 	"-webkit-user-select": (layer: Layer) => "none"
@@ -32,9 +48,13 @@ const styleMap = {
 	ignoreEvents: ["pointerEvents"],
 	x: ["transform"],
 	y: ["transform"],
+	scale: ["transform"],
 	width: ["width"],
 	height: ["height"],
-	backgroundColor: ["backgroundColor"]
+	backgroundColor: ["backgroundColor"],
+	image: ["backgroundImage"],
+	visible: ["visibility"],
+	opacity: ["opacity"]
 }
 
 export const assignStyles = (

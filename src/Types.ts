@@ -9,5 +9,5 @@ export type Edge = "top" | "right" | "bottom" | "left"
 export type Degrees = number
 
 // TODO: Replace this with something real. Maybe automatically convert values like React?
-export type CSSStyles = {[index: string]: string}
+export type CSSStyles = Partial<CSSStyleDeclaration>;
 

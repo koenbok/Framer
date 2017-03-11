@@ -99,12 +99,12 @@ describe("General", () => {
 		context.renderer.manual = true
 
 		const layer = new Layer({
-			styles: {
+			style: {
 				right: "100%"
 			}
 		})
 
-		assert.equal(layer.styles["right"], "100%")
+		assert.equal(layer.style["right"], "100%")
 
 		context.renderer.render()
 

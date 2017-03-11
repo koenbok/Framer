@@ -152,6 +152,8 @@ export class Renderer {
 
 		this._counters.renderStyle++
 
+		// debugger
+
 		for (let layer of this._dirtyStyleItems) {
 			utils.dom.assignStyles(layer._element, this.flushDirtyStyles(layer))
 		}

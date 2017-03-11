@@ -233,6 +233,10 @@ base62@^1.1.0:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/base62/-/base62-1.1.2.tgz#22ced6a49913565bc0b8d9a11563a465c084124c"
 
+base64-image-loader@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/base64-image-loader/-/base64-image-loader-1.2.0.tgz#a957cb1cbc367a150f1c312caa9cb59d0b92550b"
+
 base64-js@^1.0.2:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.2.0.tgz#a39992d723584811982be5e290bb6a53d86700f1"

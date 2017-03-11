@@ -11,8 +11,12 @@ import {Curve} from "Curve"
 import {print} from "Printer"
 import {Screen} from "Screen"
 import {Animation} from "Animation"
+
 import {GestureEventRecognizer} from "GestureEventRecognizer"
 const gestures = new GestureEventRecognizer()
+
+import {TouchEmulator} from "TouchEmulator"
+const emulator = new TouchEmulator()
 
 export {lodash as _, utils, print, Config, Screen, Layer, Curve, Context, Animation}
 

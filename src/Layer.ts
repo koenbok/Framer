@@ -14,13 +14,25 @@ import {GestureEvent} from "GestureEventRecognizer"
 
 export type LayerCallbackHandler = (this: Layer, event: GestureEvent) => void
 
-export interface LayerOptions {
+export interface LayerKeys {
+	ignoreEvents: boolean
+	x: number
+	y: number
+	z: number
+	width: number
+	height: number
+	backgroundColor: string | null
+	scale: number
+	opacity: number
+	visible: boolean
+	image: string | null,
+	style: Types.CSSStyles,
+	text: string
+}
+
+export interface LayerOptions extends Partial<LayerKeys> {
 	context?: Context
 	parent?: Layer|null
-	ignoreEvents?: boolean
-	x?: number
-	y?: number
-	z?: number
 	minX?: number
 	midX?: number
 	maxX?: number
@@ -31,16 +43,9 @@ export interface LayerOptions {
 	right?: number
 	bottom?: number
 	left?: number
-	width?: number
-	height?: number
-	backgroundColor?: string
 	point?: Types.Point,
 	size?: Types.Size,
 	frame?: Types.Frame,
-	opacity?: number
-	image?: string | null,
-	styles?: Types.CSSStyles,
-	text?: string
 }
 
 export type LayerKey = keyof LayerOptions
@@ -57,6 +62,8 @@ export interface LayerAnimationKeys {
 	minY?: number
 	midY?: number
 	maxY?: number
+	opacity?: number
+	scale?: number
 }
 
 export type LayerEventKeyTypes =
@@ -75,9 +82,25 @@ export type LayerEventUserTypes =
 	"mousemove" |
 	"mousewheel"
 
+export type LayerGestureEventTypes =
+	"tap" | "tapstart" | "tapend" | "doubletap" |
+	"forcetap" | "forcetapstart" | "forcetapend" | "forcetapchange" |
+	"longpress" | "longpressstart" | "longpressend" |
+	"swipe" | "swipestart" | "swipeend" |
+	"swipeup" | "swipeupstart" | "swipeupend" |
+	"swipedown" | "swipedownstart" | "swipedownend" |
+	"swipeleft" | "swipeleftstart" | "swipeleftend" |
+	"swiperight" | "swiperightstart" | "swiperightend" |
+	"pan" | "panstart" | "panend" |
+	"panup" | "pandown" | "panleft" | "panright" |
+	"pinch" | "pinchstart" | "pinchend" |
+	"scale" | "scalestart" | "scaleend" |
+	"rotate" | "rotatestart" | "rotateend"
+
 export type LayerEventTypes =
 	LayerEventKeyTypes |
 	LayerEventUserTypes |
+	LayerGestureEventTypes |
 	AnimationEventTypes
 
 
@@ -85,7 +108,7 @@ export class Layer extends Renderable<LayerEventTypes> {
 
 	private _context: Context = CurrentContext
 	private _parent: Layer|null = null
-	private _keys = {
+	private _keys: LayerKeys = {
 		ignoreEvents: true,
 		x: 0,
 		y: 0,
@@ -94,8 +117,10 @@ export class Layer extends Renderable<LayerEventTypes> {
 		height: 200,
 		backgroundColor: "rgba(255, 0, 0, 0.5)",
 		opacity: 1,
+		scale: 1,
+		visible: true,
 		image: null,
-		styles: {},
+		style: {},
 		text: ""
 	}
 
@@ -296,18 +321,62 @@ export class Layer extends Renderable<LayerEventTypes> {
 		this.context.renderer.updateKeyStyle(this, "backgroundColor", value)
 	}
 
-	get styles() {
-		return this._keys.styles
+	get image(): string | null {
+		return this._keys.image
 	}
 
-	set styles(styles: Types.CSSStyles) {
-		this.updateStyles(styles)
+	set image(value: string | null) {
+		if (!this._shouldChangeKey("image", value)) { return }
+		this._keys.image = value
+		this._didChangeKey("image", value)
+		this.context.renderer.updateKeyStyle(this, "image", value)
 	}
 
-	updateStyles(styles: Types.CSSStyles) {
-		if (_.isEmpty(styles)) { return }
-		Object.assign(this._keys.styles, styles)
-		this.context.renderer.updateCustomStyles(this, styles)
+	get opacity() {
+		return this._keys.opacity
+	}
+
+	set opacity(value) {
+		if (!this._shouldChangeKey("opacity", value)) { return }
+		this._keys.opacity = value
+		this._didChangeKey("opacity", value)
+		this.context.renderer.updateKeyStyle(this, "opacity", value)
+	}
+
+	get scale() {
+		return this._keys.scale
+	}
+
+	set scale(value) {
+		if (!this._shouldChangeKey("scale", value)) { return }
+		this._keys.scale = value
+		this._didChangeKey("scale", value)
+		this.context.renderer.updateKeyStyle(this, "scale", value)
+	}
+
+	get visible() {
+		return this._keys.visible
+	}
+
+	set visible(value) {
+		if (!this._shouldChangeKey("visible", value)) { return }
+		this._keys.visible = value
+		this._didChangeKey("visible", value)
+		this.context.renderer.updateKeyStyle(this, "visible", value)
+	}
+
+	get style() {
+		return this._keys.style
+	}
+
+	set style(style: Types.CSSStyles) {
+		this.updateStyle(style)
+	}
+
+	updateStyle(style: Types.CSSStyles) {
+		if (_.isEmpty(style)) { return }
+		Object.assign(this._keys.style, style)
+		this.context.renderer.updateCustomStyles(this, style)
 	}
 
 	get text() {
@@ -338,8 +407,14 @@ export class Layer extends Renderable<LayerEventTypes> {
 		return this.context.animationsForTarget(this)
 	}
 
+	animateStop() {
+		this.animations.forEach(animation => animation.stop())
+	}
+
 
 	// Events
+
+	// DOM events
 
 	onClick(fn: LayerCallbackHandler) { this.on("click", fn) }
 	onDoubleClick(fn: LayerCallbackHandler) { this.on("doubleclick", fn) }
@@ -350,6 +425,12 @@ export class Layer extends Renderable<LayerEventTypes> {
 	onMouseOut(fn: LayerCallbackHandler) { this.on("mouseout", fn) }
 	onMouseMove(fn: LayerCallbackHandler) { this.on("mousemove", fn) }
 	onMouseWheel(fn: LayerCallbackHandler) { this.on("mousewheel", fn) }
+
+	// Gesture events
+
+	// TODO: Add
+
+	// Animation events
 
 	onAnimationStart(fn: LayerCallbackHandler) { this.on("AnimationStart", fn) }
 	onAnimationStop(fn: LayerCallbackHandler) { this.on("AnimationStop", fn) }

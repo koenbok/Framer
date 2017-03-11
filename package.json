@@ -4,6 +4,7 @@
     "@types/lodash": "^4.14.53",
     "@types/mocha": "^2.2.38",
     "@types/node": "^7.0.3",
+    "base64-image-loader": "^1.2.0",
     "chai": "^3.5.0",
     "dts-builder": "^1.1.0",
     "eventemitter3": "^2.0.2",

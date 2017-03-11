@@ -781,8 +781,6 @@ export class GestureEventRecognizer {
 			target = event.target
 		}
 
-		console.log("_dispatchEvent", type, target, touchEvent)
-
 		target.dispatchEvent(touchEvent)
 	}
 

@@ -30,7 +30,7 @@ export class Printer extends BaseClass<null> {
 			const line = new Layer({
 				parent: this._layer,
 				text: this._keys.prefix + utils.inspect.inspectAll(...args),
-				styles: {
+				style: {
 					position: "relative",
 					display: "block-inline",
 					font: "12px/1.35em Menlo",
@@ -53,10 +53,10 @@ export class Printer extends BaseClass<null> {
 			width: window.innerWidth,
 			height: this._keys.height,
 			backgroundColor: "white",
-			styles: {
-				"font": "12px/1.35em Menlo, Consolas, monospace",
-				"color": "rgba(0, 0, 0, .7)",
-				"border-top": "1px solid #d9d9d9",
+			style: {
+				font: "12px/1.35em Menlo, Consolas, monospace",
+				color: "rgba(0, 0, 0, .7)",
+				borderTop: "1px solid #d9d9d9",
 				overflow: "scroll",
 			}
 		})
@@ -65,7 +65,7 @@ export class Printer extends BaseClass<null> {
 			parent: background,
 			width: window.innerWidth,
 			height: this._keys.height,
-			styles: {
+			style: {
 				overflow: "scroll",
 				height: "auto"
 			}

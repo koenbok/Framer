@@ -163,5 +163,20 @@ describe("Layer", () => {
 		expect(layer.ignoreEvents).to.be.false
 		done()
 	})
+
+	isolated.test("should set background image", (context, done) => {
+
+		const layer = new Layer()
+
+		layer.image = "test.png"
+		context.renderer.render()
+		expect(layer._element.style.backgroundImage).to.equal("url(\"test.png\")")
+
+		layer.image = "url(test.png)"
+		context.renderer.render()
+		expect(layer._element.style.backgroundImage).to.equal("url(\"test.png\")")
+
+		done()
+	})
 })
 
