@@ -23,8 +23,11 @@ Config =
 main = ->
 	exec "git config --local --get remote.origin.url", (err, output) ->
 		output = output.trim()
-		if output != "git@github.com:koenbok/framer.git"
-			throw Error("Not the right repo: '#{output}'")
+		output = output.toLowerCase()
+		if output not in [
+				"git@github.com:koenbok/framer.git", 
+				"https://github.com/koenbok/Framer.git"]
+				throw Error("Not the right repo: '#{output}'")
 		_main()
 
 _main = ->
@@ -56,8 +59,6 @@ build = ->
 
 	exec "git log --pretty=format:\"%h\t%an\t%ad\t%s\" --first-parent master", (err, output) ->
 		throw err if err
-
-		console.log output
 
 		start = false
 
