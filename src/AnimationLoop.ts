@@ -87,21 +87,21 @@ export class AnimationLoop extends EventEmitter<AnimationLoopEventNames> {
 	}
 
 	private _start() {
-		console.log("AnimationLoop._start");
+		// console.log("AnimationLoop._start");
 		this._running = true
 		raf(this.tick)
 	}
 
 	private _stop() {
-		console.log("AnimationLoop._stop");
+		// console.log("AnimationLoop._stop");
 		this._running = false
 	}
 
 	private tick = () => {
 
-		if (this._counter % 30 === 0) {
-			console.log(`AnimationLoop.tick frame:${this._counter} fps:${Math.round(1 / (time() - this._last))}`)
-		}
+		// if (this._counter % 30 === 0) {
+		// 	console.log(`AnimationLoop.tick frame:${this._counter} fps:${Math.round(1 / (time() - this._last))}`)
+		// }
 
 		if (!this.pause) {
 			if (

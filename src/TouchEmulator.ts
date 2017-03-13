@@ -99,7 +99,6 @@ export class TouchEmulator extends BaseClass<null> {
 		// this.mouseout = this.mouseout.bind(this);
 		// this.mousemovePosition = this.mousemovePosition.bind(this);
 
-		console.log(this.touchPointerImage);
 
 		Utils.dom.insertStyleSheet(`
 		body {

@@ -1,4 +1,4 @@
-import {expect} from "chai"
+import {expect, assert} from "chai"
 import {isolated} from "./Testutils"
 
 import {Layer, Curve, Animation, utils} from "Framer"
@@ -37,7 +37,6 @@ describe("Layer", () => {
 		let count = 0
 		layer.onChange("x", e => {
 			count++
-
 		})
 		expect(count).to.equal(0)
 		done()
@@ -187,6 +186,18 @@ describe("Layer", () => {
 		expect(layer._element.style.transform).to.equal("translate3d(100px, 100px, 0px) scale(1)")
 
 		done()
+	})
+
+	isolated.test("should have this as layer", (context, done) => {
+
+		const layer = new Layer()
+
+		layer.onChange("x", function(event) {
+			expect(this).to.eql(layer)
+			done()
+		})
+
+		layer.x = 100
 	})
 
 })

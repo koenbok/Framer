@@ -100,3 +100,6 @@ const run = () => {
 
 let layer = new Layer({x: 100, y: 100})
 
+layer.onTap((event) => {
+	console.log("tap");
+})

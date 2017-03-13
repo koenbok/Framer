@@ -428,6 +428,11 @@ export class Layer extends Renderable<LayerEventTypes> {
 
 	// Gesture events
 
+	onTap(fn: LayerCallbackHandler) { this.on("tap", fn) }
+	onTapStart(fn: LayerCallbackHandler) { this.on("tapstart", fn) }
+	onTapEnd(fn: LayerCallbackHandler) { this.on("tapend", fn) }
+	onDoubleTap(fn: LayerCallbackHandler) { this.on("doubletap", fn) }
+
 	// TODO: Add
 
 	// Animation events
@@ -439,7 +444,9 @@ export class Layer extends Renderable<LayerEventTypes> {
 	onChange(key: LayerKey, fn: LayerCallbackHandler) { this.on(`change:${key}` as any, fn) }
 
 	addEventListener(eventName: LayerEventTypes, fn: LayerCallbackHandler, once: boolean, context: Object) {
-		super.addEventListener(eventName, fn, once, context)
+
+		// We make sure the this for layer always is the layer itself
+		super.addEventListener(eventName, fn, once, this)
 
 		// If we added a dom event listener, turn off ignoreEvents
 		if (utils.dom.getDOMEventKeys(this).length) { this.ignoreEvents = false }

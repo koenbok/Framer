@@ -28,6 +28,7 @@ export class EventEmitter<EventName> {
 	}
 
 	addEventListener(eventName: EventName, fn: Function, once: boolean, context: Object) {
+
 		if (once === true) {
 			this._em.once(eventName as any, fn as any, context)
 		} else {
