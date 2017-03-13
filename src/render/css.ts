@@ -12,10 +12,12 @@ const getStyle = {
 		}
 	},
 	transform: (layer: Layer) => {
-		return `translate3d(
-			${layer.context.dpr(layer.x)}px,
-			${layer.context.dpr(layer.y)}px,
-			${layer.context.dpr(layer.z)}px scale(${layer.scale}))`
+		return `
+			translate3d(
+				${layer.context.dpr(layer.x)}px,
+				${layer.context.dpr(layer.y)}px,
+				${layer.context.dpr(layer.z)}px)
+			scale(${layer.scale})`
 	},
 	width: (layer: Layer) => `${layer.context.dpr(layer.width)}px`,
 	height: (layer: Layer) => `${layer.context.dpr(layer.height)}px`,

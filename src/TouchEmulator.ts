@@ -4,6 +4,7 @@ import * as Types from "Types";
 import { BaseClass } from "BaseClass";
 import { Context } from "Context";
 import { Layer } from "Layer";
+import { Curve } from "Curve";
 
 /**
  *
@@ -98,27 +99,42 @@ export class TouchEmulator extends BaseClass<null> {
 		// this.mouseout = this.mouseout.bind(this);
 		// this.mousemovePosition = this.mousemovePosition.bind(this);
 
+		console.log(this.touchPointerImage);
+
+		Utils.dom.insertStyleSheet(`
+		body {
+			cursor: url(${this.touchPointerImage}) 32 32, auto;
+			cursor: -webkit-image-set(
+				url(${this.touchPointerImage}) 1x,
+				url(${this.touchPointerImage}) 2x
+			) 32 32, auto;
+		}
+
+		body:active {
+			cursor: url('images/cursor-active.png') 32 32, auto;
+			cursor: -webkit-image-set(
+				url('images/cursor-active.png') 1x,
+				url('images/cursor-active@2x.png') 2x
+			) 32 32, auto;
+		}
+		`)
 
 
-		document.addEventListener("mousedown", this.mousedown, true);
-		document.addEventListener("mousemove", this.mousemove, true);
-		document.addEventListener("mouseup", this.mouseup, true);
-		document.addEventListener("keydown", this.keydown, true);
-		document.addEventListener("keyup", this.keyup, true);
-		document.addEventListener("mouseout", this.mouseout, true);
-
-
-
-		let { touchPointerInitialOffset } = this;
+		document.addEventListener("mousedown", this.domMouseDown, true);
+		document.addEventListener("mousemove", this.domMouseMove, true);
+		document.addEventListener("mouseup", this.domMouseUp, true);
+		document.addEventListener("keydown", this.domKeyDown, true);
+		document.addEventListener("keyup", this.domKeyUp, true);
+		document.addEventListener("mouseout", this.domMouseOut, true);
 
 		this.context.run(() => {
 			this.touchPointLayer = new Layer({
 				width: this.touchPointerImageSize,
 				height: this.touchPointerImageSize,
-				backgroundColor: null,
+				image: this.touchPointerImage,
+				backgroundColor: "rgba(255, 0, 0, 0.5)",
 				opacity: 0
 			});
-			return this.touchPointLayer.style.backgroundImage = this.touchPointerImage;
 		}
 		);
 	}
@@ -129,7 +145,7 @@ export class TouchEmulator extends BaseClass<null> {
 
 	// Event handlers
 
-	keydown = (event: KeyboardEvent) => {
+	domKeyDown = (event: KeyboardEvent) => {
 
 		if (!this.point) {
 			return
@@ -149,7 +165,7 @@ export class TouchEmulator extends BaseClass<null> {
 		}
 	}
 
-	keyup = (event: KeyboardEvent) => {
+	domKeyUp = (event: KeyboardEvent) => {
 
 		if (event.keyCode === this.keyPinchCode) {
 			cancelEvent(event);
@@ -167,7 +183,7 @@ export class TouchEmulator extends BaseClass<null> {
 	}
 
 
-	mousedown = (event: MouseEvent) => {
+	domMouseDown = (event: MouseEvent) => {
 
 		// cancelEvent(event)
 
@@ -180,10 +196,10 @@ export class TouchEmulator extends BaseClass<null> {
 			dispatchTouchEvent("touchstart", this.target, event);
 		}
 
-		return this.touchPointLayer.style.backgroundImage = this.touchPointerImageActive;
+		this.touchPointLayer.image = this.touchPointerImageActive;
 	}
 
-	mousemove = (event: MouseEvent) => {
+	domMouseMove = (event: MouseEvent) => {
 
 		this.point = {
 			x: event.pageX,
@@ -192,27 +208,27 @@ export class TouchEmulator extends BaseClass<null> {
 
 		// cancelEvent(event)
 
-		if (this.startPoint == null) { this.startPoint = this.point; }
-		if (this.centerPoint == null) { this.centerPoint = this.point; }
+		if (!this.startPoint) { this.startPoint = this.point }
+		if (!this.centerPoint) { this.centerPoint = this.point }
 
 		if (this.isPinchKeyDown && !this.isPanKeyDown) {
 			if (this.touchPointerInitialOffset && this.centerPoint) {
-				this.touchPoint = Utils.point.add(this.touchPointerInitialOffset, this.pinchPoint(this.point, this.centerPoint));
+				this.touchPoint = Utils.point.add(this.touchPointerInitialOffset, this.getPinchPoint(this.point, this.centerPoint));
 				this.touchPointDelta = Utils.point.subtract(this.point, this.touchPoint);
 			}
 		}
 
 		if (this.isPinchKeyDown && this.isPanKeyDown) {
 			if (this.touchPoint && this.touchPointDelta) {
-				this.touchPoint = this.panPoint(this.point, this.touchPointDelta);
+				this.touchPoint = this.getPanPoint(this.point, this.touchPointDelta);
 			}
 		}
 
 		if (this.isPinchKeyDown || this.isPanKeyDown) {
 			if (this.touchPoint) {
 				this.touchPointLayer.visible = true;
-				this.touchPointLayer.midX = this.touchPoint.x;
-				this.touchPointLayer.midY = this.touchPoint.y;
+				this.touchPointLayer.midX = this.touchPoint.x
+				this.touchPointLayer.midY = this.touchPoint.y
 			}
 		}
 
@@ -225,7 +241,7 @@ export class TouchEmulator extends BaseClass<null> {
 		}
 	}
 
-	mouseup = (event: MouseEvent) => {
+	domMouseUp = (event: MouseEvent) => {
 
 		// cancelEvent(event)
 
@@ -240,7 +256,7 @@ export class TouchEmulator extends BaseClass<null> {
 		return this.endMultiTouch();
 	}
 
-	mouseout = (event: MouseEvent) => {
+	domMouseOut = (event: MouseEvent) => {
 
 		if (this.isMouseDown) { return; }
 
@@ -271,7 +287,7 @@ export class TouchEmulator extends BaseClass<null> {
 		this.touchPointLayer.midX = this.point.x;
 		this.touchPointLayer.midY = this.point.y;
 		// this.touchPointLayer.scale = 1.8;
-		return this.touchPointLayer.animate({
+		this.touchPointLayer.animate({
 			opacity: 1,
 			scale: 1,
 			// midX: @point.x + @touchPointerInitialOffset.x
@@ -280,7 +296,7 @@ export class TouchEmulator extends BaseClass<null> {
 			// 	time: 0.1,
 			// 	curve: "ease-out"
 			// }
-		});
+		}, Curve.linear(0.1));
 	}
 
 	hideTouchCursor() {
@@ -292,27 +308,27 @@ export class TouchEmulator extends BaseClass<null> {
 			// options: {
 			// 	time: 0.08
 			// }
-		});
+		}), Curve.linear(0.1);
 	}
 
-	mousemovePosition(event: MouseEvent) {
-		this.point = {
-			x: event.pageX,
-			y: event.pageY
-		};
-	}
+	// mousemovePosition(event: MouseEvent) {
+	// 	this.point = {
+	// 		x: event.pageX,
+	// 		y: event.pageY
+	// 	};
+	// }
 
 	endMultiTouch() {
 		this.isMouseDown = false;
-		this.touchPointLayer.style.backgroundImage = this.touchPointerImage;
+		this.touchPointLayer.image = this.touchPointerImage;
 		return this.hideTouchCursor();
 	}
 
-	pinchPoint(point: Types.Point, centerPoint: Types.Point) {
+	getPinchPoint(point: Types.Point, centerPoint: Types.Point) {
 		return Utils.point.subtract(centerPoint, Utils.point.subtract(point, centerPoint));
 	}
 
-	panPoint(point: Types.Point, offsetPoint: Types.Point) {
+	getPanPoint(point: Types.Point, offsetPoint: Types.Point) {
 		return Utils.point.subtract(point, offsetPoint);
 	}
 }

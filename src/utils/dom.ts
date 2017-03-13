@@ -71,3 +71,17 @@ export const getDOMEventKeys = (item: Renderable<any>): string[] => {
 export const assignStyles = (element: HTMLElement, style: any) => {
 	Object.assign(element.style, style)
 }
+
+/**
+ * Insert a style element to head of the document.
+ * @param css css stylesheet contents.
+ */
+export const insertStyleSheet = (css: string) => {
+
+	const style = document.createElement("style");
+	style.appendChild(document.createTextNode(css));
+
+	whenReady(() => {
+		document.head.appendChild(style);
+	})
+}

@@ -98,5 +98,5 @@ const run = () => {
 // 	layer.animate(randomPoint(), Curve.linear(10))
 // }
 
-let layer = new Layer()
+let layer = new Layer({x: 100, y: 100})
 

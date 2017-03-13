@@ -178,5 +178,16 @@ describe("Layer", () => {
 
 		done()
 	})
+
+
+	isolated.test("should render x and y", (context, done) => {
+
+		const layer = new Layer({x: 100, y: 100})
+		context.renderer.render()
+		expect(layer._element.style.transform).to.equal("translate3d(100px, 100px, 0px) scale(1)")
+
+		done()
+	})
+
 })
 
