@@ -4,9 +4,13 @@ export class EventEmitter<EventName> {
 
 	private _em = new EventEmitter3()
 
+	eventNames() {
+		return this._em.eventNames() as string[]
+	}
+
 	eventListeners() {
 
-		const listeners: {[index: string]: EventEmitter.ListenerFn[]}= {}
+		const listeners: {[index: string]: EventEmitter.ListenerFn[]} = {}
 
 		for (let eventName of this._em.eventNames()) {
 			listeners[eventName] = this._em.listeners(eventName)

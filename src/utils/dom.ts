@@ -44,26 +44,6 @@ const _validEvent = (tagName: string, eventName: string) => {
 
 export const validEvent = utils.memoize(_validEvent)
 
-export const getDOMEventKeys = (item: Renderable<any>): string[] => {
-
-		return Object.keys(item.eventListeners()).filter((eventName) => {
-
-			// We support touch events on desktop for now
-			if (
-				eventName === "touchstart" ||
-				eventName === "touchmove" ||
-				eventName === "touchend") {
-					return true
-				}
-
-			if (validEvent("div", eventName)) {
-				return true
-			}
-
-			return false
-		})
-}
-
 // interface HTMLElement extends HTMLElement {
 // 	style: CSSStyleDeclaration;
 // }

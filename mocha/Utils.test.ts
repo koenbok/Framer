@@ -54,26 +54,32 @@ describe("utils", () => {
 
 		it("should be empty on default", () => {
 			const layer = new Layer()
-			expect(utils.dom.getDOMEventKeys(layer)).to.eql([])
+			expect(utils.events.interactiveEvents(layer.eventNames())).to.eql([])
 		})
 
 		it("should work for click but not change", () => {
 			const layer = new Layer()
 			layer.onClick((event: Event) => {})
 			layer.onChange("x", (event: Event) => {})
-			expect(utils.dom.getDOMEventKeys(layer)).to.eql(["click"])
+			expect(utils.events.interactiveEvents(layer.eventNames())).to.eql(["click"])
 		})
 
 		it("should work for touch on desktop", () => {
 			const layer = new Layer()
 			layer.on("touchend" as any, () => {})
-			expect(utils.dom.getDOMEventKeys(layer)).to.eql(["touchend"])
+			expect(utils.events.interactiveEvents(layer.eventNames())).to.eql([])
+		})
+
+		it("should work for tap", () => {
+			const layer = new Layer()
+			layer.on("tap" as any, () => {})
+			expect(utils.events.interactiveEvents(layer.eventNames())).to.eql(["tap"])
 		})
 
 		it("should not work for animation events", () => {
 			const layer = new Layer()
 			layer.on("animationstart" as any, () => {})
-			expect(utils.dom.getDOMEventKeys(layer)).to.eql([])
+			expect(utils.events.interactiveEvents(layer.eventNames())).to.eql([])
 		})
 
 	})

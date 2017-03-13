@@ -1,5 +1,5 @@
 import * as Preact from "preact"
-import * as utils from "Utils"
+import * as Utils from "Utils"
 import {Renderable} from "Renderable"
 import {Context} from "Context"
 import {assignStyles, assignAllStyles} from "render/css"
@@ -41,7 +41,7 @@ class RenderableComponent extends Preact.Component<Props, {}> {
 		}
 
 		// Add all event handlers to the dom element
-		for (let eventName of utils.dom.getDOMEventKeys(renderable)) {
+		for (let eventName of Utils.events.interactiveEvents(renderable.eventNames())) {
 			(props as any)[`on${eventName}`] = (event: Event) => {
 				renderable.emit(eventName as any, event)
 			}

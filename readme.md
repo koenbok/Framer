@@ -34,6 +34,7 @@ A complete rewrite of the core, with everything on top.
 
 - .toInspect() became .describe()
 - .properties are now named keys everywhere. So with `layer.x`, `x` is a key.
+- We don't map touchend to mouseup etc anymore, but the TouchEmulator should take care of this.
 
 
 #### Questions

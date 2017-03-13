@@ -100,23 +100,23 @@ export class TouchEmulator extends BaseClass<null> {
 		// this.mousemovePosition = this.mousemovePosition.bind(this);
 
 
-		Utils.dom.insertStyleSheet(`
-		body {
-			cursor: url(${this.touchPointerImage}) 32 32, auto;
-			cursor: -webkit-image-set(
-				url(${this.touchPointerImage}) 1x,
-				url(${this.touchPointerImage}) 2x
-			) 32 32, auto;
-		}
+		// Utils.dom.insertStyleSheet(`
+		// body {
+		// 	cursor: url(${this.touchPointerImage}) 32 32, auto;
+		// 	cursor: -webkit-image-set(
+		// 		url(${this.touchPointerImage}) 1x,
+		// 		url(${this.touchPointerImage}) 2x
+		// 	) 32 32, auto;
+		// }
 
-		body:active {
-			cursor: url('images/cursor-active.png') 32 32, auto;
-			cursor: -webkit-image-set(
-				url('images/cursor-active.png') 1x,
-				url('images/cursor-active@2x.png') 2x
-			) 32 32, auto;
-		}
-		`)
+		// body:active {
+		// 	cursor: url('images/cursor-active.png') 32 32, auto;
+		// 	cursor: -webkit-image-set(
+		// 		url('images/cursor-active.png') 1x,
+		// 		url('images/cursor-active@2x.png') 2x
+		// 	) 32 32, auto;
+		// }
+		// `)
 
 
 		document.addEventListener("mousedown", this.domMouseDown, true);

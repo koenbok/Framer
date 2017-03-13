@@ -1,4 +1,5 @@
 import * as Types from "Types"
+import * as Utils from "utils"
 
 import {BaseClass} from "BaseClass"
 import {Context} from "Context"
@@ -11,4 +12,5 @@ export abstract class Renderable<EventTypes> extends BaseClass<EventTypes> {
 	styles: Types.CSSStyles
 	text: string
 	_element: HTMLElement
+
 }

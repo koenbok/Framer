@@ -433,7 +433,7 @@ export class Layer extends Renderable<LayerEventTypes> {
 	onTapEnd(fn: LayerCallbackHandler) { this.on("tapend", fn) }
 	onDoubleTap(fn: LayerCallbackHandler) { this.on("doubletap", fn) }
 
-	// TODO: Add
+	// TODO: Add more
 
 	// Animation events
 
@@ -449,11 +449,12 @@ export class Layer extends Renderable<LayerEventTypes> {
 		super.addEventListener(eventName, fn, once, this)
 
 		// If we added a dom event listener, turn off ignoreEvents
-		if (utils.dom.getDOMEventKeys(this).length) { this.ignoreEvents = false }
+		if (utils.events.interactiveEvents(this.eventNames()).length) {
+			this.ignoreEvents = false
+		}
 
 		this.context.renderer.updateStructure()
 	}
-
 
 	// Keys
 
