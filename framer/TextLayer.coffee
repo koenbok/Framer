@@ -33,7 +33,7 @@ class exports.TextLayer extends Layer
 
 		_.defaults options, options.textStyle,
 			backgroundColor: "transparent"
-			html: "Add text"
+			html: "Hello World"
 			color: "#888"
 			fontSize: 40
 			fontWeight: 400

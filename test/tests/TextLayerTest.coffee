@@ -10,7 +10,7 @@ describe "TextLayer", ->
 	describe "defaults", ->
 		it "should set the correct defaults", ->
 			text = new TextLayer
-			text.html.should.equal "Add text"
+			text.html.should.equal "Hello World"
 			text.color.isEqual("#888").should.equal true
 			text.backgroundColor.isEqual("transparent").should.equal true
 			text.padding.should.eql Utils.rectZero()
