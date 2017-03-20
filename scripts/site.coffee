@@ -27,7 +27,7 @@ main = ->
 		if output not in [
 				"git@github.com:koenbok/framer.git",
 				"https://github.com/koenbok/framer.git"]
-				throw Error("Not the right repo: '#{output}'")
+			throw Error("Not the right repo: '#{output}'")
 		_main()
 
 _main = ->
