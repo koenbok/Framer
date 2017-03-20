@@ -25,8 +25,8 @@ main = ->
 		output = output.trim()
 		output = output.toLowerCase()
 		if output not in [
-				"git@github.com:koenbok/framer.git", 
-				"https://github.com/koenbok/Framer.git"]
+				"git@github.com:koenbok/framer.git",
+				"https://github.com/koenbok/framer.git"]
 				throw Error("Not the right repo: '#{output}'")
 		_main()
 
