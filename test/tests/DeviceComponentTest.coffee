@@ -1,3 +1,5 @@
+assert = require "assert"
+
 describe "DeviceComponent", ->
 
 	it "should default to iphone 7 silver", ->
@@ -149,3 +151,22 @@ describe "DeviceComponent", ->
 		device.orientation.should.equal -90
 		device.isPortrait.should.equal false
 		device.screenSize.should.eql {width: 1920, height: 1080}
+
+	it "should return the correct platform per device", ->
+		device = new Framer.DeviceComponent()
+		for key, value of Framer.DeviceComponent.Devices
+			device.deviceType = key
+			switch device.platform()
+				when "iOS"
+					assert(_.startsWith(key, "iphone") or _.startsWith(key, "ipad") or _.startsWith(key, "apple-iphone") or _.startsWith(key, "apple-ipad"))
+				when "watchOS"
+					assert(_.startsWith(key, "apple-watch") or _.startsWith(key, "applewatch"))
+				when "Windows"
+					assert(_.startsWith(key, "dell") or _.startsWith(key, "microsoft"))
+				when "Android"
+					assert(_.startsWith(key, "google") or _.startsWith(key, "nexus") or _.startsWith(key, "htc") or _.startsWith(key, "samsung"))
+				when "macOS"
+					assert(_.startsWith(key, "apple-macbook") or _.startsWith(key, "apple-imac") or _.startsWith(key, "desktop-safari"))
+				else
+					# Exceptions
+					assert(key in ["fullscreen", "custom", "sony-w85Oc", "test"])

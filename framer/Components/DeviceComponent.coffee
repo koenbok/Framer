@@ -192,6 +192,19 @@ class exports.DeviceComponent extends BaseClass
 		# into the device screen
 		Framer.CurrentContext = @_context
 
+	platform: ->
+		if /google|nexus|htc|samsung/.test(@deviceType)
+			return "Android"
+		if /iphone|ipad/.test(@deviceType)
+			return "iOS"
+		if /apple-watch|applewatch/.test(@deviceType)
+			return "watchOS"
+		if /apple|safari/.test(@deviceType)
+			return "macOS"
+		if /microsoft|dell/.test(@deviceType)
+			return "Windows"
+		return null
+
 	###########################################################################
 	# FULLSCREEN
 
