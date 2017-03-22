@@ -68,18 +68,19 @@ class exports.TextLayer extends Layer
 		@on "change:width", @updateExplicitWidth
 		@on "change:height", @updateExplicitHeight
 
-	defaultFont: =>
-		# Store current device
-		@_currentDevice = Framer.Device.deviceType
-
-		# Android Device: Roboto
-		if @_currentDevice.indexOf("google") > -1
-			return "Roboto, Helvetica Neue"
-		# Edge Device: Segoe UI
-		if @_currentDevice.indexOf("microsoft") > -1
-			return "Segoe UI, Helvetica Neue"
-		# General default: macOS, SF UI
-		return "-apple-system, SF UI Text, Helvetica Neue"
+	defaultFont: ->
+		appleFont = "-apple-system, SF UI Text, Helvetica Neue"
+		googleFont = "Roboto, Helvetica Neue"
+		microsoftFont = "Segoe UI, Helvetica Neue"
+		switch Framer.Device.platform()
+			when "Android" then return googleFont
+			when "iOS", "watchOS", "macOS" then return appleFont
+			when "Windows" then return microsoftFont
+		if Utils.isAndroid()
+			return googleFont
+		if Utils.isEdge()
+			return microsoftFont
+		return appleFont
 
 	autoSize: =>
 		constraints =
