@@ -38,6 +38,7 @@ class exports.TextLayer extends Layer
 			fontSize: 40
 			fontWeight: 400
 			lineHeight: 1.25
+			font: options.fontFamily ? @defaultFont()
 
 		super options
 
@@ -50,11 +51,6 @@ class exports.TextLayer extends Layer
 
 		# Reset width and height
 		@autoSize()
-
-		print @defaultFont()
-
-		# Set defaults
-		@fontFamily = @defaultFont()
 
 		for key, value of options
 			if _.isFunction(value) and @[key]?
@@ -73,7 +69,6 @@ class exports.TextLayer extends Layer
 		@on "change:height", @updateExplicitHeight
 
 	defaultFont: =>
-
 		# Store current device
 		@_currentDevice = Framer.Device.deviceType
 
@@ -139,7 +134,7 @@ class exports.TextLayer extends Layer
 			@style.padding =
 				"#{@_padding.top}px #{@_padding.right}px #{@_padding.bottom}px #{@_padding.left}px"
 
-	@define "fontFamily", layerProperty(@, "fontFamily", "fontFamily", null, _.isString, {}, (layer, value) -> layer.font = value)
+	@define "fontFamily", layerProperty(@, "fontFamily", "fontFamily", null, _.isString, null, (layer, value) -> layer.font = value)
 	@define "fontSize", layerProperty(@, "fontSize", "fontSize", null, _.isNumber)
 	@define "fontWeight", layerProperty(@, "fontWeight", "fontWeight")
 	@define "fontStyle", layerProperty(@, "fontStyle", "fontStyle", "normal", _.isString)
