@@ -10,6 +10,8 @@ Framer.resetDefaults = ->
 	Framer.Defaults.Layer.height = 100
 Framer.resetDefaults()
 
+Framer.Device = new Framer.DeviceView()
+
 window.console.debug = (v) ->
 window.console.warn = (v) ->
 
