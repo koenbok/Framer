@@ -51,6 +51,11 @@ class exports.TextLayer extends Layer
 		# Reset width and height
 		@autoSize()
 
+		print @defaultFont()
+
+		# Set defaults
+		@fontFamily = @defaultFont()
+
 		for key, value of options
 			if _.isFunction(value) and @[key]?
 				@[key] = value
@@ -67,12 +72,16 @@ class exports.TextLayer extends Layer
 		@on "change:width", @updateExplicitWidth
 		@on "change:height", @updateExplicitHeight
 
-	@defaultFont: ->
+	defaultFont: =>
+
+		# Store current device
+		@_currentDevice = Framer.Device.deviceType
+
 		# Android Device: Roboto
-		if Utils.isAndroid()
+		if @_currentDevice.indexOf("google") > -1
 			return "Roboto, Helvetica Neue"
 		# Edge Device: Segoe UI
-		if Utils.isEdge()
+		if @_currentDevice.indexOf("microsoft") > -1
 			return "Segoe UI, Helvetica Neue"
 		# General default: macOS, SF UI
 		return "-apple-system, SF UI Text, Helvetica Neue"
@@ -130,7 +139,7 @@ class exports.TextLayer extends Layer
 			@style.padding =
 				"#{@_padding.top}px #{@_padding.right}px #{@_padding.bottom}px #{@_padding.left}px"
 
-	@define "fontFamily", layerProperty(@, "fontFamily", "fontFamily", @defaultFont(), _.isString, null, {}, (layer, value) -> layer.font = value)
+	@define "fontFamily", layerProperty(@, "fontFamily", "fontFamily", null, _.isString, {}, (layer, value) -> layer.font = value)
 	@define "fontSize", layerProperty(@, "fontSize", "fontSize", null, _.isNumber)
 	@define "fontWeight", layerProperty(@, "fontWeight", "fontWeight")
 	@define "fontStyle", layerProperty(@, "fontStyle", "fontStyle", "normal", _.isString)
