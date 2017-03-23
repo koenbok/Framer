@@ -224,3 +224,16 @@ describe "TextLayer", ->
 			text.padding.bottom.should.equal 0
 			text.padding.left.should.equal 3
 			text.padding.right.should.equal 2
+
+	describe "webfonts", ->
+		it "sets the weight if the font property is set", ->
+			l = new TextLayer
+				font: Utils.loadWebFont("Raleway", 800)
+			l.fontFamily.should.equal "Raleway"
+			l.fontWeight.should.equal 800
+
+		it "doesn't set the weight if the fontFamily property is set", ->
+			l = new TextLayer
+				fontFamily: Utils.loadWebFont("Raleway", 800)
+			l.fontFamily.should.equal "Raleway"
+			expect(l.fontWeight).to.equal 400

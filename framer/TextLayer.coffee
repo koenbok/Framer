@@ -4,6 +4,12 @@
 {Events} = require "./Events"
 Utils = require "./Utils"
 
+validateFont = (arg) ->
+	return _.isString(arg) or _.isObject(arg)
+
+fontFamilyFromObject = (font) ->
+	return if _.isObject(font) then font.fontFamily else font
+
 class exports.TextLayer extends Layer
 
 	@_textProperties = [
@@ -126,7 +132,7 @@ class exports.TextLayer extends Layer
 			@style.padding =
 				"#{@_padding.top}px #{@_padding.right}px #{@_padding.bottom}px #{@_padding.left}px"
 
-	@define "fontFamily", layerProperty(@, "fontFamily", "fontFamily", null, _.isString, null, (layer, value) -> layer.font = value)
+	@define "fontFamily", layerProperty(@, "fontFamily", "fontFamily", null, _.isString, fontFamilyFromObject, (layer, value) -> layer.font = value)
 	@define "fontSize", layerProperty(@, "fontSize", "fontSize", null, _.isNumber)
 	@define "fontWeight", layerProperty(@, "fontWeight", "fontWeight")
 	@define "fontStyle", layerProperty(@, "fontStyle", "fontStyle", "normal", _.isString)
@@ -139,7 +145,12 @@ class exports.TextLayer extends Layer
 	@define "textDecoration", layerProperty(@, "textDecoration", "textDecoration", null, _.isString)
 	@define "direction", layerProperty(@, "direction", "direction", null, _.isString)
 
-	@define "font", layerProperty @, "font", null, null, _.isString, null, {}, (layer, value) ->
+
+	@define "font", layerProperty @, "font", null, null, validateFont, null, {}, (layer, value) ->
+		if _.isObject(value)
+			layer.fontFamily = value.fontFamily
+			layer.fontWeight = value.fontWeight
+			return
 		# Check if value contains number. We then assume proper use of font.
 		# Otherwise, we default to setting the fontFamily.
 		if /\d/.test(value)

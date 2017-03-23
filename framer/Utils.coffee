@@ -452,23 +452,19 @@ Utils.deviceFont = (os) ->
 _loadedFonts = []
 
 Utils.loadWebFont = (font, weight) ->
-
-	if font in _loadedFonts
-		return font
+	fontToLoad = font
+	fontToLoad += ":#{weight}" if weight?
+	fontObject = {fontFamily: font, fontWeight: weight}
+	if fontToLoad in _loadedFonts
+		return fontObject
 
 	link = document.createElement("link")
 
-	if weight
-		link.href = "https://fonts.googleapis.com/css?family=#{font}:#{weight}"
-	else
-		link.href = "https://fonts.googleapis.com/css?family=#{font}"
-
+	link.href = "https://fonts.googleapis.com/css?family=#{fontToLoad}"
 	link.rel = "stylesheet"
 	document.getElementsByTagName("head")[0].appendChild(link)
-
-	_loadedFonts.push(font)
-
-	return font
+	_loadedFonts.push(fontToLoad)
+	return fontObject
 
 ######################################################
 # MATH FUNCTIONS
