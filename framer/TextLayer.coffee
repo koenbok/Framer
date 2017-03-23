@@ -38,7 +38,9 @@ class exports.TextLayer extends Layer
 			fontSize: 40
 			fontWeight: 400
 			lineHeight: 1.25
-			font: options.fontFamily ? @defaultFont()
+
+		if not options.font? and not options.fontFamily?
+			options.fontFamily = @defaultFont()
 
 		super options
 
