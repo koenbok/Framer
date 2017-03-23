@@ -158,15 +158,15 @@ describe "DeviceComponent", ->
 			device.deviceType = key
 			switch device.platform()
 				when "iOS"
-					assert(_.startsWith(key, "iphone") or _.startsWith(key, "ipad") or _.startsWith(key, "apple-iphone") or _.startsWith(key, "apple-ipad"))
+					assert(_.startsWith(key, "iphone") or _.startsWith(key, "ipad") or _.startsWith(key, "apple-iphone") or _.startsWith(key, "apple-ipad"), "#{key} should not have platform iOS")
 				when "watchOS"
-					assert(_.startsWith(key, "apple-watch") or _.startsWith(key, "applewatch"))
+					assert(_.startsWith(key, "apple-watch") or _.startsWith(key, "applewatch"), "#{key} should not have platform watchOS")
 				when "Windows"
-					assert(_.startsWith(key, "dell") or _.startsWith(key, "microsoft"))
+					assert(_.startsWith(key, "dell") or _.startsWith(key, "microsoft"), "#{key} should not have platform Windows")
 				when "Android"
-					assert(_.startsWith(key, "google") or _.startsWith(key, "nexus") or _.startsWith(key, "htc") or _.startsWith(key, "samsung"))
+					assert(_.startsWith(key, "google") or _.startsWith(key, "nexus") or _.startsWith(key, "htc") or _.startsWith(key, "samsung"), "#{key} should not have platform Android")
 				when "macOS"
-					assert(_.startsWith(key, "apple-macbook") or _.startsWith(key, "apple-imac") or _.startsWith(key, "desktop-safari"))
+					assert(_.startsWith(key, "apple-macbook") or _.startsWith(key, "apple-imac") or _.startsWith(key, "desktop-safari"), "#{key} should not have platform macOS")
 				else
 					# Exceptions
-					assert(key in ["fullscreen", "custom", "sony-w85Oc", "test"])
+					assert(key in ["fullscreen", "custom", "sony-w85Oc", "test"], "#{key} should have a platform specified")
