@@ -69,18 +69,7 @@ class exports.TextLayer extends Layer
 		@on "change:height", @updateExplicitHeight
 
 	defaultFont: ->
-		appleFont = "-apple-system, SF UI Text, Helvetica Neue"
-		googleFont = "Roboto, Helvetica Neue"
-		microsoftFont = "Segoe UI, Helvetica Neue"
-		switch Framer.Device.platform()
-			when "Android" then return googleFont
-			when "iOS", "watchOS", "macOS" then return appleFont
-			when "Windows" then return microsoftFont
-		if Utils.isAndroid()
-			return googleFont
-		if Utils.isEdge()
-			return microsoftFont
-		return appleFont
+		return Utils.deviceFont(Framer.Device.platform())
 
 	autoSize: =>
 		constraints =

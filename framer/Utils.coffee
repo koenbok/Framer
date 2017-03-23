@@ -433,16 +433,20 @@ Utils.deviceFont = (os) ->
 	# https://github.com/jonathantneal/system-font-css
 
 	if not os
-		os = "macos" if Utils.isMacOS()
-		os = "ios" if Utils.isIOS()
-		os = "android" if Utils.isAndroid()
-		os = "windows" if Utils.isWindows()
+		os = "macOS" if Utils.isMacOS()
+		os = "iOS" if Utils.isIOS()
+		os = "Android" if Utils.isAndroid()
+		os = "Windows" if Utils.isWindows()
 
-	return "-apple-system, SF UI Text, Helvetica Neue" if os is "macos"
-	return "-apple-system, SF UI Text, Helvetica Neue" if os is "ios"
-	return "Roboto, Helvetica Neue" if os is "android"
-	return "Segoe UI" if os is "windows"
-	return "Helvetica"
+	appleFont = "-apple-system, BlinkMacSystemFont, SF UI Text, Helvetica Neue"
+	googleFont = "Roboto, Helvetica Neue"
+	microsoftFont = "Segoe UI, Helvetica Neue"
+	switch os
+		when "Android" then return googleFont
+		when "iOS", "watchOS", "macOS" then return appleFont
+		when "Windows" then return microsoftFont
+
+	return appleFont
 
 # Load fonts from Google Web Fonts
 _loadedFonts = []

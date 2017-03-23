@@ -18,7 +18,7 @@ describe "TextLayer", ->
 			text.fontWeight.should.equal 400
 			text.lineHeight.should.equal 1.25
 			text.fontStyle.should.equal "normal"
-			text.style.fontFamily.should.equal "-apple-system, 'SF UI Text', 'Helvetica Neue'"
+			text.style.fontFamily.should.equal "-apple-system, BlinkMacSystemFont, 'SF UI Text', 'Helvetica Neue'"
 
 		it "should not set the default fontFamily default if the fontFamily property is set", ->
 			text = new TextLayer
