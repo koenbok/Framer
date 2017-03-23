@@ -50,6 +50,7 @@ class exports.TextLayer extends Layer
 
 		super options
 
+		@font ?= @fontFamily
 		# Set padding
 		@padding = options.padding or Utils.rectZero()
 
