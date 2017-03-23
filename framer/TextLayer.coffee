@@ -25,6 +25,8 @@ class exports.TextLayer extends Layer
 		"textTransform"
 		"textIndent"
 		"textDecoration"
+		"textOverflow"
+		"whiteSpace"
 		"direction"
 		"font"
 		"borderWidth"
@@ -48,15 +50,15 @@ class exports.TextLayer extends Layer
 		if not options.font? and not options.fontFamily?
 			options.fontFamily = @defaultFont()
 
+		# Keeps track if the width or height are explicitly set, so we shouldn't update it afterwards
+		@explicitWidth = options.width?
+		@explicitHeight = options.height?
+
 		super options
 
 		@font ?= @fontFamily
 		# Set padding
 		@padding = options.padding or Utils.rectZero()
-
-		# Keeps track if the width or height are explicitly set, so we shouldn't update it afterwards
-		@explicitWidth = options.width?
-		@explicitHeight = options.height?
 
 		# Reset width and height
 		@autoSize()
@@ -133,7 +135,7 @@ class exports.TextLayer extends Layer
 			@style.padding =
 				"#{@_padding.top}px #{@_padding.right}px #{@_padding.bottom}px #{@_padding.left}px"
 
-	@define "fontFamily", layerProperty(@, "fontFamily", "fontFamily", null, _.isString, fontFamilyFromObject, (layer, value) -> layer.font = value)
+	@define "fontFamily", layerProperty(@, "fontFamily", "fontFamily", null, _.isString, fontFamilyFromObject, {}, (layer, value) -> layer.font = value)
 	@define "fontSize", layerProperty(@, "fontSize", "fontSize", null, _.isNumber)
 	@define "fontWeight", layerProperty(@, "fontWeight", "fontWeight")
 	@define "fontStyle", layerProperty(@, "fontStyle", "fontStyle", "normal", _.isString)
@@ -144,8 +146,35 @@ class exports.TextLayer extends Layer
 	@define "textTransform", layerProperty(@, "textTransform", "textTransform", "none", _.isString)
 	@define "textIndent", layerProperty(@, "textIndent", "textIndent", null, _.isNumber)
 	@define "textDecoration", layerProperty(@, "textDecoration", "textDecoration", null, _.isString)
+	@define "textOverflow", layerProperty(@, "textOverflow", "textOverflow", null, _.isString, null, {}, (layer, value) ->
+		if value in ["ellipsis", "clip"]
+			layer.clip = true
+			if layer.explicitHeight
+				layer.multiLineOverflow = value is "ellipsis"
+			else
+				layer.whiteSpace = "nowrap"
+				layer.multiLineOverflow = false
+		else
+			layer.whiteSpace = null
+			layer.clip = false
+			layer.multiLineOverflow = false
+	)
+	@define "whiteSpace", layerProperty(@, "whiteSpace", "whiteSpace", null, _.isString)
 	@define "direction", layerProperty(@, "direction", "direction", null, _.isString)
 
+	@define "multiLineOverflow",
+		get: ->
+			@_multiLineOverFlow ? false
+		set: (value) ->
+			@_multiLineOverFlow = true
+			if value
+				@style["-webkit-line-clamp"] = Math.ceil(@height / (@fontSize*@lineHeight))
+				@style["-webkit-box-orient"] = "vertical"
+				@style["display"] = "-webkit-box"
+			else
+				@style["-webkit-line-clamp"] = null
+				@style["-webkit-box-orient"] = null
+				@style["display"] = "block"
 
 	@define "font", layerProperty @, "font", null, null, validateFont, null, {}, (layer, value) ->
 		if _.isObject(value)
