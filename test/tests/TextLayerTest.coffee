@@ -270,3 +270,19 @@ describe "TextLayer", ->
 			expect(l.whitespace).to.equal undefined
 			l.multiLineOverflow.should.equal false
 
+		it "should update the line-clamp when the height is updated", ->
+			l = new TextLayer
+				text: longText
+				textOverflow: "ellipsis"
+				height: 150
+			l.style["-webkit-line-clamp"].should.equal '3'
+			l.height = 400
+			l.style["-webkit-line-clamp"].should.equal '8'
+
+		it "should not set the line-clamp when not using textOverflow", ->
+			l = new TextLayer
+				text: longText
+				height: 150
+			l.style["-webkit-line-clamp"].should.equal ''
+			l.height = 400
+			l.style["-webkit-line-clamp"].should.equal ''

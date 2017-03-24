@@ -103,7 +103,8 @@ class exports.TextLayer extends Layer
 			newHeight += borderOffset
 			@height = newHeight if @height isnt newHeight
 		@disableExplicitUpdating = false
-
+		if @multiLineOverflow
+			@style["-webkit-line-clamp"] = @maxVisibleLines()
 
 	updateExplicitWidth: (value) =>
 		return if @enableExplicitUpdating
@@ -112,6 +113,9 @@ class exports.TextLayer extends Layer
 	updateExplicitHeight: (value) =>
 		return if @disableExplicitUpdating
 		@explicitHeight = true
+
+	maxVisibleLines: ->
+		Math.ceil(@height / (@fontSize*@lineHeight))
 
 	@define "text",
 		get: -> @_element.textContent
@@ -164,11 +168,11 @@ class exports.TextLayer extends Layer
 
 	@define "multiLineOverflow",
 		get: ->
-			@_multiLineOverFlow ? false
+			return @_multiLineOverFlow ? false
 		set: (value) ->
-			@_multiLineOverFlow = true
-			if value
-				@style["-webkit-line-clamp"] = Math.ceil(@height / (@fontSize*@lineHeight))
+			@_multiLineOverFlow = value
+			if @_multiLineOverFlow
+				@style["-webkit-line-clamp"] = @maxVisibleLines()
 				@style["-webkit-box-orient"] = "vertical"
 				@style["display"] = "-webkit-box"
 			else
