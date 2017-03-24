@@ -79,7 +79,9 @@ class Preloader extends BaseClass
 
 		# Another bit of delay to find out if the images are already cached
 		# so we avoid a mini flickr of the progress indicator.
-		Utils.delay 0.2, => @cover.visible = true
+		Utils.delay 0.2, =>
+			@progressIndicator.visible = true
+			@brand.visible = true
 
 		# By default we take the image from the prototype and the device
 		@addImagesFromContext(Framer.DefaultContext)
@@ -108,7 +110,7 @@ class Preloader extends BaseClass
 			@_isLoading = false
 			@context?.destroy()
 
-		if @cover?.visible and animated
+		if @progressIndicator?.visible and animated
 			@cover?.animate
 				properties: {opacity: 0}
 				time: 0.13
@@ -137,12 +139,12 @@ class Preloader extends BaseClass
 		@cover = new Layer
 			frame: Canvas
 			backgroundColor: "white"
-			visible: false
 
 		@progressIndicator = new CircularProgressComponent
 			size: 160
 			point: Align.center
 			parent: @cover
+			visible: false
 
 		@progressIndicator.railsColor = Color.grey(0, 0.1)
 		@progressIndicator.progressColor = "rgb(75, 169, 248)"
@@ -152,6 +154,7 @@ class Preloader extends BaseClass
 			size: 96
 			parent: @cover
 			backgroundColor: null
+			visible: false
 			style:
 				backgroundSize: "50%"
 
