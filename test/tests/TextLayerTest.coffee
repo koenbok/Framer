@@ -237,3 +237,36 @@ describe "TextLayer", ->
 				fontFamily: Utils.loadWebFont("Raleway", 800)
 			l.fontFamily.should.equal "Raleway"
 			expect(l.fontWeight).to.equal 400
+
+	describe "textOverflow", ->
+		it "should enable clipping", ->
+			l = new TextLayer
+				textOverflow: "ellipsis"
+			l.clip.should.equal true
+
+		it "should enable multilineOverflow setting a specific height", ->
+			l = new TextLayer
+				textOverflow: "ellipsis"
+				height: 20
+			l.multiLineOverflow.should.equal true
+
+		it "should should disable multilineOverflow when using clipping and setting a specific height", ->
+			l = new TextLayer
+				textOverflow: "clip"
+				height: 20
+			l.multiLineOverflow.should.equal false
+
+		it "should set whitespace to nowrap setting no height", ->
+			l = new TextLayer
+				textOverflow: "ellipsis"
+			l.whiteSpace.should.equal "nowrap"
+			l.multiLineOverflow.should.equal false
+
+		it "should disable properties when it's disabled", ->
+			l = new TextLayer
+				textOverflow: "ellipsis"
+			l.textOverflow = null
+			l.clip.should.equal false
+			expect(l.whitespace).to.equal undefined
+			l.multiLineOverflow.should.equal false
+
