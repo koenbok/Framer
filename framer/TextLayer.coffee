@@ -204,6 +204,10 @@ class exports.TextLayer extends Layer
 		get: -> @direction
 		set: (value) -> @direction = value
 
+	@define "truncate",
+		get: -> @textOverflow is "ellipsis"
+		set: (truncate) -> @textOverflow = if truncate then "ellipsis" else null
+
 	# Map shadow properties to text shadow
 	@define "shadowX", layerProperty(@, "shadowX", "textShadow", 0, _.isNumber)
 	@define "shadowY", layerProperty(@, "shadowY", "textShadow", 0, _.isNumber)
