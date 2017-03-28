@@ -76,7 +76,7 @@ class Button extends ShareLayer
 			if options.shareButton
 				window.open(options.url, "Share", "width=560, height=714")
 			else
-				window.open(options.url, "_blank")
+				window.location.href = options.url
 
 # Share component
 class ShareComponent
