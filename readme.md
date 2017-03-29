@@ -36,6 +36,9 @@ Framer is a Mac app that allows you to design without any limitations. It is bas
 <br /><br />
 
 ## Contribute
+
+###### Building
+
 - Download or fork the repository
 - Make sure you have the latest version of node and npm installed
 - Run `make dist` to build the latest version
