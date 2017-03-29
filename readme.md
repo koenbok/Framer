@@ -6,15 +6,15 @@ Framer Library is an open source JavaScript framework for high fidelity prototyp
 
 **Insert Feature visuals**
 
-There are 2 ways to use Framer Library. Too get the most out of Library get Framer; a design tool for the Mac. The other way you can leverage Framer Library is with generator an app to import layers from Sketch, Photoshop and Figma. The following features are included with each.
+There are 2 ways to use Framer Library. To get most out of Library get Framer; a design tool for the Mac. The other way you can leverage Framer Library is with generator an app to import layers from Sketch, Photoshop and Figma. The following features are included with each.
 <br /><br />
 
 ![Table](https://dsc.cloud/krijn/comparison/comparison.png)
 <br /><br />
 
-## Framer the Design Tool
+## Framer
 
-Framer is a Mac app that allows you to design without any limitations. It is based on Framer Library and offers the familiarity of visual editing with the flexibility of code. A seamless workflow, further complemented by device previewing, version control and easy sharing.
+Framer is a design tool for the Mac which allows you to design without limitations. It is based on Framer Library and offers the familiarity of visual editing with the flexibility of code. A seamless workflow, further complemented by device previewing, version control and easy sharing.
 
 [Find out more](http://framer.com)
 <br /><br />
