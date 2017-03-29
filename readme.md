@@ -46,8 +46,6 @@ Framer is a Mac app that allows you to design without any limitations. It is bas
 - Run `make test` to run the unit tests in phantomjs
 - Run `make` to retest the latest version on changes
 
-There are also a set of visual and interactive tests for Framer Studio which you can find in test/studio.
-
 ###### Reporting Issues
 
 - Please use the issue tracker
