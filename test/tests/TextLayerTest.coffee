@@ -150,6 +150,16 @@ describe "TextLayer", ->
 				text: shortText
 			text.point.should.eql x: 180, y: 147
 
+		it "should autosize when setting the text multiple times", ->
+			text = new TextLayer
+				fontFamily: "Courier, Liberation Mono"
+				text: "Hi"
+			text.size.should.eql width: 48, height: 50
+			text.text = "Hello"
+			text.size.should.eql width: 120, height: 50
+			text.text = "Hello there"
+			text.size.should.eql width: 264, height: 50
+
 	describe "Padding", ->
 		it "should have no padding initially", ->
 			text = new TextLayer

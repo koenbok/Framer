@@ -107,7 +107,7 @@ class exports.TextLayer extends Layer
 			@style["-webkit-line-clamp"] = @maxVisibleLines()
 
 	updateExplicitWidth: (value) =>
-		return if @enableExplicitUpdating
+		return if @disableExplicitUpdating
 		@explicitWidth = true
 
 	updateExplicitHeight: (value) =>
