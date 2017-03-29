@@ -55,8 +55,8 @@ There are also a set of visual and interactive tests for Framer Studio which you
 <br /><br />
 
 ## Others
-[Follow us on Twitter](http://twitter.com/framer)
-[Join more then 19.000 designers in the Community](https://www.facebook.com/groups/framerjs/)
-[Subscribe to the Newsletter](https://framer.com/newsletter/)
-[Check out the latest work made with Framer](https://framer.com/examples/featured/)
-[Latest builds of Framer.js](http://builds.framerjs.com)
+- [Follow us on Twitter](http://twitter.com/framer)
+- [Join more then 19.000 designers in the Community](https://www.facebook.com/groups/framerjs/)
+- [Subscribe to the Newsletter](https://framer.com/newsletter/)
+- [Check out the latest work made with Framer](https://framer.com/examples/featured/)
+- [Latest builds of Framer.js](http://builds.framerjs.com)
