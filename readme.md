@@ -6,7 +6,7 @@ Framer Library is an open source JavaScript framework for high fidelity prototyp
 
 **Insert Feature visuals**
 
-There are 2 ways too use Framer Library. Too get the most out of Library get Framer; a design tool for the Mac. The other way you can leverage Framer Library is with generator an app to import layers from Sketch, Photoshop and Figma. The following features are included with each.
+There are 2 ways to use Framer Library. Too get the most out of Library get Framer; a design tool for the Mac. The other way you can leverage Framer Library is with generator an app to import layers from Sketch, Photoshop and Figma. The following features are included with each.
 <br /><br />
 
 ![Table](https://dsc.cloud/krijn/comparison/comparison.png)
@@ -52,7 +52,11 @@ There are also a set of visual and interactive tests for Framer Studio which you
 
 - Please use the issue tracker
 - Try to include an example and clearly describe expected behaviour
+<br /><br />
 
-## Social
-- Twitter
-- Dribbble etc.
+## Others
+[Follow us on Twitter](http://twitter.com/framer)
+[Join more then 19.000 designers in the Community](https://www.facebook.com/groups/framerjs/)
+[Subscribe to the Newsletter](https://framer.com/newsletter/)
+[Check out the latest work made with Framer](https://framer.com/examples/featured/)
+[Latest builds of Framer.js](http://builds.framerjs.com)
