@@ -21,7 +21,7 @@ Framer is a Mac app that allows you to design without any limitations. It is bas
 <br /><br />
 
 ### Set Up Framer Library
-- [Download] (https://builds.framerjs.com/latest/Framer.zip) (Framer.js & Framer Generator)
+- [Download](https://builds.framerjs.com/latest/Framer.zip) (Framer.js & Framer Generator)
 - Open **index.html** in a WebKit browser and you'll see an image animate on click
 - Edit the **app.js** to add interactions and animations (see example code below)
 
