@@ -10,7 +10,7 @@ There are 2 ways too use Framer Library. Too get the most out of Library get Fra
 ![Table](https://dsc.cloud/krijn/black-table/black-table.png)
 <br /><br />
 
-### Framer the Design Tool
+## Framer the Design Tool
 
 Framer is a Mac app that allows you to design without any limitations. It is based on Framer Library and offers the familiarity of visual editing with the flexibility of code. A seamless workflow, further complemented by device previewing, version control and easy sharing.
 
@@ -20,7 +20,7 @@ Framer is a Mac app that allows you to design without any limitations. It is bas
 ![Framer for Mac](https://dsc.cloud/krijn/grow/grow.png)
 <br /><br />
 
-### Set Up Framer Library
+## Set Up Framer Library
 - [Download](https://builds.framerjs.com/latest/Framer.zip) (Framer.js & Framer Generator)
 - Open **index.html** in a WebKit browser and you'll see an image animate on click
 - Edit the **app.js** to add interactions and animations (see example code below)
@@ -28,20 +28,20 @@ Framer is a Mac app that allows you to design without any limitations. It is bas
 ![Project Folder](https://dsc.cloud/krijn/files/files.png)
 <br /><br />
 
-### Get Started
+## Get Started
 - Learn Framer with guides
 - Group
 <br /><br />
 
-### Framer Generator
+## Framer Generator
 - What?
 - How?
 <br /><br />
 
-### Contribute
+## Contribute
 - How to pr
 - How to run
 
-### Social
+## Social
 - Twitter
 - Dribbble etc.
