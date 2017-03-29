@@ -27,7 +27,7 @@ Framer is a Mac app that allows you to design without any limitations. It is bas
 - Open **index.html** in a WebKit browser and you'll see an image animate on click
 - Edit the **app.js** to add interactions and animations (see example code below)
 
-![Project Folder](https://dsc.cloud/krijn/files/files.png)
+![Project Folder](https://dsc.cloud/krijn/project/project.png)
 <br /><br />
 
 ## Get Started
