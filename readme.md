@@ -56,8 +56,8 @@ Framer is a Mac app that allows you to design without any limitations. It is bas
 <br /><br />
 
 ## Others
-- [Follow us on Twitter](http://twitter.com/framer)
-- [Join more then 19.000 designers in the Community](https://www.facebook.com/groups/framerjs/)
-- [Subscribe to the Newsletter](https://framer.com/newsletter/)
-- [Check out the latest work made with Framer](https://framer.com/examples/featured/)
-- [Latest builds of Framer.js](http://builds.framerjs.com)
+- [Twitter](http://twitter.com/framer) — Follow us for updates & the latest work
+- [The Community](https://www.facebook.com/groups/framerjs/) — Join more then 19.000 designers for help and advice
+- [The Newsletter](https://framer.com/newsletter/) — Get the best work & latest news in your inbox
+- [Featured Examples](https://framer.com/examples/featured/) — The best Framer work from the community
+- [Latest builds](http://builds.framerjs.com) — The latest builds of Framer.js
