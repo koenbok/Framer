@@ -41,8 +41,22 @@ Framer is a Mac app that allows you to design without any limitations. It is bas
 <br /><br />
 
 ## Contribute
-- How to pr
-- How to run
+- Download or clone the code
+- Make sure you have node and npm >= 2 installed
+- Run `make dist` to build the latest version
+- Run `make` to rebuild the latest version on changes
+
+###### Testing
+
+- Run `make test` to run the unit tests in phantomjs
+- Run `make` to retest the latest version on changes
+
+There are also a set of visual and interactive tests for Framer Studio which you can find in test/studio.
+
+###### Reporting Issues
+
+- Please use the issue tracker
+- Try to include an example and clearly describe expected behaviour
 
 ## Social
 - Twitter
