@@ -3,8 +3,10 @@
 # Framer Library
 
 Framer Library is an open source JavaScript framework for high fidelity prototyping. Use Framer Library to design animations and interactions without any limitations. Make use of real spring physics or animate with 3D effects, nothing is too crazy.
+<br /><br />
 
 ![Example](https://dsc.cloud/krijn/Phone_small/Phone_small.gif)
+<br /><br />
 
 There are 2 ways to use Framer Library. To get most out of Library get Framer; a design tool for the Mac. The other way you can leverage Framer Library is with generator an app to import layers from Sketch, Photoshop and Figma. The following features are included with each.
 <br /><br />
