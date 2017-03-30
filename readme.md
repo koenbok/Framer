@@ -11,7 +11,7 @@ Framer Library is an open source JavaScript framework for high fidelity prototyp
 There are 2 ways to use Framer Library. To get most out of Library get Framer; a design tool for the Mac. The other way you can leverage Framer Library is with generator an app to import layers from Sketch, Photoshop and Figma. The following features are included with each.
 <br /><br />
 
-![Table](https://dsc.cloud/krijn/comparison/comparison.png)
+![Table](https://dsc.cloud/krijn/table_comparison/table_comparison.png)
 <br /><br />
 
 ## Framer
@@ -25,6 +25,7 @@ Framer is a design tool for the Mac which allows you to design without limitatio
 <br /><br />
 
 ## Set up Framer Library
+
 - [Download](https://builds.framerjs.com/latest/Framer.zip) (Framer.js & Framer Generator)
 - Open **index.html** in a WebKit browser and you'll see an image animate on click
 - Edit the **app.js** to add interactions and animations (see example code below)
@@ -33,14 +34,14 @@ Framer is a design tool for the Mac which allows you to design without limitatio
 <br /><br />
 
 ## Get Started
+ 
+![Guides](https://dsc.cloud/krijn/icon_guide/icon_guide.png)
 
-<p align="left">
-  <img src="https://dsc.cloud/krijn/guides/guides.png" width="124">
-  <p width="300px">Want to get started and learn how to code? Begin with exploring our guides explaining the functionality of the Framer Library.</p>
-</p>
-<p align="left">
-   <img src="https://dsc.cloud/krijn/guides/guides.png" width="124">
-</p>
+[Learn](https://framer.com/getstarted/guide/) Framer Library with our beginner guides.
+
+![Community](https://dsc.cloud/krijn/community_icon/community_icon.png)
+
+[Join](https://www.facebook.com/groups/framerjs/) over 19.0000 designers in our community.
 
 <br /><br />
 
@@ -65,8 +66,9 @@ Framer is a design tool for the Mac which allows you to design without limitatio
 <br /><br />
 
 ## Others
+
 - [Twitter](http://twitter.com/framer) — Follow us for updates & the latest work
-- [The Community](https://www.facebook.com/groups/framerjs/) — Join more then 19.000 designers for help and advice
+- [The Community](https://www.facebook.com/groups/framerjs/) — Join over 19.000 designers for help and advice
 - [The Newsletter](https://framer.com/newsletter/) — Get the best work & latest news in your inbox
 - [Featured Examples](https://framer.com/examples/featured/) — The best Framer work from the community
 - [Latest builds](http://builds.framerjs.com) — The latest builds of Framer.js
