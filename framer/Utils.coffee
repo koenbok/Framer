@@ -327,6 +327,9 @@ Utils.isChrome = ->
 Utils.isSafari = ->
 	return /Safari/.test(navigator.userAgent) and /Apple Computer/.test(navigator.vendor)
 
+Utils.isFirefox = ->
+	return /^Mozilla.*Firefox\/\d+\.\d+$/.test(navigator.userAgent)
+
 Utils.isEdge = ->
 	return /Edge/.test(navigator.userAgent)
 
@@ -406,7 +409,10 @@ Utils.devicePixelRatio = ->
 	window.devicePixelRatio
 
 Utils.isJP2Supported = ->
-	return Utils.isWebKit() and not Utils.isChrome()
+	if Utils.isFirefox()
+		return false
+	else
+		return Utils.isWebKit() and not Utils.isChrome()
 
 Utils.isWebPSupported = ->
 	return Utils.isChrome()
