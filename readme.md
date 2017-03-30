@@ -37,7 +37,7 @@ Framer is a design tool for the Mac which allows you to design without limitatio
  
 <img src="https://raw.githubusercontent.com/krijnrijshouwer/FramerWiki/master/icon-guide@2x.png" width="49px">
 
-[Learn](https://framer.com/getstarted/guide/) with our beginner guides. Which give you a basic overview of Framer Library, as well as a few simple pointers on how to set yourself up for success.
+[Learn with our beginner guides](https://framer.com/getstarted/guide/) which give you a basic overview of Framer Library, as well as a few simple pointers on how to set yourself up for success.
 <br /><br />
 
 <img src="https://raw.githubusercontent.com/krijnrijshouwer/FramerWiki/master/icon-community@2x.png" width="64px">
