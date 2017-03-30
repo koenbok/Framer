@@ -37,11 +37,12 @@ Framer is a design tool for the Mac which allows you to design without limitatio
  
 ![Guides](https://dsc.cloud/krijn/icon_guide/icon_guide.png)
 
-[Learn](https://framer.com/getstarted/guide/) Framer Library with our beginner guides.
+[Learn](https://framer.com/getstarted/guide/) with our beginner guides. Which give you a basic overview of Framer Library, as well as a few simple pointers on how to set yourself up for success.
+<br /><br />
 
 ![Community](https://dsc.cloud/krijn/community_icon/community_icon.png)
 
-[Join](https://www.facebook.com/groups/framerjs/) over 19.0000 designers in our community.
+[Become part of the community](https://framer.com/community/groups/) and join the Facebook Group or engage with members in your city. Over 19.000 designers, engineers and creators are waiting to meet you.
 
 <br /><br />
 
