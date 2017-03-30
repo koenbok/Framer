@@ -6,6 +6,7 @@ import * as utils from "Utils"
 
 import {Config} from "Config"
 import {Layer} from "Layer"
+import {Align} from "Align"
 import {Context} from "Context"
 import {Curve} from "Curve"
 import {print} from "Printer"
@@ -19,7 +20,7 @@ const gestures = new GestureEventRecognizer()
 import {TouchEmulator} from "TouchEmulator"
 const emulator = new TouchEmulator()
 
-export {lodash as _, utils, print, Config, Screen, Layer, Curve, Context, Animation, Events}
+export {lodash as _, utils, print, Config, Screen, Layer, Curve, Context, Animation, Events, Align}
 
 export const Framer = {
 	_: lodash,
@@ -28,7 +29,8 @@ export const Framer = {
 	Screen: Screen,
 	Layer: Layer,
 	Curve: Curve,
-	Context: Context
+	Context: Context,
+	Align: Align
 }
 
 Object.assign(window, Framer)

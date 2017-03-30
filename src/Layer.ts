@@ -3,7 +3,7 @@ import * as Types from "Types"
 import * as utils from "Utils"
 
 import {Renderable} from "Renderable"
-import {Screen} from "Screen"
+import {Screen, ScreenClass} from "Screen"
 import {Collection} from "Collection"
 import {Context, DefaultContext, CurrentContext} from "Context"
 import {Animation, AnimationEventTypes} from "Animation"
@@ -11,13 +11,14 @@ import {AnimationCurve} from "AnimationCurve"
 import {Curve} from "Curve"
 import {Color} from "Color"
 import {GestureEvent} from "GestureEventRecognizer"
+import {AlignInfo, AlignFunction} from "Align"
 
 export type LayerCallbackHandler = (this: Layer, event: GestureEvent) => void
 
 export interface LayerKeys {
 	ignoreEvents: boolean
-	x: number
-	y: number
+	x: number | AlignInfo
+	y: number | AlignInfo
 	z: number
 	width: number
 	height: number
@@ -43,7 +44,7 @@ export interface LayerOptions extends Partial<LayerKeys> {
 	right?: number
 	bottom?: number
 	left?: number
-	point?: Types.Point,
+	point?: Types.Point | AlignInfo,
 	size?: Types.Size,
 	frame?: Types.Frame,
 }
@@ -102,6 +103,16 @@ export type LayerEventTypes =
 	LayerEventUserTypes |
 	LayerGestureEventTypes |
 	AnimationEventTypes
+
+
+
+let layerPropertyPointTransformer = function(value: AlignFunction | number, layer: Layer, property: string): number | Types.Point {
+	if (_.isFunction(value)) {
+		return value(layer, property);
+	}
+	return value;
+};
+
 
 
 export class Layer extends Renderable<LayerEventTypes> {
@@ -194,24 +205,26 @@ export class Layer extends Renderable<LayerEventTypes> {
 		this.context.renderer.updateKeyStyle(this, "ignoreEvents", value)
 	}
 
-	get x() {
+	get x(): any {
 		return this._keys.x
 	}
 
-	set x(value) {
+	set x(value: any) {
 		if (!this._shouldChangeKey("x", value)) { return }
-		this._keys.x = value
+		let transformedValue = layerPropertyPointTransformer(value, this, "x")
+		this._keys.x = _.isNumber(transformedValue) ? transformedValue : transformedValue.x
 		this._didChangeKey("x", value)
 		this.context.renderer.updateKeyStyle(this, "x", value)
 	}
 
-	get y() {
+	get y(): any {
 		return this._keys.y
 	}
 
-	set y(value) {
+	set y(value: any) {
 		if (!this._shouldChangeKey("y", value)) { return }
-		this._keys.y = value
+		let transformedValue = layerPropertyPointTransformer(value, this, "y")
+		this._keys.y = _.isNumber(transformedValue) ? transformedValue : transformedValue.y
 		this._didChangeKey("y", value)
 		this.context.renderer.updateKeyStyle(this, "y", value)
 	}
@@ -250,7 +263,8 @@ export class Layer extends Renderable<LayerEventTypes> {
 	}
 
 	get point(): Types.Point {
-		return {x: this.x, y: this.y}
+		let a = this as Types.Point
+		return {x: a.x, y: a.y}
 	}
 
 	set point(point: Types.Point) {
@@ -278,36 +292,36 @@ export class Layer extends Renderable<LayerEventTypes> {
 		Object.assign(this, frame)
 	}
 
-	get minX() { return utils.frame.getMinX(this) }
-	set minX(value) { utils.frame.setMinX(this, value) }
+	get minX() { return utils.frame.getMinX(this as Types.Frame) }
+	set minX(value) { utils.frame.setMinX(this as Types.Frame, value) }
 
-	get midX() { return utils.frame.getMidX(this) }
-	set midX(value) { utils.frame.setMidX(this, value) }
+	get midX() { return utils.frame.getMidX(this as Types.Frame) }
+	set midX(value) { utils.frame.setMidX(this as Types.Frame, value) }
 
-	get maxX() { return utils.frame.getMaxX(this) }
-	set maxX(value) { utils.frame.setMaxX(this, value) }
+	get maxX() { return utils.frame.getMaxX(this as Types.Frame) }
+	set maxX(value) { utils.frame.setMaxX(this as Types.Frame, value) }
 
-	get minY() { return utils.frame.getMinY(this) }
-	set minY(value) { utils.frame.setMinY(this, value) }
+	get minY() { return utils.frame.getMinY(this as Types.Frame) }
+	set minY(value) { utils.frame.setMinY(this as Types.Frame, value) }
 
-	get midY() { return utils.frame.getMidY(this) }
-	set midY(value) { utils.frame.setMidY(this, value) }
+	get midY() { return utils.frame.getMidY(this as Types.Frame) }
+	set midY(value) { utils.frame.setMidY(this as Types.Frame, value) }
 
-	get maxY() { return utils.frame.getMaxY(this) }
-	set maxY(value) { utils.frame.setMaxY(this, value) }
+	get maxY() { return utils.frame.getMaxY(this as Types.Frame) }
+	set maxY(value) { utils.frame.setMaxY(this as Types.Frame, value) }
 
 
-	get top() { return utils.frame.getTop(this, this.parent ? this.parent : Screen) }
-	set top(value) { utils.frame.setTop(this, this.parent ? this.parent : Screen, value) }
+	get top() { return utils.frame.getTop(this as Types.Frame, this.parent ? this.parent as Types.Frame : Screen) }
+	set top(value) { utils.frame.setTop(this as Types.Frame, this.parent ? this.parent as Types.Frame : Screen , value) }
 
-	get right() { return utils.frame.getRight(this, this.parent ? this.parent : Screen) }
-	set right(value) { utils.frame.setRight(this, this.parent ? this.parent : Screen, value) }
+	get right() { return utils.frame.getRight(this as Types.Frame, this.parent ? this.parent as Types.Frame : Screen) }
+	set right(value) { utils.frame.setRight(this as Types.Frame, this.parent ? this.parent as Types.Frame : Screen, value) }
 
-	get bottom() { return utils.frame.getBottom(this, this.parent ? this.parent : Screen) }
-	set bottom(value) { utils.frame.setBottom(this, this.parent ? this.parent : Screen, value) }
+	get bottom() { return utils.frame.getBottom(this as Types.Frame, this.parent ? this.parent as Types.Frame : Screen) }
+	set bottom(value) { utils.frame.setBottom(this as Types.Frame, this.parent ? this.parent as Types.Frame : Screen, value) }
 
-	get left() { return utils.frame.getLeft(this, this.parent ? this.parent : Screen) }
-	set left(value) { utils.frame.setLeft(this, this.parent ? this.parent : Screen, value) }
+	get left() { return utils.frame.getLeft(this as Types.Frame, this.parent ? this.parent as Types.Frame : Screen) }
+	set left(value) { utils.frame.setLeft(this as Types.Frame, this.parent ? this.parent as Types.Frame : Screen, value) }
 
 
 	get backgroundColor() {
