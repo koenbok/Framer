@@ -307,7 +307,7 @@ class exports.DeviceComponent extends BaseClass
 		if /PhantomJS/.test(navigator.userAgent)
 			return
 
-		if @_shouldRenderFullScreen()
+		if @_shouldRenderFullScreen() || not @showBezel
 			@phone.image  = ""
 			@hands.image  = ""
 		else if not @_deviceImageUrl(@_deviceImageName())
@@ -361,6 +361,13 @@ class exports.DeviceComponent extends BaseClass
 
 		return "#{resourceUrl}/#{name}"
 
+	@define "showBezel",
+		get: ->
+			return @_showBezel ? true
+		set: (showBezel) ->
+			@_showBezel = showBezel
+			@_update()
+
 	###########################################################################
 	# DEVICE ZOOM
 
@@ -406,18 +413,23 @@ class exports.DeviceComponent extends BaseClass
 	_calculatePhoneScale: ->
 
 		# Calculates a phone scale that fits the screen unless a fixed value is set
+		dimension = if @showBezel then @phone else @screen
 
-		[width, height] = @_getOrientationDimensions(@phone.width, @phone.height)
+		[width, height] = @_getOrientationDimensions(dimension.width, dimension.height)
 
-		paddingOffset = @_device?.paddingOffset or 0
+		if @showBezel
+			paddingOffset = @_device?.paddingOffset or 0
+			padding = (@padding + paddingOffset) * 2
+		else
+			padding = 0
 
 		phoneScale = _.min([
-			(window.innerWidth  - ((@padding + paddingOffset) * 2)) / width,
-			(window.innerHeight - ((@padding + paddingOffset) * 2)) / height
+			(window.innerWidth  - padding) / width,
+			(window.innerHeight - padding) / height
 		])
 
 		# Never scale the phone beyond 100%
-		phoneScale = 1 if phoneScale > 1
+		phoneScale = 1 if phoneScale > 1 and @showBezel
 
 		@emit("change:phoneScale", phoneScale)
 
@@ -567,7 +579,7 @@ class exports.DeviceComponent extends BaseClass
 	# HANDS
 
 	handSwitchingSupported: ->
-		return @_device.hands isnt undefined
+		return @_device.hands isnt undefined and @showBezel
 
 	nextHand: ->
 		return if @hands.rotationZ isnt 0
