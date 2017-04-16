@@ -170,3 +170,30 @@ describe "DeviceComponent", ->
 				else
 					# Exceptions
 					assert(key in ["fullscreen", "custom", "sony-w85Oc", "test"], "#{key} should have a platform specified")
+
+	describe "when not showing bezel", ->
+		it "the background color should follow the screen color", ->
+			Canvas.backgroundColor = "red"
+			Framer.Device.screen.backgroundColor = "green"
+			Framer.Device.showBezel = false
+			Canvas.backgroundColor.toName().should.eql "green"
+			Framer.Device.screen.backgroundColor = "blue"
+			Canvas.backgroundColor.toName().should.equal "blue"
+
+		it "should keep track of background changes", ->
+			Canvas.backgroundColor = "red"
+			Framer.Device.screen.backgroundColor = "green"
+			Framer.Device.showBezel = false
+			Canvas.backgroundColor = "blue"
+			Canvas.backgroundColor.toName().should.equal "green"
+			Framer.Device.showBezel = true
+			Canvas.backgroundColor.toName().should.equal "blue"
+
+	describe "when showing bezel", ->
+		it "should revert to the background color before disabling the bezel", ->
+			Canvas.backgroundColor = "red"
+			Framer.Device.screen.backgroundColor = "green"
+			Framer.Device.showBezel = false
+			Canvas.backgroundColor.toName().should.eql "green"
+			Framer.Device.showBezel = true
+			Canvas.backgroundColor.toName().should.equal "red"

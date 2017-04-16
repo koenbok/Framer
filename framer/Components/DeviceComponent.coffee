@@ -366,6 +366,19 @@ class exports.DeviceComponent extends BaseClass
 			return @_showBezel ? true
 		set: (showBezel) ->
 			@_showBezel = showBezel
+			if @_showBezel
+				@screen.off "change:backgroundColor"
+				@background.off "change:backgroundColor"
+				if @_previousBackgroundColor?
+					@background.backgroundColor = @_previousBackgroundColor
+			else
+				@_previousBackgroundColor = @background.backgroundColor
+				@background.backgroundColor = @screen.backgroundColor
+				@screen.on "change:backgroundColor", (color) =>
+					@background.backgroundColor = color
+				@background.on "change:backgroundColor", (color) =>
+					@_previousBackgroundColor = color
+					@background.backgroundColor = @screen.backgroundColor
 			@_update()
 
 	###########################################################################
