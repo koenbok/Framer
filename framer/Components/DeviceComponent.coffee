@@ -307,7 +307,7 @@ class exports.DeviceComponent extends BaseClass
 		if /PhantomJS/.test(navigator.userAgent)
 			return
 
-		if @_shouldRenderFullScreen() || not @showBezel
+		if @_shouldRenderFullScreen() or not @showBezel
 			@phone.image  = ""
 			@hands.image  = ""
 		else if not @_deviceImageUrl(@_deviceImageName())
