@@ -673,7 +673,14 @@ Utils.loadImage = (url, callback, context) ->
 	element.src = url
 
 Utils.isInsideIframe = ->
-	return window isnt window.top
+	return window isnt window.top unless Utils.isInsideFramerCloud()
+	return false
+
+Utils.isInsideFramerCloud = ->
+	return Utils.getQueryParameters()["cloud"] is "1"
+
+Utils.getQueryParameters = ->
+	return _.fromPairs window.location.search.slice(1).split('&').map((val) -> val.split('='))
 
 ######################################################
 # GEOMETRY FUNCTIONS
