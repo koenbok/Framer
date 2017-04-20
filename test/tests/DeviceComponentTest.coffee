@@ -175,7 +175,7 @@ describe "DeviceComponent", ->
 		it "the background color should follow the screen color", ->
 			Canvas.backgroundColor = "red"
 			Framer.Device.screen.backgroundColor = "green"
-			Framer.Device.showBezel = false
+			Framer.Device.hideBezel = true
 			Canvas.backgroundColor.toName().should.eql "green"
 			Framer.Device.screen.backgroundColor = "blue"
 			Canvas.backgroundColor.toName().should.equal "blue"
@@ -183,17 +183,17 @@ describe "DeviceComponent", ->
 		it "should keep track of background changes", ->
 			Canvas.backgroundColor = "red"
 			Framer.Device.screen.backgroundColor = "green"
-			Framer.Device.showBezel = false
+			Framer.Device.hideBezel = true
 			Canvas.backgroundColor = "blue"
 			Canvas.backgroundColor.toName().should.equal "green"
-			Framer.Device.showBezel = true
+			Framer.Device.hideBezel = false
 			Canvas.backgroundColor.toName().should.equal "blue"
 
 	describe "when showing bezel", ->
 		it "should revert to the background color before disabling the bezel", ->
 			Canvas.backgroundColor = "red"
 			Framer.Device.screen.backgroundColor = "green"
-			Framer.Device.showBezel = false
+			Framer.Device.hideBezel = true
 			Canvas.backgroundColor.toName().should.eql "green"
-			Framer.Device.showBezel = true
+			Framer.Device.hideBezel = false
 			Canvas.backgroundColor.toName().should.equal "red"

@@ -307,7 +307,7 @@ class exports.DeviceComponent extends BaseClass
 		if /PhantomJS/.test(navigator.userAgent)
 			return
 
-		if @_shouldRenderFullScreen() or not @showBezel
+		if @_shouldRenderFullScreen() or @hideBezel
 			@phone.image  = ""
 			@hands.image  = ""
 		else if not @_deviceImageUrl(@_deviceImageName())
@@ -361,17 +361,12 @@ class exports.DeviceComponent extends BaseClass
 
 		return "#{resourceUrl}/#{name}"
 
-	@define "showBezel",
+	@define "hideBezel",
 		get: ->
-			return @_showBezel ? true
-		set: (showBezel) ->
-			@_showBezel = showBezel
-			if @_showBezel
-				@screen.off "change:backgroundColor"
-				@background.off "change:backgroundColor"
-				if @_previousBackgroundColor?
-					@background.backgroundColor = @_previousBackgroundColor
-			else
+			return @_hideBezel ? false
+		set: (hideBezel) ->
+			@_hideBezel = hideBezel
+			if @_hideBezel
 				@_previousBackgroundColor = @background.backgroundColor
 				@background.backgroundColor = @screen.backgroundColor
 				@screen.on "change:backgroundColor", (color) =>
@@ -379,6 +374,12 @@ class exports.DeviceComponent extends BaseClass
 				@background.on "change:backgroundColor", (color) =>
 					@_previousBackgroundColor = color
 					@background.backgroundColor = @screen.backgroundColor
+			else
+				@screen.off "change:backgroundColor"
+				@background.off "change:backgroundColor"
+				if @_previousBackgroundColor?
+					@background.backgroundColor = @_previousBackgroundColor
+
 			@_update()
 
 	###########################################################################
@@ -426,15 +427,15 @@ class exports.DeviceComponent extends BaseClass
 	_calculatePhoneScale: ->
 
 		# Calculates a phone scale that fits the screen unless a fixed value is set
-		dimension = if @showBezel then @phone else @screen
+		dimension = if @hideBezel then @screen else @phone
 
 		[width, height] = @_getOrientationDimensions(dimension.width, dimension.height)
 
-		if @showBezel
+		if @hideBezel
+			padding = 0
+		else
 			paddingOffset = @_device?.paddingOffset or 0
 			padding = (@padding + paddingOffset) * 2
-		else
-			padding = 0
 
 		phoneScale = _.min([
 			(window.innerWidth  - padding) / width,
@@ -442,7 +443,7 @@ class exports.DeviceComponent extends BaseClass
 		])
 
 		# Never scale the phone beyond 100%
-		phoneScale = 1 if phoneScale > 1 and @showBezel
+		phoneScale = 1 if phoneScale > 1 and not @hideBezel
 
 		@emit("change:phoneScale", phoneScale)
 
@@ -592,7 +593,7 @@ class exports.DeviceComponent extends BaseClass
 	# HANDS
 
 	handSwitchingSupported: ->
-		return @_device.hands isnt undefined and @showBezel
+		return @_device.hands isnt undefined and not @hideBezel
 
 	nextHand: ->
 		return if @hands.rotationZ isnt 0
