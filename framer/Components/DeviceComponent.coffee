@@ -75,6 +75,7 @@ class exports.DeviceComponent extends BaseClass
 		@background.clip = true
 		@background.backgroundColor = "transparent"
 		@background.classList.add("DeviceBackground")
+		@_previousBackgroundColor = @background.backgroundColor
 
 		@hands    = new Layer
 		@handsImageLayer = new Layer parent: @hands
@@ -370,7 +371,10 @@ class exports.DeviceComponent extends BaseClass
 				@_previousBackgroundColor = @background.backgroundColor
 				@background.backgroundColor = @screen.backgroundColor
 				@screen.on "change:backgroundColor", (color) =>
+					# Hacky way to keep the prev backgroundColor
+					prev = @_previousBackgroundColor
 					@background.backgroundColor = color
+					@_previousBackgroundColor = prev
 				@background.on "change:backgroundColor", (color) =>
 					@_previousBackgroundColor = color
 					@background.backgroundColor = @screen.backgroundColor
