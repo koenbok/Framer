@@ -389,8 +389,8 @@ class exports.DeviceComponent extends BaseClass
 					@background.backgroundColor = color
 					@_previousBackgroundColor = prev
 				@background.on "change:backgroundColor", (color) =>
-					@_previousBackgroundColor = color
 					@background.backgroundColor = @screen.backgroundColor
+					@_previousBackgroundColor = color
 			else
 				@screen.off "change:backgroundColor"
 				@background.off "change:backgroundColor"
