@@ -481,6 +481,7 @@ class exports.DeviceComponent extends BaseClass
 
 		return phoneScale
 
+
 	###########################################################################
 	# CONTENT SCALE
 
