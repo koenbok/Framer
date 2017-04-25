@@ -39,6 +39,16 @@ Events.DeviceFullScreenDidChange
 # 	DeviceContentScaleDidChange: "change:contentScale"
 # 	DeviceFullScreenDidChange: ""
 
+centerLayer = (layer) ->
+	frame = layer.frame
+	if layer.parent
+		Utils.frameSetMidX(frame, (layer.parent.width  / 2.0) - layer.parent.borderWidth)
+		Utils.frameSetMidY(frame, (layer.parent.height / 2.0) - layer.parent.borderWidth)
+	else
+		Utils.frameSetMidX(frame, layer._context.width  / 2.0)
+		Utils.frameSetMidY(frame, layer._context.height / 2.0)
+	layer.frame = frame
+
 class exports.DeviceComponent extends BaseClass
 
 	@define "context", get: -> @_context
@@ -77,16 +87,19 @@ class exports.DeviceComponent extends BaseClass
 		@background.classList.add("DeviceBackground")
 		@_previousBackgroundColor = @background.backgroundColor
 
-		@hands    = new Layer
-		@handsImageLayer = new Layer parent: @hands
-		@phone    = new Layer parent: @hands
-		@screen   = new Layer parent: @phone
-		@viewport = new Layer parent: @screen
-		@content  = new Layer parent: @viewport
+		@hands    = new Layer name: "hands"
+		@handsImageLayer = new Layer parent: @hands, name: "handsImage"
+		@phone    = new Layer parent: @hands, name: "phone"
+		@screen   = new Layer parent: @phone, name: "phone"
+		@viewport = new Layer parent: @screen, name: "screen"
+		@content  = new Layer parent: @viewport, name: "viewport"
+
+		@content.classList.add("DeviceContent")
 
 		@hands.backgroundColor = "transparent"
 		@hands._alwaysUseImageCache = true
 		@handsImageLayer.backgroundColor = "transparent"
+		@hands.classList.add("DeviceHands")
 
 		@phone.backgroundColor = "transparent"
 		@phone.classList.add("DevicePhone")
@@ -144,8 +157,8 @@ class exports.DeviceComponent extends BaseClass
 
 			@_updateDeviceImage()
 			@hands.scale = @_calculatePhoneScale()
-			@hands.center()
-			@phone.center()
+			centerLayer(@hands)
+			centerLayer(@phone)
 
 			[width, height] = @_getOrientationDimensions(
 				@_device.screenWidth / contentScaleFactor,
@@ -156,7 +169,7 @@ class exports.DeviceComponent extends BaseClass
 
 			@content.width  = width
 			@content.height = height
-			@screen.center()
+			centerLayer(@screen)
 
 			@setHand(@selectedHand) if @selectedHand and @_orientation is 0
 
@@ -423,7 +436,7 @@ class exports.DeviceComponent extends BaseClass
 				properties: {scale: phoneScale}
 		else
 			@hands.scale = phoneScale
-			@hands.center()
+			centerLayer(@hands)
 
 		@emit("change:deviceScale")
 
@@ -446,11 +459,23 @@ class exports.DeviceComponent extends BaseClass
 			(window.innerHeight - padding) / height
 		])
 
+		# Pixel crack trick. If the device is not 0, 0.5, 1 etc, we scale it up by
+		# one extra pixel to always avoid pixel cracks. This means that the coordinates
+		# are a off by a little bit if it's not at a "true" size, but you won't see that
+		# anyway id the scaling is some wird number.
+
+		if phoneScale % 0.5 > 0
+			phoneScale = _.min([
+				(window.innerWidth  - padding) / (width - 1),
+				(window.innerHeight - padding) / (height - 1)
+			])
+
 		# Never scale the phone beyond 100%
 		phoneScale = 1 if phoneScale > 1 and not @hideBezel
 
 		@emit("change:phoneScale", phoneScale)
 
+		# If the device has a set scale we use that one
 		if @_deviceScale and @_deviceScale isnt "fit"
 			return @_deviceScale
 
@@ -620,8 +645,8 @@ class exports.DeviceComponent extends BaseClass
 		if handData
 			@hands.width = handData.width
 			@hands.height = handData.height
-			@hands.center()
-			@phone.center()
+			centerLayer(@hands)
+			centerLayer(@phone)
 			@handsImageLayer.size = @hands.size
 			@handsImageLayer.y = 0
 			@handsImageLayer.y = handData.offset if handData.offset
