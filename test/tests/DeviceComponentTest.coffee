@@ -172,6 +172,10 @@ describe "DeviceComponent", ->
 					assert(key in ["fullscreen", "custom", "sony-w85Oc", "test"], "#{key} should have a platform specified")
 
 	describe "when not showing bezel", ->
+		before ->
+			Utils.isFramerStudio = ->
+				return true
+
 		it "the background color should follow the screen color", ->
 			Canvas.backgroundColor = "red"
 			Framer.Device.screen.backgroundColor = "green"

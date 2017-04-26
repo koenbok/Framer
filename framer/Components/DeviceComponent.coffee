@@ -377,8 +377,10 @@ class exports.DeviceComponent extends BaseClass
 
 	@define "hideBezel",
 		get: ->
-			return (@_hideBezel ? false) and Utils.isFramerStudio()
+			return false if not Utils.isFramerStudio()
+			return (@_hideBezel ? false)
 		set: (hideBezel) ->
+			return if not Utils.isFramerStudio()
 			@_hideBezel = hideBezel
 			if @_hideBezel
 				@_previousBackgroundColor = @background.backgroundColor
