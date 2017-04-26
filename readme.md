@@ -21,7 +21,7 @@ Framer is a design tool for the Mac which allows you to design without limitatio
 [Find out more](http://framer.com/?utm_source=GitHub%2C%20framerjs%2C%20readme&utm_medium=Github)
 <br /><br />
 
-![Framer for Mac](https://raw.githubusercontent.com/krijnrijshouwer/FramerWiki/master/framerapp@2x.png)
+![Framer for Mac](https://cloud.githubusercontent.com/assets/22095598/25440706/80c8f666-2aa0-11e7-96d9-14c318a0067e.png)
 <br /><br />
 
 ## Set up Framer Library
