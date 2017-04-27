@@ -9,9 +9,9 @@ class MIDIInput extends BaseClass
 		get: -> @_inputs?.length or @_request
 		set: (value) ->
 			return unless value isnt @enabled
-			return @_requestRejected() if not navigator.requestMIDIAccess
+			return @_requestRejected() if not window.parent.navigator.requestMIDIAccess
 			if value
-				@_request = navigator.requestMIDIAccess().then @_requestResolved, @_requestRejected
+				@_request = window.parent.navigator.requestMIDIAccess().then @_requestResolved, @_requestRejected
 			else
 				@_inputs?.map close
 				@_request = null
