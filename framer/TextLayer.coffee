@@ -54,9 +54,18 @@ class exports.TextLayer extends Layer
 		@explicitWidth = options.width?
 		@explicitHeight = options.height?
 
+		if options.size?
+			@explicitWidth = options.size.width?
+			@explicitHeight = options.size.height?
+
+		if options.frame?
+			@explicitWidth = options.frame.width?
+			@explicitHeight = options.frame.height?
+
 		super options
 
 		@font ?= @fontFamily
+
 		# Set padding
 		@padding = options.padding or Utils.rectZero()
 
@@ -90,7 +99,7 @@ class exports.TextLayer extends Layer
 		if @explicitWidth
 			constraints.width = @width
 		else
-			constraints.width = if @parent? then @parent.width - borderOffset - parentBorder - @padding.left - @padding.right else Screen.width
+			constraints.width = if @parent? then @parent.width - borderOffset - parentBorder - @padding.left - @padding.right else Screen.width - @padding.left - @padding.right
 		style = _.pick @style, @constructor._textProperties
 		size = Utils.textSize(@text, style, constraints)
 		newWidth = Math.ceil(size.width)
