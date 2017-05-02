@@ -18,15 +18,6 @@ resizeFrame = (scale, frame) ->
 
 	return result
 
-getScaleFromName = (str) ->
-
-	re = /@([\d]+|[\d]+.[\d]+)x/
-	m = undefined
-	if (m = re.exec(str)) isnt null
-		return parseFloat(m[1]) if m[1]
-
-	return null
-
 startsWithNumber = (str) ->
 	return (new RegExp("^[0-9]")).test(str)
 
@@ -214,7 +205,6 @@ class exports.Importer
 
 exports.Importer.load = (path, scale) ->
 
-	scale ?= getScaleFromName(path)
 	scale ?= 1
 
 	importer = new exports.Importer(path, scale)

@@ -276,9 +276,9 @@ describe "Layer", ->
 			layer.style["background-image"].indexOf("data:").should.not.equal(-1)
 			layer.style["background-image"].indexOf("?nocache=").should.equal(-1)
 
-		
+
 		it "should append nocache with an ampersand if url params already exist", (done) ->
-			
+
 			prefix = "../"
 			imagePath = "static/test.png?param=foo"
 			fullPath = prefix + imagePath
@@ -1316,3 +1316,24 @@ describe "Layer", ->
 
 			canvasToLayerBPoint.x.should.equal -25
 			canvasToLayerBPoint.y.should.equal 125
+	describe "Device Pixel Ratio", ->
+		it "should default to 1", ->
+			a = new Layer
+			a._devicePixelRatio.should.equal 1
+
+		it "should change all of a layers children", ->
+			a = new Layer
+			b = new Layer
+				parent: a
+			c = new Layer
+				parent: b
+			a._devicePixelRatio = 3
+			for l in [a, b, c]
+				l._devicePixelRatio.should.equal 3
+
+		it "should take the dpr when changing parent", ->
+			a = new Layer
+			b = new Layer
+			a._devicePixelRatio = 2
+			b.parent = a
+			b._devicePixelRatio.should.equal 2

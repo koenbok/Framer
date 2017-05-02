@@ -41,6 +41,14 @@ class exports.Context extends BaseClass
 
 	@define "element", get: -> @_element
 
+	@define "devicePixelRatio", @simpleProperty("devicePixelRatio", 1,
+		set: (value) ->
+			@_setPropertyValue(name, value)
+			print l._devicePixelRatio
+			for l in @_layers
+				l._devicePixelRatio = @devicePixelRatio
+	)
+
 	constructor: (options={}) ->
 
 		options = Defaults.getDefaults("Context", options)
@@ -101,6 +109,7 @@ class exports.Context extends BaseClass
 
 	addLayer: (layer) ->
 		return if layer in @_layers
+		layer._devicePixelRatio = @devicePixelRatio
 		@_layerCounter++
 		@_layers.push(layer)
 

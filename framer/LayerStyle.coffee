@@ -34,10 +34,10 @@ _Force2DProperties =
 exports.LayerStyle =
 
 	width: (layer) ->
-		layer._properties.width + "px"
+		(layer._properties.width * layer._devicePixelRatio) + "px"
 
 	height: (layer) ->
-		layer._properties.height + "px"
+		(layer._properties.height * layer._devicePixelRatio) + "px"
 
 	display: (layer) ->
 		if layer._properties.visible is true
@@ -105,10 +105,11 @@ exports.LayerStyle =
 
 		if layer._prefer2d or layer._properties.force2d
 			return exports.LayerStyle.webkitTransformForce2d(layer)
+		dpr = layer._devicePixelRatio
 		"
 		translate3d(
-			#{roundToZero(layer._properties.x)}px,
-			#{roundToZero(layer._properties.y)}px,
+			#{roundToZero(layer._properties.x * dpr)}px,
+			#{roundToZero(layer._properties.y * dpr)}px,
 			#{roundToZero(layer._properties.z)}px)
 		scale3d(
 			#{roundToZero(layer._properties.scaleX * layer._properties.scale)},
@@ -135,7 +136,8 @@ exports.LayerStyle =
 			if layer._properties[p] isnt v
 				console.warn "Layer property '#{p}'' will be ignored with force2d enabled"
 
-		css.push "translate(#{roundToZero(layer._properties.x)}px,#{roundToZero(layer._properties.y)}px)"
+		dpr = layer._devicePixelRatio
+		css.push "translate(#{roundToZero(layer._properties.x * dpr)}px,#{roundToZero(layer._properties.y * dpr)}px)"
 		css.push "scale(#{roundToZero(layer._properties.scale)})"
 		css.push "skew(#{roundToZero(layer._properties.skew)}deg,#{roundToZero(layer._properties.skew)}deg)"
 		css.push "rotate(#{roundToZero(layer._properties.rotationZ)}deg)"
@@ -166,7 +168,7 @@ exports.LayerStyle =
 		else if props.shadowX is 0 and props.shadowY is 0 and props.shadowBlur is 0 and props.shadowSpread is 0
 			return ""
 
-		return "#{layer._properties.shadowX}px #{layer._properties.shadowY}px #{layer._properties.shadowBlur}px #{layer._properties.shadowSpread}px #{layer._properties.shadowColor}"
+		return "#{layer._properties.shadowX * layer._devicePixelRatio}px #{layer._properties.shadowY * layer._devicePixelRatio}px #{layer._properties.shadowBlur * layer._devicePixelRatio}px #{layer._properties.shadowSpread * layer._devicePixelRatio}px #{layer._properties.shadowColor}"
 
 	textShadow: (layer) ->
 
@@ -177,7 +179,7 @@ exports.LayerStyle =
 		else if props.shadowX is 0 and props.shadowY is 0 and props.shadowBlur is 0 and props.shadowSpread is 0
 			return ""
 
-		return "#{layer._properties.shadowX}px #{layer._properties.shadowY}px #{layer._properties.shadowBlur}px #{layer._properties.shadowColor}"
+		return "#{layer._properties.shadowX * layer._devicePixelRatio}px #{layer._properties.shadowY * layer._devicePixelRatio}px #{layer._properties.shadowBlur * layer._devicePixelRatio}px #{layer._properties.shadowColor}"
 
 	backgroundColor: (layer) ->
 		return layer._properties.backgroundColor
@@ -190,23 +192,22 @@ exports.LayerStyle =
 		# Compatibility fix, remove later
 		if not _.isNumber(layer._properties.borderRadius)
 			return layer._properties.borderRadius
-
-		return layer._properties.borderRadius + "px"
+		return (layer._properties.borderRadius * layer._devicePixelRatio) + "px"
 
 	border: (layer) ->
-		return "#{layer._properties.borderWidth}px solid #{layer._properties.borderColor}"
+		return "#{layer._properties.borderWidth * layer._devicePixelRatio}px solid #{layer._properties.borderColor}"
 
 	fontSize: (layer) ->
-		return layer._properties.fontSize + "px"
+		return (layer._properties.fontSize * layer._devicePixelRatio) + "px"
 
 	letterSpacing: (layer) ->
-		return layer._properties.letterSpacing + "px"
+		return (layer._properties.letterSpacing * layer._devicePixelRatio) + "px"
 
 	wordSpacing: (layer) ->
-		return layer._properties.wordSpacing + "px"
+		return (layer._properties.wordSpacing * layer._devicePixelRatio) + "px"
 
 	textIndent: (layer) ->
-		return layer._properties.textIndent + "px"
+		return (layer._properties.textIndent * layer._devicePixelRatio) + "px"
 
 	textAlign: (layer) ->
 		value = layer._properties.textAlign

@@ -146,6 +146,8 @@ class exports.DeviceComponent extends BaseClass
 				layer.scale = 1
 
 			@content.scale = contentScaleFactor
+			if @deviceType isnt "fullscreen" or Utils.isMobile()
+				@_context.devicePixelRatio = window.devicePixelRatio
 
 		else
 			backgroundOverlap = 100
@@ -172,6 +174,7 @@ class exports.DeviceComponent extends BaseClass
 			centerLayer(@screen)
 
 			@setHand(@selectedHand) if @selectedHand and @_orientation is 0
+			@_context.devicePixelRatio = @_device.devicePixelRatio ? 1
 
 	_shouldRenderFullScreen: ->
 
@@ -254,16 +257,18 @@ class exports.DeviceComponent extends BaseClass
 		get: ->
 
 			if @_shouldRenderFullScreen()
-				return Canvas.size
-
-			if @isLandscape
-				return size =
+				size = Canvas.size
+			else if @isLandscape
+				size =
 					width: @_device.screenHeight
 					height: @_device.screenWidth
 			else
-				return size =
+				size =
 					width: @_device.screenWidth
 					height: @_device.screenHeight
+			size.width /= @_context.devicePixelRatio
+			size.height /= @_context.devicePixelRatio
+			return size
 
 	###########################################################################
 	# DEVICE TYPE
@@ -694,6 +699,7 @@ iPadAir2BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1536
 	screenHeight: 2048
+	devicePixelRatio: 2
 	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
 
@@ -703,6 +709,7 @@ iPadMini4BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1536
 	screenHeight: 2048
+	devicePixelRatio: 2
 	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
 
@@ -712,6 +719,7 @@ iPadProBaseDevice =
 	deviceImageCompression: true
 	screenWidth: 2048
 	screenHeight: 2732
+	devicePixelRatio: 2
 	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
 
@@ -721,6 +729,7 @@ iPhone7BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 750
 	screenHeight: 1334
+	devicePixelRatio: 2
 	deviceType: "phone"
 	minStudioVersion: 71
 	hands:
@@ -737,6 +746,7 @@ iPhone7PlusBaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1242
 	screenHeight: 2208
+	devicePixelRatio: 3
 	deviceType: "phone"
 	minStudioVersion: 71
 	hands:
@@ -753,6 +763,7 @@ iPhone6BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 750
 	screenHeight: 1334
+	devicePixelRatio: 2
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
 	hands:
@@ -769,6 +780,7 @@ iPhone6PlusBaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1242
 	screenHeight: 2208
+	devicePixelRatio: 3
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
 	hands:
@@ -785,6 +797,7 @@ iPhone5BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 640
 	screenHeight: 1136
+	devicePixelRatio: 2
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
 	hands:
@@ -803,6 +816,7 @@ iPhone5CBaseDevice =
 	deviceImageCompression: true
 	screenWidth: 640
 	screenHeight: 1136
+	devicePixelRatio: 2
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
 	hands:
@@ -821,6 +835,7 @@ Nexus4BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 768
 	screenHeight: 1280
+	devicePixelRatio: 2
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
 	hands:
@@ -839,6 +854,7 @@ Nexus5BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1080
 	screenHeight: 1920
+	devicePixelRatio: 3
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
 	hands:
@@ -857,6 +873,7 @@ Nexus6BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1440
 	screenHeight: 2560
+	devicePixelRatio: 3.5
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
 	hands:
@@ -875,6 +892,7 @@ PixelBaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1080
 	screenHeight: 1920
+	devicePixelRatio: 1
 	deviceType: "phone"
 	minStudioVersion: googlePixelReleaseVersion
 	hands:
@@ -893,6 +911,7 @@ Nexus9BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1536
 	screenHeight: 2048
+	devicePixelRatio: 2
 	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
 
@@ -902,6 +921,7 @@ HTCa9BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1080
 	screenHeight: 1920
+	devicePixelRatio: 3
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
 	hands:
@@ -920,6 +940,7 @@ HTCm8BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1080
 	screenHeight: 1920
+	devicePixelRatio: 3
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
 	hands:
@@ -938,6 +959,7 @@ MSFTLumia950BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1440
 	screenHeight: 2560
+	devicePixelRatio: 4
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
 	hands:
@@ -956,6 +978,7 @@ SamsungGalaxyNote5BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1440
 	screenHeight: 2560
+	devicePixelRatio: 4
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
 	hands:
@@ -974,6 +997,7 @@ AppleWatchSeries242Device =
 	deviceImageCompression: true
 	screenWidth: 312
 	screenHeight: 390
+	devicePixelRatio: 2
 	minStudioVersion: 71
 
 AppleWatchSeries238Device =
@@ -982,6 +1006,7 @@ AppleWatchSeries238Device =
 	deviceImageCompression: true
 	screenWidth: 272
 	screenHeight: 340
+	devicePixelRatio: 2
 	minStudioVersion: 71
 
 AppleWatch42Device =
@@ -990,6 +1015,7 @@ AppleWatch42Device =
 	deviceImageCompression: true
 	screenWidth: 312
 	screenHeight: 390
+	devicePixelRatio: 2
 	minStudioVersion: newDeviceMinVersion
 
 AppleWatch38Device =
@@ -998,6 +1024,7 @@ AppleWatch38Device =
 	deviceImageCompression: true
 	screenWidth: 272
 	screenHeight: 340
+	devicePixelRatio: 2
 	minStudioVersion: newDeviceMinVersion
 
 AppleWatch38BlackLeatherDevice =
@@ -1006,6 +1033,7 @@ AppleWatch38BlackLeatherDevice =
 	deviceImageCompression: true
 	screenWidth: 272
 	screenHeight: 340
+	devicePixelRatio: 2
 	minStudioVersion: newDeviceMinVersion
 
 AppleMacBook =
@@ -1014,6 +1042,7 @@ AppleMacBook =
 	deviceImageCompression: true
 	screenWidth: 2304
 	screenHeight: 1440
+	devicePixelRatio: 2
 	deviceType: "computer"
 	minStudioVersion: desktopReleaseVersion
 
@@ -1023,6 +1052,7 @@ AppleMacBookAir =
 	deviceImageCompression: true
 	screenWidth: 1440
 	screenHeight: 900
+	devicePixelRatio: 1
 	deviceType: "computer"
 	minStudioVersion: desktopReleaseVersion
 
@@ -1032,15 +1062,17 @@ AppleMacBookPro =
 	deviceImageCompression: true
 	screenWidth: 2880
 	screenHeight: 1800
+	devicePixelRatio: 2
 	deviceType: "computer"
 	minStudioVersion: desktopReleaseVersion
 
 AppleIMac =
-	deviceImageWidth: 2800
-	deviceImageHeight: 2940
+	deviceImageWidth: 5600
+	deviceImageHeight: 5880
 	deviceImageCompression: true
-	screenWidth: 2560
-	screenHeight: 1440
+	screenWidth: 5120
+	screenHeight: 2880
+	devicePixelRatio: 2
 	deviceType: "computer"
 	minStudioVersion: desktopReleaseVersion
 
@@ -1050,6 +1082,7 @@ DellXPS =
 	deviceImageCompression: true
 	screenWidth: 3840
 	screenHeight: 2160
+	devicePixelRatio: 2
 	deviceType: "computer"
 	minStudioVersion: desktopReleaseVersion
 
@@ -1059,6 +1092,7 @@ SonyW85OC =
 	deviceImageCompression: true
 	screenWidth: 1280
 	screenHeight: 720
+	devicePixelRatio: 1
 	minStudioVersion: desktopReleaseVersion
 
 ###########################################################################
@@ -1070,6 +1104,7 @@ old_iPhone6BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 750
 	screenHeight: 1334
+	devicePixelRatio: 2
 	deviceType: "phone"
 	maxStudioVersion: oldDeviceMaxVersion
 
@@ -1086,6 +1121,7 @@ old_iPhone6PlusBaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1242
 	screenHeight: 2208
+	devicePixelRatio: 3
 	deviceType: "phone"
 	maxStudioVersion: oldDeviceMaxVersion
 
@@ -1102,6 +1138,7 @@ old_iPhone5BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 640
 	screenHeight: 1136
+	devicePixelRatio: 2
 	deviceType: "phone"
 	maxStudioVersion: oldDeviceMaxVersion
 
@@ -1118,6 +1155,7 @@ old_iPhone5CBaseDevice =
 	deviceImageCompression: true
 	screenWidth: 640
 	screenHeight: 1136
+	devicePixelRatio: 2
 	deviceType: "phone"
 	maxStudioVersion: oldDeviceMaxVersion
 
@@ -1134,6 +1172,7 @@ old_iPadMiniBaseDevice =
 	deviceImageCompression: true
 	screenWidth: 768
 	screenHeight: 1024
+	devicePixelRatio: 1
 	deviceType: "tablet"
 	maxStudioVersion: oldDeviceMaxVersion
 
@@ -1150,6 +1189,7 @@ old_iPadAirBaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1536
 	screenHeight: 2048
+	devicePixelRatio: 2
 	deviceType: "tablet"
 	maxStudioVersion: oldDeviceMaxVersion
 
@@ -1166,6 +1206,7 @@ old_Nexus5BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1080
 	screenHeight: 1920
+	devicePixelRatio: 3
 	deviceType: "phone"
 	maxStudioVersion: oldDeviceMaxVersion
 
@@ -1182,6 +1223,7 @@ old_Nexus9BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1536
 	screenHeight: 2048
+	devicePixelRatio: 2
 	deviceType: "tablet"
 	maxStudioVersion: oldDeviceMaxVersion
 
@@ -1191,6 +1233,7 @@ old_AppleWatch42Device =
 	deviceImageCompression: true
 	screenWidth: 312
 	screenHeight: 390
+	devicePixelRatio: 2
 	maxStudioVersion: oldDeviceMaxVersion
 
 old_AppleWatch38Device =
@@ -1199,6 +1242,7 @@ old_AppleWatch38Device =
 	deviceImageCompression: true
 	screenWidth: 272
 	screenHeight: 340
+	devicePixelRatio: 2
 	maxStudioVersion: oldDeviceMaxVersion
 
 Devices =
@@ -1214,6 +1258,7 @@ Devices =
 		deviceImageHeight: 1792
 		screenWidth: 750
 		screenHeight: 1334
+		devicePixelRatio: 2
 		deviceType: "phone"
 
 	# iPad Air
@@ -1398,6 +1443,7 @@ Devices =
 		name: "Desktop Safari 1024 x 600"
 		screenWidth: 1024
 		screenHeight: 600
+		devicePixelRatio: 1
 		deviceImageWidth: 1136
 		deviceImageHeight: 760
 		deviceImageCompression: true
@@ -1407,6 +1453,7 @@ Devices =
 		name: "Desktop Safari 1280 x 800"
 		screenWidth: 1280
 		screenHeight: 800
+		devicePixelRatio: 1
 		deviceImageWidth: 1392
 		deviceImageHeight: 960
 		deviceImageCompression: true
@@ -1416,6 +1463,7 @@ Devices =
 		name: "Desktop Safari 1440 x 900"
 		screenWidth: 1440
 		screenHeight: 900
+		devicePixelRatio: 1
 		deviceImageWidth: 1552
 		deviceImageHeight: 1060
 		deviceImageCompression: true
