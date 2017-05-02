@@ -1,10 +1,10 @@
 {
 	"square": {
 		"frame": {
-			"x": 176,
-			"y": 468,
-			"width": 400,
-			"height": 400
+			"x": 88,
+			"y": 234,
+			"width": 200,
+			"height": 200
 		},
 		"subLayerNames": []
 	},
@@ -12,8 +12,8 @@
 		"frame": {
 			"x": 0,
 			"y": 0,
-			"width": 750,
-			"height": 1334
+			"width": 375,
+			"height": 667
 		},
 		"subLayerNames": [
 			"square"

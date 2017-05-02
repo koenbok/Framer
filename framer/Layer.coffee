@@ -257,12 +257,6 @@ class exports.Layer extends BaseClass
 	@define "flat", layerProperty(@, "flat", "webkitTransformStyle", false, _.isBoolean)
 	@define "backfaceVisible", layerProperty(@, "backfaceVisible", "webkitBackfaceVisibility", true, _.isBoolean)
 
-	@define "_devicePixelRatio", layerProperty(@, "_devicePixelRatio", null, 1, _.isNumber, null, {}, (layer, value) ->
-		for cssProperty in ["width", "height", "webkitTransform", "boxShadow", "textShadow", "borderRadius", "border", "fontSize", "letterSpacing", "wordSpacing", "textIndent"]
-			layer._element.style[cssProperty] = LayerStyle[cssProperty](layer)
-		layer.children.map((child) -> child._devicePixelRatio = value)
-	)
-
 	##############################################################
 	# Identity
 
@@ -490,6 +484,9 @@ class exports.Layer extends BaseClass
 		@x = parseInt @x
 		@y = parseInt @y
 
+	updateForDevicePixelRatioChange: =>
+		for cssProperty in ["width", "height", "webkitTransform", "boxShadow", "textShadow", "borderRadius", "border", "fontSize", "letterSpacing", "wordSpacing", "textIndent"]
+			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 
 	##############################################################
 	# SCREEN GEOMETRY
@@ -788,9 +785,6 @@ class exports.Layer extends BaseClass
 
 			# Set the parent
 			@_parent = layer
-
-			if layer?
-				@_devicePixelRatio = layer._devicePixelRatio
 
 			# Place this layer on top of its siblings
 			@bringToFront()

@@ -102,13 +102,15 @@ describe "DeviceComponent", ->
 		device = new DeviceComponent()
 
 		device.deviceType = "fullscreen"
+		device.context.devicePixelRatio = 2
 		device.context.run ->
-			Screen.size.should.eql Canvas.size
+			Screen.size.width.should.eql Canvas.size.width / 2
+			Screen.size.height.should.eql Canvas.size.height / 2
 
 		device.deviceType = "nexus-5-black"
 		device.context.run ->
-			Screen.size.should.eql {width: 1080, height: 1920}
-			Utils.inspect(Screen).should.equal "<Screen 1080x1920>"
+			Screen.size.should.eql {width: 360, height: 640}
+			Utils.inspect(Screen).should.equal "<Screen 360x640>"
 
 	it "should calculate canvas frames", ->
 
@@ -118,12 +120,13 @@ describe "DeviceComponent", ->
 
 		device.deviceType = "nexus-5-black"
 		device.context.run ->
-			Screen.size.should.eql {width: 1080, height: 1920}
+			Screen.size.should.eql {width: 360, height: 640}
 			Screen.canvasFrame.should.eql device.screen.canvasFrame
 
 		device.deviceType = "fullscreen"
 		device.context.run ->
-			Screen.size.should.eql Canvas.size
+			Screen.size.width.should.eql Canvas.size.width / device.context.devicePixelRatio
+			Screen.size.height.should.eql Canvas.size.height / device.context.devicePixelRatio
 
 	it "should return landscape and portrait screen sizes", ->
 
@@ -135,22 +138,22 @@ describe "DeviceComponent", ->
 
 		device.orientation.should.equal 0
 		device.isPortrait.should.equal true
-		device.screenSize.should.eql {width: 1080, height: 1920}
+		device.screenSize.should.eql {width: 360, height: 640}
 
 		device.rotateLeft(false)
 		device.orientation.should.equal 90
 		device.isPortrait.should.equal false
-		device.screenSize.should.eql {width: 1920, height: 1080}
+		device.screenSize.should.eql {width: 640, height: 360}
 
 		device.rotateRight(false)
 		device.orientation.should.equal 0
 		device.isPortrait.should.equal true
-		device.screenSize.should.eql {width: 1080, height: 1920}
+		device.screenSize.should.eql {width: 360, height: 640}
 
 		device.rotateRight(false)
 		device.orientation.should.equal -90
 		device.isPortrait.should.equal false
-		device.screenSize.should.eql {width: 1920, height: 1080}
+		device.screenSize.should.eql {width: 640, height: 360}
 
 	it "should return the correct platform per device", ->
 		device = new Framer.DeviceComponent()

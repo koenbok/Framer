@@ -1319,21 +1319,16 @@ describe "Layer", ->
 	describe "Device Pixel Ratio", ->
 		it "should default to 1", ->
 			a = new Layer
-			a._devicePixelRatio.should.equal 1
+			a.context.devicePixelRatio.should.equal 1
 
 		it "should change all of a layers children", ->
-			a = new Layer
-			b = new Layer
-				parent: a
-			c = new Layer
-				parent: b
-			a._devicePixelRatio = 3
-			for l in [a, b, c]
-				l._devicePixelRatio.should.equal 3
-
-		it "should take the dpr when changing parent", ->
-			a = new Layer
-			b = new Layer
-			a._devicePixelRatio = 2
-			b.parent = a
-			b._devicePixelRatio.should.equal 2
+			context = new Framer.Context(name: "Test")
+			context.run ->
+				a = new Layer
+				b = new Layer
+					parent: a
+				c = new Layer
+					parent: b
+				a.context.devicePixelRatio = 3
+				for l in [a, b, c]
+					l._element.style.width.should.equal "300px"
