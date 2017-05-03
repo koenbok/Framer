@@ -476,6 +476,38 @@ describe "Layer", ->
 
 			testBorderRadius(layer, "50%")
 
+		it "should set borderRadius with objects", ->
+
+			testBorderRadius = (layer, tl, tr, bl, br) ->
+
+				layer.style["border-top-left-radius"].should.equal "#{tl}"
+				layer.style["border-top-right-radius"].should.equal "#{tr}"
+				layer.style["border-bottom-left-radius"].should.equal "#{bl}"
+				layer.style["border-bottom-right-radius"].should.equal "#{br}"
+
+
+			# No matching keys is an error
+			f = ->
+				layer = new Layer
+				layer.borderRadius = {aap: 10, noot: 20, mies: 30}
+			f.should.throw()
+
+			# Arrays are not supported either
+			f = ->
+				layer = new Layer
+				layer.borderRadius = [1, 2, 3, 4]
+			f.should.throw()
+
+			layer = new Layer
+
+			layer.borderRadius = {topLeft: 10}
+			layer.borderRadius.topLeft.should.equal 10
+			testBorderRadius(layer, "10px", "0px", "0px", "0px")
+
+			layer.borderRadius = {topLeft: 1, topRight: 2, bottomLeft: 3, bottomRight: 4}
+			layer.borderRadius.topLeft.should.equal 1
+			layer.borderRadius.bottomRight.should.equal 4
+			testBorderRadius(layer, "1px", "2px", "3px", "4px")
 
 		it "should set perspective", ->
 

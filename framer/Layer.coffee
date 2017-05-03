@@ -84,6 +84,28 @@ layerPropertyIgnore = (options, propertyName, properties) ->
 
 	return options
 
+isBorderRadius = (value) ->
+	return true if _.isNumber(value)
+
+	if _.isString(value)
+		if not _.endsWith(value, "%")
+			console.error "Layer.borderRadius only correctly supports percentages in strings"
+		return true
+	# else
+
+	return false if not _.isObject(value)
+	return false if _.isEmpty(asBorderRadius(value))
+	return true
+
+asBorderRadius = (value) ->
+	return value if not _.isObject(value)
+	result = {}
+	for key in ["topLeft", "topRight", "bottomRight", "bottomLeft"]
+		# TODO: Also support percentages?
+		if _.has(value, key) and _.isNumber(value[key])
+			result[key] = value[key]
+	return result
+
 class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
@@ -248,8 +270,7 @@ class exports.Layer extends BaseClass
 	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor)
 
 	# Border properties
-	# Todo: make this default, for compat we still allow strings but throw a warning
-	# @define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, _.isNumber
+	@define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, isBorderRadius, asBorderRadius)
 	@define "borderColor", layerProperty(@, "borderColor", "border", null, Color.validColorValue, Color.toColor)
 	@define "borderWidth", layerProperty(@, "borderWidth", "border", 0, _.isNumber)
 
@@ -323,24 +344,7 @@ class exports.Layer extends BaseClass
 	##############################################################
 	# Border radius compatibility
 
-	@define "borderRadius",
-		importable: true
-		exportable: true
-		default: 0
-		get: ->
-			@_properties["borderRadius"]
-
-		set: (value) ->
-
-			if value and not _.isNumber(value)
-				console.warn "Layer.borderRadius should be a numeric property, not type #{typeof(value)}"
-
-			@_properties["borderRadius"] = value
-			@_element.style["borderRadius"] = LayerStyle["borderRadius"](@)
-
-			@emit("change:borderRadius", value)
-
-	# And, because it should be cornerRadius, we alias it here
+	# Because it should be cornerRadius, we alias it here
 	@define "cornerRadius",
 		importable: false
 		exportable: false
