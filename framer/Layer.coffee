@@ -315,6 +315,7 @@ class exports.Layer extends BaseClass
 			return new Matrix()
 				.translate(@x, @y)
 				.scale(@scale)
+				.scale(@scaleX, @scaleY)
 				.skewX(@skew)
 				.skewY(@skew)
 				.rotate(0, 0, @rotationZ)

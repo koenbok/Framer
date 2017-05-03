@@ -22,8 +22,6 @@ _WebkitProperties = [
 
 _Force2DProperties =
 	"z": 0
-	"scaleX": 1
-	"scaleY": 1
 	"scaleZ": 1
 	"skewX": 0
 	"skewY": 0
@@ -138,7 +136,7 @@ exports.LayerStyle =
 
 		dpr = layer.context.devicePixelRatio
 		css.push "translate(#{roundToZero(layer._properties.x * dpr)}px,#{roundToZero(layer._properties.y * dpr)}px)"
-		css.push "scale(#{roundToZero(layer._properties.scale)})"
+		css.push "scale(#{roundToZero(layer._properties.scaleX * layer._properties.scale)},	#{roundToZero(layer._properties.scaleY * layer._properties.scale)})"
 		css.push "skew(#{roundToZero(layer._properties.skew)}deg,#{roundToZero(layer._properties.skew)}deg)"
 		css.push "rotate(#{roundToZero(layer._properties.rotationZ)}deg)"
 
