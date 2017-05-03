@@ -436,7 +436,7 @@ class exports.Layer extends BaseClass
 		importable: true
 		exportable: false
 		get: ->
-			return Utils.boundingFrame(@)
+			return Utils.convertFrameToContext(@frame, @, true, false)
 		set: (frame) ->
 			@frame = Utils.convertFrameFromContext(frame, @, true, false)
 
@@ -444,7 +444,7 @@ class exports.Layer extends BaseClass
 		importable: true
 		exportable: false
 		get: ->
-			return Utils.boundingFrame(@, false)
+			return Utils.convertFrameToContext(@frame, @, false, false)
 		set: (frame) ->
 			@frame = Utils.convertFrameFromContext(frame, @, false, false)
 
