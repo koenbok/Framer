@@ -45,8 +45,8 @@ centerLayer = (layer) ->
 		Utils.frameSetMidX(frame, (layer.parent.width  / 2.0) - layer.parent.borderWidth)
 		Utils.frameSetMidY(frame, (layer.parent.height / 2.0) - layer.parent.borderWidth)
 	else
-		Utils.frameSetMidX(frame, layer._context.width  / 2.0)
-		Utils.frameSetMidY(frame, layer._context.height / 2.0)
+		Utils.frameSetMidX(frame, layer._context.innerWidth  / 2.0)
+		Utils.frameSetMidY(frame, layer._context.innerHeight / 2.0)
 	layer.frame = frame
 
 class exports.DeviceComponent extends BaseClass

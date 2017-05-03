@@ -1037,6 +1037,21 @@ describe "Layer", ->
 
 			layerB.frame.should.eql {x: 20, y: 20, width: 100, height: 100}
 
+		it "should center within outer frame", ->
+			layerA = new Layer width: 10, height: 10
+			layerA.center()
+			assert.equal layerA.x, 195
+			assert.equal layerA.y, 145
+
+		it "should center correctly with dpr set", ->
+			device = new DeviceComponent()
+			device.deviceType = "apple-iphone-7-black"
+			device.context.run ->
+				layerA = new Layer size: 100
+				layerA.center()
+				layerA.context.devicePixelRatio.should.equal 2
+				layerA.x.should.equal 137
+				layerA.y.should.equal 283
 
 	describe "CSS", ->
 

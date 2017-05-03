@@ -463,8 +463,8 @@ class exports.Layer extends BaseClass
 			return frame
 		else
 			frame = @frame
-			Utils.frameSetMidX(frame, parseInt(@_context.width  / 2.0))
-			Utils.frameSetMidY(frame, parseInt(@_context.height / 2.0))
+			Utils.frameSetMidX(frame, parseInt(@_context.innerWidth  / 2.0))
+			Utils.frameSetMidY(frame, parseInt(@_context.innerHeight / 2.0))
 			return frame
 
 	center: ->
