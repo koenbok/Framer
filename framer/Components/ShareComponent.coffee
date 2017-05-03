@@ -475,8 +475,9 @@ class ShareComponent
 			borderColor: "#D5D5D5"
 			width: 33
 			x: @buttonOpen.maxX + 6
-			style:
-				borderRadius: "3px 0 0 3px"
+			borderRadius:
+				topLeft: 3
+				bottomLeft: 3
 
 		@buttonFacebookIcon = new Layer
 			parent: @buttonFacebook
@@ -509,8 +510,9 @@ class ShareComponent
 			borderColor: "#D5D5D5"
 			width: 33
 			x: @buttonFacebook.maxX - 1
-			style:
-				borderRadius: "0 3px 3px 0"
+			borderRadius:
+				topRight: 3
+				bottomRight: 3
 
 		@buttonTwitterIcon = new Layer
 			parent: @buttonTwitter

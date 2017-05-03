@@ -19,7 +19,7 @@ Utils = require "./Utils"
 NoCacheDateKey = Date.now()
 
 layerValueTypeError = (name, value) ->
-	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
+	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}' is not valid")
 
 layerProperty = (obj, name, cssProperty, fallback, validator, transformer, options={}, set) ->
 	result =
@@ -83,6 +83,23 @@ layerPropertyIgnore = (options, propertyName, properties) ->
 			return options
 
 	return options
+
+asBorderRadius = (value) ->
+	return value if _.isNumber(value)
+
+	if _.isString(value)
+		if not _.endsWith(value, "%")
+			console.error "Layer.borderRadius only correctly supports percentages in strings"
+		return value
+
+	return 0 if not _.isObject(value)
+
+	result = {}
+	for key in ["topLeft", "topRight", "bottomRight", "bottomLeft"]
+		# TODO: Also support percentages?
+		if _.has(value, key) and _.isNumber(value[key])
+			result[key] = value[key]
+	return if _.isEmpty(result) then 0 else result
 
 class exports.Layer extends BaseClass
 
@@ -248,8 +265,7 @@ class exports.Layer extends BaseClass
 	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor)
 
 	# Border properties
-	# Todo: make this default, for compat we still allow strings but throw a warning
-	# @define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, _.isNumber
+	@define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, null, asBorderRadius)
 	@define "borderColor", layerProperty(@, "borderColor", "border", null, Color.validColorValue, Color.toColor)
 	@define "borderWidth", layerProperty(@, "borderWidth", "border", 0, _.isNumber)
 
@@ -323,24 +339,7 @@ class exports.Layer extends BaseClass
 	##############################################################
 	# Border radius compatibility
 
-	@define "borderRadius",
-		importable: true
-		exportable: true
-		default: 0
-		get: ->
-			@_properties["borderRadius"]
-
-		set: (value) ->
-
-			if value and not _.isNumber(value)
-				console.warn "Layer.borderRadius should be a numeric property, not type #{typeof(value)}"
-
-			@_properties["borderRadius"] = value
-			@_element.style["borderRadius"] = LayerStyle["borderRadius"](@)
-
-			@emit("change:borderRadius", value)
-
-	# And, because it should be cornerRadius, we alias it here
+	# Because it should be cornerRadius, we alias it here
 	@define "cornerRadius",
 		importable: false
 		exportable: false

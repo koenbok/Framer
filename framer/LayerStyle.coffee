@@ -189,10 +189,17 @@ exports.LayerStyle =
 
 	borderRadius: (layer) ->
 
-		# Compatibility fix, remove later
-		if not _.isNumber(layer._properties.borderRadius)
-			return layer._properties.borderRadius
-		return (layer._properties.borderRadius * layer.context.devicePixelRatio) + "px"
+		radius = layer._properties.borderRadius
+		dpr = layer.context.devicePixelRatio
+
+		if _.isNumber(radius)
+			return (radius * dpr) + "px"
+
+		if _.isObject(layer._properties.borderRadius)
+			return (radius.topLeft ? 0) * dpr + "px " + (radius.topRight ? 0) * dpr + "px " + (radius.bottomRight ? 0) * dpr + "px " + (radius.bottomLeft ? 0) * dpr + "px"
+
+		# Custom values like strings are still allowed for compatibility reasons
+		return layer._properties.borderRadius
 
 	border: (layer) ->
 		return "#{layer._properties.borderWidth * layer.context.devicePixelRatio}px solid #{layer._properties.borderColor}"

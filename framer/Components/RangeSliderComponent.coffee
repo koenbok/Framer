@@ -213,7 +213,9 @@ class exports.RangeSliderComponent extends Layer
 
 	_setRadius: =>
 		radius = @borderRadius
-		@fill.style.borderRadius = "#{radius}px 0 0 #{radius}px"
+		@fill.borderRadius =
+			topLeft: radius
+			bottomLeft: radius
 
 	@define "constrained", @simpleProperty("constrained", false)
 
