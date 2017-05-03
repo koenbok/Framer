@@ -485,20 +485,17 @@ describe "Layer", ->
 				layer.style["border-bottom-left-radius"].should.equal "#{bl}"
 				layer.style["border-bottom-right-radius"].should.equal "#{br}"
 
+			layer = new Layer
 
 			# No matching keys is an error
-			f = ->
-				layer = new Layer
-				layer.borderRadius = {aap: 10, noot: 20, mies: 30}
-			f.should.throw()
+			layer.borderRadius = {aap: 10, noot: 20, mies: 30}
+			layer.borderRadius.should.equal 0
+			testBorderRadius(layer, "0px", "0px", "0px", "0px")
 
 			# Arrays are not supported either
-			f = ->
-				layer = new Layer
-				layer.borderRadius = [1, 2, 3, 4]
-			f.should.throw()
-
-			layer = new Layer
+			layer.borderRadius = [1, 2, 3, 4]
+			layer.borderRadius.should.equal 0
+			testBorderRadius(layer, "0px", "0px", "0px", "0px")
 
 			layer.borderRadius = {topLeft: 10}
 			layer.borderRadius.topLeft.should.equal 10

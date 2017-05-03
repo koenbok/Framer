@@ -84,27 +84,22 @@ layerPropertyIgnore = (options, propertyName, properties) ->
 
 	return options
 
-isBorderRadius = (value) ->
-	return true if _.isNumber(value)
+asBorderRadius = (value) ->
+	return value if _.isNumber(value)
 
 	if _.isString(value)
 		if not _.endsWith(value, "%")
 			console.error "Layer.borderRadius only correctly supports percentages in strings"
-		return true
-	# else
+		return value
 
-	return false if not _.isObject(value)
-	return false if _.isEmpty(asBorderRadius(value))
-	return true
+	return 0 if not _.isObject(value)
 
-asBorderRadius = (value) ->
-	return value if not _.isObject(value)
 	result = {}
 	for key in ["topLeft", "topRight", "bottomRight", "bottomLeft"]
 		# TODO: Also support percentages?
 		if _.has(value, key) and _.isNumber(value[key])
 			result[key] = value[key]
-	return result
+	return if _.isEmpty(result) then 0 else result
 
 class exports.Layer extends BaseClass
 
@@ -270,7 +265,7 @@ class exports.Layer extends BaseClass
 	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor)
 
 	# Border properties
-	@define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, isBorderRadius, asBorderRadius)
+	@define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, null, asBorderRadius)
 	@define "borderColor", layerProperty(@, "borderColor", "border", null, Color.validColorValue, Color.toColor)
 	@define "borderWidth", layerProperty(@, "borderWidth", "border", 0, _.isNumber)
 
