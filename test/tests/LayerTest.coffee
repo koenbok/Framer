@@ -1130,7 +1130,7 @@ describe "Layer", ->
 
 			layer.force2d = true
 
-			layer.style.webkitTransform.should.equal "translate(0px, 0px) scale(1) skew(0deg, 0deg) rotate(0deg)"
+			layer.style.webkitTransform.should.equal "translate(0px, 0px) scale(1, 1) skew(0deg, 0deg) rotate(0deg)"
 
 	describe "Matrices", ->
 
