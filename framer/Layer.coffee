@@ -19,7 +19,7 @@ Utils = require "./Utils"
 NoCacheDateKey = Date.now()
 
 layerValueTypeError = (name, value) ->
-	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
+	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}' is not valid")
 
 layerProperty = (obj, name, cssProperty, fallback, validator, transformer, options={}, set) ->
 	result =
