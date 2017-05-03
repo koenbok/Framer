@@ -1086,7 +1086,6 @@ class exports.Layer extends BaseClass
 		get: -> @_context.domEventManager.wrap(@_element)
 
 	emit: (eventName, args...) ->
-
 		# If this layer has a parent draggable view and its position moved
 		# while dragging we automatically cancel click events. This is what
 		# you expect when you add a button to a scroll content layer. We only
@@ -1112,6 +1111,12 @@ class exports.Layer extends BaseClass
 						velocity = parentDraggableLayer.draggable.velocity
 						return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
 						return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
+
+		event = args[0]
+		if args[0]? and (event?.clientX? or event?.clientY?)
+			point = {x: event.clientX, y: event.clientY}
+			event.point = Utils.convertPointFromContext(point, @, true)
+			event.contextPoint = Utils.convertPointFromContext(point, @context, true)
 
 		# Always scope the event this to the layer and pass the layer as
 		# last argument for every event.
