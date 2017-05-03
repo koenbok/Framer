@@ -493,6 +493,7 @@ class exports.Layer extends BaseClass
 	updateForDevicePixelRatioChange: =>
 		for cssProperty in ["width", "height", "webkitTransform", "boxShadow", "textShadow", "borderRadius", "border", "fontSize", "letterSpacing", "wordSpacing", "textIndent"]
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
+		@_elementHTML?.style.zoom = @context.scale
 
 	##############################################################
 	# SCREEN GEOMETRY
@@ -632,6 +633,7 @@ class exports.Layer extends BaseClass
 				@_elementHTML = document.createElement "div"
 				@_element.appendChild @_elementHTML
 
+			@_elementHTML.style.zoom = @context.scale
 			@_elementHTML.innerHTML = value
 
 			# If the contents contains something else than plain text
