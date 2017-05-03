@@ -1040,6 +1040,10 @@ Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLaye
 	point = _.defaults(point, {x: 0, y: 0, z: 0})
 	ancestors = layer.ancestors(rootContext)
 	ancestors.unshift(layer) if includeLayer
+	pixelRatio = layer.devicePixelRatio ? 1
+	point =
+		x: point.x * pixelRatio
+		y: point.y * pixelRatio
 
 	for ancestor in ancestors
 		point.z = 0 if ancestor.flat or ancestor.clip
@@ -1066,7 +1070,13 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 		else
 			parent = layer.parent or layer.context
 			node = parent._element
-		return Utils.point(webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y)))
+		point = Utils.point(webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y)))
+		pixelRatio = layer.devicePixelRatio ? 1
+		point =
+			x: point.x / pixelRatio
+			y: point.y / pixelRatio
+		return point
+
 
 	ancestors = layer.ancestors(rootContext)
 	ancestors.reverse()
@@ -1076,6 +1086,10 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 		continue unless ancestor.matrix3d
 		point = ancestor.matrix3d.inverse().point(point)
 
+	pixelRatio = layer.devicePixelRatio ? 1
+	point =
+		x: point.x / pixelRatio
+		y: point.y / pixelRatio
 	return point
 
 # convert a frame from the context level to a layer, with rootContext enabled you can make it start from the top context

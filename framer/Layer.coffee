@@ -484,6 +484,9 @@ class exports.Layer extends BaseClass
 		@x = parseInt @x
 		@y = parseInt @y
 
+	@define "devicePixelRatio",
+		get: -> @context.devicePixelRatio
+
 	updateForDevicePixelRatioChange: =>
 		for cssProperty in ["width", "height", "webkitTransform", "boxShadow", "textShadow", "borderRadius", "border", "fontSize", "letterSpacing", "wordSpacing", "textIndent"]
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
