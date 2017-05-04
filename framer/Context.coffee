@@ -49,6 +49,18 @@ class exports.Context extends BaseClass
 			for l in @_layers
 				l.updateForDevicePixelRatioChange()
 
+	@define "renderUsingNativePixelRatio", @simpleProperty("renderUsingNativePixelRatio", false)
+
+	@define "pixelMultiplier",
+		get: ->
+			if @renderUsingNativePixelRatio
+				return 1
+			else
+				return @devicePixelRatio
+
+	@define "scale",
+		get: -> @pixelMultiplier
+
 	constructor: (options={}) ->
 
 		options = Defaults.getDefaults("Context", options)

@@ -28,14 +28,13 @@ _Force2DProperties =
 	"rotationX": 0
 	"rotationY": 0
 
-
 exports.LayerStyle =
 
 	width: (layer) ->
-		(layer._properties.width * layer.context.devicePixelRatio) + "px"
+		(layer._properties.width * layer.context.pixelMultiplier) + "px"
 
 	height: (layer) ->
-		(layer._properties.height * layer.context.devicePixelRatio) + "px"
+		(layer._properties.height * layer.context.pixelMultiplier) + "px"
 
 	display: (layer) ->
 		if layer._properties.visible is true
@@ -103,7 +102,7 @@ exports.LayerStyle =
 
 		if layer._prefer2d or layer._properties.force2d
 			return exports.LayerStyle.webkitTransformForce2d(layer)
-		dpr = layer.context.devicePixelRatio
+		dpr = layer.context.pixelMultiplier
 		"
 		translate3d(
 			#{roundToZero(layer._properties.x * dpr)}px,
@@ -134,7 +133,7 @@ exports.LayerStyle =
 			if layer._properties[p] isnt v
 				console.warn "Layer property '#{p}'' will be ignored with force2d enabled"
 
-		dpr = layer.context.devicePixelRatio
+		dpr = layer.context.pixelMultiplier
 		css.push "translate(#{roundToZero(layer._properties.x * dpr)}px,#{roundToZero(layer._properties.y * dpr)}px)"
 		css.push "scale(#{roundToZero(layer._properties.scaleX * layer._properties.scale)},	#{roundToZero(layer._properties.scaleY * layer._properties.scale)})"
 		css.push "skew(#{roundToZero(layer._properties.skew)}deg,#{roundToZero(layer._properties.skew)}deg)"
@@ -166,7 +165,7 @@ exports.LayerStyle =
 		else if props.shadowX is 0 and props.shadowY is 0 and props.shadowBlur is 0 and props.shadowSpread is 0
 			return ""
 
-		return "#{layer._properties.shadowX * layer.context.devicePixelRatio}px #{layer._properties.shadowY * layer.context.devicePixelRatio}px #{layer._properties.shadowBlur * layer.context.devicePixelRatio}px #{layer._properties.shadowSpread * layer.context.devicePixelRatio}px #{layer._properties.shadowColor}"
+		return "#{layer._properties.shadowX * layer.context.pixelMultiplier}px #{layer._properties.shadowY * layer.context.pixelMultiplier}px #{layer._properties.shadowBlur * layer.context.pixelMultiplier}px #{layer._properties.shadowSpread * layer.context.pixelMultiplier}px #{layer._properties.shadowColor}"
 
 	textShadow: (layer) ->
 
@@ -177,7 +176,7 @@ exports.LayerStyle =
 		else if props.shadowX is 0 and props.shadowY is 0 and props.shadowBlur is 0 and props.shadowSpread is 0
 			return ""
 
-		return "#{layer._properties.shadowX * layer.context.devicePixelRatio}px #{layer._properties.shadowY * layer.context.devicePixelRatio}px #{layer._properties.shadowBlur * layer.context.devicePixelRatio}px #{layer._properties.shadowColor}"
+		return "#{layer._properties.shadowX * layer.context.pixelMultiplier}px #{layer._properties.shadowY * layer.context.pixelMultiplier}px #{layer._properties.shadowBlur * layer.context.pixelMultiplier}px #{layer._properties.shadowColor}"
 
 	backgroundColor: (layer) ->
 		return layer._properties.backgroundColor
@@ -188,7 +187,7 @@ exports.LayerStyle =
 	borderRadius: (layer) ->
 
 		radius = layer._properties.borderRadius
-		dpr = layer.context.devicePixelRatio
+		dpr = layer.context.pixelMultiplier
 
 		if _.isNumber(radius)
 			return (radius * dpr) + "px"
@@ -200,19 +199,19 @@ exports.LayerStyle =
 		return layer._properties.borderRadius
 
 	border: (layer) ->
-		return "#{layer._properties.borderWidth * layer.context.devicePixelRatio}px solid #{layer._properties.borderColor}"
+		return "#{layer._properties.borderWidth * layer.context.pixelMultiplier}px solid #{layer._properties.borderColor}"
 
 	fontSize: (layer) ->
-		return (layer._properties.fontSize * layer.context.devicePixelRatio) + "px"
+		return (layer._properties.fontSize * layer.context.pixelMultiplier) + "px"
 
 	letterSpacing: (layer) ->
-		return (layer._properties.letterSpacing * layer.context.devicePixelRatio) + "px"
+		return (layer._properties.letterSpacing * layer.context.pixelMultiplier) + "px"
 
 	wordSpacing: (layer) ->
-		return (layer._properties.wordSpacing * layer.context.devicePixelRatio) + "px"
+		return (layer._properties.wordSpacing * layer.context.pixelMultiplier) + "px"
 
 	textIndent: (layer) ->
-		return (layer._properties.textIndent * layer.context.devicePixelRatio) + "px"
+		return (layer._properties.textIndent * layer.context.pixelMultiplier) + "px"
 
 	textAlign: (layer) ->
 		value = layer._properties.textAlign
