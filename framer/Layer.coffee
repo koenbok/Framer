@@ -442,7 +442,7 @@ class exports.Layer extends BaseClass
 		importable: true
 		exportable: false
 		get: ->
-			return Utils.convertFrameToContext(@frame, @, true, false)
+			return Utils.boundingFrame(@)
 		set: (frame) ->
 			@frame = Utils.convertFrameFromContext(frame, @, true, false)
 
@@ -450,7 +450,7 @@ class exports.Layer extends BaseClass
 		importable: true
 		exportable: false
 		get: ->
-			return Utils.convertFrameToContext(@frame, @, false, false)
+			return Utils.boundingFrame(@, false)
 		set: (frame) ->
 			@frame = Utils.convertFrameFromContext(frame, @, false, false)
 
@@ -490,9 +490,6 @@ class exports.Layer extends BaseClass
 		@x = parseInt @x
 		@y = parseInt @y
 
-	@define "devicePixelRatio",
-		get: -> @context.devicePixelRatio
-
 	updateForDevicePixelRatioChange: =>
 		for cssProperty in ["width", "height", "webkitTransform", "boxShadow", "textShadow", "borderRadius", "border", "fontSize", "letterSpacing", "wordSpacing", "textIndent"]
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
@@ -516,28 +513,40 @@ class exports.Layer extends BaseClass
 		scale = 1
 		scale = @scale * @scaleX if self
 		for parent in @ancestors(context=true)
-			scale = scale * parent.scale * parent.scaleX
+			if parent.scale?
+				scale *= parent.scale
+			if parent.scaleX?
+				scale *= parent.scaleX
 		return scale
 
 	canvasScaleY: (self=true) ->
 		scale = 1
 		scale = @scale * @scaleY if self
 		for parent in @ancestors(context=true)
-			scale = scale * parent.scale * parent.scaleY
+			if parent.scale?
+				scale *= parent.scale
+			if parent.scaleY?
+				scale *= parent.scaleY
 		return scale
 
 	screenScaleX: (self=true) ->
 		scale = 1
 		scale = @scale * @scaleX if self
 		for parent in @ancestors(context=false)
-			scale = scale * parent.scale * parent.scaleX
+			if parent.scale?
+				scale *= parent.scale
+			if parent.scaleX?
+				scale *= parent.scaleX
 		return scale
 
 	screenScaleY: (self=true) ->
 		scale = 1
 		scale = @scale * @scaleY if self
 		for parent in @ancestors(context=false)
-			scale = scale * parent.scale * parent.scaleY
+			if parent.scale?
+				scale *= parent.scale
+			if parent.scaleY?
+				scale *= parent.scaleY
 		return scale
 
 
@@ -556,9 +565,10 @@ class exports.Layer extends BaseClass
 		layers.reverse()
 
 		for parent in layers
-			factorX = if parent._parentOrContext() then parent._parentOrContext().screenScaleX() else 1
-			factorY = if parent._parentOrContext() then parent._parentOrContext().screenScaleY() else 1
-			layerScaledFrame = parent.scaledFrame()
+			p = parentOrContext(parent)
+			factorX = p?.screenScaleX?() ? 1
+			factorY = p?.screenScaleY?() ? 1
+			layerScaledFrame = parent.scaledFrame?() ? {x: 0, y: 0}
 			frame.x += layerScaledFrame.x * factorX
 			frame.y += layerScaledFrame.y * factorY
 
