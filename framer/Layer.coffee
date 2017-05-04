@@ -101,6 +101,12 @@ asBorderRadius = (value) ->
 			result[key] = value[key]
 	return if _.isEmpty(result) then 0 else result
 
+parentOrContext = (layerOrContext) ->
+	if layerOrContext.parent?
+		return layerOrContext.parent
+	else
+		return layerOrContext.context
+
 class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
@@ -851,13 +857,15 @@ class exports.Layer extends BaseClass
 		currentLayer = @
 
 		if context is false
-			while currentLayer.parent
-				parents.push(currentLayer.parent)
+			currentLayer = @parent
+			while currentLayer
+				parents.push(currentLayer)
 				currentLayer = currentLayer.parent
 		else
-			while currentLayer._parentOrContext()
-				parents.push(currentLayer._parentOrContext())
-				currentLayer = currentLayer._parentOrContext()
+			currentLayer = parentOrContext(currentLayer)
+			while currentLayer
+				parents.push(currentLayer)
+				currentLayer = parentOrContext(currentLayer)
 
 		return parents
 

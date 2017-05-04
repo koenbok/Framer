@@ -1032,7 +1032,6 @@ Utils.rotationNormalizer = ->
 		lastValue = value
 		return value
 
-
 # Coordinate system
 
 # convert a point from a layer to the context level, with rootContext enabled you can make it cross to the top context
@@ -1040,14 +1039,15 @@ Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLaye
 	point = _.defaults(point, {x: 0, y: 0, z: 0})
 	ancestors = layer.ancestors(rootContext)
 	ancestors.unshift(layer) if includeLayer
-	pixelRatio = layer.devicePixelRatio ? 1
-	point =
-		x: point.x * pixelRatio
-		y: point.y * pixelRatio
 
 	for ancestor in ancestors
 		point.z = 0 if ancestor.flat or ancestor.clip
-		point = ancestor.matrix3d.point(point)
+		if ancestor.matrix3d?
+			point = ancestor.matrix3d.point(point)
+		else if ancestor.devicePixelRatio?
+			point =
+				x: point.x * ancestor.devicePixelRatio
+				y: point.y * ancestor.devicePixelRatio
 		point.z = 0 unless ancestor.parent
 
 	return point
@@ -1071,7 +1071,7 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 			parent = layer.parent or layer.context
 			node = parent._element
 		point = Utils.point(webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y)))
-		pixelRatio = layer.devicePixelRatio ? 1
+		pixelRatio = (layer.devicePixelRatio ? layer.context.devicePixelRatio) ? 1
 		point =
 			x: point.x / pixelRatio
 			y: point.y / pixelRatio
@@ -1083,13 +1083,12 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 	ancestors.push(layer) if includeLayer
 
 	for ancestor in ancestors
-		continue unless ancestor.matrix3d
-		point = ancestor.matrix3d.inverse().point(point)
-
-	pixelRatio = layer.devicePixelRatio ? 1
-	point =
-		x: point.x / pixelRatio
-		y: point.y / pixelRatio
+		if ancestor.matrix3d?
+			point = ancestor.matrix3d.inverse().point(point)
+		else if ancestor.devicePixelRatio?
+			point =
+				x: point.x / ancestor.devicePixelRatio
+				y: point.y / ancestor.devicePixelRatio
 	return point
 
 # convert a frame from the context level to a layer, with rootContext enabled you can make it start from the top context
