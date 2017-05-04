@@ -513,8 +513,7 @@ class exports.Layer extends BaseClass
 		scale = 1
 		scale = @scale * @scaleX if self
 		for parent in @ancestors(context=true)
-			if parent.scale?
-				scale *= parent.scale
+			scale *= parent.scale
 			if parent.scaleX?
 				scale *= parent.scaleX
 		return scale
@@ -523,8 +522,7 @@ class exports.Layer extends BaseClass
 		scale = 1
 		scale = @scale * @scaleY if self
 		for parent in @ancestors(context=true)
-			if parent.scale?
-				scale *= parent.scale
+			scale *= parent.scale
 			if parent.scaleY?
 				scale *= parent.scaleY
 		return scale
@@ -533,8 +531,7 @@ class exports.Layer extends BaseClass
 		scale = 1
 		scale = @scale * @scaleX if self
 		for parent in @ancestors(context=false)
-			if parent.scale?
-				scale *= parent.scale
+			scale *= parent.scale
 			if parent.scaleX?
 				scale *= parent.scaleX
 		return scale
@@ -543,8 +540,7 @@ class exports.Layer extends BaseClass
 		scale = 1
 		scale = @scale * @scaleY if self
 		for parent in @ancestors(context=false)
-			if parent.scale?
-				scale *= parent.scale
+			scale *= parent.scale
 			if parent.scaleY?
 				scale *= parent.scaleY
 		return scale
