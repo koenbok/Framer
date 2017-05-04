@@ -721,13 +721,13 @@ describe "Layer", ->
 			assert.deepEqual layerB.siblingLayers, [layerC]
 			assert.deepEqual layerC.siblingLayers, [layerB]
 
-		it "should list super layers", ->
+		it "should list ancestors", ->
 
 			layerA = new Layer
 			layerB = new Layer superLayer: layerA
 			layerC = new Layer superLayer: layerB
 
-			assert.deepEqual layerC.superLayers(), [layerB, layerA]
+			assert.deepEqual layerC.ancestors(), [layerB, layerA]
 
 		it "should list descendants deeply", ->
 
@@ -853,11 +853,11 @@ describe "Layer", ->
 			layerB.siblingLayersByName("C").should.eql [layerC, layerD]
 			layerD.siblingLayersByName("B").should.eql [layerB]
 
-		it "should get a superlayers", ->
+		it "should get a ancestors", ->
 			layerA = new Layer
 			layerB = new Layer superLayer: layerA
 			layerC = new Layer superLayer: layerB
-			layerC.superLayers().should.eql [layerB, layerA]
+			layerC.ancestors().should.eql [layerB, layerA]
 
 
 	describe "Frame", ->
@@ -1376,3 +1376,28 @@ describe "Layer", ->
 				a.context.devicePixelRatio = 3
 				for l in [a, b, c]
 					l._element.style.width.should.equal "300px"
+
+	describe "containers", ->
+		it "should return empty when called on rootLayer", ->
+			a = new Layer name: "a"
+			a.containers().should.deep.equal []
+
+		it "should return all ancestors", ->
+			a = new Layer name: "a"
+			b = new Layer parent: a, name: "b"
+			c = new Layer parent: b, name: "c"
+			d = new Layer parent: c, name: "d"
+			names = d.containers().map (l) -> l.name
+			names.should.deep.equal ["c", "b", "a"]
+
+		it "should include the device return all ancestors", ->
+			device = new DeviceComponent()
+			device.context.run ->
+				a = new Layer name: "a"
+				b = new Layer parent: a, name: "b"
+				c = new Layer parent: b, name: "c"
+				d = new Layer parent: c, name: "d"
+				containers = d.containers(true)
+				containers.length.should.equal 10
+				names = containers.map((l) -> l.name)
+				names.should.eql ["c", "b", "a", undefined, "viewport", "screen", "phone", "phone", "hands", undefined]

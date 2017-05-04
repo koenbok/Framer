@@ -386,8 +386,13 @@ class exports.Context extends BaseClass
 			return unless @_element
 			@_element.style["z-index"] = value
 
-	ancestors: (args...) ->
-		return @_parent?.ancestors(args...) or []
+	containers: (result=[]) ->
+		if @_parent?
+			result.push(@_parent)
+			return @_parent?.containers(true, result)
+		else
+			return result
+
 
 	toInspect: ->
 

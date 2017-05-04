@@ -1037,18 +1037,18 @@ Utils.rotationNormalizer = ->
 # convert a point from a layer to the context level, with rootContext enabled you can make it cross to the top context
 Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLayer=true) ->
 	point = _.defaults(point, {x: 0, y: 0, z: 0})
-	ancestors = layer.ancestors(rootContext)
-	ancestors.unshift(layer) if includeLayer
+	containers = layer.containers(rootContext)
+	containers.unshift(layer) if includeLayer
 
-	for ancestor in ancestors
-		point.z = 0 if ancestor.flat or ancestor.clip
-		if ancestor.matrix3d?
-			point = ancestor.matrix3d.point(point)
-		else if ancestor.scale?
+	for container in containers
+		point.z = 0 if container.flat or container.clip
+		if container.matrix3d?
+			point = container.matrix3d.point(point)
+		else if container.scale?
 			point =
-				x: point.x * ancestor.scale
-				y: point.y * ancestor.scale
-		point.z = 0 unless ancestor.parent
+				x: point.x * container.scale
+				y: point.y * container.scale
+		point.z = 0 unless container.parent
 
 	return point
 
@@ -1078,17 +1078,17 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 		return point
 
 
-	ancestors = layer.ancestors(rootContext)
-	ancestors.reverse()
-	ancestors.push(layer) if includeLayer
+	containers = layer.containers(rootContext)
+	containers.reverse()
+	containers.push(layer) if includeLayer
 
-	for ancestor in ancestors
-		if ancestor.matrix3d?
-			point = ancestor.matrix3d.inverse().point(point)
-		else if ancestor.scale?
+	for container in containers
+		if container.matrix3d?
+			point = container.matrix3d.inverse().point(point)
+		else if container.scale?
 			point =
-				x: point.x / ancestor.scale
-				y: point.y / ancestor.scale
+				x: point.x / container.scale
+				y: point.y / container.scale
 	return point
 
 # convert a frame from the context level to a layer, with rootContext enabled you can make it start from the top context

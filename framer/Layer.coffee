@@ -512,7 +512,7 @@ class exports.Layer extends BaseClass
 	canvasScaleX: (self=true) ->
 		scale = 1
 		scale = @scale * @scaleX if self
-		for parent in @ancestors(context=true)
+		for parent in @containers(true)
 			scale *= parent.scale
 			if parent.scaleX?
 				scale *= parent.scaleX
@@ -521,7 +521,7 @@ class exports.Layer extends BaseClass
 	canvasScaleY: (self=true) ->
 		scale = 1
 		scale = @scale * @scaleY if self
-		for parent in @ancestors(context=true)
+		for parent in @containers(true)
 			scale *= parent.scale
 			if parent.scaleY?
 				scale *= parent.scaleY
@@ -530,19 +530,15 @@ class exports.Layer extends BaseClass
 	screenScaleX: (self=true) ->
 		scale = 1
 		scale = @scale * @scaleX if self
-		for parent in @ancestors(context=false)
-			scale *= parent.scale
-			if parent.scaleX?
-				scale *= parent.scaleX
+		for parent in @containers(false)
+			scale *= parent.scale * parent.scaleX
 		return scale
 
 	screenScaleY: (self=true) ->
 		scale = 1
 		scale = @scale * @scaleY if self
-		for parent in @ancestors(context=false)
-			scale *= parent.scale
-			if parent.scaleY?
-				scale *= parent.scaleY
+		for parent in @containers(false)
+			scale *= parent.scale * parent.scaleY
 		return scale
 
 
@@ -556,7 +552,7 @@ class exports.Layer extends BaseClass
 			width: @width  * @screenScaleX()
 			height: @height * @screenScaleY()
 
-		layers = @ancestors(context=true)
+		layers = @containers(true)
 		layers.push(@)
 		layers.reverse()
 
@@ -857,27 +853,26 @@ class exports.Layer extends BaseClass
 	siblingsWithName: (name) ->
 		_.filter @siblingLayers, (layer) -> layer.name is name
 
-	ancestors: (context=false) ->
 
-		parents = []
-		currentLayer = @
+	# Get all containers of this layer, including containing contexts
+	# `toRoot` specifies if you want to bubble up across contexts,
+	# so specifiying `false` will stop at the first context
+	# and thus the results will never contain any context
+	containers: (toRoot=false, result=[]) ->
+		if @parent?
+			result.push(@parent)
+			return @parent.containers(toRoot, result)
+		else if toRoot
+			result.push(@context)
+			return @context.containers(result)
+		return result
 
-		if context is false
-			currentLayer = @parent
-			while currentLayer
-				parents.push(currentLayer)
-				currentLayer = currentLayer.parent
-		else
-			currentLayer = parentOrContext(currentLayer)
-			while currentLayer
-				parents.push(currentLayer)
-				currentLayer = parentOrContext(currentLayer)
+	ancestors: ->
+		return @containers()
 
-		return parents
-
-	root: (context=false) ->
+	root: ->
 		return @ if @parent is null
-		return _.last(@ancestors(context=context))
+		return _.last(@ancestors())
 
 
 	childrenAbove: (point, originX=0, originY=0) -> _.filter @children, (layer) ->
@@ -917,7 +912,6 @@ class exports.Layer extends BaseClass
 		importable: false
 		get: -> @siblings
 
-	superLayers: (context=false) -> @ancestors(context)
 	addSubLayer: (layer) -> @addChild(layer)
 	removeSubLayer: (layer) -> @removeChild(layer)
 	subLayersByName: (name) -> @childrenWithName(name)
@@ -1312,7 +1306,7 @@ class exports.Layer extends BaseClass
 		# parent layers clip, we need to intersect the rectangle with it.
 		frame = @canvasFrame
 
-		for parent in @ancestors(context=true)
+		for parent in @ancestors()
 			if parent.clip
 				frame = Utils.frameIntersection(frame, parent.canvasFrame)
 			if not frame
@@ -1354,21 +1348,6 @@ class exports.Layer extends BaseClass
 
 		# Don't show hint if this layer is invisible
 		return false if @opacity is 0
-
-		# See if this layer is visible and not covered by another layer
-		# We don't do this for now because, trying to figure this out will
-		# introduce another class of edge cases, and it is easier to understand
-		# the default logic than some magic logic written by me to try and figure
-		# out what is covered and what not.
-
-		# rootLayer = @root()
-
-		# rootLayers = _.filter @context.layers, (layer) ->
-		# 	return layer.parent is null and layer.index < rootLayer.index
-
-		# for layer in rootLayers
-		# 	if Utils.frameInFrame(@screenFrame, layer.totalFrame())
-		# 		return false
 
 		# If we don't ignore events on this layer, make sure the layer is listening to
 		# an interactive event so there is a decent change something is happening after
