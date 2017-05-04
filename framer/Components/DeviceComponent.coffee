@@ -174,7 +174,14 @@ class exports.DeviceComponent extends BaseClass
 			centerLayer(@screen)
 
 			@setHand(@selectedHand) if @selectedHand and @_orientation is 0
-			@_context.devicePixelRatio = @_device.devicePixelRatio ? 1
+
+			pixelRatio = @_device.devicePixelRatio ? 1
+			if window.devicePixelRatio is pixelRatio and Utils.isDesktop()
+				# On desktop rendering natively without scaling looks better, so do that
+				@_context.devicePixelRatio = 1
+				@content.scale = pixelRatio
+			else
+				@_context.devicePixelRatio = pixelRatio
 
 	_shouldRenderFullScreen: ->
 
