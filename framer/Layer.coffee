@@ -912,7 +912,6 @@ class exports.Layer extends BaseClass
 	subLayersBelow: (point, originX=0, originY=0) -> @childrenBelow(point, originX, originY)
 	subLayersLeft: (point, originX=0, originY=0) -> @childrenLeft(point, originX, originY)
 	subLayersRight: (point, originX=0, originY=0) -> @childrenRight(point, originX, originY)
-	_superOrParentLayer: -> @_parentOrContext()
 
 	##############################################################
 	## ANIMATION
