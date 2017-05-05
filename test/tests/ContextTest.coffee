@@ -205,7 +205,12 @@ describe "Context", ->
 				layerA = new Layer
 				context.layerForElement(layerA._element).should.equal layerA
 
+		it "should implement selectLayer", ->
 
+			context = new Framer.Context(name:"Test")
+			context.run ->
+				layerA = new Layer name: "layerA"
+				context.selectLayers("layerA").should.eql [layerA]
 
 	describe "Events", ->
 
