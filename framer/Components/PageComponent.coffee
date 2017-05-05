@@ -102,13 +102,9 @@ class exports.PageComponent extends ScrollComponent
 		# If you add pages it makes sense they end up in the default place .
 		point = {x: 0, y: 0}
 
-		print @content.children
-
 		if @content.children.length
 			point.x = Utils.frameGetMaxX(@content.contentFrame()) if direction in ["right", "east"]
 			point.y = Utils.frameGetMaxY(@content.contentFrame()) if direction in ["down", "bottom", "south"]
-
-			print point
 
 		page.point = point
 
