@@ -898,11 +898,13 @@ Utils.frameFromPoints = (points) ->
 		height: maxY - minY
 
 Utils.pixelAlignedFrame = (frame) ->
-	result =
-		width: Math.round(frame.width + (frame.x % 1))
-		height: Math.round(frame.height + (frame.y % 1))
-		x: Math.round(frame.x)
-		y: Math.round(frame.y)
+	x = Math.round(frame.x)
+	y = Math.round(frame.y)
+	maxX = Math.round(frame.x + frame.width)
+	maxY = Math.round(frame.y + frame.height)
+	width = Math.max(maxX - x, 0)
+	height = Math.max(maxY - y, 0)
+	return {x, y, width, height}
 
 Utils.frameMerge = ->
 

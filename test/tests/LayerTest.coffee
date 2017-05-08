@@ -1191,7 +1191,7 @@ describe "Layer", ->
 
 			boundingBox.x.should.eql 184
 			boundingBox.y.should.eql 98
-			boundingBox.width.should.eql 133
+			boundingBox.width.should.eql 132
 			boundingBox.height.should.eql 144
 
 		it "should use Framer.Defaults when setting the screen frame", ->
@@ -1217,7 +1217,7 @@ describe "Layer", ->
 
 			boundingBox.x.should.eql 184
 			boundingBox.y.should.eql 98
-			boundingBox.width.should.eql 133
+			boundingBox.width.should.eql 132
 			boundingBox.height.should.eql 144
 
 	describe "Copy", ->
