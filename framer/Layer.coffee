@@ -430,6 +430,41 @@ class exports.Layer extends BaseClass
 		get: -> Utils.frameGetMaxY @
 		set: (value) -> Utils.frameSetMaxY @, value
 
+
+	@define "constraintValues",
+		importable: true
+		exportable: false
+		default: null
+		get: -> @_getPropertyValue "constraintValues"
+		set: (value) ->
+			if value is null
+				newValue = null
+				@off "change:parent", @
+			else
+				newValue = _.defaults _.clone(value),
+					left: 0,
+					right: null,
+					top: 0,
+					bottom: null,
+					centerAnchorX: 0,
+					centerAnchorY: 0,
+					widthFactor: null,
+					heightFactor: null,
+					aspectRatioLocked: false,
+					width: @width,
+					height: @height
+				@parent?.on "change:width", => @layout()
+				@parent?.on "change:height", => @layout()
+				@on "change:parent", (newParent, oldParent) =>
+					oldParent?.off "change:width", @
+					oldParent?.off "change:height", @
+					@constraintValues = null
+			@_setPropertyValue "constraintValues", newValue
+
+	layout: ->
+		return if not @constraintValues?
+		@frame = Utils.calculateLayoutFrame(@parent, @)
+
 	convertPointToScreen: (point) =>
 		return Utils.convertPointToContext(point, @, false)
 
@@ -795,14 +830,15 @@ class exports.Layer extends BaseClass
 			else
 				@_insertElement()
 
+			oldParent = @_parent
 			# Set the parent
 			@_parent = layer
 
 			# Place this layer on top of its siblings
 			@bringToFront()
 
-			@emit "change:parent"
-			@emit "change:superLayer"
+			@emit "change:parent", @_parent, oldParent
+			@emit "change:superLayer", @_parent, oldParent
 
 	@define "children",
 		enumerable: false
