@@ -62,3 +62,4 @@ Icon
 /extras/resources.framerjs.com/static/DeviceResources/.*
 /yarn.lock
 /extras/Studio.framer/framer/.bookmark
+/extras/Studio.framer/framer/design.vekter
