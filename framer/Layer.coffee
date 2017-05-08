@@ -38,8 +38,9 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 			# Convert the value
 			value = transformer(value, @, name) if transformer
 
+			oldValue = @_properties[name]
 			# Return unless we get a new value
-			return if value is @_properties[name]
+			return if value is oldValue
 
 			if value and validator and not validator(value)
 				layerValueTypeError(name, value)
@@ -58,7 +59,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 			# doesn't make sense, because no one can listen to use yet.
 			return if @__constructor
 
-			@emit("change:#{name}", value)
+			@emit("change:#{name}", value, oldValue)
 			@emit("change:point", value) if name in ["x", "y"]
 			@emit("change:size", value)  if name in ["width", "height"]
 			@emit("change:frame", value) if name in ["x", "y", "width", "height"]
