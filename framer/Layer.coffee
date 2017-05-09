@@ -440,6 +440,7 @@ class exports.Layer extends BaseClass
 			if value is null
 				newValue = null
 				@off "change:parent", @
+				Screen.off "resize", @
 			else
 				newValue = _.defaults _.clone(value),
 					left: 0,
@@ -453,17 +454,24 @@ class exports.Layer extends BaseClass
 					aspectRatioLocked: false,
 					width: @width,
 					height: @height
-				@parent?.on "change:width", => @layout()
-				@parent?.on "change:height", => @layout()
+				if @parent?
+					@parent.on "change:width", => @layout()
+					@parent.on "change:height", => @layout()
+				else
+					Screen.on "resize", => @layout()
 				@on "change:parent", (newParent, oldParent) =>
-					oldParent?.off "change:width", @
-					oldParent?.off "change:height", @
+					if oldParent?
+						oldParent.off "change:width", @
+						oldParent.off "change:height", @
+					else
+						Screen.off "resize", @
 					@constraintValues = null
 			@_setPropertyValue "constraintValues", newValue
 
 	layout: ->
 		return if not @constraintValues?
-		@frame = Utils.calculateLayoutFrame(@parent, @)
+		parent = @parent ? Screen
+		@frame = Utils.calculateLayoutFrame(parent, @)
 
 	convertPointToScreen: (point) =>
 		return Utils.convertPointToContext(point, @, false)
