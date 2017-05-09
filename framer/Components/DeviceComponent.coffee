@@ -308,7 +308,7 @@ class exports.DeviceComponent extends BaseClass
 			# If we switch from fullscreen to a device, we should zoom to fit
 			shouldZoomToFit = @_deviceType is "fullscreen"
 
-			@screen.backgroundColor = "white"
+			@screen.backgroundColor = "black"
 			@screen.backgroundColor = device.backgroundColor if device.backgroundColor?
 
 			if device.deviceType is "computer"
