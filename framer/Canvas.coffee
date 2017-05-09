@@ -27,6 +27,8 @@ class Canvas extends BaseClass
 	onResize: (cb) -> @on("resize", cb)
 
 	_handleResize: (event) =>
+		if not Screen.device?
+			Screen.emit("resize")
 		@emit("resize")
 		@emit("change:width")
 		@emit("change:height")

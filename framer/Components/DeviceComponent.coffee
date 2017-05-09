@@ -126,6 +126,9 @@ class exports.DeviceComponent extends BaseClass
 		@_context = new Framer.Context(parent: @content, name: "DeviceScreen")
 		@_context.perspective = 1200
 		@_context.device = @
+		@on "change:orientation", ->
+			if Screen.size isnt Screen.height
+				Screen.emit("resize")
 
 	_update: =>
 
@@ -133,12 +136,12 @@ class exports.DeviceComponent extends BaseClass
 
 		contentScaleFactor = @contentScale
 		contentScaleFactor = 1 if contentScaleFactor > 1
-
+		screenSizeChanged = false
 		if @_shouldRenderFullScreen()
 
 			width = window.innerWidth / contentScaleFactor
 			height = window.innerHeight / contentScaleFactor
-
+			screenSizeChanged = @content.width isnt width or @content.height isnt height
 			for layer in [@background, @hands, @phone, @viewport, @content, @screen]
 				layer.x = layer.y = 0
 				layer.width = width
@@ -147,6 +150,7 @@ class exports.DeviceComponent extends BaseClass
 
 			@content.scale = contentScaleFactor
 			if @deviceType isnt "fullscreen" or Utils.isMobile()
+				screenSizeChanged = screenSizeChanged or @_context.devicePixelRatio isnt window.devicePixelRatio
 				@_context.devicePixelRatio = window.devicePixelRatio
 
 		else
@@ -169,6 +173,7 @@ class exports.DeviceComponent extends BaseClass
 			@screen.width  = @viewport.width = @_device.screenWidth
 			@screen.height = @viewport.height = @_device.screenHeight
 
+			screenSizeChanged = @content.width isnt width or @content.height isnt height
 			@content.width  = width
 			@content.height = height
 			centerLayer(@screen)
@@ -176,11 +181,14 @@ class exports.DeviceComponent extends BaseClass
 			@setHand(@selectedHand) if @selectedHand and @_orientation is 0
 
 			pixelRatio = @_device.devicePixelRatio ? 1
+			screenSizeChanged = screenSizeChanged or @_context.devicePixelRatio isnt pixelRatio
 			@_context.devicePixelRatio = pixelRatio
 			if window.devicePixelRatio is pixelRatio and Utils.isDesktop()
 				# On desktop rendering natively without scaling looks better, so do that
 				@_context.renderUsingNativePixelRatio = true
 				@content.scale = pixelRatio
+		if screenSizeChanged
+			Screen.emit("resize")
 
 	_shouldRenderFullScreen: ->
 
@@ -261,7 +269,6 @@ class exports.DeviceComponent extends BaseClass
 
 	@define "screenSize",
 		get: ->
-
 			if @_shouldRenderFullScreen()
 				size = Canvas.size
 			else if @isLandscape
