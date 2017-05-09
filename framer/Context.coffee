@@ -149,6 +149,9 @@ class exports.Context extends BaseClass
 		return layer if layer
 		return @layerForElement(element.parentNode)
 
+	layout: ->
+		@rootLayers.map (l) => l.layout()
+
 	# Animations
 	@define "animations", get: -> _.clone(@_animations)
 
