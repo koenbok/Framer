@@ -79,8 +79,8 @@ function showHomeScreenAlert() {
 	showAlert(html)
 }
 
-function loadProject() {
-	CoffeeScript.load("app.coffee")
+function loadProject(callback) {
+	CoffeeScript.load("app.coffee", callback)
 }
 
 function setDefaultPageTitle() {
@@ -98,7 +98,6 @@ function setDefaultPageTitle() {
 }
 
 function init() {
-
 	if (Utils.isFramerStudio()) {
 		return
 	}
@@ -117,10 +116,12 @@ function init() {
 	// 	return showHomeScreenAlert()
 	// }
 
-	loadProject()
+	loadProject(function(){
+		Framer.CurrentContext.layout()
+	})
+
 
 }
 
 init()
-
 })()
