@@ -439,8 +439,8 @@ class exports.Layer extends BaseClass
 		set: (value) ->
 			if value is null
 				newValue = null
-				@off "change:parent", @
-				Screen.off "resize", @
+				@off "change:parent", @parentChanged
+				Screen.off "resize", @layout
 			else
 				newValue = _.defaults _.clone(value),
 					left: 0,
@@ -455,20 +455,25 @@ class exports.Layer extends BaseClass
 					width: @width,
 					height: @height
 				if @parent?
-					@parent.on "change:width", => @layout()
-					@parent.on "change:height", => @layout()
+					if not (@layout in @parent.listeners("change:width"))
+						@parent.on "change:width", @layout
+					if not (@layout in @parent.listeners("change:height"))
+						@parent.on "change:height", @layout
 				else
-					Screen.on "resize", => @layout()
-				@on "change:parent", (newParent, oldParent) =>
-					if oldParent?
-						oldParent.off "change:width", @
-						oldParent.off "change:height", @
-					else
-						Screen.off "resize", @
-					@constraintValues = null
+					if not (@layout in Screen.listeners("resize"))
+						Screen.on "resize", @layout
+				if not (@parentChanged in @listeners("change:parent"))
+					@on "change:parent", @parentChanged
 			@_setPropertyValue "constraintValues", newValue
 
-	layout: ->
+	parentChanged: (newParent, oldParent) =>
+		if oldParent?
+			oldParent.off "change:width", @layout
+			oldParent.off "change:height", @layout
+		else
+			Screen.off "resize", @layout
+		@constraintValues = null
+	layout: =>
 		return if not @constraintValues?
 		parent = @parent ? Screen
 		@frame = Utils.calculateLayoutFrame(parent, @)
