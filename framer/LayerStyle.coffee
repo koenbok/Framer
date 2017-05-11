@@ -188,10 +188,14 @@ exports.LayerStyle =
 	borderRadius: (layer) ->
 
 		# Compatibility fix, remove later
-		if not _.isNumber(layer._properties.borderRadius)
-			return layer._properties.borderRadius
+		if _.isNumber(layer._properties.borderRadius)
+			return layer._properties.borderRadius + "px"
 
-		return layer._properties.borderRadius + "px"
+		if _.isArray(layer._properties.borderRadius) and _.compact(layer._properties.borderRadius.map(_.isNumber).length == layer._properties.borderRadius.length)
+			return _.take(layer._properties.borderRadius, 4).map((corner) -> corner + "px").join(" ")
+
+		# else
+		return layer._properties.borderRadius
 
 	border: (layer) ->
 		return "#{layer._properties.borderWidth}px solid #{layer._properties.borderColor}"
