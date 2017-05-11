@@ -50,6 +50,7 @@ class exports.Context extends BaseClass
 				l.updateForDevicePixelRatioChange()
 
 	@define "renderUsingNativePixelRatio", @simpleProperty("renderUsingNativePixelRatio", false)
+	@define "autoLayout", @simpleProperty("autoLayout", true)
 
 	@define "pixelMultiplier",
 		get: ->
@@ -85,6 +86,7 @@ class exports.Context extends BaseClass
 			@index = @id
 
 		Contexts.push(@)
+		@on "loaded:project", @layout
 
 	reset: ->
 
@@ -338,6 +340,7 @@ class exports.Context extends BaseClass
 			return window.innerHeight
 
 	@define "frame", get: -> {x: 0, y: 0, width: @width, height: @height}
+	@define "innerFrame", get: -> {x: 0, y: 0, width: @innerWidth, height: @innerHeight}
 	@define "size",  get: -> _.pick(@frame, ["width", "height"])
 	@define "point", get: -> _.pick(@frame, ["x", "y"])
 	@define "canvasFrame",

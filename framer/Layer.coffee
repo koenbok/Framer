@@ -475,8 +475,9 @@ class exports.Layer extends BaseClass
 		@constraintValues = null
 	layout: =>
 		return if not @constraintValues?
-		parent = @parent ? Screen
-		@frame = Utils.calculateLayoutFrame(parent, @)
+		return if not @parent? and not @context.autoLayout
+		parentFrame = @parent?.frame ? @context.innerFrame
+		@frame = Utils.calculateLayoutFrame(parentFrame, @)
 
 	convertPointToScreen: (point) =>
 		return Utils.convertPointToContext(point, @, false)
