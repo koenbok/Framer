@@ -906,57 +906,56 @@ Utils.pixelAlignedFrame = (frame) ->
 	height = Math.max(maxY - y, 0)
 	return {x, y, width, height}
 
-Utils.calculateLayoutFrame = (parent, child) ->
-	parentFrame = parent?.frame
+Utils.calculateLayoutFrame = (parentFrame, child) ->
 	constraintValues = child.constraintValues
 
-	x = constraintValues.left || 0
-	y = constraintValues.top || 0
+	x = constraintValues.left or 0
+	y = constraintValues.top or 0
 	width = constraintValues.width
 	height = constraintValues.height
 
-	if (parentFrame == null)
-		return Utils.pixelAlignedFrame({ x, y, width, height })
+	if (parentFrame is null)
+		return Utils.pixelAlignedFrame({x, y, width, height})
 
 	ratio = width / height
 
-	if (constraintValues.widthFactor != null)
+	if (constraintValues.widthFactor isnt null)
 		width = parentFrame.width * constraintValues.widthFactor
 		if (constraintValues.aspectRatioLocked)
 			height = width / ratio
 
 
-	if (constraintValues.heightFactor != null)
+	if (constraintValues.heightFactor isnt null)
 		height = parentFrame.height * constraintValues.heightFactor
 		if (constraintValues.aspectRatioLocked)
 			width = height * ratio
 
-	if (constraintValues.left != null && constraintValues.right != null)
+	if (constraintValues.left isnt null and constraintValues.right isnt null)
 		width = parentFrame.width - constraintValues.right - constraintValues.left
 		if (constraintValues.aspectRatioLocked)
 			height = width / ratio
 
-	if (constraintValues.top != null && constraintValues.bottom != null)
+	if (constraintValues.top isnt null and constraintValues.bottom isnt null)
 		height = parentFrame.height - constraintValues.bottom - constraintValues.top
 		if (constraintValues.aspectRatioLocked)
 			width = height * ratio
 
-	if (constraintValues.left != null)
+	if (constraintValues.left isnt null)
 		x = constraintValues.left
-	else if (constraintValues.right != null)
+	else if (constraintValues.right isnt null)
 		x = parentFrame.width - constraintValues.right - width
 	else
 		x = (constraintValues.centerAnchorX * parentFrame.width) - (width / 2)
 
 
-	if (constraintValues.top != null)
+	if (constraintValues.top isnt null)
 		y = constraintValues.top
-	else if (constraintValues.bottom != null)
+	else if (constraintValues.bottom isnt null)
 		y = parentFrame.height - constraintValues.bottom - height
 	else
 		y = (constraintValues.centerAnchorY * parentFrame.height) - (height / 2)
 
-	return Utils.pixelAlignedFrame({ x, y, width, height })
+	return Utils.pixelAlignedFrame({x, y, width, height})
 
 Utils.frameMerge = ->
 
