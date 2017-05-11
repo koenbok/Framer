@@ -473,6 +473,13 @@ class exports.Layer extends BaseClass
 		else
 			Screen.off "resize", @layout
 		@constraintValues = null
+
+	setParentPreservingConstraintValues: (parent) ->
+		tmp = @constraintValues
+		@parent = parent
+		@constraintValues = tmp
+		@layout()
+
 	layout: =>
 		return if not @constraintValues?
 		return if not @parent? and not @context.autoLayout

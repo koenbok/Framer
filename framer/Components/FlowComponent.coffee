@@ -94,9 +94,10 @@ class exports.FlowComponent extends Layer
 			return unless layer instanceof Layer
 			@_header = layer
 			@_header.name = "header"
-			@_header.parent = @
-			@_header.x = Align.center
-			@_header.y = Align.top
+			@_header.setParentPreservingConstraintValues(@)
+			if not @_header.constraintValues?
+				@_header.x = Align.center
+				@_header.y = Align.top
 			@_wrapLayer(@current) if @current
 
 	@define "footer",
@@ -105,9 +106,10 @@ class exports.FlowComponent extends Layer
 			return unless layer instanceof Layer
 			@_footer = layer
 			@_footer.name = "footer"
-			@_footer.parent = @
-			@_footer.x = Align.center
-			@_footer.y = Align.bottom
+			@_footer.setParentPreservingConstraintValues(@)
+			if not @_footer.constraintValues?
+				@_footer.x = Align.center
+				@_footer.y = Align.bottom
 			@_wrapLayer(@current) if @current
 
 	##############################################################
