@@ -924,7 +924,7 @@ class exports.Layer extends BaseClass
 			return @parent.containers(toRoot, result)
 		else if toRoot
 			result.push(@context)
-			return @context.containers(result)
+			return @context.containers(true, result)
 		return result
 
 	ancestors: ->
