@@ -102,6 +102,15 @@ asBorderRadius = (value) ->
 			result[key] = value[key]
 	return if _.isEmpty(result) then 0 else result
 
+asBorderWidth = (value) ->
+	return value if _.isNumber(value)
+	return 0 if not _.isObject(value)
+	result = {}
+	for key in ["left", "right", "bottom", "top"]
+		if _.has(value, key) and _.isNumber(value[key])
+			result[key] = value[key]
+	return if _.isEmpty(result) then 0 else result
+
 parentOrContext = (layerOrContext) ->
 	if layerOrContext.parent?
 		return layerOrContext.parent
@@ -273,8 +282,9 @@ class exports.Layer extends BaseClass
 
 	# Border properties
 	@define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, null, asBorderRadius)
-	@define "borderColor", layerProperty(@, "borderColor", "border", null, Color.validColorValue, Color.toColor)
-	@define "borderWidth", layerProperty(@, "borderWidth", "border", 0, _.isNumber)
+	@define "borderColor", layerProperty(@, "borderColor", "borderColor", null, Color.validColorValue, Color.toColor)
+	@define "borderWidth", layerProperty(@, "borderWidth", "borderWidth", 0, null, asBorderWidth)
+	@define "borderStyle", layerProperty(@, "borderStyle", "borderStyle", "solid")
 
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
 	@define "flat", layerProperty(@, "flat", "webkitTransformStyle", false, _.isBoolean)
@@ -548,7 +558,7 @@ class exports.Layer extends BaseClass
 		@y = parseInt @y
 
 	updateForDevicePixelRatioChange: =>
-		for cssProperty in ["width", "height", "webkitTransform", "boxShadow", "textShadow", "borderRadius", "border", "fontSize", "letterSpacing", "wordSpacing", "textIndent"]
+		for cssProperty in ["width", "height", "webkitTransform", "boxShadow", "textShadow", "borderRadius", "borderWidth", "fontSize", "letterSpacing", "wordSpacing", "textIndent"]
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 		@_elementHTML?.style.zoom = @context.scale
 

@@ -198,8 +198,18 @@ exports.LayerStyle =
 		# Custom values like strings are still allowed for compatibility reasons
 		return layer._properties.borderRadius
 
-	border: (layer) ->
-		return "#{layer._properties.borderWidth * layer.context.pixelMultiplier}px solid #{layer._properties.borderColor}"
+	borderWidth: (layer) ->
+
+		borderWidth = layer._properties.borderWidth
+		dpr = layer.context.pixelMultiplier
+
+		if _.isNumber(borderWidth)
+			return (borderWidth * dpr) + "px"
+
+		if _.isObject(borderWidth)
+			return (borderWidth.top ? 0) * dpr + "px " + (borderWidth.right ? 0) * dpr + "px " + (borderWidth.bottom ? 0) * dpr + "px " + (borderWidth.left ? 0) * dpr + "px"
+
+		return borderWidth
 
 	fontSize: (layer) ->
 		return (layer._properties.fontSize * layer.context.pixelMultiplier) + "px"
