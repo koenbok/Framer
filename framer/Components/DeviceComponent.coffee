@@ -905,7 +905,7 @@ PixelBaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1080
 	screenHeight: 1920
-	devicePixelRatio: 1
+	devicePixelRatio: 2.627
 	deviceType: "phone"
 	minStudioVersion: googlePixelReleaseVersion
 	hands:
