@@ -21,7 +21,7 @@ NoCacheDateKey = Date.now()
 layerValueTypeError = (name, value) ->
 	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}' is not valid")
 
-layerProperty = (obj, name, cssProperty, fallback, validator, transformer, options={}, set) ->
+layerProperty = (obj, name, cssProperty, fallback, validator, transformer, options={}, set, targetElement, includeMainElement) ->
 	result =
 		default: fallback
 		get: ->
@@ -33,7 +33,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 		set: (value) ->
 
-			# console.log "#{@constructor.name}.#{name}.set #{value} current:#{@[name]}"
+			# console.log "#{@constructor.name}.#{name}.set #{value} current:#{@[name]}", targetElement
 
 			# Convert the value
 			value = transformer(value, @, name) if transformer
@@ -47,11 +47,17 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 			@_properties[name] = value
 
+			elements = [@_element]
+			if targetElement
+				elements = [@[targetElement]]
+				elements.push(@_element) if includeMainElement
+
 			if cssProperty isnt null
-				if name is cssProperty and not LayerStyle[cssProperty]?
-					@_element.style[cssProperty] = @_properties[name]
-				else
-					@_element.style[cssProperty] = LayerStyle[cssProperty](@)
+				elements.forEach (element) =>
+					if name is cssProperty and not LayerStyle[cssProperty]?
+						element.style[cssProperty] = @_properties[name]
+					else
+						element.style[cssProperty] = LayerStyle[cssProperty](@)
 
 			set?(@, value)
 
@@ -143,6 +149,17 @@ class exports.Layer extends BaseClass
 
 		# We have to create the element before we set the defaults
 		@_createElement()
+
+		# Create border element
+		@_elementBorder = document.createElement("div")
+		@_element.appendChild(@_elementBorder)
+		@_elementBorder.style = _.extend @_elementBorder.style,
+			position: "absolute"
+			width: "100%"
+			height: "100%"
+			boxSizing: "border-box"
+			zIndex: 1000
+			pointerEvents: "none"
 
 		# Sanitize calculated property setters so direct properties always win
 		layerPropertyIgnore(options, "point", ["x", "y"])
@@ -281,10 +298,10 @@ class exports.Layer extends BaseClass
 	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor)
 
 	# Border properties
-	@define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, null, asBorderRadius)
-	@define "borderColor", layerProperty(@, "borderColor", "borderColor", null, Color.validColorValue, Color.toColor)
-	@define "borderWidth", layerProperty(@, "borderWidth", "borderWidth", 0, null, asBorderWidth)
-	@define "borderStyle", layerProperty(@, "borderStyle", "borderStyle", "solid")
+	@define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, null, asBorderRadius, null, null, "_elementBorder", true)
+	@define "borderColor", layerProperty(@, "borderColor", "borderColor", null, Color.validColorValue, Color.toColor, null, null, "_elementBorder")
+	@define "borderWidth", layerProperty(@, "borderWidth", "borderWidth", 0, null, asBorderWidth, null, null, "_elementBorder")
+	@define "borderStyle", layerProperty(@, "borderStyle", "borderStyle", "solid", _.isString, null, null, null, "_elementBorder")
 
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
 	@define "flat", layerProperty(@, "flat", "webkitTransformStyle", false, _.isBoolean)
