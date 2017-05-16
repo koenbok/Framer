@@ -47,7 +47,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 			@_properties[name] = value
 
-			mainElement = @_element if includeMainElement || !targetElement
+			mainElement = @_element if includeMainElement or not targetElement
 			subElement = @[targetElement] if targetElement?
 
 			if cssProperty isnt null
