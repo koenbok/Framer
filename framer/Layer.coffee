@@ -715,7 +715,7 @@ class exports.Layer extends BaseClass
 
 			if not @_elementHTML
 				@_elementHTML = document.createElement "div"
-				@_element.appendChild @_elementHTML
+				@_element.insertBefore @_elementHTML, @_elementBorder
 
 			@_elementHTML.style.zoom = @context.scale
 			@_elementHTML.innerHTML = value
