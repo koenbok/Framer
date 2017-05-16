@@ -47,17 +47,17 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 			@_properties[name] = value
 
-			elements = [@_element]
-			if targetElement
-				elements = [@[targetElement]]
-				elements.push(@_element) if includeMainElement
+			mainElement = @_element if includeMainElement || !targetElement
+			subElement = @[targetElement] if targetElement?
 
 			if cssProperty isnt null
-				elements.forEach (element) =>
-					if name is cssProperty and not LayerStyle[cssProperty]?
-						element.style[cssProperty] = @_properties[name]
-					else
-						element.style[cssProperty] = LayerStyle[cssProperty](@)
+				if name is cssProperty and not LayerStyle[cssProperty]?
+					mainElement?.style[cssProperty] = @_properties[name]
+					subElement?.style[cssProperty] = @_properties[name]
+				else
+					style = LayerStyle[cssProperty](@)
+					mainElement?.style[cssProperty] = style
+					subElement?.style[cssProperty] = style
 
 			set?(@, value)
 
