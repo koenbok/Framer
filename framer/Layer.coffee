@@ -200,6 +200,8 @@ class exports.Layer extends BaseClass
 
 		delete @__constructor
 
+		@onChange("size", @updateForSizeChange)
+
 	##############################################################
 	# Properties
 
@@ -578,6 +580,9 @@ class exports.Layer extends BaseClass
 		for cssProperty in ["width", "height", "webkitTransform", "boxShadow", "textShadow", "borderRadius", "borderWidth", "fontSize", "letterSpacing", "wordSpacing", "textIndent"]
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 		@_elementHTML?.style.zoom = @context.scale
+	
+	updateForSizeChange: =>
+		@_elementBorder.style["borderWidth"] = LayerStyle["borderWidth"](@)
 
 	##############################################################
 	# SCREEN GEOMETRY

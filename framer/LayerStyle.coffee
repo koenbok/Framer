@@ -204,10 +204,27 @@ exports.LayerStyle =
 		dpr = layer.context.pixelMultiplier
 
 		if _.isNumber(borderWidth)
-			return (borderWidth * dpr) + "px"
+			borderTopBottom = (Math.min(borderWidth, layer.height / 2) ? 0) * dpr
+			borderRightLeft = (Math.min(borderWidth, layer.width / 2) ? 0) * dpr
+			return borderTopBottom + "px " + borderRightLeft + "px " + borderTopBottom + "px " + borderRightLeft + "px"
 
 		if _.isObject(borderWidth)
-			return (borderWidth.top ? 0) * dpr + "px " + (borderWidth.right ? 0) * dpr + "px " + (borderWidth.bottom ? 0) * dpr + "px " + (borderWidth.left ? 0) * dpr + "px"
+			borderTop = borderWidth.top ? 0
+			borderBottom = borderWidth.bottom ? 0
+			borderLeft = borderWidth.left ? 0
+			borderRight = borderWidth.right ? 0
+
+			if (borderTop + borderBottom) > layer.height
+				topRatio = borderTop / (borderTop + borderBottom)
+				borderTop = Math.round(topRatio * layer.height)
+				borderBottom = layer.height - borderTop
+
+			if (borderLeft + borderRight) > layer.width
+				leftRatio = borderLeft / (borderLeft + borderRight)
+				borderLeft = Math.round(leftRatio * layer.width)
+				borderRight = layer.width - borderLeft
+
+			return borderTop * dpr + "px " + borderRight * dpr + "px " + borderBottom * dpr + "px " + borderLeft * dpr + "px"
 
 		return borderWidth
 
