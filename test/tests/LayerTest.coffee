@@ -613,6 +613,10 @@ describe "Layer", ->
 			layer.shadowColor = null
 			layer.style.boxShadow.should.equal "rgba(0, 0, 0, 0) 10px 10px 10px 10px"
 
+			# Setting shadowInset will create an inset shadow
+			layer.shadowInset = true
+			layer.style.boxShadow.should.equal "rgba(0, 0, 0, 0) 10px 10px 10px 10px inset"
+
 		it "should remove all events", ->
 			layerA = new Layer
 			handler = -> console.log "hello"
