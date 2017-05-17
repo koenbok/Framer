@@ -155,6 +155,8 @@ class exports.Layer extends BaseClass
 		@_element.appendChild(@_elementBorder)
 		@_elementBorder.style = _.extend @_elementBorder.style,
 			position: "absolute"
+			top: 0
+			left: 0
 			width: "100%"
 			height: "100%"
 			boxSizing: "border-box"
