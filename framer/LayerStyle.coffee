@@ -165,7 +165,7 @@ exports.LayerStyle =
 		else if props.shadowX is 0 and props.shadowY is 0 and props.shadowBlur is 0 and props.shadowSpread is 0
 			return ""
 
-		return "#{layer._properties.shadowX * layer.context.pixelMultiplier}px #{layer._properties.shadowY * layer.context.pixelMultiplier}px #{layer._properties.shadowBlur * layer.context.pixelMultiplier}px #{layer._properties.shadowSpread * layer.context.pixelMultiplier}px #{layer._properties.shadowColor}#{if layer._properties.shadowInset then " inset" else ""}"
+		return "#{layer._properties.shadowX * layer.context.pixelMultiplier}px #{layer._properties.shadowY * layer.context.pixelMultiplier}px #{layer._properties.shadowBlur * layer.context.pixelMultiplier}px #{layer._properties.shadowSpread * layer.context.pixelMultiplier}px #{layer._properties.shadowColor}"
 
 	textShadow: (layer) ->
 
