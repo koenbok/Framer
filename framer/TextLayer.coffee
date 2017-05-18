@@ -46,6 +46,7 @@ class exports.TextLayer extends Layer
 			fontSize: 40
 			fontWeight: 400
 			lineHeight: 1.25
+			shadowType: "text"
 
 		if not options.font? and not options.fontFamily?
 			options.fontFamily = @defaultFont()
@@ -207,7 +208,3 @@ class exports.TextLayer extends Layer
 	@define "truncate",
 		get: -> @textOverflow is "ellipsis"
 		set: (truncate) -> @textOverflow = if truncate then "ellipsis" else null
-
-	# Override shadow default
-	@define "shadowType", layerProperty(@, "shadowType", null, "text", null, null, {}, updateShadow)
-
