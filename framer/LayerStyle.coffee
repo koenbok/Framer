@@ -92,6 +92,11 @@ exports.LayerStyle =
 			if layer._properties.hasOwnProperty(layerName) and layer[layerName] isnt fallback
 				css.push("#{cssName}(#{filterFormat(layer[layerName], unit)})")
 
+		# filter shadow
+		if layer._properties and layer._properties.shadowType is "drop" and layer._properties.shadowColor
+			dropShadow = "drop-shadow(#{layer._properties.shadowX * layer.context.pixelMultiplier}px #{layer._properties.shadowY * layer.context.pixelMultiplier}px #{layer._properties.shadowBlur * layer.context.pixelMultiplier}px #{layer._properties.shadowColor})"
+			css.push(dropShadow)
+
 		return css.join(" ")
 
 	webkitTransform: (layer) ->
@@ -160,18 +165,25 @@ exports.LayerStyle =
 
 		props = layer._properties
 
-		if not props.shadowColor
+		if not props and props.shadowColor
+			return ""
+		else if not (props.shadowType is "box" or props.shadowType is "inset")
 			return ""
 		else if props.shadowX is 0 and props.shadowY is 0 and props.shadowBlur is 0 and props.shadowSpread is 0
 			return ""
 
-		return "#{layer._properties.shadowX * layer.context.pixelMultiplier}px #{layer._properties.shadowY * layer.context.pixelMultiplier}px #{layer._properties.shadowBlur * layer.context.pixelMultiplier}px #{layer._properties.shadowSpread * layer.context.pixelMultiplier}px #{layer._properties.shadowColor}"
+		insetString = ""
+		insetString = "inset " if props.shadowType is "inset"
+
+		return "#{insetString} #{layer._properties.shadowX * layer.context.pixelMultiplier}px #{layer._properties.shadowY * layer.context.pixelMultiplier}px #{layer._properties.shadowBlur * layer.context.pixelMultiplier}px #{layer._properties.shadowSpread * layer.context.pixelMultiplier}px #{layer._properties.shadowColor}"
 
 	textShadow: (layer) ->
 
 		props = layer._properties
 
-		if not props.shadowColor
+		if not props and props.shadowColor
+			return ""
+		else if props.shadowType isnt "text"
 			return ""
 		else if props.shadowX is 0 and props.shadowY is 0 and props.shadowBlur is 0 and props.shadowSpread is 0
 			return ""

@@ -1,4 +1,4 @@
-{Layer, layerProperty} = require "./Layer"
+{Layer, layerProperty, updateShadow} = require "./Layer"
 {LayerStyle} = require "./LayerStyle"
 {Color} = require "./Color"
 {Events} = require "./Events"
@@ -208,8 +208,6 @@ class exports.TextLayer extends Layer
 		get: -> @textOverflow is "ellipsis"
 		set: (truncate) -> @textOverflow = if truncate then "ellipsis" else null
 
-	# Map shadow properties to text shadow
-	@define "shadowX", layerProperty(@, "shadowX", "textShadow", 0, _.isNumber)
-	@define "shadowY", layerProperty(@, "shadowY", "textShadow", 0, _.isNumber)
-	@define "shadowBlur", layerProperty(@, "shadowBlur", "textShadow", 0, _.isNumber)
-	@define "shadowColor", layerProperty(@, "shadowColor", "textShadow", "", Color.validColorValue, Color.toColor)
+	# Override shadow default
+	@define "shadowType", layerProperty(@, "shadowType", null, "text", null, null, {}, updateShadow)
+

@@ -123,6 +123,11 @@ parentOrContext = (layerOrContext) ->
 	else
 		return layerOrContext.context
 
+exports.updateShadow = (layer, value) ->
+	layer._element.style.boxShadow = LayerStyle["boxShadow"](layer)
+	layer._element.style.textShadow = LayerStyle["textShadow"](layer)
+	layer._element.style.webkitFilter = LayerStyle["webkitFilter"](layer)
+
 class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
@@ -291,11 +296,12 @@ class exports.Layer extends BaseClass
 	@define "sepia", layerProperty(@, "sepia", "webkitFilter", 0, _.isNumber)
 
 	# Shadow properties
-	@define "shadowX", layerProperty(@, "shadowX", "boxShadow", 0, _.isNumber)
-	@define "shadowY", layerProperty(@, "shadowY", "boxShadow", 0, _.isNumber)
-	@define "shadowBlur", layerProperty(@, "shadowBlur", "boxShadow", 0, _.isNumber)
-	@define "shadowSpread", layerProperty(@, "shadowSpread", "boxShadow", 0, _.isNumber)
-	@define "shadowColor", layerProperty(@, "shadowColor", "boxShadow", "", Color.validColorValue, Color.toColor)
+	@define "shadowX", layerProperty(@, "shadowX", null, 0, _.isNumber, null, {}, exports.updateShadow)
+	@define "shadowY", layerProperty(@, "shadowY", null, 0, _.isNumber, null, {}, exports.updateShadow)
+	@define "shadowBlur", layerProperty(@, "shadowBlur", null, 0, _.isNumber, null, {}, exports.updateShadow)
+	@define "shadowSpread", layerProperty(@, "shadowSpread", null, 0, _.isNumber, null, {}, exports.updateShadow)
+	@define "shadowColor", layerProperty(@, "shadowColor", null, "", Color.validColorValue, Color.toColor, {}, exports.updateShadow)
+	@define "shadowType", layerProperty(@, "shadowType", null, "box", null, null, {}, exports.updateShadow)
 
 	# Color properties
 	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, Color.validColorValue, Color.toColor)
@@ -579,7 +585,7 @@ class exports.Layer extends BaseClass
 		@y = parseInt @y
 
 	updateForDevicePixelRatioChange: =>
-		for cssProperty in ["width", "height", "webkitTransform", "boxShadow", "textShadow", "borderRadius", "borderWidth", "fontSize", "letterSpacing", "wordSpacing", "textIndent"]
+		for cssProperty in ["width", "height", "webkitTransform", "boxShadow", "textShadow", "webkitFilter", "borderRadius", "borderWidth", "fontSize", "letterSpacing", "wordSpacing", "textIndent"]
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 		@_elementHTML?.style.zoom = @context.scale
 	
