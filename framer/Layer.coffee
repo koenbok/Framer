@@ -1242,19 +1242,24 @@ class exports.Layer extends BaseClass
 				Events.Click, Events.Tap, Events.TapStart, Events.TapEnd,
 				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
 
-					parentDraggableLayer = @_parentDraggableLayer()
+					# If we dragged any layer, we should cancel click events
+					return if LayerDraggable._globalDidDrag is true
 
-					if parentDraggableLayer
+					# parentDraggableLayer = @_parentDraggableLayer()
 
-						# If we had a reasonable scrolling offset we cancel the click
-						offset = parentDraggableLayer.draggable.offset
-						return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
-						return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
+					# console.log(eventName, parentDraggableLayer)
 
-						# If there is still some velocity (scroll is moving) we cancel the click
-						velocity = parentDraggableLayer.draggable.velocity
-						return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
-						return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
+					# if parentDraggableLayer
+
+					# 	# If we had a reasonable scrolling offset we cancel the click
+					# 	offset = parentDraggableLayer.draggable.offset
+					# 	return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
+					# 	return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
+
+					# 	# If there is still some velocity (scroll is moving) we cancel the click
+					# 	velocity = parentDraggableLayer.draggable.velocity
+					# 	return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
+					# 	return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
 
 		event = args[0]
 		if args[0]? and (event?.clientX? or event?.clientY?)
