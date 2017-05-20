@@ -94,6 +94,7 @@ class exports.FlowComponent extends Layer
 			return unless layer instanceof Layer
 			@_header = layer
 			@_header.name = "header"
+			@_header.width = @width
 			@_header.setParentPreservingConstraintValues(@)
 			if not @_header.constraintValues?
 				@_header.x = Align.center
@@ -106,6 +107,7 @@ class exports.FlowComponent extends Layer
 			return unless layer instanceof Layer
 			@_footer = layer
 			@_footer.name = "footer"
+			@_footer.width = @width
 			@_footer.setParentPreservingConstraintValues(@)
 			if not @_footer.constraintValues?
 				@_footer.x = Align.center
@@ -158,7 +160,7 @@ class exports.FlowComponent extends Layer
 		wrappedLayer.parent = @
 		wrappedLayer.visible = not options.animate
 
-		layerA = @_wrappedLayer(@current)
+		layerA = @current
 		layerB = wrappedLayer
 		overlay = @overlay
 
@@ -171,6 +173,7 @@ class exports.FlowComponent extends Layer
 
 		# Run the transition and update the history
 		@_runTransition(transition, "forward", options.animate, @current, layer)
+
 		@_stack.push({layer: layer, transition: transition})
 
 
@@ -184,7 +187,6 @@ class exports.FlowComponent extends Layer
 
 		# Maybe people (Jorn) pass in a layer accidentally
 		options = {} if options instanceof(Framer._Layer)
-
 		options = _.defaults({}, options, {count: 1, animate: true})
 
 		if options.count > 1
@@ -230,8 +232,9 @@ class exports.FlowComponent extends Layer
 		flowLayer.width = Math.max(flowLayer.width, @width)
 		flowLayer.height = Math.max(flowLayer.height, @height)
 
-		layer = layoutPage(flowLayer, @size)
-		layer = layoutScroll(layer, @size)
+		size = @size
+		layer = layoutPage(flowLayer, size)
+		layer = layoutScroll(layer, size)
 
 		# Mark the layer so we don't layout it twice'
 		layer._flowLayer = flowLayer
@@ -243,6 +246,9 @@ class exports.FlowComponent extends Layer
 		# Set the background color for he created scroll component
 		if layer instanceof ScrollComponent
 			scroll.backgroundColor = @backgroundColor
+			scroll.contentInset =
+				top: @header?.height or 0
+				bottom: @footer?.height or 0
 
 		return layer
 
@@ -262,12 +268,6 @@ class exports.FlowComponent extends Layer
 			do (event) => scroll.on event, => @emit(event, scroll)
 
 		scroll._flowForward = true
-
-	_wrappedLayer: (layer) ->
-		# Get the ScrollComponent for a layer if it was wrapped,
-		# or just the layer itself if it was not.
-		return null unless layer
-		return layer[FlowComponentLayerScrollKey] or layer
 
 	_runTransition: (transition, direction, animate, from, to) =>
 
@@ -391,6 +391,15 @@ class exports.FlowComponent extends Layer
 # Layout helpers
 
 detectHeaderFooter = (layer) ->
+
+	# This function tries to detect a stack of:
+	# 1) header / body / footer
+	# 2) header / body
+	# 3) body / footer
+
+	# A valid layout is when:
+	# - The child layers cover the entire parent edge to edge.
+	# - The child layers are vertically stacked, edge to edge.
 
 	result =
 		header: null
