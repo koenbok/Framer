@@ -149,8 +149,6 @@ class exports.Layer extends BaseClass
 
 		# Private setting for canceling of click event if wrapped in moved draggable
 		@_cancelClickEventInDragSession = true
-		@_cancelClickEventInDragSessionVelocity = 0.1
-		@_cancelClickEventInDragSessionOffset = 8
 
 		# We have to create the element before we set the defaults
 		@_createElement()
@@ -1230,6 +1228,7 @@ class exports.Layer extends BaseClass
 		get: -> @_context.domEventManager.wrap(@_element)
 
 	emit: (eventName, args...) ->
+
 		# If this layer has a parent draggable view and its position moved
 		# while dragging we automatically cancel click events. This is what
 		# you expect when you add a button to a scroll content layer. We only
@@ -1245,25 +1244,15 @@ class exports.Layer extends BaseClass
 					# If we dragged any layer, we should cancel click events
 					return if LayerDraggable._globalDidDrag is true
 
-					# parentDraggableLayer = @_parentDraggableLayer()
+		# See if we need to convert coordinates for this event. Mouse events by
+		# default have the screen coordinates so we make sure that event.point and
+		# event.contextPoint always have the proper coordinates.
 
-					# console.log(eventName, parentDraggableLayer)
+		if args[0]?.clientX? or args[0]?.clientY?
 
-					# if parentDraggableLayer
-
-					# 	# If we had a reasonable scrolling offset we cancel the click
-					# 	offset = parentDraggableLayer.draggable.offset
-					# 	return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
-					# 	return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
-
-					# 	# If there is still some velocity (scroll is moving) we cancel the click
-					# 	velocity = parentDraggableLayer.draggable.velocity
-					# 	return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
-					# 	return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
-
-		event = args[0]
-		if args[0]? and (event?.clientX? or event?.clientY?)
+			event = args[0]
 			point = {x: event.clientX, y: event.clientY}
+
 			event.point = Utils.convertPointFromContext(point, @, true)
 			event.contextPoint = Utils.convertPointFromContext(point, @context, true)
 
