@@ -120,7 +120,7 @@ class exports.FlowComponent extends Layer
 		# Transition over to a new layer using a specific transtition function.
 
 		# Some basic error checking
-		throw new Error "FlowComponent.transition expects a layer" unless layer
+		throw new Error "FlowComponent.transition expects a layer" unless layer instanceof Layer
 		throw new Error "FlowComponent.transition expects transitionFunction" unless transitionFunction
 
 		return if layer is @current
@@ -224,7 +224,7 @@ class exports.FlowComponent extends Layer
 
 		# print layer
 
-		return layoutPage(layer, @size)
+		return layoutScroll(layoutPage(layer, @size), @size)
 
 		# # Wrap the layer in a ScrollComponent if the size exceeds the size of
 		# # the FlowComponent. Also set the horizontal/vertical scrollin if only
@@ -456,9 +456,9 @@ detectHeaderFooter = (layer) ->
 	if children.length is 2
 
 		# Exit if the layers are not stacked
-		return if children[0].minY isnt 0
-		return if children[0].maxY isnt children[1].minY
-		return if children[1].maxY isnt layer.height
+		return result if children[0].minY isnt 0
+		return result if children[0].maxY isnt children[1].minY
+		return result if children[1].maxY isnt layer.height
 
 		# The header or footer is the smallest of the two
 		if children[0].height < children[1].height
@@ -474,14 +474,14 @@ detectHeaderFooter = (layer) ->
 	if children.length is 3
 
 		# Exit if the header or footer is bigger than the content
-		return if children[0].height > children[1].height
-		return if children[2].height > children[1].height
+		return result if children[0].height > children[1].height
+		return result if children[2].height > children[1].height
 
 		# Exit if the layers are not stacked
-		return if children[0].minY isnt 0
-		return if children[0].maxY isnt children[1].minY
-		return if children[1].maxY isnt children[2].minY
-		return if children[2].maxY isnt layer.height
+		return result if children[0].minY isnt 0
+		return result if children[0].maxY isnt children[1].minY
+		return result if children[1].maxY isnt children[2].minY
+		return result if children[2].maxY isnt layer.height
 
 		result.header = children[0]
 		result.body = children[1]
@@ -518,7 +518,7 @@ layoutPage = (layer, size) ->
 
 layoutScroll = (layer, size) ->
 
-	if layer.width < size.width and layer.height < size.height
+	if layer.width <= size.width and layer.height <= size.height
 		return layer
 
 	scroll = new ScrollComponent
@@ -526,6 +526,7 @@ layoutScroll = (layer, size) ->
 
 	scroll.propagateEvents = false
 
+	layer.point = 0
 	layer.parent = scroll.content
 
 	scroll.scrollHorizontal = layer.maxX > size.width
