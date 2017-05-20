@@ -136,6 +136,7 @@ class exports.FlowComponent extends Layer
 		options = _.defaults {}, options,
 			animate: if @_firstTransition is true then true else false
 			scroll: true
+			wrap: true
 			modal: false
 
 		# Deal with modal transitions, where a click on the overlay goes back
@@ -152,7 +153,8 @@ class exports.FlowComponent extends Layer
 		# Wrap the layer into a ScrollComponent if it exceeds the size
 		# and correct the parent if needed.
 		wrappedLayer = layer
-		wrappedLayer = @_wrapLayer(layer) if options.scroll
+		wrappedLayer = @_wrapLayer(layer) if options.scroll and options.wrap
+
 		wrappedLayer.parent = @
 		wrappedLayer.visible = not options.animate
 
@@ -217,92 +219,49 @@ class exports.FlowComponent extends Layer
 	_handleOverlayTap: =>
 		@showPrevious() if not @isModal
 
-	_wrapLayer: (layer) ->
+	_wrapLayer: (flowLayer) ->
 
-		# layer = layoutScroll(layoutPage(layer, @size), @size)
-		# layer.point = 0
+		flowLayer._flowLayer = flowLayer
 
-		# print layer
+		return flowLayer if flowLayer instanceof ScrollComponent
+		return flowLayer if flowLayer._flowWrapped
 
-		return layoutScroll(layoutPage(layer, @size), @size)
+		# Make the layer at least match the device size
+		flowLayer.width = Math.max(flowLayer.width, @width)
+		flowLayer.height = Math.max(flowLayer.height, @height)
 
-		# # Wrap the layer in a ScrollComponent if the size exceeds the size of
-		# # the FlowComponent. Also set the horizontal/vertical scrollin if only
-		# # one of the sizes exceeds.
+		layer = layoutPage(flowLayer, @size)
+		layer = layoutScroll(layer, @size)
 
-		# # TODO: what about FlowComponent changing size, do we need to account?
+		# Mark the layer so we don't layout it twice'
+		layer._flowLayer = flowLayer
 
-		# scroll = null
+		# Forward the scroll events from created scroll components
+		for scroll in [layer, layer.children...]
+			@_forwardScrollEvents(layer)
 
-		# # Calculate the available width and height based on header and footer
-		# width = @width
+		# Set the background color for he created scroll component
+		if layer instanceof ScrollComponent
+			scroll.backgroundColor = @backgroundColor
 
-		# height = @height
-		# height =- @header.height if @header
-		# height =- @footer.height if @footer
+		return layer
 
-		# # If we already created a scroll, we can use that one
-		# if layer[FlowComponentLayerScrollKey]
-		# 	scroll = layer[FlowComponentLayerScrollKey]
+	_forwardScrollEvents: (scroll) =>
 
-		# # If the layer size is exactly equal to the size of the FlowComponent
-		# # we can just use it directly.
-		# else if layer.width is @width and layer.height is height
-		# 	return layer
+		return unless scroll instanceof ScrollComponent
+		return if scroll._flowForward is true
 
-		# # If the layer size is smaller then the size of the FlowComponent we
-		# # still need to add a backgound layer so it covers up the background.
-		# # TODO: Implement this
-		# else if layer.width < @width and layer.height < height
-		# 	return layer
+		# But only the actual scroll events
+		for event in [
+			Events.ScrollStart,
+			Events.Scroll,
+			Events.ScrollMove,
+			Events.ScrollEnd,
+			Events.ScrollAnimationDidStart,
+			Events.ScrollAnimationDidEnd]
+			do (event) => scroll.on event, => @emit(event, scroll)
 
-		# # If this layer is a ScrollComponent we do not have to add another one
-		# if layer instanceof ScrollComponent
-		# 	scroll = layer
-		# 	scroll._originalContentInset ?= scroll.contentInset
-
-		# layer.point = Utils.pointZero()
-
-		# if not scroll
-		# 	scroll = new ScrollComponent
-		# 	scroll.name = "scrollComponent"
-		# 	scroll.backgroundColor = @backgroundColor
-		# 	layer[FlowComponentLayerScrollKey] = scroll
-		# 	layer.parent = scroll.content
-
-		# 	# Forward the events to the wrapped layer so we can listen on it for
-		# 	# scroll events. This is not "pure". But you don't really have a way
-		# 	# to access the magically created scroll component.
-		# 	_addListener = layer.addListener
-		# 	layer.on = (event, args...) ->
-
-		# 		_addListener.apply(layer, [event, args...])
-
-		# 		# But only the actual scroll events
-		# 		if event in [
-		# 			Events.ScrollStart,
-		# 			Events.Scroll,
-		# 			Events.ScrollMove,
-		# 			Events.ScrollEnd,
-		# 			Events.ScrollAnimationDidStart,
-		# 			Events.ScrollAnimationDidEnd]
-		# 				scroll.addListener(event, args...)
-
-		# scroll.parent = @
-		# scroll.size = @size
-		# # scroll.width = Math.min(layer.width, @width)
-		# # scroll.height = Math.min(layer.height, @height)
-		# scroll.scrollHorizontal = layer.width > width
-		# scroll.scrollVertical = layer.height > height
-
-		# contentInset =
-		# 	top: scroll._originalContentInset?.top ? 0
-		# 	bottom: scroll._originalContentInset?.bottom ? 0
-		# contentInset.top += @header.height if @header
-		# contentInset.bottom += @footer.height if @footer
-		# scroll.contentInset = contentInset
-
-		# return scroll
+		scroll._flowForward = true
 
 	_wrappedLayer: (layer) ->
 		# Get the ScrollComponent for a layer if it was wrapped,
@@ -523,11 +482,15 @@ layoutScroll = (layer, size) ->
 
 	scroll = new ScrollComponent
 		size: size
+		name: "scroll"
 
 	scroll.propagateEvents = false
 
+	constraints = layer.constraintValues
+
 	layer.point = 0
 	layer.parent = scroll.content
+	layer.constraintValues = constraints
 
 	scroll.scrollHorizontal = layer.maxX > size.width
 	scroll.scrollVertical = layer.maxY > size.height
