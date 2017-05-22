@@ -86,7 +86,6 @@ class exports.Context extends BaseClass
 			@index = @id
 
 		Contexts.push(@)
-		@on "loaded:project", @layout
 
 	reset: ->
 
