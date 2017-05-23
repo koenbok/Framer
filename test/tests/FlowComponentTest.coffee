@@ -35,72 +35,159 @@ describe "FlowComponent", ->
 		nav.height.should.equal 100
 		nav.current.should.equal cardA
 
-	describe "Header Footer", ->
+	describe.only "Header Footer", ->
 
-		it "should add header", ->
+		flowSize =
+			width: 300
+			height: 600
 
-			nav = new FlowComponent size: 200
-			nav.header = new Layer width: 200, height: 20
-			nav.showNext new Layer width: 200, height: 200
+		makeLayer = (height=40) ->
+			new Layer
+				width: flowSize.width
+				height: height
+				backgroundColor: Utils.randomColor()
 
-			nav.children[1].should.equal nav.header
-			nav.children[2].constructor.name.should.equal "ScrollComponent"
-			nav.children[2].scrollHorizontal.should.equal false
-			nav.children[2].scrollVertical.should.equal true
-			nav.children[2].contentInset.should.eql {top: 20, right: 0, bottom: 0, left: 0}
+		stackVertically = (layers) ->
+			layers.map (layer, i) ->
+				layer.y = layers[i-1].maxY unless i is 0
+				return layer
 
-		it "should add footer", ->
+		makePage = (layers) ->
+			page = new Layer
+				size: flowSize
+			layers.forEach (l) -> l.parent = page
+			page.height = Math.max((layers.map (l) -> l.maxY)...)
+			return page
 
-			nav = new FlowComponent size: 200
-			nav.footer = new Layer width: 200, height: 20
-			nav.showNext new Layer width: 200, height: 200
+		it "should fix header if content exceeds", ->
 
-			nav.children[1].should.equal nav.footer
-			nav.children[2].constructor.name.should.equal "ScrollComponent"
-			nav.children[2].scrollHorizontal.should.equal false
-			nav.children[2].scrollVertical.should.equal true
-			nav.children[2].contentInset.should.eql {top: 0, right: 0, bottom: 20, left: 0}
+			flow = new FlowComponent size: flowSize
 
+			flow.showNext(makePage(stackVertically([
+				makeLayer(100),
+				makeLayer(600)])))
 
-	describe "Scroll", ->
+			flow.current.children[0].frame.should.eql {x: 0, y: 0, width: 300, height: 100}
+			flow.current.children[1].frame.should.eql {x: 0, y: 100, width: 300, height: 500}
+			(flow.current.children[1] instanceof ScrollComponent).should.be.true
+			flow.current.children[1].contentInset.should.eql({bottom: 0, right: 0, top: 0, left: 0})
 
-		it "should make views scrollable", ->
+		it "should fix footer if content exceeds", ->
 
-			nav = new FlowComponent size: 100
-			cardA = new Layer width: 200, height: 200
+			flow = new FlowComponent size: flowSize
 
-			nav.showNext(cardA, scroll: true)
-			nav.children[1].constructor.name.should.equal "ScrollComponent"
-			nav.children[1].scrollHorizontal.should.equal true
-			nav.children[1].scrollVertical.should.equal true
+			flow.showNext(makePage(stackVertically([
+				makeLayer(600),
+				makeLayer(100)])))
 
-		it "should make views scrollable horizontal", ->
+			flow.current.children[0].frame.should.eql {x: 0, y: 500, width: 300, height: 100}
+			flow.current.children[1].frame.should.eql {x: 0, y: 0, width: 300, height: 500}
+			(flow.current.children[1] instanceof ScrollComponent).should.be.true
+			flow.current.children[1].contentInset.should.eql({bottom: 0, right: 0, top: 0, left: 0})
 
-			nav = new FlowComponent size: 100
-			cardA = new Layer width: 200, height: 100
+		it "should fix header and footer if content exceeds", ->
 
-			nav.showNext(cardA, scroll: true)
-			nav.children[1].constructor.name.should.equal "ScrollComponent"
-			nav.children[1].scrollHorizontal.should.equal true
-			nav.children[1].scrollVertical.should.equal false
+			flow = new FlowComponent size: flowSize
 
-		it "should make views scrollable vertical", ->
+			flow.showNext(makePage(stackVertically([
+				makeLayer(40),
+				makeLayer(600 - 40 - 80 + 100),
+				makeLayer(80)])))
 
-			nav = new FlowComponent size: 100
-			cardA = new Layer width: 100, height: 200
+			flow.current.children[0].frame.should.eql {x: 0, y: 0, width: 300, height: 40}
+			flow.current.children[1].frame.should.eql {x: 0, y: 520, width: 300, height: 80}
+			flow.current.children[2].frame.should.eql {x: 0, y: 40, width: 300, height: 480}
+			(flow.current.children[2] instanceof ScrollComponent).should.be.true
+			flow.current.children[2].contentInset.should.eql({bottom: 0, right: 0, top: 0, left: 0})
 
-			nav.showNext(cardA, scroll: true)
-			nav.children[1].constructor.name.should.equal "ScrollComponent"
-			nav.children[1].scrollHorizontal.should.equal false
-			nav.children[1].scrollVertical.should.equal true
+		it "should do nothing if header is misaligned x", ->
 
-		it "should not make views scrollable", ->
+			flow = new FlowComponent size: flowSize
 
-			nav = new FlowComponent size: 100
-			cardA = new Layer width: 100, height: 200
+			page = makePage(stackVertically([
+				makeLayer(40),
+				makeLayer(600 - 40 - 80 + 100),
+				makeLayer(80)]))
 
-			nav.showNext(cardA, scroll: false)
-			nav.children[1].constructor.name.should.not.equal "ScrollComponent"
+			page.children[0].x = -1
+			flow.showNext(page)
+			(flow.current.children[2] instanceof ScrollComponent).should.be.false
+
+		it "should do nothing if header is misaligned y", ->
+
+			flow = new FlowComponent size: flowSize
+
+			page = makePage(stackVertically([
+				makeLayer(40),
+				makeLayer(600 - 40 - 80 + 100),
+				makeLayer(80)]))
+
+			page.children[0].y = -1
+			flow.showNext(page)
+			(flow.current.children[2] instanceof ScrollComponent).should.be.false
+
+		it "should set contentInset without page header but with global header", ->
+
+			flow = new FlowComponent size: flowSize
+			flow.header = new Layer width: flowSize.width, height: 60
+
+			page = makePage(stackVertically([
+				makeLayer(600),
+				makeLayer(100)]))
+
+			flow.showNext(page)
+
+			flow.current.frame.should.eql {x: 0, y: 0, width: 300, height: 600}
+			flow.current.children[0].frame.should.eql {x: 0, y: 500, width: 300, height: 100}
+			flow.current.children[1].frame.should.eql {x: 0, y: 0, width: 300, height: 500}
+			(flow.current.children[1] instanceof ScrollComponent).should.be.true
+			flow.current.children[1].contentInset.should.eql({bottom: 0, right: 0, top: 60, left: 0})
+
+		it "should set contentInset without page footer but with global footer", ->
+
+			flow = new FlowComponent size: flowSize
+			flow.footer = new Layer width: flowSize.width, height: 60
+
+			page = makePage(stackVertically([
+				makeLayer(100),
+				makeLayer(600)]))
+
+			flow.showNext(page)
+
+			flow.current.frame.should.eql {x: 0, y: 0, width: 300, height: 600}
+			flow.current.children[0].frame.should.eql {x: 0, y: 0, width: 300, height: 100}
+			flow.current.children[1].frame.should.eql {x: 0, y: 100, width: 300, height: 500}
+			(flow.current.children[1] instanceof ScrollComponent).should.be.true
+			flow.current.children[1].contentInset.should.eql({bottom: 60, right: 0, top: 0, left: 0})
+
+		it "should make content scrollable if exceeds bounds", ->
+
+			flow = new FlowComponent size: flowSize
+
+			page = makePage(stackVertically([
+				makeLayer(800)]))
+
+			flow.showNext(page)
+
+			flow.current.frame.should.eql {x: 0, y: 0, width: 300, height: 800}
+			flow.current.parent.parent.frame.should.eql {x: 0, y: 0, width: 300, height: 600}
+			(flow.current.parent.parent instanceof ScrollComponent).should.be.true
+			flow.current.parent.parent.contentInset.should.eql({bottom: 0, right: 0, top: 0, left: 0})
+
+		it "should make content scrollable if exceeds bounds and set contentInset for global header and footer", ->
+
+			flow = new FlowComponent size: flowSize
+			flow.header = new Layer width: flowSize.width, height: 60
+			flow.footer = new Layer width: flowSize.width, height: 60
+			page = makePage(stackVertically([
+				makeLayer(800)]))
+
+			flow.showNext(page)
+
+			flow.current.frame.should.eql {x: 0, y: 0, width: 300, height: 800}
+			flow.current.parent.parent.frame.should.eql {x: 0, y: 0, width: 300, height: 600}
+			(flow.current.parent.parent instanceof ScrollComponent).should.be.true
+			flow.current.parent.parent.contentInset.should.eql({bottom: 60, right: 0, top: 60, left: 0})
 
 	describe "Events", ->
 
@@ -112,7 +199,7 @@ describe "FlowComponent", ->
 			cardB = new Layer name: "cardB", size: 100
 
 			nav = new FlowComponent()
-			
+
 			nav.onTransitionStart (args...) ->
 				events.push(Events.TransitionStart)
 

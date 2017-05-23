@@ -94,6 +94,7 @@ class exports.FlowComponent extends Layer
 			return unless layer instanceof Layer
 			@_header = layer
 			@_header.name = "header"
+			@_header.width = @width
 			@_header.setParentPreservingConstraintValues(@)
 			if not @_header.constraintValues?
 				@_header.x = Align.center
@@ -106,6 +107,7 @@ class exports.FlowComponent extends Layer
 			return unless layer instanceof Layer
 			@_footer = layer
 			@_footer.name = "footer"
+			@_footer.width = @width
 			@_footer.setParentPreservingConstraintValues(@)
 			if not @_footer.constraintValues?
 				@_footer.x = Align.center
@@ -120,7 +122,7 @@ class exports.FlowComponent extends Layer
 		# Transition over to a new layer using a specific transtition function.
 
 		# Some basic error checking
-		throw new Error "FlowComponent.transition expects a layer" unless layer
+		throw new Error "FlowComponent.transition expects a layer" unless layer instanceof Layer
 		throw new Error "FlowComponent.transition expects transitionFunction" unless transitionFunction
 
 		return if layer is @current
@@ -136,6 +138,7 @@ class exports.FlowComponent extends Layer
 		options = _.defaults {}, options,
 			animate: if @_firstTransition is true then true else false
 			scroll: true
+			wrap: true
 			modal: false
 
 		# Deal with modal transitions, where a click on the overlay goes back
@@ -152,11 +155,12 @@ class exports.FlowComponent extends Layer
 		# Wrap the layer into a ScrollComponent if it exceeds the size
 		# and correct the parent if needed.
 		wrappedLayer = layer
-		wrappedLayer = @_wrapLayer(layer) if options.scroll
+		wrappedLayer = @_wrapLayer(layer) if options.scroll and options.wrap
+
 		wrappedLayer.parent = @
 		wrappedLayer.visible = not options.animate
 
-		layerA = @_wrappedLayer(@current)
+		layerA = @current
 		layerB = wrappedLayer
 		overlay = @overlay
 
@@ -169,6 +173,7 @@ class exports.FlowComponent extends Layer
 
 		# Run the transition and update the history
 		@_runTransition(transition, "forward", options.animate, @current, layer)
+
 		@_stack.push({layer: layer, transition: transition})
 
 
@@ -182,7 +187,6 @@ class exports.FlowComponent extends Layer
 
 		# Maybe people (Jorn) pass in a layer accidentally
 		options = {} if options instanceof(Framer._Layer)
-
 		options = _.defaults({}, options, {count: 1, animate: true})
 
 		if options.count > 1
@@ -217,91 +221,57 @@ class exports.FlowComponent extends Layer
 	_handleOverlayTap: =>
 		@showPrevious() if not @isModal
 
-	_wrapLayer: (layer) ->
+	_wrapLayer: (flowLayer) ->
 
-		# Wrap the layer in a ScrollComponent if the size exceeds the size of
-		# the FlowComponent. Also set the horizontal/vertical scrollin if only
-		# one of the sizes exceeds.
+		flowLayer._flowLayer = flowLayer
 
-		# TODO: what about FlowComponent changing size, do we need to account?
+		return flowLayer if flowLayer instanceof ScrollComponent
+		return flowLayer if flowLayer._flowWrapped
 
-		scroll = null
+		# Make the layer at least match the device size
+		flowLayer.width = Math.max(flowLayer.width, @width)
+		flowLayer.height = Math.max(flowLayer.height, @height)
 
-		# Calculate the available width and height based on header and footer
-		width = @width
+		size = @size
+		layer = layoutPage(flowLayer, size)
+		layer = layoutScroll(layer, size)
 
-		height = @height
-		height =- @header.height if @header
-		height =- @footer.height if @footer
+		# Mark the layer so we don't layout it twice'
+		layer._flowLayer = flowLayer
 
-		# If we already created a scroll, we can use that one
-		if layer[FlowComponentLayerScrollKey]
-			scroll = layer[FlowComponentLayerScrollKey]
+		# Forward the scroll events from created scroll components
+		for scroll in [layer, layer.children...]
+			@_forwardScrollEvents(layer)
 
-		# If the layer size is exactly equal to the size of the FlowComponent
-		# we can just use it directly.
-		else if layer.width is @width and layer.height is height
-			return layer
+			if scroll instanceof ScrollComponent
+				print "scroll", scroll
+				inset = {}
+				inset.top = @header?.height or 0 if scroll.y is 0
+				inset.bottom = @footer?.height or 0 if scroll.maxY is @height
+				scroll.contentInset = inset
 
-		# If the layer size is smaller then the size of the FlowComponent we
-		# still need to add a backgound layer so it covers up the background.
-		# TODO: Implement this
-		else if layer.width < @width and layer.height < height
-			return layer
-
-		# If this layer is a ScrollComponent we do not have to add another one
+		# Set the background color for he created scroll component
 		if layer instanceof ScrollComponent
-			scroll = layer
-			scroll._originalContentInset ?= scroll.contentInset
+			layer.backgroundColor = @backgroundColor
 
-		layer.point = Utils.pointZero()
+		return layer
 
-		if not scroll
-			scroll = new ScrollComponent
-			scroll.name = "scrollComponent"
-			scroll.backgroundColor = @backgroundColor
-			layer[FlowComponentLayerScrollKey] = scroll
-			layer.parent = scroll.content
+	_forwardScrollEvents: (scroll) =>
 
-			# Forward the events to the wrapped layer so we can listen on it for
-			# scroll events. This is not "pure". But you don't really have a way
-			# to access the magically created scroll component.
-			_addListener = layer.addListener
-			layer.on = (event, args...) ->
+		return unless scroll instanceof ScrollComponent
+		return if scroll._flowForward is true
 
-				_addListener.apply(layer, [event, args...])
+		# But only the actual scroll events
+		for event in [
+			Events.ScrollStart,
+			Events.Scroll,
+			Events.ScrollMove,
+			Events.ScrollEnd,
+			Events.ScrollAnimationDidStart,
+			Events.ScrollAnimationDidEnd]
+				do (event) => scroll.on event, => @emit(event, scroll)
 
-				# But only the actual scroll events
-				if event in [
-					Events.ScrollStart,
-					Events.Scroll,
-					Events.ScrollMove,
-					Events.ScrollEnd,
-					Events.ScrollAnimationDidStart,
-					Events.ScrollAnimationDidEnd]
-						scroll.addListener(event, args...)
-
-		scroll.parent = @
-		scroll.size = @size
-		# scroll.width = Math.min(layer.width, @width)
-		# scroll.height = Math.min(layer.height, @height)
-		scroll.scrollHorizontal = layer.width > width
-		scroll.scrollVertical = layer.height > height
-
-		contentInset =
-			top: scroll._originalContentInset?.top ? 0
-			bottom: scroll._originalContentInset?.bottom ? 0
-		contentInset.top += @header.height if @header
-		contentInset.bottom += @footer.height if @footer
-		scroll.contentInset = contentInset
-
-		return scroll
-
-	_wrappedLayer: (layer) ->
-		# Get the ScrollComponent for a layer if it was wrapped,
-		# or just the layer itself if it was not.
-		return null unless layer
-		return layer[FlowComponentLayerScrollKey] or layer
+		scroll._flowForward = true
 
 	_runTransition: (transition, direction, animate, from, to) =>
 
@@ -420,6 +390,127 @@ class exports.FlowComponent extends Layer
 	onHalt: (cb) -> @onTransitionHalt(cb)
 	onStop: (cb) -> @onTransitionStop(cb)
 	onEnd: (cb) -> @onTransitionEnd(cb)
+
+##############################################################
+# Layout helpers
+
+pageLayout = (layer) ->
+
+	# This function tries to detect a stack of:
+	# 1) header / body / footer
+	# 2) header / body
+	# 3) body / footer
+
+	# A valid layout is when:
+	# - The child layers cover the entire parent edge to edge.
+	# - The child layers are vertically stacked, edge to edge.
+
+	result =
+		header: null
+		body: null
+		footer: null
+
+	if layer.children.length > 3
+		return result
+
+	if layer.children.length < 2
+		return result
+
+	# Get a list of the children sorted by y position
+	children = _.orderBy layer.children, (child) -> child.y
+
+	# Make sure all children are edge to edge
+	for child in children
+		return result if child.minX isnt 0
+		return result if child.maxX isnt layer.width
+
+	# Header OR footer case
+	if children.length is 2
+
+		# Exit if the layers are not stacked
+		return result if children[0].minY isnt 0
+		return result if children[0].maxY isnt children[1].minY
+		return result if children[1].maxY isnt layer.height
+
+		# The header or footer is the smallest of the two
+		if children[0].height < children[1].height
+			result.header = children[0]
+			result.body = children[1]
+		else
+			result.body = children[0]
+			result.footer = children[1]
+
+		return result
+
+	# Header OR footer case
+	if children.length is 3
+
+		# Exit if the header or footer is bigger than the content
+		return result if children[0].height > children[1].height
+		return result if children[2].height > children[1].height
+
+		# Exit if the layers are not stacked
+		return result if children[0].minY isnt 0
+		return result if children[0].maxY isnt children[1].minY
+		return result if children[1].maxY isnt children[2].minY
+		return result if children[2].maxY isnt layer.height
+
+		result.header = children[0]
+		result.body = children[1]
+		result.footer = children[2]
+
+		return result
+
+	return result
+
+layoutPage = (layer, size) ->
+
+	split = pageLayout(layer)
+
+	return layer unless split.body
+
+	bodyFrame = split.body.frame
+	bodyFrame.width = size.width
+	bodyFrame.height = size.height - (split.header?.height or 0) - (split.footer?.height or 0)
+
+	split.body.point = 0
+	scroll = layoutScroll(split.body, bodyFrame)
+	scroll.parent = layer
+	scroll.frame = bodyFrame
+
+	layer.size = size
+
+	if split.footer?.maxY > size.height
+		split.footer.maxY = size.height
+
+	split.header?.bringToFront()
+	split.footer?.bringToFront()
+
+	return layer
+
+layoutScroll = (layer, size) ->
+
+	if layer.width <= size.width and layer.height <= size.height
+		return layer
+
+	scroll = new ScrollComponent
+		size: size
+		name: "scroll"
+
+	height = layer.height
+	scroll.propagateEvents = false
+
+	constraints = layer.constraintValues
+
+	layer.point = 0
+	layer.parent = scroll.content
+	layer.constraintValues = constraints
+
+	scroll.scrollHorizontal = layer.maxX > size.width
+	scroll.scrollVertical = layer.maxY > size.height
+
+	return scroll
+
 
 Transitions = {}
 
