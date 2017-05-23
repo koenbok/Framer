@@ -1403,6 +1403,16 @@ describe "Layer", ->
 				names.should.eql ["c", "b", "a", undefined, "viewport", "screen", "phone", "phone", "hands", undefined]
 
 	describe "constraintValues", ->
+		it "layout should not break constraints", ->
+			l = new Layer
+				x: 100
+				constraintValues:
+					aspectRatioLocked: true
+			l.x.should.equal 100
+			l.layout()
+			l.x.should.equal 0
+			assert.notEqual l.constraintValues, null
+
 		it "should break all constraints when setting x", ->
 			l = new Layer
 				x: 100
@@ -1423,7 +1433,7 @@ describe "Layer", ->
 			l.y = 50
 			assert.equal l.constraintValues, null
 
-		it "should break all constraints when setting width", ->
+		it "should update the width constraint when setting width", ->
 			l = new Layer
 				width: 100
 				constraintValues:
@@ -1431,9 +1441,9 @@ describe "Layer", ->
 			l.width.should.equal 100
 			assert.notEqual l.constraintValues, null
 			l.width = 50
-			assert.equal l.constraintValues, null
+			l.constraintValues.width.should.equal 50
 
-		it "should break all constraints when setting height", ->
+		it "should update the height constraint when setting height", ->
 			l = new Layer
 				height: 100
 				constraintValues:
@@ -1441,4 +1451,72 @@ describe "Layer", ->
 			l.height.should.equal 100
 			assert.notEqual l.constraintValues, null
 			l.height = 50
-			assert.equal l.constraintValues, null
+			l.constraintValues.height.should.equal 50
+
+		it "should disable the aspectRatioLock and widthFactor constraint when setting width", ->
+			l = new Layer
+				constraintValues:
+					aspectRatioLocked: true
+					widthFactor: 0.5
+					width: null
+			l.layout()
+			l.width.should.equal 200
+			assert.notEqual l.constraintValues, null
+			l.width = 50
+			l.constraintValues.aspectRatioLocked.should.equal false
+			assert.equal l.constraintValues.widthFactor, null
+
+		it "should disable the aspectRatioLock and heightFactor constraint when setting height", ->
+			l = new Layer
+				constraintValues:
+					aspectRatioLocked: true
+					heightFactor: 0.5
+					height: null
+			l.layout()
+			l.height.should.equal 150
+			assert.notEqual l.constraintValues, null
+			l.height = 50
+			assert.equal l.constraintValues.heightFactor, null
+
+		it "should update the x position when changing width", ->
+			l = new Layer
+				width: 100
+				constraintValues:
+					left: null
+					right: 20
+			l.layout()
+			l.width.should.equal 100
+			l.x.should.equal 280
+			assert.notEqual l.constraintValues, null
+			l.width = 50
+			l.x.should.equal 330
+
+		it "should update the y position when changing height", ->
+			l = new Layer
+				height: 100
+				constraintValues:
+					top: null
+					bottom: 20
+			l.layout()
+			l.height.should.equal 100
+			l.y.should.equal 180
+			assert.notEqual l.constraintValues, null
+			l.height = 50
+			l.y.should.equal 230
+
+		describe "when no constraints are set", ->
+			it "should not set the width constraint when setting the width", ->
+				l = new Layer
+					width: 100
+				l.width.should.equal 100
+				assert.equal l.constraintValues, null
+				l.width = 50
+				assert.equal l.constraintValues, null
+
+			it "should not set the height constraint when setting the height", ->
+				l = new Layer
+					height: 100
+				l.height.should.equal 100
+				assert.equal l.constraintValues, null
+				l.height = 50
+				assert.equal l.constraintValues, null

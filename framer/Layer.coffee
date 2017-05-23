@@ -228,8 +228,21 @@ class exports.Layer extends BaseClass
 	@define "animationOptions", @simpleProperty("animationOptions", {})
 
 	# Css properties
-	@define "width",  layerProperty(@, "width",  "width", 100, _.isNumber, null, {}, (layer) -> layer.constraintValues = null)
-	@define "height", layerProperty(@, "height", "height", 100, _.isNumber, null, {}, (layer) -> layer.constraintValues = null)
+	@define "width",  layerProperty(@, "width", "width", 100, _.isNumber, null, {}, (layer, value) ->
+		return if not layer.constraintValues? or layer.isLayouting
+		layer.constraintValues.width = value
+		layer.constraintValues.aspectRatioLocked = false
+		layer.constraintValues.widthFactor = null
+		layer._layoutX()
+	)
+
+	@define "height", layerProperty(@, "height", "height", 100, _.isNumber, null, {}, (layer, value) ->
+		return if not layer.constraintValues? or layer.isLayouting
+		layer.constraintValues.height = value
+		layer.constraintValues.aspectRatioLocked = false
+		layer.constraintValues.heightFactor = null
+		layer._layoutY()
+	)
 
 	@define "visible", layerProperty(@, "visible", "display", true, _.isBoolean)
 	@define "opacity", layerProperty(@, "opacity", "opacity", 1, _.isNumber)
@@ -251,9 +264,15 @@ class exports.Layer extends BaseClass
 
 	# Matrix properties
 	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber,
-		layerPropertyPointTransformer, {depends: ["width", "height"]}, (layer) -> layer.constraintValues = null)
+		layerPropertyPointTransformer, {depends: ["width", "height"]}, (layer) ->
+			return if layer.isLayouting
+			layer.constraintValues = null
+	)
 	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber,
-		layerPropertyPointTransformer, {depends: ["width", "height"]}, (layer) -> layer.constraintValues = null)
+		layerPropertyPointTransformer, {depends: ["width", "height"]}, (layer) ->
+			return if layer.isLayouting
+			layer.constraintValues = null
+	)
 	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber)
 
 	@define "scaleX", layerProperty(@, "scaleX", "webkitTransform", 1, _.isNumber)
@@ -517,11 +536,29 @@ class exports.Layer extends BaseClass
 		@constraintValues = tmp
 		@layout()
 
+	_layoutX: =>
+		return if not @constraintValues?
+		return if not @parent? and not @context.autoLayout
+		parentFrame = @parent?.frame ? @context.innerFrame
+		@isLayouting = true
+		@x = Utils.calculateLayoutX(parentFrame, @constraintValues, @width)
+		@isLayouting = false
+
+	_layoutY: =>
+		return if not @constraintValues?
+		return if not @parent? and not @context.autoLayout
+		parentFrame = @parent?.frame ? @context.innerFrame
+		@isLayouting = true
+		@y = Utils.calculateLayoutY(parentFrame, @constraintValues, @height)
+		@isLayouting = false
+
 	layout: =>
 		return if not @constraintValues?
 		return if not @parent? and not @context.autoLayout
 		parentFrame = @parent?.frame ? @context.innerFrame
+		@isLayouting = true
 		@frame = Utils.calculateLayoutFrame(parentFrame, @)
+		@isLayouting = false
 
 	convertPointToScreen: (point) =>
 		return Utils.convertPointToContext(point, @, false)
