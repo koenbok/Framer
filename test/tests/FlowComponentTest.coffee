@@ -35,7 +35,7 @@ describe "FlowComponent", ->
 		nav.height.should.equal 100
 		nav.current.should.equal cardA
 
-	describe.only "Header Footer", ->
+	describe "Header Footer", ->
 
 		flowSize =
 			width: 300
