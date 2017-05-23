@@ -244,6 +244,7 @@ class exports.FlowComponent extends Layer
 			@_forwardScrollEvents(layer)
 
 			if scroll instanceof ScrollComponent
+				print "scroll", scroll
 				inset = {}
 				inset.top = @header?.height or 0 if scroll.y is 0
 				inset.bottom = @footer?.height or 0 if scroll.maxY is @height
@@ -268,7 +269,7 @@ class exports.FlowComponent extends Layer
 			Events.ScrollEnd,
 			Events.ScrollAnimationDidStart,
 			Events.ScrollAnimationDidEnd]
-			do (event) => scroll.on event, => @emit(event, scroll)
+				do (event) => scroll.on event, => @emit(event, scroll)
 
 		scroll._flowForward = true
 
