@@ -228,8 +228,8 @@ class exports.Layer extends BaseClass
 	@define "animationOptions", @simpleProperty("animationOptions", {})
 
 	# Css properties
-	@define "width",  layerProperty(@, "width",  "width", 100, _.isNumber)
-	@define "height", layerProperty(@, "height", "height", 100, _.isNumber)
+	@define "width",  layerProperty(@, "width",  "width", 100, _.isNumber, null, {}, (layer) -> layer.constraintValues = null)
+	@define "height", layerProperty(@, "height", "height", 100, _.isNumber, null, {}, (layer) -> layer.constraintValues = null)
 
 	@define "visible", layerProperty(@, "visible", "display", true, _.isBoolean)
 	@define "opacity", layerProperty(@, "opacity", "opacity", 1, _.isNumber)
@@ -251,9 +251,9 @@ class exports.Layer extends BaseClass
 
 	# Matrix properties
 	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber,
-		layerPropertyPointTransformer, {depends: ["width", "height"]})
+		layerPropertyPointTransformer, {depends: ["width", "height"]}, (layer) -> layer.constraintValues = null)
 	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber,
-		layerPropertyPointTransformer, {depends: ["width", "height"]})
+		layerPropertyPointTransformer, {depends: ["width", "height"]}, (layer) -> layer.constraintValues = null)
 	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber)
 
 	@define "scaleX", layerProperty(@, "scaleX", "webkitTransform", 1, _.isNumber)
@@ -588,7 +588,7 @@ class exports.Layer extends BaseClass
 		for cssProperty in ["width", "height", "webkitTransform", "boxShadow", "textShadow", "webkitFilter", "borderRadius", "borderWidth", "fontSize", "letterSpacing", "wordSpacing", "textIndent"]
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
 		@_elementHTML?.style.zoom = @context.scale
-	
+
 	updateForSizeChange: =>
 		@_elementBorder.style["borderWidth"] = LayerStyle["borderWidth"](@)
 

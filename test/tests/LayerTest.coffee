@@ -1401,3 +1401,44 @@ describe "Layer", ->
 				containers.length.should.equal 10
 				names = containers.map((l) -> l.name)
 				names.should.eql ["c", "b", "a", undefined, "viewport", "screen", "phone", "phone", "hands", undefined]
+
+	describe "constraintValues", ->
+		it "should break all constraints when setting x", ->
+			l = new Layer
+				x: 100
+				constraintValues:
+					aspectRatioLocked: true
+			l.x.should.equal 100
+			assert.notEqual l.constraintValues, null
+			l.x = 50
+			assert.equal l.constraintValues, null
+
+		it "should break all constraints when setting y", ->
+			l = new Layer
+				y: 100
+				constraintValues:
+					aspectRatioLocked: true
+			l.y.should.equal 100
+			assert.notEqual l.constraintValues, null
+			l.y = 50
+			assert.equal l.constraintValues, null
+
+		it "should break all constraints when setting width", ->
+			l = new Layer
+				width: 100
+				constraintValues:
+					aspectRatioLocked: true
+			l.width.should.equal 100
+			assert.notEqual l.constraintValues, null
+			l.width = 50
+			assert.equal l.constraintValues, null
+
+		it "should break all constraints when setting height", ->
+			l = new Layer
+				height: 100
+				constraintValues:
+					aspectRatioLocked: true
+			l.height.should.equal 100
+			assert.notEqual l.constraintValues, null
+			l.height = 50
+			assert.equal l.constraintValues, null
