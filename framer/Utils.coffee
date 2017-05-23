@@ -924,7 +924,6 @@ Utils.calculateLayoutFrame = (parentFrame, child) ->
 		if (constraintValues.aspectRatioLocked)
 			height = width / ratio
 
-
 	if (constraintValues.heightFactor isnt null)
 		height = parentFrame.height * constraintValues.heightFactor
 		if (constraintValues.aspectRatioLocked)
@@ -940,22 +939,30 @@ Utils.calculateLayoutFrame = (parentFrame, child) ->
 		if (constraintValues.aspectRatioLocked)
 			width = height * ratio
 
+	x = Utils.calculateLayoutX(parentFrame, constraintValues, width)
+	y = Utils.calculateLayoutY(parentFrame, constraintValues, height)
+
+	return Utils.pixelAlignedFrame({x, y, width, height})
+
+Utils.calculateLayoutX = (parentFrame, constraintValues, width) ->
+	x = constraintValues.left or 0
 	if (constraintValues.left isnt null)
 		x = constraintValues.left
 	else if (constraintValues.right isnt null)
 		x = parentFrame.width - constraintValues.right - width
 	else
 		x = (constraintValues.centerAnchorX * parentFrame.width) - (width / 2)
+	return x
 
-
+Utils.calculateLayoutY = (parentFrame, constraintValues, height) ->
+	y = constraintValues.top or 0
 	if (constraintValues.top isnt null)
 		y = constraintValues.top
 	else if (constraintValues.bottom isnt null)
 		y = parentFrame.height - constraintValues.bottom - height
 	else
 		y = (constraintValues.centerAnchorY * parentFrame.height) - (height / 2)
-
-	return Utils.pixelAlignedFrame({x, y, width, height})
+	return y
 
 Utils.frameMerge = ->
 
