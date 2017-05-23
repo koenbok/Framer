@@ -243,12 +243,15 @@ class exports.FlowComponent extends Layer
 		for scroll in [layer, layer.children...]
 			@_forwardScrollEvents(layer)
 
+			if scroll instanceof ScrollComponent
+				inset = {}
+				inset.top = @header?.height or 0 if scroll.y is 0
+				inset.bottom = @footer?.height or 0 if scroll.maxY is @height
+				scroll.contentInset = inset
+
 		# Set the background color for he created scroll component
 		if layer instanceof ScrollComponent
-			scroll.backgroundColor = @backgroundColor
-			scroll.contentInset =
-				top: @header?.height or 0
-				bottom: @footer?.height or 0
+			layer.backgroundColor = @backgroundColor
 
 		return layer
 
@@ -390,7 +393,7 @@ class exports.FlowComponent extends Layer
 ##############################################################
 # Layout helpers
 
-detectHeaderFooter = (layer) ->
+pageLayout = (layer) ->
 
 	# This function tries to detect a stack of:
 	# 1) header / body / footer
@@ -461,7 +464,7 @@ detectHeaderFooter = (layer) ->
 
 layoutPage = (layer, size) ->
 
-	split = detectHeaderFooter(layer)
+	split = pageLayout(layer)
 
 	return layer unless split.body
 
@@ -493,6 +496,7 @@ layoutScroll = (layer, size) ->
 		size: size
 		name: "scroll"
 
+	height = layer.height
 	scroll.propagateEvents = false
 
 	constraints = layer.constraintValues
