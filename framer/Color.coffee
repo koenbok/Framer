@@ -269,7 +269,7 @@ class exports.Color extends BaseClass
 	@toColor: (color) -> return new Color(color)
 	@validColorValue: (color) -> return color instanceof Color or color is null
 
-	@isColor: (color) ->
+	@isColor: (color) =>
 		if _.isString(color)
 			return @isColorString(color)
 		else
