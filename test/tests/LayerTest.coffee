@@ -1504,6 +1504,45 @@ describe "Layer", ->
 			l.height = 50
 			l.y.should.equal 230
 
+		it "should update to center the layer when center() is called", ->
+			l = new Layer
+				constraintValues:
+					aspectRatioLocked: true
+			l.layout()
+			l.center()
+			l.x.should.equal 150
+			l.y.should.equal 100
+			assert.equal l.constraintValues.left, null
+			assert.equal l.constraintValues.right, null
+			assert.equal l.constraintValues.top, null
+			assert.equal l.constraintValues.bottom, null
+			assert.equal l.constraintValues.centerAnchorX, 0.5
+			assert.equal l.constraintValues.centerAnchorY, 0.5
+
+		it "should update to center the layer vertically when centerX() is called", ->
+			l = new Layer
+				constraintValues:
+					aspectRatioLocked: true
+			l.layout()
+			l.x.should.equal 0
+			l.centerX()
+			l.x.should.equal 150
+			assert.equal l.constraintValues.left, null
+			assert.equal l.constraintValues.right, null
+			assert.equal l.constraintValues.centerAnchorX, 0.5
+
+		it "should update to center the layer horizontally when centerY() is called", ->
+			l = new Layer
+				constraintValues:
+					aspectRatioLocked: true
+			l.layout()
+			l.y.should.equal 0
+			l.centerY()
+			l.y.should.equal 100
+			assert.equal l.constraintValues.top, null
+			assert.equal l.constraintValues.bottom, null
+			assert.equal l.constraintValues.centerAnchorY, 0.5
+
 		describe "when no constraints are set", ->
 			it "should not set the width constraint when setting the width", ->
 				l = new Layer

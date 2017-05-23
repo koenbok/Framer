@@ -606,15 +606,37 @@ class exports.Layer extends BaseClass
 			return frame
 
 	center: ->
-		@frame = @centerFrame() # Center  in parent
+		if @constraintValues?
+			@constraintValues.left = null
+			@constraintValues.right = null
+			@constraintValues.top = null
+			@constraintValues.bottom = null
+			@constraintValues.centerAnchorX = 0.5
+			@constraintValues.centerAnchorY = 0.5
+			@_layoutX()
+			@_layoutY()
+		else
+			@frame = @centerFrame() # Center  in parent
 		@
 
 	centerX: (offset=0) ->
-		@x = @centerFrame().x + offset # Center x in parent
+		if @constraintValues?
+			@constraintValues.left = null
+			@constraintValues.right = null
+			@constraintValues.centerAnchorX = 0.5
+			@_layoutX()
+		else
+			@x = @centerFrame().x + offset # Center x in parent
 		@
 
 	centerY: (offset=0) ->
-		@y = @centerFrame().y + offset # Center y in parent
+		if @constraintValues?
+			@constraintValues.top = null
+			@constraintValues.bottom = null
+			@constraintValues.centerAnchorY = 0.5
+			@_layoutY()
+		else
+			@y = @centerFrame().y + offset # Center y in parent
 		@
 
 	pixelAlign: ->
