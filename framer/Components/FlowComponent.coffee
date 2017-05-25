@@ -397,97 +397,139 @@ class exports.FlowComponent extends Layer
 ##############################################################
 # Layout helpers
 
-pageLayout = (layer) ->
+findPossibleHeader = (layer) ->
 
-	# This function tries to detect a stack of:
-	# 1) header / body / footer
-	# 2) header / body
-	# 3) body / footer
+	candidate = null
 
-	# A valid layout is when:
-	# - The child layers cover the entire parent edge to edge.
-	# - The child layers are vertically stacked, edge to edge.
+	for child in layer.children
+		if child.x is 0 and child.width is layer.width and child.y is 0
+			return if candidate
+			candidate = child
 
-	result =
-		header: null
-		body: null
-		footer: null
+	return unless candidate
 
-	if layer.children.length > 3
-		return result
+	for child in layer.children
+		continue if candidate is child
+		return if child.minY < candidate.maxY
 
-	if layer.children.length < 2
-		return result
+	return candidate
 
-	# Get a list of the children sorted by y position
-	children = _.orderBy layer.children, (child) -> child.y
+findPossibleFooter = (layer) ->
 
-	# Make sure all children are edge to edge
-	for child in children
-		return result if child.minX isnt 0
-		return result if child.maxX isnt layer.width
+	candidate = null
 
-	# Header OR footer case
-	if children.length is 2
+	for child in layer.children
+		if child.x is 0 and child.width is layer.width and child.maxY is layer.height
+			return if candidate
+			candidate = child
 
-		# Exit if the layers are not stacked
-		return result if children[0].minY isnt 0
-		return result if children[0].maxY isnt children[1].minY
-		return result if children[1].maxY isnt layer.height
+	return unless candidate
 
-		# The header or footer is the smallest of the two
-		if children[0].height < children[1].height
-			result.header = children[0]
-			result.body = children[1]
-		else
-			result.body = children[0]
-			result.footer = children[1]
+	for child in layer.children
+		continue if candidate is child
+		return if child.maxY > candidate.minY
 
-		return result
+	return candidate
 
-	# Header OR footer case
-	if children.length is 3
+findHeader = (layer) ->
+	header = findPossibleHeader(layer)
+	footer = findPossibleFooter(layer)
 
-		# Exit if the header or footer is bigger than the content
-		return result if children[0].height > children[1].height
-		return result if children[2].height > children[1].height
+	if header and footer
+		if header.maxY is footer.minY
+			return if header.height >= footer.height
 
-		# Exit if the layers are not stacked
-		return result if children[0].minY isnt 0
-		return result if children[0].maxY isnt children[1].minY
-		return result if children[1].maxY isnt children[2].minY
-		return result if children[2].maxY isnt layer.height
+	return header
 
-		result.header = children[0]
-		result.body = children[1]
-		result.footer = children[2]
+findFooter = (layer) ->
+	header = findPossibleHeader(layer)
+	footer = findPossibleFooter(layer)
 
-		return result
+	if header and footer
+		if header.maxY is footer.minY
+			return if footer.height >= header.height
 
-	return result
+	return footer
+
+findBody = (layer, header, footer) ->
+
+	return unless header or footer
+
+	for child in layer.children
+
+		continue if child is header
+		continue if child is footer
+
+		if child.x is 0 and child.width is layer.width
+			if header and footer and child.minY is header.maxY and child.maxY is footer.minY
+				return child
+			else if header and child.minY is header.maxY and child.maxY is layer.height
+				return child
+			else if footer and child.minY is 0 and child.maxY is footer.minY
+				return child
+
+guessBodyFrame = (layer, header, footer) ->
+
+	return unless header or footer
+	return if header?.maxY is footer?.minY
+
+	if header and footer
+		frame = {x: 0, y: header.height, width: layer.width, height: layer.height - header.height - footer.height}
+	else if header
+		frame = {x: 0, y: header.height, width: layer.width, height: layer.height - header.height}
+	else if footer
+		frame = {x: 0, y: 0, width: layer.width, height: layer.height - footer.height}
+	else
+		return
+
+	return if (header?.height or 0) > frame.height
+	return if (footer?.height or 0) > frame.height
+
+	return frame
 
 layoutPage = (layer, size) ->
 
-	split = pageLayout(layer)
+	header = findHeader(layer)
+	footer = findFooter(layer)
+	return layer unless header or footer
 
-	return layer unless split.body
+	body = findBody(layer, header, footer)
 
-	bodyFrame = split.body.frame
+	if not body
+		bodyFrame = guessBodyFrame(layer, header, footer)
+
+		if bodyFrame
+
+			body = new Layer
+				frame: bodyFrame
+				backgroundColor: null
+
+			for child in layer.children
+				continue if child is header
+				continue if child is footer
+				frame = child.screenFrame
+				child.parent = body
+				child.screenFrame = frame
+
+
+	return layer unless body
+
+	bodyFrame = body.frame
 	bodyFrame.width = size.width
-	bodyFrame.height = size.height - (split.header?.height or 0) - (split.footer?.height or 0)
+	bodyFrame.height = size.height - (header?.height or 0) - (footer?.height or 0)
 
-	split.body.point = 0
-	scroll = layoutScroll(split.body, bodyFrame)
+	body.point = 0
+	scroll = layoutScroll(body, bodyFrame)
 	scroll.parent = layer
 	scroll.frame = bodyFrame
 
 	layer.size = size
 
-	if split.footer?.maxY > size.height
-		split.footer.maxY = size.height
+	if footer?.maxY > size.height
+		footer.maxY = size.height
 
-	split.header?.bringToFront()
-	split.footer?.bringToFront()
+	header?.bringToFront()
+	footer?.bringToFront()
 
 	return layer
 

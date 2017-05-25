@@ -114,10 +114,11 @@ describe "FlowComponent", ->
 
 			page.children[0].x = -1
 			flow.showNext(page)
+
 			(flow.current.children[2] instanceof ScrollComponent).should.be.false
 
 			# There still is a scroll because the total size is bigger
-			flow.scroll.should.equal page.parent.parent
+			flow.scroll.should.equal page.children[1]
 
 		it "should do nothing if header is misaligned y", ->
 
@@ -131,7 +132,7 @@ describe "FlowComponent", ->
 			page.children[0].y = -1
 			flow.showNext(page)
 			(flow.current.children[2] instanceof ScrollComponent).should.be.false
-			flow.scroll.should.equal page.parent.parent
+			flow.scroll.should.equal page.children[1]
 
 		it "should set contentInset without page header but with global header", ->
 
@@ -197,6 +198,48 @@ describe "FlowComponent", ->
 			(flow.current.parent.parent instanceof ScrollComponent).should.be.true
 			flow.scroll.should.equal flow.current.parent.parent
 			flow.current.parent.parent.contentInset.should.eql({bottom: 60, right: 0, top: 60, left: 0})
+
+		it "should wrap the body if possible", ->
+
+			flow = new FlowComponent size: flowSize
+
+			page = new Layer
+				width: flow.width
+				height: flow.height * 1.5
+				backgroundColor: "red"
+
+			header = new Layer
+				parent: page
+				width: flow.width
+				height: 40
+				y: Align.top
+				label: "header"
+
+			footer = new Layer
+				parent: page
+				width: flow.width
+				height: 80
+				y: Align.bottom
+				label: "footer"
+
+			squareA = new Layer
+				parent: page
+				size: 40
+				x: 0
+				y: header.height
+				backgroundColor: "green"
+
+			squareB = new Layer
+				parent: page
+				size: 40
+				maxX: flow.width
+				maxY: footer.minY
+				backgroundColor: "green"
+
+			flow.showNext(page)
+
+			flow.current.frame.should.eql {x: 0, y: 0, width: 300, height: 600}
+			flow.scroll.content.frame.should.eql {x: 0, y: 0, width: 300, height: 780}
 
 	describe "Events", ->
 
