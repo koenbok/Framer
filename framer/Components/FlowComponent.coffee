@@ -507,10 +507,8 @@ layoutPage = (layer, size) ->
 			for child in layer.children
 				continue if child is header
 				continue if child is footer
-				frame = child.screenFrame
 				child.parent = body
-				child.screenFrame = frame
-
+				child.y -= header?.height or 0
 
 	return layer unless body
 
