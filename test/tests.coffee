@@ -12,6 +12,7 @@ Framer.resetDefaults()
 
 Framer.Device = new Framer.DeviceView()
 
+window.TESTING = true
 window.console.debug = (v) ->
 window.console.warn = (v) ->
 

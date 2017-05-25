@@ -458,9 +458,11 @@ Utils.deviceFont = (os) ->
 _loadedFonts = []
 
 Utils.loadWebFont = (font, weight) ->
+
 	fontToLoad = font
 	fontToLoad += ":#{weight}" if weight?
 	fontObject = {fontFamily: font, fontWeight: weight}
+
 	if fontToLoad in _loadedFonts
 		return fontObject
 
@@ -468,7 +470,7 @@ Utils.loadWebFont = (font, weight) ->
 
 	link.href = "https://fonts.googleapis.com/css?family=#{fontToLoad}"
 	link.rel = "stylesheet"
-	document.getElementsByTagName("head")[0].appendChild(link)
+	document.getElementsByTagName("head")[0].appendChild(link) unless TESTING
 	_loadedFonts.push(fontToLoad)
 	return fontObject
 
