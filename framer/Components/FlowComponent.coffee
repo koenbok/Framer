@@ -266,6 +266,7 @@ class exports.FlowComponent extends Layer
 
 		# But only the actual scroll events
 		for event in [
+			Events.Move,
 			Events.ScrollStart,
 			Events.ScrollMove,
 			Events.ScrollEnd,
