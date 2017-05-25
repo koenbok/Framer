@@ -70,6 +70,7 @@ describe "FlowComponent", ->
 			flow.current.children[0].frame.should.eql {x: 0, y: 0, width: 300, height: 100}
 			flow.current.children[1].frame.should.eql {x: 0, y: 100, width: 300, height: 500}
 			(flow.current.children[1] instanceof ScrollComponent).should.be.true
+			flow.scroll.should.equal flow.current.children[1]
 			flow.current.children[1].contentInset.should.eql({bottom: 0, right: 0, top: 0, left: 0})
 
 		it "should fix footer if content exceeds", ->
@@ -83,6 +84,7 @@ describe "FlowComponent", ->
 			flow.current.children[0].frame.should.eql {x: 0, y: 500, width: 300, height: 100}
 			flow.current.children[1].frame.should.eql {x: 0, y: 0, width: 300, height: 500}
 			(flow.current.children[1] instanceof ScrollComponent).should.be.true
+			flow.scroll.should.equal flow.current.children[1]
 			flow.current.children[1].contentInset.should.eql({bottom: 0, right: 0, top: 0, left: 0})
 
 		it "should fix header and footer if content exceeds", ->
@@ -98,6 +100,7 @@ describe "FlowComponent", ->
 			flow.current.children[1].frame.should.eql {x: 0, y: 520, width: 300, height: 80}
 			flow.current.children[2].frame.should.eql {x: 0, y: 40, width: 300, height: 480}
 			(flow.current.children[2] instanceof ScrollComponent).should.be.true
+			flow.scroll.should.equal flow.current.children[2]
 			flow.current.children[2].contentInset.should.eql({bottom: 0, right: 0, top: 0, left: 0})
 
 		it "should do nothing if header is misaligned x", ->
@@ -113,6 +116,9 @@ describe "FlowComponent", ->
 			flow.showNext(page)
 			(flow.current.children[2] instanceof ScrollComponent).should.be.false
 
+			# There still is a scroll because the total size is bigger
+			flow.scroll.should.equal page.parent.parent
+
 		it "should do nothing if header is misaligned y", ->
 
 			flow = new FlowComponent size: flowSize
@@ -125,6 +131,7 @@ describe "FlowComponent", ->
 			page.children[0].y = -1
 			flow.showNext(page)
 			(flow.current.children[2] instanceof ScrollComponent).should.be.false
+			flow.scroll.should.equal page.parent.parent
 
 		it "should set contentInset without page header but with global header", ->
 
@@ -141,6 +148,7 @@ describe "FlowComponent", ->
 			flow.current.children[0].frame.should.eql {x: 0, y: 500, width: 300, height: 100}
 			flow.current.children[1].frame.should.eql {x: 0, y: 0, width: 300, height: 500}
 			(flow.current.children[1] instanceof ScrollComponent).should.be.true
+			flow.scroll.should.equal flow.current.children[1]
 			flow.current.children[1].contentInset.should.eql({bottom: 0, right: 0, top: 60, left: 0})
 
 		it "should set contentInset without page footer but with global footer", ->
@@ -187,6 +195,7 @@ describe "FlowComponent", ->
 			flow.current.frame.should.eql {x: 0, y: 0, width: 300, height: 800}
 			flow.current.parent.parent.frame.should.eql {x: 0, y: 0, width: 300, height: 600}
 			(flow.current.parent.parent instanceof ScrollComponent).should.be.true
+			flow.scroll.should.equal flow.current.parent.parent
 			flow.current.parent.parent.contentInset.should.eql({bottom: 60, right: 0, top: 60, left: 0})
 
 	describe "Events", ->
@@ -212,3 +221,53 @@ describe "FlowComponent", ->
 
 			nav.showNext(cardA)
 			nav.current.should.equal cardA
+
+	describe "Events", ->
+
+		it "should forward scroll events", (callback) ->
+
+			flow = new FlowComponent size: 100
+			page = new Layer
+				width: 100
+				height: 200
+
+			flow.showNext(page)
+			flow.current.should.equal page
+
+			flow.current.frame.should.eql {x: 0, y: 0, width: 100, height: 200}
+			flow.scroll.should.equal flow.children[1]
+
+			flow.onScroll -> callback()
+			flow.scroll.emit("scroll")
+
+		it "should forward scroll events only once", (callback) ->
+
+			flow = new FlowComponent size: 100
+
+			pageA = new Layer
+				width: 100
+				height: 200
+
+			pageB = new Layer
+				width: 100
+				height: 200
+
+			flow.showNext(pageA, {animate: false})
+			flow.showNext(pageB, {animate: false})
+			flow.showNext(pageA, {animate: false})
+			flow.current.should.equal pageA
+
+			flow.current.frame.should.eql {x: 0, y: 0, width: 100, height: 200}
+			flow.scroll.should.equal pageA.parent.parent
+
+			count = 2
+
+			flow.onScroll ->
+				count--
+				if count is 0
+					Utils.delay 0, ->
+						count.should.equal 0
+						callback()
+
+			flow.scroll.emit("scroll")
+			flow.scroll.emit("scroll")

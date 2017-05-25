@@ -56,7 +56,6 @@ class exports.FlowComponent extends Layer
 				width: @width
 				height: @height
 
-
 	reset: ->
 
 		if @_stack
@@ -84,6 +83,9 @@ class exports.FlowComponent extends Layer
 
 	@define "previous",
 		get: -> return @_stack[@_stack.length - 2]?.layer
+
+	@define "scroll",
+		get: -> return @current?._flowScroll
 
 	##############################################################
 	# Header and footer
@@ -241,13 +243,15 @@ class exports.FlowComponent extends Layer
 
 		# Forward the scroll events from created scroll components
 		for scroll in [layer, layer.children...]
-			@_forwardScrollEvents(layer)
+
+			@_forwardScrollEvents(scroll)
 
 			if scroll instanceof ScrollComponent
 				inset = {}
 				inset.top = @header?.height or 0 if scroll.y is 0
 				inset.bottom = @footer?.height or 0 if scroll.maxY is @height
 				scroll.contentInset = inset
+				flowLayer._flowScroll = scroll
 
 		# Set the background color for he created scroll component
 		if layer instanceof ScrollComponent
@@ -263,7 +267,6 @@ class exports.FlowComponent extends Layer
 		# But only the actual scroll events
 		for event in [
 			Events.ScrollStart,
-			Events.Scroll,
 			Events.ScrollMove,
 			Events.ScrollEnd,
 			Events.ScrollAnimationDidStart,
