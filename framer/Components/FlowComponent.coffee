@@ -517,6 +517,9 @@ layoutPage = (layer, size) ->
 	bodyFrame.height = size.height - (header?.height or 0) - (footer?.height or 0)
 
 	body.point = 0
+	# Not scroll vertically if there's a header or footer
+	body.width = size.width
+
 	scroll = layoutScroll(body, bodyFrame)
 	scroll.parent = layer
 	scroll.frame = bodyFrame
