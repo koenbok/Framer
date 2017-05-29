@@ -29,7 +29,7 @@ sanitizeLayerName = (name) ->
 
 class exports.Importer
 
-	constructor: (@path, @scale=1, @extraLayerProperties={}) ->
+	constructor: (@path, @options={}, @extraLayerProperties={}) ->
 
 		@paths =
 			layerInfo: Utils.pathJoin(@path, "layers.json")
@@ -38,6 +38,8 @@ class exports.Importer
 
 		@_createdLayers = []
 		@_createdLayersByName = {}
+
+		@scale = @options.scale ? 1
 
 	load: ->
 
