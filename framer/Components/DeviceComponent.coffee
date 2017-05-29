@@ -187,6 +187,10 @@ class exports.DeviceComponent extends BaseClass
 				# On desktop rendering natively without scaling looks better, so do that
 				@_context.renderUsingNativePixelRatio = true
 				@content.scale = pixelRatio
+			else
+				@_context.renderUsingNativePixelRatio = false
+				@content.scale = 1
+
 		if screenSizeChanged
 			Screen.emit("resize")
 
