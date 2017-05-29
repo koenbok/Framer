@@ -136,7 +136,6 @@ class exports.DeviceComponent extends BaseClass
 
 		contentScaleFactor = @contentScale
 		contentScaleFactor = 1 if contentScaleFactor > 1
-		pixelRatio = @_device.devicePixelRatio ? 1
 		screenSizeChanged = false
 		if @_shouldRenderFullScreen()
 
@@ -152,11 +151,8 @@ class exports.DeviceComponent extends BaseClass
 			@content.scale = contentScaleFactor
 			if @deviceType isnt "fullscreen" or Utils.isMobile()
 				screenSizeChanged = screenSizeChanged or @_context.devicePixelRatio isnt window.devicePixelRatio
-				if window.devicePixelRatio is pixelRatio and Utils.isDesktop()
-					@_context.renderUsingNativePixelRatio = true
-					@content.scale = pixelRatio
-				else
-					@_context.renderUsingNativePixelRatio = false
+				@_context.devicePixelRatio = window.devicePixelRatio
+
 		else
 			backgroundOverlap = 100
 
@@ -184,16 +180,13 @@ class exports.DeviceComponent extends BaseClass
 
 			@setHand(@selectedHand) if @selectedHand and @_orientation is 0
 
+			pixelRatio = @_device.devicePixelRatio ? 1
 			screenSizeChanged = screenSizeChanged or @_context.devicePixelRatio isnt pixelRatio
 			@_context.devicePixelRatio = pixelRatio
 			if window.devicePixelRatio is pixelRatio and Utils.isDesktop()
 				# On desktop rendering natively without scaling looks better, so do that
 				@_context.renderUsingNativePixelRatio = true
 				@content.scale = pixelRatio
-			else
-				@_context.renderUsingNativePixelRatio = false
-				@content.scale = 1
-
 		if screenSizeChanged
 			Screen.emit("resize")
 
