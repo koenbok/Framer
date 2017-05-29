@@ -217,9 +217,6 @@ class exports.DeviceComponent extends BaseClass
 		if Utils.deviceType() is "phone" and @_device.deviceType is "tablet"
 			return true
 
-		if @_device.screenWidth is Canvas.width and @_device.screenHeight is Canvas.height
-			return true
-
 		return false
 
 	setupContext: ->
