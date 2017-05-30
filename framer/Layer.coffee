@@ -483,7 +483,6 @@ class exports.Layer extends BaseClass
 		get: -> Utils.frameGetMaxY @
 		set: (value) -> Utils.frameSetMaxY @, value
 
-
 	@define "constraintValues",
 		importable: true
 		exportable: false
@@ -518,6 +517,18 @@ class exports.Layer extends BaseClass
 				if not (@parentChanged in @listeners("change:parent"))
 					@on "change:parent", @parentChanged
 			@_setPropertyValue "constraintValues", newValue
+
+	@define "htmlIntrinsicSize",
+		importable: true
+		exportable: false
+		default: null
+		get: -> @_getPropertyValue "htmlIntrinsicSize"
+		set: (value) ->
+			if value is null
+				@_setPropertyValue "htmlIntrinsicSize", value
+			else
+				return if not _.isFinite(value.width) or not _.isFinite(value.height)
+				@_setPropertyValue "htmlIntrinsicSize", {width: value.width, height: value.height}
 
 	parentChanged: (newParent, oldParent) =>
 		if oldParent?
@@ -643,7 +654,6 @@ class exports.Layer extends BaseClass
 	updateForDevicePixelRatioChange: =>
 		for cssProperty in ["width", "height", "webkitTransform", "boxShadow", "textShadow", "webkitFilter", "borderRadius", "borderWidth", "fontSize", "letterSpacing", "wordSpacing", "textIndent"]
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
-		@_elementHTML?.style.zoom = @context.scale
 
 	updateForSizeChange: =>
 		@_elementBorder.style.borderWidth = LayerStyle["borderWidth"](@)
@@ -786,8 +796,8 @@ class exports.Layer extends BaseClass
 				@_elementHTML = document.createElement "div"
 				@_element.insertBefore @_elementHTML, @_elementBorder
 
-			@_elementHTML.style.zoom = @context.scale
 			@_elementHTML.innerHTML = value
+			@_updateHTMLScale()
 
 			# If the contents contains something else than plain text
 			# then we turn off ignoreEvents so buttons etc will work.
@@ -798,6 +808,15 @@ class exports.Layer extends BaseClass
 			# 	@ignoreEvents = false
 
 			@emit "change:html"
+
+	_updateHTMLScale: ->
+		return if not @_elementHTML?
+
+		if not @htmlIntrinsicSize?
+			@_elementHTML.style.zoom = @context.scale
+		else
+			@_elementHTML.style.transformOrigin = "0 0"
+			@_elementHTML.style.transform = "scale(#{@context.scale * @width / @htmlIntrinsicSize.width}, #{@context.scale * @height / @htmlIntrinsicSize.height})"
 
 	querySelector: (query) -> @_element.querySelector(query)
 	querySelectorAll: (query) -> @_element.querySelectorAll(query)

@@ -31,9 +31,11 @@ _Force2DProperties =
 exports.LayerStyle =
 
 	width: (layer) ->
+		layer._updateHTMLScale()
 		(layer._properties.width * layer.context.pixelMultiplier) + "px"
 
 	height: (layer) ->
+		layer._updateHTMLScale()
 		(layer._properties.height * layer.context.pixelMultiplier) + "px"
 
 	display: (layer) ->

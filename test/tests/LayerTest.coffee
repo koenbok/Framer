@@ -557,6 +557,25 @@ describe "Layer", ->
 			layer.__framerInstanceInfo = {name: "aap"}
 			(_.startsWith layer.toInspect(), "<Layer aap id:").should.be.true
 
+		it "should set htmlIntrinsicSize", ->
+			layer = new Layer
+
+			assert.equal layer.htmlIntrinsicSize, null
+
+			layer.htmlIntrinsicSize = "aap"
+			assert.equal layer.htmlIntrinsicSize, null
+
+			layer.htmlIntrinsicSize =
+				width: 10
+			assert.equal layer.htmlIntrinsicSize, null
+
+			layer.htmlIntrinsicSize =
+				width: 10
+				height: 20
+			layer.htmlIntrinsicSize.should.eql({width: 10, height: 20})
+
+			layer.htmlIntrinsicSize = null
+			assert.equal layer.htmlIntrinsicSize, null
 
 	describe "Filter Properties", ->
 
