@@ -515,9 +515,10 @@ layoutPage = (layer, size) ->
 				continue if child is footer
 				child.setParentPreservingConstraintValues(body)
 				headerHeight = header?.height or 0
-				if child.constraintValues?.top?
-					child.constraintValues.top -= headerHeight
-					child.layout()
+				if child.constraintValues?
+					if child.constraintValues?.top?
+						child.constraintValues?.top -= headerHeight
+						child.layout()
 				else
 					child.y -= headerHeight
 
