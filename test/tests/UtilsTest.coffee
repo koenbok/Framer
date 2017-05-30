@@ -413,6 +413,12 @@ describe "Utils", ->
 			Utils.setValueForKeyPath(obj, "fooA.fooB.fooC", "bar")
 			obj.should.eql({fooA: {fooB: {fooC: "bar"}}})
 
+		it "should merge object values", ->
+			obj = {}
+			Utils.setValueForKeyPath obj, "options.time", disabled: true
+			Utils.setValueForKeyPath obj, "options", disabled: true
+			obj.should.eql({options: {disabled: true, time: {disabled: true}}})
+
 	describe "isFileUrl", ->
 		it "should work", ->
 			Utils.isFileUrl("file:///Users/koen/Desktop/index.html").should.equal(true)

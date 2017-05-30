@@ -26,7 +26,10 @@ Utils.setValueForKeyPath = (obj, path, val) ->
 	while i < n and result isnt undefined
 		field = fields[i]
 		if i is n - 1
-			result[field] = val
+			if _.isObject(result[field]) and _.isObject(val)
+				_.extend(result[field], val)
+			else
+				result[field] = val
 		else
 			if typeof result[field] is "undefined" or not _.isObject(result[field])
 				result[field] = {}
