@@ -156,15 +156,14 @@ class exports.Layer extends BaseClass
 		# Create border element
 		@_elementBorder = document.createElement("div")
 		@_element.appendChild(@_elementBorder)
-		@_elementBorder.style = _.extend @_elementBorder.style,
-			position: "absolute"
-			top: 0
-			left: 0
-			width: "100%"
-			height: "100%"
-			boxSizing: "border-box"
-			zIndex: 1000
-			pointerEvents: "none"
+		@_elementBorder.style.position = "absolute"
+		@_elementBorder.style.top = "0"
+		@_elementBorder.style.bottom = "0"
+		@_elementBorder.style.left = "0"
+		@_elementBorder.style.right = "0"
+		@_elementBorder.style.boxSizing = "border-box"
+		@_elementBorder.style.zIndex = "1000"
+		@_elementBorder.style.pointerEvents = "none"
 
 		# Sanitize calculated property setters so direct properties always win
 		layerPropertyIgnore(options, "point", ["x", "y"])
@@ -647,7 +646,7 @@ class exports.Layer extends BaseClass
 		@_elementHTML?.style.zoom = @context.scale
 
 	updateForSizeChange: =>
-		@_elementBorder.style["borderWidth"] = LayerStyle["borderWidth"](@)
+		@_elementBorder.style.borderWidth = LayerStyle["borderWidth"](@)
 
 	##############################################################
 	# SCREEN GEOMETRY
