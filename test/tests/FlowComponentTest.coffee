@@ -241,6 +241,61 @@ describe "FlowComponent", ->
 			flow.current.frame.should.eql {x: 0, y: 0, width: 300, height: 600}
 			flow.scroll.content.frame.should.eql {x: 0, y: 0, width: 300, height: 780}
 
+		it "should set the header and footer based on constraints", ->
+
+			flowSize =
+				width: 300
+				height: 600
+
+			page = new Layer
+				width: flowSize.width
+				height: flowSize.height * 1.5
+				backgroundColor: "red"
+
+			header = new Layer
+				parent: page
+				height: 40
+				label: "header"
+				constraintValues:
+					top: 0
+					left: 0
+					right: 0
+					bottom: null
+
+			footer = new Layer
+				parent: page
+				height: 80
+				label: "footer"
+				constraintValues:
+					top: null
+					left: 0
+					right: 0
+					bottom: 0
+
+			header.layout()
+			footer.layout()
+
+			squareA = new Layer
+				parent: page
+				size: 40
+				x: 0
+				y: header.height
+				backgroundColor: "green"
+
+			squareB = new Layer
+				parent: page
+				size: 40
+				maxX: 200
+				maxY: page.height - footer.height
+				backgroundColor: "green"
+
+			flow = new FlowComponent size: 200
+			flow.showNext(page)
+
+			flow.current.frame.should.eql {x: 0, y: 0, width: 200, height: 200}
+			flow.scroll.content.frame.should.eql {x: 0, y: 0, width: 200, height: 780}
+
+
 	describe "Events", ->
 
 		it "should throw the right events", (done) ->

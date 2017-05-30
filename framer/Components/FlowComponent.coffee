@@ -402,7 +402,10 @@ findPossibleHeader = (layer) ->
 	candidate = null
 
 	for child in layer.children
-		if child.x is 0 and child.width is layer.width and child.y is 0
+		attachedLeft = child.x is 0 or child.constraintValues?.left is 0
+		atttachedRight = child.width is layer.width or child.constraintValues?.right is 0
+		attachedTop = child.y is 0 or child.constraintValues?.top is 0
+		if attachedLeft and atttachedRight and attachedTop
 			return if candidate
 			candidate = child
 
@@ -419,7 +422,10 @@ findPossibleFooter = (layer) ->
 	candidate = null
 
 	for child in layer.children
-		if child.x is 0 and child.width is layer.width and child.maxY is layer.height
+		attachedLeft = child.x is 0 or child.constraintValues?.left is 0
+		atttachedRight = child.width is layer.width or child.constraintValues?.right is 0
+		attachedBottom = child.maxY is layer.height or child.constraintValues?.bottom is 0
+		if attachedLeft and atttachedRight and attachedBottom
 			return if candidate
 			candidate = child
 
