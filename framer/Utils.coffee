@@ -771,6 +771,20 @@ Utils.pointAngle = (pointA, pointB) ->
 	return Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x) * 180 / Math.PI
 
 
+Utils.divideFrame = (frame, scale) ->
+	frame.x /= scale
+	frame.y /= scale
+	frame.width /= scale
+	frame.height /= scale
+	return frame
+
+Utils.scaleFrames = (layer, scale) ->
+	if layer instanceof Layer
+		layer.constraintValues = null
+		layer.children.map (l) -> Utils.scaleFrames l, scale
+		layer.frame = Utils.divideFrame layer.frame, scale
+	if _.isArray(layer)
+		layer.map (l) -> Utils.scaleFrames l, scale
 # Size
 
 Utils.size = (input) ->
