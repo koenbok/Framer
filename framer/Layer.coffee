@@ -19,9 +19,9 @@ Utils = require "./Utils"
 NoCacheDateKey = Date.now()
 
 layerValueTypeError = (name, value) ->
-	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}'' is not valid")
+	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}' is not valid")
 
-layerProperty = (obj, name, cssProperty, fallback, validator, transformer, options={}, set) ->
+layerProperty = (obj, name, cssProperty, fallback, validator, transformer, options={}, set, targetElement, includeMainElement) ->
 	result =
 		default: fallback
 		get: ->
@@ -33,24 +33,31 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 		set: (value) ->
 
-			# console.log "#{@constructor.name}.#{name}.set #{value} current:#{@[name]}"
+			# console.log "#{@constructor.name}.#{name}.set #{value} current:#{@[name]}", targetElement
 
 			# Convert the value
 			value = transformer(value, @, name) if transformer
 
+			oldValue = @_properties[name]
 			# Return unless we get a new value
-			return if value is @_properties[name]
+			return if value is oldValue
 
 			if value and validator and not validator(value)
 				layerValueTypeError(name, value)
 
 			@_properties[name] = value
 
+			mainElement = @_element if includeMainElement or not targetElement
+			subElement = @[targetElement] if targetElement?
+
 			if cssProperty isnt null
 				if name is cssProperty and not LayerStyle[cssProperty]?
-					@_element.style[cssProperty] = @_properties[name]
+					mainElement?.style[cssProperty] = @_properties[name]
+					subElement?.style[cssProperty] = @_properties[name]
 				else
-					@_element.style[cssProperty] = LayerStyle[cssProperty](@)
+					style = LayerStyle[cssProperty](@)
+					mainElement?.style[cssProperty] = style
+					subElement?.style[cssProperty] = style
 
 			set?(@, value)
 
@@ -58,7 +65,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 			# doesn't make sense, because no one can listen to use yet.
 			return if @__constructor
 
-			@emit("change:#{name}", value)
+			@emit("change:#{name}", value, oldValue)
 			@emit("change:point", value) if name in ["x", "y"]
 			@emit("change:size", value)  if name in ["width", "height"]
 			@emit("change:frame", value) if name in ["x", "y", "width", "height"]
@@ -84,6 +91,43 @@ layerPropertyIgnore = (options, propertyName, properties) ->
 
 	return options
 
+asBorderRadius = (value) ->
+	return value if _.isNumber(value)
+
+	if _.isString(value)
+		if not _.endsWith(value, "%")
+			console.error "Layer.borderRadius only correctly supports percentages in strings"
+		return value
+
+	return 0 if not _.isObject(value)
+
+	result = {}
+	for key in ["topLeft", "topRight", "bottomRight", "bottomLeft"]
+		# TODO: Also support percentages?
+		if _.has(value, key) and _.isNumber(value[key])
+			result[key] = value[key]
+	return if _.isEmpty(result) then 0 else result
+
+asBorderWidth = (value) ->
+	return value if _.isNumber(value)
+	return 0 if not _.isObject(value)
+	result = {}
+	for key in ["left", "right", "bottom", "top"]
+		if _.has(value, key) and _.isNumber(value[key])
+			result[key] = value[key]
+	return if _.isEmpty(result) then 0 else result
+
+parentOrContext = (layerOrContext) ->
+	if layerOrContext.parent?
+		return layerOrContext.parent
+	else
+		return layerOrContext.context
+
+exports.updateShadow = (layer, value) ->
+	layer._element.style.boxShadow = LayerStyle["boxShadow"](layer)
+	layer._element.style.textShadow = LayerStyle["textShadow"](layer)
+	layer._element.style.webkitFilter = LayerStyle["webkitFilter"](layer)
+
 class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
@@ -105,11 +149,21 @@ class exports.Layer extends BaseClass
 
 		# Private setting for canceling of click event if wrapped in moved draggable
 		@_cancelClickEventInDragSession = true
-		@_cancelClickEventInDragSessionVelocity = 0.1
-		@_cancelClickEventInDragSessionOffset = 8
 
 		# We have to create the element before we set the defaults
 		@_createElement()
+
+		# Create border element
+		@_elementBorder = document.createElement("div")
+		@_element.appendChild(@_elementBorder)
+		@_elementBorder.style.position = "absolute"
+		@_elementBorder.style.top = "0"
+		@_elementBorder.style.bottom = "0"
+		@_elementBorder.style.left = "0"
+		@_elementBorder.style.right = "0"
+		@_elementBorder.style.boxSizing = "border-box"
+		@_elementBorder.style.zIndex = "1000"
+		@_elementBorder.style.pointerEvents = "none"
 
 		# Sanitize calculated property setters so direct properties always win
 		layerPropertyIgnore(options, "point", ["x", "y"])
@@ -150,6 +204,8 @@ class exports.Layer extends BaseClass
 
 		delete @__constructor
 
+		@onChange("size", @updateForSizeChange)
+
 	##############################################################
 	# Properties
 
@@ -169,8 +225,21 @@ class exports.Layer extends BaseClass
 	@define "animationOptions", @simpleProperty("animationOptions", {})
 
 	# Css properties
-	@define "width",  layerProperty(@, "width",  "width", 100, _.isNumber)
-	@define "height", layerProperty(@, "height", "height", 100, _.isNumber)
+	@define "width",  layerProperty(@, "width", "width", 100, _.isNumber, null, {}, (layer, value) ->
+		return if not layer.constraintValues? or layer.isLayouting
+		layer.constraintValues.width = value
+		layer.constraintValues.aspectRatioLocked = false
+		layer.constraintValues.widthFactor = null
+		layer._layoutX()
+	)
+
+	@define "height", layerProperty(@, "height", "height", 100, _.isNumber, null, {}, (layer, value) ->
+		return if not layer.constraintValues? or layer.isLayouting
+		layer.constraintValues.height = value
+		layer.constraintValues.aspectRatioLocked = false
+		layer.constraintValues.heightFactor = null
+		layer._layoutY()
+	)
 
 	@define "visible", layerProperty(@, "visible", "display", true, _.isBoolean)
 	@define "opacity", layerProperty(@, "opacity", "opacity", 1, _.isNumber)
@@ -192,9 +261,15 @@ class exports.Layer extends BaseClass
 
 	# Matrix properties
 	@define "x", layerProperty(@, "x", "webkitTransform", 0, _.isNumber,
-		layerPropertyPointTransformer, {depends: ["width", "height"]})
+		layerPropertyPointTransformer, {depends: ["width", "height"]}, (layer) ->
+			return if layer.isLayouting
+			layer.constraintValues = null
+	)
 	@define "y", layerProperty(@, "y", "webkitTransform", 0, _.isNumber,
-		layerPropertyPointTransformer, {depends: ["width", "height"]})
+		layerPropertyPointTransformer, {depends: ["width", "height"]}, (layer) ->
+			return if layer.isLayouting
+			layer.constraintValues = null
+	)
 	@define "z", layerProperty(@, "z", "webkitTransform", 0, _.isNumber)
 
 	@define "scaleX", layerProperty(@, "scaleX", "webkitTransform", 1, _.isNumber)
@@ -237,21 +312,22 @@ class exports.Layer extends BaseClass
 	@define "sepia", layerProperty(@, "sepia", "webkitFilter", 0, _.isNumber)
 
 	# Shadow properties
-	@define "shadowX", layerProperty(@, "shadowX", "boxShadow", 0, _.isNumber)
-	@define "shadowY", layerProperty(@, "shadowY", "boxShadow", 0, _.isNumber)
-	@define "shadowBlur", layerProperty(@, "shadowBlur", "boxShadow", 0, _.isNumber)
-	@define "shadowSpread", layerProperty(@, "shadowSpread", "boxShadow", 0, _.isNumber)
-	@define "shadowColor", layerProperty(@, "shadowColor", "boxShadow", "", Color.validColorValue, Color.toColor)
+	@define "shadowX", layerProperty(@, "shadowX", null, 0, _.isNumber, null, {}, exports.updateShadow)
+	@define "shadowY", layerProperty(@, "shadowY", null, 0, _.isNumber, null, {}, exports.updateShadow)
+	@define "shadowBlur", layerProperty(@, "shadowBlur", null, 0, _.isNumber, null, {}, exports.updateShadow)
+	@define "shadowSpread", layerProperty(@, "shadowSpread", null, 0, _.isNumber, null, {}, exports.updateShadow)
+	@define "shadowColor", layerProperty(@, "shadowColor", null, "", Color.validColorValue, Color.toColor, {}, exports.updateShadow)
+	@define "shadowType", layerProperty(@, "shadowType", null, "box", null, null, {}, exports.updateShadow)
 
 	# Color properties
 	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, Color.validColorValue, Color.toColor)
 	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor)
 
 	# Border properties
-	# Todo: make this default, for compat we still allow strings but throw a warning
-	# @define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, _.isNumber
-	@define "borderColor", layerProperty(@, "borderColor", "border", null, Color.validColorValue, Color.toColor)
-	@define "borderWidth", layerProperty(@, "borderWidth", "border", 0, _.isNumber)
+	@define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, null, asBorderRadius, null, null, "_elementBorder", true)
+	@define "borderColor", layerProperty(@, "borderColor", "borderColor", null, Color.validColorValue, Color.toColor, null, null, "_elementBorder")
+	@define "borderWidth", layerProperty(@, "borderWidth", "borderWidth", 0, null, asBorderWidth, null, null, "_elementBorder")
+	@define "borderStyle", layerProperty(@, "borderStyle", "borderStyle", "solid", _.isString, null, null, null, "_elementBorder")
 
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
 	@define "flat", layerProperty(@, "flat", "webkitTransformStyle", false, _.isBoolean)
@@ -299,6 +375,7 @@ class exports.Layer extends BaseClass
 			return new Matrix()
 				.translate(@x, @y)
 				.scale(@scale)
+				.scale(@scaleX, @scaleY)
 				.skewX(@skew)
 				.skewY(@skew)
 				.rotate(0, 0, @rotationZ)
@@ -323,24 +400,7 @@ class exports.Layer extends BaseClass
 	##############################################################
 	# Border radius compatibility
 
-	@define "borderRadius",
-		importable: true
-		exportable: true
-		default: 0
-		get: ->
-			@_properties["borderRadius"]
-
-		set: (value) ->
-
-			if value and not _.isNumber(value)
-				console.warn "Layer.borderRadius should be a numeric property, not type #{typeof(value)}"
-
-			@_properties["borderRadius"] = value
-			@_element.style["borderRadius"] = LayerStyle["borderRadius"](@)
-
-			@emit("change:borderRadius", value)
-
-	# And, because it should be cornerRadius, we alias it here
+	# Because it should be cornerRadius, we alias it here
 	@define "cornerRadius",
 		importable: false
 		exportable: false
@@ -423,6 +483,91 @@ class exports.Layer extends BaseClass
 		get: -> Utils.frameGetMaxY @
 		set: (value) -> Utils.frameSetMaxY @, value
 
+	@define "constraintValues",
+		importable: true
+		exportable: false
+		default: null
+		get: -> @_getPropertyValue "constraintValues"
+		set: (value) ->
+			if value is null
+				newValue = null
+				@off "change:parent", @parentChanged
+				Screen.off "resize", @layout
+			else
+				newValue = _.defaults _.clone(value),
+					left: 0,
+					right: null,
+					top: 0,
+					bottom: null,
+					centerAnchorX: 0,
+					centerAnchorY: 0,
+					widthFactor: null,
+					heightFactor: null,
+					aspectRatioLocked: false,
+					width: @width,
+					height: @height
+				if @parent?
+					if not (@layout in @parent.listeners("change:width"))
+						@parent.on "change:width", @layout
+					if not (@layout in @parent.listeners("change:height"))
+						@parent.on "change:height", @layout
+				else
+					if not (@layout in Screen.listeners("resize"))
+						Screen.on "resize", @layout
+				if not (@parentChanged in @listeners("change:parent"))
+					@on "change:parent", @parentChanged
+			@_setPropertyValue "constraintValues", newValue
+
+	@define "htmlIntrinsicSize",
+		importable: true
+		exportable: false
+		default: null
+		get: -> @_getPropertyValue "htmlIntrinsicSize"
+		set: (value) ->
+			if value is null
+				@_setPropertyValue "htmlIntrinsicSize", value
+			else
+				return if not _.isFinite(value.width) or not _.isFinite(value.height)
+				@_setPropertyValue "htmlIntrinsicSize", {width: value.width, height: value.height}
+
+	parentChanged: (newParent, oldParent) =>
+		if oldParent?
+			oldParent.off "change:width", @layout
+			oldParent.off "change:height", @layout
+		else
+			Screen.off "resize", @layout
+		@constraintValues = null
+
+	setParentPreservingConstraintValues: (parent) ->
+		tmp = @constraintValues
+		@parent = parent
+		@constraintValues = tmp
+		@layout()
+
+	_layoutX: =>
+		return if not @constraintValues?
+		return if not @parent? and not @context.autoLayout
+		parentFrame = @parent?.frame ? @context.innerFrame
+		@isLayouting = true
+		@x = Utils.calculateLayoutX(parentFrame, @constraintValues, @width)
+		@isLayouting = false
+
+	_layoutY: =>
+		return if not @constraintValues?
+		return if not @parent? and not @context.autoLayout
+		parentFrame = @parent?.frame ? @context.innerFrame
+		@isLayouting = true
+		@y = Utils.calculateLayoutY(parentFrame, @constraintValues, @height)
+		@isLayouting = false
+
+	layout: =>
+		return if not @constraintValues?
+		return if not @parent? and not @context.autoLayout
+		parentFrame = @parent?.frame ? @context.innerFrame
+		@isLayouting = true
+		@frame = Utils.calculateLayoutFrame(parentFrame, @)
+		@isLayouting = false
+
 	convertPointToScreen: (point) =>
 		return Utils.convertPointToContext(point, @, false)
 
@@ -464,26 +609,54 @@ class exports.Layer extends BaseClass
 			return frame
 		else
 			frame = @frame
-			Utils.frameSetMidX(frame, parseInt(@_context.width  / 2.0))
-			Utils.frameSetMidY(frame, parseInt(@_context.height / 2.0))
+			Utils.frameSetMidX(frame, parseInt(@_context.innerWidth  / 2.0))
+			Utils.frameSetMidY(frame, parseInt(@_context.innerHeight / 2.0))
 			return frame
 
 	center: ->
-		@frame = @centerFrame() # Center  in parent
+		if @constraintValues?
+			@constraintValues.left = null
+			@constraintValues.right = null
+			@constraintValues.top = null
+			@constraintValues.bottom = null
+			@constraintValues.centerAnchorX = 0.5
+			@constraintValues.centerAnchorY = 0.5
+			@_layoutX()
+			@_layoutY()
+		else
+			@frame = @centerFrame() # Center  in parent
 		@
 
 	centerX: (offset=0) ->
-		@x = @centerFrame().x + offset # Center x in parent
+		if @constraintValues?
+			@constraintValues.left = null
+			@constraintValues.right = null
+			@constraintValues.centerAnchorX = 0.5
+			@_layoutX()
+		else
+			@x = @centerFrame().x + offset # Center x in parent
 		@
 
 	centerY: (offset=0) ->
-		@y = @centerFrame().y + offset # Center y in parent
+		if @constraintValues?
+			@constraintValues.top = null
+			@constraintValues.bottom = null
+			@constraintValues.centerAnchorY = 0.5
+			@_layoutY()
+		else
+			@y = @centerFrame().y + offset # Center y in parent
 		@
 
 	pixelAlign: ->
 		@x = parseInt @x
 		@y = parseInt @y
 
+	updateForDevicePixelRatioChange: =>
+		for cssProperty in ["width", "height", "webkitTransform", "boxShadow", "textShadow", "webkitFilter", "borderRadius", "borderWidth", "fontSize", "letterSpacing", "wordSpacing", "textIndent"]
+			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
+
+	updateForSizeChange: =>
+		@_elementBorder.style.borderWidth = LayerStyle["borderWidth"](@)
 
 	##############################################################
 	# SCREEN GEOMETRY
@@ -503,29 +676,33 @@ class exports.Layer extends BaseClass
 	canvasScaleX: (self=true) ->
 		scale = 1
 		scale = @scale * @scaleX if self
-		for parent in @ancestors(context=true)
-			scale = scale * parent.scale * parent.scaleX
+		for parent in @containers(true)
+			scale *= parent.scale
+			if parent.scaleX?
+				scale *= parent.scaleX
 		return scale
 
 	canvasScaleY: (self=true) ->
 		scale = 1
 		scale = @scale * @scaleY if self
-		for parent in @ancestors(context=true)
-			scale = scale * parent.scale * parent.scaleY
+		for parent in @containers(true)
+			scale *= parent.scale
+			if parent.scaleY?
+				scale *= parent.scaleY
 		return scale
 
 	screenScaleX: (self=true) ->
 		scale = 1
 		scale = @scale * @scaleX if self
-		for parent in @ancestors(context=false)
-			scale = scale * parent.scale * parent.scaleX
+		for parent in @containers(false)
+			scale *= parent.scale * parent.scaleX
 		return scale
 
 	screenScaleY: (self=true) ->
 		scale = 1
 		scale = @scale * @scaleY if self
-		for parent in @ancestors(context=false)
-			scale = scale * parent.scale * parent.scaleY
+		for parent in @containers(false)
+			scale *= parent.scale * parent.scaleY
 		return scale
 
 
@@ -539,14 +716,15 @@ class exports.Layer extends BaseClass
 			width: @width  * @screenScaleX()
 			height: @height * @screenScaleY()
 
-		layers = @ancestors(context=true)
+		layers = @containers(true)
 		layers.push(@)
 		layers.reverse()
 
 		for parent in layers
-			factorX = if parent._parentOrContext() then parent._parentOrContext().screenScaleX() else 1
-			factorY = if parent._parentOrContext() then parent._parentOrContext().screenScaleY() else 1
-			layerScaledFrame = parent.scaledFrame()
+			p = parentOrContext(parent)
+			factorX = p?.screenScaleX?() ? 1
+			factorY = p?.screenScaleY?() ? 1
+			layerScaledFrame = parent.scaledFrame?() ? {x: 0, y: 0}
 			frame.x += layerScaledFrame.x * factorX
 			frame.y += layerScaledFrame.y * factorY
 
@@ -616,9 +794,10 @@ class exports.Layer extends BaseClass
 
 			if not @_elementHTML
 				@_elementHTML = document.createElement "div"
-				@_element.appendChild @_elementHTML
+				@_element.insertBefore @_elementHTML, @_elementBorder
 
 			@_elementHTML.innerHTML = value
+			@_updateHTMLScale()
 
 			# If the contents contains something else than plain text
 			# then we turn off ignoreEvents so buttons etc will work.
@@ -629,6 +808,15 @@ class exports.Layer extends BaseClass
 			# 	@ignoreEvents = false
 
 			@emit "change:html"
+
+	_updateHTMLScale: ->
+		return if not @_elementHTML?
+
+		if not @htmlIntrinsicSize?
+			@_elementHTML.style.zoom = @context.scale
+		else
+			@_elementHTML.style.transformOrigin = "0 0"
+			@_elementHTML.style.transform = "scale(#{@context.scale * @width / @htmlIntrinsicSize.width}, #{@context.scale * @height / @htmlIntrinsicSize.height})"
 
 	querySelector: (query) -> @_element.querySelector(query)
 	querySelectorAll: (query) -> @_element.querySelectorAll(query)
@@ -780,14 +968,15 @@ class exports.Layer extends BaseClass
 			else
 				@_insertElement()
 
+			oldParent = @_parent
 			# Set the parent
 			@_parent = layer
 
 			# Place this layer on top of its siblings
 			@bringToFront()
 
-			@emit "change:parent"
-			@emit "change:superLayer"
+			@emit "change:parent", @_parent, oldParent
+			@emit "change:superLayer", @_parent, oldParent
 
 	@define "children",
 		enumerable: false
@@ -839,25 +1028,26 @@ class exports.Layer extends BaseClass
 	siblingsWithName: (name) ->
 		_.filter @siblingLayers, (layer) -> layer.name is name
 
-	ancestors: (context=false) ->
 
-		parents = []
-		currentLayer = @
+	# Get all containers of this layer, including containing contexts
+	# `toRoot` specifies if you want to bubble up across contexts,
+	# so specifiying `false` will stop at the first context
+	# and thus the results will never contain any context
+	containers: (toRoot=false, result=[]) ->
+		if @parent?
+			result.push(@parent)
+			return @parent.containers(toRoot, result)
+		else if toRoot
+			result.push(@context)
+			return @context.containers(true, result)
+		return result
 
-		if context is false
-			while currentLayer.parent
-				parents.push(currentLayer.parent)
-				currentLayer = currentLayer.parent
-		else
-			while currentLayer._parentOrContext()
-				parents.push(currentLayer._parentOrContext())
-				currentLayer = currentLayer._parentOrContext()
+	ancestors: ->
+		return @containers()
 
-		return parents
-
-	root: (context=false) ->
+	root: ->
 		return @ if @parent is null
-		return _.last(@ancestors(context=context))
+		return _.last(@ancestors())
 
 
 	childrenAbove: (point, originX=0, originY=0) -> _.filter @children, (layer) ->
@@ -897,7 +1087,6 @@ class exports.Layer extends BaseClass
 		importable: false
 		get: -> @siblings
 
-	superLayers: (context=false) -> @ancestors(context)
 	addSubLayer: (layer) -> @addChild(layer)
 	removeSubLayer: (layer) -> @removeChild(layer)
 	subLayersByName: (name) -> @childrenWithName(name)
@@ -906,7 +1095,6 @@ class exports.Layer extends BaseClass
 	subLayersBelow: (point, originX=0, originY=0) -> @childrenBelow(point, originX, originY)
 	subLayersLeft: (point, originX=0, originY=0) -> @childrenLeft(point, originX, originY)
 	subLayersRight: (point, originX=0, originY=0) -> @childrenRight(point, originX, originY)
-	_superOrParentLayer: -> @_parentOrContext()
 
 	##############################################################
 	## ANIMATION
@@ -1093,19 +1281,20 @@ class exports.Layer extends BaseClass
 				Events.Click, Events.Tap, Events.TapStart, Events.TapEnd,
 				Events.LongPress, Events.LongPressStart, Events.LongPressEnd]
 
-					parentDraggableLayer = @_parentDraggableLayer()
+					# If we dragged any layer, we should cancel click events
+					return if LayerDraggable._globalDidDrag is true
 
-					if parentDraggableLayer
+		# See if we need to convert coordinates for this event. Mouse events by
+		# default have the screen coordinates so we make sure that event.point and
+		# event.contextPoint always have the proper coordinates.
 
-						# If we had a reasonable scrolling offset we cancel the click
-						offset = parentDraggableLayer.draggable.offset
-						return if Math.abs(offset.x) > @_cancelClickEventInDragSessionOffset
-						return if Math.abs(offset.y) > @_cancelClickEventInDragSessionOffset
+		if args[0]?.clientX? or args[0]?.clientY?
 
-						# If there is still some velocity (scroll is moving) we cancel the click
-						velocity = parentDraggableLayer.draggable.velocity
-						return if Math.abs(velocity.x) > @_cancelClickEventInDragSessionVelocity
-						return if Math.abs(velocity.y) > @_cancelClickEventInDragSessionVelocity
+			event = args[0]
+			point = {x: event.clientX, y: event.clientY}
+
+			event.point = Utils.convertPointFromContext(point, @, true)
+			event.contextPoint = Utils.convertPointFromContext(point, @context, true)
 
 		# Always scope the event this to the layer and pass the layer as
 		# last argument for every event.
@@ -1288,7 +1477,7 @@ class exports.Layer extends BaseClass
 		# parent layers clip, we need to intersect the rectangle with it.
 		frame = @canvasFrame
 
-		for parent in @ancestors(context=true)
+		for parent in @ancestors()
 			if parent.clip
 				frame = Utils.frameIntersection(frame, parent.canvasFrame)
 			if not frame
@@ -1330,21 +1519,6 @@ class exports.Layer extends BaseClass
 
 		# Don't show hint if this layer is invisible
 		return false if @opacity is 0
-
-		# See if this layer is visible and not covered by another layer
-		# We don't do this for now because, trying to figure this out will
-		# introduce another class of edge cases, and it is easier to understand
-		# the default logic than some magic logic written by me to try and figure
-		# out what is covered and what not.
-
-		# rootLayer = @root()
-
-		# rootLayers = _.filter @context.layers, (layer) ->
-		# 	return layer.parent is null and layer.index < rootLayer.index
-
-		# for layer in rootLayers
-		# 	if Utils.frameInFrame(@screenFrame, layer.totalFrame())
-		# 		return false
 
 		# If we don't ignore events on this layer, make sure the layer is listening to
 		# an interactive event so there is a decent change something is happening after

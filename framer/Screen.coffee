@@ -25,6 +25,9 @@ class ScreenClass extends BaseClass
 	toInspect: ->
 		return "<Screen #{Utils.roundWhole(@width)}x#{Utils.roundWhole(@height)}>"
 
+	# Triggered from outside by Canvas and DeviceComponent
+	onResize: (cb) -> @on("resize", cb)
+
 	# Point Conversion
 
 	convertPointToLayer: (point, layer) ->

@@ -1,3 +1,4 @@
+assert = require "assert"
 
 describe "Utils", ->
 
@@ -413,6 +414,12 @@ describe "Utils", ->
 			Utils.setValueForKeyPath(obj, "fooA.fooB.fooC", "bar")
 			obj.should.eql({fooA: {fooB: {fooC: "bar"}}})
 
+		it "should merge object values", ->
+			obj = {}
+			Utils.setValueForKeyPath obj, "options.time", disabled: true
+			Utils.setValueForKeyPath obj, "options", disabled: true
+			obj.should.eql({options: {disabled: true, time: {disabled: true}}})
+
 	describe "isFileUrl", ->
 		it "should work", ->
 			Utils.isFileUrl("file:///Users/koen/Desktop/index.html").should.equal(true)
@@ -457,3 +464,99 @@ describe "Utils", ->
 			Utils.isLocalAssetUrl("file:///Desktop/index.html", "http://apple.com/index.html").should.equal(true)
 			Utils.isLocalAssetUrl("http://apple.com/index.html", "http://127.0.0.1/index.html").should.equal(false)
 			Utils.isLocalAssetUrl("Desktop/index.html", dataUrl).should.equal(false)
+
+	describe "convertPointToContext", ->
+		it "should work when passing in a context", ->
+			point = Utils.convertPointToContext({x: 10, y: 20}, Framer.CurrentContext, true)
+			point.should.eql {x: 10, y: 20, z: 0}
+
+	describe "divideFrame", ->
+		it "should work", ->
+		frame =
+			x: 10
+			y: 20
+			width: 30
+			height: 40
+		Utils.divideFrame frame, 2
+		frame.should.eql {x: 5, y: 10, width: 15, height: 20}
+
+	describe "scaleFrames", ->
+		it "should scale a single layer", ->
+			l = new Layer
+				x: 10
+				y: 20
+				width: 30
+				height: 40
+			Utils.scaleFrames(l, 2)
+			l.frame.should.eql {x: 5, y: 10, width: 15, height: 20}
+
+		it "should scale all the descendants of a layer", ->
+			l = new Layer
+				x: 10
+				y: 20
+				width: 30
+				height: 40
+			l2 = new Layer
+				parent: l
+				x: 10
+				y: 20
+				width: 30
+				height: 40
+			l3 = new Layer
+				parent: l
+				x: 10
+				y: 20
+				width: 30
+				height: 40
+			l4 = new Layer
+				parent: l3
+				x: 10
+				y: 20
+				width: 30
+				height: 40
+			l5 = new Layer
+				parent: l3
+				x: 10
+				y: 20
+				width: 30
+				height: 40
+			Utils.scaleFrames(l, 2)
+			l.frame.should.eql {x: 5, y: 10, width: 15, height: 20}
+			l2.frame.should.eql {x: 5, y: 10, width: 15, height: 20}
+			l3.frame.should.eql {x: 5, y: 10, width: 15, height: 20}
+			l4.frame.should.eql {x: 5, y: 10, width: 15, height: 20}
+
+		it "should scale an array of layers", ->
+			l = new Layer
+				x: 10
+				y: 20
+				width: 30
+				height: 40
+			l2 = new Layer
+				x: 10
+				y: 20
+				width: 30
+				height: 40
+			Utils.scaleFrames([l, l2], 2)
+			l.frame.should.eql {x: 5, y: 10, width: 15, height: 20}
+			l2.frame.should.eql {x: 5, y: 10, width: 15, height: 20}
+
+		it "should set the constraintValues of the layer to null", ->
+			l = new Layer
+				x: 10
+				y: 20
+				width: 30
+				height: 40
+			l2 = new Layer
+				parent: l
+				size: l.size
+				constraintValues:
+					right: 0
+					bottom: 0
+			l2.constraintValues.should.eql top: 0, left: 0, right: 0, bottom: 0, aspectRatioLocked: false, centerAnchorX: 0, centerAnchorY: 0, width: 30, height: 40, widthFactor: null, heightFactor: null
+			l.size = width: 50, height: 60
+			l2.frame.should.eql x: 0, y: 0, width: 50, height: 60
+			Utils.scaleFrames(l, 2)
+			l.frame.should.eql {x: 5, y: 10, width: 25, height: 30}
+			l2.frame.should.eql {x: 0, y: 0, width: 25, height: 30}
+			assert.equal(l2.constraintValues, null)

@@ -26,7 +26,7 @@ Framer is a design tool for the Mac which allows you to design without limitatio
 
 ## Set up Framer Library
 
-- [Download](https://builds.framerjs.com/latest/Framer.zip?utm_source=GitHub%2C%20framerjs%2C%20readme&utm_medium=Github) (Framer.js & Framer Generator)
+- [Download](https://builds.framerjs.com/version/latest/Framer.zip?utm_source=GitHub%2C%20framerjs%2C%20readme&utm_medium=Github) (Framer.js & Framer Generator)
 - Open **index.html** in a WebKit browser and you'll see an image animate on click
 - Edit the **app.js** to add interactions and animations (see example code below)
 
@@ -69,7 +69,7 @@ Framer is a design tool for the Mac which allows you to design without limitatio
 ## Others
 
 - [Twitter](http://twitter.com/framer) — Follow us for updates & the latest work
-- [The Community](https://www.facebook.com/groups/framerjs/) — Join over 19.000 designers for help and advice
+- [The Community](https://www.facebook.com/groups/framerjs/) — Join over 20.000 designers for help and advice
 - [The Newsletter](https://framer.com/newsletter/?utm_source=GitHub%2C%20framerjs%2C%20readme&utm_medium=Github) — Get the best work & latest news in your inbox
 - [Featured Examples](https://framer.com/examples/featured/?utm_source=GitHub%2C%20framerjs%2C%20readme&utm_medium=Github) — The best Framer work from the community
 - [Latest builds](http://builds.framerjs.com/?utm_source=GitHub%2C%20framerjs%2C%20readme&utm_medium=Github) — The latest builds of Framer.js

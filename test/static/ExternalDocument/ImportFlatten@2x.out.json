@@ -3,35 +3,35 @@
 		"frame": {
 			"x": 0,
 			"y": 0,
-			"width": 750,
-			"height": 1334
+			"width": 375,
+			"height": 667
 		},
 		"subLayerNames": []
 	},
 	"flat": {
 		"frame": {
-			"x": 40,
-			"y": 260,
-			"width": 180,
-			"height": 180
+			"x": 20,
+			"y": 130,
+			"width": 90,
+			"height": 90
 		},
 		"subLayerNames": []
 	},
 	"block": {
 		"frame": {
-			"x": 260,
-			"y": 40,
-			"width": 180,
-			"height": 180
+			"x": 130,
+			"y": 20,
+			"width": 90,
+			"height": 90
 		},
 		"subLayerNames": []
 	},
 	"some23layer": {
 		"frame": {
-			"x": 260,
-			"y": 260,
-			"width": 180,
-			"height": 180
+			"x": 130,
+			"y": 130,
+			"width": 90,
+			"height": 90
 		},
 		"subLayerNames": []
 	},
@@ -39,8 +39,8 @@
 		"frame": {
 			"x": 0,
 			"y": 0,
-			"width": 750,
-			"height": 1334
+			"width": 375,
+			"height": 667
 		},
 		"subLayerNames": [
 			"bg",
@@ -52,10 +52,10 @@
 	},
 	"ScreenB": {
 		"frame": {
-			"x": 950,
+			"x": 475,
 			"y": 0,
-			"width": 750,
-			"height": 1334
+			"width": 375,
+			"height": 667
 		},
 		"subLayerNames": [
 			"bg"

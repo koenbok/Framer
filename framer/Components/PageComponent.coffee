@@ -99,10 +99,8 @@ class exports.PageComponent extends ScrollComponent
 			direction = "right"
 			throw new Error("#{direction} should be in #{directions}")
 
-		# For allowing pages added with 'addPage' to behave consistently with pages added
-		# to the PageComponent using 'parent', keep the original page point
-		# so one of the two coordinates is left untouched after the page is added
-		point = page.point
+		# If you add pages it makes sense they end up in the default place .
+		point = {x: 0, y: 0}
 
 		if @content.children.length
 			point.x = Utils.frameGetMaxX(@content.contentFrame()) if direction in ["right", "east"]

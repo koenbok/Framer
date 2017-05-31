@@ -22,22 +22,21 @@ _WebkitProperties = [
 
 _Force2DProperties =
 	"z": 0
-	"scaleX": 1
-	"scaleY": 1
 	"scaleZ": 1
 	"skewX": 0
 	"skewY": 0
 	"rotationX": 0
 	"rotationY": 0
 
-
 exports.LayerStyle =
 
 	width: (layer) ->
-		layer._properties.width + "px"
+		layer._updateHTMLScale()
+		(layer._properties.width * layer.context.pixelMultiplier) + "px"
 
 	height: (layer) ->
-		layer._properties.height + "px"
+		layer._updateHTMLScale()
+		(layer._properties.height * layer.context.pixelMultiplier) + "px"
 
 	display: (layer) ->
 		if layer._properties.visible is true
@@ -95,6 +94,11 @@ exports.LayerStyle =
 			if layer._properties.hasOwnProperty(layerName) and layer[layerName] isnt fallback
 				css.push("#{cssName}(#{filterFormat(layer[layerName], unit)})")
 
+		# filter shadow
+		if layer._properties and layer._properties.shadowType is "drop" and layer._properties.shadowColor
+			dropShadow = "drop-shadow(#{layer._properties.shadowX * layer.context.pixelMultiplier}px #{layer._properties.shadowY * layer.context.pixelMultiplier}px #{layer._properties.shadowBlur * layer.context.pixelMultiplier}px #{layer._properties.shadowColor})"
+			css.push(dropShadow)
+
 		return css.join(" ")
 
 	webkitTransform: (layer) ->
@@ -105,10 +109,11 @@ exports.LayerStyle =
 
 		if layer._prefer2d or layer._properties.force2d
 			return exports.LayerStyle.webkitTransformForce2d(layer)
+		dpr = layer.context.pixelMultiplier
 		"
 		translate3d(
-			#{roundToZero(layer._properties.x)}px,
-			#{roundToZero(layer._properties.y)}px,
+			#{roundToZero(layer._properties.x * dpr)}px,
+			#{roundToZero(layer._properties.y * dpr)}px,
 			#{roundToZero(layer._properties.z)}px)
 		scale3d(
 			#{roundToZero(layer._properties.scaleX * layer._properties.scale)},
@@ -135,8 +140,9 @@ exports.LayerStyle =
 			if layer._properties[p] isnt v
 				console.warn "Layer property '#{p}'' will be ignored with force2d enabled"
 
-		css.push "translate(#{roundToZero(layer._properties.x)}px,#{roundToZero(layer._properties.y)}px)"
-		css.push "scale(#{roundToZero(layer._properties.scale)})"
+		dpr = layer.context.pixelMultiplier
+		css.push "translate(#{roundToZero(layer._properties.x * dpr)}px,#{roundToZero(layer._properties.y * dpr)}px)"
+		css.push "scale(#{roundToZero(layer._properties.scaleX * layer._properties.scale)},	#{roundToZero(layer._properties.scaleY * layer._properties.scale)})"
 		css.push "skew(#{roundToZero(layer._properties.skew)}deg,#{roundToZero(layer._properties.skew)}deg)"
 		css.push "rotate(#{roundToZero(layer._properties.rotationZ)}deg)"
 
@@ -161,23 +167,30 @@ exports.LayerStyle =
 
 		props = layer._properties
 
-		if not props.shadowColor
+		if not props and props.shadowColor
+			return ""
+		else if not (props.shadowType is "box" or props.shadowType is "inset")
 			return ""
 		else if props.shadowX is 0 and props.shadowY is 0 and props.shadowBlur is 0 and props.shadowSpread is 0
 			return ""
 
-		return "#{layer._properties.shadowX}px #{layer._properties.shadowY}px #{layer._properties.shadowBlur}px #{layer._properties.shadowSpread}px #{layer._properties.shadowColor}"
+		insetString = ""
+		insetString = "inset " if props.shadowType is "inset"
+
+		return "#{insetString} #{layer._properties.shadowX * layer.context.pixelMultiplier}px #{layer._properties.shadowY * layer.context.pixelMultiplier}px #{layer._properties.shadowBlur * layer.context.pixelMultiplier}px #{layer._properties.shadowSpread * layer.context.pixelMultiplier}px #{layer._properties.shadowColor}"
 
 	textShadow: (layer) ->
 
 		props = layer._properties
 
-		if not props.shadowColor
+		if not props and props.shadowColor
+			return ""
+		else if props.shadowType isnt "text"
 			return ""
 		else if props.shadowX is 0 and props.shadowY is 0 and props.shadowBlur is 0 and props.shadowSpread is 0
 			return ""
 
-		return "#{layer._properties.shadowX}px #{layer._properties.shadowY}px #{layer._properties.shadowBlur}px #{layer._properties.shadowColor}"
+		return "#{layer._properties.shadowX * layer.context.pixelMultiplier}px #{layer._properties.shadowY * layer.context.pixelMultiplier}px #{layer._properties.shadowBlur * layer.context.pixelMultiplier}px #{layer._properties.shadowColor}"
 
 	backgroundColor: (layer) ->
 		return layer._properties.backgroundColor
@@ -187,26 +200,59 @@ exports.LayerStyle =
 
 	borderRadius: (layer) ->
 
-		# Compatibility fix, remove later
-		if not _.isNumber(layer._properties.borderRadius)
-			return layer._properties.borderRadius
+		radius = layer._properties.borderRadius
+		dpr = layer.context.pixelMultiplier
 
-		return layer._properties.borderRadius + "px"
+		if _.isNumber(radius)
+			return (radius * dpr) + "px"
 
-	border: (layer) ->
-		return "#{layer._properties.borderWidth}px solid #{layer._properties.borderColor}"
+		if _.isObject(layer._properties.borderRadius)
+			return (radius.topLeft ? 0) * dpr + "px " + (radius.topRight ? 0) * dpr + "px " + (radius.bottomRight ? 0) * dpr + "px " + (radius.bottomLeft ? 0) * dpr + "px"
+
+		# Custom values like strings are still allowed for compatibility reasons
+		return layer._properties.borderRadius
+
+	borderWidth: (layer) ->
+
+		borderWidth = layer._properties.borderWidth
+		dpr = layer.context.pixelMultiplier
+
+		if _.isNumber(borderWidth)
+			borderTopBottom = (Math.min(borderWidth, layer.height / 2) ? 0) * dpr
+			borderRightLeft = (Math.min(borderWidth, layer.width / 2) ? 0) * dpr
+			return borderTopBottom + "px " + borderRightLeft + "px " + borderTopBottom + "px " + borderRightLeft + "px"
+
+		if _.isObject(borderWidth)
+			borderTop = borderWidth.top ? 0
+			borderBottom = borderWidth.bottom ? 0
+			borderLeft = borderWidth.left ? 0
+			borderRight = borderWidth.right ? 0
+
+			if (borderTop + borderBottom) > layer.height
+				topRatio = borderTop / (borderTop + borderBottom)
+				borderTop = Math.round(topRatio * layer.height)
+				borderBottom = layer.height - borderTop
+
+			if (borderLeft + borderRight) > layer.width
+				leftRatio = borderLeft / (borderLeft + borderRight)
+				borderLeft = Math.round(leftRatio * layer.width)
+				borderRight = layer.width - borderLeft
+
+			return borderTop * dpr + "px " + borderRight * dpr + "px " + borderBottom * dpr + "px " + borderLeft * dpr + "px"
+
+		return borderWidth
 
 	fontSize: (layer) ->
-		return layer._properties.fontSize + "px"
+		return (layer._properties.fontSize * layer.context.pixelMultiplier) + "px"
 
 	letterSpacing: (layer) ->
-		return layer._properties.letterSpacing + "px"
+		return (layer._properties.letterSpacing * layer.context.pixelMultiplier) + "px"
 
 	wordSpacing: (layer) ->
-		return layer._properties.wordSpacing + "px"
+		return (layer._properties.wordSpacing * layer.context.pixelMultiplier) + "px"
 
 	textIndent: (layer) ->
-		return layer._properties.textIndent + "px"
+		return (layer._properties.textIndent * layer.context.pixelMultiplier) + "px"
 
 	textAlign: (layer) ->
 		value = layer._properties.textAlign

@@ -26,7 +26,10 @@ Utils.setValueForKeyPath = (obj, path, val) ->
 	while i < n and result isnt undefined
 		field = fields[i]
 		if i is n - 1
-			result[field] = val
+			if _.isObject(result[field]) and _.isObject(val)
+				_.extend(result[field], val)
+			else
+				result[field] = val
 		else
 			if typeof result[field] is "undefined" or not _.isObject(result[field])
 				result[field] = {}
@@ -458,9 +461,11 @@ Utils.deviceFont = (os) ->
 _loadedFonts = []
 
 Utils.loadWebFont = (font, weight) ->
+
 	fontToLoad = font
 	fontToLoad += ":#{weight}" if weight?
 	fontObject = {fontFamily: font, fontWeight: weight}
+
 	if fontToLoad in _loadedFonts
 		return fontObject
 
@@ -468,7 +473,7 @@ Utils.loadWebFont = (font, weight) ->
 
 	link.href = "https://fonts.googleapis.com/css?family=#{fontToLoad}"
 	link.rel = "stylesheet"
-	document.getElementsByTagName("head")[0].appendChild(link)
+	document.getElementsByTagName("head")[0].appendChild(link) unless window.TESTING
 	_loadedFonts.push(fontToLoad)
 	return fontObject
 
@@ -766,6 +771,20 @@ Utils.pointAngle = (pointA, pointB) ->
 	return Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x) * 180 / Math.PI
 
 
+Utils.divideFrame = (frame, scale) ->
+	frame.x /= scale
+	frame.y /= scale
+	frame.width /= scale
+	frame.height /= scale
+	return frame
+
+Utils.scaleFrames = (layer, scale) ->
+	if layer instanceof Layer
+		layer.constraintValues = null
+		layer.children.map (l) -> Utils.scaleFrames l, scale
+		layer.frame = Utils.divideFrame layer.frame, scale
+	if _.isArray(layer)
+		layer.map (l) -> Utils.scaleFrames l, scale
 # Size
 
 Utils.size = (input) ->
@@ -898,11 +917,71 @@ Utils.frameFromPoints = (points) ->
 		height: maxY - minY
 
 Utils.pixelAlignedFrame = (frame) ->
-	result =
-		width: Math.round(frame.width + (frame.x % 1))
-		height: Math.round(frame.height + (frame.y % 1))
-		x: Math.round(frame.x)
-		y: Math.round(frame.y)
+	x = Math.round(frame.x)
+	y = Math.round(frame.y)
+	maxX = Math.round(frame.x + frame.width)
+	maxY = Math.round(frame.y + frame.height)
+	width = Math.max(maxX - x, 0)
+	height = Math.max(maxY - y, 0)
+	return {x, y, width, height}
+
+Utils.calculateLayoutFrame = (parentFrame, child) ->
+	constraintValues = child.constraintValues
+
+	x = constraintValues.left or 0
+	y = constraintValues.top or 0
+	width = constraintValues.width
+	height = constraintValues.height
+
+	if (parentFrame is null)
+		return Utils.pixelAlignedFrame({x, y, width, height})
+
+	ratio = width / height
+
+	if (constraintValues.widthFactor isnt null)
+		width = parentFrame.width * constraintValues.widthFactor
+		if (constraintValues.aspectRatioLocked)
+			height = width / ratio
+
+	if (constraintValues.heightFactor isnt null)
+		height = parentFrame.height * constraintValues.heightFactor
+		if (constraintValues.aspectRatioLocked)
+			width = height * ratio
+
+	if (constraintValues.left isnt null and constraintValues.right isnt null)
+		width = parentFrame.width - constraintValues.right - constraintValues.left
+		if (constraintValues.aspectRatioLocked)
+			height = width / ratio
+
+	if (constraintValues.top isnt null and constraintValues.bottom isnt null)
+		height = parentFrame.height - constraintValues.bottom - constraintValues.top
+		if (constraintValues.aspectRatioLocked)
+			width = height * ratio
+
+	x = Utils.calculateLayoutX(parentFrame, constraintValues, width)
+	y = Utils.calculateLayoutY(parentFrame, constraintValues, height)
+
+	return Utils.pixelAlignedFrame({x, y, width, height})
+
+Utils.calculateLayoutX = (parentFrame, constraintValues, width) ->
+	x = constraintValues.left or 0
+	if (constraintValues.left isnt null)
+		x = constraintValues.left
+	else if (constraintValues.right isnt null)
+		x = parentFrame.width - constraintValues.right - width
+	else
+		x = (constraintValues.centerAnchorX * parentFrame.width) - (width / 2)
+	return x
+
+Utils.calculateLayoutY = (parentFrame, constraintValues, height) ->
+	y = constraintValues.top or 0
+	if (constraintValues.top isnt null)
+		y = constraintValues.top
+	else if (constraintValues.bottom isnt null)
+		y = parentFrame.height - constraintValues.bottom - height
+	else
+		y = (constraintValues.centerAnchorY * parentFrame.height) - (height / 2)
+	return y
 
 Utils.frameMerge = ->
 
@@ -1032,19 +1111,23 @@ Utils.rotationNormalizer = ->
 		lastValue = value
 		return value
 
-
 # Coordinate system
 
 # convert a point from a layer to the context level, with rootContext enabled you can make it cross to the top context
 Utils.convertPointToContext = (point = {}, layer, rootContext=false, includeLayer=true) ->
 	point = _.defaults(point, {x: 0, y: 0, z: 0})
-	ancestors = layer.ancestors(rootContext)
-	ancestors.unshift(layer) if includeLayer
+	containers = layer.containers(rootContext)
+	containers.unshift(layer) if includeLayer
 
-	for ancestor in ancestors
-		point.z = 0 if ancestor.flat or ancestor.clip
-		point = ancestor.matrix3d.point(point)
-		point.z = 0 unless ancestor.parent
+	for container in containers
+		point.z = 0 if container.flat or container.clip
+		if container.matrix3d?
+			point = container.matrix3d.point(point)
+		else if container.scale?
+			point =
+				x: point.x * container.scale
+				y: point.y * container.scale
+		point.z = 0 unless container.parent
 
 	return point
 
@@ -1066,16 +1149,25 @@ Utils.convertPointFromContext = (point = {}, layer, rootContext=false, includeLa
 		else
 			parent = layer.parent or layer.context
 			node = parent._element
-		return Utils.point(webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y)))
+		point = Utils.point(webkitConvertPointFromPageToNode(node, new WebKitPoint(point.x, point.y)))
+		context = layer.context ? layer
+		point =
+			x: point.x / context.scale
+			y: point.y / context.scale
+		return point
 
-	ancestors = layer.ancestors(rootContext)
-	ancestors.reverse()
-	ancestors.push(layer) if includeLayer
 
-	for ancestor in ancestors
-		continue unless ancestor.matrix3d
-		point = ancestor.matrix3d.inverse().point(point)
+	containers = layer.containers(rootContext)
+	containers.reverse()
+	containers.push(layer) if includeLayer
 
+	for container in containers
+		if container.matrix3d?
+			point = container.matrix3d.inverse().point(point)
+		else if container.scale?
+			point =
+				x: point.x / container.scale
+				y: point.y / container.scale
 	return point
 
 # convert a frame from the context level to a layer, with rootContext enabled you can make it start from the top context
