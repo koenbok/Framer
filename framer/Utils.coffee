@@ -473,7 +473,7 @@ Utils.loadWebFont = (font, weight) ->
 
 	link.href = "https://fonts.googleapis.com/css?family=#{fontToLoad}"
 	link.rel = "stylesheet"
-	document.getElementsByTagName("head")[0].appendChild(link) unless TESTING
+	document.getElementsByTagName("head")[0].appendChild(link) unless window.TESTING
 	_loadedFonts.push(fontToLoad)
 	return fontObject
 
