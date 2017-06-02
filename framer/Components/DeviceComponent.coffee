@@ -290,6 +290,7 @@ class exports.DeviceComponent extends BaseClass
 	customize: (deviceProps) =>
 		Devices.custom = _.defaults deviceProps, Devices.custom
 		@deviceType = "custom"
+		@_update()
 
 	@define "deviceType",
 		get: ->
