@@ -15,6 +15,6 @@ class exports.SVGLayer extends Layer
 		@svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink")
 
 	addShape: (type) ->
-		shape = document.createElementNS("http://www.w3.org/2000/svg", "circle")
+		shape = document.createElementNS("http://www.w3.org/2000/svg", type)
 		@svg.appendChild(shape)
 		return shape
