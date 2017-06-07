@@ -817,6 +817,8 @@ class exports.Layer extends BaseClass
 		else
 			@_elementHTML.style.transformOrigin = "0 0"
 			@_elementHTML.style.transform = "scale(#{@context.scale * @width / @htmlIntrinsicSize.width}, #{@context.scale * @height / @htmlIntrinsicSize.height})"
+			@_elementHTML.style.width = "#{@htmlIntrinsicSize.width}px"
+			@_elementHTML.style.height = "#{@htmlIntrinsicSize.height}px"
 
 	querySelector: (query) -> @_element.querySelector(query)
 	querySelectorAll: (query) -> @_element.querySelectorAll(query)
