@@ -379,6 +379,11 @@ Utils.isTouch = ->
 	window.ontouchmove is null and
 	window.ontouchend is null
 
+Utils.isMouse = ->
+	window.onmousedown is null and
+	window.onmouseup is null and
+	window.onmousemove is null
+
 Utils.isDesktop = ->
 	Utils.deviceType() is "desktop"
 

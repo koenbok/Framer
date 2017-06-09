@@ -25,14 +25,13 @@ Events.enableEmulatedTouchEvents = (enable=true) ->
 		Events.TouchStart = "touchstart"
 		Events.TouchEnd = "touchend"
 		Events.TouchMove = "touchmove"
+	Events.Click = Events.TouchEnd
 
 Events.enableEmulatedTouchEvents(false)
 
-# Let's make sure the touch events work on desktop too
-if not Utils.isTouch()
+# Let's make sure the touch events work with a mouse too
+if Utils.isMouse()
 	Events.enableEmulatedTouchEvents()
-
-Events.Click = Events.TouchEnd
 
 # Animation events
 Events.AnimationStart = "start"
