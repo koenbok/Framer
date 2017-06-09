@@ -5,6 +5,7 @@ Utils = require "./Utils"
 
 Events = {}
 
+
 # Standard dom events
 Events.MouseUp = "mouseup"
 Events.MouseDown = "mousedown"
@@ -15,8 +16,18 @@ Events.MouseWheel = "mousewheel"
 Events.DoubleClick = "dblclick"
 Events.MouseDoubleClick = "dblclick" # Alias for consistent naming
 
+supportsPointerEvents = window.onpointerdown is null and window.onpointermove is null and window.onpointerup is null
+
+Events.PointerUp = "pointerup"
+Events.PointerDown = "pointerdown"
+Events.PointerOver = "pointerover"
+Events.PointerOut = "pointerout"
+Events.PointerMove = "pointermove"
+
 # Standard touch events
 Events.enableEmulatedTouchEvents = (enable=true) ->
+	# never emulate if the browsers supports pointer events
+	return if supportsPointerEvents
 	if enable
 		Events.TouchStart = Events.MouseDown
 		Events.TouchEnd = Events.MouseUp
@@ -26,11 +37,18 @@ Events.enableEmulatedTouchEvents = (enable=true) ->
 		Events.TouchEnd = "touchend"
 		Events.TouchMove = "touchmove"
 
-Events.enableEmulatedTouchEvents(false)
-
 # Let's make sure the touch events work on desktop too
-if not Utils.isTouch()
-	Events.enableEmulatedTouchEvents()
+Events.enableEmulatedTouchEvents(not Utils.isTouch())
+
+if supportsPointerEvents
+	Events.MouseUp = Events.PointerUp
+	Events.MouseDown = Events.PointerDown
+	Events.MouseOver = Events.PointerOver
+	Events.MouseOut = Events.PointerOut
+	Events.MouseMove = Events.PointerMove
+	Events.TouchStart = Events.PointerDown
+	Events.TouchEnd = Events.PointerUp
+	Events.TouchMove = Events.PointerMove
 
 Events.Click = Events.TouchEnd
 

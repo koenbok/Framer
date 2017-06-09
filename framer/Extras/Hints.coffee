@@ -8,12 +8,9 @@ class Hints
 		@_context.index = 10000
 
 		@_context.run =>
-			if Utils.isTouch()
-				Events.wrap(document).addEventListener("touchstart", @_handleDown, capture=true)
-				Events.wrap(document).addEventListener("touchend", @_handleUp, capture=true)
-			else
-				Events.wrap(document).addEventListener("mousedown", @_handleDown, capture=true)
-				Events.wrap(document).addEventListener("mouseup", @_handleUp, capture=true)
+			# Events.TouchStart and TouchEnd are mapped to Mouse or Pointer events automatically
+			Events.wrap(document).addEventListener(Events.TouchStart, @_handleDown, capture=true)
+			Events.wrap(document).addEventListener(Events.TouchEnd, @_handleUp, capture=true)
 
 	_handleDown: (event) =>
 		return if @_isPreloading()
