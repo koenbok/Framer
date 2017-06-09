@@ -823,6 +823,18 @@ class exports.Layer extends BaseClass
 	querySelector: (query) -> @_element.querySelector(query)
 	querySelectorAll: (query) -> @_element.querySelectorAll(query)
 
+	selectChild: (selector) ->
+		Utils.findLayer(@descendants, selector)
+
+	selectAllChildren: (selector) ->
+		Utils.filterLayers(@descendants, selector)
+
+	@select: (selector) ->
+		Framer.CurrentContext.selectLayer(selector)
+
+	@selectAll: (selector) ->
+		Framer.CurrentContext.selectAllLayers(selector)
+
 	destroy: ->
 
 		# Todo: check this
