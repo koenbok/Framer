@@ -223,7 +223,7 @@ class TouchEmulator extends BaseClass
 touchEmulator = null
 
 exports.enable = ->
-	return if Utils.isTouch()
+	return if Utils.isTouch() and not Utils.isMouse()
 	touchEmulator ?= new TouchEmulator()
 	Events.enableEmulatedTouchEvents(true)
 

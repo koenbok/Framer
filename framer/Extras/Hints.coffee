@@ -8,7 +8,7 @@ class Hints
 		@_context.index = 10000
 
 		@_context.run =>
-			if Utils.isTouch()
+			if Utils.isTouch() and not Utils.isMouse()
 				Events.wrap(document).addEventListener("touchstart", @_handleDown, capture=true)
 				Events.wrap(document).addEventListener("touchend", @_handleUp, capture=true)
 			else
