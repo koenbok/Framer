@@ -61,6 +61,10 @@ class LayerStates
 			if Color.isValidColorProperty(k, v)
 				stateProperties[k] = new Color(v)
 				continue
+			
+			if LinearGradient.isLinearGradient(v)
+				stateProperties[k] = v
+				continue
 
 			if @_isValidProperty(k, v)
 				stateProperties[k] = v
@@ -73,6 +77,7 @@ class LayerStates
 		return true if _.isBoolean(v)
 		return true if _.isString(v)
 		return true if Color.isColorObject(v)
+		return true if LinearGradient.isLinearGradient(v)
 		return true if v is null
 		return true if v?.constructor?.name is "Layer"
 		return false
