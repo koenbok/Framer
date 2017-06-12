@@ -886,18 +886,17 @@ class exports.Layer extends BaseClass
 			@_getPropertyValue "image"
 		set: (value) ->
 
+			currentValue = @_getPropertyValue "image"
+
 			if LinearGradient.isLinearGradient(value)
-				oldValue = @_getPropertyValue "image"
-				@emit("change:gradient", value, oldValue)
-				@emit("change:image", value, oldValue)
+				@emit("change:gradient", value, currentValue)
+				@emit("change:image", value, currentValue)
 				@_setPropertyValue("image", value)
 				@style["background-image"] = value.toCSS()
 				return
 
 			if not (_.isString(value) or value is null)
 				layerValueTypeError("image", value)
-
-			currentValue = @_getPropertyValue "image"
 
 			if currentValue is value
 				return @emit "load"
