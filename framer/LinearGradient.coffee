@@ -24,7 +24,7 @@ class exports.LinearGradient extends BaseClass
 		set: (value) ->
 			@_angle = value if _.isNumber(value)
 
-	toCSS: () =>
+	toCSS: =>
 		return "linear-gradient(#{this.angle}deg, #{this.start}, #{this.end})"
 	
 	mix: (gradientB, fraction) =>
@@ -56,7 +56,7 @@ class exports.LinearGradient extends BaseClass
 			end: end
 			angle: angle
 
-	@random: () ->
+	@random: ->
 		hue = Math.random() * 360
 		colorA = new Color h: hue
 		colorB = new Color h: hue + 40
