@@ -707,6 +707,7 @@ googlePixelReleaseVersion = 75
 desktopReleaseVersion = 70
 newDeviceMinVersion = 53
 oldDeviceMaxVersion = 52
+redesignMaxVersion = 92
 
 iPadAir2BaseDevice =
 	deviceImageWidth: 1856
@@ -781,6 +782,7 @@ iPhone6BaseDevice =
 	devicePixelRatio: 2
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
+	maxStudioVersion: redesignMaxVersion
 	hands:
 		"iphone-hands-2":
 			width: 2400
@@ -798,6 +800,7 @@ iPhone6PlusBaseDevice =
 	devicePixelRatio: 3
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
+	maxStudioVersion: redesignMaxVersion
 	hands:
 		"iphone-hands-2":
 			width: 3987
@@ -1032,6 +1035,7 @@ AppleWatch42Device =
 	screenHeight: 390
 	devicePixelRatio: 2
 	minStudioVersion: newDeviceMinVersion
+	maxStudioVersion: redesignMaxVersion
 
 AppleWatch38Device =
 	deviceImageWidth: 472
@@ -1041,6 +1045,7 @@ AppleWatch38Device =
 	screenHeight: 340
 	devicePixelRatio: 2
 	minStudioVersion: newDeviceMinVersion
+	maxStudioVersion: redesignMaxVersion
 
 AppleWatch38BlackLeatherDevice =
 	deviceImageWidth: 472
@@ -1050,6 +1055,7 @@ AppleWatch38BlackLeatherDevice =
 	screenHeight: 340
 	devicePixelRatio: 2
 	minStudioVersion: newDeviceMinVersion
+	maxStudioVersion: redesignMaxVersion
 
 AppleMacBook =
 	deviceImageWidth: 3084
