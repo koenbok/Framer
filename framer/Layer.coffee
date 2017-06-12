@@ -8,6 +8,7 @@ Utils = require "./Utils"
 {BaseClass} = require "./BaseClass"
 {EventEmitter} = require "./EventEmitter"
 {Color} = require "./Color"
+{LinearGradient} = require "./LinearGradient"
 {Matrix} = require "./Matrix"
 {Animation} = require "./Animation"
 {LayerStyle} = require "./LayerStyle"
@@ -882,6 +883,14 @@ class exports.Layer extends BaseClass
 			@_getPropertyValue "image"
 		set: (value) ->
 
+			if LinearGradient.isLinearGradient(value)
+				oldValue = @_getPropertyValue "image"
+				@emit("change:gradient", value, oldValue)
+				@emit("change:image", value, oldValue)
+				@_setPropertyValue("image", value)
+				@style["background-image"] = value.toCSS()
+				return
+
 			if not (_.isString(value) or value is null)
 				layerValueTypeError("image", value)
 
@@ -943,6 +952,13 @@ class exports.Layer extends BaseClass
 
 			else
 				@style["background-image"] = "url('#{imageUrl}')"
+
+	@define "gradient",
+		get: ->
+			return @image if LinearGradient.isLinearGradient(@image)
+			return null
+		set: (value) ->
+			@image = value
 
 	##############################################################
 	## HIERARCHY
