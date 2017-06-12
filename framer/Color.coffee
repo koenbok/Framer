@@ -303,10 +303,12 @@ class exports.Color extends BaseClass
 		colorA = new Color(colorA)
 		colorB = new Color(colorB)
 
-		return false if Math.round(colorA.r) isnt Math.round(colorB.r)
-		return false if Math.round(colorA.g) isnt Math.round(colorB.g)
-		return false if Math.round(colorA.b) isnt Math.round(colorB.b)
-		return false if Math.round(colorA.a) isnt Math.round(colorB.a)
+		tolerance = 1
+		alphaTolerance = 0.01
+		return false if Math.abs(colorA.r - colorB.r) >= tolerance
+		return false if Math.abs(colorA.g - colorB.g) >= tolerance
+		return false if Math.abs(colorA.b - colorB.b) >= tolerance
+		return false if Math.abs(colorA.a - colorB.a) >= alphaTolerance
 		return true
 
 	@rgbToHsl: (a, b, c) ->
