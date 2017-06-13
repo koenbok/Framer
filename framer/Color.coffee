@@ -160,6 +160,9 @@ class exports.Color extends BaseClass
 			b: @b
 			a: alpha
 
+	multiplyAlpha: (alpha) ->
+		return @alpha(@a * alpha)
+
 	transparent: ->
 		@alpha(0)
 
