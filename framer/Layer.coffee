@@ -886,6 +886,11 @@ class exports.Layer extends BaseClass
 			@_getPropertyValue "image"
 		set: (value) ->
 
+			# Unset the background color only if it’s the default color
+			defaults = Defaults.getDefaults "Layer", {}
+			if @backgroundColor?.isEqual(defaults.backgroundColor)
+				@backgroundColor = null
+
 			currentValue = @_getPropertyValue "image"
 
 			if LinearGradient.isLinearGradient(value)
@@ -900,11 +905,6 @@ class exports.Layer extends BaseClass
 
 			if currentValue is value
 				return @emit "load"
-
-			# Unset the background color only if it’s the default color
-			defaults = Defaults.getDefaults "Layer", {}
-			if @backgroundColor?.isEqual(defaults.backgroundColor)
-				@backgroundColor = null
 
 			# Set the property value
 			@_setPropertyValue("image", value)
