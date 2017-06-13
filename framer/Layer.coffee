@@ -883,12 +883,15 @@ class exports.Layer extends BaseClass
 			@_getPropertyValue "image"
 		set: (value) ->
 
+			currentValue = @_getPropertyValue "image"
+
+			if currentValue is value
+				return @emit "load"
+
 			# Unset the background color only if it’s the default color
 			defaults = Defaults.getDefaults "Layer", {}
 			if @backgroundColor?.isEqual(defaults.backgroundColor)
 				@backgroundColor = null
-
-			currentValue = @_getPropertyValue "image"
 
 			if LinearGradient.isLinearGradient(value)
 				@emit("change:gradient", value, currentValue)
@@ -899,9 +902,6 @@ class exports.Layer extends BaseClass
 
 			if not (_.isString(value) or value is null)
 				layerValueTypeError("image", value)
-
-			if currentValue is value
-				return @emit "load"
 
 			# Set the property value
 			@_setPropertyValue("image", value)
