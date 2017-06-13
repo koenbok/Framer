@@ -531,7 +531,7 @@ class exports.LayerDraggable extends BaseClass
 		return unless @_simulation
 
 		# Round the end position to whole pixels
-		@layer[axis] = parseInt(@layer[axis]) if @pixelAlign
+		@layer[axis] = Math.round(@layer[axis]) if @pixelAlign
 
 		# See if both simulators are stopped
 		if @_simulation.x.finished() and @_simulation.y.finished()
