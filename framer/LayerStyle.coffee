@@ -243,16 +243,16 @@ exports.LayerStyle =
 		return borderWidth
 
 	fontSize: (layer) ->
-		return (layer._properties.fontSize * layer.context.pixelMultiplier) + "px"
+		return (layer._properties.fontSize) + "px"
 
 	letterSpacing: (layer) ->
-		return (layer._properties.letterSpacing * layer.context.pixelMultiplier) + "px"
+		return (layer._properties.letterSpacing) + "px"
 
 	wordSpacing: (layer) ->
-		return (layer._properties.wordSpacing * layer.context.pixelMultiplier) + "px"
+		return (layer._properties.wordSpacing) + "px"
 
 	textIndent: (layer) ->
-		return (layer._properties.textIndent * layer.context.pixelMultiplier) + "px"
+		return (layer._properties.textIndent) + "px"
 
 	textAlign: (layer) ->
 		value = layer._properties.textAlign

@@ -244,7 +244,7 @@ class exports.Layer extends BaseClass
 	@define "visible", layerProperty(@, "visible", "display", true, _.isBoolean)
 	@define "opacity", layerProperty(@, "opacity", "opacity", 1, _.isNumber)
 	@define "index", layerProperty(@, "index", "zIndex", 0, _.isNumber, null, {importable: false, exportable: false})
-	@define "clip", layerProperty(@, "clip", "overflow", false, _.isBoolean)
+	@define "clip", layerProperty(@, "clip", "overflow", false, _.isBoolean, null, {}, null, "_elementHTML", true)
 
 	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBoolean, null, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
@@ -782,6 +782,12 @@ class exports.Layer extends BaseClass
 		@bringToFront()
 		@_context.element.appendChild(@_element)
 
+	_createHTMLElementIfNeeded: ->
+		if not @_elementHTML
+			@_elementHTML = document.createElement "div"
+			@_element.insertBefore @_elementHTML, @_elementBorder
+
+
 	@define "html",
 		get: ->
 			@_elementHTML?.innerHTML or ""
@@ -791,10 +797,7 @@ class exports.Layer extends BaseClass
 			# Insert some html directly into this layer. We actually create
 			# a child node to insert it in, so it won't mess with Framers
 			# layer hierarchy.
-
-			if not @_elementHTML
-				@_elementHTML = document.createElement "div"
-				@_element.insertBefore @_elementHTML, @_elementBorder
+			@_createHTMLElementIfNeeded()
 
 			@_elementHTML.innerHTML = value
 			@_updateHTMLScale()
