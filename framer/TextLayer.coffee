@@ -105,7 +105,7 @@ class exports.TextLayer extends Layer
 			@height = newHeight if @height isnt newHeight
 		@disableExplicitUpdating = false
 		if @multiLineOverflow
-			@style["-webkit-line-clamp"] = @maxVisibleLines()
+			@_elementHTML.style["-webkit-line-clamp"] = @maxVisibleLines()
 
 	updateExplicitWidth: (value) =>
 		return if @disableExplicitUpdating
@@ -119,9 +119,10 @@ class exports.TextLayer extends Layer
 		Math.ceil(@height / (@fontSize*@lineHeight))
 
 	@define "text",
-		get: -> @_element.textContent
+		get: -> @_elementHTML?.textContent
 		set: (value) ->
-			@_element.textContent = value
+			@_createHTMLElementIfNeeded()
+			@_elementHTML.textContent = value
 			@emit("change:text", value)
 
 	@define "padding",
@@ -163,7 +164,7 @@ class exports.TextLayer extends Layer
 			layer.whiteSpace = null
 			layer.clip = false
 			layer.multiLineOverflow = false
-	)
+	, "_elementHTML")
 	@define "whiteSpace", layerProperty(@, "whiteSpace", "whiteSpace", null, _.isString)
 	@define "direction", layerProperty(@, "direction", "direction", null, _.isString)
 
@@ -173,13 +174,13 @@ class exports.TextLayer extends Layer
 		set: (value) ->
 			@_multiLineOverFlow = value
 			if @_multiLineOverFlow
-				@style["-webkit-line-clamp"] = @maxVisibleLines()
-				@style["-webkit-box-orient"] = "vertical"
-				@style["display"] = "-webkit-box"
+				@_elementHTML.style["-webkit-line-clamp"] = @maxVisibleLines()
+				@_elementHTML.style["-webkit-box-orient"] = "vertical"
+				@_elementHTML.style["display"] = "-webkit-box"
 			else
-				@style["-webkit-line-clamp"] = null
-				@style["-webkit-box-orient"] = null
-				@style["display"] = "block"
+				@_elementHTML.style["-webkit-line-clamp"] = null
+				@_elementHTML.style["-webkit-box-orient"] = null
+				@_elementHTML.style["display"] = "block"
 
 	@define "font", layerProperty @, "font", null, null, validateFont, null, {}, (layer, value) ->
 		if _.isObject(value)
