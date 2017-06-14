@@ -244,7 +244,7 @@ class exports.Layer extends BaseClass
 	@define "visible", layerProperty(@, "visible", "display", true, _.isBoolean)
 	@define "opacity", layerProperty(@, "opacity", "opacity", 1, _.isNumber)
 	@define "index", layerProperty(@, "index", "zIndex", 0, _.isNumber, null, {importable: false, exportable: false})
-	@define "clip", layerProperty(@, "clip", "overflow", false, _.isBoolean, null, {}, null, "_elementHTML")
+	@define "clip", layerProperty(@, "clip", "overflow", false, _.isBoolean, null, {}, null, "_elementHTML", true)
 
 	@define "scrollHorizontal", layerProperty @, "scrollHorizontal", "overflowX", false, _.isBoolean, null, {}, (layer, value) ->
 		layer.ignoreEvents = false if value is true
