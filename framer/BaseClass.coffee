@@ -68,7 +68,9 @@ class exports.BaseClass extends EventEmitter
 		return _.extend options,
 			default: fallback
 			get: -> @_getPropertyValue(name)
-			set: (value) -> @_setPropertyValue(name, value)
+			set: (value) ->
+				@_setPropertyValue(name, value)
+				options?.didSet?(@, value)
 
 	@proxyProperty = (keyPath, options={}) ->
 
