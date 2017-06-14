@@ -285,17 +285,17 @@ describe "TextLayer", ->
 				text: longText
 				textOverflow: "ellipsis"
 				height: 150
-			l.style["-webkit-line-clamp"].should.equal '3'
+			l._elementHTML.style["-webkit-line-clamp"].should.equal '3'
 			l.height = 400
-			l.style["-webkit-line-clamp"].should.equal '8'
+			l._elementHTML.style["-webkit-line-clamp"].should.equal '8'
 
 		it "should not set the line-clamp when not using textOverflow", ->
 			l = new TextLayer
 				text: longText
 				height: 150
-			l.style["-webkit-line-clamp"].should.equal ''
+			l._elementHTML.style["-webkit-line-clamp"].should.equal ''
 			l.height = 400
-			l.style["-webkit-line-clamp"].should.equal ''
+			l._elementHTML.style["-webkit-line-clamp"].should.equal ''
 
 	describe "truncate", ->
 		it "should set textOverflow to ellipsis", ->
@@ -304,6 +304,8 @@ describe "TextLayer", ->
 				truncate: true
 			l.truncate.should.equal true
 			l.textOverflow.should.equal "ellipsis"
+			l._elementHTML.style.textOverflow.should.equal "ellipsis"
 			l.truncate = false
 			l.truncate.should.equal false
 			expect(l.textOverflow).to.equal null
+			expect(l._elementHTML.style.textOverflow).to.equal ''
