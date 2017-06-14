@@ -249,8 +249,8 @@ class exports.LayerDraggable extends BaseClass
 
 		# Align every drag to pixels
 		if @pixelAlign
-			point.x = parseInt(point.x) if @horizontal
-			point.y = parseInt(point.y) if @vertical
+			point.x = Math.round(point.x) if @horizontal
+			point.y = Math.round(point.y) if @vertical
 
 		# While we update the layer position ourselves, we don't want
 		# to trigger the updater for external changes.
