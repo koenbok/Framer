@@ -329,6 +329,7 @@ class exports.Layer extends BaseClass
 	@define "borderColor", layerProperty(@, "borderColor", "borderColor", null, Color.validColorValue, Color.toColor, null, null, "_elementBorder")
 	@define "borderWidth", layerProperty(@, "borderWidth", "borderWidth", 0, null, asBorderWidth, null, null, "_elementBorder")
 	@define "borderStyle", layerProperty(@, "borderStyle", "borderStyle", "solid", _.isString, null, null, null, "_elementBorder")
+	@define "borderGradient", layerProperty(@, "backgroundImage", "backgroundImage", null, LinearGradient.isLinearGradient, null, null, null, "_elementBorder")
 
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
 	@define "flat", layerProperty(@, "flat", "webkitTransformStyle", false, _.isBoolean)

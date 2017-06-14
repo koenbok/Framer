@@ -241,6 +241,11 @@ exports.LayerStyle =
 			return borderTop * dpr + "px " + borderRight * dpr + "px " + borderBottom * dpr + "px " + borderLeft * dpr + "px"
 
 		return borderWidth
+	
+	borderImage: (layer) ->
+		value = layer._properties.borderImage
+		return "#{value.toCSS()} 1" if LinearGradient.isLinearGradient(value)
+		return ""
 
 	fontSize: (layer) ->
 		return (layer._properties.fontSize * layer.context.pixelMultiplier) + "px"
