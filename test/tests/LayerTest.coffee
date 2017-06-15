@@ -436,6 +436,11 @@ describe "Layer", ->
 			layer.style["overflow"].should.equal "scroll"
 			layer.ignoreEvents.should.equal false
 
+		it "should disable ignore events when scroll is set from constructor", ->
+			layerA = new Layer
+				scroll: true
+			layerA.ignoreEvents.should.equal false
+
 		it "should set style properties on create", ->
 
 			layer = new Layer backgroundColor: "red"
