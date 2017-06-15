@@ -249,8 +249,8 @@ class exports.LayerDraggable extends BaseClass
 
 		# Align every drag to pixels
 		if @pixelAlign
-			point.x = parseInt(point.x) if @horizontal
-			point.y = parseInt(point.y) if @vertical
+			point.x = Math.round(point.x) if @horizontal
+			point.y = Math.round(point.y) if @vertical
 
 		# While we update the layer position ourselves, we don't want
 		# to trigger the updater for external changes.
@@ -531,7 +531,7 @@ class exports.LayerDraggable extends BaseClass
 		return unless @_simulation
 
 		# Round the end position to whole pixels
-		@layer[axis] = parseInt(@layer[axis]) if @pixelAlign
+		@layer[axis] = Math.round(@layer[axis]) if @pixelAlign
 
 		# See if both simulators are stopped
 		if @_simulation.x.finished() and @_simulation.y.finished()
