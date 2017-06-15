@@ -151,7 +151,7 @@ Utils.randomNumber = (a=0, b=1) ->
 	# Return a random number between a and b
 	Utils.mapRange Math.random(), 0, 1, a, b
 
-Utils.randomImage = (layer, offset=50) ->
+Utils.randomImage = (layer) ->
 
 	if _.isNumber(layer)
 		layer = {id: layer}
