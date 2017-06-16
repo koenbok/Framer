@@ -336,7 +336,7 @@ class exports.Layer extends BaseClass
 
 	# Color properties
 	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, Color.validColorValue, Color.toColor)
-	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor)
+	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor, null, null, "_textElement", true)
 
 	# Border properties
 	@define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, null, asBorderRadius, null, null, "_elementBorder", true, true)
