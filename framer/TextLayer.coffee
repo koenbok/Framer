@@ -80,6 +80,14 @@ class exports.TextLayer extends Layer
 		@on "change:width", @updateExplicitWidth
 		@on "change:height", @updateExplicitHeight
 
+	copySingle: ->
+		props = @props
+		delete props["width"] if not @explicitWidth
+		delete props["height"] if not @explicitHeight
+		copy = new @constructor(props)
+		copy.style = @style
+		copy
+
 	defaultFont: ->
 		return Utils.deviceFont(Framer.Device.platform())
 
