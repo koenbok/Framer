@@ -49,7 +49,7 @@ class InlineStyle
 		span = document.createElement "span"
 		for prop, value of @css
 			span.style[prop] = value
-			span.textContent = @text
+		span.textContent = @text
 		return span
 
 	setText: (text) ->
@@ -62,10 +62,8 @@ class InlineStyle
 			delete @css["WebkitTextFillColor"]
 
 	setStyle: (style, value) ->
-		if LayerStyle[style]?
-			value = LayerStyle[style]
-		value =
 		@css[style] = value
+		@element.style[style] = value
 
 	getStyle: (style) ->
 		return @css[style]
@@ -75,6 +73,7 @@ class InlineStyle
 		size =
 			width: rect.right - rect.left
 			height: rect.bottom - rect.top
+		console.log @element
 		return size
 
 class StyledTextBlock
@@ -112,6 +111,30 @@ class StyledTextBlock
 		firstStyle.setText(text)
 		@inlineStyles = [firstStyle]
 
+	setTextOverflow: (textOverflow, autoHeight) ->
+		if textOverflow in ["ellipsis", "clip"] and not autoHeight
+			@setStyle("overflow", "hidden")
+
+			multiLineOverflow = textOverflow is "ellipsis"
+			if multiLineOverflow
+				@setStyle("WebkitLineClamp", 1)
+				@setStyle("WebkitBoxOrient", "vertical")
+				@setStyle("display", "-webkit-box")
+			else
+				@resetStyle("WebkitLineClamp")
+				@resetStyle("WebkitBoxOrient")
+				@setStyle("display", "block")
+				@setStyle("whiteSpace", "nowrap")
+				@setStyle("textOverflow", textOverflow)
+		else
+			@resetStyle("whiteSpace")
+			@resetStyle("textOverflow")
+
+			@resetStyle("display")
+			@resetStyle("overflow")
+			@resetStyle("WebkitLineClamp")
+			@resetStyle("WebkitBoxOrient")
+
 	resetStyle: (style) ->
 		@inlineStyles.map (inlineStyle) -> inlineStyle.resetStyle(style)
 
@@ -124,6 +147,9 @@ class StyledTextBlock
 class StyledText
 	blocks: []
 	element: null
+	autoWidth: false
+	autoHeight: false
+	textOverflow: null
 
 	defaultStyles:
 		fontStyle: "normal"
@@ -154,6 +180,7 @@ class StyledText
 		for block in @blocks
 			blockDiv = block.createElement()
 			block.element = blockDiv
+			block.setTextOverflow(@textOverflow, @autoHeight)
 			@element.appendChild blockDiv
 
 	setText: (text) ->
@@ -161,11 +188,27 @@ class StyledText
 		firstBlock.setText(text)
 		@blocks = [firstBlock]
 
+	setTextOverflow: (textOverflow) ->
+		@textOverflow = textOverflow
+		@blocks.map (b) => b.setTextOverflow(textOverflow, @autoHeight)
+
+	setStyle: (style, value) ->
+		@blocks.map (block) -> block.setStyle(style, value)
+
 	resetStyle: (style) ->
 		@blocks.map (block) -> block.resetStyle(style)
 
-	measure: (width) ->
-		m = getMeasureElement({width: width})
+	getStyle: (style, block=null) ->
+		return (block ? _.first(@blocks))?.getStyle(style) ? @element.style[style]
+
+	measure: (currentSize) ->
+		constraints = {}
+		if not @autoWidth
+			constraints.width = currentSize.width
+		if not @autoHeight
+			constraints.height = currentSize.height
+
+		m = getMeasureElement(constraints)
 		measuredWidth = 0
 		measuredHeight = 0
 		parent = @element.parentNode
@@ -173,10 +216,24 @@ class StyledText
 		for block in @blocks
 			size = block.measure()
 			measuredWidth = Math.max(measuredWidth, size.width)
+			if constraints.height? and (measuredHeight + size.height) > constraints.height
+				fontSize = parseFloat(@getStyle("fontSize", block))
+				lineHeight = parseFloat(@getStyle("lineHeight", block))
+				availableHeight = constraints.height - measuredHeight
+				visibleLines = Math.floor(availableHeight / (fontSize*lineHeight))
+				block.setStyle("WebkitLineClamp", visibleLines)
+				size = block.measure()
 			measuredHeight += size.height
+
 		m.removeChild @element
 		parent?.appendChild @element
-		return {width: Math.ceil(measuredWidth), height: Math.ceil(measuredHeight)}
+		result = currentSize
+		if @autoWidth
+			result.width = Math.ceil(measuredWidth)
+		if @autoHeight
+			result.height = Math.ceil(measuredHeight)
+		return result
+
 
 textProperty = (obj, name, fallback, validator, transformer, set) ->
 	layerProperty(obj, name, name, fallback, validator, transformer, {}, set, "_elementHTML")
@@ -208,13 +265,14 @@ class exports.VekterTextLayer extends Layer
 	constructor: (options) ->
 		_.defaults options,
 			shadowType: "text"
-
-		super options
+			clip: true
 
 		if options.styledText?
 			@_styledText = new StyledText(options.styledText)
 		else
 			throw new Error("Not setting styled text not supported yet")
+
+		super options
 
 		@_createHTMLElementIfNeeded()
 		@_styledText.setElement(@_elementHTML)
@@ -226,7 +284,16 @@ class exports.VekterTextLayer extends Layer
 					@renderText()
 
 	#Vekter properties
-	@define "autoSize", layerProperty(@, "autoSize", null, false)
+	@define "autoWidth", @proxyProperty("_styledText.autoWidth")
+	@define "autoHeight", @proxyProperty("_styledText.autoHeight")
+
+	@define "autoSize",
+		get: -> @autoWidth and @autoHeight
+		set: (value) ->
+			@autoWidth = value
+			@autoHeight = value
+			if not @__constructor
+				@renderText()
 
 	@define "fontFamily", textProperty(@, "fontFamily", _.isString, fontFamilyFromObject, (layer, value) -> layer.font = value)
 	@define "fontWeight", textProperty(@, "fontWeight")
@@ -242,12 +309,21 @@ class exports.VekterTextLayer extends Layer
 	@define "textTransform", textProperty(@, "textTransform", "none", _.isString)
 	@define "textIndent", textProperty(@, "textIndent", null, _.isNumber)
 
+	@define "textOverflow",
+		get: -> @_styledText.textOverflow
+		set: (value) ->
+			@_styledText.setTextOverflow(value)
+			if not @__constructor
+				@renderText()
+
+	@define "truncate",
+		get: -> @textOverflow is "ellipsis"
+		set: (truncate) -> @textOverflow = if truncate then "ellipsis" else null
 
 	@define "whiteSpace", textProperty(@, "whiteSpace", null, _.isString)
 	@define "direction", textProperty(@, "direction", null, _.isString)
 
 	@define "font", layerProperty @, "font", null, null, validateFont, null, {}, (layer, value) ->
-		print value
 		if _.isObject(value)
 			layer.fontFamily = value.fontFamily
 			layer.fontWeight = value.fontWeight
@@ -274,5 +350,4 @@ class exports.VekterTextLayer extends Layer
 	renderText: ->
 		@_styledText.render()
 		@_updateHTMLScale()
-		if @autoSize
-			@size = @_styledText.measure()
+		@size = @_styledText.measure(@size)
