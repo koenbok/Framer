@@ -1,6 +1,9 @@
 {Layer, layerProperty, updateShadow} = require "./Layer"
 {LayerStyle} = require "./LayerStyle"
 
+validateFont = (arg) ->
+	return _.isString(arg) or _.isObject(arg)
+
 fontFamilyFromObject = (font) ->
 	return if _.isObject(font) then font.fontFamily else font
 
@@ -143,11 +146,10 @@ class StyledText
 		@defaultStyles.textAlign = configuration.alignment
 		@blocks = configuration.blocks.map((b) -> new StyledTextBlock(b))
 
-	createElement: ->
-		@element = document.createElement "div"
+	setElement: (element) ->
+		@element = element
 		for style, value of @defaultStyles
 			@element.style[style] = value
-		return @element
 
 	render: ->
 		return if not @element?
@@ -183,7 +185,7 @@ class StyledText
 		return {width: Math.ceil(measuredWidth), height: Math.ceil(measuredHeight)}
 
 textProperty = (obj, name, fallback, validator, transformer, set) ->
-	layerProperty(obj, name, name, fallback, validator, transformer, {}, set, "_textElement")
+	layerProperty(obj, name, name, fallback, validator, transformer, {}, set, "_elementHTML")
 
 class exports.VekterTextLayer extends Layer
 	@_textProperties = [
@@ -220,12 +222,17 @@ class exports.VekterTextLayer extends Layer
 		else
 			throw new Error("Not setting styled text not supported yet")
 
+		@_createHTMLElementIfNeeded()
+		@_styledText.setElement(@_elementHTML)
 		@renderText()
 		for property in VekterTextLayer._textStyleProperties
 			do (property) =>
 				@on "change:#{property}", =>
 					@_styledText.resetStyle(property)
 					@renderText()
+
+	#Vekter properties
+	@define "autoSize", layerProperty(@, "autoSize", null, false)
 
 	@define "fontFamily", textProperty(@, "fontFamily", _.isString, fontFamilyFromObject, (layer, value) -> layer.font = value)
 	@define "fontWeight", textProperty(@, "fontWeight")
@@ -236,6 +243,33 @@ class exports.VekterTextLayer extends Layer
 	@define "letterSpacing", textProperty(@, "letterSpacing", null, _.isNumber)
 	@define "lineHeight", textProperty(@, "lineHeight", null, _.isNumber)
 
+	#Custom properties
+	@define "wordSpacing", textProperty(@, "wordSpacing", null, _.isNumber)
+	@define "textTransform", textProperty(@, "textTransform", "none", _.isString)
+	@define "textIndent", textProperty(@, "textIndent", null, _.isNumber)
+
+
+	@define "whiteSpace", textProperty(@, "whiteSpace", null, _.isString)
+	@define "direction", textProperty(@, "direction", null, _.isString)
+
+	@define "font", layerProperty @, "font", null, null, validateFont, null, {}, (layer, value) ->
+		print value
+		if _.isObject(value)
+			layer.fontFamily = value.fontFamily
+			layer.fontWeight = value.fontWeight
+			return
+		# Check if value contains number. We then assume proper use of font.
+		# Otherwise, we default to setting the fontFamily.
+		if /\d/.test(value)
+			layer._elementHTML.style.font = value
+		else
+			layer.fontFamily = value
+	, "_elementHTML"
+
+	@define "textDirection",
+		get: -> @direction
+		set: (value) -> @direction = value
+
 	@define "text",
 		get: -> @_styledText.blocks.map((b) -> b.text).join("\n")
 		set: (value) ->
@@ -244,10 +278,7 @@ class exports.VekterTextLayer extends Layer
 			@emit("change:text", value)
 
 	renderText: ->
-		@html = ""
-		if not @_textElement?
-			@_textElement = @_styledText.createElement()
-			@_element.appendChild @_textElement
 		@_styledText.render()
-		@_textElement.style.zoom = @context.scale
-		@size = @_styledText.measure()
+		@_updateHTMLScale()
+		if @autoSize
+			@size = @_styledText.measure()
