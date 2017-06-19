@@ -32,12 +32,6 @@ getMeasureElement = (constraints={}) ->
 		_measureElement.style.height = "#{constraints.height}px" if constraints.height
 	return _measureElement
 
-applyStylesToBlock = (block, styles) ->
-	styles.map (s) ->
-		s.startIndex = 0
-		s.endIndex = block.text.length
-	block.inlineStyles = styles
-
 class InlineStyle
 	startIndex: 0
 	endIndex: 0
