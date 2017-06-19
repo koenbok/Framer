@@ -86,6 +86,7 @@ class exports.BaseClass extends EventEmitter
 			set: (value) ->
 				return unless _.isObject(@[objectKey])
 				Utils.setValueForKeyPath(@, keyPath, value)
+				options?.didSet?(@, value)
 			proxy: true
 
 	_setPropertyValue: (k, v) =>

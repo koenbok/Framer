@@ -284,16 +284,21 @@ class exports.VekterTextLayer extends Layer
 					@renderText()
 
 	#Vekter properties
-	@define "autoWidth", @proxyProperty("_styledText.autoWidth")
-	@define "autoHeight", @proxyProperty("_styledText.autoHeight")
+	@define "autoWidth", @proxyProperty("_styledText.autoWidth",
+		didSet: (layer, value) ->
+			layer.renderText()
+		)
+	@define "autoHeight", @proxyProperty("_styledText.autoHeight",
+		didSet: (layer, value) ->
+			layer.renderText()
+		)
 
 	@define "autoSize",
 		get: -> @autoWidth and @autoHeight
 		set: (value) ->
 			@autoWidth = value
 			@autoHeight = value
-			if not @__constructor
-				@renderText()
+			@renderText()
 
 	@define "fontFamily", textProperty(@, "fontFamily", _.isString, fontFamilyFromObject, (layer, value) -> layer.font = value)
 	@define "fontWeight", textProperty(@, "fontWeight")
@@ -313,8 +318,7 @@ class exports.VekterTextLayer extends Layer
 		get: -> @_styledText.textOverflow
 		set: (value) ->
 			@_styledText.setTextOverflow(value)
-			if not @__constructor
-				@renderText()
+			@renderText()
 
 	@define "truncate",
 		get: -> @textOverflow is "ellipsis"
@@ -348,6 +352,7 @@ class exports.VekterTextLayer extends Layer
 			@emit("change:text", value)
 
 	renderText: ->
+		return if @__constructor
 		@_styledText.render()
 		@_updateHTMLScale()
 		@size = @_styledText.measure(@size)
