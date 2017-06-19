@@ -73,7 +73,6 @@ class InlineStyle
 		size =
 			width: rect.right - rect.left
 			height: rect.bottom - rect.top
-		console.log @element
 		return size
 
 class StyledTextBlock
