@@ -110,13 +110,13 @@ class StyledTextBlock
 		firstStyle.setText(text)
 		@inlineStyles = [firstStyle]
 
-	setTextOverflow: (textOverflow, autoHeight) ->
-		if textOverflow in ["ellipsis", "clip"] and not autoHeight
+	setTextOverflow: (textOverflow, maxLines=1) ->
+		if textOverflow in ["ellipsis", "clip"]
 			@setStyle("overflow", "hidden")
 
 			multiLineOverflow = textOverflow is "ellipsis"
 			if multiLineOverflow
-				@setStyle("WebkitLineClamp", 1)
+				@setStyle("WebkitLineClamp", maxLines)
 				@setStyle("WebkitBoxOrient", "vertical")
 				@setStyle("display", "-webkit-box")
 			else
@@ -179,17 +179,27 @@ class StyledText
 		for block in @blocks
 			blockDiv = block.createElement()
 			block.element = blockDiv
-			block.setTextOverflow(@textOverflow, @autoHeight)
+			# block.setTextOverflow(@textOverflow, @autoHeight)
 			@element.appendChild blockDiv
 
+	getText: ->
+		@blocks.map((b) -> b.text).join("\n")
+
 	setText: (text) ->
-		firstBlock = _.first(@blocks)
-		firstBlock.setText(text)
-		@blocks = [firstBlock]
+		values = text.split("\n")
+		@blocks = @blocks.slice(0, values.length)
+		for value, index in values
+			if @blocks[index]?
+				block = @blocks[index]
+			else
+				block = new StyledTextBlock
+					text: value
+					inlineStyles: [_.clone(@blocks[index-1].inlineStyles[0])]
+				@blocks.push(block)
+			block.setText(value)
 
 	setTextOverflow: (textOverflow) ->
 		@textOverflow = textOverflow
-		@blocks.map (b) => b.setTextOverflow(textOverflow, @autoHeight)
 
 	setStyle: (style, value) ->
 		@blocks.map (block) -> block.setStyle(style, value)
@@ -203,10 +213,9 @@ class StyledText
 	measure: (currentSize) ->
 		constraints = {}
 		if not @autoWidth
-			constraints.width = currentSize.width
+			constraints.width = currentSize.width * currentSize.multiplier
 		if not @autoHeight
-			constraints.height = currentSize.height
-
+			constraints.height = currentSize.height * currentSize.multiplier
 		m = getMeasureElement(constraints)
 		measuredWidth = 0
 		measuredHeight = 0
@@ -215,13 +224,21 @@ class StyledText
 		for block in @blocks
 			size = block.measure()
 			measuredWidth = Math.max(measuredWidth, size.width)
-			if constraints.height? and (measuredHeight + size.height) > constraints.height
-				fontSize = parseFloat(@getStyle("fontSize", block))
-				lineHeight = parseFloat(@getStyle("lineHeight", block))
-				availableHeight = constraints.height - measuredHeight
-				visibleLines = Math.floor(availableHeight / (fontSize*lineHeight))
-				block.setStyle("WebkitLineClamp", visibleLines)
-				size = block.measure()
+			constrainedHeight = if constraints.height? then constraints.height / currentSize.multiplier else null
+			if  not @autoWidth and
+				@textOverflow? and @textOverflow in ["clip", "ellipsis"] and
+				constrainedHeight? and (measuredHeight + size.height) > constrainedHeight
+					fontSize = parseFloat(@getStyle("fontSize", block))
+					lineHeight = parseFloat(@getStyle("lineHeight", block))
+					availableHeight = constrainedHeight - measuredHeight
+					print lineHeight, availableHeight, fontSize, availableHeight / (fontSize*lineHeight)
+					visibleLines = Math.max(1, Math.floor(availableHeight / (fontSize*lineHeight)))
+					# print visibleLines
+					block.setTextOverflow(@textOverflow, visibleLines)
+					size.height = availableHeight
+					# print constrainedHeight, size
+			else
+					block.setTextOverflow(null)
 			measuredHeight += size.height
 
 		m.removeChild @element
@@ -321,7 +338,9 @@ class exports.VekterTextLayer extends Layer
 
 	@define "truncate",
 		get: -> @textOverflow is "ellipsis"
-		set: (truncate) -> @textOverflow = if truncate then "ellipsis" else null
+		set: (truncate) ->
+			@autoSize = false
+			@textOverflow = if truncate then "ellipsis" else null
 
 	@define "whiteSpace", textProperty(@, "whiteSpace", null, _.isString)
 	@define "direction", textProperty(@, "direction", null, _.isString)
@@ -344,7 +363,7 @@ class exports.VekterTextLayer extends Layer
 		set: (value) -> @direction = value
 
 	@define "text",
-		get: -> @_styledText.blocks.map((b) -> b.text).join("\n")
+		get: -> @_styledText.getText()
 		set: (value) ->
 			@_styledText.setText(value)
 			@renderText()
@@ -354,4 +373,8 @@ class exports.VekterTextLayer extends Layer
 		return if @__constructor
 		@_styledText.render()
 		@_updateHTMLScale()
-		@size = @_styledText.measure(@size)
+		calculatedSize = @_styledText.measure
+			width: @size.width
+			height: @size.height
+			multiplier: @context.pixelMultiplier
+		@size = calculatedSize
