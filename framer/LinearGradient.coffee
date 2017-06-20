@@ -74,3 +74,6 @@ class exports.LinearGradient extends BaseClass
 		equalStart = Color.equal(gradientA.start, gradientB.start)
 		equalEnd = Color.equal(gradientA.end, gradientB.end)
 		return equalAngle and equalStart and equalEnd
+
+	@_asPlainObject: (gradient) ->
+		_.pick(gradient, ["start", "end", "angle"])

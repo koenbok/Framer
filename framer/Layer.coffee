@@ -960,7 +960,12 @@ class exports.Layer extends BaseClass
 			return @image if LinearGradient.isLinearGradient(@image)
 			return null
 		set: (value) ->
-			@image = value
+			if LinearGradient.isLinearGradient(value)
+				@image = value
+			else
+				gradientOptions = LinearGradient._asPlainObject(value)
+				if not _.isEmpty(gradientOptions)
+					@image = new LinearGradient(gradientOptions)
 
 	##############################################################
 	## HIERARCHY
