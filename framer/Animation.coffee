@@ -294,7 +294,7 @@ class exports.Animation extends BaseClass
 		@_target[key] = Color.mix(@_stateA[key], @_stateB[key], value, false, @options.colorModel)
 
 	_updateGradientValue: (key, value) =>
-		@_target[key] = LinearGradient.mix(@_stateA[key], @_stateB[key], value)
+		@_target[key] = LinearGradient.mix(@_stateA[key], @_stateB[key], value, @options.colorModel)
 
 	_currentState: ->
 		return _.pick(@layer, _.keys(@properties))

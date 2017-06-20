@@ -8,17 +8,17 @@ class exports.LinearGradient extends BaseClass
 		options.end ?= "white"
 		options.angle ?= 0
 		super options
-	
+
 	@define "start",
 		get: -> @_start
 		set: (value) ->
 			@_start = new Color(value)
-	
+
 	@define "end",
 		get: -> @_end
 		set: (value) ->
 			@_end = new Color(value)
-	
+
 	@define "angle",
 		get: -> @_angle
 		set: (value) ->
@@ -26,9 +26,9 @@ class exports.LinearGradient extends BaseClass
 
 	toCSS: =>
 		return "linear-gradient(#{this.angle}deg, #{this.start}, #{this.end})"
-	
-	mix: (gradientB, fraction) =>
-		return LinearGradient.mix(@, gradientB, fraction)
+
+	mix: (gradientB, fraction, model) =>
+		return LinearGradient.mix(@, gradientB, fraction, model)
 
 	isEqual: (gradientB) ->
 		return LinearGradient.equal(@, gradientB)
@@ -39,10 +39,10 @@ class exports.LinearGradient extends BaseClass
 	##############################################################
 	## Class methods
 
-	@mix: (gradientA, gradientB, fraction = 0.5) ->
+	@mix: (gradientA, gradientB, fraction = 0.5, model) ->
 		fraction = Utils.clamp(fraction, 0, 1)
-		start = Color.mix(gradientA.start, gradientB.start, fraction)
-		end = Color.mix(gradientA.end, gradientB.end, fraction)
+		start = Color.mix(gradientA.start, gradientB.start, fraction, false, model)
+		end = Color.mix(gradientA.end, gradientB.end, fraction, false, model)
 
 		startAngle = gradientA.angle
 		endAngle = gradientB.angle
