@@ -39,7 +39,7 @@ Events.DeviceFullScreenDidChange
 # 	DeviceContentScaleDidChange: "change:contentScale"
 # 	DeviceFullScreenDidChange: ""
 
-centerLayer = (layer) ->
+centerLayer = (layer, snapToPixels = false) ->
 	frame = layer.frame
 	if layer.parent
 		Utils.frameSetMidX(frame, (layer.parent.width  / 2.0) - layer.parent.borderWidth)
@@ -47,6 +47,10 @@ centerLayer = (layer) ->
 	else
 		Utils.frameSetMidX(frame, layer._context.innerWidth  / 2.0)
 		Utils.frameSetMidY(frame, layer._context.innerHeight / 2.0)
+
+	if snapToPixels
+		frame.x = Math.round(frame.x)
+		frame.y = Math.round(frame.y)
 	layer.frame = frame
 
 class exports.DeviceComponent extends BaseClass
@@ -163,7 +167,7 @@ class exports.DeviceComponent extends BaseClass
 
 			@_updateDeviceImage()
 			@hands.scale = @_calculatePhoneScale()
-			centerLayer(@hands)
+			centerLayer(@hands, true)
 			centerLayer(@phone)
 
 			[width, height] = @_getOrientationDimensions(
@@ -458,7 +462,7 @@ class exports.DeviceComponent extends BaseClass
 				properties: {scale: phoneScale}
 		else
 			@hands.scale = phoneScale
-			centerLayer(@hands)
+			centerLayer(@hands, true)
 
 		@emit("change:deviceScale")
 
@@ -481,16 +485,16 @@ class exports.DeviceComponent extends BaseClass
 			(window.innerHeight - padding) / height
 		])
 
-		# Pixel crack trick. If the device is not 0, 0.5, 1 etc, we scale it up by
-		# one extra pixel to always avoid pixel cracks. This means that the coordinates
-		# are a off by a little bit if it's not at a "true" size, but you won't see that
-		# anyway id the scaling is some wird number.
+		# Only scale in fixed steps, to reduce blurriness, and pixel cracks
+		phoneScale = Math.floor(phoneScale * 1024.0) / 1024.0
+		phoneScale = 1 / 64.0 if phoneScale < 1 / 64.0
 
-		if phoneScale % 0.5 > 0
-			phoneScale = _.min([
-				(window.innerWidth  - padding) / (width - 1),
-				(window.innerHeight - padding) / (height - 1)
-			])
+		unless Utils.isFramerStudio() and @hideBezel
+			# If close to a nice round scaling, snap to it
+			if 30/64 < phoneScale < 35/64
+				phoneScale = 32/64
+			else if 15/64 < phoneScale < 18/64
+				phoneScale = 16/64
 
 		# Never scale the phone beyond 100%
 		phoneScale = 1 if phoneScale > 1 and not @hideBezel
@@ -667,7 +671,7 @@ class exports.DeviceComponent extends BaseClass
 		if handData
 			@hands.width = handData.width
 			@hands.height = handData.height
-			centerLayer(@hands)
+			centerLayer(@hands, true)
 			centerLayer(@phone)
 			@handsImageLayer.size = @hands.size
 			@handsImageLayer.y = 0
