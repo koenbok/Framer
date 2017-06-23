@@ -40,10 +40,16 @@ class InlineStyle
 	element: null
 
 	constructor: (configuration, text) ->
-		@startIndex = configuration.startIndex
-		@endIndex = configuration.endIndex
-		@css = configuration.css
-		@text = text.substring(@startIndex, @endIndex)
+		if _.isString configuration
+			@text = configuration
+			@startIndex = 0
+			@endIndex = @text.length
+			@css = text
+		else
+			@startIndex = configuration.startIndex
+			@endIndex = configuration.endIndex
+			@css = configuration.css
+			@text = text.substring(@startIndex, @endIndex)
 
 	createElement: ->
 		span = document.createElement "span"
@@ -63,7 +69,7 @@ class InlineStyle
 
 	setStyle: (style, value) ->
 		@css[style] = value
-		@element.style[style] = value
+		@element?.style[style] = value
 
 	getStyle: (style) ->
 		return @css[style]
@@ -83,7 +89,13 @@ class StyledTextBlock
 	constructor: (configuration) ->
 		text = configuration.text
 		@text = text
-		@inlineStyles = configuration.inlineStyles.map((i) -> new InlineStyle(i, text))
+		if configuration.inlineStyles?
+			@inlineStyles = configuration.inlineStyles.map((i) -> new InlineStyle(i, text))
+		else if configuration.css?
+			inlineStyle = new InlineStyle @text, configuration.css
+			@inlineStyles = [inlineStyle]
+		else
+			throw new Error("Should specify inlineStyles or css")
 
 	createElement: ->
 		div = document.createElement "div"
@@ -103,6 +115,11 @@ class StyledTextBlock
 			width: totalWidth
 			height: rect.bottom - rect.top
 		return size
+
+	clone: ->
+		new Block
+			text: ""
+			css: _.first(@inlineStyles).css
 
 	setText: (text) ->
 		@text = text
@@ -162,13 +179,17 @@ class StyledText
 		wordWrap: "break-word"
 
 	constructor: (configuration) ->
-		@defaultStyles.textAlign = configuration.alignment
-		@blocks = configuration.blocks.map((b) -> new StyledTextBlock(b))
+		@defaultStyles.textAlign = configuration?.alignment ? "left"
+		if configuration?.blocks?
+			@blocks = configuration.blocks.map((b) -> new StyledTextBlock(b))
+		else
+			@blocks = []
 
 	setElement: (element) ->
 		@element = element
 		for style, value of @defaultStyles
-			@element.style[style] = value
+			if not @element.style[style]
+				@element.style[style] = value
 
 	render: ->
 		return if not @element?
@@ -179,8 +200,21 @@ class StyledText
 		for block in @blocks
 			blockDiv = block.createElement()
 			block.element = blockDiv
-			# block.setTextOverflow(@textOverflow, @autoHeight)
 			@element.appendChild blockDiv
+
+	addBlock: (text, css = null) ->
+		if css?
+			block = new StyledTextBlock
+				text: text
+				css: css
+		else if @blocks.length > 0
+			block = _.last(@blocks).clone()
+		else
+			block = new StyledTextBlock
+				text: text
+				css: {}
+
+		@blocks.push(block)
 
 	getText: ->
 		@blocks.map((b) -> b.text).join("\n")
@@ -191,12 +225,9 @@ class StyledText
 		for value, index in values
 			if @blocks[index]?
 				block = @blocks[index]
+				block.setText(value)
 			else
-				block = new StyledTextBlock
-					text: value
-					inlineStyles: [_.clone(@blocks[index-1].inlineStyles[0])]
-				@blocks.push(block)
-			block.setText(value)
+				@addBlock value
 
 	setTextOverflow: (textOverflow) ->
 		@textOverflow = textOverflow
@@ -212,10 +243,8 @@ class StyledText
 
 	measure: (currentSize) ->
 		constraints = {}
-		if not @autoWidth
-			constraints.width = currentSize.width * currentSize.multiplier
-		if not @autoHeight
-			constraints.height = currentSize.height * currentSize.multiplier
+		constraints.width = currentSize.width * currentSize.multiplier
+		constraints.height = currentSize.height * currentSize.multiplier
 		m = getMeasureElement(constraints)
 		measuredWidth = 0
 		measuredHeight = 0
@@ -231,19 +260,19 @@ class StyledText
 					fontSize = parseFloat(@getStyle("fontSize", block))
 					lineHeight = parseFloat(@getStyle("lineHeight", block))
 					availableHeight = constrainedHeight - measuredHeight
-					print lineHeight, availableHeight, fontSize, availableHeight / (fontSize*lineHeight)
-					visibleLines = Math.max(1, Math.floor(availableHeight / (fontSize*lineHeight)))
-					# print visibleLines
-					block.setTextOverflow(@textOverflow, visibleLines)
+					if availableHeight > 0
+						visibleLines = Math.max(1, Math.floor(availableHeight / (fontSize*lineHeight)))
+						block.setTextOverflow(@textOverflow, visibleLines)
+					else
+						block.setStyle("visibility", "hidden")
 					size.height = availableHeight
-					# print constrainedHeight, size
 			else
-					block.setTextOverflow(null)
+				block.setTextOverflow(null)
 			measuredHeight += size.height
 
 		m.removeChild @element
 		parent?.appendChild @element
-		result = currentSize
+		result = {} #currentSize
 		if @autoWidth
 			result.width = Math.ceil(measuredWidth)
 		if @autoHeight
@@ -278,26 +307,70 @@ class exports.VekterTextLayer extends Layer
 
 	@_textStyleProperties = _.pull(_.clone(VekterTextLayer._textProperties), "text").concat(["color", "shadowX", "shadowY", "shadowBlur", "shadowColor"])
 
-	constructor: (options) ->
+	constructor: (options={}) ->
 		_.defaults options,
 			shadowType: "text"
 			clip: true
+			createHTMLElement: true
 
 		if options.styledText?
 			@_styledText = new StyledText(options.styledText)
 		else
-			throw new Error("Not setting styled text not supported yet")
+			_.defaults options,
+				backgroundColor: "transparent"
+				text: "Hello World"
+				color: "#888"
+				fontSize: 40
+				fontWeight: 400
+				lineHeight: 1.25
+			if not options.font? and not options.fontFamily?
+				options.fontFamily = @defaultFont()
+			@_styledText = new StyledText()
+			@_styledText.addBlock options.text
 
 		super options
+		@__constructor = true
 
-		@_createHTMLElementIfNeeded()
+		# Keeps track if the width or height are explicitly set, so we shouldn't update it afterwards
+		if not options.autoSize? and not options.truncate
+			if not options.autoWidth?
+				@autoWidth = not options.width?
+			if not options.autoHeight?
+				@autoHeight = not options.height?
+
+		if not options.styledText?
+			@font ?= @fontFamily
+
 		@_styledText.setElement(@_elementHTML)
+
+		delete @__constructor
+
 		@renderText()
+
+		# Executing function properties like Align.center again
+		for key, value of options
+			if _.isFunction(value) and @[key]?
+				@[key] = value
+
 		for property in VekterTextLayer._textStyleProperties
 			do (property) =>
-				@on "change:#{property}", =>
-					@_styledText.resetStyle(property)
+				@on "change:#{property}", (value) =>
+					# make an exception for fontSize, as it needs to be set on the inner style
+					if property isnt "fontSize"
+						@_styledText.resetStyle(property)
 					@renderText()
+
+		@on "change:width", @updateAutoWidth
+		@on "change:height", @updateAutoHeight
+		@on "change:parent", @renderText
+
+	updateAutoWidth: (value) =>
+		return if @disableAutosizeUpdating
+		@autoWidth = false
+
+	updateAutoHeight: (value) =>
+		return if @disableAutosizeUpdating
+		@autoHeight = false
 
 	#Vekter properties
 	@define "autoWidth", @proxyProperty("_styledText.autoWidth",
@@ -316,11 +389,14 @@ class exports.VekterTextLayer extends Layer
 			@autoHeight = value
 			@renderText()
 
-	@define "fontFamily", textProperty(@, "fontFamily", _.isString, fontFamilyFromObject, (layer, value) -> layer.font = value)
+	@define "fontFamily", textProperty(@, "fontFamily", null, _.isString, fontFamilyFromObject, (layer, value) -> layer.font = value)
 	@define "fontWeight", textProperty(@, "fontWeight")
 	@define "fontStyle", textProperty(@, "fontStyle", "normal", _.isString)
 	@define "textDecoration", textProperty(@, "textDecoration", null, _.isString)
-	@define "fontSize", textProperty(@, "fontSize", null, _.isNumber)
+	@define "fontSize", textProperty(@, "fontSize", null, _.isNumber, null, (layer, value) ->
+		style = LayerStyle["fontSize"](layer)
+		layer._styledText.setStyle("fontSize", style)
+	)
 	@define "textAlign", textProperty(@, "textAlign")
 	@define "letterSpacing", textProperty(@, "letterSpacing", null, _.isNumber)
 	@define "lineHeight", textProperty(@, "lineHeight", null, _.isNumber)
@@ -339,8 +415,11 @@ class exports.VekterTextLayer extends Layer
 	@define "truncate",
 		get: -> @textOverflow is "ellipsis"
 		set: (truncate) ->
-			@autoSize = false
-			@textOverflow = if truncate then "ellipsis" else null
+			if truncate
+				@autoSize = false
+				@textOverflow = "ellipsis"
+			else
+				@textOverflow = null
 
 	@define "whiteSpace", textProperty(@, "whiteSpace", null, _.isString)
 	@define "direction", textProperty(@, "direction", null, _.isString)
@@ -369,12 +448,39 @@ class exports.VekterTextLayer extends Layer
 			@renderText()
 			@emit("change:text", value)
 
-	renderText: ->
+	@define "padding",
+		get: ->
+			_.clone(@_padding)
+
+		set: (padding) ->
+			if _.isObject(padding)
+				padding.left ?= padding.horizontal
+				padding.right ?= padding.horizontal
+				padding.top ?= padding.vertical
+				padding.bottom ?= padding.vertical
+			@_padding = Utils.rectZero(Utils.parseRect(padding))
+
+			# Top, Right, Bottom, Left
+			@style.padding =
+				"#{@_padding.top}px #{@_padding.right}px #{@_padding.bottom}px #{@_padding.left}px"
+
+	renderText: =>
 		return if @__constructor
 		@_styledText.render()
 		@_updateHTMLScale()
+		parentWidth = if @parent? then @parent.width else Screen.width
 		calculatedSize = @_styledText.measure
-			width: @size.width
-			height: @size.height
+			width: if @autoWidth then parentWidth else @size.width
+			height: if @autoHeight then null else @size.height
 			multiplier: @context.pixelMultiplier
-		@size = calculatedSize
+		@disableAutosizeUpdating = true
+		if calculatedSize.width?
+			@width = calculatedSize.width
+		if calculatedSize.height?
+			@height = calculatedSize.height
+		@disableAutosizeUpdating = false
+
+	defaultFont: ->
+		return Utils.deviceFont(Framer.Device.platform())
+
+	#TODO: replaceText: (search, replace)

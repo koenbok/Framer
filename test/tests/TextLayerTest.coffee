@@ -10,15 +10,17 @@ describe "TextLayer", ->
 	describe "defaults", ->
 		it "should set the correct defaults", ->
 			text = new TextLayer
-			text.html.should.equal "Hello World"
+			text.text.should.equal "Hello World"
+			text.html.should.equal '<div style="font-size: 1px;"><span style="font-size: 40px;">Hello World</span></div>'
+			text._elementHTML.outerHTML.should.equal '<div style="zoom: 1; overflow: hidden; color: rgb(136, 136, 136); font-family: -apple-system, BlinkMacSystemFont, \'SF UI Text\', \'Helvetica Neue\'; font-weight: 400; font-style: normal; font-size: 40px; line-height: 1.25; text-transform: none; outline: none; white-space: pre-wrap; word-wrap: break-word; text-align: left;"><div style="font-size: 1px;"><span style="font-size: 40px;">Hello World</span></div></div>'
 			text.color.isEqual("#888").should.equal true
 			text.backgroundColor.isEqual("transparent").should.equal true
-			text.padding.should.eql Utils.rectZero()
+			# text.padding.should.eql Utils.rectZero()
 			text.fontSize.should.equal 40
 			text.fontWeight.should.equal 400
 			text.lineHeight.should.equal 1.25
 			text.fontStyle.should.equal "normal"
-			text.style.fontFamily.should.equal "-apple-system, BlinkMacSystemFont, 'SF UI Text', 'Helvetica Neue'"
+			text._elementHTML.style.fontFamily.should.equal "-apple-system, BlinkMacSystemFont, 'SF UI Text', 'Helvetica Neue'"
 
 		it "should not set the default fontFamily default if the fontFamily property is set", ->
 			text = new TextLayer
@@ -56,7 +58,7 @@ describe "TextLayer", ->
 				text: mediumText
 				width: 100
 			text.width.should.equal 100
-			text.height.should.equal 550
+			text.height.should.equal 750
 
 		it "should not auto size the layer the size the layer if it is explictly set", ->
 			text = new TextLayer
@@ -86,8 +88,8 @@ describe "TextLayer", ->
 				fontFamily: "Courier, Liberation Mono"
 				text: mediumText
 				parent: layer
-			text.width.should.equal 150
-			text.height.should.equal 550
+			text.width.should.equal 144
+			text.height.should.equal 600
 
 		it "should auto size the layer when its parent is set afterwards", ->
 			layer = new Layer width: 150
@@ -95,8 +97,8 @@ describe "TextLayer", ->
 				fontFamily: "Courier, Liberation Mono"
 				text: mediumText
 			text.parent = layer
-			text.width.should.equal 150
-			text.height.should.equal 550
+			text.width.should.equal 144
+			text.height.should.equal 600
 
 		it "should adjust its size on when a new text is set", (done) ->
 			text = new TextLayer
@@ -128,7 +130,7 @@ describe "TextLayer", ->
 				padding: 3
 			parent = new Layer
 			text.parent = parent
-			text.size.should.eql width: 100, height: 116
+			text.size.should.eql width: 96, height: 200
 
 		it "should autosize with the right width when inside a parent with a border", ->
 			text = new TextLayer
@@ -258,44 +260,56 @@ describe "TextLayer", ->
 			l = new TextLayer
 				textOverflow: "ellipsis"
 				height: 20
-			l.multiLineOverflow.should.equal true
+				autoWidth: false
+			l._styledText.getStyle("WebkitLineClamp").should.equal 1
 
 		it "should should disable multilineOverflow when using clipping and setting a specific height", ->
 			l = new TextLayer
 				textOverflow: "clip"
 				height: 20
-			l.multiLineOverflow.should.equal false
+				autoWidth: false
+			l._styledText.getStyle("WebkitLineClamp").should.equal ''
+			l._styledText.getStyle("whiteSpace").should.equal "nowrap"
 
-		it "should set whitespace to nowrap setting no height", ->
+		it "should set whitespace to pre-wrap setting no height", ->
 			l = new TextLayer
 				textOverflow: "ellipsis"
-			l.whiteSpace.should.equal "nowrap"
-			l.multiLineOverflow.should.equal false
+			l._styledText.getStyle("whiteSpace").should.equal "pre-wrap"
+			l._styledText.getStyle("WebkitLineClamp").should.equal ''
 
-		it "should disable properties when it's disabled", ->
+		it "should disable line clamp property when it's disabled", ->
 			l = new TextLayer
 				textOverflow: "ellipsis"
+				height: 20
+				autoWidth: false
 			l.textOverflow = null
-			l.clip.should.equal false
-			expect(l.whitespace).to.equal undefined
-			l.multiLineOverflow.should.equal false
+			l._styledText.getStyle("WebkitLineClamp").should.equal ''
+
+		it "should disable line whitespace property when it's disabled", ->
+			l = new TextLayer
+				textOverflow: "clip"
+				height: 20
+				autoWidth: false
+			l.textOverflow = null
+			l._styledText.getStyle("whiteSpace").should.equal "pre-wrap"
 
 		it "should update the line-clamp when the height is updated", ->
 			l = new TextLayer
 				text: longText
 				textOverflow: "ellipsis"
 				height: 150
-			l._elementHTML.style["-webkit-line-clamp"].should.equal '3'
+				autoWidth: false
+			l._styledText.getStyle("WebkitLineClamp").should.equal 3
 			l.height = 400
-			l._elementHTML.style["-webkit-line-clamp"].should.equal '8'
+			l._styledText.getStyle("WebkitLineClamp").should.equal 8
 
 		it "should not set the line-clamp when not using textOverflow", ->
 			l = new TextLayer
 				text: longText
 				height: 150
-			l._elementHTML.style["-webkit-line-clamp"].should.equal ''
+			l._styledText.getStyle("WebkitLineClamp").should.equal ''
 			l.height = 400
-			l._elementHTML.style["-webkit-line-clamp"].should.equal ''
+			l._styledText.getStyle("WebkitLineClamp").should.equal ''
 
 	describe "truncate", ->
 		it "should set textOverflow to ellipsis", ->
@@ -304,8 +318,8 @@ describe "TextLayer", ->
 				truncate: true
 			l.truncate.should.equal true
 			l.textOverflow.should.equal "ellipsis"
-			l._elementHTML.style.textOverflow.should.equal "ellipsis"
+			l._styledText.getStyle("WebkitLineClamp").should.equal 2
 			l.truncate = false
 			l.truncate.should.equal false
 			expect(l.textOverflow).to.equal null
-			expect(l._elementHTML.style.textOverflow).to.equal ''
+			expect(l._styledText.getStyle("WebkitLineClamp")).to.equal ''

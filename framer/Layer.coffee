@@ -63,7 +63,6 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 					style = LayerStyle[cssProperty](@)
 					mainElement?.style[cssProperty] = style
 					subElement?.style[cssProperty] = style
-
 			set?(@, value)
 
 			# We try to not send any events while we run the constructor, it just
@@ -167,6 +166,9 @@ class exports.Layer extends BaseClass
 
 		# We have to create the element before we set the defaults
 		@_createElement()
+
+		if options.createHTMLElement
+			@_createHTMLElementIfNeeded()
 
 		# Create border element
 		@_elementBorder = document.createElement("div")
