@@ -143,8 +143,8 @@ class exports.DeviceComponent extends BaseClass
 		screenSizeChanged = false
 		if @_shouldRenderFullScreen()
 
-			width = window.innerWidth / contentScaleFactor
-			height = window.innerHeight / contentScaleFactor
+			width = document.documentElement.clientWidth / contentScaleFactor
+			height = document.documentElement.clientHeight / contentScaleFactor
 			screenSizeChanged = @content.width isnt width or @content.height isnt height
 			for layer in [@background, @hands, @phone, @viewport, @content, @screen]
 				layer.x = layer.y = 0
