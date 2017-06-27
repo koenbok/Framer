@@ -1,10 +1,15 @@
-{SVGLayer} = require "../SVGLayer"
+{Layer} = require "../Layer"
 
-class exports.CircularProgressComponent extends SVGLayer
+class exports.CircularProgressComponent extends Layer
 	
 	constructor: (options={}) ->
 		super
 		
+		@svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+		@svg.setAttribute("width", "100%")
+		@svg.setAttribute("height", "100%")
+		@svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink")
+
 		@backgroundColor = null
 		@rotation = -90
 		
@@ -19,9 +24,12 @@ class exports.CircularProgressComponent extends SVGLayer
 		@railsColor = Color.grey(.2)
 		@progressColor = Color.grey(1)
 		
-		@svg.appendChild(@rails)
-		@svg.appendChild(@circle)
 		@_element.appendChild(@svg)
+
+	addShape: (type) ->
+		shape = document.createElementNS("http://www.w3.org/2000/svg", "circle")
+		@svg.appendChild(shape)
+		return shape
 
 	@define "radius",
 		get: -> @width / 2 - @strokeWidth / 2
