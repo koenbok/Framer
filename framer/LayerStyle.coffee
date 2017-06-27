@@ -194,6 +194,9 @@ exports.LayerStyle =
 
 	backgroundColor: (layer) ->
 		return layer._properties.backgroundColor
+	
+	fill: (layer) ->
+		return layer._properties.fill
 
 	color: (layer) ->
 		return layer._properties.color
