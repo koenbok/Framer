@@ -31,7 +31,6 @@ class exports.SVGLayer extends Layer
 
 		if not @_elementGradientSVG and isGradient
 			@_elementGradientSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-			@_elementGradientSVG.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink")
 			@_element.appendChild @_elementGradientSVG
 
 		if isGradient
