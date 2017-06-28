@@ -337,9 +337,9 @@ class exports.Layer extends BaseClass
 	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor)
 
 	# Border properties
-	@define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, null, asBorderRadius, null, null, "_elementBorder", true)
+	@define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, null, asBorderRadius, null, null, "_elementBorder", true, true)
 	@define "borderColor", layerProperty(@, "borderColor", "borderColor", null, Color.validColorValue, Color.toColor, null, null, "_elementBorder")
-	@define "borderWidth", layerProperty(@, "borderWidth", "borderWidth", 0, null, asBorderWidth, null, null, "_elementBorder")
+	@define "borderWidth", layerProperty(@, "borderWidth", "borderWidth", 0, null, asBorderWidth, null, null, "_elementBorder", false, true)
 	@define "borderStyle", layerProperty(@, "borderStyle", "borderStyle", "solid", _.isString, null, null, null, "_elementBorder")
 
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
@@ -970,7 +970,7 @@ class exports.Layer extends BaseClass
 
 	@define "gradient",
 		get: ->
-			return @image if Gradient.isGradient(@image)
+			return layerProxiedValue(@image, @, "gradient") if Gradient.isGradient(@image)
 			return null
 		set: (value) ->
 			if Gradient.isGradient(value)
