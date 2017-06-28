@@ -331,7 +331,7 @@ class exports.Animation extends BaseClass
 			else if Color.isValidColorProperty(k, v)
 				animatableProperties[k] = new Color(v)
 			else if k is "gradient" and not _.isEmpty(Gradient._asPlainObject(v))
-				animatableProperties[k] = v
+				animatableProperties[k] = new Gradient(v)
 
 		return animatableProperties
 
