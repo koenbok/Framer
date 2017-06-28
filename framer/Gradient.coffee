@@ -27,16 +27,16 @@ class exports.Gradient extends BaseClass
 		set: (value) ->
 			@_angle = value if _.isNumber(value)
 
-	toCSS: =>
-		return "linear-gradient(#{this.angle}deg, #{this.start}, #{this.end})"
+	toCSS: ->
+		return "linear-gradient(#{@angle}deg, #{@start}, #{@end})"
 
-	mix: (gradientB, fraction, model) =>
+	mix: (gradientB, fraction, model) ->
 		return Gradient.mix(@, gradientB, fraction, model)
 
 	isEqual: (gradientB) ->
 		return Gradient.equal(@, gradientB)
 
-	toInspect: =>
+	toInspect: ->
 		return "<#{@constructor.name} start:#{@start} end:#{@end} angle:#{@angle}>"
 
 	##############################################################
