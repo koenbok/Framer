@@ -2,7 +2,7 @@
 {BaseClass} = require "./BaseClass"
 {Color} = require "./Color"
 
-class exports.LinearGradient extends BaseClass
+class exports.Gradient extends BaseClass
 	constructor: (options = {}) ->
 		options.start ?= "black"
 		options.end ?= "white"
@@ -28,10 +28,10 @@ class exports.LinearGradient extends BaseClass
 		return "linear-gradient(#{this.angle}deg, #{this.start}, #{this.end})"
 
 	mix: (gradientB, fraction, model) =>
-		return LinearGradient.mix(@, gradientB, fraction, model)
+		return Gradient.mix(@, gradientB, fraction, model)
 
 	isEqual: (gradientB) ->
-		return LinearGradient.equal(@, gradientB)
+		return Gradient.equal(@, gradientB)
 
 	toInspect: =>
 		return "<#{@constructor.name} start:#{@start} end:#{@end} angle:#{@angle}>"
@@ -51,7 +51,7 @@ class exports.LinearGradient extends BaseClass
 		endAngle = normalizer(endAngle)
 		angle = startAngle + (endAngle - startAngle) * fraction
 
-		return new LinearGradient
+		return new Gradient
 			start: start
 			end: end
 			angle: angle
@@ -60,16 +60,16 @@ class exports.LinearGradient extends BaseClass
 		hue = Math.random() * 360
 		colorA = new Color h: hue
 		colorB = new Color h: hue + 40
-		return new LinearGradient
+		return new Gradient
 			start: colorA
 			end: colorB
 			angle: Math.random() * 360
 
-	@isLinearGradient: (gradient) -> return gradient instanceof LinearGradient
+	@isGradient: (gradient) -> return gradient instanceof Gradient
 
 	@equal: (gradientA, gradientB) ->
-		return false unless LinearGradient.isLinearGradient(gradientA)
-		return false unless LinearGradient.isLinearGradient(gradientB)
+		return false unless Gradient.isGradient(gradientA)
+		return false unless Gradient.isGradient(gradientB)
 		equalAngle = Math.abs(gradientA.angle - gradientB.angle) % 360 is 0
 		equalStart = Color.equal(gradientA.start, gradientB.start)
 		equalEnd = Color.equal(gradientA.end, gradientB.end)

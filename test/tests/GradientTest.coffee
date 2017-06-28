@@ -6,7 +6,7 @@ describe "Linear Gradient", ->
 		end = "orange"
 		angle = 20
 
-		gradient = new LinearGradient
+		gradient = new Gradient
 			start: start
 			end: end
 			angle: angle
@@ -17,15 +17,15 @@ describe "Linear Gradient", ->
 	
 	it "should compare for equality", ->
 
-		gradient = new LinearGradient
+		gradient = new Gradient
 			angle: 360
 			start: "red"
-		equalGradient = new LinearGradient
+		equalGradient = new Gradient
 			angle: 0
 			start: "red"
-		LinearGradient.equal(gradient, equalGradient).should.be.true
+		Gradient.equal(gradient, equalGradient).should.be.true
 
-		unequalGradient = new LinearGradient
+		unequalGradient = new Gradient
 			angle: 90
 		unequalGradient.isEqual(gradient).should.be.false
 
@@ -33,9 +33,9 @@ describe "Linear Gradient", ->
 
 		colorA = "red"
 		colorB = "yellow"
-		gradientA = new LinearGradient
+		gradientA = new Gradient
 			start: colorA
-		gradientB = new LinearGradient
+		gradientB = new Gradient
 			start: colorB
 			angle: 90
 		mixed = gradientA.mix(gradientB)
@@ -44,9 +44,9 @@ describe "Linear Gradient", ->
 
 	it "should take the shortest route when animating to a new angle", ->
 
-		gradientA = new LinearGradient
+		gradientA = new Gradient
 			angle: 0
-		gradientB = new LinearGradient
+		gradientB = new Gradient
 			angle: 405
-		mixed = LinearGradient.mix(gradientA, gradientB, 1)
+		mixed = Gradient.mix(gradientA, gradientB, 1)
 		mixed.angle.should.equal 45

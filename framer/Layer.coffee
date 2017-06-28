@@ -8,7 +8,7 @@ Utils = require "./Utils"
 {BaseClass} = require "./BaseClass"
 {EventEmitter} = require "./EventEmitter"
 {Color} = require "./Color"
-{LinearGradient} = require "./LinearGradient"
+{Gradient} = require "./Gradient"
 {Matrix} = require "./Matrix"
 {Animation} = require "./Animation"
 {LayerStyle} = require "./LayerStyle"
@@ -890,7 +890,7 @@ class exports.Layer extends BaseClass
 			defaults = Defaults.getDefaults "Layer", {}
 			isBackgroundColorDefault = @backgroundColor?.isEqual(defaults.backgroundColor)
 
-			if LinearGradient.isLinearGradient(value)
+			if Gradient.isGradient(value)
 				@emit("change:gradient", value, currentValue)
 				@emit("change:image", value, currentValue)
 				@_setPropertyValue("image", value)
@@ -958,15 +958,15 @@ class exports.Layer extends BaseClass
 
 	@define "gradient",
 		get: ->
-			return @image if LinearGradient.isLinearGradient(@image)
+			return @image if Gradient.isGradient(@image)
 			return null
 		set: (value) ->
-			if LinearGradient.isLinearGradient(value)
+			if Gradient.isGradient(value)
 				@image = value
 			else
-				gradientOptions = LinearGradient._asPlainObject(value)
+				gradientOptions = Gradient._asPlainObject(value)
 				if not _.isEmpty(gradientOptions)
-					@image = new LinearGradient(gradientOptions)
+					@image = new Gradient(gradientOptions)
 
 	##############################################################
 	## HIERARCHY

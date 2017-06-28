@@ -278,7 +278,7 @@ class exports.Animation extends BaseClass
 		for k, v of @_stateB
 			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
 				@_valueUpdaters[k] = @_updateColorValue
-			else if LinearGradient.isLinearGradient(v) or LinearGradient.isLinearGradient(@_stateA[k])
+			else if Gradient.isGradient(v) or Gradient.isGradient(@_stateA[k])
 				@_valueUpdaters[k] = @_updateGradientValue
 			else
 				@_valueUpdaters[k] = @_updateNumberValue
@@ -294,9 +294,9 @@ class exports.Animation extends BaseClass
 		@_target[key] = Color.mix(@_stateA[key], @_stateB[key], value, false, @options.colorModel)
 
 	_updateGradientValue: (key, value) =>
-		gradientA = LinearGradient._asPlainObject(@_stateA[key])
-		gradientB = LinearGradient._asPlainObject(@_stateB[key])
-		@_target[key] = LinearGradient.mix(
+		gradientA = Gradient._asPlainObject(@_stateA[key])
+		gradientB = Gradient._asPlainObject(@_stateB[key])
+		@_target[key] = Gradient.mix(
 			_.defaults(gradientA, gradientB)
 			_.defaults(gradientB, gradientA)
 			value
@@ -307,7 +307,7 @@ class exports.Animation extends BaseClass
 		return _.pick(@layer, _.keys(@properties))
 
 	@isAnimatable = (v) ->
-		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or LinearGradient.isLinearGradient(v)
+		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or Gradient.isGradient(v)
 
 	@filterAnimatableProperties = (properties) ->
 		# Function to filter only animatable properties out of a given set
@@ -330,7 +330,7 @@ class exports.Animation extends BaseClass
 				animatableProperties[k] = v
 			else if Color.isValidColorProperty(k, v)
 				animatableProperties[k] = new Color(v)
-			else if k is "gradient" and not _.isEmpty(LinearGradient._asPlainObject(v))
+			else if k is "gradient" and not _.isEmpty(Gradient._asPlainObject(v))
 				animatableProperties[k] = v
 
 		return animatableProperties

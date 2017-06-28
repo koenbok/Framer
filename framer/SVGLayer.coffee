@@ -15,19 +15,19 @@ class exports.SVGLayer extends Layer
 		get: ->
 			return @_gradient
 		set: (value) ->
-			if LinearGradient.isLinearGradient(value)
+			if Gradient.isGradient(value)
 				@_gradient = value
 			else
-				gradientOptions = LinearGradient._asPlainObject(value)
+				gradientOptions = Gradient._asPlainObject(value)
 				if not _.isEmpty(gradientOptions)
-					@_gradient = new LinearGradient(gradientOptions)
+					@_gradient = new Gradient(gradientOptions)
 				else
 					@_gradient = null
 			@updateGradientSVG()
 			
 	updateGradientSVG: =>
 
-		isGradient = LinearGradient.isLinearGradient @_gradient
+		isGradient = Gradient.isGradient @_gradient
 
 		if not @_elementGradientSVG and isGradient
 			@_elementGradientSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg")
