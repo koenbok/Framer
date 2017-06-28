@@ -22,15 +22,18 @@ NoCacheDateKey = Date.now()
 layerValueTypeError = (name, value) ->
 	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}' is not valid")
 
-layerProperty = (obj, name, cssProperty, fallback, validator, transformer, options={}, set, targetElement, includeMainElement) ->
+layerProperty = (obj, name, cssProperty, fallback, validator, transformer, options={}, set, targetElement, includeMainElement, useSubpropertyProxy) ->
 	result =
 		default: fallback
 		get: ->
 
 			# console.log "Layer.#{name}.get #{@_properties[name]}", @_properties.hasOwnProperty(name)
 
-			return @_properties[name] if @_properties.hasOwnProperty(name)
-			return fallback
+			value = @_properties[name] if @_properties.hasOwnProperty(name)
+			value ?= fallback
+
+			return layerProxiedValue(value, @, name) if useSubpropertyProxy
+			return value
 
 		set: (value) ->
 
@@ -75,6 +78,15 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 	result = _.extend(result, options)
 
 exports.layerProperty = layerProperty
+
+layerProxiedValue = (value, layer, property) ->
+	return value unless window.Proxy and _.isObject(value)
+	new Proxy value,
+		set: (proxiedValue, subProperty, subValue) ->
+			clone = Object.assign(new proxiedValue.constructor, proxiedValue)
+			clone[subProperty] = subValue
+			layer[property] = clone
+			return true
 
 layerPropertyPointTransformer = (value, layer, property) ->
 	if _.isFunction(value)
@@ -325,9 +337,9 @@ class exports.Layer extends BaseClass
 	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor)
 
 	# Border properties
-	@define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, null, asBorderRadius, null, null, "_elementBorder", true)
+	@define "borderRadius", layerProperty(@, "borderRadius", "borderRadius", 0, null, asBorderRadius, null, null, "_elementBorder", true, true)
 	@define "borderColor", layerProperty(@, "borderColor", "borderColor", null, Color.validColorValue, Color.toColor, null, null, "_elementBorder")
-	@define "borderWidth", layerProperty(@, "borderWidth", "borderWidth", 0, null, asBorderWidth, null, null, "_elementBorder")
+	@define "borderWidth", layerProperty(@, "borderWidth", "borderWidth", 0, null, asBorderWidth, null, null, "_elementBorder", false, true)
 	@define "borderStyle", layerProperty(@, "borderStyle", "borderStyle", "solid", _.isString, null, null, null, "_elementBorder")
 
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
@@ -958,7 +970,7 @@ class exports.Layer extends BaseClass
 
 	@define "gradient",
 		get: ->
-			return @image if Gradient.isGradient(@image)
+			return layerProxiedValue(@image, @, "gradient") if Gradient.isGradient(@image)
 			return null
 		set: (value) ->
 			if Gradient.isGradient(value)
