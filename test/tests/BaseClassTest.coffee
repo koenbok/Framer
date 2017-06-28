@@ -207,7 +207,7 @@ describe "BaseClass", ->
 		instance.testPropA.should.equal "a"
 		instance.testPropB.should.equal "value"
 
-	it.skip "should have defined properties set in sibling subclasses", ->
+	it "should have defined properties set in sibling subclasses", ->
 
 		class LalaLayer extends Framer.BaseClass
 			@define "blabla",
@@ -225,11 +225,13 @@ describe "BaseClass", ->
 				get: -> "getClassC"
 				# set: -> "setClassC"
 
-		expect(TestClassD["_DefinedPropertiesKey"]?.a?.set).to.be.ok
-		expect(TestClassC["_DefinedPropertiesKey"]?.a?.set).to.not.be.ok
+		d = new TestClassD
+		c = new TestClassC
+		expect(d._propertyList()?.a?.set).to.be.ok
+		expect(c._propertyList()?.a?.set).to.not.be.ok
 
 
-	it.skip "should not export a shared property name in props of in sibling subclasses", ->
+	it "should not export a shared property name in props of in sibling subclasses", ->
 
 		class BaseSubClass extends Framer.BaseClass
 			@define "blabla",
@@ -255,3 +257,23 @@ describe "BaseClass", ->
 		expect(b.blabla).to.be.ok
 		expect(a.props.blabla).to.be.ok
 		expect(b.props.blabla).to.be.ok
+
+	it "should allow overrides of properties", ->
+		class TestA extends Framer.BaseClass
+			@define "test", @simpleProperty("test", "a")
+		class TestB extends TestA
+			@define "test", @simpleProperty("test", "b")
+		a = new TestA
+		b = new TestB
+		a.test.should.equal "a"
+		b.test.should.equal "b"
+
+	it "should inherit properties", ->
+		class TestInherit extends Framer.BaseClass
+			@define "test", @simpleProperty("test", "a")
+		class TestInheritB extends TestInherit
+		a = new TestInherit
+		b = new TestInheritB
+			test: null
+		a.test.should.equal "a"
+		b.test.should.equal "a"

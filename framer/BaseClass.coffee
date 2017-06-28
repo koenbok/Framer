@@ -5,9 +5,13 @@ Utils = require "./Utils"
 {EventEmitter} = require "./EventEmitter"
 
 CounterKey = "_ObjectCounter"
-DefinedPropertiesKey = "_DefinedPropertiesKey"
 DefinedPropertiesValuesKey = "_DefinedPropertiesValuesKey"
-DefinedPropertiesOrderKey = "_DefinedPropertiesOrderKey"
+
+ObjectDescriptors = []
+
+# Theoretically this should be an array per class, but as long as we don't do weird stuff
+# like depending properties of subclasses in a different order then superclasses this will work
+DefaultPropertyOrder = []
 
 class exports.BaseClass extends EventEmitter
 
@@ -41,28 +45,24 @@ class exports.BaseClass extends EventEmitter
 		descriptor.importable ?= true
 
 		# We assume we don't import if there is no setter, because we can't
-		descriptor.importable = descriptor.importable and descriptor.set
+		descriptor.importable = descriptor.importable and descriptor.set?
 		# We also assume we don't export if there is no setter, because
 		# it is likely a calculated property, and we can't set it.
-		descriptor.exportable = descriptor.exportable and descriptor.set
+		descriptor.exportable = descriptor.exportable and descriptor.set?
 
 		# We assume that every property with an underscore is private
 		return if _.startsWith(propertyName, "_")
 
 		# Only retain options that are importable, exportable or both:
 		if descriptor.exportable or descriptor.importable
-			@[DefinedPropertiesKey] ?= {}
-			@[DefinedPropertiesKey][propertyName] = descriptor
-
-			# Set the order, insert it's dependants before, we'll check if they exist later
-			@[DefinedPropertiesOrderKey] ?= []
+			ObjectDescriptors.push([@, propertyName, descriptor])
 
 			if descriptor.depends
 				for depend in descriptor.depends
-					if depend not in @[DefinedPropertiesOrderKey]
-						@[DefinedPropertiesOrderKey].push(depend)
-
-			@[DefinedPropertiesOrderKey].push(propertyName)
+					if depend not in DefaultPropertyOrder
+						DefaultPropertyOrder.push(depend)
+			if propertyName not in DefaultPropertyOrder
+				DefaultPropertyOrder.push(propertyName)
 
 	@simpleProperty = (name, fallback, options={}) ->
 		return _.extend options,
@@ -97,7 +97,11 @@ class exports.BaseClass extends EventEmitter
 		@_propertyList()[k]["default"]
 
 	_propertyList: ->
-		@constructor[DefinedPropertiesKey]
+		result = {}
+		for k in ObjectDescriptors
+			if @ instanceof k[0]
+				result[k[1]] = k[2]
+		return result
 
 	keys: -> _.keys(@props)
 
@@ -151,36 +155,27 @@ class exports.BaseClass extends EventEmitter
 		# we don't get confused because the id changes from global to context
 		@_id = @constructor[CounterKey]
 
-	_applyDefaults: (options) ->
+	_applyDefaults: (options, proxy = false) ->
 
-		return unless @constructor[DefinedPropertiesOrderKey]
 		return unless options
 
-		for k in @constructor[DefinedPropertiesOrderKey]
-			@_applyDefault(k, options[k])
+		propertyList = @_propertyList()
+		for k in DefaultPropertyOrder
+			descriptor = propertyList[k]
+			if descriptor?
+				continue if proxy and not (descriptor.proxy is true)
+				@_applyDefault(descriptor, k, options[k])
 
 	_applyProxyDefaults: (options) ->
+		@_applyDefaults(options, true)
 
-		return unless @constructor[DefinedPropertiesOrderKey]
-		return unless options
-
-		for k in @constructor[DefinedPropertiesOrderKey]
-			descriptor = @constructor[DefinedPropertiesKey][k]
-			continue unless descriptor?.proxy? is true
-			@_applyDefault(k, options[k])
-
-	_applyDefault: (key, optionValue) ->
-
-		descriptor = @constructor[DefinedPropertiesKey][key]
-
-		# If this was listed as a dependent property, but it did not get defined, we err.
-		throw Error("Missing dependant descriptor: #{key}") unless descriptor
+	_applyDefault: (descriptor, key, optionValue) ->
 
 		# For each known property (registered with @define) that has a setter, fetch
 		# the value from the options object, unless the prop is not importable.
 		# When there's no user value, apply the default value:
 
-		return unless descriptor.set
+		return unless descriptor.set?
 
 		value = optionValue if descriptor.importable
 		value = Utils.valueOrDefault(optionValue, @_getPropertyDefaultValue(key))
