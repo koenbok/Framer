@@ -24,9 +24,9 @@ class exports.BaseClass extends EventEmitter
 		if @ isnt BaseClass
 			@_addDescriptor(propertyName, descriptor)
 
-		# if not descriptor.set?
-		# 	descriptor.set = (value) ->
-		# 		throw Error("#{@constructor.name}.#{propertyName} is readonly")
+		if not descriptor.set?
+			descriptor.set = (value) ->
+				throw Error("#{@constructor.name}.#{propertyName} is readonly")
 
 		# Define the property on the prototype
 		Object.defineProperty(@prototype, propertyName, descriptor)
