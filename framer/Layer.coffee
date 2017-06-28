@@ -348,6 +348,15 @@ class exports.Layer extends BaseClass
 	@define "grayscale", layerProperty(@, "grayscale", "webkitFilter", 0, _.isNumber)
 	@define "sepia", layerProperty(@, "sepia", "webkitFilter", 0, _.isNumber)
 
+	@define "backgroundBlur", layerProperty(@, "backgroundBlur", "webkitBackdropFilter", 0, _.isNumber)
+	@define "backgroundBrightness", layerProperty(@, "backgroundBrightness", "webkitBackdropFilter", 100, _.isNumber)
+	@define "backgroundSaturate", layerProperty(@, "backgroundSaturate", "webkitBackdropFilter", 100, _.isNumber)
+	@define "backgroundHueRotate", layerProperty(@, "backgroundHueRotate", "webkitBackdropFilter", 0, _.isNumber)
+	@define "backgroundContrast", layerProperty(@, "backgroundContrast", "webkitBackdropFilter", 100, _.isNumber)
+	@define "backgroundInvert", layerProperty(@, "backgroundInvert", "webkitBackdropFilter", 0, _.isNumber)
+	@define "backgroundGrayscale", layerProperty(@, "backgroundGrayscale", "webkitBackdropFilter", 0, _.isNumber)
+	@define "backgroundSepia", layerProperty(@, "backgroundSepia", "webkitBackdropFilter", 0, _.isNumber)
+
 	for i in [0...8]
 		do (i) =>
 			@define "shadow#{i+1}",
