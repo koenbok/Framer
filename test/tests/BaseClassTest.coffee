@@ -181,7 +181,7 @@ describe "BaseClass", ->
 
 		props.hasOwnProperty("testProp").should.be.false
 
-	it.skip "should throw on assignment of read-only prop", ->
+	it "should throw on assignment of read-only prop", ->
 		class TestClass extends Framer.BaseClass
 			@define "testProp",
 				get: -> "value"
