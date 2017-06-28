@@ -22,15 +22,18 @@ NoCacheDateKey = Date.now()
 layerValueTypeError = (name, value) ->
 	throw new Error("Layer.#{name}: value '#{value}' of type '#{typeof(value)}' is not valid")
 
-layerProperty = (obj, name, cssProperty, fallback, validator, transformer, options={}, set, targetElement, includeMainElement) ->
+layerProperty = (obj, name, cssProperty, fallback, validator, transformer, options={}, set, targetElement, includeMainElement, useSubpropertyProxy) ->
 	result =
 		default: fallback
 		get: ->
 
 			# console.log "Layer.#{name}.get #{@_properties[name]}", @_properties.hasOwnProperty(name)
 
-			return @_properties[name] if @_properties.hasOwnProperty(name)
-			return fallback
+			value = @_properties[name] if @_properties.hasOwnProperty(name)
+			value ?= fallback
+
+			return layerProxiedValue(value, @, name) if useSubpropertyProxy
+			return value
 
 		set: (value) ->
 
@@ -75,6 +78,15 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 	result = _.extend(result, options)
 
 exports.layerProperty = layerProperty
+
+layerProxiedValue = (value, layer, property) ->
+	return value unless window.Proxy and _.isObject(value)
+	new Proxy value,
+		set: (proxiedValue, subProperty, subValue) ->
+			clone = Object.assign(new proxiedValue.constructor, proxiedValue)
+			clone[subProperty] = subValue
+			layer[property] = clone
+			return true
 
 layerPropertyPointTransformer = (value, layer, property) ->
 	if _.isFunction(value)
