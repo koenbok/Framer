@@ -972,15 +972,11 @@ class exports.Layer extends BaseClass
 		get: ->
 			return layerProxiedValue(@image, @, "gradient") if Gradient.isGradientObject(@image)
 			return null
-		set: (value) ->
-			if Gradient.isGradientObject(value)
-				@image = value
+		set: (value) -> # Copy semantics!
+			if Gradient.isGradient(value)
+				@image = new Gradient(value)
 			else if not value and Gradient.isGradientObject(@image)
 				@image = null
-			else
-				gradientOptions = Gradient._asPlainObject(value)
-				if not _.isEmpty(gradientOptions)
-					@image = new Gradient(gradientOptions)
 
 	##############################################################
 	## HIERARCHY

@@ -5,8 +5,6 @@
 class exports.Gradient extends BaseClass
 	constructor: (options = {}) ->
 
-		if options instanceof Gradient then return options
-
 		options.start ?= "black"
 		options.end ?= "white"
 		options.angle ?= 0
