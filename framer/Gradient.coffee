@@ -78,5 +78,12 @@ class exports.Gradient extends BaseClass
 		equalEnd = Color.equal(gradientA.end, gradientB.end)
 		return equalAngle and equalStart and equalEnd
 
+	@multiplyAlpha: (gradient, alpha) ->
+		gradient = new Gradient(gradient) if not @isGradientObject(gradient)
+		return new Gradient
+			start: gradient.start.multiplyAlpha(alpha)
+			end: gradient.end.multiplyAlpha(alpha)
+			angle: gradient.angle
+
 	@_asPlainObject: (gradient) ->
 		_.pick(gradient, ["start", "end", "angle"])

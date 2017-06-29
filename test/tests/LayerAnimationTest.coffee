@@ -860,10 +860,22 @@ describe "LayerAnimation", ->
 		it "should animate if no gradient is set yet", (done) ->
 			layer = new Layer
 			layer.on "change:gradient", ->
-				layer.gradient.start.alpha.should.equal 0
-				layer.gradient.end.alpha.should.equal 0
+				if layer.gradient
+					layer.gradient.start.b.should.equal 255
+			layer.on Events.AnimationEnd, ->
+				layer.gradient.start.isEqual("blue").should.be.true
 				done()
 			layer.animate
 				gradient:
 					start: "blue"
+
+		it "should animate to a null gradient", (done) ->
+			layer = new Layer
+				gradient:
+					start: "blue"
 					end: "red"
+			layer.on Events.AnimationEnd, ->
+				assert.equal layer.gradient, null
+				done()
+			layer.animate
+				gradient: null
