@@ -46,12 +46,8 @@ class exports.Gradient extends BaseClass
 		fraction = Utils.clamp(fraction, 0, 1)
 		start = Color.mix(gradientA.start, gradientB.start, fraction, false, model)
 		end = Color.mix(gradientA.end, gradientB.end, fraction, false, model)
-
 		startAngle = gradientA.angle
 		endAngle = gradientB.angle
-		normalizer = Utils.rotationNormalizer()
-		normalizer(startAngle)
-		endAngle = normalizer(endAngle)
 		angle = startAngle + (endAngle - startAngle) * fraction
 
 		return new Gradient
