@@ -62,7 +62,7 @@ class exports.Gradient extends BaseClass
 		return new Gradient
 			start: colorA
 			end: colorB
-			angle: Math.random() * 360
+			angle: Math.round(Math.random() * 360)
 
 	@isGradient: (gradient) -> return gradient instanceof Gradient
 
