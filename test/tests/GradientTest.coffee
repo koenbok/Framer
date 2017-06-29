@@ -42,11 +42,11 @@ describe "Linear Gradient", ->
 		mixed.angle.should.equal 45
 		mixed.start.isEqual(Color.mix(colorA, colorB)).should.be.true
 
-	it "should take the shortest route when animating to a new angle", ->
+	it "should not take the shortest route when animating to a new angle", ->
 
 		gradientA = new Gradient
 			angle: 0
 		gradientB = new Gradient
 			angle: 405
 		mixed = Gradient.mix(gradientA, gradientB, 1)
-		mixed.angle.should.equal 45
+		mixed.angle.should.equal 405
