@@ -1,4 +1,4 @@
-describe "Linear Gradient", ->
+describe "Gradient", ->
 
 	it "should allow input as object", ->
 
@@ -14,7 +14,7 @@ describe "Linear Gradient", ->
 		gradient.start.isEqual(start).should.be.true
 		gradient.end.isEqual(end).should.be.true
 		gradient.angle.should.equal angle
-	
+
 	it "should compare for equality", ->
 
 		gradient = new Gradient
