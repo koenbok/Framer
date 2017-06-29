@@ -582,6 +582,26 @@ describe "Layer", ->
 			layer.htmlIntrinsicSize = null
 			assert.equal layer.htmlIntrinsicSize, null
 
+		it "should set gradient", ->
+			layer = new Layer
+			layer.gradient = new Gradient
+				start: "blue"
+				end: "red"
+				angle: 42
+			layer.gradient.start.isEqual("blue").should.be.true
+			layer.gradient.end.isEqual("red").should.be.true
+			layer.gradient.angle.should.equal(42)
+			layer.style["background-image"].should.equal("linear-gradient(42deg, rgb(0, 0, 255), rgb(255, 0, 0))")
+
+			layer.gradient =
+				start: "yellow"
+				end: "purple"
+			layer.gradient.angle.should.equal(0)
+			layer.style["background-image"].should.equal("linear-gradient(0deg, rgb(255, 255, 0), rgb(128, 0, 128))")
+
+			layer.gradent = null
+			layer.style["background-image"].should.equal("")
+
 	describe "Filter Properties", ->
 
 		it "should set nothing on defaults", ->
