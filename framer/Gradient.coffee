@@ -68,7 +68,9 @@ class exports.Gradient extends BaseClass
 			end: colorB
 			angle: Math.random() * 360
 
-	@isGradient: (gradient) -> return gradient instanceof Gradient
+	@isGradient: (gradient) -> return not _.isEmpty(@_asPlainObject(gradient))
+
+	@isGradientObject: (gradient) -> return gradient instanceof Gradient
 
 	@equal: (gradientA, gradientB) ->
 		return false unless Gradient.isGradient(gradientA)

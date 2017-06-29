@@ -278,7 +278,7 @@ class exports.Animation extends BaseClass
 		for k, v of @_stateB
 			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
 				@_valueUpdaters[k] = @_updateColorValue
-			else if Gradient.isGradient(v) or Gradient.isGradient(@_stateA[k])
+			else if Gradient.isGradientObject(v) or Gradient.isGradientObject(@_stateA[k])
 				@_valueUpdaters[k] = @_updateGradientValue
 			else
 				@_valueUpdaters[k] = @_updateNumberValue
@@ -307,7 +307,7 @@ class exports.Animation extends BaseClass
 		return _.pick(@layer, _.keys(@properties))
 
 	@isAnimatable = (v) ->
-		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or Gradient.isGradient(v)
+		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or Gradient.isGradientObject(v)
 
 	@filterAnimatableProperties = (properties) ->
 		# Function to filter only animatable properties out of a given set

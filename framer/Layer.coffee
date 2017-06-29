@@ -902,7 +902,7 @@ class exports.Layer extends BaseClass
 			defaults = Defaults.getDefaults "Layer", {}
 			isBackgroundColorDefault = @backgroundColor?.isEqual(defaults.backgroundColor)
 
-			if Gradient.isGradient(value)
+			if Gradient.isGradientObject(value)
 				@emit("change:gradient", value, currentValue)
 				@emit("change:image", value, currentValue)
 				@_setPropertyValue("image", value)
@@ -970,10 +970,10 @@ class exports.Layer extends BaseClass
 
 	@define "gradient",
 		get: ->
-			return layerProxiedValue(@image, @, "gradient") if Gradient.isGradient(@image)
+			return layerProxiedValue(@image, @, "gradient") if Gradient.isGradientObject(@image)
 			return null
 		set: (value) ->
-			if Gradient.isGradient(value)
+			if Gradient.isGradientObject(value)
 				@image = value
 			else
 				gradientOptions = Gradient._asPlainObject(value)
