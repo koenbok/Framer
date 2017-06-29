@@ -600,7 +600,7 @@ describe "Layer", ->
 			layer.gradient.angle.should.equal(0)
 			layer.style["background-image"].should.equal("linear-gradient(0deg, rgb(255, 255, 0), rgb(128, 0, 128))")
 
-			layer.gradent = null
+			layer.gradient = null
 			layer.style["background-image"].should.equal("")
 
 		it "should copy borderRadius when set with an object", ->

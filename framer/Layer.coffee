@@ -975,6 +975,8 @@ class exports.Layer extends BaseClass
 		set: (value) ->
 			if Gradient.isGradientObject(value)
 				@image = value
+			else if not value and Gradient.isGradientObject(@image)
+				@image = null
 			else
 				gradientOptions = Gradient._asPlainObject(value)
 				if not _.isEmpty(gradientOptions)
