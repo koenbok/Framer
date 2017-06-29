@@ -1,4 +1,5 @@
 assert = require "assert"
+{expect} = require "chai"
 simulate = require "simulate"
 
 describe "Layer", ->
@@ -601,6 +602,55 @@ describe "Layer", ->
 
 			layer.gradent = null
 			layer.style["background-image"].should.equal("")
+
+		it "should copy borderRadius when set with an object", ->
+			layer = new Layer
+			borderRadius = {topLeft: 100}
+			layer.borderRadius = borderRadius
+			borderRadius.bottomRight = 100
+			expect(layer.borderRadius.bottomRight).to.equal undefined
+
+		it "should copy borderWidth when set with an object", ->
+			layer = new Layer
+			borderWidth = {top: 100}
+			layer.borderWidth = borderWidth
+			borderWidth.bottom = 100
+			expect(layer.borderWidth.bottom).to.equal undefined
+
+		it "should copy gradients when set with an object", ->
+			layer = new Layer
+			gradient = new Gradient
+				start: "blue"
+			layer.gradient = gradient
+			gradient.start = "yellow"
+			layer.gradient.start.isEqual("blue").should.be.true
+
+		it "should set sub-properties of borderRadius", ->
+			layer = new Layer
+				borderRadius: {topLeft: 100}
+			layer.borderRadius.bottomRight = 100
+			layer.borderRadius.topLeft.should.equal(100)
+			layer.borderRadius.bottomRight.should.equal(100)
+			layer.style["border-top-left-radius"].should.equal "100px"
+			layer.style["border-bottom-right-radius"].should.equal "100px"
+
+		it "should set sub-properties of borderWidth", ->
+			layer = new Layer
+				borderWidth: {top: 100}
+			layer.borderWidth.bottom = 100
+			layer.borderWidth.top.should.equal(100)
+			layer.borderWidth.bottom.should.equal(100)
+			layer.style["border-top-width"].should.equal "100px"
+			layer.style["border-bottom-width"].should.equal "100px"
+
+		it "should set sub-properties of gradients", ->
+			layer = new Layer
+				gradient:
+					start: "blue"
+			layer.gradient.end = "yellow"
+			layer.gradient.start.isEqual("blue").should.be.true
+			layer.gradient.end.isEqual("yellow").should.be.true
+			layer.style["background-image"].should.equal("linear-gradient(0deg, rgb(0, 0, 255), rgb(255, 255, 0))")
 
 	describe "Filter Properties", ->
 
