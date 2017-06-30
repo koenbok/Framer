@@ -95,6 +95,9 @@ class ReSetterProxy
 			Object.defineProperty(proxy, prop, desc)
 		proxy.__proto__ = target.__proto__
 
+# Use this to wrap property values in a Proxy so setting sub-properties
+# will also trigger updates on the layer.
+# Because we’re not fully on ES6, we can’t use Proxy, so use our own wrapper.
 layerProxiedValue = (value, layer, property) ->
 	return value unless _.isObject(value)
 	new ReSetterProxy value, (proxiedValue, subProperty, subValue) ->
