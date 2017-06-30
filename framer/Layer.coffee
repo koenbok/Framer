@@ -16,6 +16,7 @@ Utils = require "./Utils"
 {LayerDraggable} = require "./LayerDraggable"
 {LayerPinchable} = require "./LayerPinchable"
 {Gestures} = require "./Gestures"
+{LayerPropertyProxy} = require "./LayerPropertyProxy"
 
 NoCacheDateKey = Date.now()
 
@@ -79,28 +80,12 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 exports.layerProperty = layerProperty
 
-class ReSetterProxy
-	constructor: (target, callback) ->
-		proxy = @
-		getter = (prop) ->
-			@[prop]
-		setter = (prop, value) ->
-			callback(@, prop, value, proxy)
-		for prop in Object.getOwnPropertyNames(target)
-			targetDesc = Object.getOwnPropertyDescriptor(target, prop)
-			desc =
-				enumerable: target.enumerable
-				get: getter.bind(target, prop)
-				set: setter.bind(target, prop)
-			Object.defineProperty(proxy, prop, desc)
-		proxy.__proto__ = target.__proto__
-
 # Use this to wrap property values in a Proxy so setting sub-properties
 # will also trigger updates on the layer.
 # Because we’re not fully on ES6, we can’t use Proxy, so use our own wrapper.
 layerProxiedValue = (value, layer, property) ->
 	return value unless _.isObject(value)
-	new ReSetterProxy value, (proxiedValue, subProperty, subValue) ->
+	new LayerPropertyProxy value, (proxiedValue, subProperty, subValue) ->
 		proxiedValue[subProperty] = subValue
 		layer[property] = proxiedValue
 
