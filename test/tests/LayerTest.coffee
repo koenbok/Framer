@@ -608,14 +608,14 @@ describe "Layer", ->
 			borderRadius = {topLeft: 100}
 			layer.borderRadius = borderRadius
 			borderRadius.bottomRight = 100
-			expect(layer.borderRadius.bottomRight).to.equal 0
+			layer.borderRadius.bottomRight.should.equal 0
 
 		it "should copy borderWidth when set with an object", ->
 			layer = new Layer
 			borderWidth = {top: 100}
 			layer.borderWidth = borderWidth
 			borderWidth.bottom = 100
-			expect(layer.borderWidth.bottom).to.equal 0
+			layer.borderWidth.bottom.should.equal 0
 
 		it "should copy gradients when set with an object", ->
 			layer = new Layer
@@ -625,7 +625,7 @@ describe "Layer", ->
 			gradient.start = "yellow"
 			layer.gradient.start.isEqual("blue").should.be.true
 
-		it.skip "should set sub-properties of borderRadius", ->
+		it "should set sub-properties of borderRadius", ->
 			layer = new Layer
 				borderRadius: {topLeft: 100}
 			layer.borderRadius.bottomRight = 100
@@ -634,16 +634,16 @@ describe "Layer", ->
 			layer.style["border-top-left-radius"].should.equal "100px"
 			layer.style["border-bottom-right-radius"].should.equal "100px"
 
-		it.skip "should set sub-properties of borderWidth", ->
+		it "should set sub-properties of borderWidth", ->
 			layer = new Layer
-				borderWidth: {top: 100}
-			layer.borderWidth.bottom = 100
-			layer.borderWidth.top.should.equal(100)
-			layer.borderWidth.bottom.should.equal(100)
-			layer.style["border-top-width"].should.equal "100px"
-			layer.style["border-bottom-width"].should.equal "100px"
+				borderWidth: {top: 10}
+			layer.borderWidth.bottom = 10
+			layer.borderWidth.top.should.equal(10)
+			layer.borderWidth.bottom.should.equal(10)
+			layer._elementBorder.style["border-top-width"].should.equal "10px"
+			layer._elementBorder.style["border-bottom-width"].should.equal "10px"
 
-		it.skip "should set sub-properties of gradients", ->
+		it "should set sub-properties of gradients", ->
 			layer = new Layer
 				gradient:
 					start: "blue"

@@ -79,14 +79,27 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 exports.layerProperty = layerProperty
 
+class ReSetterProxy
+	constructor: (target, callback) ->
+		proxy = @
+		getter = (prop) ->
+			@[prop]
+		setter = (prop, value) ->
+			callback(@, prop, value, proxy)
+		for prop in Object.getOwnPropertyNames(target)
+			targetDesc = Object.getOwnPropertyDescriptor(target, prop)
+			desc =
+				enumerable: target.enumerable
+				get: getter.bind(target, prop)
+				set: setter.bind(target, prop)
+			Object.defineProperty(proxy, prop, desc)
+		proxy.__proto__ = target.__proto__
+
 layerProxiedValue = (value, layer, property) ->
-	return value unless window.Proxy and _.isObject(value)
-	new Proxy value,
-		set: (proxiedValue, subProperty, subValue) ->
-			clone = Object.assign(new proxiedValue.constructor, proxiedValue)
-			clone[subProperty] = subValue
-			layer[property] = clone
-			return true
+	return value unless _.isObject(value)
+	new ReSetterProxy value, (proxiedValue, subProperty, subValue) ->
+		proxiedValue[subProperty] = subValue
+		layer[property] = proxiedValue
 
 layerPropertyPointTransformer = (value, layer, property) ->
 	if _.isFunction(value)
