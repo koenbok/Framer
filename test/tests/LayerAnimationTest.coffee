@@ -841,3 +841,41 @@ describe "LayerAnimation", ->
 				animation.on Events.AnimationEnd, ->
 					layer.x.should.equal 10
 					done()
+
+	describe "Gradients", ->
+
+		it "should animate only the subproperties", (done) ->
+			layer = new Layer
+			layer.gradient =
+				start: "blue"
+			layer.states.test =
+				gradient:
+					end: "red"
+			animation = layer.animate "test"
+			animation.on Events.AnimationEnd, ->
+				layer.gradient.start.isEqual("blue").should.be.true
+				layer.gradient.end.isEqual("red").should.be.true
+				done()
+
+		it "should animate if no gradient is set yet", (done) ->
+			layer = new Layer
+			layer.on "change:gradient", ->
+				if layer.gradient
+					layer.gradient.start.b.should.equal 255
+			layer.on Events.AnimationEnd, ->
+				layer.gradient.start.isEqual("blue").should.be.true
+				done()
+			layer.animate
+				gradient:
+					start: "blue"
+
+		it "should animate to a null gradient", (done) ->
+			layer = new Layer
+				gradient:
+					start: "blue"
+					end: "red"
+			layer.on Events.AnimationEnd, ->
+				assert.equal layer.gradient, null
+				done()
+			layer.animate
+				gradient: null

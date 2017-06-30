@@ -5,8 +5,6 @@
 class exports.Gradient extends BaseClass
 	constructor: (options = {}) ->
 
-		if options instanceof Gradient then return options
-
 		options.start ?= "black"
 		options.end ?= "white"
 		options.angle ?= 0
@@ -64,7 +62,9 @@ class exports.Gradient extends BaseClass
 			end: colorB
 			angle: Math.round(Math.random() * 360)
 
-	@isGradient: (gradient) -> return gradient instanceof Gradient
+	@isGradient: (gradient) -> return not _.isEmpty(@_asPlainObject(gradient))
+
+	@isGradientObject: (gradient) -> return gradient instanceof Gradient
 
 	@equal: (gradientA, gradientB) ->
 		return false unless Gradient.isGradient(gradientA)
@@ -73,6 +73,13 @@ class exports.Gradient extends BaseClass
 		equalStart = Color.equal(gradientA.start, gradientB.start)
 		equalEnd = Color.equal(gradientA.end, gradientB.end)
 		return equalAngle and equalStart and equalEnd
+
+	@multiplyAlpha: (gradient, alpha) ->
+		gradient = new Gradient(gradient) if not @isGradientObject(gradient)
+		return new Gradient
+			start: gradient.start.multiplyAlpha(alpha)
+			end: gradient.end.multiplyAlpha(alpha)
+			angle: gradient.angle
 
 	@_asPlainObject: (gradient) ->
 		_.pick(gradient, ["start", "end", "angle"])

@@ -1,4 +1,5 @@
 assert = require "assert"
+{expect} = require "chai"
 simulate = require "simulate"
 
 describe "Layer", ->
@@ -454,63 +455,6 @@ describe "Layer", ->
 				layer.x = "hello"
 			f.should.throw()
 
-		it "should set borderRadius", ->
-
-			testBorderRadius = (layer, value) ->
-
-				if layer.style["border-top-left-radius"] is "#{value}"
-					layer.style["border-top-left-radius"].should.equal "#{value}"
-					layer.style["border-top-right-radius"].should.equal "#{value}"
-					layer.style["border-bottom-left-radius"].should.equal "#{value}"
-					layer.style["border-bottom-right-radius"].should.equal "#{value}"
-				else
-					layer.style["border-top-left-radius"].should.equal "#{value} #{value}"
-					layer.style["border-top-right-radius"].should.equal "#{value} #{value}"
-					layer.style["border-bottom-left-radius"].should.equal "#{value} #{value}"
-					layer.style["border-bottom-right-radius"].should.equal "#{value} #{value}"
-
-			layer = new Layer
-
-			layer.borderRadius = 10
-			layer.borderRadius.should.equal 10
-
-			testBorderRadius(layer, "10px")
-
-			layer.borderRadius = "50%"
-			layer.borderRadius.should.equal "50%"
-
-			testBorderRadius(layer, "50%")
-
-		it "should set borderRadius with objects", ->
-
-			testBorderRadius = (layer, tl, tr, bl, br) ->
-
-				layer.style["border-top-left-radius"].should.equal "#{tl}"
-				layer.style["border-top-right-radius"].should.equal "#{tr}"
-				layer.style["border-bottom-left-radius"].should.equal "#{bl}"
-				layer.style["border-bottom-right-radius"].should.equal "#{br}"
-
-			layer = new Layer
-
-			# No matching keys is an error
-			layer.borderRadius = {aap: 10, noot: 20, mies: 30}
-			layer.borderRadius.should.equal 0
-			testBorderRadius(layer, "0px", "0px", "0px", "0px")
-
-			# Arrays are not supported either
-			layer.borderRadius = [1, 2, 3, 4]
-			layer.borderRadius.should.equal 0
-			testBorderRadius(layer, "0px", "0px", "0px", "0px")
-
-			layer.borderRadius = {topLeft: 10}
-			layer.borderRadius.topLeft.should.equal 10
-			testBorderRadius(layer, "10px", "0px", "0px", "0px")
-
-			layer.borderRadius = {topLeft: 1, topRight: 2, bottomLeft: 3, bottomRight: 4}
-			layer.borderRadius.topLeft.should.equal 1
-			layer.borderRadius.bottomRight.should.equal 4
-			testBorderRadius(layer, "1px", "2px", "3px", "4px")
-
 		it "should set perspective", ->
 
 			layer = new Layer
@@ -581,6 +525,138 @@ describe "Layer", ->
 
 			layer.htmlIntrinsicSize = null
 			assert.equal layer.htmlIntrinsicSize, null
+
+		describe "Border Radius", ->
+
+			it "should set borderRadius", ->
+
+				testBorderRadius = (layer, value) ->
+
+					if layer.style["border-top-left-radius"] is "#{value}"
+						layer.style["border-top-left-radius"].should.equal "#{value}"
+						layer.style["border-top-right-radius"].should.equal "#{value}"
+						layer.style["border-bottom-left-radius"].should.equal "#{value}"
+						layer.style["border-bottom-right-radius"].should.equal "#{value}"
+					else
+						layer.style["border-top-left-radius"].should.equal "#{value} #{value}"
+						layer.style["border-top-right-radius"].should.equal "#{value} #{value}"
+						layer.style["border-bottom-left-radius"].should.equal "#{value} #{value}"
+						layer.style["border-bottom-right-radius"].should.equal "#{value} #{value}"
+
+				layer = new Layer
+
+				layer.borderRadius = 10
+				layer.borderRadius.should.equal 10
+
+				testBorderRadius(layer, "10px")
+
+				layer.borderRadius = "50%"
+				layer.borderRadius.should.equal "50%"
+
+				testBorderRadius(layer, "50%")
+
+			it "should set borderRadius with objects", ->
+
+				testBorderRadius = (layer, tl, tr, bl, br) ->
+
+					layer.style["border-top-left-radius"].should.equal "#{tl}"
+					layer.style["border-top-right-radius"].should.equal "#{tr}"
+					layer.style["border-bottom-left-radius"].should.equal "#{bl}"
+					layer.style["border-bottom-right-radius"].should.equal "#{br}"
+
+				layer = new Layer
+
+				# No matching keys is an error
+				layer.borderRadius = {aap: 10, noot: 20, mies: 30}
+				layer.borderRadius.should.equal 0
+				testBorderRadius(layer, "0px", "0px", "0px", "0px")
+
+				# Arrays are not supported either
+				layer.borderRadius = [1, 2, 3, 4]
+				layer.borderRadius.should.equal 0
+				testBorderRadius(layer, "0px", "0px", "0px", "0px")
+
+				layer.borderRadius = {topLeft: 10}
+				layer.borderRadius.topLeft.should.equal 10
+				testBorderRadius(layer, "10px", "0px", "0px", "0px")
+
+				layer.borderRadius = {topLeft: 1, topRight: 2, bottomLeft: 3, bottomRight: 4}
+				layer.borderRadius.topLeft.should.equal 1
+				layer.borderRadius.bottomRight.should.equal 4
+				testBorderRadius(layer, "1px", "2px", "3px", "4px")
+
+			it "should copy borderRadius when set with an object", ->
+				layer = new Layer
+				borderRadius = {topLeft: 100}
+				layer.borderRadius = borderRadius
+				borderRadius.bottomRight = 100
+				layer.borderRadius.bottomRight.should.equal 0
+
+			it "should set sub-properties of borderRadius", ->
+				layer = new Layer
+					borderRadius: {topLeft: 100}
+				layer.borderRadius.bottomRight = 100
+				layer.borderRadius.topLeft.should.equal(100)
+				layer.borderRadius.bottomRight.should.equal(100)
+				layer.style["border-top-left-radius"].should.equal "100px"
+				layer.style["border-bottom-right-radius"].should.equal "100px"
+
+		describe "Border Width", ->
+
+			it "should copy borderWidth when set with an object", ->
+				layer = new Layer
+				borderWidth = {top: 100}
+				layer.borderWidth = borderWidth
+				borderWidth.bottom = 100
+				layer.borderWidth.bottom.should.equal 0
+
+			it "should set sub-properties of borderWidth", ->
+				layer = new Layer
+					borderWidth: {top: 10}
+				layer.borderWidth.bottom = 10
+				layer.borderWidth.top.should.equal(10)
+				layer.borderWidth.bottom.should.equal(10)
+				layer._elementBorder.style["border-top-width"].should.equal "10px"
+				layer._elementBorder.style["border-bottom-width"].should.equal "10px"
+
+		describe "Gradient", ->
+
+			it "should set gradient", ->
+				layer = new Layer
+				layer.gradient = new Gradient
+					start: "blue"
+					end: "red"
+					angle: 42
+				layer.gradient.start.isEqual("blue").should.be.true
+				layer.gradient.end.isEqual("red").should.be.true
+				layer.gradient.angle.should.equal(42)
+				layer.style["background-image"].should.equal("linear-gradient(42deg, rgb(0, 0, 255), rgb(255, 0, 0))")
+
+				layer.gradient =
+					start: "yellow"
+					end: "purple"
+				layer.gradient.angle.should.equal(0)
+				layer.style["background-image"].should.equal("linear-gradient(0deg, rgb(255, 255, 0), rgb(128, 0, 128))")
+
+				layer.gradient = null
+				layer.style["background-image"].should.equal("")
+
+			it "should copy gradients when set with an object", ->
+				layer = new Layer
+				gradient = new Gradient
+					start: "blue"
+				layer.gradient = gradient
+				gradient.start = "yellow"
+				layer.gradient.start.isEqual("blue").should.be.true
+
+			it "should set sub-properties of gradients", ->
+				layer = new Layer
+					gradient:
+						start: "blue"
+				layer.gradient.end = "yellow"
+				layer.gradient.start.isEqual("blue").should.be.true
+				layer.gradient.end.isEqual("yellow").should.be.true
+				layer.style["background-image"].should.equal("linear-gradient(0deg, rgb(0, 0, 255), rgb(255, 255, 0))")
 
 	describe "Filter Properties", ->
 

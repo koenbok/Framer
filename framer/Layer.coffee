@@ -16,6 +16,7 @@ Utils = require "./Utils"
 {LayerDraggable} = require "./LayerDraggable"
 {LayerPinchable} = require "./LayerPinchable"
 {Gestures} = require "./Gestures"
+{LayerPropertyProxy} = require "./LayerPropertyProxy"
 
 NoCacheDateKey = Date.now()
 
@@ -79,14 +80,14 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 exports.layerProperty = layerProperty
 
+# Use this to wrap property values in a Proxy so setting sub-properties
+# will also trigger updates on the layer.
+# Because we’re not fully on ES6, we can’t use Proxy, so use our own wrapper.
 layerProxiedValue = (value, layer, property) ->
-	return value unless window.Proxy and _.isObject(value)
-	new Proxy value,
-		set: (proxiedValue, subProperty, subValue) ->
-			clone = Object.assign(new proxiedValue.constructor, proxiedValue)
-			clone[subProperty] = subValue
-			layer[property] = clone
-			return true
+	return value unless _.isObject(value)
+	new LayerPropertyProxy value, (proxiedValue, subProperty, subValue) ->
+		proxiedValue[subProperty] = subValue
+		layer[property] = proxiedValue
 
 layerPropertyPointTransformer = (value, layer, property) ->
 	if _.isFunction(value)
@@ -115,20 +116,21 @@ asBorderRadius = (value) ->
 	return 0 if not _.isObject(value)
 
 	result = {}
+	isValidObject = false
 	for key in ["topLeft", "topRight", "bottomRight", "bottomLeft"]
-		# TODO: Also support percentages?
-		if _.has(value, key) and _.isNumber(value[key])
-			result[key] = value[key]
-	return if _.isEmpty(result) then 0 else result
+		isValidObject ||= _.has(value, key)
+		result[key] = value[key] ? 0
+	return if not isValidObject then 0 else result
 
 asBorderWidth = (value) ->
 	return value if _.isNumber(value)
 	return 0 if not _.isObject(value)
 	result = {}
+	isValidObject = false
 	for key in ["left", "right", "bottom", "top"]
-		if _.has(value, key) and _.isNumber(value[key])
-			result[key] = value[key]
-	return if _.isEmpty(result) then 0 else result
+		isValidObject ||= _.has(value, key)
+		result[key] = value[key] ? 0
+	return if not isValidObject then 0 else result
 
 parentOrContext = (layerOrContext) ->
 	if layerOrContext.parent?
@@ -902,7 +904,7 @@ class exports.Layer extends BaseClass
 			defaults = Defaults.getDefaults "Layer", {}
 			isBackgroundColorDefault = @backgroundColor?.isEqual(defaults.backgroundColor)
 
-			if Gradient.isGradient(value)
+			if Gradient.isGradientObject(value)
 				@emit("change:gradient", value, currentValue)
 				@emit("change:image", value, currentValue)
 				@_setPropertyValue("image", value)
@@ -970,15 +972,13 @@ class exports.Layer extends BaseClass
 
 	@define "gradient",
 		get: ->
-			return layerProxiedValue(@image, @, "gradient") if Gradient.isGradient(@image)
+			return layerProxiedValue(@image, @, "gradient") if Gradient.isGradientObject(@image)
 			return null
-		set: (value) ->
+		set: (value) -> # Copy semantics!
 			if Gradient.isGradient(value)
-				@image = value
-			else
-				gradientOptions = Gradient._asPlainObject(value)
-				if not _.isEmpty(gradientOptions)
-					@image = new Gradient(gradientOptions)
+				@image = new Gradient(value)
+			else if not value and Gradient.isGradientObject(@image)
+				@image = null
 
 	##############################################################
 	## HIERARCHY
