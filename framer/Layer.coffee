@@ -115,20 +115,21 @@ asBorderRadius = (value) ->
 	return 0 if not _.isObject(value)
 
 	result = {}
+	isValidObject = false
 	for key in ["topLeft", "topRight", "bottomRight", "bottomLeft"]
-		# TODO: Also support percentages?
-		if _.has(value, key) and _.isNumber(value[key])
-			result[key] = value[key]
-	return if _.isEmpty(result) then 0 else result
+		isValidObject ||= _.has(value, key)
+		result[key] = value[key] ? 0
+	return if not isValidObject then 0 else result
 
 asBorderWidth = (value) ->
 	return value if _.isNumber(value)
 	return 0 if not _.isObject(value)
 	result = {}
+	isValidObject = false
 	for key in ["left", "right", "bottom", "top"]
-		if _.has(value, key) and _.isNumber(value[key])
-			result[key] = value[key]
-	return if _.isEmpty(result) then 0 else result
+		isValidObject ||= _.has(value, key)
+		result[key] = value[key] ? 0
+	return if not isValidObject then 0 else result
 
 parentOrContext = (layerOrContext) ->
 	if layerOrContext.parent?
