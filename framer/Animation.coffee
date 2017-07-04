@@ -282,6 +282,10 @@ class exports.Animation extends BaseClass
 				@_valueUpdaters[k] = @_updateGradientValue
 				# If the begin state is not set, animate from the same state but with alpha 0
 				@_stateA[k] ?= Gradient.multiplyAlpha(v, 0)
+			else if k is "borderWidth"
+				@_valueUpdaters[k] = @_updateNumericObjectValue.bind(this, ["top", "left", "bottom", "right"])
+			else if k is "borderRadius"
+				@_valueUpdaters[k] = @_updateNumericObjectValue.bind(this, ["topLeft", "topRight", "bottomRight", "bottomLeft"])
 			else
 				@_valueUpdaters[k] = @_updateNumberValue
 
@@ -292,6 +296,24 @@ class exports.Animation extends BaseClass
 	_updateNumberValue: (key, value) =>
 		@_target[key] = Utils.mapRange(value, 0, 1, @_stateA[key], @_stateB[key])
 
+	_updateNumericObjectValue: (propKeys, key, value) =>
+		valueA = @_stateA[key]
+		valueB = @_stateB[key]
+
+		result = {}
+
+		for propKey in propKeys
+			keyValueA = if _.isNumber(valueA) then valueA else valueA[propKey]
+			keyValueB = if _.isNumber(valueB) then valueB else valueB[propKey]
+			keyValueA ?= keyValueB
+			keyValueB ?= keyValueA
+			result[propKey] = Utils.mapRange(value, 0, 1, keyValueA, keyValueB)
+
+		if _.uniq(_.values(result)).length is 1
+			result = result[propKeys[0]]
+
+		@_target[key] = result
+		
 	_updateColorValue: (key, value) =>
 		@_target[key] = Color.mix(@_stateA[key], @_stateB[key], value, false, @options.colorModel)
 
@@ -338,7 +360,7 @@ class exports.Animation extends BaseClass
 				animatableProperties[k] = v
 			else if Color.isValidColorProperty(k, v)
 				animatableProperties[k] = new Color(v)
-			else if k is "gradient"
+			else if k in ["gradient", "borderRadius", "borderWidth"]
 				animatableProperties[k] = v
 
 		return animatableProperties
