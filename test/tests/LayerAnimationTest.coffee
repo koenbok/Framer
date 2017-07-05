@@ -879,3 +879,99 @@ describe "LayerAnimation", ->
 				done()
 			layer.animate
 				gradient: null
+
+	describe "Border radius animations", (done) ->
+
+		it "should animate border radius from number to number", (done) ->
+			layer = new Layer
+				borderRadius: 20
+			layer.on Events.AnimationEnd, ->
+				layer.borderRadius.should.equal 40
+				done()
+			layer.animate
+				borderRadius: 40
+
+		it "should animate border radius from number to object", (done) ->
+			layer = new Layer
+				borderRadius: 20
+			layer.on Events.AnimationEnd, ->
+				layer.borderRadius.bottomLeft.should.equal 40
+				layer.borderRadius.bottomRight.should.equal 20
+				done()
+			layer.animate
+				borderRadius:
+					bottomLeft: 40
+
+		it "should animate border radius from object to object", (done) ->
+			layer = new Layer
+				borderRadius:
+					bottomLeft: 40
+					bottomRight: 20
+			layer.on Events.AnimationEnd, ->
+				layer.borderRadius.bottomLeft.should.equal 10
+				layer.borderRadius.bottomRight.should.equal 20
+				layer.borderRadius.topLeft.should.equal 0
+				layer.borderRadius.topRight.should.equal 20
+				done()
+			layer.animate
+				borderRadius:
+					bottomLeft: 10
+					topRight: 20
+
+		it "should animate border radius from object to number", (done) ->
+			layer = new Layer
+				borderRadius:
+					bottomLeft: 40
+			layer.on Events.AnimationEnd, ->
+				layer.borderRadius.should.equal 20
+				done()
+			layer.animate
+				borderRadius: 20
+
+	describe "Border width animations", (done) ->
+
+		it "should animate border width from number to number", (done) ->
+			layer = new Layer
+				borderWidth: 10
+			layer.on Events.AnimationEnd, ->
+				layer.borderWidth.should.equal 30
+				done()
+			layer.animate
+				borderWidth: 30
+
+		it "should animate border width from number to object", (done) ->
+			layer = new Layer
+				borderWidth: 10
+			layer.on Events.AnimationEnd, ->
+				layer.borderWidth.top.should.equal 30
+				layer.borderWidth.bottom.should.equal 10
+				done()
+			layer.animate
+				borderWidth:
+					top: 30
+
+		it "should animate border width from object to object", (done) ->
+			layer = new Layer
+				borderWidth:
+					top: 30
+					bottom: 10
+			layer.on Events.AnimationEnd, ->
+				layer.borderWidth.top.should.equal 10
+				layer.borderWidth.bottom.should.equal 10
+				layer.borderWidth.left.should.equal 20
+				layer.borderWidth.right.should.equal 0
+				done()
+			layer.animate
+				borderWidth:
+					top: 10
+					left: 20
+
+		it "should animate border width from object to number", (done) ->
+			layer = new Layer
+				borderWidth:
+					top: 30
+			layer.on Events.AnimationEnd, ->
+				layer.borderWidth.should.equal 10
+				done()
+			layer.animate
+				borderWidth: 10
