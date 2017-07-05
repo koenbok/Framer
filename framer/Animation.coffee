@@ -305,10 +305,12 @@ class exports.Animation extends BaseClass
 		for propKey in propKeys
 			keyValueA = if _.isNumber(valueA) then valueA else valueA[propKey]
 			keyValueB = if _.isNumber(valueB) then valueB else valueB[propKey]
+			# If the key value is undefined in one state, use the value from the other
 			keyValueA ?= keyValueB
 			keyValueB ?= keyValueA
 			result[propKey] = Utils.mapRange(value, 0, 1, keyValueA, keyValueB)
 
+		# Flatten to a single number if all properties have the same value
 		if _.uniq(_.values(result)).length is 1
 			result = result[propKeys[0]]
 
