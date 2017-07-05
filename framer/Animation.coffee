@@ -313,7 +313,7 @@ class exports.Animation extends BaseClass
 			result = result[propKeys[0]]
 
 		@_target[key] = result
-		
+
 	_updateColorValue: (key, value) =>
 		@_target[key] = Color.mix(@_stateA[key], @_stateB[key], value, false, @options.colorModel)
 
@@ -339,6 +339,10 @@ class exports.Animation extends BaseClass
 	@isAnimatable = (v) ->
 		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or Gradient.isGradientObject(v)
 
+	# Special cases that animate with different types of objects
+	@isAnimatableKey = (k) ->
+		k in ["gradient", "borderWidth", "borderRadius"]
+
 	@filterAnimatableProperties = (properties) ->
 		# Function to filter only animatable properties out of a given set
 		animatableProperties = {}
@@ -360,7 +364,7 @@ class exports.Animation extends BaseClass
 				animatableProperties[k] = v
 			else if Color.isValidColorProperty(k, v)
 				animatableProperties[k] = new Color(v)
-			else if k in ["gradient", "borderRadius", "borderWidth"]
+			else if @isAnimatableKey(k)
 				animatableProperties[k] = v
 
 		return animatableProperties
