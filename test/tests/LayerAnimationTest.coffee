@@ -955,6 +955,17 @@ describe "LayerAnimation", ->
 			layer.animate
 				borderRadius: 20
 
+		it "should not touch border radius if its a string", (done) ->
+			layer = new Layer
+				borderRadius: "100%"
+			layer.states.test =
+				scale: 1.5
+			layer.stateSwitch "test"
+			layer.on Events.AnimationEnd, ->
+				layer.borderRadius.should.equal "100%"
+				done()
+			layer.stateCycle()
+
 	describe "Border width animations", (done) ->
 
 		it "should animate border width from number to number", (done) ->

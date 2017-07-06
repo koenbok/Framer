@@ -116,6 +116,9 @@ class exports.Animation extends BaseClass
 
 		for k, v of @properties
 
+			# Filter out properties that are literally equal
+			continue if @_stateA[k] is v
+
 			# Evaluate function properties
 			if _.isFunction(v)
 				v = v(@layer, k)
@@ -124,7 +127,7 @@ class exports.Animation extends BaseClass
 			else if isRelativeProperty(v)
 				v = evaluateRelativeProperty(@_target, k, v)
 
-			# Filter out the properties that are equal
+			# Filter out the properties that have equal values
 			@_stateB[k] = v if @_stateA[k] isnt v
 
 		if _.keys(@_stateA).length is 0
