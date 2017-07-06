@@ -880,6 +880,20 @@ describe "LayerAnimation", ->
 			layer.animate
 				gradient: null
 
+		it "should animate to a gradient object", (done) ->
+			layer = new Layer
+				gradient:
+					start: "blue"
+			layer2 = new Layer
+				gradient:
+					end: "red"
+			layer.states.test =
+				gradient: layer2.gradient
+			layer.on Events.AnimationEnd, ->
+				assert.equal layer.gradient, layer2.gradient
+				done()
+			layer.animate "test"
+
 	describe "Border radius animations", (done) ->
 
 		it "should animate border radius from number to number", (done) ->
