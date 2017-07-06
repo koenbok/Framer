@@ -239,6 +239,14 @@ describe "TextLayer", ->
 			text.padding.left.should.equal 3
 			text.padding.right.should.equal 2
 
+		it "should have a default padding when setting styledText", ->
+			text = new TextLayer
+				styledText: {}
+			text.padding.top.should.equal 0
+			text.padding.bottom.should.equal 0
+			text.padding.left.should.equal 0
+			text.padding.right.should.equal 0
+
 	describe "webfonts", ->
 		it "sets the weight if the font property is set", ->
 			l = new TextLayer

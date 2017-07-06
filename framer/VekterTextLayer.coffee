@@ -451,7 +451,7 @@ class exports.VekterTextLayer extends Layer
 
 	@define "padding",
 		get: ->
-			_.clone(@_padding)
+			if @_padding? then _.clone(@_padding) else Utils.rectZero()
 
 		set: (padding) ->
 			if _.isObject(padding)
@@ -471,11 +471,11 @@ class exports.VekterTextLayer extends Layer
 		@_updateHTMLScale()
 		parentWidth = if @parent? then @parent.width else Screen.width
 		constrainedWidth = if @autoWidth then parentWidth else @size.width
-		constrainedWidth -= (@_padding.left + @_padding.right)
+		constrainedWidth -= (@padding.left + @padding.right)
 		if @autoHeight
 			constrainedHeight = null
 		else
-			constrainedHeight = @size.height - (@_padding.top + @_padding.bottom)
+			constrainedHeight = @size.height - (@padding.top + @padding.bottom)
 		constraints =
 			width: constrainedWidth
 			height: constrainedHeight
@@ -484,9 +484,9 @@ class exports.VekterTextLayer extends Layer
 		calculatedSize = @_styledText.measure constraints
 		@disableAutosizeUpdating = true
 		if calculatedSize.width?
-			@width = calculatedSize.width + @_padding.left + @_padding.right
+			@width = calculatedSize.width + @padding.left + @padding.right
 		if calculatedSize.height?
-			@height = calculatedSize.height + @_padding.top + @_padding.bottom
+			@height = calculatedSize.height + @padding.top + @padding.bottom
 		@disableAutosizeUpdating = false
 
 	defaultFont: ->
