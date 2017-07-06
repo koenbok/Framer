@@ -26,8 +26,9 @@ Utils.setValueForKeyPath = (obj, path, val) ->
 	while i < n and result isnt undefined
 		field = fields[i]
 		if i is n - 1
-			if _.isObject(result[field]) and _.isObject(val)
-				_.extend(result[field], val)
+			currentValue = result[field]
+			if _.isObject(currentValue) and _.isObject(val) and Object.getPrototypeOf(currentValue) is Object.prototype and Object.getPrototypeOf(val) is Object.prototype
+				_.extend(currentValue, val)
 			else
 				result[field] = val
 		else
