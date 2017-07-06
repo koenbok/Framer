@@ -334,13 +334,17 @@ describe "TextLayer", ->
 			expect(l.textOverflow).to.equal null
 			expect(l._styledText.getStyle("WebkitLineClamp")).to.equal ''
 
-	describe.only "Replacing Text", ->
+	describe "Replacing Text", ->
 		subject = null
 		styledText = {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "48px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 800, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Heavy', '.SFUIText-Heavy', 'SF UI Text', 'Times New Roman'"}}], text: "Header"}, {inlineStyles: [{startIndex: 0, endIndex: 8, css: {fontSize: "20px", WebkitTextFillColor: "rgb(153, 153, 153)", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Subtitle"}, {inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "16px", WebkitTextFillColor: "rgb(238, 68, 68)", letterSpacing: "0px", fontWeight: 200, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Light', 'SFUIText-Light', '.SFUIText-Light', 'SF UI Text', 'Times New Roman'"}}, {startIndex: 6, endIndex: 7, css: {fontSize: "16px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}, {startIndex: 7, endIndex: 16, css: {fontSize: "12px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "LEADER Body text"}], alignment: "left"}
 		beforeEach ->
 			subject = new TextLayer styledText: styledText
 
+		it "should start with a valid text", ->
+			subject._styledText.validate().should.equal true
+
 		describe "Setting the text property", ->
+
 			it "should replace the text with the provided text", ->
 				lines = ["One", "Two", "Three"]
 				newText = lines.join("\n")
@@ -349,6 +353,7 @@ describe "TextLayer", ->
 				for block, index in subject._styledText.blocks
 					block.text.should.equal lines[index]
 					block.inlineStyles[0].text.should.equal lines[index]
+				subject._styledText.validate().should.equal true
 
 
 			it "should set the styles when setting a string with multiple lines", ->
@@ -360,11 +365,13 @@ describe "TextLayer", ->
 					style.css.should.eql styledText.blocks[index].inlineStyles[0].css
 					style.startIndex.should.eql 0
 					style.endIndex.should.eql lines[index].length
+				subject._styledText.validate().should.equal true
 
 			it "should remove the blocks when setting a text with less lines then the existing text", ->
 				lines = ["One", "Two"]
 				subject.text = lines.join("\n")
 				subject._styledText.blocks.length.should.equal 2
+				subject._styledText.validate().should.equal true
 
 			it "should continue using the last style when setting a text with more lines then the existing text", ->
 				lines = ["One", "Two", "Three", "Fourteen"]
@@ -378,5 +385,6 @@ describe "TextLayer", ->
 				style.startIndex.should.equal 0
 				style.endIndex.should.equal lines[3].length
 				style.css.should.eql styledText.blocks[2].inlineStyles[0].css
+				subject._styledText.validate().should.equal true
 
 

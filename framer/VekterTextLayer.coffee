@@ -81,6 +81,9 @@ class InlineStyle
 			height: rect.bottom - rect.top
 		return size
 
+	validate: ->
+		return @startIndex isnt @endIndex and @endIndex is (@startIndex + @text.length)
+
 class StyledTextBlock
 	text: ""
 	inlineStyles: []
@@ -159,6 +162,16 @@ class StyledTextBlock
 
 	getStyle: (style) ->
 		_.first(@inlineStyles).getStyle(style)
+
+	validate: ->
+		combinedText = ''
+		currentIndex = 0
+		for style in @inlineStyles
+			return false if not (currentIndex is style.startIndex)
+			return false if not style.validate()
+			currentIndex = style.endIndex
+			combinedText += style.text
+		return @text is combinedText
 
 class StyledText
 	blocks: []
@@ -280,6 +293,10 @@ class StyledText
 			result.height = Math.ceil(measuredHeight)
 		return result
 
+	validate: ->
+		for block in @blocks
+			return false if not block.validate()
+		return true
 
 textProperty = (obj, name, fallback, validator, transformer, set) ->
 	layerProperty(obj, name, name, fallback, validator, transformer, {}, set, "_elementHTML")
