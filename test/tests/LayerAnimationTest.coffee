@@ -887,10 +887,23 @@ describe "LayerAnimation", ->
 			layer2 = new Layer
 				gradient:
 					end: "red"
+			layer.on Events.AnimationEnd, ->
+				Gradient.equal(layer.gradient, layer2.gradient).should.be.true
+				done()
+			layer.animate
+				gradient: layer2.gradient
+
+		it "should animate to a gradient object in a state", (done) ->
+			layer = new Layer
+				gradient:
+					start: "blue"
+			layer2 = new Layer
+				gradient:
+					end: "red"
 			layer.states.test =
 				gradient: layer2.gradient
 			layer.on Events.AnimationEnd, ->
-				assert.equal layer.gradient, layer2.gradient
+				Gradient.equal(layer.gradient, layer2.gradient).should.be.true
 				done()
 			layer.animate "test"
 
