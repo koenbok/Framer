@@ -49,7 +49,7 @@ describe "TextLayer", ->
 			text = new TextLayer
 				fontFamily: "Courier, Liberation Mono"
 				text: mediumText
-			text.width.should.equal Screen.width
+			text.width.should.be.lessThan Screen.width
 			text.height.should.equal 250
 
 		it "should auto size the layer if the width is set explicitly", ->
@@ -115,12 +115,12 @@ describe "TextLayer", ->
 				padding: 10
 			text.size.should.eql width: 332, height: 70
 
-		it "should take border width into account", ->
+		it "should not take border width into account", ->
 			text = new TextLayer
 				fontFamily: "Courier, Liberation Mono"
 				text: shortText
 				borderWidth: 5
-			text.size.should.eql width: 322, height: 60
+			text.size.should.eql width: 312, height: 50
 
 		it "should autosize with the right width when inside a parent", ->
 			text = new TextLayer
@@ -130,18 +130,20 @@ describe "TextLayer", ->
 				padding: 3
 			parent = new Layer
 			text.parent = parent
-			text.size.should.eql width: 96, height: 200
+			text.size.width.should.be.lessThan 100
+			text.size.height.should.equal 256
 
-		it "should autosize with the right width when inside a parent with a border", ->
+		it "should ignore the parents border when autosizing", ->
 			text = new TextLayer
 				fontFamily: "Courier, Liberation Mono"
 				text: shortText
 				borderWidth: 5
 				padding: 3
 			parent = new Layer
+				size: 200
 				borderWidth: 10
 			text.parent = parent
-			text.size.should.eql width: 80, height: 116
+			text.size.should.eql width: 198, height: 106
 
 		it "should work together with Align.center", ->
 			text = new TextLayer
