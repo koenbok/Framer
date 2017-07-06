@@ -323,6 +323,7 @@ class exports.VekterTextLayer extends Layer
 				fontSize: 40
 				fontWeight: 400
 				lineHeight: 1.25
+				padding: 0
 			if not options.font? and not options.fontFamily?
 				options.fontFamily = @defaultFont()
 			@_styledText = new StyledText()
@@ -469,15 +470,23 @@ class exports.VekterTextLayer extends Layer
 		@_styledText.render()
 		@_updateHTMLScale()
 		parentWidth = if @parent? then @parent.width else Screen.width
-		calculatedSize = @_styledText.measure
-			width: if @autoWidth then parentWidth else @size.width
-			height: if @autoHeight then null else @size.height
+		constrainedWidth = if @autoWidth then parentWidth else @size.width
+		constrainedWidth -= (@_padding.left + @_padding.right)
+		if @autoHeight
+			constrainedHeight = null
+		else
+			constrainedHeight = @size.height - (@_padding.top + @_padding.bottom)
+		constraints =
+			width: constrainedWidth
+			height: constrainedHeight
 			multiplier: @context.pixelMultiplier
+
+		calculatedSize = @_styledText.measure constraints
 		@disableAutosizeUpdating = true
 		if calculatedSize.width?
-			@width = calculatedSize.width
+			@width = calculatedSize.width + @_padding.left + @_padding.right
 		if calculatedSize.height?
-			@height = calculatedSize.height
+			@height = calculatedSize.height + @_padding.top + @_padding.bottom
 		@disableAutosizeUpdating = false
 
 	defaultFont: ->
