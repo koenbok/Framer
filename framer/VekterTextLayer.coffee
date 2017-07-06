@@ -117,7 +117,7 @@ class StyledTextBlock
 		return size
 
 	clone: ->
-		new Block
+		new StyledTextBlock
 			text: ""
 			css: _.first(@inlineStyles).css
 
@@ -209,6 +209,7 @@ class StyledText
 				css: css
 		else if @blocks.length > 0
 			block = _.last(@blocks).clone()
+			block.setText(text)
 		else
 			block = new StyledTextBlock
 				text: text
