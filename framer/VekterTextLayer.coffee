@@ -81,6 +81,16 @@ class InlineStyle
 			height: rect.bottom - rect.top
 		return size
 
+	replaceText: (search, replace) ->
+		regex = null
+		if _.isString search
+			regex = new RegExp(search, 'g')
+		else if search instanceof RegExp
+			regex = search
+		if regex?
+			@text = @text.replace(regex, replace)
+			@endIndex = @startIndex + @text.length
+
 	validate: ->
 		return @startIndex isnt @endIndex and @endIndex is (@startIndex + @text.length)
 
@@ -162,6 +172,16 @@ class StyledTextBlock
 
 	getStyle: (style) ->
 		_.first(@inlineStyles).getStyle(style)
+
+	replaceText: (search, replace) ->
+		currentIndex = 0
+		for style in @inlineStyles
+			style.startIndex = currentIndex
+			style.replaceText(search, replace)
+			currentIndex = style.endIndex
+		newText = @inlineStyles.map((i) -> i.text).join('')
+		@text = newText
+		return newText isnt @text
 
 	validate: ->
 		combinedText = ''
@@ -286,12 +306,15 @@ class StyledText
 
 		m.removeChild @element
 		parent?.appendChild @element
-		result = {} #currentSize
+		result = {}
 		if @autoWidth
 			result.width = Math.ceil(measuredWidth)
 		if @autoHeight
 			result.height = Math.ceil(measuredHeight)
 		return result
+
+	replace: (search, replace) ->
+		@blocks.map( (b) -> b.replaceText(search, replace))
 
 	validate: ->
 		for block in @blocks
@@ -510,4 +533,9 @@ class exports.VekterTextLayer extends Layer
 	defaultFont: ->
 		return Utils.deviceFont(Framer.Device.platform())
 
-	#TODO: replaceText: (search, replace)
+	replace: (search, replace) ->
+		oldText = @text
+		@_styledText.replace(search, replace)
+		if @text isnt oldText
+			@renderText()
+			@emit("change:text", @text)

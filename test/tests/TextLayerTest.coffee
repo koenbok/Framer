@@ -336,7 +336,7 @@ describe "TextLayer", ->
 
 	describe "Replacing Text", ->
 		subject = null
-		styledText = {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "48px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 800, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Heavy', '.SFUIText-Heavy', 'SF UI Text', 'Times New Roman'"}}], text: "Header"}, {inlineStyles: [{startIndex: 0, endIndex: 8, css: {fontSize: "20px", WebkitTextFillColor: "rgb(153, 153, 153)", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Subtitle"}, {inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "16px", WebkitTextFillColor: "rgb(238, 68, 68)", letterSpacing: "0px", fontWeight: 200, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Light', 'SFUIText-Light', '.SFUIText-Light', 'SF UI Text', 'Times New Roman'"}}, {startIndex: 6, endIndex: 7, css: {fontSize: "16px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}, {startIndex: 7, endIndex: 16, css: {fontSize: "12px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "LEADER Body text"}], alignment: "left"}
+		styledText = {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "48px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 800, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Heavy', '.SFUIText-Heavy', 'SF UI Text', 'Times New Roman'"}}], text: "Header"}, {inlineStyles: [{startIndex: 0, endIndex: 8, css: {fontSize: "20px", WebkitTextFillColor: "rgb(153, 153, 153)", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Subtitle"}, {inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "16px", WebkitTextFillColor: "rgb(238, 68, 68)", letterSpacing: "0px", fontWeight: 200, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Light', 'SFUIText-Light', '.SFUIText-Light', 'SF UI Text', 'Times New Roman'"}}, {startIndex: 6, endIndex: 16, css: {fontSize: "12px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Leader Body text"}], alignment: "left"}
 		beforeEach ->
 			subject = new TextLayer styledText: styledText
 
@@ -388,3 +388,69 @@ describe "TextLayer", ->
 				subject._styledText.validate().should.equal true
 
 
+		it "should replace the full text", ->
+			searchText = "Search text"
+			subject.text = searchText
+			subject.replace(searchText, "Replacement")
+			subject.text.should.equal "Replacement"
+			subject._styledText.validate().should.equal true
+
+		it "should have the same style as the original text", ->
+			searchText = "Search text"
+			replaceText = "Replacement"
+			subject.text = searchText
+			subject.replace(searchText, replaceText)
+			style = subject._styledText.blocks[0].inlineStyles[0]
+			style.startIndex.should.equal 0
+			style.endIndex.should.equal replaceText.length
+			style.css.should.equal styledText.blocks[0].inlineStyles[0].css
+			subject._styledText.validate().should.equal true
+
+		it "should replace partial text", ->
+			subject.replace("ea", "oooo")
+			subject.text.should.equal "Hooooder\nSubtitle\nLooooder Body text"
+			subject.replace("o", "%")
+			subject.text.should.equal "H%%%%der\nSubtitle\nL%%%%der B%dy text"
+			subject._styledText.validate().should.equal true
+
+		it "should handle replacing with the same text correctly", ->
+			subject.replace("e", "e")
+			subject.text.should.equal "Header\nSubtitle\nLeader Body text"
+			subject.replace("e", "ee")
+			subject.text.should.equal "Heeadeer\nSubtitlee\nLeeadeer Body teext"
+			subject._styledText.validate().should.equal true
+
+		it "should keep the styling in place when replacing text", ->
+			searchText = "Search text"
+			subject.text = searchText
+			subject.replace(searchText, "Replacement")
+			subject._styledText.blocks[0].inlineStyles[0].css.should.eql styledText.blocks[0].inlineStyles[0].css
+			subject._styledText.validate().should.equal true
+
+		it "should apply the style to the replaced partial text", ->
+			subject.replace("e", "xxx")
+			for block, blockIndex in subject._styledText.blocks
+				for style, styleIndex in block.inlineStyles
+					style.css.should.eql styledText.blocks[blockIndex].inlineStyles[styleIndex].css
+			subject._styledText.validate().should.equal true
+
+		it "should work with regexes", ->
+			subject.replace(/d[ey]+/, "die")
+			subject.text.should.equal "Headier\nSubtitle\nLeadier Bodie text"
+			subject._styledText.validate().should.equal true
+
+		it "should rerender the text when replacing it", ->
+			htmlBefore = subject.html
+			subject.replace("a", "b")
+			subject.html.should.not.equal htmlBefore
+
+		it "should emit change:text event only when the text has changed", (done) ->
+			subject.on "change:text", ->
+				done()
+			subject.replace("a", "b")
+
+		it "should not emit a change:text event when the text doesn't change", (done) ->
+			subject.on "change:text", ->
+				throw new Error("change:text event should not be emitted")
+			subject.replace("e", "e")
+			done()
