@@ -60,12 +60,29 @@ describe "TextLayer", ->
 			text.width.should.equal 100
 			text.height.should.equal 750
 
-		it "should not auto size the layer the size the layer if it is explictly set", ->
+		it "should not auto size the layer the size the layer if the width and height are explictly set", ->
 			text = new TextLayer
 				fontFamily: "Courier, Liberation Mono"
 				text: mediumText
 				width: 123
 				height: 456
+			text.size.should.eql width: 123, height: 456
+
+
+		it "should not auto size the layer the size the layer if the size is explictly set", ->
+			text = new TextLayer
+				fontFamily: "Courier, Liberation Mono"
+				text: mediumText
+				size: 123
+			text.size.should.eql width: 123, height: 123
+
+		it "should not auto size the layer the size the layer if the frame is explictly set", ->
+			text = new TextLayer
+				fontFamily: "Courier, Liberation Mono"
+				text: mediumText
+				frame:
+					width: 123
+					height: 456
 			text.size.should.eql width: 123, height: 456
 
 		it "should not auto size the layer when changing text after explictly setting width", ->
