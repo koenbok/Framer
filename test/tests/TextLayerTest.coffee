@@ -69,12 +69,21 @@ describe "TextLayer", ->
 			text.size.should.eql width: 123, height: 456
 
 
-		it "should not auto size the layer the size the layer if the size is explictly set", ->
+		it "should not auto size the layer the size the layer if the size is explictly set to a number", ->
 			text = new TextLayer
 				fontFamily: "Courier, Liberation Mono"
 				text: mediumText
 				size: 123
 			text.size.should.eql width: 123, height: 123
+
+		it "should not auto size the layer the size the layer if the size is explictly set", ->
+			text = new TextLayer
+				fontFamily: "Courier, Liberation Mono"
+				text: mediumText
+				size:
+					width: 123
+					height: 456
+			text.size.should.eql width: 123, height: 456
 
 		it "should not auto size the layer the size the layer if the frame is explictly set", ->
 			text = new TextLayer

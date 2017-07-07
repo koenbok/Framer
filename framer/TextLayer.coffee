@@ -376,10 +376,10 @@ class exports.TextLayer extends Layer
 		# Keeps track if the width or height are explicitly set, so we shouldn't update it afterwards
 		if not options.autoSize? and not options.truncate
 			if not options.autoWidth?
-				explicitWidth = options.width? or options?.size?.width? or options?.frame?.width?
+				explicitWidth = options.width? or _.isNumber(options?.size) or options?.size?.width? or options?.frame?.width?
 				@autoWidth = not explicitWidth
 			if not options.autoHeight?
-				explicitHeight = options.height? or options?.size?.height? or options?.frame?.height?
+				explicitHeight = options.height? or _.isNumber(options?.size) or options?.size?.height? or options?.frame?.height?
 				@autoHeight = not explicitHeight
 
 		if not options.styledText?
