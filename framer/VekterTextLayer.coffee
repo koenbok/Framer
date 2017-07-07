@@ -414,6 +414,14 @@ class exports.VekterTextLayer extends Layer
 		return if @disableAutosizeUpdating
 		@autoHeight = false
 
+	copySingle: ->
+		props = @props
+		delete props["width"] if @autoWidth
+		delete props["height"] if @autoHeight
+		copy = new @constructor(props)
+		copy.style = @style
+		copy
+
 	#Vekter properties
 	@define "autoWidth", @proxyProperty("_styledText.autoWidth",
 		didSet: (layer, value) ->
