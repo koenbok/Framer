@@ -11,14 +11,14 @@ _measureElement = null
 
 
 getMeasureElement = (constraints={}) ->
-	if not _measureElement
+	shouldCreateElement = not _measureElement
+	if shouldCreateElement
 		_measureElement = document.createElement("div")
 		_measureElement.id = "_measureElement"
 		_measureElement.style.position = "fixed"
 		_measureElement.style.visibility = "hidden"
 		_measureElement.style.top = "-10000px"
 		_measureElement.style.left = "-10000px"
-		window.document.body.appendChild(_measureElement)
 
 	while _measureElement.hasChildNodes()
 		_measureElement.removeChild(_measureElement.lastChild)
@@ -30,6 +30,13 @@ getMeasureElement = (constraints={}) ->
 	else
 		_measureElement.style.width = "#{constraints.width}px" if constraints.width
 		_measureElement.style.height = "#{constraints.height}px" if constraints.height
+
+	# This is a trick to call this function before the document ready event
+	if not window.document.body
+		document.write(_measureElement.outerHTML)
+		_textSizeNode = document.getElementById("_measureElement")
+	else
+		window.document.body.appendChild(_measureElement)
 	return _measureElement
 
 class InlineStyle
