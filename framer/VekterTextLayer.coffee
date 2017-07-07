@@ -447,6 +447,7 @@ class exports.VekterTextLayer extends Layer
 	@define "wordSpacing", textProperty(@, "wordSpacing", null, _.isNumber)
 	@define "textTransform", textProperty(@, "textTransform", "none", _.isString)
 	@define "textIndent", textProperty(@, "textIndent", null, _.isNumber)
+	@define "wordWrap", textProperty(@, "wordWrap", null, _.isString)
 
 	@define "textOverflow",
 		get: -> @_styledText.textOverflow
