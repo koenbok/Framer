@@ -10,7 +10,9 @@ describe "TextLayer", ->
 	describe "defaults", ->
 		it "should set the correct defaults", ->
 			text = new TextLayer
-			text.html.should.equal "Hello World"
+			text.text.should.equal "Hello World"
+			text.html.should.equal '<div style="font-size: 1px;"><span style="font-size: 40px;">Hello World</span></div>'
+			text._elementHTML.outerHTML.should.equal '<div style="zoom: 1; overflow: hidden; color: rgb(136, 136, 136); font-family: -apple-system, BlinkMacSystemFont, \'SF UI Text\', \'Helvetica Neue\'; font-weight: 400; font-style: normal; font-size: 40px; line-height: 1.25; text-transform: none; outline: none; white-space: pre-wrap; word-wrap: break-word; text-align: left;"><div style="font-size: 1px;"><span style="font-size: 40px;">Hello World</span></div></div>'
 			text.color.isEqual("#888").should.equal true
 			text.backgroundColor.isEqual("transparent").should.equal true
 			text.padding.should.eql Utils.rectZero()
@@ -18,7 +20,7 @@ describe "TextLayer", ->
 			text.fontWeight.should.equal 400
 			text.lineHeight.should.equal 1.25
 			text.fontStyle.should.equal "normal"
-			text.style.fontFamily.should.equal "-apple-system, BlinkMacSystemFont, 'SF UI Text', 'Helvetica Neue'"
+			text._elementHTML.style.fontFamily.should.equal "-apple-system, BlinkMacSystemFont, 'SF UI Text', 'Helvetica Neue'"
 
 		it "should not set the default fontFamily default if the fontFamily property is set", ->
 			text = new TextLayer
@@ -47,7 +49,7 @@ describe "TextLayer", ->
 			text = new TextLayer
 				fontFamily: "Courier, Liberation Mono"
 				text: mediumText
-			text.width.should.equal Screen.width
+			text.width.should.be.lessThan Screen.width
 			text.height.should.equal 250
 
 		it "should auto size the layer if the width is set explicitly", ->
@@ -56,14 +58,40 @@ describe "TextLayer", ->
 				text: mediumText
 				width: 100
 			text.width.should.equal 100
-			text.height.should.equal 550
+			text.height.should.equal 750
 
-		it "should not auto size the layer the size the layer if it is explictly set", ->
+		it "should not auto size the layer the size the layer if the width and height are explictly set", ->
 			text = new TextLayer
 				fontFamily: "Courier, Liberation Mono"
 				text: mediumText
 				width: 123
 				height: 456
+			text.size.should.eql width: 123, height: 456
+
+
+		it "should not auto size the layer the size the layer if the size is explictly set to a number", ->
+			text = new TextLayer
+				fontFamily: "Courier, Liberation Mono"
+				text: mediumText
+				size: 123
+			text.size.should.eql width: 123, height: 123
+
+		it "should not auto size the layer the size the layer if the size is explictly set", ->
+			text = new TextLayer
+				fontFamily: "Courier, Liberation Mono"
+				text: mediumText
+				size:
+					width: 123
+					height: 456
+			text.size.should.eql width: 123, height: 456
+
+		it "should not auto size the layer the size the layer if the frame is explictly set", ->
+			text = new TextLayer
+				fontFamily: "Courier, Liberation Mono"
+				text: mediumText
+				frame:
+					width: 123
+					height: 456
 			text.size.should.eql width: 123, height: 456
 
 		it "should not auto size the layer when changing text after explictly setting width", ->
@@ -86,8 +114,8 @@ describe "TextLayer", ->
 				fontFamily: "Courier, Liberation Mono"
 				text: mediumText
 				parent: layer
-			text.width.should.equal 150
-			text.height.should.equal 550
+			text.width.should.equal 144
+			text.height.should.equal 600
 
 		it "should auto size the layer when its parent is set afterwards", ->
 			layer = new Layer width: 150
@@ -95,8 +123,8 @@ describe "TextLayer", ->
 				fontFamily: "Courier, Liberation Mono"
 				text: mediumText
 			text.parent = layer
-			text.width.should.equal 150
-			text.height.should.equal 550
+			text.width.should.equal 144
+			text.height.should.equal 600
 
 		it "should adjust its size on when a new text is set", (done) ->
 			text = new TextLayer
@@ -113,12 +141,12 @@ describe "TextLayer", ->
 				padding: 10
 			text.size.should.eql width: 332, height: 70
 
-		it "should take border width into account", ->
+		it "should not take border width into account", ->
 			text = new TextLayer
 				fontFamily: "Courier, Liberation Mono"
 				text: shortText
 				borderWidth: 5
-			text.size.should.eql width: 322, height: 60
+			text.size.should.eql width: 312, height: 50
 
 		it "should autosize with the right width when inside a parent", ->
 			text = new TextLayer
@@ -128,18 +156,20 @@ describe "TextLayer", ->
 				padding: 3
 			parent = new Layer
 			text.parent = parent
-			text.size.should.eql width: 100, height: 116
+			text.size.width.should.be.lessThan 100
+			text.size.height.should.equal 256
 
-		it "should autosize with the right width when inside a parent with a border", ->
+		it "should ignore the parents border when autosizing", ->
 			text = new TextLayer
 				fontFamily: "Courier, Liberation Mono"
 				text: shortText
 				borderWidth: 5
 				padding: 3
 			parent = new Layer
+				size: 200
 				borderWidth: 10
 			text.parent = parent
-			text.size.should.eql width: 80, height: 116
+			text.size.should.eql width: 198, height: 106
 
 		it "should work together with Align.center", ->
 			text = new TextLayer
@@ -235,6 +265,14 @@ describe "TextLayer", ->
 			text.padding.left.should.equal 3
 			text.padding.right.should.equal 2
 
+		it "should have a default padding when setting styledText", ->
+			text = new TextLayer
+				styledText: {}
+			text.padding.top.should.equal 0
+			text.padding.bottom.should.equal 0
+			text.padding.left.should.equal 0
+			text.padding.right.should.equal 0
+
 	describe "webfonts", ->
 		it "sets the weight if the font property is set", ->
 			l = new TextLayer
@@ -258,44 +296,56 @@ describe "TextLayer", ->
 			l = new TextLayer
 				textOverflow: "ellipsis"
 				height: 20
-			l.multiLineOverflow.should.equal true
+				autoWidth: false
+			l._styledText.getStyle("WebkitLineClamp").should.equal 1
 
 		it "should should disable multilineOverflow when using clipping and setting a specific height", ->
 			l = new TextLayer
 				textOverflow: "clip"
 				height: 20
-			l.multiLineOverflow.should.equal false
+				autoWidth: false
+			l._styledText.getStyle("WebkitLineClamp").should.equal ''
+			l._styledText.getStyle("whiteSpace").should.equal "nowrap"
 
-		it "should set whitespace to nowrap setting no height", ->
+		it "should set whitespace to pre-wrap setting no height", ->
 			l = new TextLayer
 				textOverflow: "ellipsis"
-			l.whiteSpace.should.equal "nowrap"
-			l.multiLineOverflow.should.equal false
+			l._styledText.getStyle("whiteSpace").should.equal "pre-wrap"
+			l._styledText.getStyle("WebkitLineClamp").should.equal ''
 
-		it "should disable properties when it's disabled", ->
+		it "should disable line clamp property when it's disabled", ->
 			l = new TextLayer
 				textOverflow: "ellipsis"
+				height: 20
+				autoWidth: false
 			l.textOverflow = null
-			l.clip.should.equal false
-			expect(l.whitespace).to.equal undefined
-			l.multiLineOverflow.should.equal false
+			l._styledText.getStyle("WebkitLineClamp").should.equal ''
+
+		it "should disable line whitespace property when it's disabled", ->
+			l = new TextLayer
+				textOverflow: "clip"
+				height: 20
+				autoWidth: false
+			l.textOverflow = null
+			l._styledText.getStyle("whiteSpace").should.equal "pre-wrap"
 
 		it "should update the line-clamp when the height is updated", ->
 			l = new TextLayer
 				text: longText
 				textOverflow: "ellipsis"
 				height: 150
-			l._elementHTML.style["-webkit-line-clamp"].should.equal '3'
+				autoWidth: false
+			l._styledText.getStyle("WebkitLineClamp").should.equal 3
 			l.height = 400
-			l._elementHTML.style["-webkit-line-clamp"].should.equal '8'
+			l._styledText.getStyle("WebkitLineClamp").should.equal 8
 
 		it "should not set the line-clamp when not using textOverflow", ->
 			l = new TextLayer
 				text: longText
 				height: 150
-			l._elementHTML.style["-webkit-line-clamp"].should.equal ''
+			l._styledText.getStyle("WebkitLineClamp").should.equal ''
 			l.height = 400
-			l._elementHTML.style["-webkit-line-clamp"].should.equal ''
+			l._styledText.getStyle("WebkitLineClamp").should.equal ''
 
 	describe "truncate", ->
 		it "should set textOverflow to ellipsis", ->
@@ -304,8 +354,129 @@ describe "TextLayer", ->
 				truncate: true
 			l.truncate.should.equal true
 			l.textOverflow.should.equal "ellipsis"
-			l._elementHTML.style.textOverflow.should.equal "ellipsis"
+			l._styledText.getStyle("WebkitLineClamp").should.equal 2
 			l.truncate = false
 			l.truncate.should.equal false
 			expect(l.textOverflow).to.equal null
-			expect(l._elementHTML.style.textOverflow).to.equal ''
+			expect(l._styledText.getStyle("WebkitLineClamp")).to.equal ''
+
+	describe "Replacing Text", ->
+		subject = null
+		styledText = {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "48px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 800, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Heavy', '.SFUIText-Heavy', 'SF UI Text', 'Times New Roman'"}}], text: "Header"}, {inlineStyles: [{startIndex: 0, endIndex: 8, css: {fontSize: "20px", WebkitTextFillColor: "rgb(153, 153, 153)", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Subtitle"}, {inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "16px", WebkitTextFillColor: "rgb(238, 68, 68)", letterSpacing: "0px", fontWeight: 200, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Light', 'SFUIText-Light', '.SFUIText-Light', 'SF UI Text', 'Times New Roman'"}}, {startIndex: 6, endIndex: 16, css: {fontSize: "12px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Leader Body text"}], alignment: "left"}
+		beforeEach ->
+			subject = new TextLayer styledText: styledText
+
+		it "should start with a valid text", ->
+			subject._styledText.validate().should.equal true
+
+		describe "Setting the text property", ->
+
+			it "should replace the text with the provided text", ->
+				lines = ["One", "Two", "Three"]
+				newText = lines.join("\n")
+				subject.text = newText
+				subject.text.should.eql newText
+				for block, index in subject._styledText.blocks
+					block.text.should.equal lines[index]
+					block.inlineStyles[0].text.should.equal lines[index]
+				subject._styledText.validate().should.equal true
+
+
+			it "should set the styles when setting a string with multiple lines", ->
+				lines = ["One", "Two", "Three"]
+				subject.text = lines.join("\n")
+				for block, index in subject._styledText.blocks
+					block.inlineStyles.length.should.equal 1
+					style = block.inlineStyles[0]
+					style.css.should.eql styledText.blocks[index].inlineStyles[0].css
+					style.startIndex.should.eql 0
+					style.endIndex.should.eql lines[index].length
+				subject._styledText.validate().should.equal true
+
+			it "should remove the blocks when setting a text with less lines then the existing text", ->
+				lines = ["One", "Two"]
+				subject.text = lines.join("\n")
+				subject._styledText.blocks.length.should.equal 2
+				subject._styledText.validate().should.equal true
+
+			it "should continue using the last style when setting a text with more lines then the existing text", ->
+				lines = ["One", "Two", "Three", "Fourteen"]
+				text = lines.join("\n")
+				subject.text = text
+				subject.text.should.equal text
+				subject._styledText.blocks.length.should.equal 4
+				subject._styledText.blocks[3].inlineStyles.length.should.equal 1
+				style = subject._styledText.blocks[3].inlineStyles[0]
+				style.text.should.equal lines[3]
+				style.startIndex.should.equal 0
+				style.endIndex.should.equal lines[3].length
+				style.css.should.eql styledText.blocks[2].inlineStyles[0].css
+				subject._styledText.validate().should.equal true
+
+
+		it "should replace the full text", ->
+			searchText = "Search text"
+			subject.text = searchText
+			subject.replace(searchText, "Replacement")
+			subject.text.should.equal "Replacement"
+			subject._styledText.validate().should.equal true
+
+		it "should have the same style as the original text", ->
+			searchText = "Search text"
+			replaceText = "Replacement"
+			subject.text = searchText
+			subject.replace(searchText, replaceText)
+			style = subject._styledText.blocks[0].inlineStyles[0]
+			style.startIndex.should.equal 0
+			style.endIndex.should.equal replaceText.length
+			style.css.should.equal styledText.blocks[0].inlineStyles[0].css
+			subject._styledText.validate().should.equal true
+
+		it "should replace partial text", ->
+			subject.replace("ea", "oooo")
+			subject.text.should.equal "Hooooder\nSubtitle\nLooooder Body text"
+			subject.replace("o", "%")
+			subject.text.should.equal "H%%%%der\nSubtitle\nL%%%%der B%dy text"
+			subject._styledText.validate().should.equal true
+
+		it "should handle replacing with the same text correctly", ->
+			subject.replace("e", "e")
+			subject.text.should.equal "Header\nSubtitle\nLeader Body text"
+			subject.replace("e", "ee")
+			subject.text.should.equal "Heeadeer\nSubtitlee\nLeeadeer Body teext"
+			subject._styledText.validate().should.equal true
+
+		it "should keep the styling in place when replacing text", ->
+			searchText = "Search text"
+			subject.text = searchText
+			subject.replace(searchText, "Replacement")
+			subject._styledText.blocks[0].inlineStyles[0].css.should.eql styledText.blocks[0].inlineStyles[0].css
+			subject._styledText.validate().should.equal true
+
+		it "should apply the style to the replaced partial text", ->
+			subject.replace("e", "xxx")
+			for block, blockIndex in subject._styledText.blocks
+				for style, styleIndex in block.inlineStyles
+					style.css.should.eql styledText.blocks[blockIndex].inlineStyles[styleIndex].css
+			subject._styledText.validate().should.equal true
+
+		it "should work with regexes", ->
+			subject.replace(/d[ey]+/, "die")
+			subject.text.should.equal "Headier\nSubtitle\nLeadier Bodie text"
+			subject._styledText.validate().should.equal true
+
+		it "should rerender the text when replacing it", ->
+			htmlBefore = subject.html
+			subject.replace("a", "b")
+			subject.html.should.not.equal htmlBefore
+
+		it "should emit change:text event only when the text has changed", (done) ->
+			subject.on "change:text", ->
+				done()
+			subject.replace("a", "b")
+
+		it "should not emit a change:text event when the text doesn't change", (done) ->
+			subject.on "change:text", ->
+				throw new Error("change:text event should not be emitted")
+			subject.replace("e", "e")
+			done()
