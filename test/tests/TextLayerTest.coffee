@@ -273,6 +273,15 @@ describe "TextLayer", ->
 			text.padding.left.should.equal 0
 			text.padding.right.should.equal 0
 
+		it "should take the devicePixelRatio into account", ->
+			device = new DeviceComponent()
+			device.deviceType = "apple-iphone-7-black"
+			device.context.run ->
+				layerA = new TextLayer
+					size: 100
+					padding: 10
+				layerA.style.padding.should.equal "20px"
+
 	describe "webfonts", ->
 		it "sets the weight if the font property is set", ->
 			l = new TextLayer

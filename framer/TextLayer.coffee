@@ -522,7 +522,7 @@ class exports.TextLayer extends Layer
 
 			# Top, Right, Bottom, Left
 			@style.padding =
-				"#{@_padding.top}px #{@_padding.right}px #{@_padding.bottom}px #{@_padding.left}px"
+				"#{@_padding.top * @context.pixelMultiplier}px #{@_padding.right * @context.pixelMultiplier}px #{@_padding.bottom * @context.pixelMultiplier}px #{@_padding.left * @context.pixelMultiplier}px"
 
 	renderText: =>
 		return if @__constructor
