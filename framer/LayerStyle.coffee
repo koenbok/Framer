@@ -114,7 +114,7 @@ exports.LayerStyle =
 		translate3d(
 			#{roundToZero(layer._properties.x * dpr)}px,
 			#{roundToZero(layer._properties.y * dpr)}px,
-			#{roundToZero(layer._properties.z)}px)
+			#{roundToZero(layer._properties.z * dpr)}px)
 		scale3d(
 			#{roundToZero(layer._properties.scaleX * layer._properties.scale)},
 			#{roundToZero(layer._properties.scaleY * layer._properties.scale)},
@@ -122,11 +122,11 @@ exports.LayerStyle =
 		skew(#{roundToZero(layer._properties.skew)}deg,#{roundToZero(layer._properties.skew)}deg)
 		skewX(#{roundToZero(layer._properties.skewX)}deg)
 		skewY(#{roundToZero(layer._properties.skewY)}deg)
-		translateZ(#{roundToZero(layer._properties.originZ)}px)
+		translateZ(#{roundToZero(layer._properties.originZ * dpr)}px)
 		rotateX(#{roundToZero(layer._properties.rotationX)}deg)
 		rotateY(#{roundToZero(layer._properties.rotationY)}deg)
 		rotateZ(#{roundToZero(layer._properties.rotationZ)}deg)
-		translateZ(#{roundToZero(-layer._properties.originZ)}px)
+		translateZ(#{roundToZero(-layer._properties.originZ * dpr)}px)
 		"
 
 	webkitTransformForce2d: (layer) ->
@@ -152,7 +152,7 @@ exports.LayerStyle =
 		"#{layer._properties.originX * 100}% #{layer._properties.originY * 100}%"
 
 	webkitPerspective: (layer) ->
-		"#{layer._properties.perspective}"
+		"#{layer._properties.perspective * Framer.CurrentContext.pixelMultiplier}"
 
 	webkitPerspectiveOrigin: (layer) ->
 		"#{layer._properties.perspectiveOriginX * 100}% #{layer._properties.perspectiveOriginY * 100}%"
