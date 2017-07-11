@@ -85,6 +85,7 @@ class exports.TextLayer extends Layer
 		for property in TextLayer._textStyleProperties
 			do (property) =>
 				@on "change:#{property}", (value) =>
+					return if value is null
 					# make an exception for fontSize, as it needs to be set on the inner style
 					if not (property in ["fontSize", "font"])
 						@_styledText.resetStyle(property)
@@ -142,11 +143,15 @@ class exports.TextLayer extends Layer
 			@autoHeight = value
 			@renderText()
 
-	@define "fontFamily", textProperty(@, "fontFamily", null, _.isString, fontFamilyFromObject, (layer, value) -> layer.font = value)
+	@define "fontFamily", textProperty(@, "fontFamily", null, _.isString, fontFamilyFromObject, (layer, value) ->
+		return if value is null
+		layer.font = value
+	)
 	@define "fontWeight", textProperty(@, "fontWeight")
 	@define "fontStyle", textProperty(@, "fontStyle", "normal", _.isString)
 	@define "textDecoration", textProperty(@, "textDecoration", null, _.isString)
 	@define "fontSize", textProperty(@, "fontSize", null, _.isNumber, null, (layer, value) ->
+		return if value is null
 		style = LayerStyle["fontSize"](layer)
 		layer._styledText.setStyle("fontSize", style)
 	)
@@ -178,7 +183,12 @@ class exports.TextLayer extends Layer
 	@define "whiteSpace", textProperty(@, "whiteSpace", null, _.isString)
 	@define "direction", textProperty(@, "direction", null, _.isString)
 
+	@define "html",
+		get: ->
+			@_elementHTML?.innerHTML or ""
+
 	@define "font", layerProperty @, "font", null, null, validateFont, null, {}, (layer, value) ->
+		return if value is null
 		if _.isObject(value)
 			layer.fontFamily = value.fontFamily
 			layer.fontWeight = value.fontWeight

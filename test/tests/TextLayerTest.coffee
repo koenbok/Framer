@@ -38,6 +38,15 @@ describe "TextLayer", ->
 				fontFamily: "Monaco"
 			text.font.should.equal "Monaco"
 
+		it "should render correctly when switching to the default state", ->
+			text = new TextLayer
+				styledText: {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 5, css: {fontSize: "16px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "2.5", tabSize: 4, fontFamily: "'Roboto-Regular', 'Roboto', 'Times New Roman'"}}], text: "Color"}]}
+			textSize = text.size
+			options = text.styledTextOptions
+			text.stateSwitch("default")
+			text.styledTextOptions.should.eql options
+			text.size.should.eql textSize
+
 		it "should provide the same text options that have been put in", ->
 			l = new TextLayer
 				styledText: exampleStyledTextOptions
