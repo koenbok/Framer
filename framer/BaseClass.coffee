@@ -54,10 +54,9 @@ class exports.BaseClass extends EventEmitter
 		# We assume that every property with an underscore is private
 		return if _.startsWith(propertyName, "_")
 
+		ObjectDescriptors.push([@, propertyName, descriptor])
 		# Only retain options that are importable, exportable or both:
 		if descriptor.exportable or descriptor.importable
-			ObjectDescriptors.push([@, propertyName, descriptor])
-
 			if descriptor.depends
 				for depend in descriptor.depends
 					if depend not in DefaultPropertyOrder
@@ -103,8 +102,12 @@ class exports.BaseClass extends EventEmitter
 	_propertyList: ->
 		result = {}
 		for k in ObjectDescriptors
-			if @ instanceof k[0]
-				result[k[1]] = k[2]
+			[Class, name, descriptor] = k
+			if @ instanceof Class
+				if descriptor.exportable or descriptor.importable
+					result[name] = descriptor
+				else
+					delete result[name]
 		return result
 
 	keys: -> _.keys(@props)
