@@ -24,7 +24,7 @@ class exports.BaseClass extends EventEmitter
 		if @ isnt BaseClass
 			@_addDescriptor(propertyName, descriptor)
 
-		if not descriptor.set?
+		if descriptor.readonly
 			descriptor.set = (value) ->
 				throw Error("#{@constructor.name}.#{propertyName} is readonly")
 
@@ -43,12 +43,13 @@ class exports.BaseClass extends EventEmitter
 		descriptor.enumerable ?= true
 		descriptor.exportable ?= true
 		descriptor.importable ?= true
+		descriptor.readonly ?= not descriptor.set?
 
 		# We assume we don't import if there is no setter, because we can't
-		descriptor.importable = descriptor.importable and descriptor.set?
+		descriptor.importable = descriptor.importable and not descriptor.readonly
 		# We also assume we don't export if there is no setter, because
 		# it is likely a calculated property, and we can't set it.
-		descriptor.exportable = descriptor.exportable and descriptor.set?
+		descriptor.exportable = descriptor.exportable and not descriptor.readonly
 
 		# We assume that every property with an underscore is private
 		return if _.startsWith(propertyName, "_")
@@ -178,7 +179,7 @@ class exports.BaseClass extends EventEmitter
 		# the value from the options object, unless the prop is not importable.
 		# When there's no user value, apply the default value:
 
-		return unless descriptor.set?
+		return if descriptor.readonly
 
 		value = optionValue if descriptor.importable
 		value = Utils.valueOrDefault(optionValue, @_getPropertyDefaultValue(key))
