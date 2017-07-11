@@ -407,7 +407,7 @@ class exports.TextLayer extends Layer
 			do (property) =>
 				@on "change:#{property}", (value) =>
 					# make an exception for fontSize, as it needs to be set on the inner style
-					if property isnt "fontSize"
+					if not (property in ["fontSize", "font"])
 						@_styledText.resetStyle(property)
 					@renderText()
 
@@ -492,7 +492,7 @@ class exports.TextLayer extends Layer
 		# Check if value contains number. We then assume proper use of font.
 		# Otherwise, we default to setting the fontFamily.
 		if /\d/.test(value)
-			layer._elementHTML.style.font = value
+			layer._styledText.setStyle("font", value)
 		else
 			layer.fontFamily = value
 	, "_elementHTML"

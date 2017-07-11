@@ -282,7 +282,7 @@ describe "TextLayer", ->
 					padding: 10
 				layerA.style.padding.should.equal "20px"
 
-	describe "webfonts", ->
+	describe "Fonts", ->
 		it "sets the weight if the font property is set", ->
 			l = new TextLayer
 				font: Utils.loadWebFont("Raleway", 800)
@@ -294,6 +294,28 @@ describe "TextLayer", ->
 				fontFamily: Utils.loadWebFont("Raleway", 800)
 			l.fontFamily.should.equal "Raleway"
 			expect(l.fontWeight).to.equal 400
+
+		it "should set the font property correctly", ->
+			tagLayer1 = new TextLayer
+				x: 24
+				y: 24
+				text: "tag"
+				fontSize: 15
+				fontFamily: "Courier"
+				fontWeight: 400
+				lineHeight: 1.6
+				color: "white"
+				backgroundColor: "red"
+
+			tagLayer2 = new TextLayer
+				x: 24
+				y: 200
+				text: "tag"
+				font: "400 15px/1.6 Courier"
+				color: "white"
+				backgroundColor: "red"
+
+			tagLayer1.size.should.eql tagLayer2.size
 
 	describe "textOverflow", ->
 		it "should enable clipping", ->
