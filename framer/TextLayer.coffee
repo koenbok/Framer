@@ -42,7 +42,7 @@ class exports.TextLayer extends Layer
 			createHTMLElement: true
 
 		if options.styledText?
-			@_styledText = new StyledText(options.styledText)
+			@styledTextOptions = options.styledText
 		else
 			_.defaults options,
 				backgroundColor: "transparent"
@@ -54,7 +54,6 @@ class exports.TextLayer extends Layer
 				padding: 0
 			if not options.font? and not options.fontFamily?
 				options.fontFamily = @defaultFont()
-			@_styledText = new StyledText()
 			@_styledText.addBlock options.text
 
 		super options
@@ -110,6 +109,21 @@ class exports.TextLayer extends Layer
 		copy = new @constructor(props)
 		copy.style = @style
 		copy
+
+	@define "_styledText",
+		get: ->
+			if not @__styledText?
+				@__styledText = new StyledText()
+			return @__styledText
+		set: (value) ->
+			return unless value instanceof StyledText
+			@__styledText = value
+
+	@define "styledTextOptions",
+		get: -> @_styledText?.getOptions()
+		set: (value) ->
+			@_styledText = new StyledText(value)
+			@_styledText.setElement(@_elementHTML)
 
 	#Vekter properties
 	@define "autoWidth", @proxyProperty("_styledText.autoWidth",
