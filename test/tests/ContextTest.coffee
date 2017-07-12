@@ -1,4 +1,4 @@
-assert = require "assert"
+{expect} = require "chai"
 
 describe "Context", ->
 
@@ -282,12 +282,36 @@ describe "Context", ->
 			context._element.style["backgroundColor"].should.equal colorString
 
 		it "should have a default perspective of 0", ->
-
 			context = new Framer.Context(name: "Test")
-			context._element.style["webkitPerspective"].should.equal "0"
+			context._element.style["webkitPerspective"].should.equal "none"
+			context.perspective.should.equal 0
 
 		it "should allow the perspective to be changed", ->
-
 			context = new Framer.Context(name: "Test")
 			context.perspective = 800
+			context.perspective.should.equal 800
 			context._element.style["webkitPerspective"].should.equal "800"
+
+		it "should set the perspective to 'none' if set to 0", ->
+			context = new Framer.Context(name: "Test")
+			context.perspective = 0
+			context.perspective.should.equal 0
+			context._element.style["webkitPerspective"].should.equal "none"
+
+		it "should set the perspective to 'none' if set to none", ->
+			context = new Framer.Context(name: "Test")
+			context.perspective = "none"
+			context.perspective.should.equal "none"
+			context._element.style["webkitPerspective"].should.equal "none"
+
+		it "should set the perspective to 'none' if set to null", ->
+			context = new Framer.Context(name: "Test")
+			context.perspective = null
+			expect(context.perspective).to.be.null
+			context._element.style["webkitPerspective"].should.equal "none"
+
+		it "should not allow setting the perspective to random string", ->
+			context = new Framer.Context(name: "Test")
+			context.perspective = "bla"
+			context.perspective.should.equal 0
+			context._element.style["webkitPerspective"].should.equal "none"

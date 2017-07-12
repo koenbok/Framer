@@ -31,6 +31,15 @@ these at any time.
 
 ###
 
+webkitPerspectiveForValue =  (value) ->
+	if value in ["none", null, 0]
+		return "none"
+	else if _.isNumber(value)
+		return value
+	else
+		return null
+
+
 Contexts = []
 
 class exports.Context extends BaseClass
@@ -293,7 +302,9 @@ class exports.Context extends BaseClass
 		@_element = document.createElement("div")
 		@_element.id = "FramerContextRoot-#{@_name}"
 		@_element.classList.add("framerContext")
-		@_element.style["webkitPerspective"] = @perspective
+		webkitPerspective = webkitPerspectiveForValue(@perspective)
+		if webkitPerspective?
+			@_element.style["webkitPerspective"] = webkitPerspective
 		@_element.style["backgroundColor"] = @backgroundColor
 
 		@__pendingElementAppend = =>
@@ -366,9 +377,10 @@ class exports.Context extends BaseClass
 		get: ->
 			return @_perspective
 		set: (value) ->
-			if _.isNumber(value)
+			webkitPerspective = webkitPerspectiveForValue(value)
+			if webkitPerspective?
 				@_perspective = value
-				@_element?.style["webkitPerspective"] = @_perspective
+				@_element?.style["webkitPerspective"] = webkitPerspective
 
 	_updatePerspective: ->
 		@_element?.style["webkitPerspectiveOrigin"] = "#{@perspectiveOriginX * 100}% #{@perspectiveOriginY * 100}%"
