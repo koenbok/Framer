@@ -244,6 +244,35 @@ describe "BaseClass", ->
 		a.test.should.equal "a"
 		b.test.should.equal "b"
 
+	it "should allow readonly overrides of readable properties", ->
+		class TestA extends Framer.BaseClass
+			@define "test",
+				get: -> @_bla ? "bla"
+				set: (value) -> @_bla = value
+		class TestB extends TestA
+			@define "test",
+				get: -> "hoera"
+		a = new TestA
+		b = new TestB
+		a.test.should.equal "bla"
+		a.test = "test"
+		a.test.should.equal "test"
+
+		b.test.should.equal "hoera"
+		(-> b.test = "test").should.throw "TestB.test is readonly"
+		b.test.should.equal "hoera"
+
+	it "should not include a readonly overrides of readable property in props", ->
+		class TestA extends Framer.BaseClass
+			@define "test",
+				get: -> @_bla ? "bla"
+				set: (value) -> @_bla = value
+		class TestB extends TestA
+			@define "test",
+				get: -> "hoera"
+		b = new TestB
+		b.props.should.eql {}
+
 	it "should inherit properties", ->
 		class TestInherit extends Framer.BaseClass
 			@define "test", @simpleProperty("test", "a")

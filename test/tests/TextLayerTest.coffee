@@ -4,6 +4,7 @@ assert = require "assert"
 shortText = "Awesome title"
 mediumText = "What about this text that probably spans just over two lines"
 longText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas posuere odio nisi, non elementum ipsum posuere ac. Vestibulum et faucibus ante. Praesent mi eros, scelerisque non venenatis at, tempus ut purus. Morbi volutpat velit lacus, id convallis lacus vulputate id. Nullam eu ex sed purus accumsan finibus sed eget lorem. Maecenas vulputate ante non ipsum luctus cursus. Nam dapibus purus ut lorem laoreet sollicitudin. Sed ullamcorper odio sed risus viverra, in vehicula lectus malesuada. Morbi porttitor, augue vel mollis pulvinar, sem lacus fringilla dui, facilisis venenatis lacus velit vitae velit. Suspendisse dictum elit in quam feugiat, nec ornare neque tempus. Duis eget arcu risus. Sed vitae turpis sit amet sapien pharetra consequat quis a dui. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla laoreet quis augue ac venenatis. Aenean nec lorem sodales, finibus purus in, ornare elit. Maecenas ut feugiat tellus."
+exampleStyledTextOptions = {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "48px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 800, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Heavy', '.SFUIText-Heavy', 'SF UI Text', 'Times New Roman'"}}], text: "Header"}, {inlineStyles: [{startIndex: 0, endIndex: 8, css: {fontSize: "20px", WebkitTextFillColor: "rgb(153, 153, 153)", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Subtitle"}, {inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "16px", WebkitTextFillColor: "rgb(238, 68, 68)", letterSpacing: "0px", fontWeight: 200, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Light', 'SFUIText-Light', '.SFUIText-Light', 'SF UI Text', 'Times New Roman'"}}, {startIndex: 6, endIndex: 16, css: {fontSize: "12px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Leader Body text"}], alignment: "left"}
 
 describe "TextLayer", ->
 
@@ -36,6 +37,20 @@ describe "TextLayer", ->
 			text = new TextLayer
 				fontFamily: "Monaco"
 			text.font.should.equal "Monaco"
+
+		it "should render correctly when switching to the default state", ->
+			text = new TextLayer
+				styledText: {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 5, css: {fontSize: "16px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "2.5", tabSize: 4, fontFamily: "'Roboto-Regular', 'Roboto', 'Times New Roman'"}}], text: "Color"}]}
+			textSize = text.size
+			options = text.styledTextOptions
+			text.stateSwitch("default")
+			text.styledTextOptions.should.eql options
+			text.size.should.eql textSize
+
+		it "should provide the same text options that have been put in", ->
+			l = new TextLayer
+				styledText: exampleStyledTextOptions
+			l.styledTextOptions.should.eql exampleStyledTextOptions
 
 	describe "Auto-sizing", ->
 
@@ -393,9 +408,9 @@ describe "TextLayer", ->
 
 	describe "Replacing Text", ->
 		subject = null
-		styledText = {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "48px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 800, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Heavy', '.SFUIText-Heavy', 'SF UI Text', 'Times New Roman'"}}], text: "Header"}, {inlineStyles: [{startIndex: 0, endIndex: 8, css: {fontSize: "20px", WebkitTextFillColor: "rgb(153, 153, 153)", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Subtitle"}, {inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "16px", WebkitTextFillColor: "rgb(238, 68, 68)", letterSpacing: "0px", fontWeight: 200, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Light', 'SFUIText-Light', '.SFUIText-Light', 'SF UI Text', 'Times New Roman'"}}, {startIndex: 6, endIndex: 16, css: {fontSize: "12px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Leader Body text"}], alignment: "left"}
+
 		beforeEach ->
-			subject = new TextLayer styledText: styledText
+			subject = new TextLayer styledText: exampleStyledTextOptions
 
 		it "should start with a valid text", ->
 			subject._styledText.validate().should.equal true
@@ -419,7 +434,7 @@ describe "TextLayer", ->
 				for block, index in subject._styledText.blocks
 					block.inlineStyles.length.should.equal 1
 					style = block.inlineStyles[0]
-					style.css.should.eql styledText.blocks[index].inlineStyles[0].css
+					style.css.should.eql exampleStyledTextOptions.blocks[index].inlineStyles[0].css
 					style.startIndex.should.eql 0
 					style.endIndex.should.eql lines[index].length
 				subject._styledText.validate().should.equal true
@@ -441,7 +456,7 @@ describe "TextLayer", ->
 				style.text.should.equal lines[3]
 				style.startIndex.should.equal 0
 				style.endIndex.should.equal lines[3].length
-				style.css.should.eql styledText.blocks[2].inlineStyles[0].css
+				style.css.should.eql exampleStyledTextOptions.blocks[2].inlineStyles[0].css
 				subject._styledText.validate().should.equal true
 
 
@@ -460,7 +475,7 @@ describe "TextLayer", ->
 			style = subject._styledText.blocks[0].inlineStyles[0]
 			style.startIndex.should.equal 0
 			style.endIndex.should.equal replaceText.length
-			style.css.should.equal styledText.blocks[0].inlineStyles[0].css
+			style.css.should.equal exampleStyledTextOptions.blocks[0].inlineStyles[0].css
 			subject._styledText.validate().should.equal true
 
 		it "should replace partial text", ->
@@ -481,14 +496,14 @@ describe "TextLayer", ->
 			searchText = "Search text"
 			subject.text = searchText
 			subject.replace(searchText, "Replacement")
-			subject._styledText.blocks[0].inlineStyles[0].css.should.eql styledText.blocks[0].inlineStyles[0].css
+			subject._styledText.blocks[0].inlineStyles[0].css.should.eql exampleStyledTextOptions.blocks[0].inlineStyles[0].css
 			subject._styledText.validate().should.equal true
 
 		it "should apply the style to the replaced partial text", ->
 			subject.replace("e", "xxx")
 			for block, blockIndex in subject._styledText.blocks
 				for style, styleIndex in block.inlineStyles
-					style.css.should.eql styledText.blocks[blockIndex].inlineStyles[styleIndex].css
+					style.css.should.eql exampleStyledTextOptions.blocks[blockIndex].inlineStyles[styleIndex].css
 			subject._styledText.validate().should.equal true
 
 		it "should work with regexes", ->
