@@ -43,6 +43,7 @@ class exports.TextLayer extends Layer
 
 		if options.styledText?
 			@styledTextOptions = options.styledText
+			options.color ?= @_styledText.getStyle("color")
 		else
 			_.defaults options,
 				backgroundColor: "transparent"

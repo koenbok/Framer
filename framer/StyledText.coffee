@@ -75,6 +75,8 @@ class InlineStyle
 		@element?.style[style] = value
 
 	getStyle: (style) ->
+		if style is "color"
+			return @css["color"] ? @css["WebkitTextFillColor"]
 		return @css[style]
 
 	measure: ->
@@ -288,7 +290,7 @@ class exports.StyledText
 		@blocks.map (block) -> block.resetStyle(style)
 
 	getStyle: (style, block=null) ->
-		return (block ? _.first(@blocks))?.getStyle(style) ? @element.style[style]
+		return (block ? _.first(@blocks))?.getStyle(style) ? @element?.style[style]
 
 	measure: (currentSize) ->
 		constraints = {}
