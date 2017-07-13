@@ -1,5 +1,5 @@
 
-describe.only "SVGLayer", ->
+describe "SVGLayer", ->
 	describe "gradients", ->
 		it "should generate unique gradient id per instance", ->
 			a = new SVGLayer
