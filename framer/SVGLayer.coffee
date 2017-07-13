@@ -18,7 +18,7 @@ class exports.SVGLayer extends Layer
 			# Backwards compatibility for old Vekter exporter that would
 			# set backgroundColor instead of color
 			options.color ?= options.backgroundColor
-			delete options.backgroundColor
+			options.backgroundColor = null
 		super options
 		@updateGradientSVG()
 
