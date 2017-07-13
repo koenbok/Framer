@@ -13,7 +13,9 @@ toFill = (value) ->
 class exports.SVGLayer extends Layer
 
 	constructor: (options={}) ->
-		options.backgroundColor ?= null
+		if options.backgroundColor?
+			# Backwards compatibility for old Vekter exporter
+			options.color ?= options.backgroundColor
 		super options
 
 	@define "fill", layerProperty(@, "fill", "fill", null, validFill, toFill)
