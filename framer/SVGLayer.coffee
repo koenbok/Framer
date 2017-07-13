@@ -1,6 +1,6 @@
 {_} = require "./Underscore"
 {Color} = require "./Color"
-{Layer, layerProperty} = require "./Layer"
+{Layer, layerProperty, layerProxiedValue} = require "./Layer"
 
 validFill = (value) ->
 	Color.validColorValue(value) or _.startsWith(value, "url(")
@@ -17,6 +17,7 @@ class exports.SVGLayer extends Layer
 			# Backwards compatibility for old Vekter exporter
 			options.color ?= options.backgroundColor
 		super options
+		@updateGradientSVG()
 
 	@define "fill", layerProperty(@, "fill", "fill", null, validFill, toFill)
 	@define "stroke", layerProperty(@, "stroke", "stroke", null, validFill, toFill)
@@ -24,21 +25,19 @@ class exports.SVGLayer extends Layer
 
 	@define "gradient",
 		get: ->
-			return @_gradient
-		set: (value) ->
+			return layerProxiedValue(@_gradient, @, "gradient") if Gradient.isGradientObject(@_gradient)
+			return null
+		set: (value) -> # Copy semantics!
 			if Gradient.isGradient(value)
-				@_gradient = value
-			else
-				gradientOptions = Gradient._asPlainObject(value)
-				if not _.isEmpty(gradientOptions)
-					@_gradient = new Gradient(gradientOptions)
-				else
-					@_gradient = null
+				@_gradient = new Gradient(value)
+			else if not value and Gradient.isGradientObject(@_gradient)
+				@_gradient = null
 			@updateGradientSVG()
 
-	updateGradientSVG: =>
-		if not Gradient.isGradient(@_gradient)
-			@_elementGradientSVG.innerHTML = ""
+	updateGradientSVG: ->
+		return if @__constructor
+		if not Gradient.isGradient(@gradient)
+			@_elementGradientSVG?.innerHTML = ""
 			return
 
 		if not @_elementGradientSVG

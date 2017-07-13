@@ -88,6 +88,8 @@ layerProxiedValue = (value, layer, property) ->
 		proxiedValue[subProperty] = subValue
 		layer[property] = proxiedValue
 
+exports.layerProxiedValue = layerProxiedValue
+
 layerPropertyPointTransformer = (value, layer, property) ->
 	if _.isFunction(value)
 		value = value(layer, property)
