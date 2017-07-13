@@ -2,6 +2,7 @@ _ = require("lodash")
 async = require("async")
 gulp = require("gulp")
 phantomjs = require("gulp-mocha-phantomjs")
+istanbulReport = require('gulp-istanbul-report')
 webpack = require("webpack")
 rename = require("gulp-rename")
 template = require("gulp-template")
@@ -34,10 +35,11 @@ gulp.task "test", ["webpack:tests", "lint"], ->
 	return gulp
 		.src("test/phantomjs/index.html")
 		.pipe(phantomjs({
-			reporter: "dot",
-			viewportSize: {width: 1024, height: 768},
-			useColors: true,
-			loadImages: false
+			reporter: "dot"
+			phantomjs:
+				# viewportSize: {width: 1024, height: 768}
+				useColors: true
+				loadImages: false
 		}))
 
 gulp.task 'lint', ->
@@ -114,21 +116,36 @@ gulp.task "webpack:coverage", ["version"], (callback) ->
 	config = _.extend WEBPACK,
 		entry: "./build/instrumented/Framer.js"
 		output:
-			filename: "framer.debug.js"
+			filename: "build/framer.debug.js"
 		debug: true
 
 	webpackDev("webpack:coverage", config, callback)
 
-gulp.task "coverage", ["webpack:coverage", "webpack:tests"], ->
+gulp.task "coverage", ["version", "webpack:coverage", "webpack:tests"], ->
+	coverageFile = "build/coverage/coverage.json"
 	return gulp
 		.src("test/phantomjs/index.html")
 		.pipe(phantomjs(
-			# reporter: "landing"
 			phantomjs:
-				hooks: "coverage-capture"
-				coverageFile: "build/coverage/jscoverage.json"
+				hooks: "mocha-phantomjs-istanbul"
+				coverageFile: coverageFile
+				# viewportSize: {width: 1024, height: 768}
+				useColors: true
+				loadImages: false
+			reporter: "dot"
 		))
 		.on "finish", ->
+			gulp.src(coverageFile)
+				.pipe(istanbulReport(
+					reporterOpts:
+						dir: './build/coverage'
+					reporters: [
+						'text',
+						{'name': 'lcov', file: 'lcov.info'},
+						{'name': 'json', file: 'coverage-final.json'},
+						{'name': 'clover', file: 'clover.xml'},
+					]
+				))
 			console.log "done"
 
 

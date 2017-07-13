@@ -79,8 +79,8 @@ resources:
 # Code coverage
 
 coverage: bootstrap
-	$(BIN)/coffeeCoverage ./build/Version.coffee ./build/build/Version.js
-	$(BIN)/coffeeCoverage ./framer ./build/instrumented
+	$(BIN)/gulp version
+	mkdir -p ./build/build
+	$(BIN)/coffeeCoverage -t istanbul -c __coverage__ ./build/Version.coffee ./build/build/Version.js
+	$(BIN)/coffeeCoverage -t istanbul -c __coverage__ ./framer ./build/instrumented
 	$(BIN)/gulp coverage
-	cp ./test/coverage-template/* ./build/coverage
-	open ./build/coverage/jscoverage.html
