@@ -109,6 +109,30 @@ gulp.task "webpack:tests", ["webpack:debug"], (callback) ->
 	webpackDev("webpack:tests", config, callback)
 
 
+gulp.task "webpack:coverage", ["version"], (callback) ->
+
+	config = _.extend WEBPACK,
+		entry: "./build/instrumented/Framer.js"
+		output:
+			filename: "framer.debug.js"
+		debug: true
+
+	webpackDev("webpack:coverage", config, callback)
+
+gulp.task "coverage", ["webpack:coverage", "webpack:tests"], ->
+	return gulp
+		.src("test/phantomjs/index.html")
+		.pipe(phantomjs(
+			# reporter: "landing"
+			phantomjs:
+				hooks: "coverage-capture"
+				coverageFile: "build/coverage/jscoverage.json"
+		))
+		.on "finish", ->
+			console.log "done"
+
+
+
 ################################################################################
 # Utilities
 
