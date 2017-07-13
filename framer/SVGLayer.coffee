@@ -13,9 +13,12 @@ toFill = (value) ->
 class exports.SVGLayer extends Layer
 
 	constructor: (options={}) ->
-		if options.backgroundColor?
-			# Backwards compatibility for old Vekter exporter
+		# Ugly: detect Vekter export with html intrinsic size
+		if options.htmlIntrinsicSize? and options.backgroundColor?
+			# Backwards compatibility for old Vekter exporter that would
+			# set backgroundColor instead of color
 			options.color ?= options.backgroundColor
+			delete options.backgroundColor
 		super options
 		@updateGradientSVG()
 
