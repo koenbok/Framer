@@ -37,7 +37,7 @@ gulp.task "test", ["webpack:tests", "lint"], ->
 		.pipe(phantomjs({
 			reporter: "dot"
 			phantomjs:
-				# viewportSize: {width: 1024, height: 768}
+				viewportSize: {width: 400, height: 300}
 				useColors: true
 				loadImages: false
 		}))
@@ -126,13 +126,13 @@ gulp.task "coverage", ["version", "webpack:coverage", "webpack:tests"], ->
 	return gulp
 		.src("test/phantomjs/index.html")
 		.pipe(phantomjs(
+			reporter: "dot"
 			phantomjs:
 				hooks: "mocha-phantomjs-istanbul"
 				coverageFile: coverageFile
-				# viewportSize: {width: 1024, height: 768}
+				viewportSize: {width: 400, height: 300}
 				useColors: true
 				loadImages: false
-			reporter: "dot"
 		))
 		.on "finish", ->
 			gulp.src(coverageFile)
