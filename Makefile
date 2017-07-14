@@ -74,3 +74,13 @@ site-upload: bootstrap site-build
 
 resources:
 	scripts/resources-optimize.sh
+
+
+# Code coverage
+
+coverage: bootstrap
+	$(BIN)/gulp version
+	mkdir -p ./build/build
+	$(BIN)/coffeeCoverage -t istanbul -c __coverage__ ./build/Version.coffee ./build/build/Version.js
+	$(BIN)/coffeeCoverage -t istanbul -c __coverage__ ./framer ./build/instrumented
+	$(BIN)/gulp coverage

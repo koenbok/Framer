@@ -11,6 +11,11 @@ build:
         - npm-install
         - npm-test
         - script:
+            name: generate code coverage
+            code: |
+                make coverage
+                `npm bin`/codecov -t f39fdc5b-687d-4986-bcb7-d6a478b2709d
+        - script:
             name: release build
             code: |
                 make release
