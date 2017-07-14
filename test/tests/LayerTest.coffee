@@ -462,6 +462,41 @@ describe "Layer", ->
 
 			layer.style["-webkit-perspective"].should.equal("500")
 
+		it "should have a default perspective of 0", ->
+			layer = new Layer
+			layer._element.style["webkitPerspective"].should.equal "none"
+			layer.perspective.should.equal 0
+
+		it "should allow the perspective to be changed", ->
+			layer = new Layer
+			layer.perspective = 800
+			layer.perspective.should.equal 800
+			layer._element.style["webkitPerspective"].should.equal "800"
+
+		it "should set the perspective to 'none' if set to 0", ->
+			layer = new Layer
+			layer.perspective = 0
+			layer.perspective.should.equal 0
+			layer._element.style["webkitPerspective"].should.equal "none"
+
+		it "should set the perspective to 'none' if set to none", ->
+			layer = new Layer
+			layer.perspective = "none"
+			layer.perspective.should.equal "none"
+			layer._element.style["webkitPerspective"].should.equal "none"
+
+		it "should set the perspective to 'none' if set to null", ->
+			layer = new Layer
+			layer.perspective = null
+			layer.perspective.should.equal 0
+			layer._element.style["webkitPerspective"].should.equal "none"
+
+		it "should not allow setting the perspective to random string", ->
+			layer = new Layer
+			(-> layer.perspective = "bla").should.throw("Layer.perspective: value 'bla' of type 'string' is not valid")
+			layer.perspective.should.equal 0
+			layer._element.style["webkitPerspective"].should.equal "none"
+
 		it "should have its backface visible by default", ->
 
 			layer = new Layer

@@ -51,6 +51,14 @@ Utils.arrayNext = (arr, item) ->
 Utils.arrayPrev = (arr, item) ->
 	arr[arr.indexOf(item) - 1] or _.last arr
 
+Utils.webkitPerspectiveForValue =  (value) ->
+	if value in ["none", null, 0]
+		return "none"
+	else if _.isNumber(value)
+		return value
+	else
+		return null
+
 
 ######################################################
 # MATH
