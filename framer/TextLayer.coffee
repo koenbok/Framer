@@ -11,6 +11,22 @@ fontFamilyFromObject = (font) ->
 textProperty = (obj, name, fallback, validator, transformer, set) ->
 	layerProperty(obj, name, name, fallback, validator, transformer, {}, set, "_elementHTML")
 
+asPadding = (value) ->
+	return value if _.isNumber(value)
+	return 0 if not _.isObject(value)
+	result = {}
+	isValidObject = false
+	if value.horizontal?
+		value.left ?= value.horizontal
+		value.right ?= value.horizontal
+	if value.vertical?
+		value.top ?= value.vertical
+		value.bottom ?= value.vertical
+	for key in ["left", "right", "bottom", "top"]
+		isValidObject ||= _.has(value, key)
+		result[key] = value[key] ? 0
+	return if not isValidObject then 0 else result
+
 class exports.TextLayer extends Layer
 	@_textProperties = [
 		"text"
@@ -215,21 +231,7 @@ class exports.TextLayer extends Layer
 			@renderText()
 			@emit("change:text", value)
 
-	@define "padding",
-		get: ->
-			if @_padding? then _.clone(@_padding) else Utils.rectZero()
-
-		set: (padding) ->
-			if _.isObject(padding)
-				padding.left ?= padding.horizontal
-				padding.right ?= padding.horizontal
-				padding.top ?= padding.vertical
-				padding.bottom ?= padding.vertical
-			@_padding = Utils.rectZero(Utils.parseRect(padding))
-
-			# Top, Right, Bottom, Left
-			@style.padding =
-				"#{@_padding.top * @context.pixelMultiplier}px #{@_padding.right * @context.pixelMultiplier}px #{@_padding.bottom * @context.pixelMultiplier}px #{@_padding.left * @context.pixelMultiplier}px"
+	@define "padding", layerProperty(@, "padding", "padding", 0, null, asPadding)
 
 	renderText: =>
 		return if @__constructor
@@ -237,11 +239,12 @@ class exports.TextLayer extends Layer
 		@_updateHTMLScale()
 		parentWidth = if @parent? then @parent.width else Screen.width
 		constrainedWidth = if @autoWidth then parentWidth else @size.width
-		constrainedWidth -= (@padding.left + @padding.right)
+		padding = Utils.rectZero(Utils.parseRect(@padding))
+		constrainedWidth -= (padding.left + padding.right)
 		if @autoHeight
 			constrainedHeight = null
 		else
-			constrainedHeight = @size.height - (@padding.top + @padding.bottom)
+			constrainedHeight = @size.height - (padding.top + padding.bottom)
 		constraints =
 			width: constrainedWidth
 			height: constrainedHeight
@@ -250,9 +253,9 @@ class exports.TextLayer extends Layer
 		calculatedSize = @_styledText.measure constraints
 		@disableAutosizeUpdating = true
 		if calculatedSize.width?
-			@width = calculatedSize.width + @padding.left + @padding.right
+			@width = calculatedSize.width + padding.left + padding.right
 		if calculatedSize.height?
-			@height = calculatedSize.height + @padding.top + @padding.bottom
+			@height = calculatedSize.height + padding.top + padding.bottom
 		@disableAutosizeUpdating = false
 
 	defaultFont: ->

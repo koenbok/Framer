@@ -17,7 +17,7 @@ describe "TextLayer", ->
 			text._elementHTML.outerHTML.should.equal '<div style="zoom: 1; overflow: hidden; color: rgb(136, 136, 136); font-family: -apple-system, BlinkMacSystemFont, \'SF UI Text\', \'Helvetica Neue\'; font-weight: 400; font-style: normal; font-size: 40px; line-height: 1.25; text-transform: none; outline: none; white-space: pre-wrap; word-wrap: break-word; text-align: left;"><div style="font-size: 1px;"><span style="font-size: 40px;">Hello World</span></div></div>'
 			text.color.isEqual("#888").should.equal true
 			text.backgroundColor.isEqual("transparent").should.equal true
-			text.padding.should.eql Utils.rectZero()
+			text.padding.should.eql 0
 			text.fontSize.should.equal 40
 			text.fontWeight.should.equal 400
 			text.lineHeight.should.equal 1.25
@@ -76,6 +76,25 @@ describe "TextLayer", ->
 			#
 			text.animate
 				color: "red"
+
+		it "should animate padding", (done) ->
+			text = new TextLayer
+				styledText: simpleStyledTextOptions
+
+			text.padding = 10
+
+			text.onAnimationStart ->
+				text.padding.should.equal 10
+				done()
+
+			text.onAnimationEnd ->
+				text.padding.should.equal 20
+				done()
+			#
+			text.animate
+				padding: 20
+
+
 	describe "Auto-sizing", ->
 
 		it "should auto size the layer the size of the text", ->
@@ -233,20 +252,14 @@ describe "TextLayer", ->
 		it "should have no padding initially", ->
 			text = new TextLayer
 			text.style.padding.should.equal "0px"
-			text.padding.top.should.equal 0
-			text.padding.bottom.should.equal 0
-			text.padding.left.should.equal 0
-			text.padding.right.should.equal 0
+			text.padding.should.equal 0
 
 		it "should all padding when given a numeric value", ->
 			text = new TextLayer
 				padding: 10
 
 			text.style.padding.should.equal "10px"
-			text.padding.top.should.equal 10
-			text.padding.bottom.should.equal 10
-			text.padding.left.should.equal 10
-			text.padding.right.should.equal 10
+			text.padding.should.equal 10
 
 		it "should set horizontal padding", ->
 			text = new TextLayer
@@ -307,10 +320,7 @@ describe "TextLayer", ->
 		it "should have a default padding when setting styledText", ->
 			text = new TextLayer
 				styledText: {}
-			text.padding.top.should.equal 0
-			text.padding.bottom.should.equal 0
-			text.padding.left.should.equal 0
-			text.padding.right.should.equal 0
+			text.padding.should.equal 0
 
 		it "should take the devicePixelRatio into account", ->
 			device = new DeviceComponent()

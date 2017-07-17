@@ -198,7 +198,7 @@ exports.LayerStyle =
 
 	backgroundColor: (layer) ->
 		return layer._properties.backgroundColor
-	
+
 	fill: (layer) ->
 		return layer._properties.fill
 
@@ -278,3 +278,7 @@ exports.LayerStyle =
 			when "right-to-left" then return "rtl"
 			when "left-to-right" then return "ltr"
 			else return value
+
+	padding: (layer) ->
+		padding = Utils.rectZero(Utils.parseRect(layer.padding))
+		return "#{padding.top * layer.context.pixelMultiplier}px #{padding.right * layer.context.pixelMultiplier}px #{padding.bottom * layer.context.pixelMultiplier}px #{padding.left * layer.context.pixelMultiplier}px"
