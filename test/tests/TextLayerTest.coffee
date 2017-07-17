@@ -80,12 +80,10 @@ describe "TextLayer", ->
 		it "should animate padding", (done) ->
 			text = new TextLayer
 				styledText: simpleStyledTextOptions
-
 			text.padding = 10
 
 			text.onAnimationStart ->
 				text.padding.should.equal 10
-				done()
 
 			text.onAnimationEnd ->
 				text.padding.should.equal 20
