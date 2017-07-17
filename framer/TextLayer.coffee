@@ -44,6 +44,8 @@ class exports.TextLayer extends Layer
 		if options.styledText?
 			@styledTextOptions = options.styledText
 			options.color ?= @_styledText.getStyle("color")
+			options.fontSize ?= parseFloat(@_styledText.getStyle("fontSize"))
+			options.lineHeight ?= parseFloat(@_styledText.getStyle("lineHeight"))
 		else
 			_.defaults options,
 				backgroundColor: "transparent"

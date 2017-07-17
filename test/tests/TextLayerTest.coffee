@@ -66,6 +66,16 @@ describe "TextLayer", ->
 			text.animate
 				color: "red"
 
+		it "should start animating from the fontsize the layer has", (done) ->
+			text = new TextLayer
+				styledText: simpleStyledTextOptions
+
+			text.onAnimationStart ->
+				text.fontSize.should.equal 16
+				done()
+			#
+			text.animate
+				color: "red"
 	describe "Auto-sizing", ->
 
 		it "should auto size the layer the size of the text", ->
