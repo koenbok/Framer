@@ -88,7 +88,7 @@ describe "TextLayer", ->
 			text.onAnimationEnd ->
 				text.padding.should.equal 20
 				done()
-			#
+
 			text.animate
 				padding: 20
 
@@ -558,3 +558,61 @@ describe "TextLayer", ->
 				throw new Error("change:text event should not be emitted")
 			subject.replace("e", "e")
 			done()
+
+	describe "value transformer", ->
+		it "should set a value property", ->
+			l = new TextLayer
+				value: 123
+			l.value.should.equal 123
+
+		it "should set the text when setting the value property", ->
+			l = new TextLayer
+				value: 456
+			l.text.should.equal "456"
+
+		it "should only allow function for the transform property", ->
+			(-> new TextLayer transform: 3).should.throw "Layer.transform: value '3' of type 'number' is not valid"
+
+		it "should transform the value if the transform function is set", ->
+			l = new TextLayer
+				value: 123
+				transform: (value) -> value + 456
+			l.value.should.equal 123
+			l.text.should.equal "579"
+
+		it "should be able to animate text through the transform function", (done) ->
+			l = new TextLayer
+				value: 75
+				transform: (value) ->
+					minutes = Math.floor(value / 60)
+					seconds = Math.round(value - (minutes * 60))
+					return "#{minutes}:#{seconds}"
+
+			l.onAnimationStart ->
+				l.text.should.equal "1:15"
+
+			l.onAnimationEnd ->
+				l.text.should.equal "1:50"
+				done()
+
+			Utils.delay 0.1, ->
+				l.text.substring(0, 3).should.equal "1:3"
+
+			a = l.animate
+				value: 110
+				options:
+					curve: Bezier.linear
+					time: 0.2
+
+		it "should treat non-numeric values as-is when states", (done) ->
+			l = new TextLayer
+				value: "hiep hiep"
+			l.text.should.equal "hiep hiep"
+			l.states.test =
+				rotation: 100
+				value: "hoera"
+			l.onAnimationEnd ->
+				l.text.should.equal "hoera"
+				done()
+
+			l.animate "test"

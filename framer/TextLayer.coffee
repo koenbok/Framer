@@ -224,6 +224,8 @@ class exports.TextLayer extends Layer
 		get: -> @direction
 		set: (value) -> @direction = value
 
+	@define "padding", layerProperty(@, "padding", "padding", 0, null, asPadding)
+
 	@define "text",
 		get: -> @_styledText.getText()
 		set: (value) ->
@@ -231,7 +233,17 @@ class exports.TextLayer extends Layer
 			@renderText()
 			@emit("change:text", value)
 
-	@define "padding", layerProperty(@, "padding", "padding", 0, null, asPadding)
+	@define "value", layerProperty(@, "value", null, null, null, null, {exportable: false}, (layer, value) ->
+		if layer.transform?
+			value = layer.transform(value)
+		layer.text = "#{value}"
+	)
+
+	@define "transform", layerProperty(@, "transform", null, null, _.isFunction, null, {exportable: false}, (layer, transform) ->
+		if layer.transform?
+			layer.text = layer.transform(layer.value) + ''
+	)
+
 
 	renderText: =>
 		return if @__constructor
