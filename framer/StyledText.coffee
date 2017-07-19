@@ -203,13 +203,14 @@ class StyledTextBlock
 		return @text is combinedText
 
 class exports.StyledText
-	blocks: []
+	blocks: null
+	textAlign: null
 	element: null
 	autoWidth: false
 	autoHeight: false
 	textOverflow: null
 
-	defaultStyles:
+	@defaultStyles =
 		fontStyle: "normal"
 		fontVariantCaps: "normal"
 		fontWeight: "normal"
@@ -221,7 +222,7 @@ class exports.StyledText
 		wordWrap: "break-word"
 
 	constructor: (configuration) ->
-		@defaultStyles.textAlign = configuration?.alignment ? "left"
+		@textAlign = configuration?.alignment ? "left"
 		if configuration?.blocks?
 			@blocks = configuration.blocks.map((b) -> new StyledTextBlock(b))
 		else
@@ -229,7 +230,7 @@ class exports.StyledText
 
 	getOptions: ->
 		blocks: @blocks.map((b) -> b.getOptions())
-		alignment: @defaultStyles.textAlign
+		alignment: @textAlign
 
 	@isStyledText: (styledText) ->
 		return styledText?.blocks? and styledText?.alignment? and _.isArray(styledText.blocks) and _.isString(styledText.alignment)
@@ -237,9 +238,11 @@ class exports.StyledText
 	setElement: (element) ->
 		return if not element?
 		@element = element
-		for style, value of @defaultStyles
+		for style, value of StyledText.defaultStyles
 			if not @element.style[style]
 				@element.style[style] = value
+		if @textAlign? and not @element.style["textAlign"]
+			@element.style["textAlign"] = @textAlign
 
 	render: ->
 		return if not @element?

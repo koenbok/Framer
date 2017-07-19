@@ -53,6 +53,20 @@ describe "TextLayer", ->
 				styledText: exampleStyledTextOptions
 			l.styledTextOptions.should.eql exampleStyledTextOptions
 
+		it "setting the alignment shouldn't influence other layers", ->
+			a = new TextLayer
+				styledText:
+					blocks: []
+					alignment: "left"
+
+			b = new TextLayer
+				styledText:
+					blocks: []
+					alignment: "center"
+
+			a.styledTextOptions.alignment.should.equal "left"
+			b.styledTextOptions.alignment.should.equal "center"
+
 	describe "animation", ->
 		it "should start animating from the textcolor the layer has", (done) ->
 			text = new TextLayer
