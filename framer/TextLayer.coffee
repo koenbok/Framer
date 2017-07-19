@@ -240,7 +240,7 @@ class exports.TextLayer extends Layer
 	)
 
 	@define "transform", layerProperty(@, "transform", null, null, _.isFunction, null, {exportable: false}, (layer, transform) ->
-		if layer.transform?
+		if layer.transform? and layer.value?
 			layer.text = layer.transform(layer.value) + ''
 	)
 
