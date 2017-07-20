@@ -165,6 +165,10 @@ class exports.TextLayer extends Layer
 	@define "fontFamily", textProperty(@, "fontFamily", null, _.isString, fontFamilyFromObject, (layer, value) ->
 		return if value is null
 		layer.font = value
+		promise = Utils.isFontFamilyLoaded(value)
+		if _.isObject(promise)
+			promise.then ->
+				layer.renderText()
 	)
 	@define "fontWeight", textProperty(@, "fontWeight")
 	@define "fontStyle", textProperty(@, "fontStyle", "normal", _.isString)

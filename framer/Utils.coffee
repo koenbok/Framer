@@ -1,7 +1,7 @@
 {_} = require "./Underscore"
 {Screen} = require "./Screen"
 {Matrix} = require "./Matrix"
-
+WebFont = require('webfontloader')
 Utils = {}
 
 Utils.reset = ->
@@ -493,24 +493,94 @@ Utils.deviceFont = (os) ->
 	return appleFont
 
 # Load fonts from Google Web Fonts
-_loadedFonts = []
+_isFontLoadedResults = {}
 
-Utils.loadWebFont = (font, weight) ->
+Utils.isFontFamilyLoaded = (font, timeout = 10000) ->
+	return Utils.loadWebFontConfig
+		custom:
+			families: [font]
+		timeout: timeout
 
-	fontToLoad = font
-	fontToLoad += ":#{weight}" if weight?
-	fontObject = {fontFamily: font, fontWeight: weight}
+fontsFromConfig = (config) ->
+	result = []
+	if _.isArray(config?.custom?.families)
+		result = result.concat(config?.custom?.families)
+	if _.isArray(config?.google?.families)
+		result = result.concat(config?.google?.families)
+	return result
 
-	if fontToLoad in _loadedFonts
-		return fontObject
+Utils.loadWebFontConfig = (config) ->
+	fonts = fontsFromConfig(config)
+	allLoadedResult = null
+	for currentFont in fonts
+		currentFontLoaded = _isFontLoadedResults[currentFont]
+		if not currentFontLoaded?
+			allLoadedResult = null
+			break
+		allLoadedResult ?= currentFontLoaded
+		allLoadedResult = allLoadedResult and currentFontLoaded
+	if allLoadedResult?
+		return allLoadedResult
 
-	link = document.createElement("link")
+	promise =
+		resolved: false
+		error: null
+		resolve: null
+		reject: null
+		'then': (cb) ->
+			@resolve = cb
+			@resolve?() if @resolved
+			return @
+		'catch': (cb) ->
+			@reject = cb
+			@reject?(@error) if @error?
+			return @
 
-	link.href = "https://fonts.googleapis.com/css?family=#{fontToLoad}"
-	link.rel = "stylesheet"
-	document.getElementsByTagName("head")[0].appendChild(link) unless window.TESTING
-	_loadedFonts.push(fontToLoad)
-	return fontObject
+	customActive = config.active
+	customInactive = config.inactive
+	customFontactive = config.fontactive
+	customFontinactive = config.fontinactive
+
+	config.fontloading = (font) ->
+		console.log "loading", font
+	config.fontactive = (font) ->
+		console.log "active", font
+		_isFontLoadedResults[font] = true
+		customFontactive?()
+
+	config.fontinactive = (font) ->
+		console.log "inactive", font
+		_isFontLoadedResults[font] = false
+		customFontinactive?()
+
+	config.active = ->
+		console.log "allactive", fonts
+		promise.resolve?()
+		promise.resolved = true
+		customActive?()
+	config.inactive = ->
+		console.log "allinactive", fonts
+		error = new Error("#{fonts.join(', ')} failed to load")
+		promise.reject?(error)
+		promise.error = error
+		customInactive?()
+
+	WebFont.load config
+
+	return promise
+
+Utils.loadWebFont = (font, weight, source = "google") ->
+	delete _isFontLoadedResults[font]
+
+	config = {}
+	if source is "google"
+		fontToLoad = font
+		fontToLoad += ":#{weight}" if weight?
+		config.google =
+			families: [fontToLoad]
+	Utils.loadWebFontConfig config
+
+	return {fontFamily: font, fontWeight: weight}
 
 ######################################################
 # MATH FUNCTIONS
