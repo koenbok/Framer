@@ -233,10 +233,11 @@ class exports.TextLayer extends Layer
 			@renderText()
 			@emit("change:text", value)
 
-	@define "value", layerProperty(@, "value", null, null, null, null, {exportable: false}, (layer, value) ->
+	@define "value", layerProperty(@, "value", null, null, null, null, {}, (layer, value) ->
 		if layer.transform?
 			value = layer.transform(value)
-		layer.text = "#{value}"
+		if value?
+			layer.text = "#{value}"
 	)
 
 	@define "transform", layerProperty(@, "transform", null, null, _.isFunction, null, {exportable: false}, (layer, transform) ->

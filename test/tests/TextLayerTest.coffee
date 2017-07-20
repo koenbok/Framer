@@ -630,3 +630,14 @@ describe "TextLayer", ->
 				done()
 
 			l.animate "test"
+
+		it "should be able to animate back to the value of the default state", ->
+			l = new TextLayer
+				value: 3
+			l.states.test = value: 10
+			l.stateSwitch "test"
+			l.text.should.equal "10"
+			l.stateSwitch "default"
+			l.text.should.equal "3"
+			l.stateSwitch "test"
+			l.text.should.equal "10"
