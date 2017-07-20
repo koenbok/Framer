@@ -52,5 +52,8 @@
   "bugs": {
     "url": "https://github.com/koenbok/Framer/issues"
   },
-  "homepage": "http://framer.com"
+  "homepage": "http://framer.com",
+  "dependencies": {
+    "webfontloader": "^1.6.28"
+  }
 }
