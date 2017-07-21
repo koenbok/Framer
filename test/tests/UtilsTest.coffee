@@ -272,33 +272,62 @@ describe "Utils", ->
 			# 	Utils.textSize(text, style, {height: 100}).should.eql(width: 168, height: 100)
 
 	describe "loadWebFontConfig", ->
-		it "should resolve the promise if the font is loaded", (done) ->
-			# We skip the this test on CI, because I can't get the WebFont loading to work... :'(
-			if mocha.env.CI
-				@skip()
+		describe "Real font loading tests", ->
+			before ->
+				# We skip the this test on CI, because I can't get the WebFont loading to work... :'(
+				if mocha.env.CI
+					@skip()
+			it "should resolve the promise if the font is loaded", (done) ->
+				promise = Utils.loadWebFontConfig
+					custom:
+						families: ["Courier"]
+				promise.then ->
+					done()
 				return
-			promise = Utils.loadWebFontConfig
-				custom:
-					families: ["Courier"]
-			promise.then ->
-				done()
-			return
 
-		it "should return true if the font is already correctly loaded", (done) ->
-			# We skip the this test on CI, because I can't get the WebFont loading to work... :'(
-			if mocha.env.CI
-				@skip()
-				return
-			promise = Utils.loadWebFontConfig
-				custom:
-					families: ["Arial"]
-			promise.then ->
-				result = Utils.loadWebFontConfig
+			it "should return true if the font is already correctly loaded", (done) ->
+				promise = Utils.loadWebFontConfig
 					custom:
 						families: ["Arial"]
-				result.should.equal true
-				done()
-			return
+				promise.then ->
+					result = Utils.loadWebFontConfig
+						custom:
+							families: ["Arial"]
+					result.should.equal true
+					done()
+				return
+
+			it "should not interfere with each other", (done) ->
+				Utils.loadWebFont("Raleway")
+				roboto = Utils.loadWebFontConfig
+					google:
+						families: ['Roboto']
+				roboto.then ->
+					done()
+				return
+
+			it "should cache loading of google fonts", (done) ->
+				droid = Utils.loadWebFontConfig
+					google:
+						families: ['Droid Sans']
+				droid.then ->
+					r = Utils.loadWebFontConfig
+						google:
+							families: ['Droid Sans']
+					r.should.equal true
+					done()
+				return
+
+			it "should support loading multiple fonts at the same time", (done) ->
+				promise = Utils.loadWebFontConfig
+					google:
+						families: ['Droid Sans']
+					custom:
+						families: ['Helvetica']
+				promise.then ->
+					done()
+				return
+
 
 		it "should return a promise", (done) ->
 			promise = Utils.loadWebFontConfig
@@ -342,35 +371,33 @@ describe "Utils", ->
 				done()
 			return
 
-		it "should not interfere with each other", (done) ->
-			# We skip the this test on CI, because I can't get the WebFont loading to work... :'(
+	describe "isFontFamilyLoaded", ->
+		it "should not reset the result if it is loaded successfully", (done) ->
 			if mocha.env.CI
 				@skip()
 				return
-			Utils.loadWebFont("Raleway")
-			roboto = Utils.loadWebFontConfig
-				google:
-					families: ['Roboto']
-			roboto.then ->
+			p = Utils.loadWebFontConfig
+				custom:
+					families: ["Georgia"]
+				timeout: 100
+			p.then ->
+				Utils.loadWebFont("Georgia")
+				promise = Utils.isFontFamilyLoaded("Georgia", 100)
+				promise.should.be.true
 				done()
 			return
 
-		it "should cache loading of google fonts"
-		it "should support loading multiple fonts at the same time"
-		it "should return a promise if one of the fonts is not yet loaded"
-		it "should return true if all the fonts are loaded"
-		it "should return false if any fonts are already failed loading"
-		it "should return an promise like object"
-		it "should cache the specific fonts that succeeded loading"
-		it "should call the custom active and inactive handlers"
-		it "should cache the specific fonts that failed loading"
-		it "should override the active and inactive callbacks"
-
-	describe "isFontFamilyLoaded", ->
-		it "should reset the result if a new load request is made", ->
-			Utils.loadWebFont("Raleway")
-			promise = Utils.isFontFamilyLoaded("Raleway", 100)
-			promise.should.have.property('then')
+		it "should reset the result if a new load request is made", (done) ->
+			p = Utils.loadWebFontConfig
+				custom:
+					families: ["Test4"]
+				timeout: 100
+			p.catch ->
+				Utils.loadWebFont("Test4")
+				promise = Utils.isFontFamilyLoaded("Test4", 100)
+				promise.should.have.property('then')
+				done()
+			return
 
 	describe "loadWebFont", ->
 		it "loads fonts at different weights" , ->
