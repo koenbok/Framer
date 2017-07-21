@@ -495,10 +495,12 @@ Utils.deviceFont = (os) ->
 # Load fonts from Google Web Fonts
 _isFontLoadedResults = {}
 
-Utils.isFontFamilyLoaded = (font, timeout = 10000) ->
+Utils.isFontFamilyLoaded = (fonts, timeout = 10000) ->
+	if not _.isArray(fonts)
+		fonts = [fonts]
 	return Utils.loadWebFontConfig
 		custom:
-			families: [font]
+			families: fonts
 		timeout: timeout
 
 fontsFromConfig = (config) ->

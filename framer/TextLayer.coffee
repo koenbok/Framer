@@ -144,6 +144,11 @@ class exports.TextLayer extends Layer
 		set: (value) ->
 			@_styledText = new StyledText(value)
 			@_styledText.setElement(@_elementHTML)
+			fonts = @_styledText.getFonts()
+			promise = Utils.isFontFamilyLoaded(fonts)
+			if _.isObject(promise)
+				promise.then =>
+					@renderText()
 
 	#Vekter properties
 	@define "autoWidth", @proxyProperty("_styledText.autoWidth",

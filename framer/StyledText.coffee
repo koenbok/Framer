@@ -182,6 +182,14 @@ class StyledTextBlock
 	getStyle: (style) ->
 		_.first(@inlineStyles).getStyle(style)
 
+	getFonts: ->
+		fonts = []
+		for style in @inlineStyles
+			font = style.getStyle("fontFamily")
+			if font?
+				fonts.push(font)
+		return fonts
+
 	replaceText: (search, replace) ->
 		currentIndex = 0
 		for style in @inlineStyles
@@ -294,6 +302,15 @@ class exports.StyledText
 
 	getStyle: (style, block=null) ->
 		return (block ? _.first(@blocks))?.getStyle(style) ? @element?.style[style]
+
+	getFonts: ->
+		fonts = []
+		elementFont = @element?.style["fontFamily"]
+		if elementFont?
+			fonts.push(elementFont)
+		for block in @blocks
+			fonts = fonts.concat block.getFonts()
+		return _.uniq(fonts)
 
 	measure: (currentSize) ->
 		constraints = {}
