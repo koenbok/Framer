@@ -33,7 +33,7 @@ getMeasureElement = (constraints={}) ->
 class InlineStyle
 	startIndex: 0
 	endIndex: 0
-	css: {}
+	css: null
 	text: ""
 	element: null
 
@@ -58,7 +58,10 @@ class InlineStyle
 		span = document.createElement "span"
 		for prop, value of @css
 			span.style[prop] = value
-		span.textContent = @text
+		if @text is ""
+			span.innerHTML = "<br/>"
+		else
+			span.textContent = @text
 		return span
 
 	setText: (text) ->

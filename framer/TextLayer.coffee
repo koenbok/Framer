@@ -73,7 +73,7 @@ class exports.TextLayer extends Layer
 				padding: 0
 			if not options.font? and not options.fontFamily?
 				options.fontFamily = @defaultFont()
-			@_styledText.addBlock options.text
+			@_styledText.addBlock options.text, fontSize: "#{options.fontSize}px"
 
 		super options
 		@__constructor = true
@@ -179,7 +179,7 @@ class exports.TextLayer extends Layer
 	@define "fontStyle", textProperty(@, "fontStyle", "normal", _.isString)
 	@define "textDecoration", textProperty(@, "textDecoration", null, _.isString)
 	@define "fontSize", textProperty(@, "fontSize", null, _.isNumber, null, (layer, value) ->
-		return if value is null
+		return if value is null or layer.__constructor
 		style = LayerStyle["fontSize"](layer)
 		layer._styledText.setStyle("fontSize", style)
 	)

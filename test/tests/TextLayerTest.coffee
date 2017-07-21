@@ -6,9 +6,10 @@ mediumText = "What about this text that probably spans just over two lines"
 longText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas posuere odio nisi, non elementum ipsum posuere ac. Vestibulum et faucibus ante. Praesent mi eros, scelerisque non venenatis at, tempus ut purus. Morbi volutpat velit lacus, id convallis lacus vulputate id. Nullam eu ex sed purus accumsan finibus sed eget lorem. Maecenas vulputate ante non ipsum luctus cursus. Nam dapibus purus ut lorem laoreet sollicitudin. Sed ullamcorper odio sed risus viverra, in vehicula lectus malesuada. Morbi porttitor, augue vel mollis pulvinar, sem lacus fringilla dui, facilisis venenatis lacus velit vitae velit. Suspendisse dictum elit in quam feugiat, nec ornare neque tempus. Duis eget arcu risus. Sed vitae turpis sit amet sapien pharetra consequat quis a dui. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla laoreet quis augue ac venenatis. Aenean nec lorem sodales, finibus purus in, ornare elit. Maecenas ut feugiat tellus."
 simpleStyledTextOptions = {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 5, css: {fontSize: "16px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "2.5", tabSize: 4, fontFamily: "'Roboto-Regular', 'Roboto', 'Times New Roman'"}}], text: "Color"}]}
 exampleStyledTextOptions = {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "48px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 800, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Heavy', '.SFUIText-Heavy', 'SF UI Text', 'Times New Roman'"}}], text: "Header"}, {inlineStyles: [{startIndex: 0, endIndex: 8, css: {fontSize: "20px", WebkitTextFillColor: "rgb(153, 153, 153)", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Subtitle"}, {inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "16px", WebkitTextFillColor: "rgb(238, 68, 68)", letterSpacing: "0px", fontWeight: 200, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Light', 'SFUIText-Light', '.SFUIText-Light', 'SF UI Text', 'Times New Roman'"}}, {startIndex: 6, endIndex: 16, css: {fontSize: "12px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Leader Body text"}], alignment: "left"}
+differentFonts = {"blocks": [{"inlineStyles": [{"startIndex": 0, "endIndex": 14, "css": {"fontSize": "60px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', sans-serif"}}], "text": "This is Roboto"}, {"inlineStyles": [{"startIndex": 0, "endIndex": 0, "css": {"fontSize": "47px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Roboto-Regular', 'Roboto', sans-serif"}}], "text": ""}, {"inlineStyles": [{"startIndex": 0, "endIndex": 14, "css": {"fontSize": "60px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Roboto-Regular', 'Roboto', sans-serif"}}], "text": "This is Roboto"}, {"inlineStyles": [{"startIndex": 0, "endIndex": 27, "css": {"fontSize": "60px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'VesperLibre-Regular', 'Vesper Libre', serif"}}], "text": "With a little bit of Vesper"}, {"inlineStyles": [{"startIndex": 0, "endIndex": 0, "css": {"fontSize": "10px", "WebkitTextFillColor": "rgb(255, 0, 0)", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Lato-Regular', 'Lato', serif"}}], "text": ""}, {"inlineStyles": [{"startIndex": 0, "endIndex": 16, "css": {"fontSize": "12px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Alcubierre', serif"}}], "text": "And some Raleway"}]}
+
 
 describe "TextLayer", ->
-
 	describe "defaults", ->
 		it "should set the correct defaults", ->
 			text = new TextLayer
@@ -66,6 +67,17 @@ describe "TextLayer", ->
 
 			a.styledTextOptions.alignment.should.equal "left"
 			b.styledTextOptions.alignment.should.equal "center"
+
+		it "should render all lines at the correct fontsize", ->
+			l = new TextLayer
+				styledText: differentFonts
+			l._styledText.blocks[1].inlineStyles[0].css.fontSize.should.equal "47px"
+			l._styledText.blocks[4].inlineStyles[0].css.fontSize.should.equal "10px"
+
+		it "should render empty newlines", ->
+			l = new TextLayer
+				styledText: differentFonts
+			l._styledText.blocks.length.should.equal 6
 
 	describe "animation", ->
 		it "should start animating from the textcolor the layer has", (done) ->
