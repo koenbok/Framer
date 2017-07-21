@@ -335,7 +335,7 @@ describe "Utils", ->
 				done()
 			return
 
-		it.skip "should not interfere with each other", (done) ->
+		it "should not interfere with each other", (done) ->
 			Utils.loadWebFont("Raleway")
 			roboto = Utils.loadWebFontConfig
 				google:

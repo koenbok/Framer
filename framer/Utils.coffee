@@ -541,45 +541,54 @@ Utils.loadWebFontConfig = (config) ->
 	customFontactive = config.fontactive
 	customFontinactive = config.fontinactive
 
-	config.fontloading = (font) ->
-		console.log "loading", font
-	config.fontactive = (font) ->
-		console.log "active", font
-		_isFontLoadedResults[font] = true
-		customFontactive?()
-
-	config.fontinactive = (font) ->
-		console.log "inactive", font
-		_isFontLoadedResults[font] = false
-		customFontinactive?()
-
-	config.active = ->
-		console.log "allactive", fonts
+	resolvePromise = ->
 		promise.resolve?()
 		promise.resolved = true
-		customActive?()
-	config.inactive = ->
-		console.log "allinactive", fonts
-		error = new Error("#{fonts.join(', ')} failed to load")
+
+	rejectPromise = (error) ->
 		promise.reject?(error)
 		promise.error = error
+
+	config.fontactive = (font) ->
+		_isFontLoadedResults[font] = true
+		customFontactive?(font)
+		if fonts.length is 1
+			f = resolvePromise
+			resolvePromise = null
+			f()
+
+	config.fontinactive = (font) ->
+		_isFontLoadedResults[font] = false
+		customFontinactive?(font)
+		if fonts.length is 1
+			f = rejectPromise
+			rejectPromise = null
+			error = new Error("#{font} failed to load")
+			f(error)
+
+	config.active = ->
+		customActive?()
+		resolvePromise?()
+
+	config.inactive = ->
 		customInactive?()
+		error = new Error("#{fonts.join(', ')} failed to load")
+		rejectPromise?(error)
 
 	WebFont.load config
 
 	return promise
 
 Utils.loadWebFont = (font, weight, source = "google") ->
-	delete _isFontLoadedResults[font]
-
-	config = {}
-	if source is "google"
-		fontToLoad = font
-		fontToLoad += ":#{weight}" if weight?
-		config.google =
-			families: [fontToLoad]
-	Utils.loadWebFontConfig config
-
+	if not _isFontLoadedResults[font]? or _isFontLoadedResults[font] is false
+		delete _isFontLoadedResults[font]
+		config = {}
+		if source is "google"
+			fontToLoad = font
+			fontToLoad += ":#{weight}" if weight?
+			config.google =
+				families: [fontToLoad]
+		Utils.loadWebFontConfig config
 	return {fontFamily: font, fontWeight: weight}
 
 ######################################################
