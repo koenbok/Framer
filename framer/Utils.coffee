@@ -560,6 +560,7 @@ Utils.loadWebFontConfig = (config) ->
 			f()
 
 	config.fontinactive = (font) ->
+		console.warn("Tried to load unavailable font: '#{font}'")
 		_isFontLoadedResults[font] = false
 		customFontinactive?(font)
 		if fonts.length is 1
