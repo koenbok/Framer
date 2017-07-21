@@ -168,7 +168,7 @@ class exports.TextLayer extends Layer
 		promise = Utils.isFontFamilyLoaded(value)
 		if _.isObject(promise)
 			promise.then ->
-				layer.renderText()
+				setTimeout(layer.renderText, 0)
 	)
 	@define "fontWeight", textProperty(@, "fontWeight")
 	@define "fontStyle", textProperty(@, "fontStyle", "normal", _.isString)
