@@ -307,6 +307,7 @@ describe "Utils", ->
 				return
 
 			it "should cache loading of google fonts", (done) ->
+				@skip()
 				droid = Utils.loadWebFontConfig
 					google:
 						families: ['Droid Sans']
