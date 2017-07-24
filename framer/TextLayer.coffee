@@ -54,7 +54,7 @@ class exports.TextLayer extends Layer
 	constructor: (options={}) ->
 		_.defaults options,
 			shadowType: "text"
-			clip: true
+			clip: false
 			createHTMLElement: true
 
 		if options.styledText?
