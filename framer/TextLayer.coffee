@@ -196,6 +196,7 @@ class exports.TextLayer extends Layer
 	@define "textOverflow",
 		get: -> @_styledText.textOverflow
 		set: (value) ->
+			@clip = _.isString(value)
 			@_styledText.setTextOverflow(value)
 			@renderText()
 
