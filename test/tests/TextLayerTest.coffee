@@ -79,6 +79,16 @@ describe "TextLayer", ->
 				styledText: differentFonts
 			l._styledText.blocks.length.should.equal 6
 
+		it "should convert number values", ->
+			l = new TextLayer
+				text: 333
+			l.text.should.equal "333"
+
+		it "should err on other values", ->
+			l = new TextLayer
+			f = -> l.text = {}
+			f.should.throw()
+
 	describe "animation", ->
 		it "should start animating from the textcolor the layer has", (done) ->
 			text = new TextLayer

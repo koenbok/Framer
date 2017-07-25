@@ -31,6 +31,12 @@ getMeasureElement = (constraints={}) ->
 
 	return _measureElement
 
+getTextString = (value="") ->
+	return value.toString() if _.isNumber(value)
+	return value if _.isString(value)
+
+	throw Error("Text should be a string value not #{typeof value}")
+
 class InlineStyle
 	startIndex: 0
 	endIndex: 0
@@ -48,7 +54,7 @@ class InlineStyle
 			@startIndex = configuration.startIndex
 			@endIndex = configuration.endIndex
 			@css = configuration.css
-			@text = text.substring(@startIndex, @endIndex)
+			@text = getTextString(text).substring(@startIndex, @endIndex)
 
 	getOptions: ->
 		startIndex: @startIndex
@@ -66,6 +72,7 @@ class InlineStyle
 		return span
 
 	setText: (text) ->
+		text = getTextString(text)
 		@text = text
 		@endIndex = @startIndex + text.length
 
@@ -109,7 +116,7 @@ class StyledTextBlock
 	element: null
 
 	constructor: (configuration) ->
-		text = configuration.text
+		text = getTextString(configuration.text)
 		@text = text
 		if configuration.inlineStyles?
 			@inlineStyles = configuration.inlineStyles.map((i) -> new InlineStyle(i, text))
@@ -148,6 +155,7 @@ class StyledTextBlock
 			css: _.first(@inlineStyles).css
 
 	setText: (text) ->
+		text = getTextString(text)
 		@text = text
 		firstStyle = _.first(@inlineStyles)
 		firstStyle.setText(text)
@@ -286,6 +294,7 @@ class exports.StyledText
 		@blocks.map((b) -> b.text).join("\n")
 
 	setText: (text) ->
+		text = getTextString(text)
 		values = text.split("\n")
 		@blocks = @blocks.slice(0, values.length)
 		for value, index in values
