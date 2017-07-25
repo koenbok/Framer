@@ -21,6 +21,7 @@ Framer.AnimationStateGroup = (require "./AnimationGroup").AnimationStateGroup
 Framer.Screen = (require "./Screen").Screen
 Framer.Align = (require "./Align").Align
 Framer.print = (require "./Print").print
+Framer.template = (require "./Template").template
 
 # Components
 Framer.ScrollComponent = (require "./Components/ScrollComponent").ScrollComponent

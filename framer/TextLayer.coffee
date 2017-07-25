@@ -239,6 +239,7 @@ class exports.TextLayer extends Layer
 	@define "text",
 		get: -> @_styledText.getText()
 		set: (value) ->
+			@_template = value?.template
 			@_styledText.setText(value)
 			@renderText()
 			@emit("change:text", value)
