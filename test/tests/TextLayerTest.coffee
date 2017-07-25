@@ -8,6 +8,39 @@ simpleStyledTextOptions = {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 5,
 exampleStyledTextOptions = {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "48px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 800, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Heavy', '.SFUIText-Heavy', 'SF UI Text', 'Times New Roman'"}}], text: "Header"}, {inlineStyles: [{startIndex: 0, endIndex: 8, css: {fontSize: "20px", WebkitTextFillColor: "rgb(153, 153, 153)", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Subtitle"}, {inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "16px", WebkitTextFillColor: "rgb(238, 68, 68)", letterSpacing: "0px", fontWeight: 200, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Light', 'SFUIText-Light', '.SFUIText-Light', 'SF UI Text', 'Times New Roman'"}}, {startIndex: 6, endIndex: 16, css: {fontSize: "12px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Leader Body text"}], alignment: "left"}
 differentFonts = {"blocks": [{"inlineStyles": [{"startIndex": 0, "endIndex": 14, "css": {"fontSize": "60px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', sans-serif"}}], "text": "This is Roboto"}, {"inlineStyles": [{"startIndex": 0, "endIndex": 0, "css": {"fontSize": "47px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Roboto-Regular', 'Roboto', sans-serif"}}], "text": ""}, {"inlineStyles": [{"startIndex": 0, "endIndex": 14, "css": {"fontSize": "60px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Roboto-Regular', 'Roboto', sans-serif"}}], "text": "This is Roboto"}, {"inlineStyles": [{"startIndex": 0, "endIndex": 27, "css": {"fontSize": "60px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'VesperLibre-Regular', 'Vesper Libre', serif"}}], "text": "With a little bit of Vesper"}, {"inlineStyles": [{"startIndex": 0, "endIndex": 0, "css": {"fontSize": "10px", "WebkitTextFillColor": "rgb(255, 0, 0)", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Lato-Regular', 'Lato', serif"}}], "text": ""}, {"inlineStyles": [{"startIndex": 0, "endIndex": 16, "css": {"fontSize": "12px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Alcubierre', serif"}}], "text": "And some Raleway"}]}
 
+describe.only "TextLayer.template", ->
+	it "should work", ->
+		text = new TextLayer({text: "xxx {hello} xxx"})
+		text.template({hello: "xxx"})
+		text.text.should.eql "xxx xxx xxx"
+		text._styledText.validate().should.equal true
+
+		text.template({hello: "again"})
+		text.text.should.eql "xxx again xxx"
+
+		text.replace("again", "HELLO THIS IS ME AND MORE")
+		text.text = ""
+		text.text.should.eql ""
+
+		text.template({hello: "still works"})
+		text.text.should.eql "xxx still works xxx"
+		text._styledText.validate().should.equal true
+
+	it "should expand many blocks", ->
+		text = new TextLayer({text:"{a},{b},{c},{d}"})
+		text.template({a: "AAAAA"})
+		text.text.should.eql "AAAAA,{b},{c},{d}"
+		text.template({a: "AAAAA", b: "BEE"})
+		text.text.should.eql "AAAAA,BEE,{c},{d}"
+		text.template({a: "AAAAA", b: "BEE", c: "CEEEE"})
+		text.text.should.eql "AAAAA,BEE,CEEEE,{d}"
+		text.template({a: "AAAAA", b: "BEE", c: "CEEEE", d: "DEE"})
+		text.text.should.eql "AAAAA,BEE,CEEEE,DEE"
+
+	it "should support multiple blocks and inline styles", ->
+		text = new TextLayer({text:"{a}\n{b},{c}\n{d}"})
+		text.template({a: "AAAAAAA", b: "BEE", c: "CEEEE", d: "DEE"})
+		text.text.should.eql "AAAAAAA\nBEE,CEEEE\nDEE"
 
 describe "TextLayer", ->
 	describe "defaults", ->

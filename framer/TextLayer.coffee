@@ -290,3 +290,9 @@ class exports.TextLayer extends Layer
 		if @text isnt oldText
 			@renderText()
 			@emit("change:text", @text)
+
+	# data = {name: "replacement text", ...}
+	template: (data) ->
+		@_styledText.template(data)
+		@renderText()
+		@emit("change:text", @text)
