@@ -292,6 +292,9 @@ class exports.TextLayer extends Layer
 
 	# data = {name: "replacement text", ...}
 	template: (data) ->
-		@_styledText.template(data)
+		if not _.isObject(data)
+			list = _.concat([], arguments)
+			data = null
+		@_styledText.template(data, list)
 		@renderText()
 		@emit("change:text", @text)

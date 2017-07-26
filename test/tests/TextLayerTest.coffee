@@ -21,6 +21,8 @@ describe.only "TextLayer.template", ->
 		text.template({hello: ""})
 		text.text.should.eql "xxx  xxx"
 
+		text.template({hello: 42})
+		text.text.should.eql "xxx 42 xxx"
 
 		text.replace("again", "HELLO THIS IS ME AND MORE")
 		text.text = ""
@@ -31,7 +33,7 @@ describe.only "TextLayer.template", ->
 		text._styledText.validate().should.equal true
 
 	it "should expand many blocks", ->
-		text = new TextLayer({text:"{a},{b},{c},{d}"})
+		text = new TextLayer({text: "{a},{b},{c},{d}"})
 		text.template({a: "AAAAA"})
 		text.text.should.eql "AAAAA,{b},{c},{d}"
 		text.template({a: "AAAAA", b: "BEE"})
@@ -40,18 +42,52 @@ describe.only "TextLayer.template", ->
 		text.text.should.eql "AAAAA,BEE,CEEEE,{d}"
 		text.template({a: "AAAAA", b: "BEE", c: "CEEEE", d: "DEE"})
 		text.text.should.eql "AAAAA,BEE,CEEEE,DEE"
+		text._styledText.validate().should.equal true
 
 	it "should support multiple blocks and inline styles", ->
-		text = new TextLayer({text:"{a}\n{b},{c}\n{d}"})
+		text = new TextLayer({text: "{a}\n{b},{c}\n{d}"})
 		text.template({a: "AAAAAAA", b: "BEE", c: "CEEEE", d: "DEE"})
 		text.text.should.eql "AAAAAAA\nBEE,CEEEE\nDEE"
+		text._styledText.validate().should.equal true
+
 
 	it "should support inserting multilines", ->
-		text = new TextLayer({text:"{a}\n{b},{c}\n{d}"})
+		text = new TextLayer({text: "{a}\n{b},{c}\n{d}"})
 		text._styledText.blocks.length.should.eql 3
-		text.template({a: "ALONG", b:"BELOW\nMORE STUFF\nOEPS", c: "CIRCLE", d:"DEAF"})
+		text.template({a: "ALONG", b: "BELOW\nMORE STUFF\nOEPS", c: "CIRCLE", d: "DEAF"})
 		text.text.should.eql "ALONG\nBELOW\nMORE STUFF\nOEPS,CIRCLE\nDEAF"
+		text._styledText.validate().should.equal true
 		# text._styledText.blocks.length.should.eql 5
+
+	it "should take a numbers, booleans", ->
+		text = new TextLayer({text: "{a}"})
+		text.template({a: 42})
+		text.text.should.eql "42"
+
+		text.template({a: false})
+		text.text.should.eql "false"
+
+	it "should not take null or nothing", ->
+		text = new TextLayer({text: "{a}"})
+		text.template({a: null})
+		text.text.should.eql "{a}"
+
+		text.template({b: "HELLO"})
+		text.text.should.eql "{a}"
+
+	it "should support no names sugar", ->
+		text = new TextLayer({text: "{a}\n{b},{c}\n{d}"})
+		text.template("A", "B", "C", 42)
+		text.text.should.eql "A\nB,C\n42"
+
+		text.template("A", "B", "C", 42, "and", "too", "many")
+		text.text.should.eql "A\nB,C\n42"
+
+		text.template(true, 42)
+		text.text.should.eql "true\n42,{c}\n{d}"
+
+		text.template()
+		text.text.should.eql "{a}\n{b},{c}\n{d}"
 
 describe "TextLayer", ->
 	describe "defaults", ->

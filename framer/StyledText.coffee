@@ -396,7 +396,7 @@ class exports.StyledText
 	replace: (search, replace) ->
 		@blocks.map( (b) -> b.replaceText(search, replace))
 
-	template: (data) ->
+	template: (data, list) ->
 		# we store the initial template data, so template() can be called more than once
 		if not @_templateRanges
 			# find all "{name}"" text ranges, building a name->{blocks.index,inlines.index,start,length,start} index
@@ -416,6 +416,21 @@ class exports.StyledText
 		else
 			# restore the original template
 			@blocks = @_templateBlocks.map((b) -> b.copy())
+
+		# replace a list of arguments in order
+		if list
+			if list.length > @_templateRanges.length
+				list = list.slice(0, @_templateRanges.length)
+			list.reverse() # template ranges is in reverse order
+			first = @_templateRanges.length - list.length
+			for range, index in @_templateRanges
+				continue if index < first
+				text = list[index - first]
+				continue unless text?
+				block = @blocks[range.block]
+				block.replaceRange(range.inline, range.start, range.length, text)
+			return
+		return unless data
 
 		# replace all ranges that are in data; @_templateRanges is reverse sorted, so ranges stay valid throughout
 		for range in @_templateRanges
