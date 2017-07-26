@@ -11,42 +11,43 @@ differentFonts = {"blocks": [{"inlineStyles": [{"startIndex": 0, "endIndex": 14,
 describe "TextLayer.template", ->
 	it "should work", ->
 		text = new TextLayer({text: "xxx {hello} xxx"})
-		text.template({hello: "xxx"})
+		text.template = {hello: "xxx"}
 		text.text.should.eql "xxx xxx xxx"
 		text._styledText.validate().should.equal true
+		text.template.hello.should.eql "xxx"
 
-		text.template({hello: "again"})
+		text.template = {hello: "again"}
 		text.text.should.eql "xxx again xxx"
+		text.textReplace("again", "HELLO THIS IS ME AND MORE")
 
-		text.template({hello: ""})
+		text.template = {hello: ""}
 		text.text.should.eql "xxx  xxx"
 
-		text.template({hello: 42})
+		text.template = {hello: 42}
 		text.text.should.eql "xxx 42 xxx"
 
-		text.textReplace("again", "HELLO THIS IS ME AND MORE")
 		text.text = ""
 		text.text.should.eql ""
 
-		text.template({hello: "still works"})
+		text.template = {hello: "still works"}
 		text.text.should.eql "xxx still works xxx"
 		text._styledText.validate().should.equal true
 
 	it "should expand many blocks", ->
 		text = new TextLayer({text: "{a},{b},{c},{d}"})
-		text.template({a: "AAAAA"})
+		text.template = {a: "AAAAA"}
 		text.text.should.eql "AAAAA,{b},{c},{d}"
-		text.template({a: "AAAAA", b: "BEE"})
+		text.template = {a: "AAAAA", b: "BEE"}
 		text.text.should.eql "AAAAA,BEE,{c},{d}"
-		text.template({a: "AAAAA", b: "BEE", c: "CEEEE"})
+		text.template = {a: "AAAAA", b: "BEE", c: "CEEEE"}
 		text.text.should.eql "AAAAA,BEE,CEEEE,{d}"
-		text.template({a: "AAAAA", b: "BEE", c: "CEEEE", d: "DEE"})
+		text.template = {a: "AAAAA", b: "BEE", c: "CEEEE", d: "DEE"}
 		text.text.should.eql "AAAAA,BEE,CEEEE,DEE"
 		text._styledText.validate().should.equal true
 
 	it "should support multiple blocks and inline styles", ->
 		text = new TextLayer({text: "{a}\n{b},{c}\n{d}"})
-		text.template({a: "AAAAAAA", b: "BEE", c: "CEEEE", d: "DEE"})
+		text.template = {a: "AAAAAAA", b: "BEE", c: "CEEEE", d: "DEE"}
 		text.text.should.eql "AAAAAAA\nBEE,CEEEE\nDEE"
 		text._styledText.validate().should.equal true
 
@@ -54,64 +55,73 @@ describe "TextLayer.template", ->
 	it "should support inserting multilines", ->
 		text = new TextLayer({text: "{a}\n{b},{c}\n{d}"})
 		text._styledText.blocks.length.should.eql 3
-		text.template({a: "ALONG", b: "BELOW\nMORE STUFF\nOEPS", c: "CIRCLE", d: "DEAF"})
+		text.template = {a: "ALONG", b: "BELOW\nMORE STUFF\nOEPS", c: "CIRCLE", d: "DEAF"}
 		text.text.should.eql "ALONG\nBELOW\nMORE STUFF\nOEPS,CIRCLE\nDEAF"
 		text._styledText.validate().should.equal true
 		# text._styledText.blocks.length.should.eql 5
 
 	it "should take a numbers, booleans", ->
 		text = new TextLayer({text: "{a}"})
-		text.template({a: 42})
+		text.template = {a: 42}
 		text.text.should.eql "42"
 
-		text.template({a: false})
+		text.template = {a: false}
 		text.text.should.eql "false"
 
 	it "should not take null or nothing", ->
 		text = new TextLayer({text: "{a}"})
-		text.template({a: null})
+		text.template = {a: null}
 		text.text.should.eql "{a}"
 
-		text.template({b: "HELLO"})
+		text.template = {b: "HELLO"}
 		text.text.should.eql "{a}"
 
 	it "should support no names sugar", ->
 		text = new TextLayer({text: "{a}\n{b},{c}\n{d}"})
-		text.template("A", "B", "C", 42)
+		text.template = "A"
+		text.text.should.eql "A\n{b},{c}\n{d}"
+		text.template = null
+		text.text.should.eql "{a}\n{b},{c}\n{d}"
+
+	it "should support multiple lists using _styledText", ->
+		text = new TextLayer({text: "{a}\n{b},{c}\n{d}"})
+		text._styledText.template(null, ["A", "B", "C", 42])
 		text.text.should.eql "A\nB,C\n42"
 
-		text.template("A", "B", "C", 42, "and", "too", "many")
+		text._styledText.template(null, ["A", "B", "C", 42, "and", "too", "many"])
 		text.text.should.eql "A\nB,C\n42"
 
-		text.template(true, 42)
+		text._styledText.template(null, [true, 42])
 		text.text.should.eql "true\n42,{c}\n{d}"
 
-		text.template()
+		text._styledText.template(null, [])
 		text.text.should.eql "{a}\n{b},{c}\n{d}"
 
 	it "should support formatters", ->
 		text = new TextLayer({text: "{report}"})
-		text.templateFormatter
+		text.templateFormatter =
 			report: (v) -> v.toFixed(1)
-		text.template({report: 88.8121})
+		text.template =
+			report: 88.8121
 		text.text.should.eql "88.8"
 
 	it "should support sugared formatters", ->
 		text = new TextLayer({text: "{report}"})
-		text.templateFormatter (v) -> v.toFixed(1)
-		text.template 88.8122
+		text.templateFormatter = (v) -> v.toFixed(1)
+		text.template = 88.8122
 		text.text.should.eql "88.8"
 
 	it "should support multiplate formatters", ->
 		text = new TextLayer({text: "{title}\n{date} - {user}"})
-		text.templateFormatter
+		text.templateFormatter =
 			date: (v) -> v.toISOString().slice(0, -8)
 			user: (v) -> v.toLowerCase()
-		text.template
+		text.template =
 			title: "hello world"
 			date: new Date(1500000000000)
 			user: "Test User"
 		text.text.should.eql "hello world\n2017-07-14T02:40 - test user"
+		text.template.user.should.eql "Test User"
 
 describe "TextLayer", ->
 	describe "defaults", ->

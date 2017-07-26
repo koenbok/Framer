@@ -294,18 +294,24 @@ class exports.TextLayer extends Layer
 			@renderText()
 			@emit("change:text", @text)
 
-	# data = {name: "replacement text", ...}
-	template: (data) ->
-		if not _.isObject(data)
-			list = _.concat([], arguments)
-			data = null
-		@_styledText.template(data, list)
-		@renderText()
-		@emit("change:text", @text)
+	@define "template",
+		get: -> @_templateData
+		set: (data) ->
+			@_templateData = data
+			if not _.isObject(data)
+				first = [data]
+				data = null
+			oldText = @text
+			@_styledText.template(data, first)
+			if @text isnt oldText
+				@renderText()
+				@emit("change:text", @text)
 
-	# data = {name: ()->(), ...}
-	templateFormatter: (data) ->
-		if _.isFunction(data) or not _.isObject(data)
-			list = _.concat([], arguments)
-			data = null
-		@_styledText.templateFormatter(data, list)
+	@define "templateFormatter",
+		get: -> @_templateFormatter
+		set: (data) ->
+			@_templateFormatter = data
+			if _.isFunction(data) or not _.isObject(data)
+				first = [data]
+				data = null
+			@_styledText.templateFormatter(data, first)
