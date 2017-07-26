@@ -73,7 +73,10 @@ class exports.TextLayer extends Layer
 				padding: 0
 			if not options.font? and not options.fontFamily?
 				options.fontFamily = @defaultFont()
-			@_styledText.addBlock options.text, fontSize: "#{options.fontSize}px"
+
+			text = options.text
+			text = String(text) if not _.isString(text)
+			@_styledText.addBlock text, fontSize: "#{options.fontSize}px"
 
 		super options
 		@__constructor = true
@@ -239,6 +242,7 @@ class exports.TextLayer extends Layer
 	@define "text",
 		get: -> @_styledText.getText()
 		set: (value) ->
+			value = String(value) if not _.isString(value)
 			@_styledText.setText(value)
 			@renderText()
 			@emit("change:text", value)
