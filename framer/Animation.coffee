@@ -289,6 +289,8 @@ class exports.Animation extends BaseClass
 				@_valueUpdaters[k] = @_updateNumericObjectValue.bind(this, ["top", "left", "bottom", "right"])
 			else if k is "borderRadius"
 				@_valueUpdaters[k] = @_updateNumericObjectValue.bind(this, ["topLeft", "topRight", "bottomRight", "bottomLeft"])
+			else if k is "template"
+				@_valueUpdaters[k] = @_updateTemplateValue
 			else
 				@_valueUpdaters[k] = @_updateNumberValue
 
@@ -338,6 +340,24 @@ class exports.Animation extends BaseClass
 			@options.colorModel
 		)
 
+	# shallow mix all end state `{key: value}`s if `value` is a number, otherwise just takes `value`
+	_updateTemplateValue: (key, value) =>
+		fromData = @_stateA[key]
+		toData = @_stateB[key]
+		targetData = {}
+
+		if not _.isObject(toData)
+			if _.isNumber(toData)
+				toData = Utils.mapRange(value, 0, 1, parseFloat(fromData) or 0, toData)
+			@_target.template = toData
+			return
+
+		for k, valueB of toData
+			if _.isNumber(valueB)
+				valueB = Utils.mapRange(value, 0, 1, parseFloat(fromData[k]) or 0, valueB)
+			targetData[k] = valueB
+		@_target[key] = targetData
+
 	_currentState: ->
 		return _.pick(@layer, _.keys(@properties))
 
@@ -346,7 +366,7 @@ class exports.Animation extends BaseClass
 
 	# Special cases that animate with different types of objects
 	@isAnimatableKey = (k) ->
-		k in ["gradient", "borderWidth", "borderRadius"]
+		k in ["gradient", "borderWidth", "borderRadius", "template"]
 
 	@filterAnimatableProperties = (properties) ->
 		# Function to filter only animatable properties out of a given set
