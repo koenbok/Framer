@@ -420,7 +420,7 @@ class exports.StyledText
 		# replace all ranges that are in data; @_templateRanges is reverse sorted, so ranges stay valid throughout
 		for range in @_templateRanges
 			text = data[range.name]
-			continue unless text
+			continue unless text?
 			block = @blocks[range.block]
 			block.replaceRange(range.inline, range.start, range.length, text)
 

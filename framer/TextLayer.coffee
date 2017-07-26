@@ -255,7 +255,6 @@ class exports.TextLayer extends Layer
 			layer.text = layer.transform(layer.value) + ''
 	)
 
-
 	renderText: =>
 		return if @__constructor
 		@_styledText.render()

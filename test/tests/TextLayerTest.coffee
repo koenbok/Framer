@@ -18,6 +18,10 @@ describe.only "TextLayer.template", ->
 		text.template({hello: "again"})
 		text.text.should.eql "xxx again xxx"
 
+		text.template({hello: ""})
+		text.text.should.eql "xxx  xxx"
+
+
 		text.replace("again", "HELLO THIS IS ME AND MORE")
 		text.text = ""
 		text.text.should.eql ""
@@ -41,6 +45,13 @@ describe.only "TextLayer.template", ->
 		text = new TextLayer({text:"{a}\n{b},{c}\n{d}"})
 		text.template({a: "AAAAAAA", b: "BEE", c: "CEEEE", d: "DEE"})
 		text.text.should.eql "AAAAAAA\nBEE,CEEEE\nDEE"
+
+	it "should support inserting multilines", ->
+		text = new TextLayer({text:"{a}\n{b},{c}\n{d}"})
+		text._styledText.blocks.length.should.eql 3
+		text.template({a: "ALONG", b:"BELOW\nMORE STUFF\nOEPS", c: "CIRCLE", d:"DEAF"})
+		text.text.should.eql "ALONG\nBELOW\nMORE STUFF\nOEPS,CIRCLE\nDEAF"
+		# text._styledText.blocks.length.should.eql 5
 
 describe "TextLayer", ->
 	describe "defaults", ->
