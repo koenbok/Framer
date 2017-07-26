@@ -33,16 +33,16 @@ describe "TextLayer.template", ->
 		text.text.should.eql "xxx still works xxx"
 		text._styledText.validate().should.equal true
 
-	it "should expand many blocks", ->
+	it "should expand many blocks, and remember old template values", ->
 		text = new TextLayer({text: "{a},{b},{c},{d}"})
 		text.template = {a: "AAAAA"}
 		text.text.should.eql "AAAAA,{b},{c},{d}"
-		text.template = {a: "AAAAA", b: "BEE"}
+		text.template = {b: "BEE"}
 		text.text.should.eql "AAAAA,BEE,{c},{d}"
-		text.template = {a: "AAAAA", b: "BEE", c: "CEEEE"}
+		text.template = {c: "CEEEE"}
 		text.text.should.eql "AAAAA,BEE,CEEEE,{d}"
-		text.template = {a: "AAAAA", b: "BEE", c: "CEEEE", d: "DEE"}
-		text.text.should.eql "AAAAA,BEE,CEEEE,DEE"
+		text.template = {a: "XXXX", d: "DEE"}
+		text.text.should.eql "XXXX,BEE,CEEEE,DEE"
 		text._styledText.validate().should.equal true
 
 	it "should support multiple blocks and inline styles", ->
@@ -58,6 +58,7 @@ describe "TextLayer.template", ->
 		text.template = {a: "ALONG", b: "BELOW\nMORE STUFF\nOEPS", c: "CIRCLE", d: "DEAF"}
 		text.text.should.eql "ALONG\nBELOW\nMORE STUFF\nOEPS,CIRCLE\nDEAF"
 		text._styledText.validate().should.equal true
+		# we don't actually build new blocks, or spans, not needed
 		# text._styledText.blocks.length.should.eql 5
 
 	it "should take a numbers, booleans", ->
@@ -76,25 +77,11 @@ describe "TextLayer.template", ->
 		text.template = {b: "HELLO"}
 		text.text.should.eql "{a}"
 
-	it "should support no names sugar", ->
+	it "should be able to set the first template without a name", ->
 		text = new TextLayer({text: "{a}\n{b},{c}\n{d}"})
 		text.template = "A"
 		text.text.should.eql "A\n{b},{c}\n{d}"
 		text.template = null
-		text.text.should.eql "{a}\n{b},{c}\n{d}"
-
-	it "should support multiple lists using _styledText", ->
-		text = new TextLayer({text: "{a}\n{b},{c}\n{d}"})
-		text._styledText.template(null, ["A", "B", "C", 42])
-		text.text.should.eql "A\nB,C\n42"
-
-		text._styledText.template(null, ["A", "B", "C", 42, "and", "too", "many"])
-		text.text.should.eql "A\nB,C\n42"
-
-		text._styledText.template(null, [true, 42])
-		text.text.should.eql "true\n42,{c}\n{d}"
-
-		text._styledText.template(null, [])
 		text.text.should.eql "{a}\n{b},{c}\n{d}"
 
 	it "should support formatters", ->
@@ -105,7 +92,7 @@ describe "TextLayer.template", ->
 			report: 88.8121
 		text.text.should.eql "88.8"
 
-	it "should support sugared formatters", ->
+	it "should support just setting the first formatter", ->
 		text = new TextLayer({text: "{report}"})
 		text.templateFormatter = (v) -> v.toFixed(1)
 		text.template = 88.8122

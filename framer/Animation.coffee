@@ -347,16 +347,24 @@ class exports.Animation extends BaseClass
 		targetData = {}
 
 		if not _.isObject(toData)
-			if _.isNumber(toData)
-				toData = Utils.mapRange(value, 0, 1, parseFloat(fromData) or 0, toData)
-			@_target.template = toData
+			k = @_target._styledText?.buildTemplate()
+			return if not k
+			valueB = toData
+			if _.isNumber(valueB)
+				valueA = if _.isObject(fromData) then fromData[k] else fromData
+				valueA = 0 unless _.isNumber(valueA)
+				valueB = Utils.mapRange(value, 0, 1, valueA, valueB)
+			targetData[k] = valueB
+			@_target.template = targetData
 			return
 
 		for k, valueB of toData
 			if _.isNumber(valueB)
-				valueB = Utils.mapRange(value, 0, 1, parseFloat(fromData[k]) or 0, valueB)
+				valueA = if _.isObject(fromData) then fromData[k] else fromData
+				valueA = 0 unless _.isNumber(valueA)
+				valueB = Utils.mapRange(value, 0, 1, valueA, valueB)
 			targetData[k] = valueB
-		@_target[key] = targetData
+		@_target.template = targetData
 
 	_currentState: ->
 		return _.pick(@layer, _.keys(@properties))

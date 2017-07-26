@@ -294,15 +294,21 @@ class exports.TextLayer extends Layer
 			@renderText()
 			@emit("change:text", @text)
 
+	# we remember the template data, and merge it with new data
 	@define "template",
 		get: -> @_templateData
 		set: (data) ->
-			@_templateData = data
+			if not @_templateData then @_templateData = {}
+
+			firstName = @_styledText.buildTemplate()
 			if not _.isObject(data)
-				first = [data]
-				data = null
+				return unless firstName
+				@_templateData[firstName] = data
+			else
+				_.assign(@_templateData, data)
+
 			oldText = @text
-			@_styledText.template(data, first)
+			@_styledText.template(@_templateData)
 			if @text isnt oldText
 				@renderText()
 				@emit("change:text", @text)
@@ -310,8 +316,8 @@ class exports.TextLayer extends Layer
 	@define "templateFormatter",
 		get: -> @_templateFormatter
 		set: (data) ->
-			@_templateFormatter = data
+			firstName = @_styledText.buildTemplate()
 			if _.isFunction(data) or not _.isObject(data)
-				first = [data]
-				data = null
-			@_styledText.templateFormatter(data, first)
+				return unless firstName
+				tmp = {}; tmp[firstName] = data; data = tmp
+			@_styledText.templateFormatter(data)

@@ -396,7 +396,10 @@ class exports.StyledText
 	textReplace: (search, replace) ->
 		@blocks.map( (b) -> b.replaceText(search, replace))
 
-	_buildTemplate: ->
+	# must be called first, calling it repeatedly does nothing, returns the first name from the templates
+	buildTemplate: ->
+		return @_firstTemplateName if @_templateRanges
+
 		# find all "{name}"" text ranges, building a name->{blocks.index,inlines.index,start,length,start} index
 		regex = /\{\s*(\w+)\s*\}/g
 		templateRanges = {}
@@ -410,32 +413,16 @@ class exports.StyledText
 			return i unless i is 0
 			r.start - l.start
 		)
+		firstRange = @_templateRanges[@_templateRanges.length - 1]
+		@_firstTemplateName = if firstRange then firstRange.name else null
 
 		# we store the initial template data, so template() can be called more than once
 		@_templateBlocks = @blocks.map((b) -> b.copy())
+		return @_firstTemplateName
 
-	template: (data, list) ->
-		@_buildTemplate() if not @_templateRanges
-
+	template: (data) ->
 		# restore the original template
 		@blocks = @_templateBlocks.map((b) -> b.copy())
-
-		# replace a list of arguments in order
-		if list
-			if list.length > @_templateRanges.length
-				list = list.slice(0, @_templateRanges.length)
-			 # template ranges is in reverse order
-			list.reverse()
-			first = @_templateRanges.length - list.length
-			for range, index in @_templateRanges
-				continue if index < first
-				text = list[index - first]
-				continue unless text?
-				text = range.formatter.call(@, text) if _.isFunction(range.formatter)
-				block = @blocks[range.block]
-				block.replaceRange(range.inline, range.start, range.length, text)
-			return
-		return unless data
 
 		# replace all ranges that are in data; @_templateRanges is reverse sorted, so ranges stay valid throughout
 		for range in @_templateRanges
@@ -445,25 +432,7 @@ class exports.StyledText
 			block = @blocks[range.block]
 			block.replaceRange(range.inline, range.start, range.length, text)
 
-	templateFormatter: (data, list) ->
-		@_buildTemplate() if not @_templateRanges
-
-		if list
-			if list.length > @_templateRanges.length
-				list = list.slice(0, @_templateRanges.length)
-			# template ranges is in reverse order
-			list.reverse()
-			first = @_templateRanges.length - list.length
-			for range, index in @_templateRanges
-				range.formatter = null # reset formatters if given this way
-				continue if index < first
-				formatter = list[index - first]
-				continue unless formatter?
-				continue unless _.isFunction(formatter)
-				range.formatter = formatter
-			return
-		return unless data
-
+	templateFormatter: (data) ->
 		for range in @_templateRanges
 			formatter = data[range.name]
 			continue unless formatter?
