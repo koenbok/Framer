@@ -24,7 +24,7 @@ describe.only "TextLayer.template", ->
 		text.template({hello: 42})
 		text.text.should.eql "xxx 42 xxx"
 
-		text.replace("again", "HELLO THIS IS ME AND MORE")
+		text.textReplace("again", "HELLO THIS IS ME AND MORE")
 		text.text = ""
 		text.text.should.eql ""
 
@@ -601,7 +601,7 @@ describe "TextLayer", ->
 		it "should replace the full text", ->
 			searchText = "Search text"
 			subject.text = searchText
-			subject.replace(searchText, "Replacement")
+			subject.textReplace(searchText, "Replacement")
 			subject.text.should.equal "Replacement"
 			subject._styledText.validate().should.equal true
 
@@ -609,7 +609,7 @@ describe "TextLayer", ->
 			searchText = "Search text"
 			replaceText = "Replacement"
 			subject.text = searchText
-			subject.replace(searchText, replaceText)
+			subject.textReplace(searchText, replaceText)
 			style = subject._styledText.blocks[0].inlineStyles[0]
 			style.startIndex.should.equal 0
 			style.endIndex.should.equal replaceText.length
@@ -617,52 +617,52 @@ describe "TextLayer", ->
 			subject._styledText.validate().should.equal true
 
 		it "should replace partial text", ->
-			subject.replace("ea", "oooo")
+			subject.textReplace("ea", "oooo")
 			subject.text.should.equal "Hooooder\nSubtitle\nLooooder Body text"
-			subject.replace("o", "%")
+			subject.textReplace("o", "%")
 			subject.text.should.equal "H%%%%der\nSubtitle\nL%%%%der B%dy text"
 			subject._styledText.validate().should.equal true
 
 		it "should handle replacing with the same text correctly", ->
-			subject.replace("e", "e")
+			subject.textReplace("e", "e")
 			subject.text.should.equal "Header\nSubtitle\nLeader Body text"
-			subject.replace("e", "ee")
+			subject.textReplace("e", "ee")
 			subject.text.should.equal "Heeadeer\nSubtitlee\nLeeadeer Body teext"
 			subject._styledText.validate().should.equal true
 
 		it "should keep the styling in place when replacing text", ->
 			searchText = "Search text"
 			subject.text = searchText
-			subject.replace(searchText, "Replacement")
+			subject.textReplace(searchText, "Replacement")
 			subject._styledText.blocks[0].inlineStyles[0].css.should.eql exampleStyledTextOptions.blocks[0].inlineStyles[0].css
 			subject._styledText.validate().should.equal true
 
 		it "should apply the style to the replaced partial text", ->
-			subject.replace("e", "xxx")
+			subject.textReplace("e", "xxx")
 			for block, blockIndex in subject._styledText.blocks
 				for style, styleIndex in block.inlineStyles
 					style.css.should.eql exampleStyledTextOptions.blocks[blockIndex].inlineStyles[styleIndex].css
 			subject._styledText.validate().should.equal true
 
 		it "should work with regexes", ->
-			subject.replace(/d[ey]+/, "die")
+			subject.textReplace(/d[ey]+/, "die")
 			subject.text.should.equal "Headier\nSubtitle\nLeadier Bodie text"
 			subject._styledText.validate().should.equal true
 
 		it "should rerender the text when replacing it", ->
 			htmlBefore = subject.html
-			subject.replace("a", "b")
+			subject.textReplace("a", "b")
 			subject.html.should.not.equal htmlBefore
 
 		it "should emit change:text event only when the text has changed", (done) ->
 			subject.on "change:text", ->
 				done()
-			subject.replace("a", "b")
+			subject.textReplace("a", "b")
 
 		it "should not emit a change:text event when the text doesn't change", (done) ->
 			subject.on "change:text", ->
 				throw new Error("change:text event should not be emitted")
-			subject.replace("e", "e")
+			subject.textReplace("e", "e")
 			done()
 
 	describe "value transformer", ->

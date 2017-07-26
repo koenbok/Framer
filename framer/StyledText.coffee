@@ -393,14 +393,14 @@ class exports.StyledText
 			result.height = Math.ceil(measuredHeight)
 		return result
 
-	replace: (search, replace) ->
+	textReplace: (search, replace) ->
 		@blocks.map( (b) -> b.replaceText(search, replace))
 
 	template: (data, list) ->
 		# we store the initial template data, so template() can be called more than once
 		if not @_templateRanges
 			# find all "{name}"" text ranges, building a name->{blocks.index,inlines.index,start,length,start} index
-			regex = new RegExp("\\{\\s*(\\w+)\\s*\\}", "g")
+			regex = /\{\s*(\w+)\s*\}/g
 			templateRanges = {}
 			@blocks.forEach((b, index) -> b.addRangesFrom(regex, index, templateRanges))
 

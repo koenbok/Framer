@@ -283,9 +283,9 @@ class exports.TextLayer extends Layer
 	defaultFont: ->
 		return Utils.deviceFont(Framer.Device.platform())
 
-	replace: (search, replace) ->
+	textReplace: (search, replace) ->
 		oldText = @text
-		@_styledText.replace(search, replace)
+		@_styledText.textReplace(search, replace)
 		if @text isnt oldText
 			@renderText()
 			@emit("change:text", @text)
