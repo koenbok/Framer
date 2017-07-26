@@ -271,7 +271,7 @@ describe "Utils", ->
 			# it "should return the right size with height constraint", ->
 			# 	Utils.textSize(text, style, {height: 100}).should.eql(width: 168, height: 100)
 
-	describe "loadWebFontConfig", ->
+	describe.skip "loadWebFontConfig", ->
 		describe "Real font loading tests", ->
 			before ->
 				# We skip the this test on CI, because I can't get the WebFont loading to work... :'(
@@ -372,7 +372,7 @@ describe "Utils", ->
 				done()
 			return
 
-	describe "isFontFamilyLoaded", ->
+	describe.skip "isFontFamilyLoaded", ->
 		it "should not reset the result if it is loaded successfully", (done) ->
 			if mocha.env.CI
 				@skip()
@@ -400,7 +400,7 @@ describe "Utils", ->
 				done()
 			return
 
-	describe "loadWebFont", ->
+	describe.skip "loadWebFont", ->
 		it "loads fonts at different weights" , ->
 			raleway = Utils.loadWebFont("Raleway")
 			raleway200 = Utils.loadWebFont("Raleway", 200)
