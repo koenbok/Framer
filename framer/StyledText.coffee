@@ -396,37 +396,42 @@ class exports.StyledText
 	textReplace: (search, replace) ->
 		@blocks.map( (b) -> b.replaceText(search, replace))
 
-	template: (data, list) ->
-		# we store the initial template data, so template() can be called more than once
-		if not @_templateRanges
-			# find all "{name}"" text ranges, building a name->{blocks.index,inlines.index,start,length,start} index
-			regex = /\{\s*(\w+)\s*\}/g
-			templateRanges = {}
-			@blocks.forEach((b, index) -> b.addRangesFrom(regex, index, templateRanges))
+	_buildTemplate: ->
+		# find all "{name}"" text ranges, building a name->{blocks.index,inlines.index,start,length,start} index
+		regex = /\{\s*(\w+)\s*\}/g
+		templateRanges = {}
+		@blocks.forEach((b, index) -> b.addRangesFrom(regex, index, templateRanges))
 
-			# turn that into a reverse sorted list of ranges
-			@_templateRanges = Object.keys(templateRanges).map((k) -> templateRanges[k]).sort((l, r) ->
-				b = r.block - l.block
-				return b unless b is 0
-				i = r.inline - l.inline
-				return i unless i is 0
-				r.start - l.start
-			)
-			@_templateBlocks = @blocks.map((b) -> b.copy())
-		else
-			# restore the original template
-			@blocks = @_templateBlocks.map((b) -> b.copy())
+		# turn that into a reverse sorted list of ranges
+		@_templateRanges = Object.keys(templateRanges).map((k) -> templateRanges[k]).sort((l, r) ->
+			b = r.block - l.block
+			return b unless b is 0
+			i = r.inline - l.inline
+			return i unless i is 0
+			r.start - l.start
+		)
+
+		# we store the initial template data, so template() can be called more than once
+		@_templateBlocks = @blocks.map((b) -> b.copy())
+
+	template: (data, list) ->
+		@_buildTemplate() if not @_templateRanges
+
+		# restore the original template
+		@blocks = @_templateBlocks.map((b) -> b.copy())
 
 		# replace a list of arguments in order
 		if list
 			if list.length > @_templateRanges.length
 				list = list.slice(0, @_templateRanges.length)
-			list.reverse() # template ranges is in reverse order
+			 # template ranges is in reverse order
+			list.reverse()
 			first = @_templateRanges.length - list.length
 			for range, index in @_templateRanges
 				continue if index < first
 				text = list[index - first]
 				continue unless text?
+				text = range.formatter.call(@, text) if _.isFunction(range.formatter)
 				block = @blocks[range.block]
 				block.replaceRange(range.inline, range.start, range.length, text)
 			return
@@ -436,8 +441,33 @@ class exports.StyledText
 		for range in @_templateRanges
 			text = data[range.name]
 			continue unless text?
+			text = range.formatter.call(@, text) if _.isFunction(range.formatter)
 			block = @blocks[range.block]
 			block.replaceRange(range.inline, range.start, range.length, text)
+
+	templateFormatter: (data, list) ->
+		@_buildTemplate() if not @_templateRanges
+
+		if list
+			if list.length > @_templateRanges.length
+				list = list.slice(0, @_templateRanges.length)
+			# template ranges is in reverse order
+			list.reverse()
+			first = @_templateRanges.length - list.length
+			for range, index in @_templateRanges
+				range.formatter = null # reset formatters if given this way
+				continue if index < first
+				formatter = list[index - first]
+				continue unless formatter?
+				continue unless _.isFunction(formatter)
+				range.formatter = formatter
+			return
+		return unless data
+
+		for range in @_templateRanges
+			formatter = data[range.name]
+			continue unless formatter?
+			range.formatter = formatter
 
 	validate: ->
 		for block in @blocks

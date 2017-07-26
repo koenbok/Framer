@@ -302,3 +302,10 @@ class exports.TextLayer extends Layer
 		@_styledText.template(data, list)
 		@renderText()
 		@emit("change:text", @text)
+
+	# data = {name: ()->(), ...}
+	templateFormatter: (data) ->
+		if _.isFunction(data) or not _.isObject(data)
+			list = _.concat([], arguments)
+			data = null
+		@_styledText.templateFormatter(data, list)

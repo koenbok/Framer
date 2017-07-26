@@ -89,6 +89,30 @@ describe "TextLayer.template", ->
 		text.template()
 		text.text.should.eql "{a}\n{b},{c}\n{d}"
 
+	it "should support formatters", ->
+		text = new TextLayer({text: "{report}"})
+		text.templateFormatter
+			report: (v) -> v.toFixed(1)
+		text.template({report: 88.8121})
+		text.text.should.eql "88.8"
+
+	it "should support sugared formatters", ->
+		text = new TextLayer({text: "{report}"})
+		text.templateFormatter (v) -> v.toFixed(1)
+		text.template 88.8122
+		text.text.should.eql "88.8"
+
+	it "should support multiplate formatters", ->
+		text = new TextLayer({text: "{title}\n{date} - {user}"})
+		text.templateFormatter
+			date: (v) -> v.toISOString().slice(0, -8)
+			user: (v) -> v.toLowerCase()
+		text.template
+			title: "hello world"
+			date: new Date(1500000000000)
+			user: "Test User"
+		text.text.should.eql "hello world\n2017-07-14T02:40 - test user"
+
 describe "TextLayer", ->
 	describe "defaults", ->
 		it "should set the correct defaults", ->
