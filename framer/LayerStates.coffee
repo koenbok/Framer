@@ -66,9 +66,6 @@ class LayerStates
 				stateProperties[k] = v
 				continue
 
-			if StyledText.isStyledText(v)
-				stateProperties[k] = v
-
 			if @_isValidProperty(k, v)
 				stateProperties[k] = v
 
@@ -83,6 +80,7 @@ class LayerStates
 		return true if Gradient.isGradient(v)
 		return true if v is null
 		return true if v?.constructor?.name is "Layer"
+		return true if k is "template"
 		return false
 
 	#################################################################

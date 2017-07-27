@@ -110,6 +110,20 @@ describe "TextLayer.template", ->
 		text.text.should.eql "hello world\n2017-07-14T02:40 - test user"
 		text.template.user.should.eql "Test User"
 
+	it "should be able to state switch templates", ->
+		l = new TextLayer({text: "{value}"})
+		l.template = value: 3
+		l.text.should.equal "3"
+		l.states.test = template: value: 10
+		l.stateSwitch "test"
+		l.text.should.equal "10"
+
+		l.stateSwitch "default"
+		l.text.should.equal "3"
+
+		l.stateSwitch "test"
+		l.text.should.equal "10"
+
 describe "TextLayer", ->
 	describe "defaults", ->
 		it "should set the correct defaults", ->

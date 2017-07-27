@@ -284,7 +284,7 @@ class exports.TextLayer extends Layer
 
 	# we remember the template data, and merge it with new data
 	@define "template",
-		get: -> @_templateData
+		get: -> _.clone(@_templateData)
 		set: (data) ->
 			if not @_templateData then @_templateData = {}
 
