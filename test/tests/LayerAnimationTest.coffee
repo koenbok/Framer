@@ -1013,3 +1013,42 @@ describe "LayerAnimation", ->
 				done()
 			layer.animate
 				borderWidth: 10
+
+	describe "template animations", (done) ->
+		textLayer = new TextLayer({text: "{distance}{unit}"})
+		textLayer.templateFormatter =
+			distance: (v) -> (v / 1000).toFixed(2)
+		textLayer.template =
+			unit: "KM"
+		textLayer.animate
+			template: 8000
+		textLayer.on Events.AnimationEnd, ->
+			textLayer.text.should.equal "8.00KM"
+			done()
+
+	describe "template animations", (done) ->
+		textLayer = new TextLayer({text: "{distance}{unit}"})
+		textLayer.templateFormatter =
+			distance: (v) -> (v / 1000).toFixed(2)
+		textLayer.template =
+			unit: "KM"
+		textLayer.template = 0
+		textLayer.animate
+			template: 8000
+		textLayer.on Events.AnimationEnd, ->
+			textLayer.text.should.equal "8.00KM"
+			done()
+
+	describe "template animations with multiple properties and formatters", (done) ->
+		textLayer = new TextLayer({text: "{distance}{unit}-{scale}"})
+		textLayer.templateFormatter =
+			distance: (v) -> (v / 1000).toFixed(2)
+		textLayer.template =
+			unit: "KM"
+		textLayer.animate
+			template:
+				distance: 8000
+				scale: "HEAVY"
+		textLayer.on Events.AnimationEnd, ->
+			textLayer.text.should.equal "8.00KM-HEAVY"
+			done()

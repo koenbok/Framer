@@ -10,7 +10,7 @@ getMeasureElement = (constraints={}) ->
 		_measureElement.style.visibility = "hidden"
 		_measureElement.style.top = "-10000px"
 		_measureElement.style.left = "-10000px"
-	
+
 		# This is a trick to call this function before the document ready event
 		if not window.document.body
 			document.write(_measureElement.outerHTML)
@@ -49,6 +49,12 @@ class InlineStyle
 			@endIndex = configuration.endIndex
 			@css = configuration.css
 			@text = text.substring(@startIndex, @endIndex)
+
+	copy: ->
+		c = new InlineStyle(@text, @css)
+		c.startIndex = @startIndex
+		c.endIndex = @endIndex
+		return c
 
 	getOptions: ->
 		startIndex: @startIndex
@@ -100,6 +106,21 @@ class InlineStyle
 			@text = @text.replace(regex, replace)
 			@endIndex = @startIndex + @text.length
 
+	addRangesFrom: (regex, block, inline, templateRanges) ->
+		text = @text
+		regex.lastIndex = 0
+		while true
+			m = regex.exec(text)
+			return unless m
+			name = m[1]
+			return unless name
+			continue if templateRanges[name]
+			templateRanges[name] = {block, inline, start: m.index, length: m[0].length, name}
+
+	replaceRange: (start, length, text) ->
+		@text = @text.slice(0, start) + text + @text.slice(start + length)
+		@endIndex = @startIndex + @text.length
+
 	validate: ->
 		return @startIndex isnt @endIndex and @endIndex is (@startIndex + @text.length)
 
@@ -118,6 +139,11 @@ class StyledTextBlock
 			@inlineStyles = [inlineStyle]
 		else
 			throw new Error("Should specify inlineStyles or css")
+
+	copy: ->
+		c = new StyledTextBlock({text: @text, inlineStyles: []})
+		c.inlineStyles = @inlineStyles.map((inline) -> inline.copy())
+		return c
 
 	getOptions: ->
 		text: @text
@@ -203,6 +229,19 @@ class StyledTextBlock
 		newText = @inlineStyles.map((i) -> i.text).join('')
 		@text = newText
 		return newText isnt @text
+
+	addRangesFrom: (regex, block, templateRanges) ->
+		@inlineStyles.forEach((inline, index) -> inline.addRangesFrom(regex, block, index, templateRanges))
+
+	replaceRange: (inline, start, length, text) ->
+		currentIndex = 0
+		for style, index in @inlineStyles
+			style.startIndex = currentIndex
+			style.replaceRange(start, length, text) if index is inline
+			currentIndex += style.text.length
+			style.endIndex = currentIndex
+		newText = @inlineStyles.map((i) -> i.text).join('')
+		@text = newText
 
 	validate: ->
 		combinedText = ''
@@ -354,8 +393,50 @@ class exports.StyledText
 			result.height = Math.ceil(measuredHeight)
 		return result
 
-	replace: (search, replace) ->
+	textReplace: (search, replace) ->
 		@blocks.map( (b) -> b.replaceText(search, replace))
+
+	# must be called first, calling it repeatedly does nothing, returns the first name from the templates
+	buildTemplate: ->
+		return @_firstTemplateName if @_templateRanges
+
+		# find all "{name}"" text ranges, building a name->{blocks.index,inlines.index,start,length,start} index
+		regex = /\{\s*(\w+)\s*\}/g
+		templateRanges = {}
+		@blocks.forEach((b, index) -> b.addRangesFrom(regex, index, templateRanges))
+
+		# turn that into a reverse sorted list of ranges
+		@_templateRanges = Object.keys(templateRanges).map((k) -> templateRanges[k]).sort((l, r) ->
+			b = r.block - l.block
+			return b unless b is 0
+			i = r.inline - l.inline
+			return i unless i is 0
+			r.start - l.start
+		)
+		firstRange = @_templateRanges[@_templateRanges.length - 1]
+		@_firstTemplateName = if firstRange then firstRange.name else null
+
+		# we store the initial template data, so template() can be called more than once
+		@_templateBlocks = @blocks.map((b) -> b.copy())
+		return @_firstTemplateName
+
+	template: (data) ->
+		# restore the original template
+		@blocks = @_templateBlocks.map((b) -> b.copy())
+
+		# replace all ranges that are in data; @_templateRanges is reverse sorted, so ranges stay valid throughout
+		for range in @_templateRanges
+			text = data[range.name]
+			continue unless text?
+			text = range.formatter.call(@, text) if _.isFunction(range.formatter)
+			block = @blocks[range.block]
+			block.replaceRange(range.inline, range.start, range.length, text)
+
+	templateFormatter: (data) ->
+		for range in @_templateRanges
+			formatter = data[range.name]
+			continue unless formatter?
+			range.formatter = formatter
 
 	validate: ->
 		for block in @blocks

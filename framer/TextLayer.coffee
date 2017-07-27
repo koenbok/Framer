@@ -73,7 +73,10 @@ class exports.TextLayer extends Layer
 				padding: 0
 			if not options.font? and not options.fontFamily?
 				options.fontFamily = @defaultFont()
-			@_styledText.addBlock options.text, fontSize: "#{options.fontSize}px"
+
+			text = options.text
+			text = String(text) if not _.isString(text)
+			@_styledText.addBlock text, fontSize: "#{options.fontSize}px"
 
 		super options
 		@__constructor = true
@@ -239,6 +242,7 @@ class exports.TextLayer extends Layer
 	@define "text",
 		get: -> @_styledText.getText()
 		set: (value) ->
+			value = String(value) if not _.isString(value)
 			@_styledText.setText(value)
 			@renderText()
 			@emit("change:text", value)
@@ -254,7 +258,6 @@ class exports.TextLayer extends Layer
 		if layer.transform? and layer.value?
 			layer.text = layer.transform(layer.value) + ''
 	)
-
 
 	renderText: =>
 		return if @__constructor
@@ -284,9 +287,37 @@ class exports.TextLayer extends Layer
 	defaultFont: ->
 		return Utils.deviceFont(Framer.Device.platform())
 
-	replace: (search, replace) ->
+	textReplace: (search, replace) ->
 		oldText = @text
-		@_styledText.replace(search, replace)
+		@_styledText.textReplace(search, replace)
 		if @text isnt oldText
 			@renderText()
 			@emit("change:text", @text)
+
+	# we remember the template data, and merge it with new data
+	@define "template",
+		get: -> @_templateData
+		set: (data) ->
+			if not @_templateData then @_templateData = {}
+
+			firstName = @_styledText.buildTemplate()
+			if not _.isObject(data)
+				return unless firstName
+				@_templateData[firstName] = data
+			else
+				_.assign(@_templateData, data)
+
+			oldText = @text
+			@_styledText.template(@_templateData)
+			if @text isnt oldText
+				@renderText()
+				@emit("change:text", @text)
+
+	@define "templateFormatter",
+		get: -> @_templateFormatter
+		set: (data) ->
+			firstName = @_styledText.buildTemplate()
+			if _.isFunction(data) or not _.isObject(data)
+				return unless firstName
+				tmp = {}; tmp[firstName] = data; data = tmp
+			@_styledText.templateFormatter(data)

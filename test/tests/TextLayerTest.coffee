@@ -8,6 +8,107 @@ simpleStyledTextOptions = {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 5,
 exampleStyledTextOptions = {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "48px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 800, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Heavy', '.SFUIText-Heavy', 'SF UI Text', 'Times New Roman'"}}], text: "Header"}, {inlineStyles: [{startIndex: 0, endIndex: 8, css: {fontSize: "20px", WebkitTextFillColor: "rgb(153, 153, 153)", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Subtitle"}, {inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "16px", WebkitTextFillColor: "rgb(238, 68, 68)", letterSpacing: "0px", fontWeight: 200, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Light', 'SFUIText-Light', '.SFUIText-Light', 'SF UI Text', 'Times New Roman'"}}, {startIndex: 6, endIndex: 16, css: {fontSize: "12px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Leader Body text"}], alignment: "left"}
 differentFonts = {"blocks": [{"inlineStyles": [{"startIndex": 0, "endIndex": 14, "css": {"fontSize": "60px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', sans-serif"}}], "text": "This is Roboto"}, {"inlineStyles": [{"startIndex": 0, "endIndex": 0, "css": {"fontSize": "47px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Roboto-Regular', 'Roboto', sans-serif"}}], "text": ""}, {"inlineStyles": [{"startIndex": 0, "endIndex": 14, "css": {"fontSize": "60px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Roboto-Regular', 'Roboto', sans-serif"}}], "text": "This is Roboto"}, {"inlineStyles": [{"startIndex": 0, "endIndex": 27, "css": {"fontSize": "60px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'VesperLibre-Regular', 'Vesper Libre', serif"}}], "text": "With a little bit of Vesper"}, {"inlineStyles": [{"startIndex": 0, "endIndex": 0, "css": {"fontSize": "10px", "WebkitTextFillColor": "rgb(255, 0, 0)", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Lato-Regular', 'Lato', serif"}}], "text": ""}, {"inlineStyles": [{"startIndex": 0, "endIndex": 16, "css": {"fontSize": "12px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Alcubierre', serif"}}], "text": "And some Raleway"}]}
 
+describe "TextLayer.template", ->
+	it "should work", ->
+		text = new TextLayer({text: "xxx {hello} xxx"})
+		text.template = {hello: "xxx"}
+		text.text.should.eql "xxx xxx xxx"
+		text._styledText.validate().should.equal true
+		text.template.hello.should.eql "xxx"
+
+		text.template = {hello: "again"}
+		text.text.should.eql "xxx again xxx"
+		text.textReplace("again", "HELLO THIS IS ME AND MORE")
+
+		text.template = {hello: ""}
+		text.text.should.eql "xxx  xxx"
+
+		text.template = {hello: 42}
+		text.text.should.eql "xxx 42 xxx"
+
+		text.text = ""
+		text.text.should.eql ""
+
+		text.template = {hello: "still works"}
+		text.text.should.eql "xxx still works xxx"
+		text._styledText.validate().should.equal true
+
+	it "should expand many blocks, and remember old template values", ->
+		text = new TextLayer({text: "{a},{b},{c},{d}"})
+		text.template = {a: "AAAAA"}
+		text.text.should.eql "AAAAA,{b},{c},{d}"
+		text.template = {b: "BEE"}
+		text.text.should.eql "AAAAA,BEE,{c},{d}"
+		text.template = {c: "CEEEE"}
+		text.text.should.eql "AAAAA,BEE,CEEEE,{d}"
+		text.template = {a: "XXXX", d: "DEE"}
+		text.text.should.eql "XXXX,BEE,CEEEE,DEE"
+		text._styledText.validate().should.equal true
+
+	it "should support multiple blocks and inline styles", ->
+		text = new TextLayer({text: "{a}\n{b},{c}\n{d}"})
+		text.template = {a: "AAAAAAA", b: "BEE", c: "CEEEE", d: "DEE"}
+		text.text.should.eql "AAAAAAA\nBEE,CEEEE\nDEE"
+		text._styledText.validate().should.equal true
+
+
+	it "should support inserting multilines", ->
+		text = new TextLayer({text: "{a}\n{b},{c}\n{d}"})
+		text._styledText.blocks.length.should.eql 3
+		text.template = {a: "ALONG", b: "BELOW\nMORE STUFF\nOEPS", c: "CIRCLE", d: "DEAF"}
+		text.text.should.eql "ALONG\nBELOW\nMORE STUFF\nOEPS,CIRCLE\nDEAF"
+		text._styledText.validate().should.equal true
+		# we don't actually build new blocks, or spans, not needed
+		# text._styledText.blocks.length.should.eql 5
+
+	it "should take a numbers, booleans", ->
+		text = new TextLayer({text: "{a}"})
+		text.template = {a: 42}
+		text.text.should.eql "42"
+
+		text.template = {a: false}
+		text.text.should.eql "false"
+
+	it "should not take null or nothing", ->
+		text = new TextLayer({text: "{a}"})
+		text.template = {a: null}
+		text.text.should.eql "{a}"
+
+		text.template = {b: "HELLO"}
+		text.text.should.eql "{a}"
+
+	it "should be able to set the first template without a name", ->
+		text = new TextLayer({text: "{a}\n{b},{c}\n{d}"})
+		text.template = "A"
+		text.text.should.eql "A\n{b},{c}\n{d}"
+		text.template = null
+		text.text.should.eql "{a}\n{b},{c}\n{d}"
+
+	it "should support formatters", ->
+		text = new TextLayer({text: "{report}"})
+		text.templateFormatter =
+			report: (v) -> v.toFixed(1)
+		text.template =
+			report: 88.8121
+		text.text.should.eql "88.8"
+
+	it "should support just setting the first formatter", ->
+		text = new TextLayer({text: "{report}"})
+		text.templateFormatter = (v) -> v.toFixed(1)
+		text.template = 88.8122
+		text.text.should.eql "88.8"
+
+	it "should support multiplate formatters", ->
+		text = new TextLayer({text: "{title}\n{date} - {user}"})
+		text.templateFormatter =
+			date: (v) -> v.toISOString().slice(0, -8)
+			user: (v) -> v.toLowerCase()
+		text.template =
+			title: "hello world"
+			date: new Date(1500000000000)
+			user: "Test User"
+		text.text.should.eql "hello world\n2017-07-14T02:40 - test user"
+		text.template.user.should.eql "Test User"
 
 describe "TextLayer", ->
 	describe "defaults", ->
@@ -78,6 +179,17 @@ describe "TextLayer", ->
 			l = new TextLayer
 				styledText: differentFonts
 			l._styledText.blocks.length.should.equal 6
+
+		it "should convert number values", ->
+			l = new TextLayer({text: 333})
+			l.text.should.equal "333"
+			l.text = 42
+			l.text.should.equal "42"
+
+		it "should err on other values", ->
+			l = new TextLayer
+			l.text = {}
+			l.text.should.eql "[object Object]"
 
 	describe "animation", ->
 		it "should start animating from the textcolor the layer has", (done) ->
@@ -521,7 +633,7 @@ describe "TextLayer", ->
 		it "should replace the full text", ->
 			searchText = "Search text"
 			subject.text = searchText
-			subject.replace(searchText, "Replacement")
+			subject.textReplace(searchText, "Replacement")
 			subject.text.should.equal "Replacement"
 			subject._styledText.validate().should.equal true
 
@@ -529,7 +641,7 @@ describe "TextLayer", ->
 			searchText = "Search text"
 			replaceText = "Replacement"
 			subject.text = searchText
-			subject.replace(searchText, replaceText)
+			subject.textReplace(searchText, replaceText)
 			style = subject._styledText.blocks[0].inlineStyles[0]
 			style.startIndex.should.equal 0
 			style.endIndex.should.equal replaceText.length
@@ -537,52 +649,52 @@ describe "TextLayer", ->
 			subject._styledText.validate().should.equal true
 
 		it "should replace partial text", ->
-			subject.replace("ea", "oooo")
+			subject.textReplace("ea", "oooo")
 			subject.text.should.equal "Hooooder\nSubtitle\nLooooder Body text"
-			subject.replace("o", "%")
+			subject.textReplace("o", "%")
 			subject.text.should.equal "H%%%%der\nSubtitle\nL%%%%der B%dy text"
 			subject._styledText.validate().should.equal true
 
 		it "should handle replacing with the same text correctly", ->
-			subject.replace("e", "e")
+			subject.textReplace("e", "e")
 			subject.text.should.equal "Header\nSubtitle\nLeader Body text"
-			subject.replace("e", "ee")
+			subject.textReplace("e", "ee")
 			subject.text.should.equal "Heeadeer\nSubtitlee\nLeeadeer Body teext"
 			subject._styledText.validate().should.equal true
 
 		it "should keep the styling in place when replacing text", ->
 			searchText = "Search text"
 			subject.text = searchText
-			subject.replace(searchText, "Replacement")
+			subject.textReplace(searchText, "Replacement")
 			subject._styledText.blocks[0].inlineStyles[0].css.should.eql exampleStyledTextOptions.blocks[0].inlineStyles[0].css
 			subject._styledText.validate().should.equal true
 
 		it "should apply the style to the replaced partial text", ->
-			subject.replace("e", "xxx")
+			subject.textReplace("e", "xxx")
 			for block, blockIndex in subject._styledText.blocks
 				for style, styleIndex in block.inlineStyles
 					style.css.should.eql exampleStyledTextOptions.blocks[blockIndex].inlineStyles[styleIndex].css
 			subject._styledText.validate().should.equal true
 
 		it "should work with regexes", ->
-			subject.replace(/d[ey]+/, "die")
+			subject.textReplace(/d[ey]+/, "die")
 			subject.text.should.equal "Headier\nSubtitle\nLeadier Bodie text"
 			subject._styledText.validate().should.equal true
 
 		it "should rerender the text when replacing it", ->
 			htmlBefore = subject.html
-			subject.replace("a", "b")
+			subject.textReplace("a", "b")
 			subject.html.should.not.equal htmlBefore
 
 		it "should emit change:text event only when the text has changed", (done) ->
 			subject.on "change:text", ->
 				done()
-			subject.replace("a", "b")
+			subject.textReplace("a", "b")
 
 		it "should not emit a change:text event when the text doesn't change", (done) ->
 			subject.on "change:text", ->
 				throw new Error("change:text event should not be emitted")
-			subject.replace("e", "e")
+			subject.textReplace("e", "e")
 			done()
 
 	describe "value transformer", ->
