@@ -748,6 +748,27 @@ describe "Layer", ->
 			layer.shadowColor = null
 			layer.style.boxShadow.should.equal "rgba(0, 0, 0, 0) 10px 10px 10px 10px"
 
+		it "should set the shadow via layer.style.boxShadow", ->
+
+			layer = new Layer
+				style: boxShadow: "inset 10px 10px 10px rgba(255, 0, 0, 0.5)"
+
+			# layer.style.boxShadow should propagate to Framer's shadow properties
+			layer.shadowX.should.equal 10
+			layer.shadowY.should.equal 10
+			layer.shadowBlur.should.equal 10
+			layer.shadowSpread.should.equal 10
+			layer.shadowColor.should.equal "rgba(255, 0, 0, 0.5)"
+
+			layer.shadowColor.r.should.equal 255
+			layer.shadowColor.g.should.equal 0
+			layer.shadowColor.b.should.equal 0
+			layer.shadowColor.a.should.equal 0.5
+
+			layer.style.boxShadow.should.equal "inset 10px 10px 10px rgba(255, 0, 0, 0.5)"		
+
+	describe "Events", ->
+			
 		it "should remove all events", ->
 			layerA = new Layer
 			handler = -> console.log "hello"
