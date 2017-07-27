@@ -247,18 +247,6 @@ class exports.TextLayer extends Layer
 			@renderText()
 			@emit("change:text", value)
 
-	@define "value", layerProperty(@, "value", null, null, null, null, {}, (layer, value) ->
-		if layer.transform?
-			value = layer.transform(value)
-		if value?
-			layer.text = "#{value}"
-	)
-
-	@define "transform", layerProperty(@, "transform", null, null, _.isFunction, null, {exportable: false}, (layer, transform) ->
-		if layer.transform? and layer.value?
-			layer.text = layer.transform(layer.value) + ''
-	)
-
 	renderText: =>
 		return if @__constructor
 		@_styledText.render()
