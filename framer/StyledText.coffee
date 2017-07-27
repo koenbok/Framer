@@ -61,11 +61,11 @@ class InlineStyle
 		endIndex: @endIndex
 		css: _.clone(@css)
 
-	createElement: ->
+	createElement: (maybeLineBreak) ->
 		span = document.createElement "span"
 		for prop, value of @css
 			span.style[prop] = value
-		if @text is ""
+		if @text is "" and maybeLineBreak
 			span.innerHTML = "<br/>"
 		else
 			span.textContent = @text
@@ -152,8 +152,9 @@ class StyledTextBlock
 	createElement: ->
 		div = document.createElement "div"
 		div.style.fontSize = "1px"
+		maybeLineBreak = @inlineStyles.length is 1
 		for style in @inlineStyles
-			span = style.createElement()
+			span = style.createElement(maybeLineBreak)
 			style.element = span
 			div.appendChild span
 		return div
