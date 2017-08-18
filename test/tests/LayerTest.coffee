@@ -775,14 +775,19 @@ describe "Layer", ->
 			l.shadow1.x.should.equal 10
 
 		it "should change the first shadow when a shadow property is changed", ->
-			new Layer
 			l = new Layer
 			l.shadow1.x = 10
 			l.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 0px 0px 0px"
 
-		it "should remove a shadow when a shadow property is set to null"
-		it "should keep the rest of the shadows when a shadow property is removed"
+		it "should remove a shadow when a shadow property is set to null", ->
+			l = new Layer
+			l.shadow1 = x: 10
 		it "should animate shadows through a shadow property"
+			l.shadow2 = y: 10
+			l.shadow3 = blur: 10
+			l.shadow2 = null
+			l.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 0px 0px 0px, rgba(123, 123, 123, 0.498039) 0px 0px 10px 0px"
+
 
 		it "should should change all shadows when shadowColor, shadowX, shadowY are changed", ->
 			l = new Layer
