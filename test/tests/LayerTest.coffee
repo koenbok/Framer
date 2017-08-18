@@ -758,9 +758,28 @@ describe "Layer", ->
 		it "should remove a shadow when a shadow property is set to null"
 		it "should keep the rest of the shadows when a shadow property is removed"
 		it "should animate shadows through a shadow property"
-		it "should should change all shadows when shadowColor, shadowX, shadowY are changed"
-		it "should create a shadow1 if a shadowColor when there aren't any shadows"
+
+		it "should should change all shadows when shadowColor, shadowX, shadowY are changed", ->
+			l = new Layer
+				shadows: [{blur: 10, color: "red"}, {x: 1, color: "blue"}, {y: 10, color: "green", type: "inset"}]
+
+			l.shadowColor = "yellow"
+			l.shadowX = 10
+			l.shadowY = 20
+			l.shadowBlur = 30
+			l.shadowSpread = 40
+
+			l.style.boxShadow.should.equal "rgb(255, 255, 0) 10px 20px 30px 40px, rgb(255, 255, 0) 10px 20px 30px 40px, rgb(255, 255, 0) 10px 20px 30px 40px inset"
+
+		it "should create a shadow if a shadowColor is set when there aren't any shadows", ->
+			l = new Layer
+			l.shadows = []
+			l.shadowColor = "yellow"
+			l.shadows.length.should.equal 1
+			Color.equal(l.shadows[0].color, "yellow").should.be.true
+
 		it "should copy shadows if you copy a layer"
+		it "should convert color strings to color objects when set via shadows"
 
 	describe "Events", ->
 
