@@ -748,6 +748,18 @@ describe "Layer", ->
 			layer.shadowColor = null
 			layer.style.boxShadow.should.equal "rgba(0, 0, 0, 0) 10px 10px 10px 10px"
 
+		it "should add multiple shadows by passing an array into the shadows property"
+		it "should be able to access shadow properties through properties"
+		it "should change the shadow when a shadow property is changed"
+		it "should remove a shadow when a shadow property is set to null"
+		it "should keep the rest of the shadows when a shadow property is removed"
+		it "should animate shadows through a shadow property"
+		it "should should change all shadows when shadowColor, shadowX, shadowY are changed"
+		it "should create a shadow1 if a shadowColor when there aren't any shadows"
+		it "should copy shadows if you copy a layer"
+
+	describe "Events", ->
+
 		it "should remove all events", ->
 			layerA = new Layer
 			handler = -> console.log "hello"
