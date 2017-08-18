@@ -168,20 +168,22 @@ exports.LayerStyle =
 			return "auto"
 
 	boxShadow: (layer) ->
-
-		props = layer._properties
-
-		if not props and props.shadowColor
-			return ""
-		else if not (props.shadowType is "box" or props.shadowType is "inset")
-			return ""
-		else if props.shadowX is 0 and props.shadowY is 0 and props.shadowBlur is 0 and props.shadowSpread is 0
-			return ""
-
-		insetString = ""
-		insetString = "inset " if props.shadowType is "inset"
-
-		return "#{insetString} #{layer._properties.shadowX * layer.context.pixelMultiplier}px #{layer._properties.shadowY * layer.context.pixelMultiplier}px #{layer._properties.shadowBlur * layer.context.pixelMultiplier}px #{layer._properties.shadowSpread * layer.context.pixelMultiplier}px #{layer._properties.shadowColor}"
+		shadowStrings = []
+		for shadow in layer.shadows
+			if shadow is null
+				continue
+			shadow = _.defaults _.clone(shadow),
+				x: 0
+				y: 0
+				color: Framer.Defaults.Layer.shadowColor
+				type: "box"
+				blur: 0
+				spread: 0
+			insetString = if shadow.type is "inset" then "inset " else ""
+			if shadow.x is 0 and shadow.y is 0 and shadow.blur is 0 and shadow.spread is 0
+				continue
+			shadowStrings.push "#{insetString} #{shadow.x * layer.context.pixelMultiplier}px #{shadow.y * layer.context.pixelMultiplier}px #{shadow.blur * layer.context.pixelMultiplier}px #{shadow.spread * layer.context.pixelMultiplier}px #{shadow.color}"
+		return shadowStrings.join(", ")
 
 	textShadow: (layer) ->
 

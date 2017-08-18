@@ -748,7 +748,11 @@ describe "Layer", ->
 			layer.shadowColor = null
 			layer.style.boxShadow.should.equal "rgba(0, 0, 0, 0) 10px 10px 10px 10px"
 
-		it "should add multiple shadows by passing an array into the shadows property"
+		it "should add multiple shadows by passing an array into the shadows property", ->
+			l = new Layer
+				shadows: [{blur: 10, color: "red"}, {x: 1, color: "blue"}, {y: 10, color: "green", type: "inset"}]
+			l.style.boxShadow.should.equal "red 0px 0px 10px 0px, blue 1px 0px 0px 0px, green 0px 10px 0px 0px inset"
+
 		it "should be able to access shadow properties through properties"
 		it "should change the shadow when a shadow property is changed"
 		it "should remove a shadow when a shadow property is set to null"

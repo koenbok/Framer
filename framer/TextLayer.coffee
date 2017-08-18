@@ -1,4 +1,4 @@
-{Layer, layerProperty, updateShadow} = require "./Layer"
+{Layer, layerProperty} = require "./Layer"
 {LayerStyle} = require "./LayerStyle"
 {StyledText} = require "./StyledText"
 

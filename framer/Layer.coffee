@@ -139,10 +139,18 @@ parentOrContext = (layerOrContext) ->
 	else
 		return layerOrContext.context
 
-exports.updateShadow = (layer, value) ->
+updateShadow = (layer) ->
 	layer._element.style.boxShadow = LayerStyle["boxShadow"](layer)
 	layer._element.style.textShadow = LayerStyle["textShadow"](layer)
 	layer._element.style.webkitFilter = LayerStyle["webkitFilter"](layer)
+
+updateShadowsProperty = (prop) ->
+	(layer, value) ->
+		if (layer.shadows.filter (s) -> s isnt null).length is 0
+			layer.shadows[0] = {}
+		for shadow in layer.shadows
+			shadow?[prop] = value
+		updateShadow(layer)
 
 class exports.Layer extends BaseClass
 
@@ -331,12 +339,13 @@ class exports.Layer extends BaseClass
 	@define "sepia", layerProperty(@, "sepia", "webkitFilter", 0, _.isNumber)
 
 	# Shadow properties
-	@define "shadowX", layerProperty(@, "shadowX", null, 0, _.isNumber, null, {}, exports.updateShadow)
-	@define "shadowY", layerProperty(@, "shadowY", null, 0, _.isNumber, null, {}, exports.updateShadow)
-	@define "shadowBlur", layerProperty(@, "shadowBlur", null, 0, _.isNumber, null, {}, exports.updateShadow)
-	@define "shadowSpread", layerProperty(@, "shadowSpread", null, 0, _.isNumber, null, {}, exports.updateShadow)
-	@define "shadowColor", layerProperty(@, "shadowColor", null, "", Color.validColorValue, Color.toColor, {}, exports.updateShadow)
-	@define "shadowType", layerProperty(@, "shadowType", null, "box", null, null, {}, exports.updateShadow)
+	@define "shadowX", layerProperty(@, "shadowX", null, 0, _.isNumber, null, {}, updateShadowsProperty("x"))
+	@define "shadowY", layerProperty(@, "shadowY", null, 0, _.isNumber, null, {}, updateShadowsProperty("y"))
+	@define "shadowBlur", layerProperty(@, "shadowBlur", null, 0, _.isNumber, null, {}, updateShadowsProperty("blur"))
+	@define "shadowSpread", layerProperty(@, "shadowSpread", null, 0, _.isNumber, null, {}, updateShadowsProperty("spread"))
+	@define "shadowColor", layerProperty(@, "shadowColor", null, "", Color.validColorValue, Color.toColor, {}, updateShadowsProperty("color"))
+	@define "shadowType", layerProperty(@, "shadowType", null, "box", null, null, {}, updateShadowsProperty("type"))
+	@define "shadows", @simpleProperty("shadows", [], {didSet: updateShadow})
 
 	# Color properties
 	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, Color.validColorValue, Color.toColor)
