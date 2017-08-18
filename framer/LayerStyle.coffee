@@ -172,17 +172,11 @@ exports.LayerStyle =
 		for shadow in layer.shadows
 			if shadow is null
 				continue
-			shadow = _.defaults _.clone(shadow),
-				x: 0
-				y: 0
-				color: Framer.Defaults.Layer.shadowColor
-				type: "box"
-				blur: 0
-				spread: 0
+			shadow = _.defaults _.clone(shadow), Framer.Defaults.Shadow
 			insetString = if shadow.type is "inset" then "inset " else ""
 			if shadow.x is 0 and shadow.y is 0 and shadow.blur is 0 and shadow.spread is 0
 				continue
-			shadowStrings.push "#{insetString} #{shadow.x * layer.context.pixelMultiplier}px #{shadow.y * layer.context.pixelMultiplier}px #{shadow.blur * layer.context.pixelMultiplier}px #{shadow.spread * layer.context.pixelMultiplier}px #{shadow.color}"
+			shadowStrings.push "#{insetString}#{shadow.x * layer.context.pixelMultiplier}px #{shadow.y * layer.context.pixelMultiplier}px #{shadow.blur * layer.context.pixelMultiplier}px #{shadow.spread * layer.context.pixelMultiplier}px #{shadow.color}"
 		return shadowStrings.join(", ")
 
 	textShadow: (layer) ->

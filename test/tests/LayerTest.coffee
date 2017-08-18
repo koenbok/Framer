@@ -732,7 +732,6 @@ describe "Layer", ->
 			layer.shadowY.should.equal 10
 			layer.shadowBlur.should.equal 10
 			layer.shadowSpread.should.equal 10
-
 			layer.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 10px 10px 10px"
 
 			# Only after we set a color a shadow should be drawn
@@ -754,11 +753,33 @@ describe "Layer", ->
 			l.style.boxShadow.should.equal "red 0px 0px 10px 0px, blue 1px 0px 0px 0px, green 0px 10px 0px 0px inset"
 
 		it "should be able to access shadow properties through properties", ->
-			layer = new Layer
-			layer.shadow1 = x: 10
-			layer.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 0px 0px 0px"
+			l = new Layer
+			l.shadow1 = x: 10
+			l.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 0px 0px 0px"
 
-		it "should change the shadow when a shadow property is changed"
+		it "should change the shadow when a shadow property is changed", ->
+			l = new Layer
+			l.shadow2 = x: 10
+			l.shadow2.x = 5
+			l.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 5px 0px 0px 0px"
+
+		it "should change the shadow when another shadow property is changed", ->
+			l = new Layer
+			l.shadow2 = x: 10
+			l.shadow2.y = 5
+			l.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 5px 0px 0px"
+
+		it "should get the same shadow that is set", ->
+			l = new Layer
+			l.shadow1 = x: 10
+			l.shadow1.x.should.equal 10
+
+		it "should change the first shadow when a shadow property is changed", ->
+			new Layer
+			l = new Layer
+			l.shadow1.x = 10
+			l.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 0px 0px 0px"
+
 		it "should remove a shadow when a shadow property is set to null"
 		it "should keep the rest of the shadows when a shadow property is removed"
 		it "should animate shadows through a shadow property"

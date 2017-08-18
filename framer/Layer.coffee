@@ -146,8 +146,9 @@ updateShadow = (layer) ->
 
 updateShadowsProperty = (prop) ->
 	(layer, value) ->
+		layer.shadows ?= []
 		if (layer.shadows.filter (s) -> s isnt null).length is 0
-			layer.shadows[0] = {}
+			layer.shadows[0] = layerProxiedValue(_.clone(Framer.Defaults.Shadow), layer, "shadow1")
 		for shadow in layer.shadows
 			shadow?[prop] = value
 		updateShadow(layer)
@@ -338,6 +339,16 @@ class exports.Layer extends BaseClass
 	@define "grayscale", layerProperty(@, "grayscale", "webkitFilter", 0, _.isNumber)
 	@define "sepia", layerProperty(@, "sepia", "webkitFilter", 0, _.isNumber)
 
+	for i in [0...8]
+		do (i) =>
+			@define "shadow#{i+1}",
+				get: ->
+					@shadows[i]
+				set: (value) ->
+					_.defaults value, Framer.Defaults.Shadow
+					@shadows[i] = layerProxiedValue(value, @, "shadow#{i+1}")
+					updateShadow(@)
+
 	# Shadow properties
 	@define "shadowX", layerProperty(@, "shadowX", null, 0, _.isNumber, null, {}, updateShadowsProperty("x"))
 	@define "shadowY", layerProperty(@, "shadowY", null, 0, _.isNumber, null, {}, updateShadowsProperty("y"))
@@ -345,7 +356,7 @@ class exports.Layer extends BaseClass
 	@define "shadowSpread", layerProperty(@, "shadowSpread", null, 0, _.isNumber, null, {}, updateShadowsProperty("spread"))
 	@define "shadowColor", layerProperty(@, "shadowColor", null, "", Color.validColorValue, Color.toColor, {}, updateShadowsProperty("color"))
 	@define "shadowType", layerProperty(@, "shadowType", null, "box", null, null, {}, updateShadowsProperty("type"))
-	@define "shadows", @simpleProperty("shadows", [], {didSet: updateShadow})
+	@define "shadows", @simpleProperty("shadows", null, {didSet: updateShadow})
 
 	# Color properties
 	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, Color.validColorValue, Color.toColor)
@@ -360,14 +371,6 @@ class exports.Layer extends BaseClass
 	@define "force2d", layerProperty(@, "force2d", "webkitTransform", false, _.isBoolean)
 	@define "flat", layerProperty(@, "flat", "webkitTransformStyle", false, _.isBoolean)
 	@define "backfaceVisible", layerProperty(@, "backfaceVisible", "webkitBackfaceVisibility", true, _.isBoolean)
-
-	for i in [0...8]
-		@define "shadow#{i+1}",
-			get: ->
-				@shadows[i]
-			set: (value) ->
-				@shadows[i] = value
-				updateShadow(@)
 
 	##############################################################
 	# Identity
