@@ -753,7 +753,11 @@ describe "Layer", ->
 				shadows: [{blur: 10, color: "red"}, {x: 1, color: "blue"}, {y: 10, color: "green", type: "inset"}]
 			l.style.boxShadow.should.equal "red 0px 0px 10px 0px, blue 1px 0px 0px 0px, green 0px 10px 0px 0px inset"
 
-		it "should be able to access shadow properties through properties"
+		it "should be able to access shadow properties through properties", ->
+			layer = new Layer
+			layer.shadow1 = x: 10
+			layer.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 0px 0px 0px"
+
 		it "should change the shadow when a shadow property is changed"
 		it "should remove a shadow when a shadow property is set to null"
 		it "should keep the rest of the shadows when a shadow property is removed"

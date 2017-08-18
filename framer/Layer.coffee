@@ -361,6 +361,14 @@ class exports.Layer extends BaseClass
 	@define "flat", layerProperty(@, "flat", "webkitTransformStyle", false, _.isBoolean)
 	@define "backfaceVisible", layerProperty(@, "backfaceVisible", "webkitBackfaceVisibility", true, _.isBoolean)
 
+	for i in [0...8]
+		@define "shadow#{i+1}",
+			get: ->
+				@shadows[i]
+			set: (value) ->
+				@shadows[i] = value
+				updateShadow(@)
+
 	##############################################################
 	# Identity
 
