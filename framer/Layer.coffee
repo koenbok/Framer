@@ -139,7 +139,7 @@ parentOrContext = (layerOrContext) ->
 	else
 		return layerOrContext.context
 
-updateShadow = (layer) ->
+updateShadowStyle = (layer) ->
 	layer._element.style.boxShadow = LayerStyle["boxShadow"](layer)
 	layer._element.style.textShadow = LayerStyle["textShadow"](layer)
 	layer._element.style.webkitFilter = LayerStyle["webkitFilter"](layer)
@@ -148,10 +148,12 @@ updateShadowsProperty = (prop) ->
 	(layer, value) ->
 		layer.shadows ?= []
 		if (layer.shadows.filter (s) -> s isnt null).length is 0
-			layer.shadows[0] = layerProxiedValue(_.clone(Framer.Defaults.Shadow), layer, "shadow1")
+			v = _.clone(Framer.Defaults.Shadow)
+			v?.color = new Color(v.color)
+			layer.shadows[0] = layerProxiedValue(v, layer, "shadow1")
 		for shadow in layer.shadows
 			shadow?[prop] = value
-		updateShadow(layer)
+		updateShadowStyle(layer)
 
 class exports.Layer extends BaseClass
 
@@ -342,12 +344,15 @@ class exports.Layer extends BaseClass
 	for i in [0...8]
 		do (i) =>
 			@define "shadow#{i+1}",
+				depends: ["shadowX", "shadowY", "shadowBlur", "shadowSpread", "shadowColor", "shadowType"]
 				get: ->
-					@shadows[i]
+					@shadows?[i]
 				set: (value) ->
-					_.defaults value, Framer.Defaults.Shadow
+					value = _.defaults _.clone(value), Framer.Defaults.Shadow
+					@shadows ?= []
+					value?.color = new Color(value.color)
 					@shadows[i] = layerProxiedValue(value, @, "shadow#{i+1}")
-					updateShadow(@)
+					updateShadowStyle(@)
 
 	# Shadow properties
 	@define "shadowX", layerProperty(@, "shadowX", null, 0, _.isNumber, null, {}, updateShadowsProperty("x"))
@@ -356,7 +361,17 @@ class exports.Layer extends BaseClass
 	@define "shadowSpread", layerProperty(@, "shadowSpread", null, 0, _.isNumber, null, {}, updateShadowsProperty("spread"))
 	@define "shadowColor", layerProperty(@, "shadowColor", null, "", Color.validColorValue, Color.toColor, {}, updateShadowsProperty("color"))
 	@define "shadowType", layerProperty(@, "shadowType", null, "box", null, null, {}, updateShadowsProperty("type"))
-	@define "shadows", @simpleProperty("shadows", null, {didSet: updateShadow})
+	@define "shadows",
+		default: null
+		get: ->
+			@_getPropertyValue("shadows")
+		set: (value) ->
+			shadows = _.cloneDeep(value)
+			for shadow in shadows
+				_.defaults shadow, Framer.Defaults.Shadow
+				shadow.color = new Color(shadow.color)
+			@_setPropertyValue("shadows", shadows)
+			updateShadowStyle(@)
 
 	# Color properties
 	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, Color.validColorValue, Color.toColor)

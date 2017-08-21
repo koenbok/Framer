@@ -750,7 +750,7 @@ describe "Layer", ->
 		it "should add multiple shadows by passing an array into the shadows property", ->
 			l = new Layer
 				shadows: [{blur: 10, color: "red"}, {x: 1, color: "blue"}, {y: 10, color: "green", type: "inset"}]
-			l.style.boxShadow.should.equal "red 0px 0px 10px 0px, blue 1px 0px 0px 0px, green 0px 10px 0px 0px inset"
+			l.style.boxShadow.should.equal "rgb(255, 0, 0) 0px 0px 10px 0px, rgb(0, 0, 255) 1px 0px 0px 0px, rgb(0, 128, 0) 0px 10px 0px 0px inset"
 
 		it "should be able to access shadow properties through properties", ->
 			l = new Layer
@@ -774,15 +774,51 @@ describe "Layer", ->
 			l.shadow1 = x: 10
 			l.shadow1.x.should.equal 10
 
+		it "should let the shadow be set in the constructor", ->
+			l = new Layer
+				shadow1:
+					x: 10
+					color: "red"
+			l.shadow1.x.should.equal 10
+			l.shadow1.color.toString().should.equal "rgb(255, 0, 0)"
+
+		it "should convert color strings to color objects when set via shadows", ->
+			l = new Layer
+				shadows: [{blur: 10, color: "red"}]
+			l.style.boxShadow.should.equal "rgb(255, 0, 0) 0px 0px 10px 0px"
+
 		it "should change the first shadow when a shadow property is changed", ->
 			l = new Layer
 			l.shadow1.x = 10
 			l.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 0px 0px 0px"
 
+		it "should animate shadows through a shadow property", (done) ->
+			l = new Layer
+			l.animate
+				shadow1:
+					x: 20
+				options:
+					time: 0.2
+			l.onAnimationEnd ->
+				l.shadow1.x.should.equal 20
+				done()
+
+		it "should animate shadow colors", (done) ->
+			l = new Layer
+				shadow1:
+					color: "red"
+			l.animate
+				shadow1:
+					color: "blue"
+				options:
+					time: 0.2
+			l.onAnimationEnd ->
+				l.shadow1.color.toString().should.equal "rgb(0, 0, 255)"
+				done()
+
 		it "should remove a shadow when a shadow property is set to null", ->
 			l = new Layer
 			l.shadow1 = x: 10
-		it "should animate shadows through a shadow property"
 			l.shadow2 = y: 10
 			l.shadow3 = blur: 10
 			l.shadow2 = null
@@ -808,8 +844,21 @@ describe "Layer", ->
 			l.shadows.length.should.equal 1
 			Color.equal(l.shadows[0].color, "yellow").should.be.true
 
-		it "should copy shadows if you copy a layer"
-		it "should convert color strings to color objects when set via shadows"
+		it "should copy shadows if you copy a layer", ->
+			l = new Layer
+				shadows: [{blur: 10, color: "red"}, {x: 1, color: "blue"}, {y: 10, color: "green", type: "inset"}]
+			l2 = l.copy()
+			l2.style.boxShadow.should.equal "rgb(255, 0, 0) 0px 0px 10px 0px, rgb(0, 0, 255) 1px 0px 0px 0px, rgb(0, 128, 0) 0px 10px 0px 0px inset"
+			l2.shadows.should.eql l.shadows
+			l2.shadows.should.not.equal l.shadows
+
+		it "should not change shadows after copying a layer", ->
+			l = new Layer
+				shadows: [{blur: 10, color: "red"}, {x: 1, color: "blue"}, {y: 10, color: "green", type: "inset"}]
+			l2 = l.copy()
+			l.shadow1.x = 100
+			l2.shadow1.should.not.equal l.shadow1
+			l2.shadow1.x.should.not.equal 100
 
 	describe "Events", ->
 

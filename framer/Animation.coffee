@@ -291,6 +291,8 @@ class exports.Animation extends BaseClass
 				@_valueUpdaters[k] = @_updateNumericObjectValue.bind(this, ["topLeft", "topRight", "bottomRight", "bottomLeft"])
 			else if k is "template"
 				@_valueUpdaters[k] = @_updateTemplateValue
+			else if /^shadow[1-9]$/.test(k)
+				@_valueUpdaters[k] = @_updateShadowValue
 			else
 				@_valueUpdaters[k] = @_updateNumberValue
 
@@ -301,7 +303,7 @@ class exports.Animation extends BaseClass
 	_updateNumberValue: (key, value) =>
 		@_target[key] = Utils.mapRange(value, 0, 1, @_stateA[key], @_stateB[key])
 
-	_updateNumericObjectValue: (propKeys, key, value) =>
+	_updateNumericObjectValue: (propKeys, key, value, flatten=true) =>
 		valueA = @_stateA[key]
 		valueB = @_stateB[key]
 
@@ -316,7 +318,7 @@ class exports.Animation extends BaseClass
 			result[propKey] = Utils.mapRange(value, 0, 1, keyValueA, keyValueB)
 
 		# Flatten to a single number if all properties have the same value
-		if _.uniq(_.values(result)).length is 1
+		if flatten and _.uniq(_.values(result)).length is 1
 			result = result[propKeys[0]]
 
 		@_target[key] = result
@@ -339,6 +341,10 @@ class exports.Animation extends BaseClass
 			value
 			@options.colorModel
 		)
+
+	_updateShadowValue: (key, value) =>
+		@_updateNumericObjectValue(["x", "y", "blur", "spread"], key, value, false)
+		@_target[key].color = Color.mix(@_stateA[key].color, @_stateB[key].color, value, false, @options.colorModel)
 
 	# shallow mix all end state `{key: value}`s if `value` is a number, otherwise just takes `value`
 	_updateTemplateValue: (key, value) =>
@@ -374,7 +380,7 @@ class exports.Animation extends BaseClass
 
 	# Special cases that animate with different types of objects
 	@isAnimatableKey = (k) ->
-		k in ["gradient", "borderWidth", "borderRadius", "template"]
+		k in ["gradient", "borderWidth", "borderRadius", "template"] or /^shadow[1-9]$/.test(k)
 
 	@filterAnimatableProperties = (properties) ->
 		# Function to filter only animatable properties out of a given set
