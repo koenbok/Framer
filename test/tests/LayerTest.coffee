@@ -860,6 +860,21 @@ describe "Layer", ->
 			l2.shadow1.should.not.equal l.shadow1
 			l2.shadow1.x.should.not.equal 100
 
+		it "should be able to handle more then 10 shadows", ->
+			shadows = []
+			result = []
+			for i in [1...16]
+				shadows.push {x: i}
+				result.push "rgba(123, 123, 123, 0.498039) #{i}px 0px 0px 0px"
+			l = new Layer
+				shadows: shadows
+			l.style.boxShadow.should.equal result.join(", ")
+			l.shadows.length.should.equal 15
+			l.shadows[14].y = 10
+			l.updateShadowStyle()
+			result[14] = "rgba(123, 123, 123, 0.498039) 15px 10px 0px 0px"
+			l.style.boxShadow.should.equal result.join(", ")
+
 	describe "Events", ->
 
 		it "should remove all events", ->
