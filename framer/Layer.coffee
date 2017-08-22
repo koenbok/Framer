@@ -905,6 +905,8 @@ class exports.Layer extends BaseClass
 		set: (value) ->
 
 			currentValue = @_getPropertyValue "image"
+			return if currentValue?.contstructor?.name is "Promise"
+
 			defaults = Defaults.getDefaults "Layer", {}
 			isBackgroundColorDefault = @backgroundColor?.isEqual(defaults.backgroundColor)
 
@@ -916,7 +918,7 @@ class exports.Layer extends BaseClass
 				@backgroundColor = null if isBackgroundColorDefault
 				return
 
-			if not (_.isString(value) or value is null)
+			if not (_.isString(value) or value is null or value?.constructor?.name is "Promise")
 				layerValueTypeError("image", value)
 
 			if currentValue is value
@@ -938,6 +940,11 @@ class exports.Layer extends BaseClass
 					@emit Events.ImageLoadCancelled, @_imageLoader
 					@_cleanupImageLoader()
 
+				return
+
+			if value?.constructor?.name is "Promise"
+				value.then (image) =>
+					@image = image
 				return
 
 			# Show placeholder image on any browser that doesn't support inline pdf
