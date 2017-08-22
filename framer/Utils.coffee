@@ -161,28 +161,50 @@ Utils.randomNumber = (a=0, b=1) ->
 	Utils.mapRange Math.random(), 0, 1, a, b
 
 Utils.randomImage = (layer) ->
+	# TODO: Use size
+	# TODO: Use layer (make an image sticky on a layer how?)
+	new Promise (resolve, reject) ->
+		Utils.domLoadJSON "https://api.unsplash.com/photos/random?client_id=eabe25a77fca689893f96ff2ceb0028652960a818a9809109574f21d6cb12614", (error, json) ->
+			if error
+				reject()
+				return
+			else
+				image_url = json.urls.full
+				# Log credit, as required by the Unsplash API terms
+				console.group("Photo by #{json.user.name} from Unsplash https://unsplash.com/@#{json.user.username}?utm_source=framer&utm_medium=referral&utm_campaign=api-credit")
+				imageSize = 50
+				imageStyle =
+					"background: url('#{image_url}');" +
+					"background-size: #{imageSize}px #{imageSize}px;" +
+					"font-size: 1px;" +
+					"padding: #{imageSize / 2}px;" +
+					"line-height: #{imageSize}px;" +
+					"color: transparent;"
+				console.log("%c ", imageStyle)
+				console.groupEnd()
+				resolve(image_url)
 
-	if _.isNumber(layer)
-		layer = {id: layer}
-
-	photos = ["1417733403748-83bbc7c05140", "1423841265803-dfac59ebf718", "1433689056001-018e493576bc", "1430812411929-de4cf1d1fe73", "1457269449834-928af64c684d", "1443616839562-036bb2afd9a2", "1461535676131-2de1f7054d3f", "1462393582935-1ac76b85dcf1", "1414589530802-cb54ce0575d9", "1422908132590-117a051fc5cd", "1438522014717-d7ce32b9bab9", "1462058164249-2dcdcda67ce7", "1456757014009-0614a080ff7f", "1434238255348-4fb0d9caa0a4", "1448071792026-7064a01897e7", "1458681842652-019f4eeda5e5", "1460919920543-d8c45f4bd621", "1447767961238-038617b84a2b", "1449089299624-89ce41e8306c", "1414777410116-81e404502b52", "1433994349623-0a18966ee9c0", "1452567772283-91d67178f409", "1458245229726-a8ba04cb5969", "1422246719650-cb30d19825e3", "1417392639864-2c88dd07f460", "1442328166075-47fe7153c128", "1448467258552-6b3982373a13", "1447023362548-250f3a7b80ed", "1451486242265-24b0c0ef9a51", "1414339372428-797ec111646d"]
-	photo = Utils.randomChoice(photos)
-	photo = photos[(layer.id) % photos.length] if layer?.id
-
-	increment = 100
-	size = 1024
-
-	if layer
-		size = Math.max(layer.width, layer.height)
-		size = Math.ceil(size / increment) * increment
-		size = increment if size < increment
-		size = Utils.devicePixelRatio() * size
-		size = parseInt(size)
-
-	# width = Utils.round(layer.width, 0, 100, 100)
-	# height = Utils.round(layer.height, 0, 100, 100)
-
-	return "https://images.unsplash.com/photo-#{photo}?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&w=#{size}&h=#{size}&fit=max"
+	# if _.isNumber(layer)
+	# 	layer = {id: layer}
+	#
+	# photos = ["1417733403748-83bbc7c05140", "1423841265803-dfac59ebf718", "1433689056001-018e493576bc", "1430812411929-de4cf1d1fe73", "1457269449834-928af64c684d", "1443616839562-036bb2afd9a2", "1461535676131-2de1f7054d3f", "1462393582935-1ac76b85dcf1", "1414589530802-cb54ce0575d9", "1422908132590-117a051fc5cd", "1438522014717-d7ce32b9bab9", "1462058164249-2dcdcda67ce7", "1456757014009-0614a080ff7f", "1434238255348-4fb0d9caa0a4", "1448071792026-7064a01897e7", "1458681842652-019f4eeda5e5", "1460919920543-d8c45f4bd621", "1447767961238-038617b84a2b", "1449089299624-89ce41e8306c", "1414777410116-81e404502b52", "1433994349623-0a18966ee9c0", "1452567772283-91d67178f409", "1458245229726-a8ba04cb5969", "1422246719650-cb30d19825e3", "1417392639864-2c88dd07f460", "1442328166075-47fe7153c128", "1448467258552-6b3982373a13", "1447023362548-250f3a7b80ed", "1451486242265-24b0c0ef9a51", "1414339372428-797ec111646d"]
+	# photo = Utils.randomChoice(photos)
+	# photo = photos[(layer.id) % photos.length] if layer?.id
+	#
+	# increment = 100
+	# size = 1024
+	#
+	# if layer
+	# 	size = Math.max(layer.width, layer.height)
+	# 	size = Math.ceil(size / increment) * increment
+	# 	size = increment if size < increment
+	# 	size = Utils.devicePixelRatio() * size
+	# 	size = parseInt(size)
+	#
+	# # width = Utils.round(layer.width, 0, 100, 100)
+	# # height = Utils.round(layer.height, 0, 100, 100)
+	#
+	# return "https://images.unsplash.com/photo-#{photo}?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&w=#{size}&h=#{size}&fit=max"
 
 Utils.defineEnum = (names = [], offset = 0, geometric = 0) ->
 	# TODO: What is this doing here?
