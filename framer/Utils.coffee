@@ -175,7 +175,9 @@ Utils.randomImage = (layer) ->
 				imageSize = 50
 				imageStyle =
 					"background: url('#{image_url}');" +
-					"background-size: #{imageSize}px #{imageSize}px;" +
+					"background-repeat: no-repeat;" +
+					"background-position: center;" +
+					"background-size: cover;" +
 					"font-size: 1px;" +
 					"padding: #{imageSize / 2}px;" +
 					"line-height: #{imageSize}px;" +
