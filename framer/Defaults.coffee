@@ -88,6 +88,14 @@ Originals =
 		backgroundColor: null
 	Hints:
 		color: "rgba(144, 19, 254, 0.8)"
+	Shadow:
+		x: 0
+		y: 0
+		color: "rgba(123, 123, 123, 0.5)"
+		type: "box"
+		blur: 0
+		spread: 0
+
 
 
 exports.Defaults =

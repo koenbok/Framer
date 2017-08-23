@@ -139,10 +139,19 @@ parentOrContext = (layerOrContext) ->
 	else
 		return layerOrContext.context
 
-exports.updateShadow = (layer, value) ->
-	layer._element.style.boxShadow = LayerStyle["boxShadow"](layer)
-	layer._element.style.textShadow = LayerStyle["textShadow"](layer)
-	layer._element.style.webkitFilter = LayerStyle["webkitFilter"](layer)
+proxiedShadowValue = (layer, value, index = 0) ->
+	v = _.defaults _.clone(value), Framer.Defaults.Shadow
+	v?.color = new Color(v.color)
+	layerProxiedValue(v, layer, "shadow#{index+1}")
+
+updateShadowsProperty = (prop) ->
+	(layer, value) ->
+		layer.shadows ?= []
+		if (layer.shadows.filter (s) -> s isnt null).length is 0
+			layer.shadows[0] = proxiedShadowValue(layer, Framer.Defaults.Shadow)
+		for shadow in layer.shadows
+			shadow?[prop] = value
+		layer.updateShadowStyle()
 
 class exports.Layer extends BaseClass
 
@@ -330,13 +339,39 @@ class exports.Layer extends BaseClass
 	@define "grayscale", layerProperty(@, "grayscale", "webkitFilter", 0, _.isNumber)
 	@define "sepia", layerProperty(@, "sepia", "webkitFilter", 0, _.isNumber)
 
+	for i in [0...8]
+		do (i) =>
+			@define "shadow#{i+1}",
+				depends: ["shadowX", "shadowY", "shadowBlur", "shadowSpread", "shadowColor", "shadowType"]
+				get: ->
+					@shadows?[i]
+				set: (value) ->
+					@shadows ?= []
+					@shadows[i] = proxiedShadowValue(@, value, i)
+					@updateShadowStyle()
+
 	# Shadow properties
-	@define "shadowX", layerProperty(@, "shadowX", null, 0, _.isNumber, null, {}, exports.updateShadow)
-	@define "shadowY", layerProperty(@, "shadowY", null, 0, _.isNumber, null, {}, exports.updateShadow)
-	@define "shadowBlur", layerProperty(@, "shadowBlur", null, 0, _.isNumber, null, {}, exports.updateShadow)
-	@define "shadowSpread", layerProperty(@, "shadowSpread", null, 0, _.isNumber, null, {}, exports.updateShadow)
-	@define "shadowColor", layerProperty(@, "shadowColor", null, "", Color.validColorValue, Color.toColor, {}, exports.updateShadow)
-	@define "shadowType", layerProperty(@, "shadowType", null, "box", null, null, {}, exports.updateShadow)
+	@define "shadowX", layerProperty(@, "shadowX", null, 0, _.isNumber, null, {}, updateShadowsProperty("x"))
+	@define "shadowY", layerProperty(@, "shadowY", null, 0, _.isNumber, null, {}, updateShadowsProperty("y"))
+	@define "shadowBlur", layerProperty(@, "shadowBlur", null, 0, _.isNumber, null, {}, updateShadowsProperty("blur"))
+	@define "shadowSpread", layerProperty(@, "shadowSpread", null, 0, _.isNumber, null, {}, updateShadowsProperty("spread"))
+	@define "shadowColor", layerProperty(@, "shadowColor", null, "", Color.validColorValue, Color.toColor, {}, updateShadowsProperty("color"))
+	@define "shadowType", layerProperty(@, "shadowType", null, "box", null, null, {}, updateShadowsProperty("type"))
+	@define "shadows",
+		default: null
+		get: ->
+			@_getPropertyValue("shadows")
+		set: (value) ->
+			shadows = []
+			for shadow, index in value
+				shadows.push proxiedShadowValue(@, shadow, index)
+			@_setPropertyValue("shadows", shadows)
+			@updateShadowStyle()
+
+	updateShadowStyle: ->
+		@_element.style.boxShadow = LayerStyle["boxShadow"](@)
+		@_element.style.textShadow = LayerStyle["textShadow"](@)
+		@_element.style.webkitFilter = LayerStyle["webkitFilter"](@)
 
 	# Color properties
 	@define "backgroundColor", layerProperty(@, "backgroundColor", "backgroundColor", null, Color.validColorValue, Color.toColor)
