@@ -875,6 +875,13 @@ describe "Layer", ->
 			result[14] = "rgba(123, 123, 123, 0.498039) 15px 10px 0px 0px"
 			l.style.boxShadow.should.equal result.join(", ")
 
+		it "should handle multiple shadow types", ->
+			l = new Layer
+				shadows: [{type: "box", x: 10}, {type: "text", x: 5}, {type: "inset", y: 3}, {type: "drop", y: 15}]
+			l.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 0px 0px 0px, rgba(123, 123, 123, 0.498039) 0px 3px 0px 0px inset"
+			l.style.textShadow.should.equal "rgba(123, 123, 123, 0.498039) 5px 0px 0px"
+			l.style.webkitFilter.should.equal "drop-shadow(rgba(123, 123, 123, 0.498039) 0px 15px 0px)"
+
 	describe "Events", ->
 
 		it "should remove all events", ->

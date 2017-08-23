@@ -28,6 +28,21 @@ _Force2DProperties =
 	"rotationX": 0
 	"rotationY": 0
 
+getShadowStrings = (layer, types, createString) ->
+	if not _.isArray(types)
+		types = [types]
+	result = []
+	if layer.shadows?
+		for shadow in layer.shadows
+			if shadow is null or not (shadow.type in types)
+				continue
+			shadow = _.defaults _.clone(shadow), Framer.Defaults.Shadow
+			if shadow.x is 0 and shadow.y is 0 and shadow.blur is 0 and shadow.spread is 0
+				continue
+			dropShadow = createString(shadow, layer.context.pixelMultiplier)
+			result.push(dropShadow)
+	return result
+
 exports.LayerStyle =
 
 	width: (layer) ->
@@ -95,10 +110,11 @@ exports.LayerStyle =
 				css.push("#{cssName}(#{filterFormat(layer[layerName], unit)})")
 
 		# filter shadow
-		if layer._properties and layer._properties.shadowType is "drop" and layer._properties.shadowColor
-			dropShadow = "drop-shadow(#{layer._properties.shadowX * layer.context.pixelMultiplier}px #{layer._properties.shadowY * layer.context.pixelMultiplier}px #{layer._properties.shadowBlur * layer.context.pixelMultiplier}px #{layer._properties.shadowColor})"
-			css.push(dropShadow)
+		shadowStrings = getShadowStrings(layer, "drop", (shadow, pixelMultiplier) ->
+			"drop-shadow(#{shadow.x * pixelMultiplier}px #{shadow.y * pixelMultiplier}px #{shadow.blur * pixelMultiplier}px #{shadow.color})"
+		)
 
+		css = css.concat shadowStrings
 		return css.join(" ")
 
 	webkitTransform: (layer) ->
@@ -168,29 +184,19 @@ exports.LayerStyle =
 			return "auto"
 
 	boxShadow: (layer) ->
-		shadowStrings = []
-		for shadow in layer.shadows
-			if shadow is null
-				continue
-			shadow = _.defaults _.clone(shadow), Framer.Defaults.Shadow
+		shadowStrings = getShadowStrings(layer, ["box", "inset"], (shadow, pixelMultiplier) ->
 			insetString = if shadow.type is "inset" then "inset " else ""
-			if shadow.x is 0 and shadow.y is 0 and shadow.blur is 0 and shadow.spread is 0
-				continue
-			shadowStrings.push "#{insetString}#{shadow.x * layer.context.pixelMultiplier}px #{shadow.y * layer.context.pixelMultiplier}px #{shadow.blur * layer.context.pixelMultiplier}px #{shadow.spread * layer.context.pixelMultiplier}px #{shadow.color}"
+			"#{insetString}#{shadow.x * pixelMultiplier}px #{shadow.y * pixelMultiplier}px #{shadow.blur * pixelMultiplier}px #{shadow.spread * pixelMultiplier}px #{shadow.color}"
+		)
+
+
 		return shadowStrings.join(", ")
 
 	textShadow: (layer) ->
-
-		props = layer._properties
-
-		if not props and props.shadowColor
-			return ""
-		else if props.shadowType isnt "text"
-			return ""
-		else if props.shadowX is 0 and props.shadowY is 0 and props.shadowBlur is 0 and props.shadowSpread is 0
-			return ""
-
-		return "#{layer._properties.shadowX * layer.context.pixelMultiplier}px #{layer._properties.shadowY * layer.context.pixelMultiplier}px #{layer._properties.shadowBlur * layer.context.pixelMultiplier}px #{layer._properties.shadowColor}"
+		shadowStrings = getShadowStrings(layer, "text", (shadow, pixelMultiplier) ->
+			"#{shadow.x * pixelMultiplier}px #{shadow.y * pixelMultiplier}px #{shadow.blur * pixelMultiplier}px #{shadow.color}"
+		)
+		return shadowStrings.join(", ")
 
 	backgroundColor: (layer) ->
 		return layer._properties.backgroundColor
