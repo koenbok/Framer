@@ -577,6 +577,36 @@ describe "TextLayer", ->
 			l.height = 400
 			l._styledText.getStyle("WebkitLineClamp").should.equal ''
 
+		it "should actually clone the css properties when adding a block", ->
+			t = new TextLayer
+				text: "hiep hiep"
+			t._styledText.addBlock("hoera")
+			t._styledText.blocks[0].inlineStyles[0].css.should.not.equal t._styledText.blocks[1].inlineStyles[0].css
+
+		it "should not hide the first element when the second is hidden", ->
+			t = new TextLayer
+				width: 297
+				styledText:
+					blocks: [{
+						inlineStyles: [{
+							startIndex: 0
+							endIndex: 161
+							css:
+								"fontSize": "14px"
+								"fontFamily": "\".SFNSText\", \"SFUIText-Regular\", \".SFUIText\", \"SF UI Text\", sans-serif"
+						}]
+						text: "a"
+					}]
+				height: 65
+				autoSize: false
+			t.truncate = true
+			t.text = """
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque erat felis, egestas eu congue
+
+			Duis eleifend risus vel imperdiet venenatis. Suspendisse rhoncus nisi ex, ut mollis arcu
+			"""
+			expect(t._styledText.blocks[0].inlineStyles[0].css.visibility).to.not.equal "hidden"
+
 	describe "truncate", ->
 		it "should set textOverflow to ellipsis", ->
 			l = new TextLayer

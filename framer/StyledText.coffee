@@ -172,7 +172,7 @@ class StyledTextBlock
 	clone: ->
 		new StyledTextBlock
 			text: ""
-			css: _.first(@inlineStyles).css
+			css: _.clone(_.first(@inlineStyles).css)
 
 	setText: (text) ->
 		@text = text
