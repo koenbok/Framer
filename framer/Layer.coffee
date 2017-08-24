@@ -574,7 +574,7 @@ class exports.Layer extends BaseClass
 
 	@define "htmlIntrinsicSize",
 		importable: true
-		exportable: false
+		exportable: true
 		default: null
 		get: -> @_getPropertyValue "htmlIntrinsicSize"
 		set: (value) ->
