@@ -244,7 +244,8 @@ class exports.Layer extends BaseClass
 
 	@define "label",
 		get: -> @_label
-		set: (value="") ->
+		set: (value) ->
+			return if value is @_label
 			@_label = value
 			Utils.labelLayer(@, @_label)
 
