@@ -183,7 +183,6 @@ class exports.Layer extends BaseClass
 
 		# Create border element
 		@_elementBorder = document.createElement("div")
-		@_element.appendChild(@_elementBorder)
 		@_elementBorder.style.position = "absolute"
 		@_elementBorder.style.top = "0"
 		@_elementBorder.style.bottom = "0"
@@ -192,6 +191,7 @@ class exports.Layer extends BaseClass
 		@_elementBorder.style.boxSizing = "border-box"
 		@_elementBorder.style.zIndex = "1000"
 		@_elementBorder.style.pointerEvents = "none"
+		@_element.appendChild(@_elementBorder)
 
 		# Sanitize calculated property setters so direct properties always win
 		layerPropertyIgnore(options, "point", ["x", "y"])
