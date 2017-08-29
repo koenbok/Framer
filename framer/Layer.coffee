@@ -232,6 +232,8 @@ class exports.Layer extends BaseClass
 
 		delete @__constructor
 
+		@updateShadowStyle()
+
 		@onChange("size", @updateForSizeChange)
 
 	##############################################################
@@ -369,6 +371,7 @@ class exports.Layer extends BaseClass
 			@updateShadowStyle()
 
 	updateShadowStyle: ->
+		return if @__constructor
 		@_element.style.boxShadow = LayerStyle["boxShadow"](@)
 		@_element.style.textShadow = LayerStyle["textShadow"](@)
 		@_element.style.webkitFilter = LayerStyle["webkitFilter"](@)
