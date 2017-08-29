@@ -8,6 +8,7 @@ CounterKey = "_ObjectCounter"
 DefinedPropertiesValuesKey = "_DefinedPropertiesValuesKey"
 
 ObjectDescriptors = []
+ObjectDescriptorsChanged = true
 
 # Theoretically this should be an array per class, but as long as we don't do weird stuff
 # like depending properties of subclasses in a different order then superclasses this will work
@@ -55,6 +56,8 @@ class exports.BaseClass extends EventEmitter
 		return if _.startsWith(propertyName, "_")
 
 		ObjectDescriptors.push([@, propertyName, descriptor])
+		ObjectDescriptorsChanged = true
+
 		# Only retain options that are importable, exportable or both:
 		if descriptor.exportable or descriptor.importable
 			if descriptor.depends
@@ -100,7 +103,16 @@ class exports.BaseClass extends EventEmitter
 		@_propertyList()[k]["default"]
 
 	_propertyList: ->
+		if not @_propertyListCache or ObjectDescriptorsChanged
+			@_propertyListCache = @__propertyList()
+			ObjectDescriptorsChanged = false
+		
+		return @_propertyListCache
+
+	__propertyList: ->
+
 		result = {}
+
 		for k in ObjectDescriptors
 			[Class, name, descriptor] = k
 			if @ instanceof Class
