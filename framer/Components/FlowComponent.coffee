@@ -235,8 +235,21 @@ class exports.FlowComponent extends Layer
 		flowLayer.height = Math.max(flowLayer.height, @height)
 
 		size = @size
+		# Save the parent so we can clean up when we re-wrap this layer
+		if @ in flowLayer.ancestors()
+			content = flowLayer?.parent
+			scroll = content?.parent
+			if scroll instanceof ScrollComponent
+				previousWrappingScroll = scroll
+				previousWrappingContent = content
 		layer = layoutPage(flowLayer, size)
 		layer = layoutScroll(layer, size)
+		if flowLayer isnt layer and
+		   previousWrappingContent?.children.length is 0 and
+		   previousWrappingScroll?.children.length is 1 and
+		   previousWrappingScroll?.children[0] is previousWrappingContent
+			# we wrapped the layer
+			previousWrappingScroll.destroy()
 
 		# Mark the layer so we don't layout it twice'
 		layer._flowLayer = flowLayer
