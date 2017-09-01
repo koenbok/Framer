@@ -61,7 +61,12 @@ class exports.TextLayer extends Layer
 			@styledTextOptions = options.styledText
 			options.color ?= @_styledText.getStyle("color")
 			options.fontSize ?= parseFloat(@_styledText.getStyle("fontSize"))
-			options.lineHeight ?= parseFloat(@_styledText.getStyle("lineHeight"))
+			lineHeight = @_styledText.getStyle("lineHeight")
+			if not lineHeight? or lineHeight is "normal"
+				lineHeight = 1.25
+			else
+				lineHeight = parseFloat(lineHeight)
+			options.lineHeight ?= lineHeight
 		else
 			_.defaults options,
 				backgroundColor: "transparent"
@@ -178,7 +183,7 @@ class exports.TextLayer extends Layer
 			promise.then ->
 				setTimeout(layer.renderText, 0)
 	)
-	@define "fontWeight", textProperty(@, "fontWeight")
+	@define "fontWeight", textProperty(@, "fontWeight", null)
 	@define "fontStyle", textProperty(@, "fontStyle", "normal", _.isString)
 	@define "textDecoration", textProperty(@, "textDecoration", null, _.isString)
 	@define "fontSize", textProperty(@, "fontSize", null, _.isNumber, null, (layer, value) ->
@@ -186,7 +191,7 @@ class exports.TextLayer extends Layer
 		style = LayerStyle["fontSize"](layer)
 		layer._styledText.setStyle("fontSize", style)
 	)
-	@define "textAlign", textProperty(@, "textAlign")
+	@define "textAlign", textProperty(@, "textAlign", null)
 	@define "letterSpacing", textProperty(@, "letterSpacing", null, _.isNumber)
 	@define "lineHeight", textProperty(@, "lineHeight", null, _.isNumber)
 

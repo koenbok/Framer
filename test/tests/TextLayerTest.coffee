@@ -516,6 +516,46 @@ describe "TextLayer", ->
 
 			tagLayer1.size.should.eql tagLayer2.size
 
+		it "should set a default lineHeight", ->
+			home = new TextLayer({
+				"styledText": {
+					"blocks": [{
+						"inlineStyles": [{
+							"startIndex": 0,
+							"endIndex": 4,
+							"css": {
+								"fontSize": "16px",
+							}
+						}],
+						"text": "HOME"
+					}]
+				},
+			})
+
+			home.lineHeight.should.equal 1.25
+
+		it "should set the font weight correctly through a state", ->
+			home = new TextLayer({
+				"styledText": {
+					"blocks": [{
+						"inlineStyles": [{
+							"startIndex": 0,
+							"endIndex": 4,
+							"css": {
+								"fontSize": "16px",
+							}
+						}],
+						"text": "HOME"
+					}]
+				},
+			})
+
+			home.states.selected =
+				fontWeight: 800
+				backgroundColor: "black"
+			home.stateSwitch("selected")
+			expect(home.fontWeight).to.equal 800
+
 	describe "textOverflow", ->
 		it "should enable clipping", ->
 			l = new TextLayer
