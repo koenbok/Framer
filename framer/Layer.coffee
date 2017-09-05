@@ -1276,7 +1276,7 @@ class exports.Layer extends BaseClass
 
 	bringToFront: ->
 		maxIndex = null
-		siblings = @parent?.children ? @context.layers
+		siblings = @parent?.children ? @context._layers
 		return if siblings.count <= 1
 		for layer in siblings
 			continue if layer is @
@@ -1288,7 +1288,7 @@ class exports.Layer extends BaseClass
 
 	sendToBack: ->
 		minIndex = null
-		siblings = @parent?.children ? @context.layers
+		siblings = @parent?.children ? @context._layers
 		return if siblings.count <= 1
 		for layer in siblings
 			continue if layer is @
