@@ -54,12 +54,13 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 			mainElement = @_element if includeMainElement or not targetElement
 			subElement = @[targetElement] if targetElement?
-
 			if cssProperty isnt null
 				if name is cssProperty and not LayerStyle[cssProperty]?
 					mainElement?.style[cssProperty] = @_properties[name]
 					subElement?.style[cssProperty] = @_properties[name]
-				else
+				else if not @__applyingDefaults
+						# These values are set multiple times during applyDefaults, so ignore them here, and set the style in the constructor
+						or (cssProperty not in ["webkitTransform", "webkitFilter", "webkitPerspectiveOrigin", "webkitTransformOrigin"])
 					style = LayerStyle[cssProperty](@)
 					mainElement?.style[cssProperty] = style
 					subElement?.style[cssProperty] = style
@@ -203,7 +204,13 @@ class exports.Layer extends BaseClass
 			options.parent = options.superLayer
 			delete options.superLayer
 
+		@__applyingDefaults = true
 		super Defaults.getDefaults("Layer", options)
+		delete @__applyingDefaults
+		@_element.style["webkitTransform"] = LayerStyle["webkitTransform"](@)
+		@_element.style["webkitFilter"] = LayerStyle["webkitFilter"](@)
+		@_element.style["webkitTransformOrigin"] = LayerStyle["webkitTransformOrigin"](@)
+		@_element.style["webkitPerspectiveOrigin"] = LayerStyle["webkitPerspectiveOrigin"](@)
 
 		# Add this layer to the current context
 		@_context.addLayer(@)
