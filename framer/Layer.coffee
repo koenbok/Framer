@@ -58,9 +58,8 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 				if name is cssProperty and not LayerStyle[cssProperty]?
 					mainElement?.style[cssProperty] = @_properties[name]
 					subElement?.style[cssProperty] = @_properties[name]
-				else if not @__applyingDefaults
-						# These values are set multiple times during applyDefaults, so ignore them here, and set the style in the constructor
-						or (cssProperty not in ["webkitTransform", "webkitFilter", "webkitPerspectiveOrigin", "webkitTransformOrigin"])
+				# These values are set multiple times during applyDefaults, so ignore them here, and set the style in the constructor
+				else if not @__applyingDefaults or (cssProperty not in ["webkitTransform", "webkitFilter", "webkitPerspectiveOrigin", "webkitTransformOrigin"])
 					style = LayerStyle[cssProperty](@)
 					mainElement?.style[cssProperty] = style
 					subElement?.style[cssProperty] = style
