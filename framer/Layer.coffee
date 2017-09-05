@@ -1053,7 +1053,7 @@ class exports.Layer extends BaseClass
 
 			# Remove from previous parent children
 			if @_parent
-				@_parent._children = _.without @_parent._children, @
+				@_parent._children = _.pull @_parent._children, @
 				@_parent._element.removeChild @_element
 				@_parent.emit "change:children", {added: [], removed: [@]}
 				@_parent.emit "change:subLayers", {added: [], removed: [@]}
@@ -1275,10 +1275,28 @@ class exports.Layer extends BaseClass
 	## INDEX ORDERING
 
 	bringToFront: ->
-		@index = _.max(_.union([0], @siblingLayers.map (layer) -> layer.index)) + 1
+		maxIndex = null
+		siblings = @parent?.children ? @context.layers
+		return if siblings.count <= 1
+		for layer in siblings
+			continue if layer is @
+			maxIndex ?= layer.index
+			if layer.index > maxIndex
+				maxIndex = layer.index
+		if maxIndex?
+			@index = maxIndex + 1
 
 	sendToBack: ->
-		@index = _.min(_.union([0], @siblingLayers.map (layer) -> layer.index)) - 1
+		minIndex = null
+		siblings = @parent?.children ? @context.layers
+		return if siblings.count <= 1
+		for layer in siblings
+			continue if layer is @
+			minIndex ?= layer.index
+			if layer.index < minIndex
+				minIndex = layer.index
+		if minIndex?
+			@index = minIndex - 1
 
 	placeBefore: (layer) ->
 		return if layer not in @siblingLayers

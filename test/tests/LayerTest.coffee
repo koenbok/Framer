@@ -1057,8 +1057,8 @@ describe "Layer", ->
 			layerB = new Layer superLayer: layerA
 			layerC = new Layer superLayer: layerA
 
-			assert.equal layerB.index, 1
-			assert.equal layerC.index, 2
+			assert.equal layerB.index, 0
+			assert.equal layerC.index, 1
 
 		it "should send back and front", ->
 
@@ -1068,41 +1068,80 @@ describe "Layer", ->
 
 			layerC.sendToBack()
 
-			assert.equal layerB.index,  1
-			assert.equal layerC.index, -1
+			assert.equal layerB.index,  0
+			assert.equal layerC.index,  -1
 
 			layerC.bringToFront()
 
-			assert.equal layerB.index,  1
-			assert.equal layerC.index,  2
+			assert.equal layerB.index,  0
+			assert.equal layerC.index,  1
+
+
+		it "should take the layer index below the mininum layer index", ->
+			layerA = new Layer
+			layerB = new Layer
+				parent: layerA
+				index: 10
+			layerC = new Layer
+				parent: layerA
+				index: 11
+
+			layerC.sendToBack()
+
+			assert.equal layerB.index,  10
+			assert.equal layerC.index, 9
+
+		it "should handle negative values correctly when sending to back", ->
+			layerA = new Layer
+			layerB = new Layer
+				parent: layerA
+				index: -3
+			layerC = new Layer
+				parent: layerA
+				index: -2
+
+			layerC.sendToBack()
+
+			assert.equal layerB.index, -3
+			assert.equal layerC.index, -4
+
+		it "should leave the index alone if it is the only layer", ->
+			layerA = new Layer
+			layerB = new Layer
+				parent: layerA
+				index: 10
+
+			layerB.sendToBack()
+			layerB.bringToFront()
+			assert.equal layerB.index, 10
 
 		it "should place in front", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer: layerA # 1
-			layerC = new Layer superLayer: layerA # 2
-			layerD = new Layer superLayer: layerA # 3
+			layerB = new Layer superLayer: layerA # 0
+			layerC = new Layer superLayer: layerA # 1
+			layerD = new Layer superLayer: layerA # 2
 
 			layerB.placeBefore layerC
 
-			assert.equal layerB.index, 2
-			assert.equal layerC.index, 1
-			assert.equal layerD.index, 3
+			assert.equal layerB.index, 1
+			assert.equal layerC.index, 0
+			assert.equal layerD.index, 2
 
 		it "should place behind", ->
 
 			layerA = new Layer
-			layerB = new Layer superLayer: layerA # 1
-			layerC = new Layer superLayer: layerA # 2
-			layerD = new Layer superLayer: layerA # 3
+			layerB = new Layer superLayer: layerA # 0
+			layerC = new Layer superLayer: layerA # 1
+			layerD = new Layer superLayer: layerA # 2
 
 			layerC.placeBehind layerB
 
 			# TODO: Still something fishy here, but it works
 
-			assert.equal layerB.index, 2
-			assert.equal layerC.index, 1
-			assert.equal layerD.index, 4
+			assert.equal layerB.index, 1
+			assert.equal layerC.index, 0
+			assert.equal layerD.index, 3
 
 		it "should get a children by name", ->
 
