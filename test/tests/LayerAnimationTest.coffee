@@ -907,7 +907,7 @@ describe "LayerAnimation", ->
 				done()
 			layer.animate "test"
 
-	describe "Border radius animations", (done) ->
+	describe "Border radius animations", ->
 
 		it "should animate border radius from number to number", (done) ->
 			layer = new Layer
@@ -966,7 +966,7 @@ describe "LayerAnimation", ->
 				done()
 			layer.stateCycle()
 
-	describe "Border width animations", (done) ->
+	describe "Border width animations", ->
 
 		it "should animate border width from number to number", (done) ->
 			layer = new Layer
@@ -1014,41 +1014,43 @@ describe "LayerAnimation", ->
 			layer.animate
 				borderWidth: 10
 
-	describe "template animations", (done) ->
-		textLayer = new TextLayer({text: "{distance}{unit}"})
-		textLayer.templateFormatter =
-			distance: (v) -> (v / 1000).toFixed(2)
-		textLayer.template =
-			unit: "KM"
-		textLayer.animate
-			template: 8000
-		textLayer.on Events.AnimationEnd, ->
-			textLayer.text.should.equal "8.00KM"
-			done()
+	describe "template animations", ->
 
-	describe "template animations", (done) ->
-		textLayer = new TextLayer({text: "{distance}{unit}"})
-		textLayer.templateFormatter =
-			distance: (v) -> (v / 1000).toFixed(2)
-		textLayer.template =
-			unit: "KM"
-		textLayer.template = 0
-		textLayer.animate
-			template: 8000
-		textLayer.on Events.AnimationEnd, ->
-			textLayer.text.should.equal "8.00KM"
-			done()
+		it "should animate", (done) ->
+			textLayer = new TextLayer({text: "{distance}{unit}"})
+			textLayer.templateFormatter =
+				distance: (v) -> (v / 1000).toFixed(2)
+			textLayer.template =
+				unit: "KM"
+			textLayer.animate
+				template: 8000
+			textLayer.on Events.AnimationEnd, ->
+				textLayer.text.should.equal "8.00KM"
+				done()
 
-	describe "template animations with multiple properties and formatters", (done) ->
-		textLayer = new TextLayer({text: "{distance}{unit}-{scale}"})
-		textLayer.templateFormatter =
-			distance: (v) -> (v / 1000).toFixed(2)
-		textLayer.template =
-			unit: "KM"
-		textLayer.animate
-			template:
-				distance: 8000
-				scale: "HEAVY"
-		textLayer.on Events.AnimationEnd, ->
-			textLayer.text.should.equal "8.00KM-HEAVY"
-			done()
+		it "should work with a start template value", (done) ->
+			textLayer = new TextLayer({text: "{distance}{unit}"})
+			textLayer.templateFormatter =
+				distance: (v) -> (v / 1000).toFixed(2)
+			textLayer.template =
+				unit: "KM"
+			textLayer.template = 0
+			textLayer.animate
+				template: 8000
+			textLayer.on Events.AnimationEnd, ->
+				textLayer.text.should.equal "8.00KM"
+				done()
+
+		it "should work with multiple properties and formatters", (done) ->
+			textLayer = new TextLayer({text: "{distance}{unit}-{scale}"})
+			textLayer.templateFormatter =
+				distance: (v) -> (v / 1000).toFixed(2)
+			textLayer.template =
+				unit: "KM"
+			textLayer.animate
+				template:
+					distance: 8000
+					scale: "HEAVY"
+			textLayer.on Events.AnimationEnd, ->
+				textLayer.text.should.equal "8.00KM-HEAVY"
+				done()
