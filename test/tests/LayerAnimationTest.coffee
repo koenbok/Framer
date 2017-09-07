@@ -1,47 +1,51 @@
 assert = require "assert"
 
-AnimationTime = 0.05
+AnimationTime = 0.001
 AnimationProperties = ["x", "y", "midY", "rotation"]
 
+describe "Animation Defaults", ->
+
+	it "should use defaults", ->
+
+		Framer.Defaults.Animation =
+			curve: "ease-in"
+
+		animation = new Animation new Layer(),
+			x: 50
+
+		animation.options.curve.should.equal Bezier.easeIn
+
+		Framer.resetDefaults()
+
+	it "should handle default spring curves correctly", ->
+
+		Framer.Defaults.Animation =
+			curve: Spring(0.5)
+
+		layer = new Layer
+		animation = layer.animate
+			x: 50
+
+		animation._animator.constructor.name.should.equal "SpringRK4Animator"
+
+		Framer.resetDefaults()
+
+
+	it "should use linear", ->
+
+		# We shouldn't change the linear default, people rely on it
+
+		animation = new Animation new Layer(),
+			x: 50
+
+		animation.options.curve.should.equal Bezier.ease
+		animation.options.time.should.equal 1
+
 describe "LayerAnimation", ->
-
-	describe "Defaults", ->
-
-		it "should use defaults", ->
-
-			Framer.Defaults.Animation =
-				curve: "ease-in"
-
-			animation = new Animation new Layer(),
-				x: 50
-
-			animation.options.curve.should.equal Bezier.easeIn
-
-			Framer.resetDefaults()
-
-		it "should handle default spring curves correctly", ->
-
-			Framer.Defaults.Animation =
-				curve: Spring(0.5)
-
-			layer = new Layer
-			animation = layer.animate
-				x: 50
-
-			animation._animator.constructor.name.should.equal "SpringRK4Animator"
-
-			Framer.resetDefaults()
-
-
-		it "should use linear", ->
-
-			# We shouldn't change the linear default, people rely on it
-
-			animation = new Animation new Layer(),
-				x: 50
-
-			animation.options.curve.should.equal Bezier.ease
-			animation.options.time.should.equal 1
+	before ->
+		Framer.Defaults.Animation.time = AnimationTime
+	after ->
+		Framer.resetDefaults()
 
 	describe "Properties", ->
 
@@ -57,7 +61,6 @@ describe "LayerAnimation", ->
 				layer.animate
 					properties: properties
 					curve: "linear"
-					time: AnimationTime
 
 				layer.on "end", ->
 					layer[p].should.equal 100
@@ -71,7 +74,6 @@ describe "LayerAnimation", ->
 				properties[p] = 100
 				options =
 					curve: Bezier.easeInOut
-					time: AnimationTime
 
 				animation = layer.animate properties, options
 				animation.options.curve.should.equal Bezier.easeInOut
@@ -86,7 +88,6 @@ describe "LayerAnimation", ->
 				properties[p] = 100
 				properties.options =
 					curve: Bezier.linear
-					time: AnimationTime
 
 				animation = layer.animate properties
 				animation.options.curve.should.equal Bezier.linear
@@ -105,7 +106,6 @@ describe "LayerAnimation", ->
 
 				layer.animate properties,
 					curve: "linear"
-					time: AnimationTime
 
 
 				layer.on "end", ->
@@ -122,7 +122,6 @@ describe "LayerAnimation", ->
 
 				layer.animate properties,
 					curve: "linear"
-					time: AnimationTime
 
 
 				layer.on "end", ->
@@ -138,7 +137,6 @@ describe "LayerAnimation", ->
 				scale: -> layer.scale + 1
 				options:
 					curve: "linear"
-					time: AnimationTime
 
 			layer.on "end", ->
 				layer.scale.should.equal 2
@@ -153,7 +151,6 @@ describe "LayerAnimation", ->
 				backgroundColor: color
 				options:
 					curve: "linear"
-					time: AnimationTime
 
 			layer.on "end", ->
 				layer.backgroundColor.toName().should.eql color
@@ -218,7 +215,6 @@ describe "LayerAnimation", ->
 		it "should work, even with MobileScrollFix enabled", (done) ->
 			layer = new Layer()
 			Framer.Extras.MobileScrollFix.enable()
-			layer.animationOptions = time: AnimationTime
 			animation = layer.animate x: 100
 			animation.start()
 			Utils.delay animation.options.time, ->
@@ -227,7 +223,7 @@ describe "LayerAnimation", ->
 		it "copy should work", (done) ->
 			layer = new Layer
 				x: 50
-			animation = new Animation layer, {x: 100}, {time: AnimationTime}
+			animation = new Animation layer, {x: 100}
 			copy = animation.copy()
 			copy.onAnimationEnd ->
 				layer.x.should.equal 100
@@ -237,7 +233,7 @@ describe "LayerAnimation", ->
 		it "reverse should work", (done) ->
 			layer = new Layer
 				x: 50
-			animation = new Animation layer, {x: 100}, {time: AnimationTime}
+			animation = new Animation layer, {x: 100}
 			animation.onAnimationEnd ->
 				layer.x.should.equal 100
 				a = animation.reverse()
@@ -407,7 +403,6 @@ describe "LayerAnimation", ->
 				x: 50
 				options:
 					curve: "linear"
-					time: AnimationTime
 
 			count = 0
 
@@ -428,7 +423,6 @@ describe "LayerAnimation", ->
 				x: 50
 				options:
 					curve: "linear"
-					time: AnimationTime
 
 			count = 0
 			test = -> count++; done() if count is 2
@@ -463,21 +457,20 @@ describe "LayerAnimation", ->
 	describe "Delay", ->
 
 		it "should start after a while", (done) ->
-
+			time = 0.05
 			layer = new Layer()
-
 			animation = new Animation layer,
 				x: 50
 				options:
 					curve: "linear"
-					time: AnimationTime
-					delay: AnimationTime
+					time: time
+					delay: time
 
 			animation.start()
 
-			Utils.delay AnimationTime, ->
+			Utils.delay time, ->
 				layer.x.should.be.within(0, 1)
-				Utils.delay AnimationTime, ->
+				Utils.delay time, ->
 					layer.x.should.be.within(30, 50)
 					done()
 
@@ -534,7 +527,6 @@ describe "LayerAnimation", ->
 				x: -> layer.x + 100
 				options:
 					curve: "linear"
-					time: AnimationTime
 					repeat: 5
 
 			animation.start()
@@ -549,7 +541,7 @@ describe "LayerAnimation", ->
 
 	describe "AnimationLoop", ->
 
-		it "should only stop when all animations are done", (done) ->
+		it "should only stop when all animations are", (done) ->
 
 			layerA = new Layer width: 80, height: 80
 			layerA.name = "layerA"
@@ -708,7 +700,6 @@ describe "LayerAnimation", ->
 				layer.animate
 					x: 100
 					options:
-						time: AnimationTime
 						onStart: ->
 							layer.x.should.eql 0
 							done()
@@ -718,7 +709,6 @@ describe "LayerAnimation", ->
 				layer.animate
 					x: 100
 					options:
-						time: AnimationTime
 						onHalt: ->
 							done()
 				layer.animateStop()
@@ -728,7 +718,6 @@ describe "LayerAnimation", ->
 				layer.animate
 					x: 100
 					options:
-						time: AnimationTime
 						onStop: ->
 							layer.x.should.eql 100
 							done()
@@ -738,7 +727,6 @@ describe "LayerAnimation", ->
 				layer.animate
 					x: 100
 					options:
-						time: AnimationTime
 						onEnd: ->
 							layer.x.should.eql 100
 							done()
@@ -782,7 +770,6 @@ describe "LayerAnimation", ->
 
 			it "should support properties", (done) ->
 				layer = new Layer
-				layer.animationOptions = time: AnimationTime
 				animation = layer.animate x: 10
 				animation.on Events.AnimationEnd, ->
 					layer.x.should.equal 10
@@ -790,7 +777,6 @@ describe "LayerAnimation", ->
 
 			it "should support properties with options", (done) ->
 				layer = new Layer
-				layer.animationOptions = time: AnimationTime
 				animation = layer.animate({x: 10}, {curve: "linear"})
 				animation.options.curve.should.equal Bezier.linear
 				animation.on Events.AnimationEnd, ->
@@ -799,7 +785,6 @@ describe "LayerAnimation", ->
 
 			it "should support properties with options as object", (done) ->
 				layer = new Layer
-				layer.animationOptions = time: AnimationTime
 				animation = layer.animate
 					x: 10
 					options:
@@ -812,7 +797,6 @@ describe "LayerAnimation", ->
 
 			it "should support states", (done) ->
 				layer = new Layer
-				layer.animationOptions = time: AnimationTime
 				layer.states.test = {x: 10}
 				animation = layer.animate "test"
 				animation.on Events.AnimationEnd, ->
@@ -821,7 +805,6 @@ describe "LayerAnimation", ->
 
 			it "should support state with options", (done) ->
 				layer = new Layer
-				layer.animationOptions = time: AnimationTime
 				layer.states.test = {x: 10}
 				animation = layer.animate("test", {curve: "linear"})
 				animation.options.curve.should.equal Bezier.linear
@@ -831,7 +814,6 @@ describe "LayerAnimation", ->
 
 			it "should support state with options as object", (done) ->
 				layer = new Layer
-				layer.animationOptions = time: AnimationTime
 				layer.states.test = {x: 10}
 				animation = layer.animate "test",
 					options:

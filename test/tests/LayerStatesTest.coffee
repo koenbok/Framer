@@ -2,6 +2,7 @@ assert = require "assert"
 {expect} = require "chai"
 
 initialStateName = "default"
+AnimationTime = 0.001
 
 stateWithoutName = (state) ->
 	return _.pickBy(state, (value, key) -> key isnt "name")
@@ -39,7 +40,7 @@ describe "LayerStates", ->
 				done()
 
 			@layer.on Events.StateSwitchStop, test
-			@layer.animate "a", time: 0.01
+			@layer.animate "a", time: AnimationTime
 
 		it "should emit StateSwitchStop when switching instant", (done) ->
 
@@ -204,7 +205,7 @@ describe "LayerStates", ->
 		# 	layer = new Layer
 		# 	layer.states.stateA = {x: 100}
 		# 	layer.stateSwitch "stateA"
-		# 	animation = layer.animate "stateA", time: 0.05
+		# 	animation = layer.animate "stateA", time: AnimationTime
 		# 	assert.equal(animation, null)
 
 		it "should change to a state when the properties defined are not the current", (done) ->
@@ -216,7 +217,7 @@ describe "LayerStates", ->
 				layer.states.current.name.should.equal "stateA"
 				layer.x.should.equal 100
 				done()
-			animation = layer.animate "stateA", time: 0.05
+			animation = layer.animate "stateA", time: AnimationTime
 
 	it "should change the state name when using 'previous' as stateName", (done) ->
 		layer = new Layer
@@ -237,8 +238,8 @@ describe "LayerStates", ->
 
 			layer = new Layer
 			layer.states =
-				stateA: {x: 100, rotation: 90, options: time: 0.05}
-				stateB: {x: 200, rotation: 180, options: time: 0.05}
+				stateA: {x: 100, rotation: 90, options: time: AnimationTime}
+				stateB: {x: 200, rotation: 180, options: time: AnimationTime}
 
 			layer.x.should.equal 0
 
@@ -251,7 +252,7 @@ describe "LayerStates", ->
 					when "stateB"
 						layer.x.should.equal 200
 						layer.rotation.should.equal 180
-						layer.stateCycle(time: 0.05)
+						layer.stateCycle(time: AnimationTime)
 					when initialStateName
 						layer.x.should.equal 0
 						layer.rotation.should.equal 0
@@ -269,6 +270,7 @@ describe "LayerStates", ->
 				y: 445
 
 			layer.x.should.equal 0
+			layer.animationOptions.time = AnimationTime
 
 			count = 0
 			ready = (animation, layer) ->
@@ -280,14 +282,14 @@ describe "LayerStates", ->
 					when "stateA"
 						layer.x.should.equal 302
 						layer.y.should.equal 445
-						layer.stateCycle(time: 0.05)
+						layer.stateCycle(time: AnimationTime)
 					when initialStateName
 						layer.x.should.equal 0
 						layer.rotation.should.equal 0
-						layer.stateCycle(time: 0.05)
+						layer.stateCycle(time: AnimationTime)
 
 			layer.on Events.AnimationEnd, ready
-			layer.stateCycle(time: 0.05)
+			layer.stateCycle(time: AnimationTime)
 
 		it "ignoreEvents should not be part of the initial state", ->
 
@@ -326,6 +328,7 @@ describe "LayerStates", ->
 		it "should set non numeric properties with animation", (done) ->
 
 			layer = new Layer
+			layer.animationOptions.time = AnimationTime
 			layer.states =
 				stateA: {scroll: true, backgroundColor: "red"}
 
@@ -353,7 +356,7 @@ describe "LayerStates", ->
 				layer.style.backgroundColor.should.equal new Color("red").toString()
 				done()
 
-			layer.animate "stateA", {curve: "linear", time: 0.1}
+			layer.animate "stateA", {curve: "linear", time: AnimationTime}
 
 		it "should restore the initial state when using non exportable properties", ->
 
@@ -489,7 +492,7 @@ describe "LayerStates", ->
 
 		it "should cycle two", (done) ->
 			layer = new Layer
-			layer.animationOptions.time = 0.1
+			layer.animationOptions.time = AnimationTime
 			layer.states.test = {x: 200}
 
 			layer.on Events.StateSwitchEnd, ->
@@ -500,7 +503,7 @@ describe "LayerStates", ->
 
 		it "should cycle two with options", (done) ->
 			layer = new Layer
-			layer.animationOptions.time = 0.1
+			layer.animationOptions.time = AnimationTime
 			layer.states.test = {x: 200}
 			layer.stateCycle onEnd: ->
 				layer.x.should.equal 200
@@ -516,7 +519,7 @@ describe "LayerStates", ->
 		it "should not touch the options object", (done) ->
 			layer = new Layer
 			layer.states.test = {x: 200}
-			options = {time: 0.1}
+			options = {time: AnimationTime}
 			layer.stateCycle(options)
 			layer.once Events.StateDidSwitch, ->
 				layer.x.should.equal 200
@@ -529,7 +532,7 @@ describe "LayerStates", ->
 
 		it "should cycle three with options", (done) ->
 			layer = new Layer
-			layer.animationOptions.time = 0.1
+			layer.animationOptions.time = AnimationTime
 			layer.states.testA = {x: 200}
 			layer.states.testB = {x: 400}
 			layer.stateCycle onEnd: ->
@@ -545,7 +548,7 @@ describe "LayerStates", ->
 
 		it "should cycle two out of three in a list", (done) ->
 			layer = new Layer
-			layer.animationOptions.time = 0.1
+			layer.animationOptions.time = AnimationTime
 			layer.states.testA = {x: 200}
 			layer.states.testB = {x: 400}
 			layer.stateCycle ["testA", "testB"], onEnd: ->
@@ -561,7 +564,7 @@ describe "LayerStates", ->
 
 		it "should cycle list without options", (done) ->
 			layer = new Layer
-			layer.animationOptions.time = 0.1
+			layer.animationOptions.time = AnimationTime
 			layer.states.testA = {x: 200}
 			layer.states.testB = {x: 400}
 			layer.once Events.StateSwitchEnd, ->
@@ -574,7 +577,7 @@ describe "LayerStates", ->
 
 		it "should cycle multiple arguments without options", (done) ->
 			layer = new Layer
-			layer.animationOptions.time = 0.1
+			layer.animationOptions.time = AnimationTime
 			layer.states.testA = {x: 200}
 			layer.states.testB = {x: 400}
 			layer.once Events.StateSwitchEnd, ->
@@ -588,7 +591,7 @@ describe "LayerStates", ->
 
 		it "should cycle two out of three in arguments", (done) ->
 			layer = new Layer
-			layer.animationOptions.time = 0.1
+			layer.animationOptions.time = AnimationTime
 			layer.states.testA = {x: 200}
 			layer.states.testB = {x: 400}
 			layer.stateCycle "testA", "testB", onEnd: ->
@@ -604,7 +607,7 @@ describe "LayerStates", ->
 
 		it "should cycle all without state list", (done) ->
 			layer = new Layer
-			layer.animationOptions.time = 0.1
+			layer.animationOptions.time = AnimationTime
 			layer.states.testA = {x: 200}
 			layer.states.testB = {x: 400}
 			layer.stateCycle onEnd: ->
@@ -617,7 +620,7 @@ describe "LayerStates", ->
 
 		it "should listen to animationOptions defined in a state", (done) ->
 			layer = new Layer
-			layer.animationOptions.time = 0.1
+			layer.animationOptions.time = AnimationTime
 			layer.states.testA = {x: 200, animationOptions: curve: Bezier.easeOut}
 			cycle = layer.stateCycle onEnd: ->
 				layer.states.current.name.should.equal "testA"
@@ -627,11 +630,11 @@ describe "LayerStates", ->
 						layer.states.current.name.should.equal "testA"
 						done()
 					cycle3.options.curve.should.equal Bezier.easeOut
-					layer.animationOptions.should.eql {time: 0.1}
+					layer.animationOptions.should.eql {time: AnimationTime}
 				cycle2.options.curve.should.equal Bezier.ease
-				layer.animationOptions.should.eql {time: 0.1}
+				layer.animationOptions.should.eql {time: AnimationTime}
 			cycle.options.curve.should.equal Bezier.easeOut
-			layer.animationOptions.should.eql {time: 0.1}
+			layer.animationOptions.should.eql {time: AnimationTime}
 
 	describe "Switch", ->
 
@@ -703,7 +706,7 @@ describe "LayerStates", ->
 
 			animation = layer.animate "test",
 				onStop: onStop
-				time: 0.1
+				time: AnimationTime
 
 			animation.options.onStop.should.equal onStop
 
@@ -718,6 +721,6 @@ describe "LayerStates", ->
 
 			animation = layer.animate "test",
 				onEnd: onEnd
-				time: 0.1
+				time: AnimationTime
 
 			animation.options.onEnd.should.equal onEnd
