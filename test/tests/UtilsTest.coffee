@@ -1,3 +1,4 @@
+require('es6-promise').polyfill()
 assert = require "assert"
 
 describe "Utils", ->

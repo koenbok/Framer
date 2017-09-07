@@ -21,6 +21,7 @@
     "coffee-coverage": "^2.0.1",
     "coffee-loader": "^0.7.2",
     "coffee-script": "^1.9.1",
+    "es6-promise": "^4.1.1",
     "eventemitter3": "^1.1.1",
     "gulp": "^3.8.11",
     "gulp-coffeelint": "^0.6.0",

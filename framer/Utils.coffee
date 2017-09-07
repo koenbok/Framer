@@ -524,64 +524,40 @@ Utils.loadWebFontConfig = (config) ->
 	if allLoadedResult?
 		return allLoadedResult
 
-	promise =
-		resolved: false
-		error: null
-		resolve: null
-		reject: null
-		'then': (cb) ->
-			@resolve = cb
-			@resolve?() if @resolved
-			return @
-		'catch': (cb) ->
-			@reject = cb
-			@reject?(@error) if @error?
-			return @
-
 	customActive = config.active
 	customInactive = config.inactive
 	customFontactive = config.fontactive
 	customFontinactive = config.fontinactive
 
-	resolvePromise = ->
-		promise.resolve?()
-		promise.resolved = true
+	promise = new Promise (resolve, reject) ->
+		config.fontactive = (font) ->
+			_isFontLoadedResults[font] = true
+			customFontactive?(font)
+			if fonts.length is 1
+				resolve()
 
-	rejectPromise = (error) ->
-		promise.reject?(error)
-		promise.error = error
+		config.fontinactive = (font) ->
+			console.warn("Tried to load unavailable font: '#{font}'")
+			_isFontLoadedResults[font] = false
+			customFontinactive?(font)
+			if fonts.length is 1
+				error = new Error("#{font} failed to load")
+				reject(error)
 
-	config.fontactive = (font) ->
-		_isFontLoadedResults[font] = true
-		customFontactive?(font)
-		if fonts.length is 1
-			f = resolvePromise
-			resolvePromise = null
-			f()
+		config.active = ->
+			customActive?()
+			resolve()
 
-	config.fontinactive = (font) ->
-		console.warn("Tried to load unavailable font: '#{font}'")
-		_isFontLoadedResults[font] = false
-		customFontinactive?(font)
-		if fonts.length is 1
-			f = rejectPromise
-			rejectPromise = null
-			error = new Error("#{font} failed to load")
-			f(error)
+		config.inactive = ->
+			customInactive?()
+			error = new Error("#{fonts.join(', ')} failed to load")
+			reject(error)
 
-	config.active = ->
-		customActive?()
-		resolvePromise?()
-
-	config.inactive = ->
-		customInactive?()
-		error = new Error("#{fonts.join(', ')} failed to load")
-		rejectPromise?(error)
-
-	WebFont.load config
+		WebFont.load config
 
 	return promise
 
+# Load fonts from Google Web Fonts
 Utils.loadWebFont = (font, weight, source = "google") ->
 	if not _isFontLoadedResults[font]? or _isFontLoadedResults[font] is false
 		delete _isFontLoadedResults[font]
