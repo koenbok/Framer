@@ -24,7 +24,7 @@ describe "Layer", ->
 		describe "Simulation", ->
 			it "should be cancelled when animating the same property", (done) ->
 				layerA = new Layer
-				time = 0.04
+				time = 0.001
 				for i in [0..3]
 					do (i) ->
 						Utils.delay i*time, ->
@@ -42,10 +42,8 @@ describe "Layer", ->
 					simulation = layerA.draggable._simulation.x
 					a = @animate
 						x: 10
-						options:
-							time: 0.1
 					simulation._running.should.equal false
 					a.onAnimationStop (animation) ->
-						Utils.delay 0.1, ->
+						Utils.delay a.options.time, ->
 							layerA.x.should.equal 10
 							done()

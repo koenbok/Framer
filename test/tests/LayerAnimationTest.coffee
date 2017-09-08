@@ -173,7 +173,6 @@ describe "LayerAnimation", ->
 				x: 50
 				options:
 					curve: "linear"
-					time: 0.5
 
 			animation.start()
 
@@ -190,13 +189,11 @@ describe "LayerAnimation", ->
 				x: 50
 				options:
 					curve: "linear"
-					time: 0.5
 
 			animationB = new Animation layer,
 				x: 50
 				options:
 					curve: "linear"
-					time: 0.5
 
 			stopped = false
 			animationA.on "stop", -> stopped = true
@@ -301,8 +298,6 @@ describe "LayerAnimation", ->
 			layer = new Layer()
 			animation = layer.animate
 				x: 100
-				options:
-					time: 0.5
 
 			(animation in layer.animations()).should.be.true
 			layer.animateStop()
@@ -314,8 +309,6 @@ describe "LayerAnimation", ->
 
 			animation = layer.animate
 				x: 100
-				options:
-					time: 0.5
 
 			count = 0
 
@@ -334,8 +327,8 @@ describe "LayerAnimation", ->
 			animation = layer.animate
 				x: 100
 				options:
-					time: 0.1
-					delay: 0.1
+					time: AnimationTime
+					delay: AnimationTime
 			count = 0
 			test = ->
 				layer.animations().length.should.equal 0
@@ -351,8 +344,7 @@ describe "LayerAnimation", ->
 			animation = layer.animate
 				x: 100
 				options:
-					time: 0.1
-					delay: 0.1
+					delay: AnimationTime
 			count = 0
 			test = ->
 				(animation in layer.animations(true)).should.equal true
@@ -367,8 +359,6 @@ describe "LayerAnimation", ->
 			layer = new Layer()
 			animation = layer.animate
 				x: 100
-				options:
-					time: 0.5
 
 			layer.isAnimating.should.equal(true)
 			layer.animateStop()
@@ -379,10 +369,10 @@ describe "LayerAnimation", ->
 			animation = layer.animate
 				x: 100
 				options:
-					time: 0.3
-					delay: 0.1
+					time: AnimationTime * 2
+					delay: AnimationTime
 			animation.isAnimating.should.equal(false)
-			Utils.delay 0.2, ->
+			Utils.delay AnimationTime * 2, ->
 				animation.isAnimating.should.equal(true)
 				done()
 
@@ -451,7 +441,7 @@ describe "LayerAnimation", ->
 	describe "Delay", ->
 
 		it "should start after a while", (done) ->
-			time = 0.05
+			time = AnimationTime
 			layer = new Layer()
 			animation = new Animation layer,
 				x: 50
@@ -473,14 +463,13 @@ describe "LayerAnimation", ->
 			animation = new Animation layer,
 				properties: {x: 50}
 				curve: "linear"
-				time: 0.5
-				delay: 0.3
+				delay: AnimationTime
 
 			animation.start()
 			animation.stop()
-			Utils.delay 0.3, ->
+			Utils.delay AnimationTime, ->
 				layer.x.should.equal 0
-				Utils.delay 0.5, ->
+				Utils.delay AnimationTime, ->
 					layer.x.should.equal 0
 					done()
 
@@ -496,9 +485,9 @@ describe "LayerAnimation", ->
 			a = layer.animate
 				x: 100
 				options:
-					delay: 0.3
+					delay: AnimationTime
 			a.isPending.should.equal true
-			Utils.delay 0.3, ->
+			Utils.delay AnimationTime, ->
 				a.isPending.should.equal false
 				done()
 
@@ -507,7 +496,7 @@ describe "LayerAnimation", ->
 			a = layer.animate
 				x: 100
 				options:
-					delay: 0.3
+					delay: AnimationTime
 			(a in layer.context.animations).should.equal true
 
 
@@ -521,7 +510,7 @@ describe "LayerAnimation", ->
 				x: -> layer.x + 100
 				options:
 					curve: "linear"
-					repeat: 5
+					repeat: 3
 
 			animation.start()
 
@@ -542,21 +531,21 @@ describe "LayerAnimation", ->
 			layerA.animate
 				y: 300
 				options:
-					time: 2 * AnimationTime
+					time: AnimationTime
 
 			layerB = new Layer width: 80, height: 80, x: 100, backgroundColor: "red"
 			layerB.name = "layerB"
 			layerB.animate
 				y: 300
 				options:
-					time: 5 * AnimationTime
+					time: 2 * AnimationTime
 
 			layerC = new Layer width: 80, height: 80, x: 200, backgroundColor: "orange"
 			layerC.name = "layerC"
 			layerC.animate
 				y: 300
 				options:
-					time: 2 * AnimationTime
+					time: AnimationTime
 					curve: "cubic-bezier"
 
 			readyLayers = []
