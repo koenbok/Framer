@@ -272,7 +272,50 @@ describe "Utils", ->
 			# it "should return the right size with height constraint", ->
 			# 	Utils.textSize(text, style, {height: 100}).should.eql(width: 168, height: 100)
 
-	describe.skip "loadWebFontConfig", ->
+	describe "loadWebFontConfig", ->
+
+		it "should return a promise", (done) ->
+			promise = Utils.loadWebFontConfig
+				custom:
+					families: ["Test"]
+				timeout: 5
+			promise.catch ->
+				done()
+			return
+
+		it "should reject the promise if the font can't be loaded", (done) ->
+			promise = Utils.loadWebFontConfig
+				custom:
+					families: ["Test2"]
+				timeout: 5
+			promise.catch (error) ->
+				error.message.should.equal "Test2 failed to load"
+				done()
+			return
+
+		it "should return false if the font has already failed loading", (done) ->
+			promise = Utils.loadWebFontConfig
+				custom:
+					families: ["Test3"]
+				timeout: 5
+			promise.catch ->
+				result = Utils.loadWebFontConfig
+					custom:
+						families: ["Test3"]
+				result.should.equal false
+				done()
+			return
+
+		it "should support loading webfonts with WebFontConfig syntax", (done) ->
+			result = Utils.loadWebFontConfig
+				custom:
+					families: ['Random font']
+				timeout: 5
+			result.catch (e) ->
+				e.message.should.equal "Random font failed to load"
+				done()
+			return
+
 		describe "Real font loading tests", ->
 			before ->
 				# We skip the this test on CI, because I can't get the WebFont loading to work... :'(
@@ -298,6 +341,12 @@ describe "Utils", ->
 					done()
 				return
 
+		describe "Online font loading tests", ->
+			before ->
+				# We skip the this test on CI, because I can't get the WebFont loading to work... :'(
+				if mocha.env.CI or not mocha.env.ONLINE
+					@skip()
+
 			it "should not interfere with each other", (done) ->
 				Utils.loadWebFont("Raleway")
 				roboto = Utils.loadWebFontConfig
@@ -308,7 +357,7 @@ describe "Utils", ->
 				return
 
 			it "should cache loading of google fonts", (done) ->
-				@skip()
+				@timeout(5000)
 				droid = Utils.loadWebFontConfig
 					google:
 						families: ['Droid Sans']
@@ -330,58 +379,17 @@ describe "Utils", ->
 					done()
 				return
 
-
-		it "should return a promise", (done) ->
-			promise = Utils.loadWebFontConfig
-				custom:
-					families: ["Test"]
-				timeout: 100
-			promise.catch ->
-				done()
-			return
-
-		it "should reject the promise if the font can't be loaded", (done) ->
-			promise = Utils.loadWebFontConfig
-				custom:
-					families: ["Test2"]
-				timeout: 100
-			promise.catch (error) ->
-				error.message.should.equal "Test2 failed to load"
-				done()
-			return
-
-		it "should return false if the font has already failed loading", (done) ->
-			promise = Utils.loadWebFontConfig
-				custom:
-					families: ["Test3"]
-				timeout: 100
-			promise.catch ->
-				result = Utils.loadWebFontConfig
-					custom:
-						families: ["Test3"]
-				result.should.equal false
-				done()
-			return
-
-		it "should support loading webfonts with WebFontConfig syntax", (done) ->
-			result = Utils.loadWebFontConfig
-				custom:
-					families: ['Random font']
-				timeout: 100
-			result.catch (e) ->
-				e.message.should.equal "Random font failed to load"
-				done()
-			return
-
-	describe.skip "isFontFamilyLoaded", ->
-		it "should not reset the result if it is loaded successfully", (done) ->
-			if mocha.env.CI
+	describe "isFontFamilyLoaded", ->
+		before: ->
+			if mocha.env.CI or not mocha.env.ONLINE
 				@skip()
 				return
+
+		it "should not reset the result if it is loaded successfully", (done) ->
 			p = Utils.loadWebFontConfig
 				custom:
 					families: ["Georgia"]
-				timeout: 100
+				timeout: 5
 			p.then ->
 				Utils.loadWebFont("Georgia")
 				promise = Utils.isFontFamilyLoaded("Georgia", 100)
@@ -393,7 +401,7 @@ describe "Utils", ->
 			p = Utils.loadWebFontConfig
 				custom:
 					families: ["Test4"]
-				timeout: 100
+				timeout: 5
 			p.catch ->
 				Utils.loadWebFont("Test4")
 				promise = Utils.isFontFamilyLoaded("Test4", 100)
@@ -401,7 +409,12 @@ describe "Utils", ->
 				done()
 			return
 
-	describe.skip "loadWebFont", ->
+	describe "Online loadWebFont", ->
+		before: ->
+			if not mocha.env.ONLINE
+				@skip()
+				return
+
 		it "loads fonts at different weights" , ->
 			raleway = Utils.loadWebFont("Raleway")
 			raleway200 = Utils.loadWebFont("Raleway", 200)
