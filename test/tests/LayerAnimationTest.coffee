@@ -1,9 +1,9 @@
 assert = require "assert"
 
-AnimationTime = 0.001
+AnimationTime = Framer.Defaults.Animation.time
 AnimationProperties = ["x", "y", "midY", "rotation"]
 
-describe "Animation Defaults", ->
+describe "LayerAnimation", ->
 
 	it "should use defaults", ->
 
@@ -39,13 +39,7 @@ describe "Animation Defaults", ->
 			x: 50
 
 		animation.options.curve.should.equal Bezier.ease
-		animation.options.time.should.equal 1
-
-describe "LayerAnimation", ->
-	before ->
-		Framer.Defaults.Animation.time = AnimationTime
-	after ->
-		Framer.resetDefaults()
+		animation.options.time.should.equal Framer.Defaults.Animation.time
 
 	describe "Properties", ->
 

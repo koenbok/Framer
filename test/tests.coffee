@@ -8,7 +8,9 @@ Framer.resetDefaults = ->
 	# We don't want to update all the tests if we change these
 	Framer.Defaults.Layer.width = 100
 	Framer.Defaults.Layer.height = 100
+	Framer.Defaults.Animation.time = 0.035
 Framer.resetDefaults()
+
 
 Framer.Device = new Framer.DeviceView()
 

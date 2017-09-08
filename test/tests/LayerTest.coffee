@@ -797,8 +797,6 @@ describe "Layer", ->
 			l.animate
 				shadow1:
 					x: 20
-				options:
-					time: 0.2
 			l.onAnimationEnd ->
 				l.shadow1.x.should.equal 20
 				done()
@@ -810,8 +808,6 @@ describe "Layer", ->
 			l.animate
 				shadow1:
 					color: "blue"
-				options:
-					time: 0.2
 			l.onAnimationEnd ->
 				l.shadow1.color.toString().should.equal "rgb(0, 0, 255)"
 				done()
