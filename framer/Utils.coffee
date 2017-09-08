@@ -492,15 +492,37 @@ Utils.deviceFont = (os) ->
 
 	return appleFont
 
-# Load fonts from Google Web Fonts
 _isFontLoadedResults = {}
+
+getWidth = (fontFamily) ->
+	Utils.textSize("BESbswy",
+		fontFamily: fontFamily
+		fontSize: 300).width
+
+monoWidth = null
+serifWidth = null
+sansWidth = null
+
+Utils.isFontAvailable = (fonts) ->
+	if _isFontLoadedResults[fonts] is true
+		return true
+	monoWidth ?= getWidth('monospace')
+	serifWidth ?= getWidth('serif')
+	sansWidth ?= getWidth('sans-serif')
+	if monoWidth isnt getWidth(fonts + ",monospace") or serifWidth isnt getWidth(fonts + ",serif") or sansWidth isnt getWidth(fonts + ",sans-serif")
+		_isFontLoadedResults[fonts] = true
+		return true
+	else
+		return false
 
 Utils.isFontFamilyLoaded = (fonts, timeout = 1000) ->
 	if not _.isArray(fonts)
 		fonts = [fonts]
+	unavailableFonts = fonts.filter (font) -> not Utils.isFontAvailable(font)
+	return true if unavailableFonts.length is 0
 	return Utils.loadWebFontConfig
 		custom:
-			families: fonts
+			families: unavailableFonts
 		timeout: timeout
 
 fontsFromConfig = (config) ->
