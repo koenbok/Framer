@@ -484,13 +484,13 @@ describe "TextLayer", ->
 	describe "Fonts", ->
 		it "sets the weight if the font property is set", ->
 			l = new TextLayer
-				font: Utils.loadWebFont("Raleway", 800)
+				font: {fontFamily: "Raleway", fontWeight: 800}
 			l.fontFamily.should.equal "Raleway"
 			l.fontWeight.should.equal 800
 
 		it "doesn't set the weight if the fontFamily property is set", ->
 			l = new TextLayer
-				fontFamily: Utils.loadWebFont("Raleway", 800)
+				fontFamily: {fontFamily: "Raleway", fontWeight: 800}
 			l.fontFamily.should.equal "Raleway"
 			expect(l.fontWeight).to.equal 400
 
