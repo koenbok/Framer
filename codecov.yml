@@ -1,7 +1,7 @@
-coverage:
-  precision: 1
-  range: 40..95
-
 codecov:
   branch: master
   strict_yaml_branch: master
+
+coverage:
+  precision: 1
+  range: 40..95
