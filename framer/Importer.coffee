@@ -34,7 +34,7 @@ class exports.Importer
 		@paths =
 			layerInfo: Utils.pathJoin(@path, "layers.json")
 			images: Utils.pathJoin(@path, "images")
-			documentName: @path.split("/").pop()
+			documentName: decodeURIComponent(@path.split("/").pop())
 
 		@_createdLayers = []
 		@_createdLayersByName = {}
