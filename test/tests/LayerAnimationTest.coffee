@@ -172,6 +172,7 @@ describe "LayerAnimation", ->
 			animation = new Animation layer,
 				x: 50
 				options:
+					time: AnimationTime * 2
 					curve: "linear"
 
 			animation.start()
