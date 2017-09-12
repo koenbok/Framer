@@ -349,6 +349,8 @@ class exports.Layer extends BaseClass
 	@define "grayscale", layerProperty(@, "grayscale", "webkitFilter", 0, _.isNumber)
 	@define "sepia", layerProperty(@, "sepia", "webkitFilter", 0, _.isNumber)
 
+	@define "blending", layerProperty(@, "blending", "mixBlendMode", null, _.isString)
+
 	@define "backgroundBlur", layerProperty(@, "backgroundBlur", "webkitBackdropFilter", 0, _.isNumber)
 	@define "backgroundBrightness", layerProperty(@, "backgroundBrightness", "webkitBackdropFilter", 100, _.isNumber)
 	@define "backgroundSaturate", layerProperty(@, "backgroundSaturate", "webkitBackdropFilter", 100, _.isNumber)

@@ -197,6 +197,12 @@ exports.LayerStyle =
 	webkitPerspectiveOrigin: (layer) ->
 		"#{layer._properties.perspectiveOriginX * 100}% #{layer._properties.perspectiveOriginY * 100}%"
 
+	mixBlendMode: (layer) ->
+		if layer._properties.blending in _.values(Blending)
+			return layer._properties.blending
+		else
+			return ""
+
 	pointerEvents: (layer) ->
 		if layer._properties.ignoreEvents
 			return "none"

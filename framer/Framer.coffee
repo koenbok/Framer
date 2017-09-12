@@ -20,6 +20,7 @@ Framer.AnimationGroup = (require "./AnimationGroup").AnimationGroup
 Framer.AnimationStateGroup = (require "./AnimationGroup").AnimationStateGroup
 Framer.Screen = (require "./Screen").Screen
 Framer.Align = (require "./Align").Align
+Framer.Blending = (require "./Blending").Blending
 Framer.print = (require "./Print").print
 
 # Components

@@ -711,6 +711,12 @@ describe "Layer", ->
 			layer.contrast = 50
 			layer.contrast.should.equal 50
 			layer.style.webkitFilter.should.equal "blur(10px) contrast(50%)"
+	describe "Blending", ->
+		it "Should work with every blending mode", ->
+			l = new Layer
+			for key, value of Blending
+				l.blending = value
+				l.style.mixBlendMode.should.equal value
 
 	describe "Shadow Properties", ->
 
