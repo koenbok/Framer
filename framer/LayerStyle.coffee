@@ -116,9 +116,9 @@ exports.LayerStyle =
 
 		css = []
 
-		for [cssName, layerName, fallback, unit] in _WebkitProperties
-			if layer._properties.hasOwnProperty(layerName) and layer[layerName] isnt fallback
-				css.push("#{cssName}(#{filterFormat(layer[layerName], unit)})")
+		for [cssName, layerPropertyName, fallback, unit] in _WebkitProperties
+			if layer._properties.hasOwnProperty(layerPropertyName) and layer[layerPropertyName] isnt fallback
+				css.push("#{cssName}(#{filterFormat(layer[layerPropertyName], unit)})")
 
 		# filter shadow
 		shadowStrings = getShadowStrings(layer, "drop", (shadow, pixelMultiplier) ->
@@ -127,14 +127,14 @@ exports.LayerStyle =
 
 		css = css.concat shadowStrings
 		return css.join(" ")
-	
+
 	webkitBackdropFilter: (layer) ->
 		css = []
 
-		for [cssName, layerName, fallback, unit] in _BackdropProperties
-			if layer._properties.hasOwnProperty(layerName) and layer[layerName] isnt fallback
-				css.push("#{cssName}(#{filterFormat(layer[layerName], unit)})")
-		
+		for [cssName, layerPropertyName, fallback, unit] in _BackdropProperties
+			if layer._properties.hasOwnProperty(layerPropertyName) and layer[layerPropertyName] isnt fallback
+				css.push("#{cssName}(#{filterFormat(layer[layerPropertyName], unit)})")
+
 		return css.join(" ")
 
 	webkitTransform: (layer) ->
