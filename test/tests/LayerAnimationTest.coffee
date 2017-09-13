@@ -3,6 +3,15 @@ assert = require "assert"
 AnimationTime = Framer.Defaults.Animation.time
 AnimationProperties = ["x", "y", "midY", "rotation"]
 
+equalShadows = (shadow1, shadow2) ->
+	equal = true
+	for key, value of shadow1
+		if Color.isColor(value)
+			equal = equal and Color.equal(value, shadow2[key])
+		else
+			equal = equal and _.eq(value, shadow2[key])
+	return equal
+
 describe "LayerAnimation", ->
 
 	it "should use defaults", ->
@@ -162,6 +171,128 @@ describe "LayerAnimation", ->
 
 			assert.equal(layerB.parent, layerA)
 
+	describe "Shadows", ->
+		template = null
+		beforeEach ->
+			template = new Layer
+				shadows: [
+					{spread: 0, x: 0, type: 'box', y: 10, blur: 5, color: 'rgb(238, 68, 68)'}
+					{spread: 10, x: 10, type: 'box', y: 0, blur: 30, color: 'rgba(17, 153, 238, 0.67)'}
+					{spread: 0, x: 10, type: 'inset', y: 5, blur: 0, color: 'rgb(102, 187, 102)'}
+					{spread: 0, x: -10, type: 'inset', y: -5, blur: 0, color: 'rgb(204, 221, 51)'}
+					{spread: 0, x: 0, type: 'inset', y: 0, blur: 30, color: 'rgb(255, 238, 102)'}
+				]
+		describe "by setting individual shadows", ->
+			it "should work when starting with no shadows", (done) ->
+				layer = new Layer
+				a = layer.animate
+					shadow1: template.shadow1
+					shadow2: template.shadow2
+					shadow3: template.shadow3
+					shadow4: template.shadow4
+					shadow5: template.shadow5
+					shadow6: template.shadow6
+					shadow7: template.shadow7
+					shadow8: template.shadow8
+					shadow9: template.shadow9
+				a.onAnimationEnd ->
+					layer.shadows.length.should.eql template.shadows.length
+					layer.shadows.map (shadow, index) ->
+						equalShadows(shadow, template.shadows[index]).should.be.true
+					done()
+
+			it "should work when using the same kind of shadows", (done) ->
+				layer = new Layer
+					shadows: [
+						{spread: 0, x: 0, type: 'box', y: 10, blur: 0, color: 'rgb(238, 68, 68)'}
+						{spread: 10, x: 10, type: 'box', y: 0, blur: 30, color: 'rgb(187, 102, 204)'}
+						{spread: 0, x: 0, type: 'inset', y: 0, blur: 0, color: 'rgb(102, 187, 102)'}
+						{spread: 0, x: -10, type: 'inset', y: -5, blur: 0, color: 'rgb(85, 204, 255)'}
+						{spread: 0, x: 0, type: 'inset', y: 0, blur: 0, color: 'rgb(255, 238, 102)'}
+					]
+				layer = new Layer
+				a = layer.animate
+					shadow1: template.shadow1
+					shadow2: template.shadow2
+					shadow3: template.shadow3
+					shadow4: template.shadow4
+					shadow5: template.shadow5
+					shadow6: template.shadow6
+					shadow7: template.shadow7
+					shadow8: template.shadow8
+					shadow9: template.shadow9
+				a.onAnimationEnd ->
+					layer.shadows.length.should.eql template.shadows.length
+					layer.shadows.map (shadow, index) ->
+						equalShadows(shadow, template.shadows[index]).should.be.true
+					done()
+
+			it "should work when using different shadows", (done) ->
+				layer = new Layer
+					shadows: [
+						{spread: 0, x: 10, type: 'box', y: 10, blur: 0, color: 'rgb(0, 204, 187)'}
+						{spread: 13, x: 0, type: 'inset', y: 0, blur: 10, color: 'rgb(255, 170, 34)'}
+					]
+				layer = new Layer
+				a = layer.animate
+					shadow1: template.shadow1
+					shadow2: template.shadow2
+					shadow3: template.shadow3
+					shadow4: template.shadow4
+					shadow5: template.shadow5
+					shadow6: template.shadow6
+					shadow7: template.shadow7
+					shadow8: template.shadow8
+					shadow9: template.shadow9
+				a.onAnimationEnd ->
+					layer.shadows.length.should.eql template.shadows.length
+					layer.shadows.map (shadow, index) ->
+						equalShadows(shadow, template.shadows[index]).should.be.true
+					done()
+
+		describe "by setting shadow array", ->
+			it "should work when starting with no shadows", (done) ->
+				layer = new Layer
+				a = layer.animate
+					shadows: template.shadows
+				a.onAnimationEnd ->
+					layer.shadows.length.should.eql template.shadows.length
+					layer.shadows.map (shadow, index) ->
+						equalShadows(shadow, template.shadows[index]).should.be.true
+					done()
+
+			it "should work when using the same kind of shadows", (done) ->
+				layer = new Layer
+					shadows: [
+						{spread: 0, x: 0, type: 'box', y: 10, blur: 0, color: 'rgb(238, 68, 68)'}
+						{spread: 10, x: 10, type: 'box', y: 0, blur: 30, color: 'rgb(187, 102, 204)'}
+						{spread: 0, x: 0, type: 'inset', y: 0, blur: 0, color: 'rgb(102, 187, 102)'}
+						{spread: 0, x: -10, type: 'inset', y: -5, blur: 0, color: 'rgb(85, 204, 255)'}
+						{spread: 0, x: 0, type: 'inset', y: 0, blur: 0, color: 'rgb(255, 238, 102)'}
+					]
+				layer = new Layer
+				a = layer.animate
+					shadows: template.shadows
+				a.onAnimationEnd ->
+					layer.shadows.length.should.eql template.shadows.length
+					layer.shadows.map (shadow, index) ->
+						equalShadows(shadow, template.shadows[index]).should.be.true
+					done()
+
+			it "should work when using different shadows", (done) ->
+				layer = new Layer
+					shadows: [
+						{spread: 0, x: 10, type: 'box', y: 10, blur: 0, color: 'rgb(0, 204, 187)'}
+						{spread: 13, x: 0, type: 'inset', y: 0, blur: 10, color: 'rgb(255, 170, 34)'}
+					]
+				layer = new Layer
+				a = layer.animate
+					shadows: template.shadows
+				a.onAnimationEnd ->
+					layer.shadows.length.should.eql template.shadows.length
+					layer.shadows.map (shadow, index) ->
+						equalShadows(shadow, template.shadows[index]).should.be.true
+					done()
 
 	describe "Basic", ->
 

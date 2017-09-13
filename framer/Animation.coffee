@@ -291,8 +291,8 @@ class exports.Animation extends BaseClass
 				@_valueUpdaters[k] = @_updateNumericObjectValue.bind(this, ["topLeft", "topRight", "bottomRight", "bottomLeft"])
 			else if k is "template"
 				@_valueUpdaters[k] = @_updateTemplateValue
-			else if /^shadow[1-9]$/.test(k)
-				@_valueUpdaters[k] = @_updateShadowValue
+			else if k is "shadows"
+				@_valueUpdaters[k] = @_updateShadows
 			else
 				@_valueUpdaters[k] = @_updateNumberValue
 
@@ -303,10 +303,7 @@ class exports.Animation extends BaseClass
 	_updateNumberValue: (key, value) =>
 		@_target[key] = Utils.mapRange(value, 0, 1, @_stateA[key], @_stateB[key])
 
-	_updateNumericObjectValue: (propKeys, key, value, flatten=true) =>
-		valueA = @_stateA[key]
-		valueB = @_stateB[key]
-
+	_interpolateNumericObjectValues: (propKeys, valueA, valueB, value, flatten=true) ->
 		result = {}
 
 		for propKey in propKeys
@@ -320,7 +317,16 @@ class exports.Animation extends BaseClass
 		# Flatten to a single number if all properties have the same value
 		if flatten and _.uniq(_.values(result)).length is 1
 			result = result[propKeys[0]]
+		return result
 
+	_calculateNumericObjectValue: (propKeys, key, value, flatten=true) =>
+		valueA = @_stateA[key]
+		valueB = @_stateB[key]
+
+		return @_interpolateNumericObjectValues(propKeys, valueA, valueB, value, flatten)
+
+	_updateNumericObjectValue: (propKeys, key, value, flatten=true) =>
+		result = @_calculateNumericObjectValue(propKeys, key, value, flatten)
 		@_target[key] = result
 
 	_updateColorValue: (key, value) =>
@@ -342,9 +348,19 @@ class exports.Animation extends BaseClass
 			@options.colorModel
 		)
 
-	_updateShadowValue: (key, value) =>
-		@_updateNumericObjectValue(["x", "y", "blur", "spread"], key, value, false)
-		@_target[key].color = Color.mix(@_stateA[key].color, @_stateB[key].color, value, false, @options.colorModel)
+	_updateShadows: (key, value) =>
+		result = []
+		for shadow, index in @_stateB[key]
+			if shadow is @_stateA[key][index]
+				continue
+			if shadow? and @_stateA[key][index]?
+				result[index] = @_interpolateNumericObjectValues(["x", "y", "blur", "spread"], @_stateA[key][index], shadow, value, false)
+				result[index].color = Color.mix(@_stateA[key][index].color, shadow.color, value, false, @options.colorModel)
+				result[index].type = shadow.type
+			else
+				result[index] = shadow
+		@_target[key] = result
+
 
 	# shallow mix all end state `{key: value}`s if `value` is a number, otherwise just takes `value`
 	_updateTemplateValue: (key, value) =>
@@ -380,7 +396,7 @@ class exports.Animation extends BaseClass
 
 	# Special cases that animate with different types of objects
 	@isAnimatableKey = (k) ->
-		k in ["gradient", "borderWidth", "borderRadius", "template"] or /^shadow[1-9]$/.test(k)
+		k in ["gradient", "borderWidth", "borderRadius", "template", "shadows"]
 
 	@filterAnimatableProperties = (properties) ->
 		# Function to filter only animatable properties out of a given set
@@ -405,7 +421,10 @@ class exports.Animation extends BaseClass
 				animatableProperties[k] = new Color(v)
 			else if @isAnimatableKey(k)
 				animatableProperties[k] = v
-
+			else if matches = k.match(/^shadow([1-9])$/)
+				animatableProperties.shadows ?= []
+				shadowIndex = parseInt(matches[1]) - 1
+				animatableProperties.shadows[shadowIndex] = v
 		return animatableProperties
 
 	toInspect: ->
