@@ -711,6 +711,60 @@ describe "Layer", ->
 			layer.contrast = 50
 			layer.contrast.should.equal 50
 			layer.style.webkitFilter.should.equal "blur(10px) contrast(50%)"
+	describe "Backdrop properties", ->
+		it "should set backgroundBlur", ->
+			l = new Layer
+				backgroundBlur: 50
+			l.style.webkitBackdropFilter.should.equal "blur(50px)"
+
+		it "should set backgroundBrightness", ->
+			l = new Layer
+				backgroundBrightness: 50
+			l.style.webkitBackdropFilter.should.equal "brightness(50%)"
+
+		it "should set backgroundSaturate", ->
+			l = new Layer
+				backgroundSaturate: 50
+			l.style.webkitBackdropFilter.should.equal "saturate(50%)"
+
+		it "should set backgroundHueRotate", ->
+			l = new Layer
+				backgroundHueRotate: 50
+			l.style.webkitBackdropFilter.should.equal "hue-rotate(50deg)"
+
+		it "should set backgroundContrast", ->
+			l = new Layer
+				backgroundContrast: 50
+			l.style.webkitBackdropFilter.should.equal "contrast(50%)"
+
+		it "should set backgroundInvert", ->
+			l = new Layer
+				backgroundInvert: 50
+			l.style.webkitBackdropFilter.should.equal "invert(50%)"
+
+		it "should set backgroundGrayscale", ->
+			l = new Layer
+				backgroundGrayscale: 50
+			l.style.webkitBackdropFilter.should.equal "grayscale(50%)"
+
+		it "should set backgroundSepia", ->
+			l = new Layer
+				backgroundSepia: 50
+			l.style.webkitBackdropFilter.should.equal "sepia(50%)"
+
+		it "should support multiple filters", ->
+			l = new Layer
+				backgroundBlur: 50
+				backgroundHueRotate: 20
+				backgroundSepia: 10
+			l.style.webkitBackdropFilter.should.equal "blur(50px) hue-rotate(20deg) sepia(10%)"
+
+	describe "Blending", ->
+		it "Should work with every blending mode", ->
+			l = new Layer
+			for key, value of Blending
+				l.blending = value
+				l.style.mixBlendMode.should.equal value
 
 	describe "Shadow Properties", ->
 

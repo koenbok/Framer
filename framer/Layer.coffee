@@ -59,7 +59,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 					mainElement?.style[cssProperty] = @_properties[name]
 					subElement?.style[cssProperty] = @_properties[name]
 				# These values are set multiple times during applyDefaults, so ignore them here, and set the style in the constructor
-				else if not @__applyingDefaults or (cssProperty not in ["webkitTransform", "webkitFilter", "webkitPerspectiveOrigin", "webkitTransformOrigin"])
+				else if not @__applyingDefaults or (cssProperty not in ["webkitTransform", "webkitFilter", "webkitPerspectiveOrigin", "webkitTransformOrigin", "webkitBackdropFilter"])
 					style = LayerStyle[cssProperty](@)
 					mainElement?.style[cssProperty] = style
 					subElement?.style[cssProperty] = style
@@ -210,6 +210,7 @@ class exports.Layer extends BaseClass
 		@_element.style["webkitFilter"] = LayerStyle["webkitFilter"](@)
 		@_element.style["webkitTransformOrigin"] = LayerStyle["webkitTransformOrigin"](@)
 		@_element.style["webkitPerspectiveOrigin"] = LayerStyle["webkitPerspectiveOrigin"](@)
+		@_element.style["webkitBackdropFilter"] = LayerStyle["webkitBackdropFilter"](@)
 
 		# Add this layer to the current context
 		@_context.addLayer(@)
@@ -347,6 +348,17 @@ class exports.Layer extends BaseClass
 	@define "invert", layerProperty(@, "invert", "webkitFilter", 0, _.isNumber)
 	@define "grayscale", layerProperty(@, "grayscale", "webkitFilter", 0, _.isNumber)
 	@define "sepia", layerProperty(@, "sepia", "webkitFilter", 0, _.isNumber)
+
+	@define "blending", layerProperty(@, "blending", "mixBlendMode", null, _.isString)
+
+	@define "backgroundBlur", layerProperty(@, "backgroundBlur", "webkitBackdropFilter", 0, _.isNumber)
+	@define "backgroundBrightness", layerProperty(@, "backgroundBrightness", "webkitBackdropFilter", 100, _.isNumber)
+	@define "backgroundSaturate", layerProperty(@, "backgroundSaturate", "webkitBackdropFilter", 100, _.isNumber)
+	@define "backgroundHueRotate", layerProperty(@, "backgroundHueRotate", "webkitBackdropFilter", 0, _.isNumber)
+	@define "backgroundContrast", layerProperty(@, "backgroundContrast", "webkitBackdropFilter", 100, _.isNumber)
+	@define "backgroundInvert", layerProperty(@, "backgroundInvert", "webkitBackdropFilter", 0, _.isNumber)
+	@define "backgroundGrayscale", layerProperty(@, "backgroundGrayscale", "webkitBackdropFilter", 0, _.isNumber)
+	@define "backgroundSepia", layerProperty(@, "backgroundSepia", "webkitBackdropFilter", 0, _.isNumber)
 
 	for i in [0...8]
 		do (i) =>

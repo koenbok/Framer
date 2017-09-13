@@ -20,6 +20,17 @@ _WebkitProperties = [
 	["sepia", "sepia", 0, "%"],
 ]
 
+_BackdropProperties = [
+	["blur", "backgroundBlur", 0, "px"],
+	["brightness", "backgroundBrightness", 100, "%"],
+	["saturate", "backgroundSaturate", 100, "%"],
+	["hue-rotate", "backgroundHueRotate", 0, "deg"],
+	["contrast", "backgroundContrast", 100, "%"],
+	["invert", "backgroundInvert", 0, "%"],
+	["grayscale", "backgroundGrayscale", 0, "%"],
+	["sepia", "backgroundSepia", 0, "%"],
+]
+
 _Force2DProperties =
 	"z": 0
 	"scaleZ": 1
@@ -105,9 +116,9 @@ exports.LayerStyle =
 
 		css = []
 
-		for [cssName, layerName, fallback, unit] in _WebkitProperties
-			if layer._properties.hasOwnProperty(layerName) and layer[layerName] isnt fallback
-				css.push("#{cssName}(#{filterFormat(layer[layerName], unit)})")
+		for [cssName, layerPropertyName, fallback, unit] in _WebkitProperties
+			if layer._properties.hasOwnProperty(layerPropertyName) and layer[layerPropertyName] isnt fallback
+				css.push("#{cssName}(#{filterFormat(layer[layerPropertyName], unit)})")
 
 		# filter shadow
 		shadowStrings = getShadowStrings(layer, "drop", (shadow, pixelMultiplier) ->
@@ -115,6 +126,15 @@ exports.LayerStyle =
 		)
 
 		css = css.concat shadowStrings
+		return css.join(" ")
+
+	webkitBackdropFilter: (layer) ->
+		css = []
+
+		for [cssName, layerPropertyName, fallback, unit] in _BackdropProperties
+			if layer._properties.hasOwnProperty(layerPropertyName) and layer[layerPropertyName] isnt fallback
+				css.push("#{cssName}(#{filterFormat(layer[layerPropertyName], unit)})")
+
 		return css.join(" ")
 
 	webkitTransform: (layer) ->
@@ -176,6 +196,12 @@ exports.LayerStyle =
 
 	webkitPerspectiveOrigin: (layer) ->
 		"#{layer._properties.perspectiveOriginX * 100}% #{layer._properties.perspectiveOriginY * 100}%"
+
+	mixBlendMode: (layer) ->
+		if layer._properties.blending in _.values(Blending)
+			return layer._properties.blending
+		else
+			return ""
 
 	pointerEvents: (layer) ->
 		if layer._properties.ignoreEvents
