@@ -45,13 +45,20 @@ getShadowStrings = (layer, types, createString) ->
 	result = []
 	if layer.shadows?
 		for shadow in layer.shadows
-			if shadow is null or not (shadow.type in types)
+			if shadow is null
 				continue
 			shadow = _.defaults _.clone(shadow), Framer.Defaults.Shadow
-			if shadow.x is 0 and shadow.y is 0 and shadow.blur is 0 and shadow.spread is 0
+			if shadow.type is "inside"
+				shadow.type = "inset"
+			else if shadow.type is "outside"
+				if layer.image? and layer.image isnt ""
+					shadow.type = "drop"
+				else
+					shadow.type = "box"
+			if not (shadow.type in types) or (shadow.x is 0 and shadow.y is 0 and shadow.blur is 0 and shadow.spread is 0)
 				continue
-			dropShadow = createString(shadow, layer.context.pixelMultiplier)
-			result.push(dropShadow)
+			shadowString = createString(shadow, layer.context.pixelMultiplier)
+			result.push(shadowString)
 	return result
 
 exports.LayerStyle =
