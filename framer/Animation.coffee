@@ -79,7 +79,7 @@ class exports.Animation extends BaseClass
 		unless layer instanceof _Layer
 			throw Error("Animation: missing layer")
 
-		@properties = Animation.filterAnimatableProperties(properties)
+		@properties = Animation.filterAnimatableProperties(properties, layer)
 
 		if properties.origin
 			console.warn "Animation.origin: please use layer.originX and layer.originY"
@@ -351,7 +351,7 @@ class exports.Animation extends BaseClass
 	_updateShadows: (key, value) =>
 		result = []
 		for shadow, index in @_stateB[key]
-			if shadow is @_stateA[key][index]
+			if not shadow? and not @_stateA[key][index]?
 				continue
 			if shadow? and @_stateA[key][index]?
 				result[index] = @_interpolateNumericObjectValues(["x", "y", "blur", "spread"], @_stateA[key][index], shadow, value, false)
@@ -398,7 +398,7 @@ class exports.Animation extends BaseClass
 	@isAnimatableKey = (k) ->
 		k in ["gradient", "borderWidth", "borderRadius", "template", "shadows"]
 
-	@filterAnimatableProperties = (properties) ->
+	@filterAnimatableProperties = (properties, layer) ->
 		# Function to filter only animatable properties out of a given set
 		animatableProperties = {}
 
@@ -422,8 +422,11 @@ class exports.Animation extends BaseClass
 			else if @isAnimatableKey(k)
 				animatableProperties[k] = v
 			else if matches = k.match(/^shadow([1-9])$/)
-				animatableProperties.shadows ?= []
+				animatableProperties.shadows ?= _.clone(layer.shadows) ? []
 				shadowIndex = parseInt(matches[1]) - 1
+				if animatableProperties.shadows[shadowIndex]?
+					_.defaults v, animatableProperties.shadows[shadowIndex]
+				# else
 				animatableProperties.shadows[shadowIndex] = v
 		return animatableProperties
 

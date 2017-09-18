@@ -250,6 +250,25 @@ describe "LayerAnimation", ->
 						equalShadows(shadow, template.shadows[index]).should.be.true
 					done()
 
+			it "should keep other shadows intact when animating one shadow", (done) ->
+				layer = new Layer
+					shadows: template.shadows
+				a = layer.animate
+					shadow3:
+						blur: 200
+				a.onAnimationEnd ->
+					layer.shadows.length.should.eql template.shadows.length
+					layer.shadows.map (shadow, index) ->
+						if index is 2
+							shadow.x.should.equal template.shadows[index].x
+							shadow.y.should.equal template.shadows[index].y
+							shadow.type.should.equal template.shadows[index].type
+							Color.equal(shadow.color, template.shadows[index].color).should.be.true
+							shadow.blur.should.equal 200
+						else
+							equalShadows(shadow, template.shadows[index]).should.be.true
+					done()
+
 		describe "by setting shadow array", ->
 			it "should work when starting with no shadows", (done) ->
 				layer = new Layer
