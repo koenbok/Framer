@@ -957,6 +957,15 @@ describe "Layer", ->
 			l.shadow1.type.should.equal "inner"
 			l.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 0px 0px 0px inset"
 
+		it "should use inner as an alias for inset shadow in the constructor", ->
+			l = new Layer
+				shadowType: "inner"
+				shadowColor: "red"
+				shadowY: 10
+				shadowBlur: 10
+			l.shadow1.type.should.equal "inner"
+			l.style.boxShadow.should.equal "rgb(255, 0, 0) 0px 10px 10px 0px inset"
+
 	describe "Events", ->
 
 		it "should remove all events", ->
