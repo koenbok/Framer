@@ -966,6 +966,17 @@ describe "Layer", ->
 			l.shadow1.type.should.equal "inner"
 			l.style.boxShadow.should.equal "rgb(255, 0, 0) 0px 10px 10px 0px inset"
 
+		it "should change the shadowType of all shadows using shadowType", ->
+			l = new Layer
+				shadows: [
+					blur: 10
+					type: "inset"
+					color: "red"
+				]
+			l.shadowType = "box"
+			l.shadow1.type.should.equal "box"
+			l.style.boxShadow.should.equal "rgb(255, 0, 0) 0px 0px 10px 0px"
+
 	describe "Events", ->
 
 		it "should remove all events", ->
