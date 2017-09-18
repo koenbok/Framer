@@ -932,29 +932,29 @@ describe "Layer", ->
 			l.style.textShadow.should.equal "rgba(123, 123, 123, 0.498039) 5px 0px 0px"
 			l.style.webkitFilter.should.equal "drop-shadow(rgba(123, 123, 123, 0.498039) 0px 15px 0px)"
 
-		it "should use outside as an alias for box shadow", ->
+		it "should use outer as an alias for box shadow", ->
 			l = new Layer
 			l.shadow1 =
-				type: "outside"
+				type: "outer"
 				x: 10
-			l.shadow1.type.should.equal "outside"
+			l.shadow1.type.should.equal "outer"
 			l.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 0px 0px 0px"
 
-		it "should use outside as an alias for drop shadow when image is set", ->
+		it "should use outer as an alias for drop shadow when image is set", ->
 			l = new Layer
 				image: "static/test2.png"
 			l.shadow1 =
-				type: "outside"
+				type: "outer"
 				x: 10
-			l.shadow1.type.should.equal "outside"
+			l.shadow1.type.should.equal "outer"
 			l.style.webkitFilter.should.equal "drop-shadow(rgba(123, 123, 123, 0.498039) 10px 0px 0px)"
 
-		it "should use inside as an alias for inset shadow", ->
+		it "should use inner as an alias for inset shadow", ->
 			l = new Layer
 			l.shadow1 =
-				type: "inside"
+				type: "inner"
 				x: 10
-			l.shadow1.type.should.equal "inside"
+			l.shadow1.type.should.equal "inner"
 			l.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 0px 0px 0px inset"
 
 	describe "Events", ->

@@ -48,9 +48,9 @@ getShadowStrings = (layer, types, createString) ->
 			if shadow is null
 				continue
 			shadow = _.defaults _.clone(shadow), Framer.Defaults.Shadow
-			if shadow.type is "inside"
+			if shadow.type is "inner"
 				shadow.type = "inset"
-			else if shadow.type is "outside"
+			else if shadow.type is "outer"
 				if layer.image? and layer.image isnt ""
 					shadow.type = "drop"
 				else
