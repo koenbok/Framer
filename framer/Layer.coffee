@@ -377,7 +377,7 @@ class exports.Layer extends BaseClass
 	@define "shadowBlur", layerProperty(@, "shadowBlur", null, 0, _.isNumber, null, {}, updateShadowsProperty("blur"))
 	@define "shadowSpread", layerProperty(@, "shadowSpread", null, 0, _.isNumber, null, {}, updateShadowsProperty("spread"))
 	@define "shadowColor", layerProperty(@, "shadowColor", null, "", Color.validColorValue, Color.toColor, {}, updateShadowsProperty("color"))
-	@define "shadowType", layerProperty(@, "shadowType", null, null, null, null, {}, updateShadowsProperty("type"))
+	@define "shadowType", layerProperty(@, "shadowType", null, undefined, null, null, {}, updateShadowsProperty("type"))
 	@define "shadows",
 		default: null
 		get: ->

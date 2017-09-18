@@ -441,6 +441,16 @@ describe "LayerStates", ->
 			layer.states.current.name.should.equal initialStateName
 			layer.states.default.x.should.equal 100
 
+		it "should capture shadowType as part of the default state", ->
+			l = new Layer
+				size: 60
+				borderRadius: 30
+				backgroundColor: "red"
+				shadowColor: "blue"
+				shadowSpread: 10
+			l.stateSwitch "default"
+			l.style.boxShadow.should.equal "rgb(0, 0, 255) 0px 0px 0px 10px"
+
 		it "should listen to options provided to stateCycle", ->
 			layer = new Layer
 			layer.states =
