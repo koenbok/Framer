@@ -1,5 +1,7 @@
-filterFormat = (value, unit) ->
-	"#{Utils.round value, 2}#{unit}"
+filterFormat = (name, value, unit, pixelMultiplier) ->
+	if unit is "px"
+		value *= pixelMultiplier
+	"#{name}(#{Utils.round value, 2}#{unit})"
 	# "#{value}#{unit}"
 
 roundToZero = (num) ->
@@ -125,7 +127,8 @@ exports.LayerStyle =
 
 		for [cssName, layerPropertyName, fallback, unit] in _WebkitProperties
 			if layer._properties.hasOwnProperty(layerPropertyName) and layer[layerPropertyName] isnt fallback
-				css.push("#{cssName}(#{filterFormat(layer[layerPropertyName], unit)})")
+				filter = filterFormat(cssName, layer[layerPropertyName], unit, layer.context.pixelMultiplier)
+				css.push(filter)
 
 		# filter shadow
 		shadowStrings = getShadowStrings(layer, "drop", (shadow, pixelMultiplier) ->
@@ -140,7 +143,8 @@ exports.LayerStyle =
 
 		for [cssName, layerPropertyName, fallback, unit] in _BackdropProperties
 			if layer._properties.hasOwnProperty(layerPropertyName) and layer[layerPropertyName] isnt fallback
-				css.push("#{cssName}(#{filterFormat(layer[layerPropertyName], unit)})")
+				filter = filterFormat(cssName, layer[layerPropertyName], unit, layer.context.pixelMultiplier)
+				css.push(filter)
 
 		return css.join(" ")
 

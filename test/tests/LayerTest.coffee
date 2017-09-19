@@ -717,6 +717,17 @@ describe "Layer", ->
 				backgroundBlur: 50
 			l.style.webkitBackdropFilter.should.equal "blur(50px)"
 
+		it "should take dpr into account when setting blur", ->
+			device = new DeviceComponent()
+			device.deviceType = "apple-iphone-7-black"
+			device.context.run ->
+				l = new Layer
+					blur: 20
+					backgroundBlur: 30
+				l.context.devicePixelRatio.should.equal 2
+				l.style.webkitFilter.should.equal "blur(40px)"
+				l.style.webkitBackdropFilter.should.equal "blur(60px)"
+
 		it "should set backgroundBrightness", ->
 			l = new Layer
 				backgroundBrightness: 50
