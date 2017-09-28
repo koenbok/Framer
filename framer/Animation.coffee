@@ -350,15 +350,17 @@ class exports.Animation extends BaseClass
 
 	_updateShadows: (key, value) =>
 		result = []
-		for shadow, index in @_stateB[key]
-			if not shadow? and not @_stateA[key][index]?
+		for toShadow, index in @_stateB[key]
+			fromShadow = @_stateA[key]?[index]
+			if not toShadow? and not fromShadow?
 				continue
-			if shadow? and @_stateA[key][index]?
-				result[index] = @_interpolateNumericObjectValues(["x", "y", "blur", "spread"], @_stateA[key][index], shadow, value, false)
-				result[index].color = Color.mix(@_stateA[key][index].color, shadow.color, value, false, @options.colorModel)
-				result[index].type = shadow.type
+			fromShadow ?= _.defaults {color: null, type: toShadow.type}, Framer.Defaults.Shadow
+			if toShadow? and fromShadow?
+				result[index] = @_interpolateNumericObjectValues(["x", "y", "blur", "spread"], fromShadow, toShadow, value, false)
+				result[index].color = Color.mix(fromShadow.color, toShadow.color, value, false, @options.colorModel)
+				result[index].type = toShadow.type ? fromShadow.type
 			else
-				result[index] = shadow
+				result[index] = toShadow
 		@_target[key] = result
 
 
@@ -426,8 +428,7 @@ class exports.Animation extends BaseClass
 				shadowIndex = parseInt(matches[1]) - 1
 				if animatableProperties.shadows[shadowIndex]?
 					_.defaults v, animatableProperties.shadows[shadowIndex]
-				# else
-				animatableProperties.shadows[shadowIndex] = v
+				animatableProperties.shadows[shadowIndex] = _.defaults v, {color: null, type: null}, Framer.Defaults.Shadow
 		return animatableProperties
 
 	toInspect: ->

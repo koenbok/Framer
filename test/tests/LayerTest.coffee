@@ -857,13 +857,21 @@ describe "Layer", ->
 			l.shadow1.x = 10
 			l.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 10px 0px 0px 0px"
 
+		it "should ignore the first shadow when the second shadow property is changed", ->
+			l = new Layer
+			l.shadow2.y = 10
+			l.style.boxShadow.should.equal "rgba(123, 123, 123, 0.498039) 0px 10px 0px 0px"
+
 		it "should animate shadows through a shadow property", (done) ->
 			l = new Layer
-			l.animate
+			a = l.animate
 				shadow1:
-					x: 20
+					blur: 100
+			Utils.delay a.time /2, ->
+				l.shadow1.blur.should.be.above 10
+				l.shadow1.blur.should.be.below 90
 			l.onAnimationEnd ->
-				l.shadow1.x.should.equal 20
+				l.shadow1.blur.should.equal 100
 				done()
 
 		it "should animate shadow colors", (done) ->
@@ -987,6 +995,36 @@ describe "Layer", ->
 			l.shadowType = "box"
 			l.shadow1.type.should.equal "box"
 			l.style.boxShadow.should.equal "rgb(255, 0, 0) 0px 0px 10px 0px"
+
+		it "should reflect the current value throught the shadow<prop> properties", ->
+			layer = new Layer
+				shadow1:
+					x: 5
+					y: 20
+					color: "blue"
+					blur: 10
+				shadow2:
+					x: 10
+					y: 20
+					color: "red"
+
+			layer.shadowX.should.equal 5
+			layer.shadowY.should.equal 20
+			Color.equal(layer.shadowColor, "blue").should.be.true
+			layer.shadowBlur.should.equal 10
+			layer.shadowType.should.equal "box"
+
+			layer.shadowX = 2
+
+			layer.shadowX.should.equal 2
+
+		it "should return null for the shadow<prop> properties initially", ->
+			layer = new Layer
+			expect(layer.shadowX).to.equal null
+			expect(layer.shadowY).to.equal null
+			expect(layer.shadowColor).to.equal null
+			expect(layer.shadowBlur).to.equal null
+			expect(layer.shadowType).to.equal null
 
 	describe "Events", ->
 

@@ -144,15 +144,6 @@ proxiedShadowValue = (layer, value, index = 0) ->
 	v?.color = new Color(v.color)
 	layerProxiedValue(v, layer, "shadow#{index+1}")
 
-updateShadowsProperty = (prop) ->
-	(layer, value) ->
-		layer.shadows ?= []
-		if (layer.shadows.filter (s) -> s isnt null).length is 0
-			layer.shadows[0] = proxiedShadowValue(layer, Framer.Defaults.Shadow)
-		for shadow in layer.shadows
-			shadow?[prop] = value
-		layer.updateShadowStyle()
-
 class exports.Layer extends BaseClass
 
 	constructor: (options={}) ->
@@ -360,24 +351,38 @@ class exports.Layer extends BaseClass
 	@define "backgroundGrayscale", layerProperty(@, "backgroundGrayscale", "webkitBackdropFilter", 0, _.isNumber)
 	@define "backgroundSepia", layerProperty(@, "backgroundSepia", "webkitBackdropFilter", 0, _.isNumber)
 
-	for i in [0...8]
+	for i in [0..8]
 		do (i) =>
 			@define "shadow#{i+1}",
 				depends: ["shadowX", "shadowY", "shadowBlur", "shadowSpread", "shadowColor", "shadowType"]
 				get: ->
-					@shadows?[i]
+					@shadows ?= []
+					@shadows[i] ?= proxiedShadowValue(@, {}, i)
+					@shadows[i]
 				set: (value) ->
 					@shadows ?= []
 					@shadows[i] = proxiedShadowValue(@, value, i)
 					@updateShadowStyle()
 
+	updateShadowsProperty: (prop, value) ->
+		@shadows ?= []
+		if (@shadows.filter (s) -> s isnt null).length is 0
+			@shadows[0] = proxiedShadowValue(@, Framer.Defaults.Shadow)
+		for shadow in @shadows
+			shadow?[prop] = value
+		@updateShadowStyle()
+
 	# Shadow properties
-	@define "shadowX", layerProperty(@, "shadowX", null, 0, _.isNumber, null, {}, updateShadowsProperty("x"))
-	@define "shadowY", layerProperty(@, "shadowY", null, 0, _.isNumber, null, {}, updateShadowsProperty("y"))
-	@define "shadowBlur", layerProperty(@, "shadowBlur", null, 0, _.isNumber, null, {}, updateShadowsProperty("blur"))
-	@define "shadowSpread", layerProperty(@, "shadowSpread", null, 0, _.isNumber, null, {}, updateShadowsProperty("spread"))
-	@define "shadowColor", layerProperty(@, "shadowColor", null, "", Color.validColorValue, Color.toColor, {}, updateShadowsProperty("color"))
-	@define "shadowType", layerProperty(@, "shadowType", null, undefined, null, null, {}, updateShadowsProperty("type"))
+	for shadowProp in ["X", "Y", "Blur", "Spread", "Color", "Type"]
+		do (shadowProp) =>
+			@define "shadow#{shadowProp}",
+				exportable: false
+				get: ->
+					return null if not @shadows? or @shadows.length is 0
+					@shadow1[shadowProp.toLowerCase()]
+				set: (value) ->
+					@updateShadowsProperty(shadowProp.toLowerCase(), value)
+
 	@define "shadows",
 		default: null
 		get: ->

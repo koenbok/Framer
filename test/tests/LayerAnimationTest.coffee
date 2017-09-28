@@ -1,4 +1,5 @@
 assert = require "assert"
+{expect} = require "chai"
 
 AnimationTime = Framer.Defaults.Animation.time
 AnimationProperties = ["x", "y", "midY", "rotation"]
@@ -267,6 +268,68 @@ describe "LayerAnimation", ->
 							shadow.blur.should.equal 200
 						else
 							equalShadows(shadow, template.shadows[index]).should.be.true
+					done()
+
+			it "should animate to null shadow nicely", (done) ->
+				layerA = new Layer
+				layerA.shadow1.x = 100
+				layerA.shadow1.color = "blue"
+				layerA.shadow1.type = "inset"
+				layerA.shadow1.blur = 10
+
+				a = layerA.animate
+					shadow1: null
+				a.onAnimationEnd ->
+					layerA.shadow1.x.should.equal 0
+					layerA.shadow1.y.should.equal 0
+					layerA.shadow1.blur.should.equal 0
+					layerA.shadow1.type.should.equal "inset"
+					transparentBlue = (new Color("blue")).alpha(0)
+					Color.equal(transparentBlue, layerA.shadow1.color).should.be.true
+					done()
+
+			it "should animate from null shadow nicely", (done) ->
+				layerA = new Layer
+					shadow1: null
+				a = layerA.animate
+					shadow1:
+						x: 100
+						color: "blue"
+						type: "inset"
+						blur: 10
+				a.onAnimationStart ->
+					shadow1 = layerA.shadows[0]
+					shadow1.type.should.equal "inset"
+					opaqueShadowColor = shadow1.color.alpha(1)
+					Color.equal(new Color("blue"), opaqueShadowColor).should.be.true
+				a.onAnimationEnd ->
+					layerA.shadow1.x.should.equal 100
+					layerA.shadow1.y.should.equal 0
+					layerA.shadow1.blur.should.equal 10
+					layerA.shadow1.type.should.equal "inset"
+					Color.equal(new Color("blue"), layerA.shadow1.color).should.be.true
+					done()
+
+			it "should animate from no shadows nicely", (done) ->
+				layerA = new Layer
+				expect(layerA.shadows).to.be.null
+				a = layerA.animate
+					shadow1:
+						x: 100
+						color: "blue"
+						type: "inset"
+						blur: 10
+				a.onAnimationStart ->
+					shadow1 = layerA.shadows[0]
+					shadow1.type.should.equal "inset"
+					opaqueShadowColor = shadow1.color.alpha(1)
+					Color.equal(new Color("blue"), opaqueShadowColor).should.be.true
+				a.onAnimationEnd ->
+					layerA.shadow1.x.should.equal 100
+					layerA.shadow1.y.should.equal 0
+					layerA.shadow1.blur.should.equal 10
+					layerA.shadow1.type.should.equal "inset"
+					Color.equal(new Color("blue"), layerA.shadow1.color).should.be.true
 					done()
 
 		describe "by setting shadow array", ->
