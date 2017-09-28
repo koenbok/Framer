@@ -141,7 +141,8 @@ parentOrContext = (layerOrContext) ->
 
 proxiedShadowValue = (layer, value, index = 0) ->
 	v = _.defaults _.clone(value), Framer.Defaults.Shadow
-	v?.color = new Color(v.color)
+	if v.color isnt null
+		v?.color = new Color(v.color)
 	layerProxiedValue(v, layer, "shadow#{index+1}")
 
 class exports.Layer extends BaseClass
@@ -354,6 +355,7 @@ class exports.Layer extends BaseClass
 	for i in [0..8]
 		do (i) =>
 			@define "shadow#{i+1}",
+				exportable: false
 				depends: ["shadowX", "shadowY", "shadowBlur", "shadowSpread", "shadowColor", "shadowType"]
 				get: ->
 					@shadows ?= []
@@ -379,7 +381,7 @@ class exports.Layer extends BaseClass
 				exportable: false
 				get: ->
 					return null if not @shadows? or @shadows.length is 0
-					@shadow1[shadowProp.toLowerCase()]
+					@shadows[0][shadowProp.toLowerCase()]
 				set: (value) ->
 					@updateShadowsProperty(shadowProp.toLowerCase(), value)
 
@@ -388,9 +390,13 @@ class exports.Layer extends BaseClass
 		get: ->
 			@_getPropertyValue("shadows")
 		set: (value) ->
+			value ?= []
 			shadows = []
 			for shadow, index in value
-				shadows.push proxiedShadowValue(@, shadow, index)
+				if shadow is null
+					shadows.push null
+				else
+					shadows.push proxiedShadowValue(@, shadow, index)
 			@_setPropertyValue("shadows", shadows)
 			@updateShadowStyle()
 

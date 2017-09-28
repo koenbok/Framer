@@ -349,18 +349,24 @@ class exports.Animation extends BaseClass
 		)
 
 	_updateShadows: (key, value) =>
+		if value is 1
+			@_target[key] = @_stateB[key]
+			return
+
 		result = []
-		for toShadow, index in @_stateB[key]
+		numShadows = Math.max(@_stateA[key]?.length ? 0, @_stateB[key]?.length ? 0)
+		for index in [0...numShadows]
 			fromShadow = @_stateA[key]?[index]
+			toShadow = @_stateB[key]?[index]
 			if not toShadow? and not fromShadow?
 				continue
-			fromShadow ?= _.defaults {color: null, type: toShadow.type}, Framer.Defaults.Shadow
-			if toShadow? and fromShadow?
-				result[index] = @_interpolateNumericObjectValues(["x", "y", "blur", "spread"], fromShadow, toShadow, value, false)
-				result[index].color = Color.mix(fromShadow.color, toShadow.color, value, false, @options.colorModel)
-				result[index].type = toShadow.type ? fromShadow.type
-			else
-				result[index] = toShadow
+			type = toShadow?.type ? fromShadow?.type ? Framer.Defaults.Shadow.type
+			fromShadow ?= _.defaults {color: null, type: type}, Framer.Defaults.Shadow
+			toShadow ?= _.defaults {color: null, type: type}, Framer.Defaults.Shadow
+			result[index] = @_interpolateNumericObjectValues(["x", "y", "blur", "spread"], fromShadow, toShadow, value, false)
+			result[index].color = Color.mix(fromShadow.color, toShadow.color, value, false, @options.colorModel)
+			result[index].type = type
+
 		@_target[key] = result
 
 
@@ -428,7 +434,7 @@ class exports.Animation extends BaseClass
 				shadowIndex = parseInt(matches[1]) - 1
 				if animatableProperties.shadows[shadowIndex]?
 					_.defaults v, animatableProperties.shadows[shadowIndex]
-				animatableProperties.shadows[shadowIndex] = _.defaults v, {color: null, type: null}, Framer.Defaults.Shadow
+				animatableProperties.shadows[shadowIndex] = v
 		return animatableProperties
 
 	toInspect: ->

@@ -59,6 +59,8 @@ getShadowStrings = (layer, types, createString) ->
 					shadow.type = "box"
 			if not (shadow.type in types) or (shadow.x is 0 and shadow.y is 0 and shadow.blur is 0 and shadow.spread is 0)
 				continue
+			if shadow.color is null
+				shadow.color = new Color(null)
 			shadowString = createString(shadow, layer.context.pixelMultiplier)
 			result.push(shadowString)
 	return result
@@ -225,7 +227,6 @@ exports.LayerStyle =
 			insetString = if shadow.type is "inset" then "inset " else ""
 			"#{insetString}#{shadow.x * pixelMultiplier}px #{shadow.y * pixelMultiplier}px #{shadow.blur * pixelMultiplier}px #{shadow.spread * pixelMultiplier}px #{shadow.color}"
 		)
-
 
 		return shadowStrings.join(", ")
 

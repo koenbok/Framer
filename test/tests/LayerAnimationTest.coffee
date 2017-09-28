@@ -280,12 +280,7 @@ describe "LayerAnimation", ->
 				a = layerA.animate
 					shadow1: null
 				a.onAnimationEnd ->
-					layerA.shadow1.x.should.equal 0
-					layerA.shadow1.y.should.equal 0
-					layerA.shadow1.blur.should.equal 0
-					layerA.shadow1.type.should.equal "inset"
-					transparentBlue = (new Color("blue")).alpha(0)
-					Color.equal(transparentBlue, layerA.shadow1.color).should.be.true
+					expect(layerA.shadows[0]).to.be.null
 					done()
 
 			it "should animate from null shadow nicely", (done) ->
