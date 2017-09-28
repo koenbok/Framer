@@ -152,6 +152,7 @@ class StyledTextBlock
 	createElement: ->
 		div = document.createElement "div"
 		div.style.fontSize = "1px"
+		div.style.webkitFontSmoothing = "antialiased"
 		maybeLineBreak = @inlineStyles.length is 1
 		for style in @inlineStyles
 			span = style.createElement(maybeLineBreak)

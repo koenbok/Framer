@@ -129,8 +129,8 @@ describe "TextLayer", ->
 		it "should set the correct defaults", ->
 			text = new TextLayer
 			text.text.should.equal "Hello World"
-			text.html.should.equal '<div style="font-size: 1px;"><span style="font-size: 40px;">Hello World</span></div>'
-			text._elementHTML.outerHTML.should.equal '<div style="zoom: 1; overflow: visible; color: rgb(136, 136, 136); font-family: -apple-system, BlinkMacSystemFont, \'SF UI Text\', \'Helvetica Neue\'; font-weight: 400; font-style: normal; font-size: 40px; line-height: 1.25; text-transform: none; outline: none; white-space: pre-wrap; word-wrap: break-word; text-align: left;"><div style="font-size: 1px;"><span style="font-size: 40px;">Hello World</span></div></div>'
+			text.html.should.equal '<div style="font-size: 1px; -webkit-font-smoothing: antialiased;"><span style="font-size: 40px;">Hello World</span></div>'
+			text._elementHTML.outerHTML.should.equal '<div style="zoom: 1; overflow: visible; color: rgb(136, 136, 136); font-family: -apple-system, BlinkMacSystemFont, \'SF UI Text\', \'Helvetica Neue\'; font-weight: 400; font-style: normal; font-size: 40px; line-height: 1.25; text-transform: none; outline: none; white-space: pre-wrap; word-wrap: break-word; text-align: left;"><div style="font-size: 1px; -webkit-font-smoothing: antialiased;"><span style="font-size: 40px;">Hello World</span></div></div>'
 			text.color.isEqual("#888").should.equal true
 			text.backgroundColor.isEqual("transparent").should.equal true
 			text.padding.should.eql 0
