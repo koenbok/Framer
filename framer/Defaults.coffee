@@ -8,7 +8,6 @@ Originals =
 	Layer:
 		backgroundColor: "rgba(123, 123, 123, 0.5)"
 		color: "white"
-		shadowColor: "rgba(123, 123, 123, 0.5)"
 		borderColor: "rgba(123, 123, 123, 0.5)"
 		width: 200
 		height: 200
