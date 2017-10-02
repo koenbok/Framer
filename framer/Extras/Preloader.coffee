@@ -43,6 +43,7 @@ class Preloader extends BaseClass
 		_.map(context.layers, "player").map(@addPlayer)
 
 	addImage: (image) =>
+		return if image instanceof Gradient
 		if image and image not in @_media
 			@_media.push(image)
 			# We simply count failed images as loaded for now so that we avoid

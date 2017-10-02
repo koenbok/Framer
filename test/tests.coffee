@@ -54,5 +54,6 @@ require "./tests/DeviceComponentTest"
 require "./tests/SliderComponentTest"
 require "./tests/RangeSliderComponentTest"
 require "./tests/FlowComponentTest"
+require "./tests/PreloaderTest"
 
 mocha.run()
