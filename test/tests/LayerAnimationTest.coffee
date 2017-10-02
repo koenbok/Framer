@@ -1188,6 +1188,17 @@ describe "LayerAnimation", ->
 			layer.animate
 				borderWidth: 10
 
+		it "should not touch border width when animating from object to undefined", (done) ->
+			layer = new Layer
+				borderWidth:
+					top: 30
+			layer.on Events.AnimationEnd, ->
+				layer.borderWidth.should.eql {left: 0, right: 0, bottom: 0, top: 30}
+				done()
+			layer.animate
+				x: 10
+				borderWidth: undefined
+
 	describe "template animations", ->
 
 		it "should animate", (done) ->

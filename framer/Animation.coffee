@@ -307,8 +307,8 @@ class exports.Animation extends BaseClass
 		result = {}
 
 		for propKey in propKeys
-			keyValueA = if _.isNumber(valueA) then valueA else valueA[propKey]
-			keyValueB = if _.isNumber(valueB) then valueB else valueB[propKey]
+			keyValueA = if _.isNumber(valueA) then valueA else valueA?[propKey]
+			keyValueB = if _.isNumber(valueB) then valueB else valueB?[propKey]
 			# If the key value is undefined in one state, use the value from the other
 			keyValueA ?= keyValueB
 			keyValueB ?= keyValueA
