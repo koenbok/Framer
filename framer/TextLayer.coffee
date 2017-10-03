@@ -206,7 +206,7 @@ class exports.TextLayer extends Layer
 		set: (value) ->
 			@clip = _.isString(value)
 			@_styledText.setTextOverflow(value)
-			@renderText()
+			@renderText(true)
 
 	@define "truncate",
 		get: -> @textOverflow is "ellipsis"
@@ -252,10 +252,11 @@ class exports.TextLayer extends Layer
 			@renderText()
 			@emit("change:text", value)
 
-	renderText: =>
+	renderText: (forceRender = false) =>
 		return if @__constructor
 		@_styledText.render()
 		@_updateHTMLScale()
+		return unless forceRender or @autoHeight or @autoWidth or @textOverflow isnt null
 		parentWidth = if @parent? then @parent.width else Screen.width
 		constrainedWidth = if @autoWidth then parentWidth else @size.width
 		padding = Utils.rectZero(Utils.parseRect(@padding))
