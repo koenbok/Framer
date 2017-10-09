@@ -103,11 +103,8 @@ class exports.RangeSliderComponent extends Layer
 	_touchStart: (event) =>
 		event.preventDefault()
 
-		offsetX = (@min / @canvasScaleX()) - @min
-		offsetY = (@min / @canvasScaleY()) - @min
-
 		if @width > @height
-			clickedValue = @valueForPoint(Events.touchEvent(event).clientX - @screenScaledFrame().x) / @canvasScaleX() - offsetX
+			clickedValue = @valueForPoint((Events.touchEvent(event).clientX / @canvasScaleX()) - @screenScaledFrame().x)
 
 			if clickedValue > @maxValue
 				@maxValue = clickedValue
@@ -120,7 +117,7 @@ class exports.RangeSliderComponent extends Layer
 				@emit(Events.SliderMinValueChange, @minValue)
 
 		else
-			clickedValue = @valueForPoint(Events.touchEvent(event).clientY - @screenScaledFrame().y) / @canvasScaleY() - offsetY
+			clickedValue = @valueForPoint((Events.touchEvent(event).clientY / @canvasScaleY()) - @screenScaledFrame().y)
 
 			if clickedValue > @maxValue
 				@maxValue = clickedValue
