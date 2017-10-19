@@ -398,6 +398,72 @@ describe "TextLayer", ->
 			text.text = "Hello there"
 			text.size.should.eql width: 264, height: 50
 
+		it "should set clipping to true if the text is bigger than the size", ->
+			textLayer = new TextLayer
+				width: 283
+				styledText:
+					blocks: [ {
+						inlineStyles: [
+							{
+							'startIndex': 0
+							'endIndex': 19
+							'css':
+								'fontSize': '16px'
+								'letterSpacing': '0px'
+								'lineHeight': '1.2'
+								'tabSize': 4
+								'fontFamily': '".SFNSText", "SFProText-Regular", "SFUIText-Regular", ".SFUIText", sans-serif'
+								'WebkitTextFillColor': 'rgb(0, 0, 0)'
+							}
+							{
+							'startIndex': 19
+							'endIndex': 120
+							'css':
+								'fontSize': '16px'
+								'tabSize': 4
+								'fontFamily': '".SFNSText", "SFProText-Regular", "SFUIText-Regular", ".SFUIText", sans-serif'
+								'WebkitTextFillColor': 'rgb(0, 0, 0)'
+							}
+						]
+						text: 'this is dummy text this is dummy text this is dummy text this is dummy text this is dummy text this is dummy text this i'
+					} ]
+				height: 55
+				autoSize: false
+			textLayer.clip.should.equal true
+
+		it "should set clipping to false if the text is bigger than the size", ->
+			textLayer = new TextLayer
+				width: 283
+				styledText:
+					blocks: [ {
+						inlineStyles: [
+							{
+							'startIndex': 0
+							'endIndex': 19
+							'css':
+								'fontSize': '16px'
+								'letterSpacing': '0px'
+								'lineHeight': '1.2'
+								'tabSize': 4
+								'fontFamily': '".SFNSText", "SFProText-Regular", "SFUIText-Regular", ".SFUIText", sans-serif'
+								'WebkitTextFillColor': 'rgb(0, 0, 0)'
+							}
+							{
+							'startIndex': 19
+							'endIndex': 120
+							'css':
+								'fontSize': '16px'
+								'tabSize': 4
+								'fontFamily': '".SFNSText", "SFProText-Regular", "SFUIText-Regular", ".SFUIText", sans-serif'
+								'WebkitTextFillColor': 'rgb(0, 0, 0)'
+							}
+						]
+						text: 'this is dummy text this is dummy text this is dummy text this is dummy text this is dummy text this is dummy text this i'
+					} ]
+				height: 77
+				autoSize: false
+			textLayer.clip.should.equal false
+
 	describe "Padding", ->
 		it "should have no padding initially", ->
 			text = new TextLayer
