@@ -257,8 +257,7 @@ class exports.TextLayer extends Layer
 		@_styledText.render()
 		@_updateHTMLScale()
 		if not @autoSize
-			htmlRect = @_elementHTML.getBoundingClientRect()
-			if @width < htmlRect.width or @height < htmlRect.height
+			if @width < @_elementHTML.clientWidth or @height < @_elementHTML.clientHeight
 				@clip = true
 		return unless forceRender or @autoHeight or @autoWidth or @textOverflow isnt null
 		parentWidth = if @parent? then @parent.width else Screen.width
