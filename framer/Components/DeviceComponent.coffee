@@ -94,9 +94,10 @@ class exports.DeviceComponent extends BaseClass
 		@hands    = new Layer name: "hands"
 		@handsImageLayer = new Layer parent: @hands, name: "handsImage"
 		@phone    = new Layer parent: @hands, name: "phone"
-		@screen   = new Layer parent: @phone, name: "phone"
+		@screen   = new Layer parent: @hands, name: "phone"
 		@viewport = new Layer parent: @screen, name: "screen"
 		@content  = new Layer parent: @viewport, name: "viewport"
+		@screenMask = new Layer parent: @screen, name: "mask", backgroundColor: null
 
 		@content.classList.add("DeviceContent")
 
@@ -124,8 +125,11 @@ class exports.DeviceComponent extends BaseClass
 		Framer.CurrentContext.domEventManager.wrap(window).addEventListener("resize", @_orientationChange) if Utils.isMobile()
 
 		# This avoids rubber banding on mobile
-		for layer in [@background, @phone, @viewport, @content, @screen]
+		for layer in [@background, @phone, @viewport, @content, @screen, @screenMask]
 			layer.on "touchmove", (event) -> event.preventDefault()
+
+		@screenMask.ignoreEvents = true
+		@phone.ignoreEvents = true
 
 		@_context = new Framer.Context(parent: @content, name: "DeviceScreen")
 		@_context.perspective = 1200
@@ -146,7 +150,7 @@ class exports.DeviceComponent extends BaseClass
 			width = document.documentElement.clientWidth / contentScaleFactor
 			height = document.documentElement.clientHeight / contentScaleFactor
 			screenSizeChanged = @content.width isnt width or @content.height isnt height
-			for layer in [@background, @hands, @phone, @viewport, @content, @screen]
+			for layer in [@background, @hands, @phone, @viewport, @content, @screen, @screenMask]
 				layer.x = layer.y = 0
 				layer.width = width
 				layer.height = height
@@ -156,7 +160,8 @@ class exports.DeviceComponent extends BaseClass
 			if @deviceType isnt "fullscreen" or Utils.isMobile()
 				screenSizeChanged = screenSizeChanged or @_context.devicePixelRatio isnt window.devicePixelRatio
 				@_context.devicePixelRatio = window.devicePixelRatio
-
+			if Utils.isMobile()
+				@screenMask.visible = false
 		else
 			backgroundOverlap = 100
 
@@ -174,14 +179,13 @@ class exports.DeviceComponent extends BaseClass
 				@_device.screenWidth / contentScaleFactor,
 				@_device.screenHeight / contentScaleFactor)
 
-			@screen.width  = @viewport.width = @_device.screenWidth
-			@screen.height = @viewport.height = @_device.screenHeight
-
+			@screenMask.width = @screen.width = @viewport.width = @_device.screenWidth
+			@screenMask.height = @screen.height = @viewport.height = @_device.screenHeight
 			screenSizeChanged = @content.width isnt width or @content.height isnt height
 			@content.width  = width
 			@content.height = height
 			centerLayer(@screen)
-
+			centerLayer(@screenMask)
 			@setHand(@selectedHand) if @selectedHand and @_orientation is 0
 
 			pixelRatio = @_device.devicePixelRatio ? 1
@@ -357,6 +361,12 @@ class exports.DeviceComponent extends BaseClass
 			@phone.height = @_device.deviceImageHeight
 			@hands.width  = @phone.width
 			@hands.height = @phone.height
+			if @_device.screenMask
+				@phone.bringToFront()
+				@screenMask.image = @_device.screenMask
+			else
+				@screenMask.image = null
+				@phone.sendToBack()
 
 	_deviceImageName: ->
 		if @_device.hasOwnProperty("deviceImage")
