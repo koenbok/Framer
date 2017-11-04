@@ -676,7 +676,6 @@ describe "TextLayer", ->
 					'inlineStyles': [ {
 						'startIndex': 0
 						'endIndex': 3
-						'css':
 						'fontSize': '40px'
 						'WebkitTextFillColor': 'rgb(0, 0, 0)'
 						'whiteSpace': 'pre'
@@ -707,7 +706,6 @@ describe "TextLayer", ->
 					'inlineStyles': [ {
 						'startIndex': 0
 						'endIndex': 3
-						'css':
 						'fontSize': '40px'
 						'WebkitTextFillColor': 'rgb(0, 0, 0)'
 						'whiteSpace': 'pre'
@@ -726,7 +724,7 @@ describe "TextLayer", ->
 					'width': 70
 				'blending': 'normal'
 				'autoSize': true)
-				text.fontFamily.should.equal "Roboto"
+			text.fontFamily.should.equal "Roboto"
 
 		it "should infer letterSpacing from design with custom font", ->
 			text = new TextLayer(
@@ -738,7 +736,6 @@ describe "TextLayer", ->
 					'inlineStyles': [ {
 						'startIndex': 0
 						'endIndex': 3
-						'css':
 						'fontSize': '40px'
 						'WebkitTextFillColor': 'rgb(0, 0, 0)'
 						'whiteSpace': 'pre'
@@ -769,7 +766,6 @@ describe "TextLayer", ->
 					'inlineStyles': [ {
 						'startIndex': 0
 						'endIndex': 3
-						'css':
 						'fontSize': '40px'
 						'WebkitTextFillColor': 'rgb(0, 0, 0)'
 						'whiteSpace': 'pre'
