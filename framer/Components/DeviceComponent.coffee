@@ -1031,7 +1031,7 @@ Pixel2XLBaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1440
 	screenHeight: 2880
-	# devicePixelRatio: 3.5
+	devicePixelRatio: 4
 	deviceType: "phone"
 	minStudioVersion: iPhoneXReleaseVersion
 	screenMask: "google-pixel-2-xl-mask.svg"
