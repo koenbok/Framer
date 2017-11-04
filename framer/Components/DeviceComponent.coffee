@@ -1026,8 +1026,8 @@ Pixel2BaseDevice =
 			height: 5188
 
 Pixel2XLBaseDevice =
-	deviceImageWidth: 1840
-	deviceImageHeight: 3560
+	deviceImageWidth: 1650
+	deviceImageHeight: 3364
 	deviceImageCompression: true
 	screenWidth: 1440
 	screenHeight: 2880
@@ -1133,8 +1133,8 @@ SamsungGalaxyNote5BaseDevice =
 
 
 SamsungGalaxyS8BaseDevice =
-	deviceImageWidth: 1640
-	deviceImageHeight: 3600
+	deviceImageWidth: 1536
+	deviceImageHeight: 3334
 	deviceImageCompression: true
 	screenWidth: 1440
 	screenHeight: 2960
