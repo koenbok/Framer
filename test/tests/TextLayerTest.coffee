@@ -531,35 +531,263 @@ describe "TextLayer", ->
 
 	describe "Fonts", ->
 		it "should infer fontWeight from design", ->
-			text = new TextLayer({ "name": "text", "backgroundColor": null, "width": 162, "x": 107, "styledText": { "blocks": [{ "inlineStyles": [{ "startIndex": 0, "endIndex": 4, "css": { "fontSize": "80px", "WebkitTextFillColor": "rgb(0, 0, 0)", "whiteSpace": "pre", "letterSpacing": "0px", "lineHeight": "1.2", "tabSize": 4, "fontFamily": "\".SFNSDisplay-Heavy\", \"SFProDisplay-Heavy\", \"SFUIDisplay-Heavy\", \".SFUIDisplay-Heavy\", sans-serif" } }], "text": "Test" }] }, "height": 96, "constraintValues": { "left": null, "height": 96, "centerAnchorX": 0.5013333333333333, "width": 162, "top": null, "centerAnchorY": 0.50074962518740629 }, "blending": "normal", "autoSize": true, "y": 286 })
+			text = new TextLayer(
+				'name': 'text'
+				'backgroundColor': null
+				'width': 162
+				'x': 107
+				'styledText': 'blocks': [ {
+					'inlineStyles': [ {
+					'startIndex': 0
+					'endIndex': 4
+					'css':
+						'fontSize': '80px'
+						'WebkitTextFillColor': 'rgb(0, 0, 0)'
+						'whiteSpace': 'pre'
+						'letterSpacing': '0px'
+						'lineHeight': '1.2'
+						'tabSize': 4
+						'fontFamily': '".SFNSDisplay-Heavy", "SFProDisplay-Heavy", "SFUIDisplay-Heavy", ".SFUIDisplay-Heavy", sans-serif'
+					} ]
+					'text': 'Test'
+				} ]
+				'height': 96
+				'constraintValues':
+					'left': null
+					'height': 96
+					'centerAnchorX': 0.5013333333333333
+					'width': 162
+					'top': null
+					'centerAnchorY': 0.50074962518740629
+				'blending': 'normal'
+				'autoSize': true
+				'y': 286)
 			text.fontWeight.should.equal 800
 
 		it "should infer fontFamily from design", ->
-			text = new TextLayer({ "name": "text", "backgroundColor": null, "width": 162, "x": 107, "styledText": { "blocks": [{ "inlineStyles": [{ "startIndex": 0, "endIndex": 4, "css": { "fontSize": "80px", "WebkitTextFillColor": "rgb(0, 0, 0)", "whiteSpace": "pre", "letterSpacing": "0px", "lineHeight": "1.2", "tabSize": 4, "fontFamily": "\".SFNSDisplay-Heavy\", \"SFProDisplay-Heavy\", \"SFUIDisplay-Heavy\", \".SFUIDisplay-Heavy\", sans-serif" } }], "text": "Test" }] }, "height": 96, "constraintValues": { "left": null, "height": 96, "centerAnchorX": 0.5013333333333333, "width": 162, "top": null, "centerAnchorY": 0.50074962518740629 }, "blending": "normal", "autoSize": true, "y": 286 })
+			text = new TextLayer(
+				'name': 'text'
+				'backgroundColor': null
+				'width': 162
+				'x': 107
+				'styledText': 'blocks': [ {
+					'inlineStyles': [ {
+					'startIndex': 0
+					'endIndex': 4
+					'css':
+						'fontSize': '80px'
+						'WebkitTextFillColor': 'rgb(0, 0, 0)'
+						'whiteSpace': 'pre'
+						'letterSpacing': '0px'
+						'lineHeight': '1.2'
+						'tabSize': 4
+						'fontFamily': '".SFNSDisplay-Heavy", "SFProDisplay-Heavy", "SFUIDisplay-Heavy", ".SFUIDisplay-Heavy", sans-serif'
+					} ]
+					'text': 'Test'
+				} ]
+				'height': 96
+				'constraintValues':
+					'left': null
+					'height': 96
+					'centerAnchorX': 0.5013333333333333
+					'width': 162
+					'top': null
+					'centerAnchorY': 0.50074962518740629
+				'blending': 'normal'
+				'autoSize': true
+				'y': 286)
 			text.fontFamily.should.equal "-apple-system"
 
 		it "should infer letterSpacing from design", ->
-			text = new TextLayer({ "name": "text", "backgroundColor": null, "width": 162, "x": 107, "styledText": { "blocks": [{ "inlineStyles": [{ "startIndex": 0, "endIndex": 4, "css": { "fontSize": "80px", "WebkitTextFillColor": "rgb(0, 0, 0)", "whiteSpace": "pre", "letterSpacing": "0px", "lineHeight": "1.2", "tabSize": 4, "fontFamily": "\".SFNSDisplay-Heavy\", \"SFProDisplay-Heavy\", \"SFUIDisplay-Heavy\", \".SFUIDisplay-Heavy\", sans-serif" } }], "text": "Test" }] }, "height": 96, "constraintValues": { "left": null, "height": 96, "centerAnchorX": 0.5013333333333333, "width": 162, "top": null, "centerAnchorY": 0.50074962518740629 }, "blending": "normal", "autoSize": true, "y": 286 })
+			text = new TextLayer(
+				'name': 'text'
+				'backgroundColor': null
+				'width': 162
+				'x': 107
+				'styledText': 'blocks': [ {
+					'inlineStyles': [ {
+					'startIndex': 0
+					'endIndex': 4
+					'css':
+						'fontSize': '80px'
+						'WebkitTextFillColor': 'rgb(0, 0, 0)'
+						'whiteSpace': 'pre'
+						'letterSpacing': '0px'
+						'lineHeight': '1.2'
+						'tabSize': 4
+						'fontFamily': '".SFNSDisplay-Heavy", "SFProDisplay-Heavy", "SFUIDisplay-Heavy", ".SFUIDisplay-Heavy", sans-serif'
+					} ]
+					'text': 'Test'
+				} ]
+				'height': 96
+				'constraintValues':
+					'left': null
+					'height': 96
+					'centerAnchorX': 0.5013333333333333
+					'width': 162
+					'top': null
+					'centerAnchorY': 0.50074962518740629
+				'blending': 'normal'
+				'autoSize': true
+				'y': 286)
 			text.letterSpacing.should.equal 0
 
 		it "should infer textAlign from design", ->
-			text = new TextLayer({ "name": "text", "backgroundColor": null, "width": 162, "x": 107, "styledText": { "blocks": [{ "inlineStyles": [{ "startIndex": 0, "endIndex": 4, "css": { "fontSize": "80px", "WebkitTextFillColor": "rgb(0, 0, 0)", "whiteSpace": "pre", "letterSpacing": "0px", "lineHeight": "1.2", "tabSize": 4, "fontFamily": "\".SFNSDisplay-Heavy\", \"SFProDisplay-Heavy\", \"SFUIDisplay-Heavy\", \".SFUIDisplay-Heavy\", sans-serif" } }], "text": "Test" }] }, "height": 96, "constraintValues": { "left": null, "height": 96, "centerAnchorX": 0.5013333333333333, "width": 162, "top": null, "centerAnchorY": 0.50074962518740629 }, "blending": "normal", "autoSize": true, "y": 286 })
+			text = new TextLayer(
+				'name': 'text'
+				'backgroundColor': null
+				'width': 162
+				'x': 107
+				'styledText': 'blocks': [ {
+					'inlineStyles': [ {
+					'startIndex': 0
+					'endIndex': 4
+					'css':
+						'fontSize': '80px'
+						'WebkitTextFillColor': 'rgb(0, 0, 0)'
+						'whiteSpace': 'pre'
+						'letterSpacing': '0px'
+						'lineHeight': '1.2'
+						'tabSize': 4
+						'fontFamily': '".SFNSDisplay-Heavy", "SFProDisplay-Heavy", "SFUIDisplay-Heavy", ".SFUIDisplay-Heavy", sans-serif'
+					} ]
+					'text': 'Test'
+				} ]
+				'height': 96
+				'constraintValues':
+					'left': null
+					'height': 96
+					'centerAnchorX': 0.5013333333333333
+					'width': 162
+					'top': null
+					'centerAnchorY': 0.50074962518740629
+				'blending': 'normal'
+				'autoSize': true
+				'y': 286)
 			text.textAlign.should.equal "auto"
 
 		it "should infer fontWeight from design with custom font", ->
-			text = new TextLayer({ "name": "text", "backgroundColor": null, "width": 70, "styledText": { "blocks": [{ "inlineStyles": [{ "startIndex": 0, "endIndex": 3, "css": { "fontSize": "40px", "WebkitTextFillColor": "rgb(0, 0, 0)", "whiteSpace": "pre", "fontWeight": 400, "letterSpacing": "0px", "tabSize": 4, "fontFamily": "\"Roboto-Regular\", \"Roboto\", sans-serif", "lineHeight": "1.2" } }], "text": "Ben" }], "alignment": "center" }, "height": 48, "constraintValues": { "height": 48, "width": 70 }, "blending": "normal", "autoSize": true })
+			text = new TextLayer(
+				'name': 'text'
+				'backgroundColor': null
+				'width': 70
+				'styledText':
+					'blocks': [ {
+					'inlineStyles': [ {
+						'startIndex': 0
+						'endIndex': 3
+						'css':
+						'fontSize': '40px'
+						'WebkitTextFillColor': 'rgb(0, 0, 0)'
+						'whiteSpace': 'pre'
+						'fontWeight': 400
+						'letterSpacing': '0px'
+						'tabSize': 4
+						'fontFamily': '"Roboto-Regular", "Roboto", sans-serif'
+						'lineHeight': '1.2'
+					} ]
+					'text': 'Ben'
+					} ]
+					'alignment': 'center'
+				'height': 48
+				'constraintValues':
+					'height': 48
+					'width': 70
+				'blending': 'normal'
+				'autoSize': true)
 			text.fontWeight.should.equal 400
 
 		it "should infer fontFamily from design with custom font", ->
-			text = new TextLayer({ "name": "text", "backgroundColor": null, "width": 70, "styledText": { "blocks": [{ "inlineStyles": [{ "startIndex": 0, "endIndex": 3, "css": { "fontSize": "40px", "WebkitTextFillColor": "rgb(0, 0, 0)", "whiteSpace": "pre", "fontWeight": 400, "letterSpacing": "0px", "tabSize": 4, "fontFamily": "\"Roboto-Regular\", \"Roboto\", sans-serif", "lineHeight": "1.2" } }], "text": "Ben" }], "alignment": "center" }, "height": 48, "constraintValues": { "height": 48, "width": 70 }, "blending": "normal", "autoSize": true })
-			text.fontFamily.should.equal "Roboto"
+			text = new TextLayer(
+				'name': 'text'
+				'backgroundColor': null
+				'width': 70
+				'styledText':
+					'blocks': [ {
+					'inlineStyles': [ {
+						'startIndex': 0
+						'endIndex': 3
+						'css':
+						'fontSize': '40px'
+						'WebkitTextFillColor': 'rgb(0, 0, 0)'
+						'whiteSpace': 'pre'
+						'fontWeight': 400
+						'letterSpacing': '0px'
+						'tabSize': 4
+						'fontFamily': '"Roboto-Regular", "Roboto", sans-serif'
+						'lineHeight': '1.2'
+					} ]
+					'text': 'Ben'
+					} ]
+					'alignment': 'center'
+				'height': 48
+				'constraintValues':
+					'height': 48
+					'width': 70
+				'blending': 'normal'
+				'autoSize': true)
+				text.fontFamily.should.equal "Roboto"
 
 		it "should infer letterSpacing from design with custom font", ->
-			text = new TextLayer({ "name": "text", "backgroundColor": null, "width": 70, "styledText": { "blocks": [{ "inlineStyles": [{ "startIndex": 0, "endIndex": 3, "css": { "fontSize": "40px", "WebkitTextFillColor": "rgb(0, 0, 0)", "whiteSpace": "pre", "fontWeight": 400, "letterSpacing": "0px", "tabSize": 4, "fontFamily": "\"Roboto-Regular\", \"Roboto\", sans-serif", "lineHeight": "1.2" } }], "text": "Ben" }], "alignment": "center" }, "height": 48, "constraintValues": { "height": 48, "width": 70 }, "blending": "normal", "autoSize": true })
+			text = new TextLayer(
+				'name': 'text'
+				'backgroundColor': null
+				'width': 70
+				'styledText':
+					'blocks': [ {
+					'inlineStyles': [ {
+						'startIndex': 0
+						'endIndex': 3
+						'css':
+						'fontSize': '40px'
+						'WebkitTextFillColor': 'rgb(0, 0, 0)'
+						'whiteSpace': 'pre'
+						'fontWeight': 400
+						'letterSpacing': '0px'
+						'tabSize': 4
+						'fontFamily': '"Roboto-Regular", "Roboto", sans-serif'
+						'lineHeight': '1.2'
+					} ]
+					'text': 'Ben'
+					} ]
+					'alignment': 'center'
+				'height': 48
+				'constraintValues':
+					'height': 48
+					'width': 70
+				'blending': 'normal'
+				'autoSize': true)
 			text.letterSpacing.should.equal 0
 
 		it "should infer textAlign from design with custom font", ->
-			text = new TextLayer({ "name": "text", "backgroundColor": null, "width": 70, "styledText": { "blocks": [{ "inlineStyles": [{ "startIndex": 0, "endIndex": 3, "css": { "fontSize": "40px", "WebkitTextFillColor": "rgb(0, 0, 0)", "whiteSpace": "pre", "fontWeight": 400, "letterSpacing": "0px", "tabSize": 4, "fontFamily": "\"Roboto-Regular\", \"Roboto\", sans-serif", "lineHeight": "1.2" } }], "text": "Ben" }], "alignment": "center" }, "height": 48, "constraintValues": { "height": 48, "width": 70 }, "blending": "normal", "autoSize": true })
+			text = new TextLayer(
+				'name': 'text'
+				'backgroundColor': null
+				'width': 70
+				'styledText':
+					'blocks': [ {
+					'inlineStyles': [ {
+						'startIndex': 0
+						'endIndex': 3
+						'css':
+						'fontSize': '40px'
+						'WebkitTextFillColor': 'rgb(0, 0, 0)'
+						'whiteSpace': 'pre'
+						'fontWeight': 400
+						'letterSpacing': '0px'
+						'tabSize': 4
+						'fontFamily': '"Roboto-Regular", "Roboto", sans-serif'
+						'lineHeight': '1.2'
+					} ]
+					'text': 'Ben'
+					} ]
+					'alignment': 'center'
+				'height': 48
+				'constraintValues':
+					'height': 48
+					'width': 70
+				'blending': 'normal'
+				'autoSize': true)
 			text.textAlign.should.equal "center"
 
 		it "sets the weight if the font property is set", ->
