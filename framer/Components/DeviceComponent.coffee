@@ -724,6 +724,7 @@ class exports.DeviceComponent extends BaseClass
 ###########################################################################
 # DEVICE CONFIGURATIONS
 
+iphoneXReleaseVersion = 105
 googlePixelReleaseVersion = 75
 desktopReleaseVersion = 70
 newDeviceMinVersion = 53
@@ -768,7 +769,7 @@ iPhoneXBaseDevice =
 	screenHeight: 2436
 	devicePixelRatio: 3
 	deviceType: "phone"
-	minStudioVersion: 105
+	minStudioVersion: iphoneXReleaseVersion
 	screenMask: "apple-iphone-x-mask.svg"
 	hands:
 		"iphone-hands-2":
@@ -778,6 +779,42 @@ iPhoneXBaseDevice =
 		"iphone-hands-1":
 			width: 3568
 			height: 5559
+			offset: -15
+
+iPhone8BaseDevice =
+	deviceImageWidth: 871
+	deviceImageHeight: 1776
+	deviceImageCompression: true
+	screenWidth: 750
+	screenHeight: 1334
+	devicePixelRatio: 2
+	deviceType: "phone"
+	minStudioVersion: iphoneXReleaseVersion
+	hands:
+		"iphone-hands-2":
+			width: 2400
+			height: 3740
+		"iphone-hands-1":
+			width: 2400
+			height: 3740
+
+iPhone8PlusBaseDevice =
+	deviceImageWidth: 1436
+	deviceImageHeight: 2876
+	deviceImageCompression: true
+	screenWidth: 1242
+	screenHeight: 2208
+	devicePixelRatio: 3
+	deviceType: "phone"
+	minStudioVersion: iphoneXReleaseVersion
+	hands:
+		"iphone-hands-2":
+			width: 3949
+			height: 6192
+			offset: -15
+		"iphone-hands-1":
+			width: 3949
+			height: 6192
 			offset: -15
 
 iPhone7BaseDevice =
@@ -964,6 +1001,43 @@ PixelBaseDevice =
 			height: 5211
 			offset: 23
 
+Pixel2BaseDevice =
+	deviceImageWidth: 1210
+	deviceImageHeight: 2513
+	deviceImageCompression: true
+	screenWidth: 1080
+	screenHeight: 1920
+	devicePixelRatio: 2.627
+	deviceType: "phone"
+	minStudioVersion: iphoneXReleaseVersion
+	hands:
+		"iphone-hands-2":
+			width: 3320
+			height: 5178
+		"iphone-hands-1":
+			width: 3327
+			height: 5188
+
+Pixel2XLBaseDevice =
+	deviceImageWidth: 1840
+	deviceImageHeight: 3560
+	deviceImageCompression: true
+	screenWidth: 1440
+	screenHeight: 2880
+	# devicePixelRatio: 3.5
+	deviceType: "phone"
+	minStudioVersion: iphoneXReleaseVersion
+	screenMask: "google-pixel-2-xl-mask.svg"
+	hands:
+		"iphone-hands-2":
+			width: 4530
+			height: 7064
+		"iphone-hands-1":
+			width: 4530
+			height: 7064
+
+
+
 Nexus9BaseDevice =
 	deviceImageWidth: 1896
 	deviceImageHeight: 2648
@@ -1049,6 +1123,26 @@ SamsungGalaxyNote5BaseDevice =
 			width: 4279
 			height: 6668
 			offset: -84
+
+
+SamsungGalaxyS8BaseDevice =
+	deviceImageWidth: 1640
+	deviceImageHeight: 3600
+	deviceImageCompression: true
+	screenWidth: 1440
+	screenHeight: 2960
+	devicePixelRatio: 4
+	deviceType: "phone"
+	minStudioVersion: iphoneXReleaseVersion
+	screenMask: "samsung-galaxy-s8-mask.svg"
+	hands:
+		"iphone-hands-2":
+			width: 4219
+			height: 6573
+		"iphone-hands-1":
+			width: 4219
+			height: 6573
+
 
 AppleWatchSeries242Device =
 	deviceImageWidth: 512
@@ -1342,6 +1436,16 @@ Devices =
 	"apple-iphone-x-silver": _.clone(iPhoneXBaseDevice)
 	"apple-iphone-x-space-gray": _.clone(iPhoneXBaseDevice)
 
+	# iPhone 8
+	"apple-iphone-8-silver": _.clone(iPhone8BaseDevice)
+	"apple-iphone-8-gold": _.clone(iPhone8BaseDevice)
+	"apple-iphone-8-space-gray": _.clone(iPhone8BaseDevice)
+
+	# iPhone 8 Plus
+	"apple-iphone-8-plus-silver": _.clone(iPhone8PlusBaseDevice)
+	"apple-iphone-8-plus-gold": _.clone(iPhone8PlusBaseDevice)
+	"apple-iphone-8-plus-space-gray": _.clone(iPhone8PlusBaseDevice)
+
 	# iPhone 7
 	"apple-iphone-7-gold": _.clone(iPhone7BaseDevice)
 	"apple-iphone-7-rose-gold": _.clone(iPhone7BaseDevice)
@@ -1471,6 +1575,13 @@ Devices =
 	"google-pixel-really-blue": _.clone(PixelBaseDevice)
 	"google-pixel-very-silver": _.clone(PixelBaseDevice)
 
+	# Pixel 2
+	"google-pixel-2-clearly-white": _.clone(Pixel2BaseDevice)
+	"google-pixel-2-just-black": _.clone(Pixel2BaseDevice)
+	"google-pixel-2-kinda-blue": _.clone(Pixel2BaseDevice)
+	"google-pixel-2-xl-black-and-white": _.clone(Pixel2XLBaseDevice)
+	"google-pixel-2-xl-just-black": _.clone(Pixel2XLBaseDevice)
+
 	# HTC ONE A9
 	"htc-one-a9-black": _.clone(HTCa9BaseDevice)
 	"htc-one-a9-white": _.clone(HTCa9BaseDevice)
@@ -1490,6 +1601,13 @@ Devices =
 	"samsung-galaxy-note-5-pink": _.clone(SamsungGalaxyNote5BaseDevice)
 	"samsung-galaxy-note-5-silver-titanium": _.clone(SamsungGalaxyNote5BaseDevice)
 	"samsung-galaxy-note-5-white": _.clone(SamsungGalaxyNote5BaseDevice)
+
+	#Samsug Galaxy S8
+	"samsung-galaxy-s8-orchid-gray": _.clone(SamsungGalaxyS8BaseDevice)
+	"samsung-galaxy-s8-midnight-black": _.clone(SamsungGalaxyS8BaseDevice)
+	"samsung-galaxy-s8-maple-gold": _.clone(SamsungGalaxyS8BaseDevice)
+	"samsung-galaxy-s8-coral-blue": _.clone(SamsungGalaxyS8BaseDevice)
+	"samsung-galaxy-s8-arctic-silver": _.clone(SamsungGalaxyS8BaseDevice)
 
 	# Notebooks
 	"apple-macbook": _.clone(AppleMacBook)
