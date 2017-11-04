@@ -162,6 +162,8 @@ class exports.DeviceComponent extends BaseClass
 				@_context.devicePixelRatio = window.devicePixelRatio
 			if Utils.isMobile()
 				@screenMask.visible = false
+			else
+				@_updateMaskImage()
 		else
 			backgroundOverlap = 100
 
@@ -361,12 +363,17 @@ class exports.DeviceComponent extends BaseClass
 			@phone.height = @_device.deviceImageHeight
 			@hands.width  = @phone.width
 			@hands.height = @phone.height
-			if @_device.screenMask
-				@phone.bringToFront()
-				@screenMask.image = @_deviceImageUrl(@_device.screenMask)
-			else
-				@screenMask.image = null
-				@phone.sendToBack()
+			@_updateMaskImage()
+
+	_updateMaskImage: =>
+		if @_device.screenMask
+			@phone.bringToFront()
+			@screenMask.image = @_deviceImageUrl(@_device.screenMask)
+			@screenMask.visible = true
+		else
+			@screenMask.image = null
+			@screenMask.visible = false
+			@phone.sendToBack()
 
 	_deviceImageName: ->
 		if @_device.hasOwnProperty("deviceImage")
