@@ -1887,9 +1887,9 @@ describe "Layer", ->
 				c = new Layer parent: b, name: "c"
 				d = new Layer parent: c, name: "d"
 				containers = d.containers(true)
-				containers.length.should.equal 10
+				containers.length.should.equal 9
 				names = containers.map((l) -> l.name)
-				names.should.eql ["c", "b", "a", undefined, "viewport", "screen", "phone", "phone", "hands", undefined]
+				names.should.eql ["c", "b", "a", undefined, "viewport", "screen", "phone", "hands", undefined]
 
 	describe "constraintValues", ->
 		it "layout should not break constraints", ->
