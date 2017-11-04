@@ -184,9 +184,9 @@ class exports.DeviceComponent extends BaseClass
 			screenSizeChanged = @content.width isnt width or @content.height isnt height
 			@content.width  = width
 			@content.height = height
+			@setHand(@selectedHand) if @selectedHand and @_orientation is 0
 			centerLayer(@screen)
 			centerLayer(@screenMask)
-			@setHand(@selectedHand) if @selectedHand and @_orientation is 0
 
 			pixelRatio = @_device.devicePixelRatio ? 1
 			screenSizeChanged = screenSizeChanged or @_context.devicePixelRatio isnt pixelRatio
@@ -363,7 +363,7 @@ class exports.DeviceComponent extends BaseClass
 			@hands.height = @phone.height
 			if @_device.screenMask
 				@phone.bringToFront()
-				@screenMask.image = @_device.screenMask
+				@screenMask.image = @_deviceImageUrl(@_device.screenMask)
 			else
 				@screenMask.image = null
 				@phone.sendToBack()
@@ -752,6 +752,26 @@ iPadProBaseDevice =
 	devicePixelRatio: 2
 	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
+
+iPhoneXBaseDevice =
+	deviceImageWidth: 1405
+	deviceImageHeight: 2796
+	deviceImageCompression: true
+	screenWidth: 1125
+	screenHeight: 2436
+	devicePixelRatio: 3
+	deviceType: "phone"
+	minStudioVersion: 105
+	screenMask: "apple-iphone-x-mask.svg"
+	hands:
+		"iphone-hands-2":
+			width: 3568
+			height: 5559
+			offset: -15
+		"iphone-hands-1":
+			width: 3568
+			height: 5559
+			offset: -15
 
 iPhone7BaseDevice =
 	deviceImageWidth: 874
@@ -1310,6 +1330,10 @@ Devices =
 	"apple-ipad-pro-silver": _.clone(iPadProBaseDevice)
 	"apple-ipad-pro-gold": _.clone(iPadProBaseDevice)
 	"apple-ipad-pro-space-gray": _.clone(iPadProBaseDevice)
+
+	# iPhone X
+	"apple-iphone-x-silver": _.clone(iPhoneXBaseDevice)
+	"apple-iphone-x-space-gray": _.clone(iPhoneXBaseDevice)
 
 	# iPhone 7
 	"apple-iphone-7-gold": _.clone(iPhone7BaseDevice)
