@@ -428,13 +428,22 @@ class exports.DeviceComponent extends BaseClass
 			@_hideBezel = hideBezel
 			if @_hideBezel
 				@_previousBackgroundColor = @background.backgroundColor
-				@background.backgroundColor = @screen.backgroundColor
+				if @_device.screenMask?
+					@background.backgroundColor = "black"
+				else
+					@background.backgroundColor = @screen.backgroundColor
 				@screen.on "change:backgroundColor", (color) =>
+					return if @_device.screenMask?
 					# Hacky way to keep the prev backgroundColor
 					prev = @_previousBackgroundColor
 					@background.backgroundColor = color
 					@_previousBackgroundColor = prev
 				@background.on "change:backgroundColor", (color) =>
+					if @_device.screenMask?
+						if not Color.equal(@background.backgroundColor, "black")
+							@_previousBackgroundColor = color
+							@background.backgroundColor = "black"
+						return
 					@background.backgroundColor = @screen.backgroundColor
 					@_previousBackgroundColor = color
 			else

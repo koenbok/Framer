@@ -204,3 +204,29 @@ describe "DeviceComponent", ->
 			Canvas.backgroundColor.toName().should.eql "green"
 			Framer.Device.hideBezel = false
 			Canvas.backgroundColor.toName().should.equal "red"
+
+		describe "when the device has a mask", ->
+
+			it "should should keep the backgroundColor black if the canvas background is set", ->
+				device = new DeviceComponent()
+				device.deviceType = "apple-iphone-x-silver"
+				device.context.run ->
+					device.background.backgroundColor = "red"
+					device.screen.backgroundColor = "green"
+					device.hideBezel = true
+					device.background.backgroundColor = "blue"
+					device.background.backgroundColor.toName().should.equal "black"
+					device.hideBezel = false
+					device.background.backgroundColor.toName().should.equal "blue"
+
+			it "should should set the backgroundColor to black", ->
+				device = new DeviceComponent()
+				device.deviceType = "apple-iphone-x-silver"
+				device.context.devicePixelRatio = 2
+				device.context.run ->
+					device.background.backgroundColor = "red"
+					device.screen.backgroundColor = "green"
+					device.hideBezel = true
+					device.background.backgroundColor.toName().should.equal "black"
+					device.hideBezel = false
+					device.background.backgroundColor.toName().should.equal "red"
