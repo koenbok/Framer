@@ -94,9 +94,10 @@ class exports.DeviceComponent extends BaseClass
 		@hands    = new Layer name: "hands"
 		@handsImageLayer = new Layer parent: @hands, name: "handsImage"
 		@phone    = new Layer parent: @hands, name: "phone"
-		@screen   = new Layer parent: @phone, name: "phone"
+		@screen   = new Layer parent: @hands, name: "phone"
 		@viewport = new Layer parent: @screen, name: "screen"
 		@content  = new Layer parent: @viewport, name: "viewport"
+		@screenMask = new Layer parent: @screen, name: "mask", backgroundColor: null
 
 		@content.classList.add("DeviceContent")
 
@@ -124,8 +125,11 @@ class exports.DeviceComponent extends BaseClass
 		Framer.CurrentContext.domEventManager.wrap(window).addEventListener("resize", @_orientationChange) if Utils.isMobile()
 
 		# This avoids rubber banding on mobile
-		for layer in [@background, @phone, @viewport, @content, @screen]
+		for layer in [@background, @phone, @viewport, @content, @screen, @screenMask]
 			layer.on "touchmove", (event) -> event.preventDefault()
+
+		@screenMask.ignoreEvents = true
+		@phone.ignoreEvents = true
 
 		@_context = new Framer.Context(parent: @content, name: "DeviceScreen")
 		@_context.perspective = 1200
@@ -146,7 +150,7 @@ class exports.DeviceComponent extends BaseClass
 			width = document.documentElement.clientWidth / contentScaleFactor
 			height = document.documentElement.clientHeight / contentScaleFactor
 			screenSizeChanged = @content.width isnt width or @content.height isnt height
-			for layer in [@background, @hands, @phone, @viewport, @content, @screen]
+			for layer in [@background, @hands, @phone, @viewport, @content, @screen, @screenMask]
 				layer.x = layer.y = 0
 				layer.width = width
 				layer.height = height
@@ -156,7 +160,10 @@ class exports.DeviceComponent extends BaseClass
 			if @deviceType isnt "fullscreen" or Utils.isMobile()
 				screenSizeChanged = screenSizeChanged or @_context.devicePixelRatio isnt window.devicePixelRatio
 				@_context.devicePixelRatio = window.devicePixelRatio
-
+			if Utils.isMobile()
+				@screenMask.visible = false
+			else
+				@_updateMaskImage()
 		else
 			backgroundOverlap = 100
 
@@ -166,6 +173,8 @@ class exports.DeviceComponent extends BaseClass
 			@background.height = window.innerHeight + (2 * backgroundOverlap)
 
 			@_updateDeviceImage()
+			@_updateMaskImage()
+			@screenMask.visible = @hideBezel
 			@hands.scale = @_calculatePhoneScale()
 			centerLayer(@hands, true)
 			centerLayer(@phone)
@@ -174,15 +183,14 @@ class exports.DeviceComponent extends BaseClass
 				@_device.screenWidth / contentScaleFactor,
 				@_device.screenHeight / contentScaleFactor)
 
-			@screen.width  = @viewport.width = @_device.screenWidth
-			@screen.height = @viewport.height = @_device.screenHeight
-
+			@screenMask.width = @screen.width = @viewport.width = @_device.screenWidth
+			@screenMask.height = @screen.height = @viewport.height = @_device.screenHeight
 			screenSizeChanged = @content.width isnt width or @content.height isnt height
 			@content.width  = width
 			@content.height = height
-			centerLayer(@screen)
-
 			@setHand(@selectedHand) if @selectedHand and @_orientation is 0
+			centerLayer(@screen)
+			centerLayer(@screenMask)
 
 			pixelRatio = @_device.devicePixelRatio ? 1
 			screenSizeChanged = screenSizeChanged or @_context.devicePixelRatio isnt pixelRatio
@@ -268,6 +276,7 @@ class exports.DeviceComponent extends BaseClass
 			@hands.image = ""
 		else
 			@_updateDeviceImage()
+		@_updateMaskImage()
 
 		@_update()
 		@emit("change:fullScreen")
@@ -332,6 +341,7 @@ class exports.DeviceComponent extends BaseClass
 			@_deviceType = deviceType
 			@fullscreen = false
 			@_updateDeviceImage()
+			@_updateMaskImage()
 			@_update()
 			@emit("change:deviceType")
 
@@ -357,6 +367,16 @@ class exports.DeviceComponent extends BaseClass
 			@phone.height = @_device.deviceImageHeight
 			@hands.width  = @phone.width
 			@hands.height = @phone.height
+
+	_updateMaskImage: =>
+		if @_device.screenMask
+			@phone.bringToFront()
+			@screenMask.image = @_deviceImageUrl(@_device.screenMask)
+			@screenMask.visible = true
+		else
+			@screenMask.image = null
+			@screenMask.visible = false
+			@phone.placeBehind(@screen)
 
 	_deviceImageName: ->
 		if @_device.hasOwnProperty("deviceImage")
@@ -707,6 +727,7 @@ class exports.DeviceComponent extends BaseClass
 ###########################################################################
 # DEVICE CONFIGURATIONS
 
+iPhoneXReleaseVersion = 105
 googlePixelReleaseVersion = 75
 desktopReleaseVersion = 70
 newDeviceMinVersion = 53
@@ -743,6 +764,62 @@ iPadProBaseDevice =
 	deviceType: "tablet"
 	minStudioVersion: newDeviceMinVersion
 
+iPhoneXBaseDevice =
+	deviceImageWidth: 1405
+	deviceImageHeight: 2796
+	deviceImageCompression: true
+	screenWidth: 1125
+	screenHeight: 2436
+	devicePixelRatio: 3
+	deviceType: "phone"
+	minStudioVersion: iPhoneXReleaseVersion
+	screenMask: "apple-iphone-x-mask.svg"
+	hands:
+		"iphone-hands-2":
+			width: 3568
+			height: 5559
+			offset: -15
+		"iphone-hands-1":
+			width: 3568
+			height: 5559
+			offset: -15
+
+iPhone8BaseDevice =
+	deviceImageWidth: 871
+	deviceImageHeight: 1776
+	deviceImageCompression: true
+	screenWidth: 750
+	screenHeight: 1334
+	devicePixelRatio: 2
+	deviceType: "phone"
+	minStudioVersion: iPhoneXReleaseVersion
+	hands:
+		"iphone-hands-2":
+			width: 2400
+			height: 3740
+		"iphone-hands-1":
+			width: 2400
+			height: 3740
+
+iPhone8PlusBaseDevice =
+	deviceImageWidth: 1436
+	deviceImageHeight: 2876
+	deviceImageCompression: true
+	screenWidth: 1242
+	screenHeight: 2208
+	devicePixelRatio: 3
+	deviceType: "phone"
+	minStudioVersion: iPhoneXReleaseVersion
+	hands:
+		"iphone-hands-2":
+			width: 3949
+			height: 6192
+			offset: -15
+		"iphone-hands-1":
+			width: 3949
+			height: 6192
+			offset: -15
+
 iPhone7BaseDevice =
 	deviceImageWidth: 874
 	deviceImageHeight: 1792
@@ -752,6 +829,7 @@ iPhone7BaseDevice =
 	devicePixelRatio: 2
 	deviceType: "phone"
 	minStudioVersion: 71
+	maxStudioVersion: iPhoneXReleaseVersion - 1
 	hands:
 		"iphone-hands-2":
 			width: 2400
@@ -769,6 +847,7 @@ iPhone7PlusBaseDevice =
 	devicePixelRatio: 3
 	deviceType: "phone"
 	minStudioVersion: 71
+	maxStudioVersion: iPhoneXReleaseVersion - 1
 	hands:
 		"iphone-hands-2":
 			width: 3987
@@ -860,6 +939,7 @@ Nexus4BaseDevice =
 	devicePixelRatio: 2
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
+	maxStudioVersion: iPhoneXReleaseVersion - 1
 	hands:
 		"iphone-hands-2":
 			width: 2362
@@ -917,6 +997,7 @@ PixelBaseDevice =
 	devicePixelRatio: 2.627
 	deviceType: "phone"
 	minStudioVersion: googlePixelReleaseVersion
+	maxStudioVersion: iPhoneXReleaseVersion - 1
 	hands:
 		"iphone-hands-2":
 			width: 3344
@@ -926,6 +1007,43 @@ PixelBaseDevice =
 			width: 3344
 			height: 5211
 			offset: 23
+
+Pixel2BaseDevice =
+	deviceImageWidth: 1210
+	deviceImageHeight: 2513
+	deviceImageCompression: true
+	screenWidth: 1080
+	screenHeight: 1920
+	devicePixelRatio: 2.627
+	deviceType: "phone"
+	minStudioVersion: iPhoneXReleaseVersion
+	hands:
+		"iphone-hands-2":
+			width: 3320
+			height: 5178
+		"iphone-hands-1":
+			width: 3327
+			height: 5188
+
+Pixel2XLBaseDevice =
+	deviceImageWidth: 1840
+	deviceImageHeight: 3560
+	deviceImageCompression: true
+	screenWidth: 1440
+	screenHeight: 2880
+	# devicePixelRatio: 3.5
+	deviceType: "phone"
+	minStudioVersion: iPhoneXReleaseVersion
+	screenMask: "google-pixel-2-xl-mask.svg"
+	hands:
+		"iphone-hands-2":
+			width: 4530
+			height: 7064
+		"iphone-hands-1":
+			width: 4530
+			height: 7064
+
+
 
 Nexus9BaseDevice =
 	deviceImageWidth: 1896
@@ -1012,6 +1130,26 @@ SamsungGalaxyNote5BaseDevice =
 			width: 4279
 			height: 6668
 			offset: -84
+
+
+SamsungGalaxyS8BaseDevice =
+	deviceImageWidth: 1640
+	deviceImageHeight: 3600
+	deviceImageCompression: true
+	screenWidth: 1440
+	screenHeight: 2960
+	devicePixelRatio: 4
+	deviceType: "phone"
+	minStudioVersion: iPhoneXReleaseVersion
+	screenMask: "samsung-galaxy-s8-mask.svg"
+	hands:
+		"iphone-hands-2":
+			width: 4219
+			height: 6573
+		"iphone-hands-1":
+			width: 4219
+			height: 6573
+
 
 AppleWatchSeries242Device =
 	deviceImageWidth: 512
@@ -1301,6 +1439,20 @@ Devices =
 	"apple-ipad-pro-gold": _.clone(iPadProBaseDevice)
 	"apple-ipad-pro-space-gray": _.clone(iPadProBaseDevice)
 
+	# iPhone X
+	"apple-iphone-x-silver": _.clone(iPhoneXBaseDevice)
+	"apple-iphone-x-space-gray": _.clone(iPhoneXBaseDevice)
+
+	# iPhone 8
+	"apple-iphone-8-silver": _.clone(iPhone8BaseDevice)
+	"apple-iphone-8-gold": _.clone(iPhone8BaseDevice)
+	"apple-iphone-8-space-gray": _.clone(iPhone8BaseDevice)
+
+	# iPhone 8 Plus
+	"apple-iphone-8-plus-silver": _.clone(iPhone8PlusBaseDevice)
+	"apple-iphone-8-plus-gold": _.clone(iPhone8PlusBaseDevice)
+	"apple-iphone-8-plus-space-gray": _.clone(iPhone8PlusBaseDevice)
+
 	# iPhone 7
 	"apple-iphone-7-gold": _.clone(iPhone7BaseDevice)
 	"apple-iphone-7-rose-gold": _.clone(iPhone7BaseDevice)
@@ -1430,6 +1582,13 @@ Devices =
 	"google-pixel-really-blue": _.clone(PixelBaseDevice)
 	"google-pixel-very-silver": _.clone(PixelBaseDevice)
 
+	# Pixel 2
+	"google-pixel-2-clearly-white": _.clone(Pixel2BaseDevice)
+	"google-pixel-2-just-black": _.clone(Pixel2BaseDevice)
+	"google-pixel-2-kinda-blue": _.clone(Pixel2BaseDevice)
+	"google-pixel-2-xl-black-and-white": _.clone(Pixel2XLBaseDevice)
+	"google-pixel-2-xl-just-black": _.clone(Pixel2XLBaseDevice)
+
 	# HTC ONE A9
 	"htc-one-a9-black": _.clone(HTCa9BaseDevice)
 	"htc-one-a9-white": _.clone(HTCa9BaseDevice)
@@ -1449,6 +1608,13 @@ Devices =
 	"samsung-galaxy-note-5-pink": _.clone(SamsungGalaxyNote5BaseDevice)
 	"samsung-galaxy-note-5-silver-titanium": _.clone(SamsungGalaxyNote5BaseDevice)
 	"samsung-galaxy-note-5-white": _.clone(SamsungGalaxyNote5BaseDevice)
+
+	#Samsug Galaxy S8
+	"samsung-galaxy-s8-orchid-gray": _.clone(SamsungGalaxyS8BaseDevice)
+	"samsung-galaxy-s8-midnight-black": _.clone(SamsungGalaxyS8BaseDevice)
+	"samsung-galaxy-s8-maple-gold": _.clone(SamsungGalaxyS8BaseDevice)
+	"samsung-galaxy-s8-coral-blue": _.clone(SamsungGalaxyS8BaseDevice)
+	"samsung-galaxy-s8-arctic-silver": _.clone(SamsungGalaxyS8BaseDevice)
 
 	# Notebooks
 	"apple-macbook": _.clone(AppleMacBook)
