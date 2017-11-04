@@ -173,6 +173,8 @@ class exports.DeviceComponent extends BaseClass
 			@background.height = window.innerHeight + (2 * backgroundOverlap)
 
 			@_updateDeviceImage()
+			@_updateMaskImage()
+			@screenMask.visible = @hideBezel
 			@hands.scale = @_calculatePhoneScale()
 			centerLayer(@hands, true)
 			centerLayer(@phone)
@@ -274,6 +276,7 @@ class exports.DeviceComponent extends BaseClass
 			@hands.image = ""
 		else
 			@_updateDeviceImage()
+		@_updateMaskImage()
 
 		@_update()
 		@emit("change:fullScreen")
@@ -338,6 +341,7 @@ class exports.DeviceComponent extends BaseClass
 			@_deviceType = deviceType
 			@fullscreen = false
 			@_updateDeviceImage()
+			@_updateMaskImage()
 			@_update()
 			@emit("change:deviceType")
 
@@ -363,7 +367,6 @@ class exports.DeviceComponent extends BaseClass
 			@phone.height = @_device.deviceImageHeight
 			@hands.width  = @phone.width
 			@hands.height = @phone.height
-			@_updateMaskImage()
 
 	_updateMaskImage: =>
 		if @_device.screenMask
@@ -373,7 +376,7 @@ class exports.DeviceComponent extends BaseClass
 		else
 			@screenMask.image = null
 			@screenMask.visible = false
-			@phone.sendToBack()
+			@phone.placeBehind(@screen)
 
 	_deviceImageName: ->
 		if @_device.hasOwnProperty("deviceImage")
