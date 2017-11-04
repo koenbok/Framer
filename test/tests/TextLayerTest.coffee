@@ -547,19 +547,19 @@ describe "TextLayer", ->
 			text.textAlign.should.equal "auto"
 
 		it "should infer fontWeight from design with custom font", ->
-			text = new TextLayer({"name":"text","backgroundColor":null,"width":70,"styledText":{"blocks":[{"inlineStyles":[{"startIndex":0,"endIndex":3,"css":{"fontSize":"40px","WebkitTextFillColor":"rgb(0, 0, 0)","whiteSpace":"pre","fontWeight":400,"letterSpacing":"0px","tabSize":4,"fontFamily":"\"Roboto-Regular\", \"Roboto\", sans-serif","lineHeight":"1.2"}}],"text":"Ben"}],"alignment":"center"},"height":48,"constraintValues":{"height":48,"width":70},"blending":"normal","autoSize":true})
+			text = new TextLayer({ "name": "text", "backgroundColor": null, "width": 70, "styledText": { "blocks": [{ "inlineStyles": [{ "startIndex": 0, "endIndex": 3, "css": { "fontSize": "40px", "WebkitTextFillColor": "rgb(0, 0, 0)", "whiteSpace": "pre", "fontWeight": 400, "letterSpacing": "0px", "tabSize": 4, "fontFamily": "\"Roboto-Regular\", \"Roboto\", sans-serif", "lineHeight": "1.2" } }], "text": "Ben" }], "alignment": "center" }, "height": 48, "constraintValues": { "height": 48, "width": 70 }, "blending": "normal", "autoSize": true })
 			text.fontWeight.should.equal 400
 
 		it "should infer fontFamily from design with custom font", ->
-			text = new TextLayer({"name":"text","backgroundColor":null,"width":70,"styledText":{"blocks":[{"inlineStyles":[{"startIndex":0,"endIndex":3,"css":{"fontSize":"40px","WebkitTextFillColor":"rgb(0, 0, 0)","whiteSpace":"pre","fontWeight":400,"letterSpacing":"0px","tabSize":4,"fontFamily":"\"Roboto-Regular\", \"Roboto\", sans-serif","lineHeight":"1.2"}}],"text":"Ben"}],"alignment":"center"},"height":48,"constraintValues":{"height":48,"width":70},"blending":"normal","autoSize":true})
+			text = new TextLayer({ "name": "text", "backgroundColor": null, "width": 70, "styledText": { "blocks": [{ "inlineStyles": [{ "startIndex": 0, "endIndex": 3, "css": { "fontSize": "40px", "WebkitTextFillColor": "rgb(0, 0, 0)", "whiteSpace": "pre", "fontWeight": 400, "letterSpacing": "0px", "tabSize": 4, "fontFamily": "\"Roboto-Regular\", \"Roboto\", sans-serif", "lineHeight": "1.2" } }], "text": "Ben" }], "alignment": "center" }, "height": 48, "constraintValues": { "height": 48, "width": 70 }, "blending": "normal", "autoSize": true })
 			text.fontFamily.should.equal "Roboto"
 
 		it "should infer letterSpacing from design with custom font", ->
-			text = new TextLayer({"name":"text","backgroundColor":null,"width":70,"styledText":{"blocks":[{"inlineStyles":[{"startIndex":0,"endIndex":3,"css":{"fontSize":"40px","WebkitTextFillColor":"rgb(0, 0, 0)","whiteSpace":"pre","fontWeight":400,"letterSpacing":"0px","tabSize":4,"fontFamily":"\"Roboto-Regular\", \"Roboto\", sans-serif","lineHeight":"1.2"}}],"text":"Ben"}],"alignment":"center"},"height":48,"constraintValues":{"height":48,"width":70},"blending":"normal","autoSize":true})
+			text = new TextLayer({ "name": "text", "backgroundColor": null, "width": 70, "styledText": { "blocks": [{ "inlineStyles": [{ "startIndex": 0, "endIndex": 3, "css": { "fontSize": "40px", "WebkitTextFillColor": "rgb(0, 0, 0)", "whiteSpace": "pre", "fontWeight": 400, "letterSpacing": "0px", "tabSize": 4, "fontFamily": "\"Roboto-Regular\", \"Roboto\", sans-serif", "lineHeight": "1.2" } }], "text": "Ben" }], "alignment": "center" }, "height": 48, "constraintValues": { "height": 48, "width": 70 }, "blending": "normal", "autoSize": true })
 			text.letterSpacing.should.equal 0
 
 		it "should infer textAlign from design with custom font", ->
-			text = new TextLayer({"name":"text","backgroundColor":null,"width":70,"styledText":{"blocks":[{"inlineStyles":[{"startIndex":0,"endIndex":3,"css":{"fontSize":"40px","WebkitTextFillColor":"rgb(0, 0, 0)","whiteSpace":"pre","fontWeight":400,"letterSpacing":"0px","tabSize":4,"fontFamily":"\"Roboto-Regular\", \"Roboto\", sans-serif","lineHeight":"1.2"}}],"text":"Ben"}],"alignment":"center"},"height":48,"constraintValues":{"height":48,"width":70},"blending":"normal","autoSize":true})
+			text = new TextLayer({ "name": "text", "backgroundColor": null, "width": 70, "styledText": { "blocks": [{ "inlineStyles": [{ "startIndex": 0, "endIndex": 3, "css": { "fontSize": "40px", "WebkitTextFillColor": "rgb(0, 0, 0)", "whiteSpace": "pre", "fontWeight": 400, "letterSpacing": "0px", "tabSize": 4, "fontFamily": "\"Roboto-Regular\", \"Roboto\", sans-serif", "lineHeight": "1.2" } }], "text": "Ben" }], "alignment": "center" }, "height": 48, "constraintValues": { "height": 48, "width": 70 }, "blending": "normal", "autoSize": true })
 			text.textAlign.should.equal "center"
 
 		it "sets the weight if the font property is set", ->
