@@ -727,7 +727,7 @@ class exports.DeviceComponent extends BaseClass
 ###########################################################################
 # DEVICE CONFIGURATIONS
 
-iphoneXReleaseVersion = 105
+iPhoneXReleaseVersion = 105
 googlePixelReleaseVersion = 75
 desktopReleaseVersion = 70
 newDeviceMinVersion = 53
@@ -772,7 +772,7 @@ iPhoneXBaseDevice =
 	screenHeight: 2436
 	devicePixelRatio: 3
 	deviceType: "phone"
-	minStudioVersion: iphoneXReleaseVersion
+	minStudioVersion: iPhoneXReleaseVersion
 	screenMask: "apple-iphone-x-mask.svg"
 	hands:
 		"iphone-hands-2":
@@ -792,7 +792,7 @@ iPhone8BaseDevice =
 	screenHeight: 1334
 	devicePixelRatio: 2
 	deviceType: "phone"
-	minStudioVersion: iphoneXReleaseVersion
+	minStudioVersion: iPhoneXReleaseVersion
 	hands:
 		"iphone-hands-2":
 			width: 2400
@@ -809,7 +809,7 @@ iPhone8PlusBaseDevice =
 	screenHeight: 2208
 	devicePixelRatio: 3
 	deviceType: "phone"
-	minStudioVersion: iphoneXReleaseVersion
+	minStudioVersion: iPhoneXReleaseVersion
 	hands:
 		"iphone-hands-2":
 			width: 3949
@@ -1012,7 +1012,7 @@ Pixel2BaseDevice =
 	screenHeight: 1920
 	devicePixelRatio: 2.627
 	deviceType: "phone"
-	minStudioVersion: iphoneXReleaseVersion
+	minStudioVersion: iPhoneXReleaseVersion
 	hands:
 		"iphone-hands-2":
 			width: 3320
@@ -1029,7 +1029,7 @@ Pixel2XLBaseDevice =
 	screenHeight: 2880
 	# devicePixelRatio: 3.5
 	deviceType: "phone"
-	minStudioVersion: iphoneXReleaseVersion
+	minStudioVersion: iPhoneXReleaseVersion
 	screenMask: "google-pixel-2-xl-mask.svg"
 	hands:
 		"iphone-hands-2":
@@ -1136,7 +1136,7 @@ SamsungGalaxyS8BaseDevice =
 	screenHeight: 2960
 	devicePixelRatio: 4
 	deviceType: "phone"
-	minStudioVersion: iphoneXReleaseVersion
+	minStudioVersion: iPhoneXReleaseVersion
 	screenMask: "samsung-galaxy-s8-mask.svg"
 	hands:
 		"iphone-hands-2":
