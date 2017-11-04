@@ -34,6 +34,7 @@ mkdir -p "$TARGET_PATH"
 
 cd "$SOURCE_PATH"
 pax -wrs'/png$/unoptim.png/' *.png "../$TARGET_PATH"
+cp *-mask.svg "../$TARGET_PATH"
 cd - > /dev/null
 
 cd "$TARGET_PATH"
@@ -56,7 +57,7 @@ webp: \$(WEBP_FILES)
 	optipng -clobber \$< -out \$@
 
 \$(JP2_FILES): %.jp2: %.unoptim.png
-	$SCRIPT_PATH/jp2-convert.sh \$< \$@ $JP2_COMPRESSION $SMALL_PIXEL_LIMIT $JP2_COMPRESSION_SMALL    
+	$SCRIPT_PATH/jp2-convert.sh \$< \$@ $JP2_COMPRESSION $SMALL_PIXEL_LIMIT $JP2_COMPRESSION_SMALL
 
 \$(WEBP_FILES): %.webp: %.unoptim.png
 	cwebp -q $WEBP_QUALITY \$< -o \$@
