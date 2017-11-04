@@ -829,6 +829,7 @@ iPhone7BaseDevice =
 	devicePixelRatio: 2
 	deviceType: "phone"
 	minStudioVersion: 71
+	maxStudioVersion: iPhoneXReleaseVersion - 1
 	hands:
 		"iphone-hands-2":
 			width: 2400
@@ -846,6 +847,7 @@ iPhone7PlusBaseDevice =
 	devicePixelRatio: 3
 	deviceType: "phone"
 	minStudioVersion: 71
+	maxStudioVersion: iPhoneXReleaseVersion - 1
 	hands:
 		"iphone-hands-2":
 			width: 3987
@@ -937,6 +939,7 @@ Nexus4BaseDevice =
 	devicePixelRatio: 2
 	deviceType: "phone"
 	minStudioVersion: newDeviceMinVersion
+	maxStudioVersion: iPhoneXReleaseVersion - 1
 	hands:
 		"iphone-hands-2":
 			width: 2362
@@ -994,6 +997,7 @@ PixelBaseDevice =
 	devicePixelRatio: 2.627
 	deviceType: "phone"
 	minStudioVersion: googlePixelReleaseVersion
+	maxStudioVersion: iPhoneXReleaseVersion - 1
 	hands:
 		"iphone-hands-2":
 			width: 3344
