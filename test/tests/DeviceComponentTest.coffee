@@ -2,7 +2,7 @@ assert = require "assert"
 
 describe "DeviceComponent", ->
 
-	it "should default to iphone 7 silver", ->
+	it "should default to iphone 8 silver", ->
 
 		comp = new DeviceComponent()
 		comp.deviceType.should.equal "apple-iphone-8-silver"
