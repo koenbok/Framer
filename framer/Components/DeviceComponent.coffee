@@ -901,6 +901,25 @@ iPhone6PlusBaseDevice =
 			width: 3987
 			height: 6212
 
+iPhoneSEBaseDevice =
+	deviceImageWidth: 768
+	deviceImageHeight: 1610
+	deviceImageCompression: true
+	screenWidth: 640
+	screenHeight: 1136
+	devicePixelRatio: 2
+	deviceType: "phone"
+	minStudioVersion: iPhoneXReleaseVersion
+	hands:
+		"iphone-hands-2":
+			width: 2098
+			height: 3269
+			offset: 19
+		"iphone-hands-1":
+			width: 2098
+			height: 3269
+			offset: 19
+
 iPhone5BaseDevice =
 	deviceImageWidth: 768
 	deviceImageHeight: 1612
@@ -1208,6 +1227,15 @@ AppleWatch38BlackLeatherDevice =
 	minStudioVersion: newDeviceMinVersion
 	maxStudioVersion: redesignMaxVersion
 
+SonySmartwatch3Base =
+	deviceImageWidth: 444
+	deviceImageHeight: 780
+	deviceImageCompression: true
+	screenWidth: 320
+	screenHeight: 320
+	devicePixelRatio: 1.5
+	minStudioVersion: iPhoneXReleaseVersion
+
 AppleMacBook =
 	deviceImageWidth: 3084
 	deviceImageHeight: 1860
@@ -1248,6 +1276,17 @@ AppleIMac =
 	deviceType: "computer"
 	minStudioVersion: desktopReleaseVersion
 
+AppleThunderboltDisplay =
+	deviceImageWidth: 2788
+	deviceImageHeight: 2580
+	deviceImageCompression: true
+	screenWidth: 2560
+	screenHeight: 1440
+	devicePixelRatio: 1
+	deviceType: "computer"
+	minStudioVersion: iPhoneXReleaseVersion
+
+
 DellXPS =
 	deviceImageWidth: 5200
 	deviceImageHeight: 3040
@@ -1266,6 +1305,38 @@ SonyW85OC =
 	screenHeight: 720
 	devicePixelRatio: 1
 	minStudioVersion: desktopReleaseVersion
+
+MicrosoftSurfaceBook =
+	deviceImageWidth: 4102
+	deviceImageHeight: 2474
+	deviceImageCompression: true
+	screenWidth: 3000
+	screenHeight: 2000
+	devicePixelRatio: 2
+	deviceType: "computer"
+	minStudioVersion: iPhoneXReleaseVersion
+
+MicrosoftSurfacePro3 =
+	deviceImageWidth: 2196
+	deviceImageHeight: 1514
+	deviceImageCompression: true
+	screenWidth: 2160
+	screenHeight: 1440
+	devicePixelRatio: 1.5
+	deviceType: "computer"
+	minStudioVersion: iPhoneXReleaseVersion
+
+MicrosoftSurfacePro4 =
+	deviceImageWidth: 3064
+	deviceImageHeight: 2120
+	deviceImageCompression: true
+	screenWidth: 2736
+	screenHeight: 1824
+	devicePixelRatio: 2
+	deviceType: "computer"
+	minStudioVersion: iPhoneXReleaseVersion
+
+
 
 ###########################################################################
 # OLD DEVICE CONFIGURATIONS
@@ -1488,6 +1559,12 @@ Devices =
 	"apple-iphone-6s-plus-silver": _.clone(iPhone6PlusBaseDevice)
 	"apple-iphone-6s-plus-space-gray": _.clone(iPhone6PlusBaseDevice)
 
+	# iPhone SE
+	"apple-iphone-se-gold": _.clone(iPhoneSEBaseDevice)
+	"apple-iphone-se-silver": _.clone(iPhoneSEBaseDevice)
+	"apple-iphone-se-space-gray": _.clone(iPhoneSEBaseDevice)
+	"apple-iphone-se-rose-gold": _.clone(iPhoneSEBaseDevice)
+
 	# iPhone 5S
 	"apple-iphone-5s-gold": _.clone(iPhone5BaseDevice)
 	"apple-iphone-5s-silver": _.clone(iPhone5BaseDevice)
@@ -1580,6 +1657,10 @@ Devices =
 	"apple-watch-42mm-sport-space-gray-black-closed": _.clone(AppleWatch42Device)
 	"apple-watch-42mm-stainless-steel-black-leather-closed": _.clone(AppleWatch42Device)
 
+	# Sony SmartWatch 3
+	"sony-smartwatch-3-black": _.clone(SonySmartwatch3Base)
+	"sony-smartwatch-3-white": _.clone(SonySmartwatch3Base)
+
 	# NEXUS
 	"google-nexus-4": _.clone(Nexus4BaseDevice)
 	"google-nexus-5x": _.clone(Nexus5BaseDevice)
@@ -1633,6 +1714,10 @@ Devices =
 
 	# Desktops
 	"apple-imac": _.clone(AppleIMac)
+	"apple-thunderbolt-display": _.clone(AppleThunderboltDisplay)
+	"microsoft-surface-book": _.clone(MicrosoftSurfaceBook)
+	"microsoft-surface-pro-3": _.clone(MicrosoftSurfacePro3)
+	"microsoft-surface-pro-4": _.clone(MicrosoftSurfacePro4)
 
 	# TV
 	"sony-w85Oc": _.clone(SonyW85OC)
