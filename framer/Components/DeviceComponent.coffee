@@ -1323,7 +1323,7 @@ MicrosoftSurfacePro3 =
 	screenWidth: 2160
 	screenHeight: 1440
 	devicePixelRatio: 1.5
-	deviceType: "computer"
+	deviceType: "tablet"
 	minStudioVersion: iPhoneXReleaseVersion
 
 MicrosoftSurfacePro4 =
@@ -1333,7 +1333,7 @@ MicrosoftSurfacePro4 =
 	screenWidth: 2736
 	screenHeight: 1824
 	devicePixelRatio: 2
-	deviceType: "computer"
+	deviceType: "tablet"
 	minStudioVersion: iPhoneXReleaseVersion
 
 
