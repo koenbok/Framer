@@ -1317,8 +1317,8 @@ MicrosoftSurfaceBook =
 	minStudioVersion: iPhoneXReleaseVersion
 
 MicrosoftSurfacePro3 =
-	deviceImageWidth: 2196
-	deviceImageHeight: 1514
+	deviceImageWidth: 2472
+	deviceImageHeight: 1704
 	deviceImageCompression: true
 	screenWidth: 2160
 	screenHeight: 1440
