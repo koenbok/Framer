@@ -94,6 +94,8 @@ class exports.DeviceComponent extends BaseClass
 		@hands    = new Layer name: "hands"
 		@handsImageLayer = new Layer parent: @hands, name: "handsImage"
 		@phone    = new Layer parent: @hands, name: "phone"
+		# This background is made slightly bigger than the screen to prevent the background shining through cracks
+		@screenBackground = new Layer parent: @hands, name: "screenBackground", backgroundColor: "black"
 		@screen   = new Layer parent: @hands, name: "phone"
 		@viewport = new Layer parent: @screen, name: "screen"
 		@content  = new Layer parent: @viewport, name: "viewport"
@@ -188,7 +190,10 @@ class exports.DeviceComponent extends BaseClass
 			screenSizeChanged = @content.width isnt width or @content.height isnt height
 			@content.width  = width
 			@content.height = height
+			@screenBackground.width = @screen.width + 40
+			@screenBackground.height = @screen.height + 40
 			@setHand(@selectedHand) if @selectedHand and @_orientation is 0
+			centerLayer(@screenBackground)
 			centerLayer(@screen)
 			centerLayer(@screenMask)
 
@@ -426,31 +431,6 @@ class exports.DeviceComponent extends BaseClass
 		set: (hideBezel) ->
 			return if not Utils.isFramerStudio()
 			@_hideBezel = hideBezel
-			if @_hideBezel
-				@_previousBackgroundColor = @background.backgroundColor
-				if @_device.screenMask?
-					@background.backgroundColor = "black"
-				else
-					@background.backgroundColor = @screen.backgroundColor
-				@screen.on "change:backgroundColor", (color) =>
-					return if @_device.screenMask?
-					# Hacky way to keep the prev backgroundColor
-					prev = @_previousBackgroundColor
-					@background.backgroundColor = color
-					@_previousBackgroundColor = prev
-				@background.on "change:backgroundColor", (color) =>
-					if @_device.screenMask?
-						if not Color.equal(@background.backgroundColor, "black")
-							@_previousBackgroundColor = color
-							@background.backgroundColor = "black"
-						return
-					@background.backgroundColor = @screen.backgroundColor
-					@_previousBackgroundColor = color
-			else
-				@screen.off "change:backgroundColor"
-				@background.off "change:backgroundColor"
-				if @_previousBackgroundColor?
-					@background.backgroundColor = @_previousBackgroundColor
 
 			@_update()
 
