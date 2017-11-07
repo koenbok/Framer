@@ -167,9 +167,9 @@ describe "DeviceComponent", ->
 				when "Windows"
 					assert(_.startsWith(key, "dell") or _.startsWith(key, "microsoft"), "#{key} should not have platform Windows")
 				when "Android"
-					assert(_.startsWith(key, "google") or _.startsWith(key, "nexus") or _.startsWith(key, "htc") or _.startsWith(key, "samsung"), "#{key} should not have platform Android")
+					assert(_.startsWith(key, "google") or _.startsWith(key, "nexus") or _.startsWith(key, "htc") or _.startsWith(key, "samsung") or _.startsWith(key, "sony-smartwatch"), "#{key} should not have platform Android")
 				when "macOS"
-					assert(_.startsWith(key, "apple-macbook") or _.startsWith(key, "apple-imac") or _.startsWith(key, "desktop-safari"), "#{key} should not have platform macOS")
+					assert(_.startsWith(key, "apple-macbook") or _.startsWith(key, "apple-imac") or _.startsWith(key, "apple-thunderbolt") or _.startsWith(key, "desktop-safari"), "#{key} should not have platform macOS")
 				else
 					# Exceptions
 					assert(key in ["fullscreen", "custom", "sony-w85Oc", "test"], "#{key} should have a platform specified")

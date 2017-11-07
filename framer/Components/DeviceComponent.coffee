@@ -237,7 +237,7 @@ class exports.DeviceComponent extends BaseClass
 		Framer.CurrentContext = @_context
 
 	platform: ->
-		if /google|nexus|htc|samsung/.test(@deviceType)
+		if /google|nexus|htc|samsung|sony-smartwatch/.test(@deviceType)
 			return "Android"
 		if /iphone|ipad/.test(@deviceType)
 			return "iOS"
