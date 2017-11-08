@@ -784,11 +784,11 @@ iPhone8BaseDevice =
 	minStudioVersion: iPhoneXReleaseVersion
 	hands:
 		"iphone-hands-2":
-			width: 2400
-			height: 3740
+			width: 2399
+			height: 3738
 		"iphone-hands-1":
-			width: 2400
-			height: 3740
+			width: 2399
+			height: 3738
 
 iPhone8PlusBaseDevice =
 	deviceImageWidth: 1436
@@ -1027,11 +1027,11 @@ Pixel2BaseDevice =
 	minStudioVersion: iPhoneXReleaseVersion
 	hands:
 		"iphone-hands-2":
-			width: 3320
-			height: 5178
+			width: 3316
+			height: 5167
 		"iphone-hands-1":
-			width: 3327
-			height: 5188
+			width: 3316
+			height: 5167
 
 Pixel2XLBaseDevice =
 	deviceImageWidth: 1650
@@ -1152,11 +1152,11 @@ SamsungGalaxyS8BaseDevice =
 	screenMask: "samsung-galaxy-s8-mask.svg"
 	hands:
 		"iphone-hands-2":
-			width: 4219
-			height: 6573
+			width: 4210
+			height: 6560
 		"iphone-hands-1":
-			width: 4219
-			height: 6573
+			width: 4210
+			height: 6560
 
 
 AppleWatchSeries242Device =
