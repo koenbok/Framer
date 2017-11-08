@@ -763,12 +763,12 @@ iPhoneXBaseDevice =
 	screenMask: "apple-iphone-x-mask.svg"
 	hands:
 		"iphone-hands-2":
-			width: 3568
-			height: 5559
+			width: 3567
+			height: 5558
 			offset: -15
 		"iphone-hands-1":
-			width: 3568
-			height: 5559
+			width: 3567
+			height: 5558
 			offset: -15
 
 iPhone8BaseDevice =
@@ -800,11 +800,11 @@ iPhone8PlusBaseDevice =
 	hands:
 		"iphone-hands-2":
 			width: 3949
-			height: 6192
+			height: 6154
 			offset: -15
 		"iphone-hands-1":
 			width: 3949
-			height: 6192
+			height: 6154
 			offset: -15
 
 iPhone7BaseDevice =
@@ -1044,10 +1044,10 @@ Pixel2XLBaseDevice =
 	hands:
 		"iphone-hands-2":
 			width: 4530
-			height: 7064
+			height: 7059
 		"iphone-hands-1":
-			width: 4530
-			height: 7064
+			width: 4521
+			height: 7045
 
 
 
