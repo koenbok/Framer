@@ -161,6 +161,8 @@ class exports.DeviceComponent extends BaseClass
 			if @deviceType isnt "fullscreen" or Utils.isMobile()
 				screenSizeChanged = screenSizeChanged or @_context.devicePixelRatio isnt window.devicePixelRatio
 				@_context.devicePixelRatio = window.devicePixelRatio
+			@screenBackground.visible = @deviceType isnt "fullscreen"
+
 			if Utils.isMobile()
 				@screenMask.visible = false
 			else

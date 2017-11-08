@@ -174,6 +174,11 @@ describe "DeviceComponent", ->
 					# Exceptions
 					assert(key in ["fullscreen", "custom", "sony-w85Oc", "test"], "#{key} should have a platform specified")
 
+	it "should hide the screen background when device is fullscreen", ->
+		device = new DeviceComponent()
+		device.deviceType = "fullscreen"
+		device.screenBackground.visible.should.equal false
+
 	describe.skip "when not showing bezel", ->
 		before ->
 			Utils.isFramerStudio = ->
