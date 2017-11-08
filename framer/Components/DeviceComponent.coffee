@@ -89,7 +89,6 @@ class exports.DeviceComponent extends BaseClass
 		@background.clip = true
 		@background.backgroundColor = "transparent"
 		@background.classList.add("DeviceBackground")
-		@_previousBackgroundColor = @background.backgroundColor
 
 		@hands    = new Layer name: "hands"
 		@handsImageLayer = new Layer parent: @hands, name: "handsImage"
@@ -431,7 +430,6 @@ class exports.DeviceComponent extends BaseClass
 		set: (hideBezel) ->
 			return if not Utils.isFramerStudio()
 			@_hideBezel = hideBezel
-
 			@_update()
 
 	###########################################################################
