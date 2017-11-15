@@ -712,6 +712,13 @@ class exports.DeviceComponent extends BaseClass
 	toInspect: ->
 		return "<Device '#{@deviceType}' #{@screenSize.width}x#{@screenSize.height}>"
 
+	prepareForSnapshot: ->
+		@hideBezel = true
+		@setDeviceScale(-1, true)
+		@screenMask.visible = false
+		@screenBackground.visible = false
+		@background.backgroundColor = null
+
 
 ###########################################################################
 # DEVICE CONFIGURATIONS
