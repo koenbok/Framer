@@ -78,6 +78,10 @@ Events.ImageLoaded = "imageload"
 Events.ImageLoadError = "imageerror"
 Events.ImageLoadCancelled = "imagecancelled"
 
+# Sensor Events
+Events.DeviceOrientation = "deviceorientation"
+Events.DeviceMotion = "devicemotion"
+
 # Add all gesture events
 _.extend(Events, Gestures)
 
