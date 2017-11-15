@@ -326,13 +326,13 @@ class exports.GestureInputRecognizer
 
 	_getEventPoint: (event) ->
 		return @_getTouchPoint(event, 0) if event.touches?.length
-		return {x: event.pageX, y: event.pageY}
+		point = {x: event.pageX, y: event.pageY}
+		Utils.convertPointFromContext(point, Framer.CurrentContext, true, true)
 
 	_getGestureEvent: (event) ->
 
 		# Convert the point to the current context
-		eventPoint = Utils.convertPointFromContext(
-			@_getEventPoint(event), Framer.CurrentContext, true, true)
+		eventPoint = @_getEventPoint(event)
 
 		_.extend event,
 			time: Date.now() # Current time √
@@ -430,9 +430,11 @@ class exports.GestureInputRecognizer
 		return event
 
 	_getTouchPoint: (event, index) ->
-		return point =
+		point =
 			x: event.touches[index].pageX
 			y: event.touches[index].pageY
+		return Utils.convertPointFromContext(point, Framer.CurrentContext, true, true)
+
 
 	_getDirection: (offset) ->
 		if Math.abs(offset.x) > Math.abs(offset.y)

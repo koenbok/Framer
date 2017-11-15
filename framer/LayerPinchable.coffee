@@ -52,12 +52,10 @@ class exports.LayerPinchable extends BaseClass
 		#@_centerOrigin(event) if @centerOrigin
 
 	_centerOrigin: (event) =>
-
 		topInSuperBefore = Utils.convertPoint({}, @layer, @layer.superLayer)
-		pinchLocation = Utils.convertPointFromContext(event.touchCenter, @layer, true, true)
+		pinchLocation = Screen.convertPointToLayer(event.touchCenter, @layer)
 		@layer.originX = pinchLocation.x / @layer.width
 		@layer.originY = pinchLocation.y / @layer.height
-
 		topInSuperAfter = Utils.convertPoint({}, @layer, @layer.superLayer)
 		originDelta =
 			x: topInSuperAfter.x - topInSuperBefore.x
@@ -75,16 +73,7 @@ class exports.LayerPinchable extends BaseClass
 
 		return unless event.fingers is 2
 		return unless @enabled
-
-		pointA =
-			x: event.touches[0].pageX
-			y: event.touches[0].pageY
-
-		pointB =
-			x: event.touches[1].pageX
-			y: event.touches[1].pageY
-
-		return unless Utils.pointTotal(Utils.pointAbs(Utils.pointSubtract(pointA, pointB))) > @threshold
+		return unless event.touchDistance > @threshold
 
 		if @scale
 			@_scaleStart ?= @layer.scale

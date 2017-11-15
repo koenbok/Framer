@@ -1436,6 +1436,12 @@ class exports.Layer extends BaseClass
 			event.point = Utils.convertPointFromContext(point, @, true)
 			event.contextPoint = Utils.convertPointFromContext(point, @context, true)
 
+			if event.touches?
+				for touch in event.touches
+					point = {x: touch.clientX, y: touch.clientY}
+					touch.point = Utils.convertPointFromContext(point, @, true)
+					touch.contextPoint = Utils.convertPointFromContext(point, @context, true)
+
 		# Always scope the event this to the layer and pass the layer as
 		# last argument for every event.
 		super(eventName, args..., @)

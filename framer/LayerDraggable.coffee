@@ -194,7 +194,6 @@ class exports.LayerDraggable extends BaseClass
 		@emit(Events.DragSessionStart, event)
 
 	_touchMove: (event) =>
-
 		return unless @enabled
 
 		# If we started dragging from another event we need to capture some initial values
@@ -202,13 +201,16 @@ class exports.LayerDraggable extends BaseClass
 
 		event.preventDefault()
 		event.stopPropagation() if @propagateEvents is false
-
+		# print event.touches[0].identifier, event.touches[1].identifier
 		touchEvent = Events.touchEvent(event)
+		point = {x: touchEvent.clientX, y: touchEvent.clientY}
+		touchEvent.point = Utils.convertPointFromContext(point, @layer, true)
+		touchEvent.contextPoint = Utils.convertPointFromContext(point, @layer.context, true)
 		@_lastEvent = touchEvent
 
 		@_eventBuffer.push
-			x: touchEvent.clientX
-			y: touchEvent.clientY
+			x: touchEvent.point.x
+			y: touchEvent.point.y
 			t: Date.now() # We don't use timeStamp because it's different on Chrome/Safari
 
 		point = _.clone(@_point)

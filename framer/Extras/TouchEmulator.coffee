@@ -2,7 +2,7 @@ Utils = require "../Utils"
 {BaseClass} = require "../BaseClass"
 
 createTouch = (event, identifier, offset={x: 0, y: 0}) ->
-	return touch =
+	touch =
 		identifier: identifier
 		target: event.target
 		pageX: event.pageX - offset.x
@@ -11,6 +11,10 @@ createTouch = (event, identifier, offset={x: 0, y: 0}) ->
 		clientY: event.clientY - offset.y
 		screenX: event.screenX - offset.x
 		screenY: event.screenY - offset.y
+	touch.point =
+		x: touch.pageX
+		y: touch.pageY
+	return touch
 
 dispatchTouchEvent = (type, target, event, offset) ->
 
