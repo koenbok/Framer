@@ -194,9 +194,9 @@ class exports.DeviceComponent extends BaseClass
 			@screenBackground.width = @screen.width + 40
 			@screenBackground.height = @screen.height + 40
 			@setHand(@selectedHand) if @selectedHand and @_orientation is 0
-			centerLayer(@screenBackground)
-			centerLayer(@screen)
-			centerLayer(@screenMask)
+			centerLayer(@screenBackground, true)
+			centerLayer(@screen, true)
+			centerLayer(@screenMask, true)
 
 			pixelRatio = @_device.devicePixelRatio ? 1
 			screenSizeChanged = screenSizeChanged or @_context.devicePixelRatio isnt pixelRatio
