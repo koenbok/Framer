@@ -174,7 +174,8 @@ class exports.DeviceComponent extends BaseClass
 			@background.y = 0 - backgroundOverlap
 			@background.width  = window.innerWidth  + (2 * backgroundOverlap)
 			@background.height = window.innerHeight + (2 * backgroundOverlap)
-
+			if @disableSizeUpdates
+				return
 			@_updateDeviceImage()
 			@_updateMaskImage()
 			@screenMask.visible = @hideBezel
@@ -476,8 +477,7 @@ class exports.DeviceComponent extends BaseClass
 		@emit("change:deviceScale")
 
 
-	_calculatePhoneScale: ->
-
+	_calculatePhoneScale: (windowWidth, windowHeight) ->
 		# Calculates a phone scale that fits the screen unless a fixed value is set
 		dimension = if @hideBezel then @screen else @phone
 
@@ -489,9 +489,11 @@ class exports.DeviceComponent extends BaseClass
 			paddingOffset = @_device?.paddingOffset or 0
 			padding = (@padding + paddingOffset) * 2
 
+		windowWidth ?= window.innerWidth
+		windowHeight ?= window.innerHeight
 		phoneScale = _.min([
-			(window.innerWidth  - padding) / width,
-			(window.innerHeight - padding) / height
+			(windowWidth  - padding) / width,
+			(windowHeight - padding) / height
 		])
 
 		# Only scale in fixed steps, to reduce blurriness, and pixel cracks
@@ -556,7 +558,7 @@ class exports.DeviceComponent extends BaseClass
 
 		set: (orientation) -> @setOrientation(orientation, false)
 
-	setOrientation: (orientation, animate=false) ->
+	setOrientation: (orientation, animate=false, suggestedSize=null) ->
 
 		orientation *= -1 if Utils.framerStudioVersion() is oldDeviceMaxVersion
 
@@ -580,26 +582,46 @@ class exports.DeviceComponent extends BaseClass
 		@_orientation = orientation
 
 		# Calculate properties for the phone
-		phoneProperties =
+		handsProperties =
 			rotationZ: -@_orientation
-			scale: @_calculatePhoneScale()
 
+		options = _.clone(@animationOptions)
+		if suggestedSize?
+			scale = @_calculatePhoneScale(suggestedSize.width, suggestedSize.height)
+			handsProperties.x = (suggestedSize.width / 2) - (@hands.width / 2.0)
+			handsProperties.y = (suggestedSize.height / 2) - (@hands.height / 2.0)
+			options.time = null
+			# Converted with Origami from Bounciness 5, Speed 12
+			options.curve = Spring(tension: 342.10059, friction: 28.97662)
+		else
+			scale = @_calculatePhoneScale()
+
+		handsProperties.scale = scale
 		contentProperties = @_viewportOrientationOffset()
 
 		@hands.animateStop()
 		@viewport.animateStop()
 
 		if animate
-			animation = @hands.animate _.extend @animationOptions,
-				properties: phoneProperties
-			@viewport.animate _.extend @animationOptions,
+			previousBackgroundColor = @background.backgroundColor
+			if @hideBezel
+				@screenBackground.visible = false
+				@background.backgroundColor = @screen.backgroundColor
+				@disableSizeUpdates = true
+			animation = @hands.animate _.extend options,
+				properties: handsProperties
+			@viewport.animate _.extend options,
 				properties: contentProperties
 
 			animation.on Events.AnimationEnd, =>
 				@_update()
 
+			animation.on Events.AnimationStop, =>
+				@disableSizeUpdates = false
+				@background.backgroundColor = previousBackgroundColor
+
 		else
-			@hands.props = phoneProperties
+			@hands.props = handsProperties
 			@viewport.props = contentProperties
 			@_update()
 
