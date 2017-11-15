@@ -604,6 +604,7 @@ class exports.DeviceComponent extends BaseClass
 
 		if animate
 			previousBackgroundColor = @background.backgroundColor
+			previousScreenBackgroundVisiblity = @screenBackground.visible
 			if @hideBezel
 				@screenBackground.visible = false
 				@background.backgroundColor = @screen.backgroundColor
@@ -619,6 +620,7 @@ class exports.DeviceComponent extends BaseClass
 			animation.on Events.AnimationStop, =>
 				@disableSizeUpdates = false
 				@background.backgroundColor = previousBackgroundColor
+				@screenBackground.visible = previousScreenBackgroundVisiblity
 
 		else
 			@hands.props = handsProperties
