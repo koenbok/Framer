@@ -80,9 +80,10 @@ class exports.PageComponent extends ScrollComponent
 		nextPage ?= @closestPage
 		@snapToPage(nextPage, animate, animationOptions)
 
-	snapToPreviousPage: ->
+	snapToPreviousPage: (animate=true, animationOptions=null) ->
 		return unless @previousPage
-		@snapToPage(@previousPage)
+		animationOptions ?= @animationOptions
+		@snapToPage(@previousPage, animate, animationOptions)
 
 		# Modify the previous page stack so we don"t end up in a loop
 		@_previousPages = @_previousPages[0..@_previousPages.length-3]
