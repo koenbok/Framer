@@ -61,6 +61,13 @@ class exports.TextLayer extends Layer
 			@styledTextOptions = options.styledText
 			options.color ?= @_styledText.getStyle("color")
 			options.fontSize ?= parseFloat(@_styledText.getStyle("fontSize"))
+			options.fontFamily ?= @_styledText.getStyle("fontFamily")
+			options.letterSpacing ?= parseFloat(@_styledText.getStyle("letterSpacing"))
+			options.textAlign ?= @_styledText.textAlign
+			fontWeight = @_styledText.getStyle("fontWeight")
+			if fontWeight?
+				options.fontWeight = parseFloat(fontWeight)
+
 			lineHeight = @_styledText.getStyle("lineHeight")
 			if not lineHeight? or lineHeight is "normal"
 				lineHeight = 1.25
