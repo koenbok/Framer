@@ -534,35 +534,32 @@ describe "TextLayer", ->
 			text = new TextLayer(
 				'name': 'text'
 				'backgroundColor': null
-				'width': 162
-				'x': 107
-				'styledText': 'blocks': [ {
+				'width': 70
+				'styledText':
+					'blocks': [ {
 					'inlineStyles': [ {
-					'startIndex': 0
-					'endIndex': 4
-					'css':
-						'fontSize': '80px'
-						'WebkitTextFillColor': 'rgb(0, 0, 0)'
-						'whiteSpace': 'pre'
-						'letterSpacing': '0px'
-						'lineHeight': '1.2'
-						'tabSize': 4
-						'fontFamily': '".SFNSDisplay-Heavy", "SFProDisplay-Heavy", "SFUIDisplay-Heavy", ".SFUIDisplay-Heavy", sans-serif'
+						'startIndex': 0
+						'endIndex': 3
+						'css':
+							'fontSize': '40px'
+							'WebkitTextFillColor': 'rgb(0, 0, 0)'
+							'whiteSpace': 'pre'
+							'fontWeight': 400
+							'letterSpacing': '0px'
+							'tabSize': 4
+							'fontFamily': '"Roboto-Regular", "Roboto", sans-serif'
+							'lineHeight': '1.2'
 					} ]
-					'text': 'Test'
-				} ]
-				'height': 96
+					'text': 'Ben'
+					} ]
+					'alignment': 'center'
+				'height': 48
 				'constraintValues':
-					'left': null
-					'height': 96
-					'centerAnchorX': 0.5013333333333333
-					'width': 162
-					'top': null
-					'centerAnchorY': 0.50074962518740629
+					'height': 48
+					'width': 70
 				'blending': 'normal'
-				'autoSize': true
-				'y': 286)
-			text.fontWeight.should.equal 800
+				'autoSize': true)
+			text.fontWeight.should.equal 400
 
 		it "should infer fontFamily from design", ->
 			text = new TextLayer(
@@ -596,7 +593,7 @@ describe "TextLayer", ->
 				'blending': 'normal'
 				'autoSize': true
 				'y': 286)
-			text.fontFamily.should.equal "-apple-system"
+			text.fontFamily.should.equal '".SFNSDisplay-Heavy", "SFProDisplay-Heavy", "SFUIDisplay-Heavy", ".SFUIDisplay-Heavy", sans-serif'
 
 		it "should infer letterSpacing from design", ->
 			text = new TextLayer(
@@ -664,7 +661,7 @@ describe "TextLayer", ->
 				'blending': 'normal'
 				'autoSize': true
 				'y': 286)
-			text.textAlign.should.equal "auto"
+			text.textAlign.should.equal "left"
 
 		it "should infer fontWeight from design with custom font", ->
 			text = new TextLayer(
@@ -676,14 +673,15 @@ describe "TextLayer", ->
 					'inlineStyles': [ {
 						'startIndex': 0
 						'endIndex': 3
-						'fontSize': '40px'
-						'WebkitTextFillColor': 'rgb(0, 0, 0)'
-						'whiteSpace': 'pre'
-						'fontWeight': 400
-						'letterSpacing': '0px'
-						'tabSize': 4
-						'fontFamily': '"Roboto-Regular", "Roboto", sans-serif'
-						'lineHeight': '1.2'
+						'css':
+							'fontSize': '40px'
+							'WebkitTextFillColor': 'rgb(0, 0, 0)'
+							'whiteSpace': 'pre'
+							'fontWeight': 400
+							'letterSpacing': '0px'
+							'tabSize': 4
+							'fontFamily': '"Roboto-Regular", "Roboto", sans-serif'
+							'lineHeight': '1.2'
 					} ]
 					'text': 'Ben'
 					} ]
@@ -706,14 +704,15 @@ describe "TextLayer", ->
 					'inlineStyles': [ {
 						'startIndex': 0
 						'endIndex': 3
-						'fontSize': '40px'
-						'WebkitTextFillColor': 'rgb(0, 0, 0)'
-						'whiteSpace': 'pre'
-						'fontWeight': 400
-						'letterSpacing': '0px'
-						'tabSize': 4
-						'fontFamily': '"Roboto-Regular", "Roboto", sans-serif'
-						'lineHeight': '1.2'
+						'css':
+							'fontSize': '40px'
+							'WebkitTextFillColor': 'rgb(0, 0, 0)'
+							'whiteSpace': 'pre'
+							'fontWeight': 400
+							'letterSpacing': '0px'
+							'tabSize': 4
+							'fontFamily': '"Roboto-Regular", "Roboto", sans-serif'
+							'lineHeight': '1.2'
 					} ]
 					'text': 'Ben'
 					} ]
@@ -724,7 +723,7 @@ describe "TextLayer", ->
 					'width': 70
 				'blending': 'normal'
 				'autoSize': true)
-			text.fontFamily.should.equal "Roboto"
+			text.fontFamily.should.equal '"Roboto-Regular", "Roboto", sans-serif'
 
 		it "should infer letterSpacing from design with custom font", ->
 			text = new TextLayer(
@@ -736,14 +735,15 @@ describe "TextLayer", ->
 					'inlineStyles': [ {
 						'startIndex': 0
 						'endIndex': 3
-						'fontSize': '40px'
-						'WebkitTextFillColor': 'rgb(0, 0, 0)'
-						'whiteSpace': 'pre'
-						'fontWeight': 400
-						'letterSpacing': '0px'
-						'tabSize': 4
-						'fontFamily': '"Roboto-Regular", "Roboto", sans-serif'
-						'lineHeight': '1.2'
+						'css':
+							'fontSize': '40px'
+							'WebkitTextFillColor': 'rgb(0, 0, 0)'
+							'whiteSpace': 'pre'
+							'fontWeight': 400
+							'letterSpacing': '0px'
+							'tabSize': 4
+							'fontFamily': '"Roboto-Regular", "Roboto", sans-serif'
+							'lineHeight': '1.2'
 					} ]
 					'text': 'Ben'
 					} ]
@@ -766,14 +766,15 @@ describe "TextLayer", ->
 					'inlineStyles': [ {
 						'startIndex': 0
 						'endIndex': 3
-						'fontSize': '40px'
-						'WebkitTextFillColor': 'rgb(0, 0, 0)'
-						'whiteSpace': 'pre'
-						'fontWeight': 400
-						'letterSpacing': '0px'
-						'tabSize': 4
-						'fontFamily': '"Roboto-Regular", "Roboto", sans-serif'
-						'lineHeight': '1.2'
+						'css':
+							'fontSize': '40px'
+							'WebkitTextFillColor': 'rgb(0, 0, 0)'
+							'whiteSpace': 'pre'
+							'fontWeight': 400
+							'letterSpacing': '0px'
+							'tabSize': 4
+							'fontFamily': '"Roboto-Regular", "Roboto", sans-serif'
+							'lineHeight': '1.2'
 					} ]
 					'text': 'Ben'
 					} ]
