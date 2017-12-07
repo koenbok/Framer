@@ -37,6 +37,24 @@ class exports.SVGLayer extends Layer
 				@_gradient = null
 			@updateGradientSVG()
 
+	@define "svg",
+		get: ->
+			svgNode = _.first(@_elementHTML.children)
+			if svgNode instanceof SVGElement
+				return svgNode
+			else
+				return null
+		set: (value) ->
+			if typeof value is "string"
+				@html = value
+			else if value instanceof SVGElement
+				@_createHTMLElementIfNeeded()
+				while @_elementHTML.firstChild
+					@_elementHTML.removeChild(@_elementHTML.firstChild)
+				if value.parentNode?
+					value = value.cloneNode(true)
+				@_elementHTML.appendChild(value)
+
 	updateGradientSVG: ->
 		return if @__constructor
 		if not Gradient.isGradient(@gradient)
