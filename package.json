@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "async": "^2.0.1",
-    "chai": "^3.5.0",
+    "chai": "^4.1.2",
     "codecov": "^2.2.0",
     "coffee-coverage": "^2.0.1",
     "coffee-loader": "^0.7.2",
@@ -45,9 +45,7 @@
     "webpack-dev-server": "^1.14.1",
     "webpack-stream": "^3.0.1"
   },
-  "keywords": [
-    "prototyping"
-  ],
+  "keywords": ["prototyping"],
   "author": "Koen Bok",
   "license": "MIT",
   "bugs": {
