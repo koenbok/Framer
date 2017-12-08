@@ -1,6 +1,7 @@
 {_} = require "./Underscore"
 {Color} = require "./Color"
 {Layer, layerProperty, layerProxiedValue} = require "./Layer"
+{SVG, SVGPath} = require "./SVG"
 
 validFill = (value) ->
 	Color.validColorValue(value) or _.startsWith(value, "url(")
@@ -10,6 +11,7 @@ toFill = (value) ->
 		return value
 	else
 		return Color.toColor(value)
+
 class exports.SVGLayer extends Layer
 
 	constructor: (options={}) ->
@@ -55,6 +57,19 @@ class exports.SVGLayer extends Layer
 				if value.parentNode?
 					value = value.cloneNode(true)
 				@_elementHTML.appendChild(value)
+
+	@define "path",
+		get: ->
+			SVG.getPath(@svg)
+
+	@define "pathStart",
+		get: ->
+			start = SVGPath.getStart(@path)
+			return null if not start?
+			point =
+				x: @x + start.x
+				y: @y + start.y
+			return point
 
 	updateGradientSVG: ->
 		return if @__constructor
