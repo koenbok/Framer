@@ -60,7 +60,12 @@ class exports.SVGLayer extends Layer
 
 	@define "path",
 		get: ->
-			SVG.getPath(@svg)
+			if @svg.children.length isnt 1
+				throw new Error("SVGLayer.path can only be used on SVG's that have a single child")
+			child = @svg.children[0]
+			if not SVGPath.isPath(child)
+				throw new Error("SVGLayer.path can only be used on SVG's containing an SVGPathElement, not #{Utils.inspectObjectType(child)}")
+			return child
 
 	@define "pathStart",
 		get: ->

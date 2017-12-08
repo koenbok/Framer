@@ -4,15 +4,6 @@ class SVG
 	@isSVG: (svg) ->
 		svg instanceof SVGElement
 
-	@hasSinglePath: (svg) ->
-		return false if not @isSVG(svg)
-		svg.children.length is 1 and exports.SVGPath.isPath(svg.children[0])
-
-	@getPath: (svg) ->
-		return null if not @hasSinglePath(svg)
-		return svg.children[0]
-
-
 class SVGPath extends BaseClass
 
 	@define "length",
