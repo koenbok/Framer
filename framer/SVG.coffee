@@ -17,7 +17,7 @@ class SVGPath extends BaseClass
 
 	@define "end",
 		get: ->
-			@pointAtFraction(0)
+			@pointAtFraction(1)
 
 	@define "path", @simpleProperty("path", null)
 
