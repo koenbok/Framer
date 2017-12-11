@@ -4,6 +4,7 @@ class SVG
 	@isSVG: (svg) ->
 		svg instanceof SVGElement
 
+
 class SVGPath extends BaseClass
 
 	@define "length",
