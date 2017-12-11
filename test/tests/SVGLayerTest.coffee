@@ -25,6 +25,18 @@ describe "SVGLayer", ->
 			b = a.copy()
 			a.htmlIntrinsicSize.should.eql b.htmlIntrinsicSize
 
+	describe "initializing", ->
+		it "should set clip to true by default", ->
+			a = new SVGLayer
+			a.clip.should.be.false
+			a._element.style.overflow.should.equal("visible")
+
+		it "should allow for overriding the clip property", ->
+			a = new SVGLayer
+				clip: true
+			a.clip.should.be.true
+			a._element.style.overflow.should.equal("hidden")
+
 	describe "svg", ->
 		describe "getter", ->
 			it "should return the SVG node", ->

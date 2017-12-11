@@ -37,6 +37,10 @@ body {
 	-webkit-user-select: auto;
 }
 
+.framerLayer svg {
+	overflow: visible;
+}
+
 .framerDebug {
 	padding: 6px;
 	color: #fff;
