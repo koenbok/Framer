@@ -60,11 +60,19 @@ class exports.SVGLayer extends Layer
 
 	@define "path",
 		get: ->
-			if @svg.children.length isnt 1
-				throw new Error("SVGLayer.path can only be used on SVG's that have a single child")
+			if @svg.children?.length isnt 1
+				error = "SVGLayer.path can only be used on SVG's that have a single child"
+				if Utils.isFramerStudio()
+					throw new Error(error)
+				else
+					console.error(error)
 			child = @svg.children[0]
 			if not SVGPath.isPath(child)
-				throw new Error("SVGLayer.path can only be used on SVG's containing an SVGPathElement, not #{Utils.inspectObjectType(child)}")
+				error = "SVGLayer.path can only be used on SVG's containing an SVGPathElement, not #{Utils.inspectObjectType(child)}"
+				if Utils.isFramerStudio()
+					throw new Error(error)
+				else
+					console.error(error)
 			return child
 
 	@define "pathStart",
