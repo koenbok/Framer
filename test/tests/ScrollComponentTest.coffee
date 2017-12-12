@@ -119,13 +119,13 @@ describe "ScrollComponent", ->
 					done("expected up+, down+, null+, but got: #{moves}")
 
 				# TODO instead of actually taking time, trick time
-				draggable._touchStart({clientX: 100, clientY: 100, preventDefault: (->), stopPropagation: (->)})
+				draggable._touchStart({point: {x: 100, y: 100}, preventDefault: (->), stopPropagation: (->)})
 				Utils.delay 0.01, ->
-					draggable._touchMove({clientX: 100, clientY: 111, preventDefault: (->), stopPropagation: (->), delta: {x: 0, y: 11}})
+					draggable._touchMove({clientX: 100, clientY: 111, point: {x: 100, y: 111}, preventDefault: (->), stopPropagation: (->), delta: {x: 0, y: 11}})
 				Utils.delay 0.20, -> # enough time to set velocity to zero
-					draggable._touchMove({clientX: 100, clientY: 112, preventDefault: (->), stopPropagation: (->), delta: {x: 0, y: 1}})
+					draggable._touchMove({clientX: 100, clientY: 112, point: {x: 100, y: 112}, preventDefault: (->), stopPropagation: (->), delta: {x: 0, y: 1}})
 				Utils.delay 0.21, ->
-					draggable._touchEnd({clientX: 100, clientY: 112, preventDefault: (->), stopPropagation: (->), delta: {x: 0, y: 0}})
+					draggable._touchEnd({clientX: 100, clientY: 112, point: {x: 100, y: 112}, preventDefault: (->), stopPropagation: (->), delta: {x: 0, y: 0}})
 
 		describe "PageComponent", ->
 			it "should fire scroll events", (done) ->

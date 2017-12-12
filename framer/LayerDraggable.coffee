@@ -107,17 +107,12 @@ class exports.LayerDraggable extends BaseClass
 		@attach()
 
 	attach: ->
-		@layer.on(Gestures.TapStart, @touchStart)
-		# @layer.on(Gestures.Pan, @_touchMove)
-		# @layer.on(Gestures.TapEnd, @_touchEnd)
-
-
-
+		@layer.on(Gestures.PanStart, @touchStart)
 		@layer.on("change:x", @_updateLayerPosition)
 		@layer.on("change:y", @_updateLayerPosition)
 
 	remove: ->
-		@layer.off(Gestures.TapStart, @touchStart)
+		@layer.off(Gestures.PanStart, @touchStart)
 		@layer.off(Gestures.Pan, @_touchMove)
 		@layer.off(Gestures.PanEnd, @_touchEnd)
 
@@ -141,7 +136,7 @@ class exports.LayerDraggable extends BaseClass
 		LayerDraggable._globalDidDrag = false
 
 		Events.wrap(document).addEventListener(Gestures.Pan, @_touchMove)
-		Events.wrap(document).addEventListener(Gestures.TapEnd, @_touchEnd)
+		Events.wrap(document).addEventListener(Gestures.PanEnd, @_touchEnd)
 
 		# Only reset isMoving if this was not animating when we were clicking
 		# so we can use it to detect a click versus a drag.
@@ -162,10 +157,11 @@ class exports.LayerDraggable extends BaseClass
 		# Extract the event (mobile may have multiple)
 		touchEvent = Events.touchEvent(event)
 
+
 		# TODO: we should use the event velocity
 		@_eventBuffer.push
-			x: touchEvent.clientX
-			y: touchEvent.clientY
+			x: event.point.x
+			y: event.point.y
 			t: Date.now()
 
 		# Store original layer position
