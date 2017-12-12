@@ -39,6 +39,7 @@ body {
 
 .framerLayer svg {
 	overflow: visible;
+	display: block;
 }
 
 .framerDebug {
