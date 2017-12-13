@@ -27,6 +27,8 @@ class exports.SVGLayer extends Layer
 
 	@define "fill", layerProperty(@, "fill", "fill", null, validFill, toFill)
 	@define "stroke", layerProperty(@, "stroke", "stroke", null, validFill, toFill)
+	@define "strokeWidthMultiplier", @simpleProperty("strokeWidthMultiplier", 1)
+	@define "strokeWidth", layerProperty(@, "strokeWidth", "strokeWidth", null, _.isNumber)
 	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor, null, ((layer, value) -> layer.fill = value), "_elementHTML", true)
 
 	@define "gradient",

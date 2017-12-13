@@ -242,6 +242,9 @@ exports.LayerStyle =
 	fill: (layer) ->
 		return layer._properties.fill
 
+	strokeWidth: (layer) ->
+		return layer._properties.strokeWidth * layer.strokeWidthMultiplier
+
 	color: (layer) ->
 		return layer._properties.color
 
