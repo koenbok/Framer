@@ -1239,3 +1239,44 @@ describe "LayerAnimation", ->
 			textLayer.on Events.AnimationEnd, ->
 				textLayer.text.should.equal "8.00KM-HEAVY"
 				done()
+
+	describe "svg animations", ->
+		layer = null
+		beforeEach ->
+			layer = new SVGLayer
+				name: "ret",
+				backgroundColor: null,
+				width: 200,
+				html: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="5"><path id="shape-id-o075lAYCB" d="M 0 0 L 200 0 L 200 200 L 0 200 Z"></path></svg>',
+				htmlIntrinsicSize: {height: 200, width: 200},
+				height: 200,
+				constraintValues: {height: 200, width: 200},
+				fill: "rgba(0,170,255,0.75)",
+				blending: "normal",
+				autoSize: true
+				strokeWidth: 1
+
+		it "should animate the fill property", (done) ->
+			layer.onAnimationEnd ->
+				Color.equal(layer.fill, "yellow").should.be.true
+				done()
+			layer.animate
+				fill: "yellow"
+				x: 100
+		it "should animate the stroke property", (done) ->
+			layer.onAnimationEnd ->
+				Color.equal(layer.stroke, "yellow").should.be.true
+				done()
+			layer.animate
+				stroke: "yellow"
+				x: 100
+
+		it "should animate the stroke width", (done) ->
+			layer.onAnimationEnd ->
+				layer.strokeWidth.should.equal 10
+				done()
+			layer.animate
+				strokeWidth: 10
+				x: 100
+
+		it "should animate along a path"

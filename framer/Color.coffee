@@ -288,7 +288,8 @@ class exports.Color extends BaseClass
 	@isValidColorProperty: (name, value) ->
 		# We check if the property name ends with color, because we don't want
 		# to convert every string that looks like a Color, like the html property containing "add"
-		if _.endsWith(name.toLowerCase(), "color") and _.isString(value) and Color.isColorString(value)
+		isColorKey = _.endsWith(name.toLowerCase(), "color") or name in ["fill", "stroke"]
+		if isColorKey and _.isString(value) and Color.isColorString(value)
 			return true
 
 		return false
