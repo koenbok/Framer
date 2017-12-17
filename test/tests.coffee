@@ -22,6 +22,30 @@ chai.should()
 chai.config.truncateThreshold = 2
 chai.config.showDiff = true
 
+chai.Assertion.addChainableMethod 'equalColor', (color) ->
+	expected = color
+	actual = @_obj
+
+	return @assert Color.equal(expected, actual),
+		"expected #{this._obj} to equal #{color}",
+		"expected #{this._obj} to not equal #{color}"
+
+chai.Assertion.addChainableMethod 'equalShadow', (shadow) ->
+	expected = shadow
+	actual = @_obj
+
+	equal = true
+	for key, value of expected
+		if Color.isColor(value)
+			equal = equal and Color.equal(value, actual[key])
+		else
+			equal = equal and _.eq(value, actual[key])
+
+	return @assert equal,
+		"expected #{Utils.inspect(this._obj)} to equal #{Utils.inspect(shadow)}",
+		"expected #{Utils.inspect(this._obj)} to not equal #{Utils.inspect(shadow)}"
+
+
 mocha.setup({ui: "bdd", bail: true, reporter: "dot"})
 mocha.globals(["__import__"])
 

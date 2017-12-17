@@ -4,15 +4,6 @@ assert = require "assert"
 AnimationTime = Framer.Defaults.Animation.time
 AnimationProperties = ["x", "y", "midY", "rotation"]
 
-equalShadows = (shadow1, shadow2) ->
-	equal = true
-	for key, value of shadow1
-		if Color.isColor(value)
-			equal = equal and Color.equal(value, shadow2[key])
-		else
-			equal = equal and _.eq(value, shadow2[key])
-	return equal
-
 describe "LayerAnimation", ->
 
 	it "should use defaults", ->
@@ -199,7 +190,7 @@ describe "LayerAnimation", ->
 				a.onAnimationEnd ->
 					layer.shadows.length.should.eql template.shadows.length
 					layer.shadows.map (shadow, index) ->
-						equalShadows(shadow, template.shadows[index]).should.be.true
+						shadow.should.equalShadow template.shadows[index]
 					done()
 
 			it "should work when using the same kind of shadows", (done) ->
@@ -225,7 +216,7 @@ describe "LayerAnimation", ->
 				a.onAnimationEnd ->
 					layer.shadows.length.should.eql template.shadows.length
 					layer.shadows.map (shadow, index) ->
-						equalShadows(shadow, template.shadows[index]).should.be.true
+						shadow.should.equalShadow template.shadows[index]
 					done()
 
 			it "should work when using different shadows", (done) ->
@@ -248,7 +239,7 @@ describe "LayerAnimation", ->
 				a.onAnimationEnd ->
 					layer.shadows.length.should.eql template.shadows.length
 					layer.shadows.map (shadow, index) ->
-						equalShadows(shadow, template.shadows[index]).should.be.true
+						shadow.should.equalShadow template.shadows[index]
 					done()
 
 			it "should keep other shadows intact when animating one shadow", (done) ->
@@ -264,10 +255,10 @@ describe "LayerAnimation", ->
 							shadow.x.should.equal template.shadows[index].x
 							shadow.y.should.equal template.shadows[index].y
 							shadow.type.should.equal template.shadows[index].type
-							Color.equal(shadow.color, template.shadows[index].color).should.be.true
+							shadow.color.should.equalColor template.shadows[index].color
 							shadow.blur.should.equal 200
 						else
-							equalShadows(shadow, template.shadows[index]).should.be.true
+							shadow.should.equalShadow template.shadows[index]
 					done()
 
 			it "should animate to null shadow nicely", (done) ->
@@ -296,13 +287,13 @@ describe "LayerAnimation", ->
 					shadow1 = layerA.shadows[0]
 					shadow1.type.should.equal "inset"
 					opaqueShadowColor = shadow1.color.alpha(1)
-					Color.equal(new Color("blue"), opaqueShadowColor).should.be.true
+					opaqueShadowColor.shoul.equalColor "blue"
 				a.onAnimationEnd ->
 					layerA.shadow1.x.should.equal 100
 					layerA.shadow1.y.should.equal 0
 					layerA.shadow1.blur.should.equal 10
 					layerA.shadow1.type.should.equal "inset"
-					Color.equal(new Color("blue"), layerA.shadow1.color).should.be.true
+					layerA.shadow1.color.should.equalColor "blue"
 					done()
 
 			it "should animate from no shadows nicely", (done) ->
@@ -318,13 +309,13 @@ describe "LayerAnimation", ->
 					shadow1 = layerA.shadows[0]
 					shadow1.type.should.equal "inset"
 					opaqueShadowColor = shadow1.color.alpha(1)
-					Color.equal(new Color("blue"), opaqueShadowColor).should.be.true
+					opaqueShadowColor.should.equalColor "blue"
 				a.onAnimationEnd ->
 					layerA.shadow1.x.should.equal 100
 					layerA.shadow1.y.should.equal 0
 					layerA.shadow1.blur.should.equal 10
 					layerA.shadow1.type.should.equal "inset"
-					Color.equal(new Color("blue"), layerA.shadow1.color).should.be.true
+					layerA.shadow1.color.should.equalColor "blue"
 					done()
 
 		describe "by setting shadow array", ->
@@ -335,7 +326,7 @@ describe "LayerAnimation", ->
 				a.onAnimationEnd ->
 					layer.shadows.length.should.eql template.shadows.length
 					layer.shadows.map (shadow, index) ->
-						equalShadows(shadow, template.shadows[index]).should.be.true
+						shadow.should.equalShadow template.shadows[index]
 					done()
 
 			it "should work when using the same kind of shadows", (done) ->
@@ -353,7 +344,7 @@ describe "LayerAnimation", ->
 				a.onAnimationEnd ->
 					layer.shadows.length.should.eql template.shadows.length
 					layer.shadows.map (shadow, index) ->
-						equalShadows(shadow, template.shadows[index]).should.be.true
+						shadow.should.equalShadow template.shadows[index]
 					done()
 
 			it "should work when using different shadows", (done) ->
@@ -368,7 +359,7 @@ describe "LayerAnimation", ->
 				a.onAnimationEnd ->
 					layer.shadows.length.should.eql template.shadows.length
 					layer.shadows.map (shadow, index) ->
-						equalShadows(shadow, template.shadows[index]).should.be.true
+						shadow.should.equalShadow template.shadows[index]
 					done()
 
 	describe "Basic", ->
@@ -1258,14 +1249,14 @@ describe "LayerAnimation", ->
 
 		it "should animate the fill property", (done) ->
 			layer.onAnimationEnd ->
-				Color.equal(layer.fill, "yellow").should.be.true
+				layer.fill.should.equalColor "yellow"
 				done()
 			layer.animate
 				fill: "yellow"
 				x: 100
 		it "should animate the stroke property", (done) ->
 			layer.onAnimationEnd ->
-				Color.equal(layer.stroke, "yellow").should.be.true
+				layer.stroke.should.equalColor "yellow"
 				done()
 			layer.animate
 				stroke: "yellow"
