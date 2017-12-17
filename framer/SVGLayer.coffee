@@ -22,6 +22,8 @@ class exports.SVGLayer extends Layer
 			options.color ?= options.backgroundColor
 			options.backgroundColor = null
 		options.clip ?= false
+		if options.svg? or options.html?
+			options.backgroundColor ?= null
 		super options
 		@updateGradientSVG()
 
