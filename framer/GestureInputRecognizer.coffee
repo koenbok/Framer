@@ -40,7 +40,6 @@ class exports.GestureInputRecognizer
 		@touchstart(event)
 
 	touchstart: (event) =>
-		console.log "touchStart", event.target
 		# Only fire if we are not already in a session
 		return if @session
 
