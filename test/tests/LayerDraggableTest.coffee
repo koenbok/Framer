@@ -15,8 +15,7 @@ describe "Layer", ->
 			a2.isAnimating.should.equal true
 			a3.isAnimating.should.equal true
 
-			event = Framer.GestureInputRecognizer._getGestureEvent(document.createEvent("MouseEvent"))
-			layer.draggable.touchStart(event)
+			layer.draggable.touchStart(document.createEvent("MouseEvent"))
 
 			a1.isAnimating.should.equal false
 			a2.isAnimating.should.equal false
@@ -25,25 +24,20 @@ describe "Layer", ->
 		describe "Simulation", ->
 			it "should be cancelled when animating the same property", (done) ->
 				layerA = new Layer
-				start = document.createEvent("MouseEvent")
-				event = Framer.GestureInputRecognizer._getGestureEvent(start)
-				layerA.draggable._touchStart(start)
 				time = 0.001
 				for i in [0..3]
 					do (i) ->
 						Utils.delay i*time, ->
 							move = document.createEvent("MouseEvent")
-							move.touches = [
-								{pageX: i, pageY: 0}
-							]
-							event = Framer.GestureInputRecognizer._getGestureEvent(move)
-							event.delta =
+							move.delta =
 								x: i
 								y: 0
-							layerA.draggable._touchMove(event)
+							move.touches = [
+								{clientX: i, clientY: 0}
+							]
+							layerA.draggable._touchMove(move)
 				Utils.delay i*time, ->
-					event = Framer.GestureInputRecognizer._getGestureEvent(document.createEvent("MouseEvent"))
-					layerA.draggable._touchEnd(event)
+					layerA.draggable._touchEnd(document.createEvent("MouseEvent"))
 				layerA.onDragEnd ->
 					simulation = layerA.draggable._simulation.x
 					a = @animate

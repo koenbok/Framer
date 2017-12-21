@@ -157,11 +157,10 @@ class exports.LayerDraggable extends BaseClass
 		# Extract the event (mobile may have multiple)
 		touchEvent = Events.touchEvent(event)
 
-
 		# TODO: we should use the event velocity
 		@_eventBuffer.push
-			x: event.point.x
-			y: event.point.y
+			x: touchEvent.clientX
+			y: touchEvent.clientY
 			t: Date.now()
 
 		# Store original layer position
@@ -197,16 +196,13 @@ class exports.LayerDraggable extends BaseClass
 
 		event.preventDefault()
 		event.stopPropagation() if @propagateEvents is false
-		# print event.touches[0].identifier, event.touches[1].identifier
+
 		touchEvent = Events.touchEvent(event)
-		point = {x: touchEvent.clientX, y: touchEvent.clientY}
-		touchEvent.point = Utils.convertPointFromContext(point, @layer, true)
-		touchEvent.contextPoint = Utils.convertPointFromContext(point, @layer.context, true)
 		@_lastEvent = touchEvent
 
 		@_eventBuffer.push
-			x: touchEvent.point.x
-			y: touchEvent.point.y
+			x: touchEvent.clientX
+			y: touchEvent.clientY
 			t: Date.now() # We don't use timeStamp because it's different on Chrome/Safari
 
 		point = _.clone(@_point)
