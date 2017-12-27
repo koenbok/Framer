@@ -924,6 +924,25 @@ class exports.Layer extends BaseClass
 	@selectAll: (selector) ->
 		Framer.CurrentContext.selectAllLayers(selector)
 
+	@defineChild: (name, classConstructor = Layer, defaultValue = null, options = {}) ->
+		options = _.defaults options,
+			propertyType: classConstructor
+			childLayer: true
+		@define name, @simpleProperty name, defaultValue, options
+
+	configureComponent: ->
+		propertyList = @_propertyList()
+		for key, descriptor of propertyList
+			if descriptor.childLayer
+				childName = descriptor.propertyName
+				child = @selectChild(childName)
+				if not child?
+					throw new Error "#{@constructor.name} expects a child with name '#{childName}'"
+				if not (child instanceof descriptor.propertyType)
+					throw new Error "#{@constructor.name} expects child '#{childName}' to be a #{descriptor.propertyType.name}"
+				@[descriptor.propertyName] = child
+
+
 	destroy: ->
 
 		# Todo: check this
