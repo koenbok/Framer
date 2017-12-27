@@ -1407,5 +1407,21 @@ Utils.textSize = (text, style={}, constraints={}) ->
 		width: rect.right - rect.left
 		height: rect.bottom - rect.top
 
+# Components
+
+Utils.createComponent = createComponent = (classConstructor, options = {}) ->
+	if global?.exports?
+		global.exports[classConstructor.name] = classConstructor
+	else
+		rootLayer = _.first Framer.CurrentContext.layers
+		if not rootLayer?
+			throw new Error "Can't find layer from Design"
+		component = new classConstructor _.defaults options, rootLayer.props
+		for child in rootLayer.children
+			child.setParentPreservingConstraintValues(component)
+		component.parent = rootLayer.parent
+		component.configureComponent()
+		rootLayer.destroy()
+		return component
 
 _.extend exports, Utils
