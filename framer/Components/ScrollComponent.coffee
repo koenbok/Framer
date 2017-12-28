@@ -90,6 +90,10 @@ class exports.ScrollComponent extends Layer
 		if options.hasOwnProperty("wrap")
 			wrapComponent(@, options.wrap)
 
+	configureComponent: ->
+		for child in @children[1..] 
+			child.parent = @content
+
 	calculateContentFrame: ->
 
 		return Utils.rectZero() unless @content
