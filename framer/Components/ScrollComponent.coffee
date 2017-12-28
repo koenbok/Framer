@@ -91,7 +91,7 @@ class exports.ScrollComponent extends Layer
 			wrapComponent(@, options.wrap)
 
 	configureComponent: ->
-		for child in @children[1..] 
+		for child in @children[1..]
 			child.parent = @content
 
 	calculateContentFrame: ->
