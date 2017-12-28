@@ -378,7 +378,6 @@ class exports.Layer extends BaseClass
 	for shadowProp in ["X", "Y", "Blur", "Spread", "Color", "Type"]
 		do (shadowProp) =>
 			@define "shadow#{shadowProp}",
-				exportable: false
 				get: ->
 					return null if not @shadows? or @shadows.length is 0
 					@shadows[0][shadowProp.toLowerCase()]

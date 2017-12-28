@@ -1,6 +1,7 @@
 {_} = require "./Underscore"
 {Color} = require "./Color"
 {Layer, layerProperty, layerProxiedValue} = require "./Layer"
+{SVG, SVGPath} = require "./SVG"
 
 validFill = (value) ->
 	Color.validColorValue(value) or _.startsWith(value, "url(")
@@ -10,6 +11,7 @@ toFill = (value) ->
 		return value
 	else
 		return Color.toColor(value)
+
 class exports.SVGLayer extends Layer
 
 	constructor: (options={}) ->
@@ -19,11 +21,16 @@ class exports.SVGLayer extends Layer
 			# set backgroundColor instead of color
 			options.color ?= options.backgroundColor
 			options.backgroundColor = null
+		options.clip ?= false
+		if options.svg? or options.html?
+			options.backgroundColor ?= null
 		super options
 		@updateGradientSVG()
 
 	@define "fill", layerProperty(@, "fill", "fill", null, validFill, toFill)
 	@define "stroke", layerProperty(@, "stroke", "stroke", null, validFill, toFill)
+	@define "strokeWidthMultiplier", @simpleProperty("strokeWidthMultiplier", 1)
+	@define "strokeWidth", layerProperty(@, "strokeWidth", "strokeWidth", null, _.isNumber)
 	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor, null, ((layer, value) -> layer.fill = value), "_elementHTML", true)
 
 	@define "gradient",
@@ -54,6 +61,32 @@ class exports.SVGLayer extends Layer
 				if value.parentNode?
 					value = value.cloneNode(true)
 				@_elementHTML.appendChild(value)
+
+	@define "path",
+		get: ->
+			if @svg.children?.length isnt 1
+				error = "SVGLayer.path can only be used on SVG's that have a single child"
+				if Utils.isFramerStudio()
+					throw new Error(error)
+				else
+					console.error(error)
+			child = @svg.children[0]
+			if not SVGPath.isPath(child)
+				error = "SVGLayer.path can only be used on SVG's containing an SVGPathElement, not #{Utils.inspectObjectType(child)}"
+				if Utils.isFramerStudio()
+					throw new Error(error)
+				else
+					console.error(error)
+			return child
+
+	@define "pathStart",
+		get: ->
+			start = SVGPath.getStart(@path)
+			return null if not start?
+			point =
+				x: @x + start.x
+				y: @y + start.y
+			return point
 
 	updateGradientSVG: ->
 		return if @__constructor

@@ -448,6 +448,10 @@ describe "LayerStates", ->
 				backgroundColor: "red"
 				shadowColor: "blue"
 				shadowSpread: 10
+			l.states.a =
+				shadowColor: "red"
+				shadowSpread: 3
+			l.stateSwitch "a"
 			l.stateSwitch "default"
 			l.style.boxShadow.should.equal "rgb(0, 0, 255) 0px 0px 0px 10px"
 

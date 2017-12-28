@@ -25,6 +25,38 @@ describe "SVGLayer", ->
 			b = a.copy()
 			a.htmlIntrinsicSize.should.eql b.htmlIntrinsicSize
 
+	describe "initializing", ->
+		it "should set clip to true by default", ->
+			a = new SVGLayer
+			a.clip.should.be.false
+			a._element.style.overflow.should.equal("visible")
+
+		it "should allow for overriding the clip property", ->
+			a = new SVGLayer
+				clip: true
+			a.clip.should.be.true
+			a._element.style.overflow.should.equal("hidden")
+
+		it "should use the default backgroundColor when not providing SVG", ->
+			a = new SVGLayer
+			a.backgroundColor.should.equalColor Framer.Defaults.Layer.backgroundColor
+
+		it "should set the backgroundColor to null when providing SVG", ->
+			a = new SVGLayer
+				svg: svgString
+			expect(a.backgroundColor).to.be.null
+
+		it "should allow overriding the backgroundColor to null when providing SVG", ->
+			a = new SVGLayer
+				svg: svgString
+				backgroundColor: "blue"
+			a.backgroundColor.should.equalColor "blue"
+
+		it "should set the backgroundColor to null when providing SVG", ->
+			a = new SVGLayer
+				html: svgString
+			expect(a.backgroundColor).to.be.null
+
 	describe "svg", ->
 		describe "getter", ->
 			it "should return the SVG node", ->

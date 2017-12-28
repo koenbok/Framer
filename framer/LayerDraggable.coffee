@@ -107,17 +107,12 @@ class exports.LayerDraggable extends BaseClass
 		@attach()
 
 	attach: ->
-		@layer.on(Gestures.TapStart, @touchStart)
-		# @layer.on(Gestures.Pan, @_touchMove)
-		# @layer.on(Gestures.TapEnd, @_touchEnd)
-
-
-
+		@layer.on(Gestures.PanStart, @touchStart)
 		@layer.on("change:x", @_updateLayerPosition)
 		@layer.on("change:y", @_updateLayerPosition)
 
 	remove: ->
-		@layer.off(Gestures.TapStart, @touchStart)
+		@layer.off(Gestures.PanStart, @touchStart)
 		@layer.off(Gestures.Pan, @_touchMove)
 		@layer.off(Gestures.PanEnd, @_touchEnd)
 
@@ -141,7 +136,7 @@ class exports.LayerDraggable extends BaseClass
 		LayerDraggable._globalDidDrag = false
 
 		Events.wrap(document).addEventListener(Gestures.Pan, @_touchMove)
-		Events.wrap(document).addEventListener(Gestures.TapEnd, @_touchEnd)
+		Events.wrap(document).addEventListener(Gestures.PanEnd, @_touchEnd)
 
 		# Only reset isMoving if this was not animating when we were clicking
 		# so we can use it to detect a click versus a drag.
@@ -201,16 +196,13 @@ class exports.LayerDraggable extends BaseClass
 
 		event.preventDefault()
 		event.stopPropagation() if @propagateEvents is false
-		# print event.touches[0].identifier, event.touches[1].identifier
+
 		touchEvent = Events.touchEvent(event)
-		point = {x: touchEvent.clientX, y: touchEvent.clientY}
-		touchEvent.point = Utils.convertPointFromContext(point, @layer, true)
-		touchEvent.contextPoint = Utils.convertPointFromContext(point, @layer.context, true)
 		@_lastEvent = touchEvent
 
 		@_eventBuffer.push
-			x: touchEvent.point.x
-			y: touchEvent.point.y
+			x: touchEvent.clientX
+			y: touchEvent.clientY
 			t: Date.now() # We don't use timeStamp because it's different on Chrome/Safari
 
 		point = _.clone(@_point)

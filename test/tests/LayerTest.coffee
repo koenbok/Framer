@@ -50,7 +50,7 @@ describe "Layer", ->
 			# if the default background color is not set the content layer of scrollcomponent is not hidden when layers are added
 			layer = new Layer()
 
-			Color.equal(layer.backgroundColor, Framer.Defaults.Layer.backgroundColor).should.be.true
+			layer.backgroundColor.should.equalColor Framer.Defaults.Layer.backgroundColor
 
 			Framer.Defaults =
 				Layer:
@@ -371,12 +371,12 @@ describe "Layer", ->
 
 			layer = new Layer backgroundColor: "red"
 			layer.image = imagePath
-			Color.equal(layer.backgroundColor, new Color("red")).should.be.true
+			layer.backgroundColor.should.equalColor "red"
 
 			layer = new Layer
 			layer.backgroundColor = "red"
 			layer.image = imagePath
-			Color.equal(layer.backgroundColor, new Color("red")).should.be.true
+			layer.backgroundColor.should.equalColor "red"
 
 		it "should set visible", ->
 
@@ -911,7 +911,7 @@ describe "Layer", ->
 			l.shadows = []
 			l.shadowColor = "yellow"
 			l.shadows.length.should.equal 1
-			Color.equal(l.shadows[0].color, "yellow").should.be.true
+			l.shadows[0].color.should.equalColor "yellow"
 
 		it "should copy shadows if you copy a layer", ->
 			l = new Layer
@@ -1010,7 +1010,7 @@ describe "Layer", ->
 
 			layer.shadowX.should.equal 5
 			layer.shadowY.should.equal 20
-			Color.equal(layer.shadowColor, "blue").should.be.true
+			layer.shadowColor.should.equalColor "blue"
 			layer.shadowBlur.should.equal 10
 			layer.shadowType.should.equal "box"
 
