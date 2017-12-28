@@ -1409,14 +1409,14 @@ Utils.textSize = (text, style={}, constraints={}) ->
 
 # Components
 
-Utils.createComponent = createComponent = (classConstructor, options = {}) ->
-	if global?.exports?
-		global.exports[classConstructor.name] = classConstructor
+Utils.createComponent = (classConstructor, exports = null) ->
+	if exports?
+		exports[classConstructor.name] = classConstructor
 	else
 		rootLayer = _.first Framer.CurrentContext.layers
 		if not rootLayer?
 			throw new Error "Can't find layer from Design"
-		component = new classConstructor _.defaults options, rootLayer.props
+		component = new classConstructor rootLayer.props
 		for child in rootLayer.children
 			child.setParentPreservingConstraintValues(component)
 		component.parent = rootLayer.parent
