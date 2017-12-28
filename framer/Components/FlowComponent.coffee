@@ -56,6 +56,24 @@ class exports.FlowComponent extends Layer
 				width: @width
 				height: @height
 
+
+	configureComponent: ->
+		for child in @children[1..]
+			if child.name is "header"
+				header = child
+				continue
+			if child.name is "footer"
+				footer = child
+				continue
+			if child.name is "content"
+				content = child
+				continue
+			if not content?
+				content = child
+		@header = header if header?
+		@footer = footer if footer?
+		@showNext content if content?
+
 	reset: ->
 
 		if @_stack
