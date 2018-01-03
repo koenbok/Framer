@@ -45,7 +45,9 @@
     "webpack-dev-server": "^1.14.1",
     "webpack-stream": "^3.0.1"
   },
-  "keywords": ["prototyping"],
+  "keywords": [
+    "prototyping"
+  ],
   "author": "Koen Bok",
   "license": "MIT",
   "bugs": {

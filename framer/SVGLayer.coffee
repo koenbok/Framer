@@ -1,7 +1,7 @@
 {_} = require "./Underscore"
 {Color} = require "./Color"
 {Layer, layerProperty, layerProxiedValue} = require "./Layer"
-{SVG, SVGPath} = require "./SVG"
+{SVG, SVGPath, SVGGroup} = require "./SVG"
 
 validFill = (value) ->
 	Color.validColorValue(value) or _.startsWith(value, "url(")
@@ -25,7 +25,19 @@ class exports.SVGLayer extends Layer
 		if options.svg? or options.html?
 			options.backgroundColor ?= null
 		super options
+		elements = @svg?.querySelectorAll("[id]")
+		if elements?
+			for element in elements
+				if element instanceof SVGGElement
+					@elements[element.id] = new SVGGroup(element)
+					continue
+				if element instanceof SVGPathElement
+					@elements[element.id] = new SVGPath(element)
+					continue
+				@elements[element.id] = element
 		@updateGradientSVG()
+
+	@define "elements", @simpleProperty("elements", {})
 
 	@define "fill", layerProperty(@, "fill", "fill", null, validFill, toFill)
 	@define "stroke", layerProperty(@, "stroke", "stroke", null, validFill, toFill)
@@ -46,7 +58,7 @@ class exports.SVGLayer extends Layer
 
 	@define "svg",
 		get: ->
-			svgNode = _.first(@_elementHTML.children)
+			svgNode = _.first(@_elementHTML?.children)
 			if svgNode instanceof SVGElement
 				return svgNode
 			else

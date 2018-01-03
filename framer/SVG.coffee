@@ -5,6 +5,13 @@ class SVG
 		svg instanceof SVGElement
 
 
+class SVGGroup extends BaseClass
+	@define "element", @simpleProperty("element", null)
+	constructor: (group) ->
+		super
+		@element = group
+
+
 class SVGPath extends BaseClass
 
 	@define "length",
@@ -20,18 +27,18 @@ class SVGPath extends BaseClass
 		get: ->
 			@pointAtFraction(1)
 
-	@define "path", @simpleProperty("path", null)
+	@define "element", @simpleProperty("element", null)
 
 	constructor: (path) ->
 		return null if not SVGPath.isPath(path)
 		super
 		if path instanceof SVGPath
-			path = path.path
-		@path = path
-		@_length = path.getTotalLength()
+			path = path.element
+		@element = path
+		@_length = @element.getTotalLength()
 
 	pointAtFraction: (fraction) ->
-		@path.getPointAtLength(@length * fraction)
+		@element.getPointAtLength(@length * fraction)
 
 	valueUpdater: (axis, target, offset) =>
 		switch axis
@@ -68,3 +75,4 @@ class SVGPath extends BaseClass
 
 exports.SVG = SVG
 exports.SVGPath = SVGPath
+exports.SVGGroup = SVGGroup
