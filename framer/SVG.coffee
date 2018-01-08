@@ -1,18 +1,25 @@
 {BaseClass} = require "./BaseClass"
+{LayerStyle} = require "./LayerStyle"
+{Layer, layerProperty} = require "./Layer"
+{Color} = require "./Color"
+
 
 class SVG
 	@isSVG: (svg) ->
 		svg instanceof SVGElement
 
 
-class SVGGroup extends BaseClass
-	@define "element", @simpleProperty("element", null)
-	constructor: (group) ->
-		super
-		@element = group
+class SVGGroup extends Layer
+	constructor: (group, options) ->
+		@_element = group
+		super (options)
+
+	_insertElement: ->
 
 
-class SVGPath extends BaseClass
+class SVGPath extends Layer
+	@define "fill", layerProperty(@, "fill", "fill", null, Color.validColorValue, Color.toColor)
+	@define "stroke", layerProperty(@, "stroke", "stroke", null, Color.validColorValue, Color.toColor)
 
 	@define "length",
 		get: ->
@@ -27,18 +34,17 @@ class SVGPath extends BaseClass
 		get: ->
 			@pointAtFraction(1)
 
-	@define "element", @simpleProperty("element", null)
 
-	constructor: (path) ->
+	constructor: (path, options) ->
 		return null if not SVGPath.isPath(path)
-		super
 		if path instanceof SVGPath
 			path = path.element
-		@element = path
-		@_length = @element.getTotalLength()
+		@_element = path
+		super(options)
+		@_length = @_element.getTotalLength()
 
 	pointAtFraction: (fraction) ->
-		@element.getPointAtLength(@length * fraction)
+		@_element.getPointAtLength(@length * fraction)
 
 	valueUpdater: (axis, target, offset) =>
 		switch axis
@@ -57,6 +63,8 @@ class SVGPath extends BaseClass
 					toPoint = @pointAtFraction(Math.min(value + delta, 1))
 					angle = Math.atan2(fromPoint.y - toPoint.y, fromPoint.x - toPoint.x) * 180 / Math.PI - 90
 					target[key] = angle
+
+	_insertElement: ->
 
 	@isPath: (path) ->
 		path instanceof SVGPathElement or path instanceof SVGPath

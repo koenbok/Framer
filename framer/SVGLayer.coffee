@@ -26,13 +26,15 @@ class exports.SVGLayer extends Layer
 			options.backgroundColor ?= null
 		super options
 		elements = @svg?.querySelectorAll("[id]")
+		options =
+			disableBorder: true
 		if elements?
 			for element in elements
 				if element instanceof SVGGElement
-					@elements[element.id] = new SVGGroup(element)
+					@elements[element.id] = new SVGGroup(element, options)
 					continue
 				if element instanceof SVGPathElement
-					@elements[element.id] = new SVGPath(element)
+					@elements[element.id] = new SVGPath(element, options)
 					continue
 				@elements[element.id] = element
 		@updateGradientSVG()
