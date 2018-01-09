@@ -8,7 +8,7 @@ dashArrayTransform = (value) ->
 			values = value.split(',')
 		else
 			values = value.split(" ")
-		values = values.map((v) -> parseInt(v.trim()))
+		values = values.map((v) -> parseFloat(v.trim()))
 		return values
 	return value
 
