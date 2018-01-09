@@ -1,7 +1,9 @@
 {_} = require "./Underscore"
 {Color} = require "./Color"
 {Layer, layerProperty, layerProxiedValue} = require "./Layer"
-{SVG, SVGPath, SVGGroup} = require "./SVG"
+{SVG} = require "./SVG"
+{SVGGroup} = require "./SVGGroup"
+{SVGPath} = require "./SVGPath"
 
 validFill = (value) ->
 	Color.validColorValue(value) or _.startsWith(value, "url(")
