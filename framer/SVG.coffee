@@ -17,9 +17,26 @@ class SVGGroup extends Layer
 	_insertElement: ->
 
 
+dashArrayTransform = (value) ->
+	if _.isString value
+		values = []
+		if value.indexOf(",") isnt -1
+			values = value.split(',')
+		else
+			values = value.split(" ")
+		values = values.map((v) -> parseInt(v.trim()))
+		return values
+	return value
+
+
+
+
 class SVGPath extends Layer
 	@define "fill", layerProperty(@, "fill", "fill", null, Color.validColorValue, Color.toColor)
 	@define "stroke", layerProperty(@, "stroke", "stroke", null, Color.validColorValue, Color.toColor)
+	@define "strokeWidth", layerProperty(@, "strokeWidth", "strokeWidth", null, _.isNumber)
+	@define "strokeDashoffset", layerProperty(@, "strokeDashoffset", "strokeDashoffset", null, _.isNumber)
+	@define "strokeDasharray", layerProperty(@, "strokeDasharray", "strokeDasharray", [], _.isArray, dashArrayTransform)
 
 	@define "length",
 		get: ->

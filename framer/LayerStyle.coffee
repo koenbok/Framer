@@ -243,7 +243,11 @@ exports.LayerStyle =
 		return layer._properties.fill
 
 	strokeWidth: (layer) ->
-		return layer._properties.strokeWidth * layer.strokeWidthMultiplier
+		factor = layer.strokeWidthMultiplier ? 1
+		return layer._properties.strokeWidth * factor
+
+	strokeDasharray: (layer) ->
+		return layer._properties.strokeDasharray.join(",")
 
 	color: (layer) ->
 		return layer._properties.color
