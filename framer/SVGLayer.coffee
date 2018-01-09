@@ -5,15 +5,6 @@
 {SVGGroup} = require "./SVGGroup"
 {SVGPath} = require "./SVGPath"
 
-validFill = (value) ->
-	Color.validColorValue(value) or _.startsWith(value, "url(")
-
-toFill = (value) ->
-	if _.startsWith(value, "url(")
-		return value
-	else
-		return Color.toColor(value)
-
 class exports.SVGLayer extends Layer
 
 	constructor: (options={}) ->
@@ -44,8 +35,8 @@ class exports.SVGLayer extends Layer
 
 	@define "elements", @simpleProperty("elements", {})
 
-	@define "fill", layerProperty(@, "fill", "fill", null, validFill, toFill)
-	@define "stroke", layerProperty(@, "stroke", "stroke", null, validFill, toFill)
+	@define "fill", layerProperty(@, "fill", "fill", null, SVG.validFill, SVG.toFill)
+	@define "stroke", layerProperty(@, "stroke", "stroke", null, SVG.validFill, SVG.toFill)
 	@define "strokeWidthMultiplier", @simpleProperty("strokeWidthMultiplier", 1)
 	@define "strokeWidth", layerProperty(@, "strokeWidth", "strokeWidth", null, _.isNumber)
 	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor, null, ((layer, value) -> layer.fill = value), "_elementHTML", true)
