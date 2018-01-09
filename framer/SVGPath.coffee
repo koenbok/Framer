@@ -45,6 +45,12 @@ class SVGPath extends Layer
 		if path instanceof SVGPath
 			path = path.element
 		@_element = path
+		_.defaults options,
+			fill: @_element.getAttribute("fill")
+			stroke: @_element.getAttribute("stroke")
+			strokeWidth: @_element.getAttribute("stroke-width")
+			strokeDasharray: @_element.getAttribute("stroke-dasharray")
+			strokeDashoffset: @_element.getAttribute("stroke-dashoffset")
 		super(options)
 		@_length = @_element.getTotalLength()
 
