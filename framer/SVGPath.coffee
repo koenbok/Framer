@@ -15,9 +15,16 @@ dashArrayTransform = (value) ->
 class SVGPath extends Layer
 	@define "fill", layerProperty(@, "fill", "fill", null, Color.validColorValue, Color.toColor)
 	@define "stroke", layerProperty(@, "stroke", "stroke", null, Color.validColorValue, Color.toColor)
-	@define "strokeWidth", layerProperty(@, "strokeWidth", "strokeWidth", null, _.isNumber)
-	@define "strokeDashoffset", layerProperty(@, "strokeDashoffset", "strokeDashoffset", null, _.isNumber)
+	@define "strokeWidth", layerProperty(@, "strokeWidth", "strokeWidth", null, _.isNumber, parseFloat)
 	@define "strokeDasharray", layerProperty(@, "strokeDasharray", "strokeDasharray", [], _.isArray, dashArrayTransform)
+	@define "strokeDashoffset", layerProperty(@, "strokeDashoffset", "strokeDashoffset", null, _.isNumber, parseFloat)
+	@define "strokeLength", layerProperty @, "strokeLength", null, null, _.isNumber, null, {}, (path, value) ->
+		path._properties.strokeFraction = value / path.length
+		if _.isEmpty path.strokeDasharray
+			path.strokeDasharray = [path.length]
+		path.strokeDashoffset = path.length - value
+	@define "strokeFraction", layerProperty @, "strokeFraction", null, null, _.isNumber, null, {}, (path, value) ->
+		path.strokeLength = path.length * value
 
 	@define "length",
 		get: ->
