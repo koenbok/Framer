@@ -30,6 +30,7 @@ class exports.SVGLayer extends Layer
 			disableBorder: true
 		if elements?
 			for element in elements
+				options.name = element.id
 				if element instanceof SVGGElement
 					@elements[element.id] = new SVGGroup(element, options)
 					continue
