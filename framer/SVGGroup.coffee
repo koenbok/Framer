@@ -13,6 +13,10 @@ class SVGGroup extends Layer
 		{children, targets} = SVG.constructSVGElements(group, SVGPath, SVGGroup)
 		@_children = children
 		@elements = targets
+		for parent in @ancestors()
+			if parent instanceof SVGLayer
+				@_svg = parent.svg
+				break
 
 		SVG.updateGradientSVG(@)
 

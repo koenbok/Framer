@@ -86,6 +86,19 @@ class exports.SVGPath extends Layer
 		super(options)
 		@_length = @_element.getTotalLength()
 
+		for parent in @ancestors()
+			if parent instanceof SVGLayer
+				@_svg = parent.svg
+				break
+
+		for prop in ["frame", "stroke", "strokeWidth", "strokeLinecap", "strokeLinejoin", "strokeMiterlimit", "strokeDasharray", "strokeDashoffset"]
+			@on "change:#{prop}", @resetViewbox
+
+	resetViewbox: =>
+		@_svg.setAttribute("viewBox", "0,0,#{@width},#{@height}")
+		@_svg.removeAttribute("viewBox")
+
+
 	# Custom properties
 	@define "fill", layerProperty(@, "fill", "fill", null, Color.validColorValue, Color.toColor)
 	@define "stroke", layerProperty(@, "stroke", "stroke", null, Color.validColorValue, Color.toColor)
