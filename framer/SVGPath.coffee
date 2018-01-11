@@ -26,6 +26,14 @@ class exports.SVGPath extends Layer
 		get: ->
 			@_element.outerHTML or ""
 	
+	@define "width",
+		get: ->
+			@_width
+	
+	@define "height",
+		get: ->
+			@_height
+	
 	# Disabled properties
 	@undefine ["label", "blending", "image"]
 	@undefine ["blur", "brightness", "saturate", "hueRotate", "contrast", "invert", "grayscale", "sepia"] # webkitFilter properties
@@ -87,7 +95,9 @@ class exports.SVGPath extends Layer
 		_.defaults options, @constructor.attributesFromElement(pathProperties, @_element)
 		super(options)
 		@_length = @_element.getTotalLength()
-
+		rect = @_element.getBoundingClientRect()
+		@_width = rect.width
+		@_height = rect.height
 		for parent in @ancestors()
 			if parent instanceof SVGLayer
 				@_svg = parent.svg
