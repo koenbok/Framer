@@ -51,6 +51,7 @@ class SVGPath extends Layer
 			strokeWidth: @_element.getAttribute("stroke-width")
 			strokeDasharray: @_element.getAttribute("stroke-dasharray")
 			strokeDashoffset: @_element.getAttribute("stroke-dashoffset")
+		@_elementBorder = path
 		super(options)
 		@_length = @_element.getTotalLength()
 

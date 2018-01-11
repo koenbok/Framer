@@ -174,17 +174,7 @@ class exports.Layer extends BaseClass
 			@_createHTMLElementIfNeeded()
 
 		# Create border element
-		if not options.disableBorder
-			@_elementBorder = document.createElement("div")
-			@_elementBorder.style.position = "absolute"
-			@_elementBorder.style.top = "0"
-			@_elementBorder.style.bottom = "0"
-			@_elementBorder.style.left = "0"
-			@_elementBorder.style.right = "0"
-			@_elementBorder.style.boxSizing = "border-box"
-			@_elementBorder.style.zIndex = "1000"
-			@_elementBorder.style.pointerEvents = "none"
-			@_element.appendChild(@_elementBorder)
+		@_createBorderElement()
 
 		# Sanitize calculated property setters so direct properties always win
 		layerPropertyIgnore(options, "point", ["x", "y"])
@@ -864,6 +854,19 @@ class exports.Layer extends BaseClass
 		return if @_element?
 		@_element = document.createElement "div"
 		@_element.classList.add("framerLayer")
+
+	_createBorderElement: ->		
+		return if @_elementBorder?
+		@_elementBorder = document.createElement "div"
+		@_elementBorder.style.position = "absolute"
+		@_elementBorder.style.top = "0"
+		@_elementBorder.style.bottom = "0"
+		@_elementBorder.style.left = "0"
+		@_elementBorder.style.right = "0"
+		@_elementBorder.style.boxSizing = "border-box"
+		@_elementBorder.style.zIndex = "1000"
+		@_elementBorder.style.pointerEvents = "none"
+		@_element.appendChild(@_elementBorder)
 
 	_insertElement: ->
 		@bringToFront()
