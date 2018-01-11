@@ -103,7 +103,6 @@ class exports.SVGPath extends Layer
 		for attribute in attributes
 			key = _.camelCase attribute
 			options[key] = element.getAttribute(attribute)
-		print options
 		return options
 
 	constructor: (path, options) ->
