@@ -67,6 +67,25 @@ class exports.SVGPath extends Layer
 	placeBefore: undefined
 	placeBehind: undefined
 
+	@attributesFromElement: (attributes, element) ->
+		options = {}
+		for attribute in attributes
+			key = _.camelCase attribute
+			options[key] = element.getAttribute(attribute)
+		return options
+
+	constructor: (path, options) ->
+		return null if not SVGPath.isPath(path)
+		if path instanceof SVGPath
+			path = path.element
+		@_element = path
+		@_elementBorder = path
+		@_elementHTML = path
+		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset"]
+		_.defaults options, @constructor.attributesFromElement(pathProperties, @_element)
+		super(options)
+		@_length = @_element.getTotalLength()
+
 	# Custom properties
 	@define "fill", layerProperty(@, "fill", "fill", null, Color.validColorValue, Color.toColor)
 	@define "stroke", layerProperty(@, "stroke", "stroke", null, Color.validColorValue, Color.toColor)
@@ -97,25 +116,6 @@ class exports.SVGPath extends Layer
 	@define "end",
 		get: ->
 			@pointAtFraction(1)
-
-	@attributesFromElement: (attributes, element) ->
-		options = {}
-		for attribute in attributes
-			key = _.camelCase attribute
-			options[key] = element.getAttribute(attribute)
-		return options
-
-	constructor: (path, options) ->
-		return null if not SVGPath.isPath(path)
-		if path instanceof SVGPath
-			path = path.element
-		@_element = path
-		@_elementBorder = path
-		@_elementHTML = path
-		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset"]
-		_.defaults options, @constructor.attributesFromElement(pathProperties, @_element)
-		super(options)
-		@_length = @_element.getTotalLength()
 
 	pointAtFraction: (fraction) ->
 		@_element.getPointAtLength(@length * fraction)
