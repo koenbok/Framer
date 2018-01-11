@@ -37,9 +37,8 @@ class SVGGroup extends Layer
 
 	@defineGroupProxyProp "fill"
 	@defineGroupProxyProp "stroke"
-	# Unclear what "strokeWidthMultiplier" should do. It's present on SVGLayer, but it
-	# doesn't seem to do anything. Omitting it here for now.
-	@defineGroupProxyProp "strokeWidth", _.isNumber, parseInt, (value) -> value.toString()
+	@defineGroupProxyProp "strokeWidth", _.isNumber, parseInt, Object.prototype.toString
+	@defineGroupProxyProp "strokeWidthMultiplier", _.isNumber, parseInt, Object.prototype.toString
 	@defineGroupProxyProp "color", Color.validColorValue, Color.toColor
 
 exports.SVGGroup = SVGGroup
