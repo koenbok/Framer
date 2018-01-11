@@ -46,7 +46,7 @@ class exports.SVG
 				options = {}
 				options.name = element.id if isTarget
 
-				if element instanceof SVGGElement and element.tagName is "g"
+				if element instanceof SVGGElement
 					group = new GroupClass(element, options)
 					children.push(group)
 					_.extend(targets, group.elements)
