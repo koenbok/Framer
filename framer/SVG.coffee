@@ -43,7 +43,7 @@ class exports.SVG
 
 				isTarget = element.id?
 
-				options = disableBorder: true
+				options = {}
 				options.name = element.id if isTarget
 
 				if element instanceof SVGGElement and element.tagName is "g"
