@@ -31,4 +31,34 @@ class SVG
 		"""
 		svgLayer.fill = "url(##{id})"
 
+	@constructSVGElements: (svgRootOrGroup, PathClass, GroupClass) ->
+
+		elements = svgRootOrGroup.childNodes
+
+		targets = {}
+		children = []
+
+		if elements?
+			for element in elements
+
+				isTarget = element.id?
+
+				options = disableBorder: true
+				options.name = element.id if isTarget
+
+				if element instanceof SVGGElement and element.tagName is "g"
+					group = new GroupClass(element, options)
+					children.push(group)
+					_.extend(targets, group.elements)
+					if isTarget then targets[element.id] = group
+					continue
+				if element instanceof SVGPathElement
+					path = new PathClass(element, options)
+					children.push(path)
+					if isTarget then targets[element.id] = path
+					continue
+
+		return {targets, children}
+
+
 exports.SVG = SVG

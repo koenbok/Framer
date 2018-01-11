@@ -1,12 +1,19 @@
 {Layer, layerProperty} = require "./Layer"
 {Color} = require "./Color"
 {SVG} = require "./SVG"
+{SVGPath} = require "./SVGPath"
 
 class SVGGroup extends Layer
 
 	constructor: (group, options) ->
 		@_element = group
+
 		super (options)
+
+		{children, targets} = SVG.constructSVGElements(group, SVGPath, SVGGroup)
+		@_children = children
+		@elements = targets
+
 		SVG.updateGradientSVG(@)
 
 	_insertElement: ->
@@ -35,12 +42,9 @@ class SVGGroup extends Layer
 					@[privateProp] = null
 
 				persistedValue = @[privateProp]
-				elements = @_element?.querySelectorAll("[id]") or []
-				for element in elements
-					if (persistedValue is null)
-						delete element.style[propertyName]
-					else
-						element.style[propertyName] = toStyle(persistedValue)
+
+				for child in @_children
+					child[propertyName] = persistedValue
 
 	@defineGroupProxyProp "fill"
 	@defineGroupProxyProp "stroke"
@@ -57,7 +61,6 @@ class SVGGroup extends Layer
 			else if not value and Gradient.isGradientObject(@_gradient)
 				@_gradient = null
 			SVG.updateGradientSVG(@)
-
 
 
 exports.SVGGroup = SVGGroup

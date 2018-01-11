@@ -18,19 +18,10 @@ class exports.SVGLayer extends Layer
 		if options.svg? or options.html?
 			options.backgroundColor ?= null
 		super options
-		elements = @svg?.querySelectorAll("[id]")
-		options =
-			disableBorder: true
-		if elements?
-			for element in elements
-				options.name = element.id
-				if element instanceof SVGGElement
-					@elements[element.id] = new SVGGroup(element, options)
-					continue
-				if element instanceof SVGPathElement
-					@elements[element.id] = new SVGPath(element, options)
-					continue
-				@elements[element.id] = element
+
+		{targets, children} = SVG.constructSVGElements(@svg, SVGPath, SVGGroup)
+		@elements = targets
+
 		SVG.updateGradientSVG(@)
 
 	@define "elements", @simpleProperty("elements", {})
