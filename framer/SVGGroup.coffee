@@ -28,7 +28,7 @@ class SVGGroup extends Layer
 			else
 				value
 
-		privateProp = "_" + propertyName
+		privateProp = "_#{propertyName}"
 
 		return @define propertyName,
 			get: ->
@@ -66,12 +66,16 @@ class SVGGroup extends Layer
 
 	@define "gradient",
 		get: ->
+			# No reduction from child members here; don't think we need it for gradients per se.
 			@_gradient
-		set: (value) -> # Copy semantics!
+		set: (value) ->
 			if Gradient.isGradient(value)
 				@_gradient = new Gradient(value)
 			else if not value and Gradient.isGradientObject(@_gradient)
 				@_gradient = null
+
+			# Below method ends in @fill being set to a url, which is then in turn forwarded
+			# to the group's children:
 			SVG.updateGradientSVG(@)
 
 
