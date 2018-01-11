@@ -31,7 +31,7 @@ class exports.SVGLayer extends Layer
 					@elements[element.id] = new SVGPath(element, options)
 					continue
 				@elements[element.id] = element
-		@updateGradientSVG()
+		SVG.updateGradientSVG(@)
 
 	@define "elements", @simpleProperty("elements", {})
 
@@ -50,7 +50,7 @@ class exports.SVGLayer extends Layer
 				@_gradient = new Gradient(value)
 			else if not value and Gradient.isGradientObject(@_gradient)
 				@_gradient = null
-			@updateGradientSVG()
+			SVG.updateGradientSVG(@)
 
 	@define "svg",
 		get: ->
@@ -95,22 +95,3 @@ class exports.SVGLayer extends Layer
 				x: @x + start.x
 				y: @y + start.y
 			return point
-
-	updateGradientSVG: ->
-		return if @__constructor
-		if not Gradient.isGradient(@gradient)
-			@_elementGradientSVG?.innerHTML = ""
-			return
-
-		if not @_elementGradientSVG
-			@_elementGradientSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-			@_element.appendChild @_elementGradientSVG
-
-		id = "#{@id}-gradient"
-		@_elementGradientSVG.innerHTML = """
-			<linearGradient id='#{id}' gradientTransform='rotate(#{@gradient.angle - 90}, 0.5, 0.5)' >
-				<stop offset="0" stop-color='##{@gradient.start.toHex()}' stop-opacity='#{@gradient.start.a}' />
-				<stop offset="1" stop-color='##{@gradient.end.toHex()}' stop-opacity='#{@gradient.end.a}' />
-			</linearGradient>
-		"""
-		@fill = "url(##{id})"

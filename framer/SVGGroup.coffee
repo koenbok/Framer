@@ -7,6 +7,7 @@ class SVGGroup extends Layer
 	constructor: (group, options) ->
 		@_element = group
 		super (options)
+		SVG.updateGradientSVG(@)
 
 	_insertElement: ->
 
@@ -55,25 +56,8 @@ class SVGGroup extends Layer
 				@_gradient = new Gradient(value)
 			else if not value and Gradient.isGradientObject(@_gradient)
 				@_gradient = null
-			@updateGradientSVG()
+			SVG.updateGradientSVG(@)
 
-	updateGradientSVG: ->
-		return if @__constructor
-		if not Gradient.isGradient(@gradient)
-			@_elementGradientSVG?.innerHTML = ""
-			return
 
-		if not @_elementGradientSVG
-			@_elementGradientSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-			@_element.appendChild @_elementGradientSVG
-
-		id = "#{@id}-gradient"
-		@_elementGradientSVG.innerHTML = """
-			<linearGradient id='#{id}' gradientTransform='rotate(#{@gradient.angle - 90}, 0.5, 0.5)' >
-				<stop offset="0" stop-color='##{@gradient.start.toHex()}' stop-opacity='#{@gradient.start.a}' />
-				<stop offset="1" stop-color='##{@gradient.end.toHex()}' stop-opacity='#{@gradient.end.a}' />
-			</linearGradient>
-		"""
-		@fill = "url(##{id})"
 
 exports.SVGGroup = SVGGroup
