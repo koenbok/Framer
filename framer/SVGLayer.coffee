@@ -20,8 +20,8 @@ class exports.SVGLayer extends Layer
 		super options
 
 		svg = @svg
-		if svg
-			{targets, children} = SVG.constructSVGElements(svg, SVGPath, SVGGroup)
+		if svg?
+			{targets, children} = SVG.constructSVGElements(@, svg.childNodes, SVGPath, SVGGroup)
 			@elements = targets
 		else
 			@elements = []

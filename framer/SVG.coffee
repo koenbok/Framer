@@ -31,9 +31,7 @@ class exports.SVG
 		"""
 		svgLayer.fill = "url(##{id})"
 
-	@constructSVGElements: (svgRootOrGroup, PathClass, GroupClass) ->
-
-		elements = svgRootOrGroup.childNodes
+	@constructSVGElements: (root, elements, PathClass, GroupClass) ->
 
 		targets = {}
 		children = []
@@ -45,6 +43,7 @@ class exports.SVG
 
 				options = {}
 				options.name = element.id if isTarget
+				options.parent = root
 
 				if element instanceof SVGGElement
 					group = new GroupClass(element, options)

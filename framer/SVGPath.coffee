@@ -81,6 +81,8 @@ class exports.SVGPath extends Layer
 		@_element = path
 		@_elementBorder = path
 		@_elementHTML = path
+		@_parent = options.parent
+		delete options.parent
 		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset"]
 		_.defaults options, @constructor.attributesFromElement(pathProperties, @_element)
 		super(options)

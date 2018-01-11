@@ -7,10 +7,12 @@ class SVGGroup extends Layer
 
 	constructor: (group, options) ->
 		@_element = group
+		@_parent = options.parent
+		delete options.parent
 
 		super (options)
 
-		{children, targets} = SVG.constructSVGElements(group, SVGPath, SVGGroup)
+		{children, targets} = SVG.constructSVGElements(@, @_element.childNodes, SVGPath, SVGGroup)
 		@_children = children
 		@elements = targets
 		for parent in @ancestors()
