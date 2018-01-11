@@ -32,7 +32,19 @@ class SVGGroup extends Layer
 
 		return @define propertyName,
 			get: ->
-				return @[privateProp]
+				return @[privateProp] if @[privateProp]?
+
+				# When not set, try to reduce the value from our children:
+				value = undefined
+				for child in @_children
+					childPropertyValue = child[propertyName]
+					# The equality check is naive - needs more work when comparing Color instances, etc.:
+					if value is undefined
+						value = childPropertyValue
+					else
+						if childPropertyValue isnt value
+							return @[privateProp]
+				return value
 
 			set: (value) ->
 				value = converter(value) unless validator(value)
