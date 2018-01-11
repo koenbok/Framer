@@ -31,6 +31,13 @@ class exports.BaseClass extends EventEmitter
 
 		# Define the property on the prototype
 		Object.defineProperty(@prototype, propertyName, descriptor)
+	
+	@undefine = (propertyName) ->
+		@define propertyName, @simpleProperty propertyName, undefined,
+			importable: false
+			exportable: false
+			enumerable: false
+
 
 	@_addDescriptor: (propertyName, descriptor) ->
 
