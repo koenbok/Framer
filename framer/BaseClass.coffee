@@ -33,10 +33,13 @@ class exports.BaseClass extends EventEmitter
 		Object.defineProperty(@prototype, propertyName, descriptor)
 	
 	@undefine = (propertyName) ->
-		@define propertyName, @simpleProperty propertyName, undefined,
-			importable: false
-			exportable: false
-			enumerable: false
+		if _.isArray propertyName
+			propertyName.map((prop) => @undefine(prop))
+		else
+			@define propertyName, @simpleProperty propertyName, undefined,
+				importable: false
+				exportable: false
+				enumerable: false
 
 
 	@_addDescriptor: (propertyName, descriptor) ->
@@ -107,7 +110,7 @@ class exports.BaseClass extends EventEmitter
 			@_getPropertyDefaultValue k
 
 	_getPropertyDefaultValue: (k) ->
-		@_propertyList()[k]["default"]
+		@_propertyList()[k]?["default"]
 
 	_propertyList: ->
 		if not @_propertyListCache or ObjectDescriptorsChanged

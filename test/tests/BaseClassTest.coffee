@@ -303,3 +303,20 @@ describe "BaseClass", ->
 		# It shouldn't be part of props
 		a.props.hasOwnProperty("test").should.equal true
 		b.props.hasOwnProperty("test").should.equal false
+
+	it "should undefine an array of properties", ->
+		class TestSuper extends Framer.BaseClass
+			@define "test",
+				get: ->
+					"a"
+			@define "test2",
+				get: ->
+					"b"
+		class TestSub extends TestSuper
+			@undefine ["test", "test2"]
+
+		b = new TestSub
+		expect(b.test).to.equal undefined
+		expect(b.test2).to.equal undefined
+		b.props.hasOwnProperty("test").should.equal false
+		b.props.hasOwnProperty("test2").should.equal false
