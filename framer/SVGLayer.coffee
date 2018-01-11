@@ -23,6 +23,7 @@ class exports.SVGLayer extends Layer
 		if svg?
 			{targets, children} = SVG.constructSVGElements(@, svg.childNodes, SVGPath, SVGGroup)
 			@elements = targets
+			@_children = children
 		else
 			@elements = []
 
