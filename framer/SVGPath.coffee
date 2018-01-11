@@ -12,10 +12,69 @@ dashArrayTransform = (value) ->
 		return values
 	return value
 
-class SVGPath extends Layer
+class exports.SVGPath extends Layer
+	# Overridden Layer properties
+
+	@define "parent",
+		enumerable: false
+		exportable: false
+		importable: false
+		get: ->
+			@_parent or null
+
+	@define "html",
+		get: ->
+			@_element.outerHTML or ""
+	
+	# Disabled properties
+	@undefine ["label", "blending", "image"]
+	@undefine ["blur", "brightness", "saturate", "hueRotate", "contrast", "invert", "grayscale", "sepia"] # webkitFilter properties
+	@undefine ["backgroundBlur","backgroundBrightness","backgroundSaturate","backgroundHueRotate","backgroundContrast","backgroundInvert","backgroundGrayscale","backgroundSepia"] # webkitBackdropFilter properties
+	for i in [0..8]
+		do (i) =>
+			@undefine "shadow#{i+1}"
+	@undefine "shadows"
+	@undefine ["borderRadius", "cornerRadius", "borderStyle"]
+	@undefine ["constraintValues", "htmlIntrinsicSize"]
+
+	# Proxied helpers
+	@proxy = (propertyName, proxiedName) ->
+		@define propertyName,
+			get: ->
+				@[proxiedName]
+			set: (value) ->
+				return if @__applyingDefaults
+				@[proxiedName] = value
+
+	@proxy "borderColor", "stroke"
+	@proxy "strokeColor", "stroke"
+	@proxy "borderWidth", "strokeWidth"
+
+	# Overridden functions from Layer
+	_insertElement: ->
+	updateForSizeChange: ->
+	updateForDevicePixelRatioChange: =>
+		for cssProperty in ["width", "height", "webkitTransform"]
+			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
+	copy: undefined
+	copySingle: undefined
+	addChild: undefined
+	removeChild: undefined
+	addSubLayer: undefined
+	removeSubLayer: undefined
+	bringToFront: undefined
+	sendToBack: undefined
+	placeBefore: undefined
+	placeBehind: undefined
+
+	# Custom properties
 	@define "fill", layerProperty(@, "fill", "fill", null, Color.validColorValue, Color.toColor)
 	@define "stroke", layerProperty(@, "stroke", "stroke", null, Color.validColorValue, Color.toColor)
 	@define "strokeWidth", layerProperty(@, "strokeWidth", "strokeWidth", null, _.isNumber, parseFloat)
+	@define "strokeLinecap", layerProperty(@, "strokeLinecap", "strokeLinecap", null, _.isString)
+	@define "strokeLinejoin", layerProperty(@, "strokeLinejoin", "strokeLinejoin", null, _.isString)
+	@define "strokeMiterlimit", layerProperty(@, "strokeMiterlimit", "strokeMiterlimit", null, _.isNumber)
+	@define "strokeOpacity", layerProperty(@, "strokeOpacity", "strokeOpacity", null, _.isNumber)
 	@define "strokeDasharray", layerProperty(@, "strokeDasharray", "strokeDasharray", [], _.isArray, dashArrayTransform)
 	@define "strokeDashoffset", layerProperty(@, "strokeDashoffset", "strokeDashoffset", null, _.isNumber, parseFloat)
 	@define "strokeLength", layerProperty @, "strokeLength", null, null, _.isNumber, null, {}, (path, value) ->
@@ -39,19 +98,23 @@ class SVGPath extends Layer
 		get: ->
 			@pointAtFraction(1)
 
+	@attributesFromElement: (attributes, element) ->
+		options = {}
+		for attribute in attributes
+			key = _.camelCase attribute
+			options[key] = element.getAttribute(attribute)
+		print options
+		return options
 
 	constructor: (path, options) ->
 		return null if not SVGPath.isPath(path)
 		if path instanceof SVGPath
 			path = path.element
 		@_element = path
-		_.defaults options,
-			fill: @_element.getAttribute("fill")
-			stroke: @_element.getAttribute("stroke")
-			strokeWidth: @_element.getAttribute("stroke-width")
-			strokeDasharray: @_element.getAttribute("stroke-dasharray")
-			strokeDashoffset: @_element.getAttribute("stroke-dashoffset")
 		@_elementBorder = path
+		@_elementHTML = path
+		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset"]
+		_.defaults options, @constructor.attributesFromElement(pathProperties, @_element)
 		super(options)
 		@_length = @_element.getTotalLength()
 
@@ -76,7 +139,6 @@ class SVGPath extends Layer
 					angle = Math.atan2(fromPoint.y - toPoint.y, fromPoint.x - toPoint.x) * 180 / Math.PI - 90
 					target[key] = angle
 
-	_insertElement: ->
 
 	@isPath: (path) ->
 		path instanceof SVGPathElement or path instanceof SVGPath
@@ -91,5 +153,3 @@ class SVGPath extends Layer
 
 	@getEnd: (path) ->
 		@getPointAtFraction(path, 1)
-
-exports.SVGPath = SVGPath
