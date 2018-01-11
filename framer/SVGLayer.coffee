@@ -19,8 +19,12 @@ class exports.SVGLayer extends Layer
 			options.backgroundColor ?= null
 		super options
 
-		{targets, children} = SVG.constructSVGElements(@svg, SVGPath, SVGGroup)
-		@elements = targets
+		svg = @svg
+		if svg
+			{targets, children} = SVG.constructSVGElements(svg, SVGPath, SVGGroup)
+			@elements = targets
+		else
+			@elements = []
 
 		SVG.updateGradientSVG(@)
 
