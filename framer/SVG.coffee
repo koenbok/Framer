@@ -1,7 +1,7 @@
 {_} = require "./Underscore"
 {Color} = require "./Color"
 
-class SVG
+class exports.SVG
 
 	@validFill = (value) ->
 		Color.validColorValue(value) or _.startsWith(value, "url(")
@@ -60,5 +60,3 @@ class SVG
 
 		return {targets, children}
 
-
-exports.SVG = SVG
