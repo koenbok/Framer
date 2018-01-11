@@ -867,7 +867,9 @@ describe "Layer", ->
 			a = l.animate
 				shadow1:
 					blur: 100
-			Utils.delay a.time /2, ->
+			Utils.delay a.time / 2, ->
+				l.shadow1.color.a.should.be.above 0
+				l.shadow1.color.a.should.be.below 0.5
 				l.shadow1.blur.should.be.above 10
 				l.shadow1.blur.should.be.below 90
 			l.onAnimationEnd ->

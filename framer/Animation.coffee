@@ -365,10 +365,11 @@ class exports.Animation extends BaseClass
 			type = toShadow?.type ? fromShadow?.type ? Framer.Defaults.Shadow.type
 			fromShadow ?= _.defaults {color: null, type: type}, Framer.Defaults.Shadow
 			toShadow ?= _.defaults {color: null, type: type}, Framer.Defaults.Shadow
+			_.defaults fromShadow, Framer.Defaults.Shadow
+			_.defaults toShadow, Framer.Defaults.Shadow
 			result[index] = @_interpolateNumericObjectValues(["x", "y", "blur", "spread"], fromShadow, toShadow, value, false)
 			result[index].color = Color.mix(fromShadow.color, toShadow.color, value, false, @options.colorModel)
 			result[index].type = type
-
 		@_target[key] = result
 
 
