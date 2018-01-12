@@ -1,6 +1,7 @@
 {Layer, layerProperty} = require "./Layer"
 {Color} = require "./Color"
 {SVGBaseLayer} = require "./SVGBaseLayer"
+{SVG} = require "./SVG"
 
 dashArrayTransform = (value) ->
 	if _.isString value
@@ -43,8 +44,8 @@ class exports.SVGPath extends SVGBaseLayer
 
 
 	# Custom properties
-	@define "fill", layerProperty(@, "fill", "fill", null, Color.validColorValue, Color.toColor)
-	@define "stroke", layerProperty(@, "stroke", "stroke", null, Color.validColorValue, Color.toColor)
+	@define "fill", layerProperty(@, "fill", "fill", null, SVG.validFill, SVG.toFill)
+	@define "stroke", layerProperty(@, "stroke", "stroke", null, SVG.validFill, SVG.toFill)
 	@define "strokeWidth", layerProperty(@, "strokeWidth", "strokeWidth", null, _.isNumber, parseFloat)
 	@define "strokeLinecap", layerProperty(@, "strokeLinecap", "strokeLinecap", null, _.isString)
 	@define "strokeLinejoin", layerProperty(@, "strokeLinejoin", "strokeLinejoin", null, _.isString)
