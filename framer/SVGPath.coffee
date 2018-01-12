@@ -1,5 +1,6 @@
 {Layer, layerProperty} = require "./Layer"
 {Color} = require "./Color"
+{SVGBaseLayer} = require "./SVGBaseLayer"
 
 dashArrayTransform = (value) ->
 	if _.isString value
@@ -12,88 +13,18 @@ dashArrayTransform = (value) ->
 		return values
 	return value
 
-class exports.SVGPath extends Layer
-	# Overridden Layer properties
+class exports.SVGPath extends SVGBaseLayer
 
-	@define "parent",
-		enumerable: false
-		exportable: false
-		importable: false
-		get: ->
-			@_parent or null
 
-	@define "html",
-		get: ->
-			@_element.outerHTML or ""
-	
-	@define "width",
-		get: ->
-			@_width
-	
-	@define "height",
-		get: ->
-			@_height
-	
-	# Disabled properties
-	@undefine ["label", "blending", "image"]
-	@undefine ["blur", "brightness", "saturate", "hueRotate", "contrast", "invert", "grayscale", "sepia"] # webkitFilter properties
-	@undefine ["backgroundBlur","backgroundBrightness","backgroundSaturate","backgroundHueRotate","backgroundContrast","backgroundInvert","backgroundGrayscale","backgroundSepia"] # webkitBackdropFilter properties
-	for i in [0..8]
-		do (i) =>
-			@undefine "shadow#{i+1}"
-	@undefine "shadows"
-	@undefine ["borderRadius", "cornerRadius", "borderStyle"]
-	@undefine ["constraintValues", "htmlIntrinsicSize"]
-
-	# Proxied helpers
-	@proxy = (propertyName, proxiedName) ->
-		@define propertyName,
-			get: ->
-				@[proxiedName]
-			set: (value) ->
-				return if @__applyingDefaults
-				@[proxiedName] = value
-
-	@proxy "borderColor", "stroke"
-	@proxy "strokeColor", "stroke"
-	@proxy "borderWidth", "strokeWidth"
-
-	# Overridden functions from Layer
-	_insertElement: ->
-	updateForSizeChange: ->
-	updateForDevicePixelRatioChange: =>
-		for cssProperty in ["width", "height", "webkitTransform"]
-			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
-	copy: undefined
-	copySingle: undefined
-	addChild: undefined
-	removeChild: undefined
-	addSubLayer: undefined
-	removeSubLayer: undefined
-	bringToFront: undefined
-	sendToBack: undefined
-	placeBefore: undefined
-	placeBehind: undefined
-
-	@attributesFromElement: (attributes, element) ->
-		options = {}
-		for attribute in attributes
-			key = _.camelCase attribute
-			options[key] = element.getAttribute(attribute)
-		return options
 
 	constructor: (path, options) ->
-		return null if not SVGPath.isPath(path)
+
 		if path instanceof SVGPath
 			path = path.element
-		@_element = path
-		@_elementBorder = path
-		@_elementHTML = path
-		@_parent = options.parent
-		delete options.parent
-		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset"]
-		_.defaults options, @constructor.attributesFromElement(pathProperties, @_element)
+
+		options.element = path
 		super(options)
+
 		@_length = @_element.getTotalLength()
 		rect = @_element.getBoundingClientRect()
 		@_width = rect.width
