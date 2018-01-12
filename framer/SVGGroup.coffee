@@ -15,6 +15,7 @@ class SVGGroup extends Layer
 		{children, targets} = SVG.constructSVGElements(@, @_element.childNodes, SVGPath, SVGGroup)
 		@_children = children
 		@elements = targets
+
 		for parent in @ancestors()
 			if parent instanceof SVGLayer
 				@_svg = parent.svg
@@ -24,9 +25,9 @@ class SVGGroup extends Layer
 
 	_insertElement: ->
 
-	@defineGroupProxyProp = (propertyName, validator, converter, toStyle) ->
+	@defineGroupProxyProp = (propertyName, validator, transformer, toStyle) ->
 		validator ?= SVG.validFill
-		converter ?= SVG.toFill
+		transformer ?= SVG.toFill
 
 		toStyle ?= (value) ->
 			if value instanceof Color
@@ -38,22 +39,26 @@ class SVGGroup extends Layer
 
 		return @define propertyName,
 			get: ->
+				# If our value got set from the outside in, then that's the value that we return:
 				return @[privateProp] if @[privateProp]?
 
 				# When not set, try to reduce the value from our children:
 				value = undefined
 				for child in @_children
 					childPropertyValue = child[propertyName]
-					# The equality check is naive - needs more work when comparing Color instances, etc.:
 					if value is undefined
 						value = childPropertyValue
 					else
-						if childPropertyValue isnt value
+						if toStyle(childPropertyValue) isnt toStyle(value)
+							# Stick to the internally set value; for the children
+							# do not provide a homogeneous value:
 							return @[privateProp]
+
+				# This child values are homogeneous; return their value as our value:
 				return value
 
 			set: (value) ->
-				value = converter(value) unless validator(value)
+				value = transformer(value) unless validator(value)
 				if validator(value)
 					@[privateProp] = value
 				else
