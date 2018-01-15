@@ -57,5 +57,6 @@ class SVGGroup extends SVGBaseLayer
 	@defineGroupProxyProp "strokeWidth", _.isNumber, parseInt
 	@defineGroupProxyProp "strokeWidthMultiplier", _.isNumber, parseInt
 	@defineGroupProxyProp "color", Color.validColorValue, Color.toColor
+	@defineGroupProxyProp "ignoreEvents", _.isBoolean, (value) -> !!value
 
 exports.SVGGroup = SVGGroup
