@@ -1,5 +1,5 @@
 describe "SVGPath", ->
-	describe.only "pointAtFraction", ->
+	describe "pointAtFraction", ->
 		path = null
 		beforeEach ->
 			svg = new SVGLayer
