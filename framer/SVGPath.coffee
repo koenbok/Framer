@@ -80,18 +80,3 @@ class exports.SVGPath extends SVGBaseLayer
 					toPoint = @pointAtFraction(Math.min(value + delta, 1))
 					angle = Math.atan2(fromPoint.y - toPoint.y, fromPoint.x - toPoint.x) * 180 / Math.PI - 90
 					target[key] = angle
-
-
-	@isPath: (path) ->
-		path instanceof SVGPathElement or path instanceof SVGPath
-
-	@getStart: (path) ->
-		@getPointAtFraction(path, 0)
-
-	@getPointAtFraction: (path, fraction) ->
-		return null if not @isPath(path)
-		length = path.getTotalLength() * fraction
-		path.getPointAtLength(length)
-
-	@getEnd: (path) ->
-		@getPointAtFraction(path, 1)

@@ -65,29 +65,3 @@ class exports.SVGLayer extends Layer
 				if value.parentNode?
 					value = value.cloneNode(true)
 				@_elementHTML.appendChild(value)
-
-	@define "path",
-		get: ->
-			if @svg.children?.length isnt 1
-				error = "SVGLayer.path can only be used on SVG's that have a single child"
-				if Utils.isFramerStudio()
-					throw new Error(error)
-				else
-					console.error(error)
-			child = @svg.children[0]
-			if not SVGPath.isPath(child)
-				error = "SVGLayer.path can only be used on SVG's containing an SVGPathElement, not #{Utils.inspectObjectType(child)}"
-				if Utils.isFramerStudio()
-					throw new Error(error)
-				else
-					console.error(error)
-			return child
-
-	@define "pathStart",
-		get: ->
-			start = SVGPath.getStart(@path)
-			return null if not start?
-			point =
-				x: @x + start.x
-				y: @y + start.y
-			return point

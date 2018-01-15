@@ -7,6 +7,7 @@ Utils = require "./Utils"
 {BaseClass} = require "./BaseClass"
 {Animator} = require "./Animators/Animator"
 {LinearAnimator} = require "./Animators/LinearAnimator"
+{SVG} = require "./SVG"
 Curves = require "./Animators/Curves"
 
 numberRE = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/
@@ -279,7 +280,21 @@ class exports.Animation extends BaseClass
 	_prepareUpdateValues: =>
 		@_valueUpdaters = {}
 		for k, v of @_stateB
-			if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
+			if SVG.isPath(v)
+				path = v
+				direction = null
+				start = null
+				end = null
+				switch k
+					when "x", "minX", "midX", "maxX", "width"
+						direction = "horizontal"
+					when "y", "minY", "midY", "maxY", "height"
+						direction = "vertical"
+					when "rotation", "rotationZ", "rotationX", "rotationY"
+						direction = "angle"
+
+				@_valueUpdaters[k] = path.valueUpdater(direction, @_target, @_target[k])
+			else if Color.isColorObject(v) or Color.isColorObject(@_stateA[k])
 				@_valueUpdaters[k] = @_updateColorValue
 			else if Gradient.isGradient(v) or Gradient.isGradient(@_stateA[k])
 				@_valueUpdaters[k] = @_updateGradientValue
@@ -403,7 +418,7 @@ class exports.Animation extends BaseClass
 		return _.pick(@layer, _.keys(@properties))
 
 	@isAnimatable = (v) ->
-		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or Gradient.isGradientObject(v) #or SVGPath.isPath(v)
+		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or Gradient.isGradientObject(v) or SVG.isPath(v)
 
 	# Special cases that animate with different types of objects
 	@isAnimatableKey = (k) ->
@@ -421,7 +436,10 @@ class exports.Animation extends BaseClass
 					when "size" then derivedKeys = ["width", "height"]
 					when "point" then derivedKeys = ["x", "y"]
 					else derivedKeys = []
-				if _.isObject(v)
+				if SVG.isPath(v)
+					for derivedKey in derivedKeys
+						animatableProperties[derivedKey] = v
+				else if _.isObject(v)
 					_.defaults(animatableProperties, _.pick(v, derivedKeys))
 				else if _.isNumber(v)
 					for derivedKey in derivedKeys

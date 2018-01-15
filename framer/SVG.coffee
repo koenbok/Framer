@@ -11,7 +11,7 @@ class exports.SVG
 			return value
 		else
 			Color.toColor(value)
-			
+
 	@updateGradientSVG: (svgLayer) ->
 		return if svgLayer.__constructor
 		if not Gradient.isGradient(svgLayer.gradient)
@@ -57,3 +57,6 @@ class exports.SVG
 					if isTarget then targets[element.id] = path
 					continue
 		return {targets, children}
+
+	@isPath: (path) ->
+		path instanceof Framer.SVGPath

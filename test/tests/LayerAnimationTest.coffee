@@ -1270,4 +1270,27 @@ describe "LayerAnimation", ->
 				strokeWidth: 10
 				x: 100
 
-		it "should animate along a path"
+		it "should animate along a path", (done) ->
+			svg = new SVGLayer
+				svg: '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><path d="M 100 50 C 100 77.614 77.614 100 50 100 C 22.386 100 0 77.614 0 50 C 0 22.386 22.386 0 50 0" id="path" fill="transparent" stroke="#0AF"></path></svg>'
+			path = svg.elements.path
+			l = new Layer
+				size: 10
+				midX: path.start.x + path.parent.x
+				midY: path.start.y + path.parent.y
+			l.x.should.equal 95
+			l.y.should.equal 45
+			a = l.animate
+				x: path
+				y: path
+				options:
+					curve: Bezier.linear
+					time: 0.1
+			Utils.delay a.options.time / 2, ->
+				l.x.should.be.within(5, 40)
+				l.y.should.be.within(55, 90)
+
+			a.onAnimationEnd ->
+				l.x.should.equal 45
+				l.y.should.equal -5
+				done()
