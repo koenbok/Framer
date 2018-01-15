@@ -5,11 +5,6 @@
 {SVGBaseLayer} = require "./SVGBaseLayer"
 {SVGPath} = require "./SVGPath"
 
-areEqual = (a, b) ->
-	if (a instanceof Color)
-		return Color.equal(a, b)
-	return a is b
-
 class SVGGroup extends SVGBaseLayer
 	constructor: (group, options) ->
 		options.element = group
@@ -44,7 +39,7 @@ class SVGGroup extends SVGBaseLayer
 					if value is null
 						value = childPropertyValue
 					else
-						if not areEqual(childPropertyValue, value)
+						if not Utils.equal(childPropertyValue, value)
 							# Stick to the internally set value; for the children
 							# do not provide a homogeneous value:
 							return @[privateProp] ? null
