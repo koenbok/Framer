@@ -37,12 +37,12 @@ class exports.SVGPath extends SVGBaseLayer
 	@define "strokeOpacity", layerProperty(@, "strokeOpacity", "strokeOpacity", null, _.isNumber)
 	@define "strokeDasharray", layerProperty(@, "strokeDasharray", "strokeDasharray", [], _.isArray, dashArrayTransform)
 	@define "strokeDashoffset", layerProperty(@, "strokeDashoffset", "strokeDashoffset", null, _.isNumber, parseFloat)
-	@define "strokeLength", layerProperty @, "strokeLength", null, null, _.isNumber, null, {}, (path, value) ->
+	@define "strokeLength", layerProperty @, "strokeLength", null, undefined, _.isNumber, null, {}, (path, value) ->
 		path._properties.strokeFraction = value / path.length
 		if _.isEmpty path.strokeDasharray
 			path.strokeDasharray = [path.length]
 		path.strokeDashoffset = path.length - value
-	@define "strokeFraction", layerProperty @, "strokeFraction", null, null, _.isNumber, null, {}, (path, value) ->
+	@define "strokeFraction", layerProperty @, "strokeFraction", null, undefined, _.isNumber, null, {}, (path, value) ->
 		path.strokeLength = path.length * value
 
 	@define "length", get: -> @_length
