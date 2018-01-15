@@ -178,6 +178,7 @@ class exports.Layer extends BaseClass
 
 		# Sanitize calculated property setters so direct properties always win
 		layerPropertyIgnore(options, "point", ["x", "y"])
+		layerPropertyIgnore(options, "midPoint", ["midX", "midY"])
 		layerPropertyIgnore(options, "size", ["width", "height"])
 		layerPropertyIgnore(options, "frame", ["x", "y", "width", "height"])
 
@@ -510,6 +511,23 @@ class exports.Layer extends BaseClass
 		set: (input) ->
 			input = layerPropertyPointTransformer(input, @, "point")
 			@_setGeometryValues(input, ["x", "y"])
+
+	@define "midPoint",
+		importable: true
+		exportable: false
+		depends: ["width", "height", "size", "parent", "point"]
+		get: ->
+			x: @midX
+			y: @midY
+		set: (input) ->
+			if input.x?
+				input.midX = input.x
+				delete input.x
+			if input.y?
+				input.midY = input.y
+				delete input.y
+			input = layerPropertyPointTransformer(input, @, "midPoint")
+			@_setGeometryValues(input, ["midX", "midY"])
 
 	@define "size",
 		importable: true

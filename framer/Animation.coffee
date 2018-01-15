@@ -430,11 +430,12 @@ class exports.Animation extends BaseClass
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			if k in ["frame", "size", "point"] # Derived properties
+			if k in ["frame", "size", "point", "midPoint"] # Derived properties
 				switch k
 					when "frame" then derivedKeys = ["x", "y", "width", "height"]
 					when "size" then derivedKeys = ["width", "height"]
 					when "point" then derivedKeys = ["x", "y"]
+					when "midPoint" then derivedKeys = ["midX", "midY"]
 					else derivedKeys = []
 				if SVG.isPath(v)
 					for derivedKey in derivedKeys
