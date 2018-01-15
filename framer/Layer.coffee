@@ -174,19 +174,11 @@ class exports.Layer extends BaseClass
 			@_createHTMLElementIfNeeded()
 
 		# Create border element
-		@_elementBorder = document.createElement("div")
-		@_elementBorder.style.position = "absolute"
-		@_elementBorder.style.top = "0"
-		@_elementBorder.style.bottom = "0"
-		@_elementBorder.style.left = "0"
-		@_elementBorder.style.right = "0"
-		@_elementBorder.style.boxSizing = "border-box"
-		@_elementBorder.style.zIndex = "1000"
-		@_elementBorder.style.pointerEvents = "none"
-		@_element.appendChild(@_elementBorder)
+		@_createBorderElement()
 
 		# Sanitize calculated property setters so direct properties always win
 		layerPropertyIgnore(options, "point", ["x", "y"])
+		layerPropertyIgnore(options, "midPoint", ["midX", "midY"])
 		layerPropertyIgnore(options, "size", ["width", "height"])
 		layerPropertyIgnore(options, "frame", ["x", "y", "width", "height"])
 
@@ -519,6 +511,23 @@ class exports.Layer extends BaseClass
 		set: (input) ->
 			input = layerPropertyPointTransformer(input, @, "point")
 			@_setGeometryValues(input, ["x", "y"])
+
+	@define "midPoint",
+		importable: true
+		exportable: false
+		depends: ["width", "height", "size", "parent", "point"]
+		get: ->
+			x: @midX
+			y: @midY
+		set: (input) ->
+			if input.x?
+				input.midX = input.x
+				delete input.x
+			if input.y?
+				input.midY = input.y
+				delete input.y
+			input = layerPropertyPointTransformer(input, @, "midPoint")
+			@_setGeometryValues(input, ["midX", "midY"])
 
 	@define "size",
 		importable: true
@@ -863,6 +872,19 @@ class exports.Layer extends BaseClass
 		return if @_element?
 		@_element = document.createElement "div"
 		@_element.classList.add("framerLayer")
+
+	_createBorderElement: ->
+		return if @_elementBorder?
+		@_elementBorder = document.createElement "div"
+		@_elementBorder.style.position = "absolute"
+		@_elementBorder.style.top = "0"
+		@_elementBorder.style.bottom = "0"
+		@_elementBorder.style.left = "0"
+		@_elementBorder.style.right = "0"
+		@_elementBorder.style.boxSizing = "border-box"
+		@_elementBorder.style.zIndex = "1000"
+		@_elementBorder.style.pointerEvents = "none"
+		@_element.appendChild(@_elementBorder)
 
 	_insertElement: ->
 		@bringToFront()

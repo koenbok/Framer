@@ -7,7 +7,7 @@ Utils = require "./Utils"
 {BaseClass} = require "./BaseClass"
 {Animator} = require "./Animators/Animator"
 {LinearAnimator} = require "./Animators/LinearAnimator"
-{SVG, SVGPath} = require "./SVG"
+{SVG} = require "./SVG"
 Curves = require "./Animators/Curves"
 
 numberRE = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/
@@ -280,8 +280,8 @@ class exports.Animation extends BaseClass
 	_prepareUpdateValues: =>
 		@_valueUpdaters = {}
 		for k, v of @_stateB
-			if SVGPath.isPath(v)
-				path = new SVGPath(v)
+			if SVG.isPath(v)
+				path = v
 				direction = null
 				start = null
 				end = null
@@ -380,10 +380,11 @@ class exports.Animation extends BaseClass
 			type = toShadow?.type ? fromShadow?.type ? Framer.Defaults.Shadow.type
 			fromShadow ?= _.defaults {color: null, type: type}, Framer.Defaults.Shadow
 			toShadow ?= _.defaults {color: null, type: type}, Framer.Defaults.Shadow
+			_.defaults fromShadow, Framer.Defaults.Shadow
+			_.defaults toShadow, Framer.Defaults.Shadow
 			result[index] = @_interpolateNumericObjectValues(["x", "y", "blur", "spread"], fromShadow, toShadow, value, false)
 			result[index].color = Color.mix(fromShadow.color, toShadow.color, value, false, @options.colorModel)
 			result[index].type = type
-
 		@_target[key] = result
 
 
@@ -417,7 +418,7 @@ class exports.Animation extends BaseClass
 		return _.pick(@layer, _.keys(@properties))
 
 	@isAnimatable = (v) ->
-		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or Gradient.isGradientObject(v) or SVGPath.isPath(v)
+		_.isNumber(v) or _.isFunction(v) or isRelativeProperty(v) or Color.isColorObject(v) or Gradient.isGradientObject(v) or SVG.isPath(v)
 
 	# Special cases that animate with different types of objects
 	@isAnimatableKey = (k) ->
@@ -429,13 +430,14 @@ class exports.Animation extends BaseClass
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			if k in ["frame", "size", "point"] # Derived properties
+			if k in ["frame", "size", "point", "midPoint"] # Derived properties
 				switch k
 					when "frame" then derivedKeys = ["x", "y", "width", "height"]
 					when "size" then derivedKeys = ["width", "height"]
 					when "point" then derivedKeys = ["x", "y"]
+					when "midPoint" then derivedKeys = ["midX", "midY"]
 					else derivedKeys = []
-				if SVGPath.isPath(v)
+				if SVG.isPath(v)
 					for derivedKey in derivedKeys
 						animatableProperties[derivedKey] = v
 				else if _.isObject(v)

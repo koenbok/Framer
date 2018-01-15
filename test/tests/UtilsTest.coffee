@@ -738,3 +738,46 @@ describe "Utils", ->
 			l.frame.should.eql {x: 5, y: 10, width: 25, height: 30}
 			l2.frame.should.eql {x: 0, y: 0, width: 25, height: 30}
 			assert.equal(l2.constraintValues, null)
+
+	describe "equal", ->
+		describe "null", ->
+			it "should return true when both are null", ->
+				Utils.equal(null, null).should.be.true
+			it "should return false when only left side is null", ->
+				Utils.equal(null, 0).should.be.false
+			it "should return false when only right side is null", ->
+				Utils.equal(0, null).should.be.false
+		describe "undefined", ->
+			it "should return true when both are undefined", ->
+				Utils.equal(undefined, undefined).should.be.true
+			it "should return false when only left side is undefined", ->
+				Utils.equal(undefined, 0).should.be.false
+			it "should return false when only right side is undefined", ->
+				Utils.equal(null, undefined).should.be.false
+		describe "numbers", ->
+			it "should return true when they are the same", ->
+				Utils.equal(1, 1).should.be.true
+			it "should return false when they are the different", ->
+				Utils.equal(1, 2).should.be.false
+			it "should return false when only left side is a number", ->
+				Utils.equal(0, "0").should.be.false
+			it "should return false when only right side is a number", ->
+				Utils.equal("", 0).should.be.false
+		describe "strings", ->
+			it "should return true when they are the same", ->
+				Utils.equal("test", "test").should.be.true
+			it "should return false when they are different", ->
+				Utils.equal("test", "tset").should.be.false
+			it "should return false when only left side is a string", ->
+				Utils.equal("", {}).should.be.false
+			it "should return false when only right side is a string", ->
+				Utils.equal({}, "").should.be.false
+		describe "Color", ->
+			it "should return true when they are the same", ->
+				Utils.equal(new Color("red"), new Color("red")).should.be.true
+			it "should return false when they are different", ->
+				Utils.equal(new Color("red"), new Color("blue")).should.be.false
+			it "should return false when only left side is a Color", ->
+				Utils.equal(new Color("red"), 0).should.be.false
+			it "should return false when only right side is a Color", ->
+				Utils.equal(3, new Color("red")).should.be.false

@@ -1,70 +1,62 @@
-{BaseClass} = require "./BaseClass"
+{_} = require "./Underscore"
+{Color} = require "./Color"
 
-class SVG
-	@isSVG: (svg) ->
-		svg instanceof SVGElement
+class exports.SVG
 
+	@validFill = (value) ->
+		Color.validColorValue(value) or _.startsWith(value, "url(")
 
-class SVGPath extends BaseClass
+	@toFill = (value) ->
+		if _.startsWith(value, "url(")
+			return value
+		else
+			Color.toColor(value)
 
-	@define "length",
-		get: ->
-			@_length
+	@updateGradientSVG: (svgLayer) ->
+		return if svgLayer.__constructor
+		if not Gradient.isGradient(svgLayer.gradient)
+			svgLayer._elementGradientSVG?.innerHTML = ""
+			return
 
+		if not svgLayer._elementGradientSVG
+			svgLayer._elementGradientSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+			svgLayer._element.appendChild svgLayer._elementGradientSVG
 
-	@define "start",
-		get: ->
-			@pointAtFraction(0)
+		id = "#{svgLayer.id}-gradient"
+		svgLayer._elementGradientSVG.innerHTML = """
+			<linearGradient id='#{id}' gradientTransform='rotate(#{svgLayer.gradient.angle - 90}, 0.5, 0.5)' >
+				<stop offset="0" stop-color='##{svgLayer.gradient.start.toHex()}' stop-opacity='#{svgLayer.gradient.start.a}' />
+				<stop offset="1" stop-color='##{svgLayer.gradient.end.toHex()}' stop-opacity='#{svgLayer.gradient.end.a}' />
+			</linearGradient>
+		"""
+		svgLayer.fill = "url(##{id})"
 
-	@define "end",
-		get: ->
-			@pointAtFraction(1)
+	@constructSVGElements: (root, elements, PathClass, GroupClass) ->
 
-	@define "path", @simpleProperty("path", null)
+		targets = {}
+		children = []
 
-	constructor: (path) ->
-		return null if not SVGPath.isPath(path)
-		super
-		if path instanceof SVGPath
-			path = path.path
-		@path = path
-		@_length = path.getTotalLength()
+		if elements?
+			for element in elements
 
-	pointAtFraction: (fraction) ->
-		@path.getPointAtLength(@length * fraction)
+				isTarget = element.id?
 
-	valueUpdater: (axis, target, offset) =>
-		switch axis
-			when "horizontal"
-				offset -= @start.x
-				return (key, value) =>
-					target[key] = offset + @pointAtFraction(value).x
-			when "vertical"
-				offset -= @start.y
-				return (key, value) =>
-					target[key] = offset + @pointAtFraction(value).y
-			when "angle"
-				return (key, value, delta = 0) =>
-					return if delta is 0
-					fromPoint = @pointAtFraction(Math.max(value - delta, 0))
-					toPoint = @pointAtFraction(Math.min(value + delta, 1))
-					angle = Math.atan2(fromPoint.y - toPoint.y, fromPoint.x - toPoint.x) * 180 / Math.PI - 90
-					target[key] = angle
+				options = {}
+				options.name = element.id if isTarget
+				options.parent = root
+
+				if element instanceof SVGGElement
+					group = new GroupClass(element, options)
+					children.push(group)
+					_.extend(targets, group.elements)
+					if isTarget then targets[element.id] = group
+					continue
+				if element instanceof SVGPathElement
+					path = new PathClass(element, options)
+					children.push(path)
+					if isTarget then targets[element.id] = path
+					continue
+		return {targets, children}
 
 	@isPath: (path) ->
-		path instanceof SVGPathElement or path instanceof SVGPath
-
-	@getStart: (path) ->
-		@getPointAtFraction(path, 0)
-
-	@getPointAtFraction: (path, fraction) ->
-		return null if not @isPath(path)
-		length = path.getTotalLength() * fraction
-		path.getPointAtLength(length)
-
-	@getEnd: (path) ->
-		@getPointAtFraction(path, 1)
-
-
-exports.SVG = SVG
-exports.SVGPath = SVGPath
+		path instanceof Framer.SVGPath
