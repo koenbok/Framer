@@ -56,6 +56,11 @@ class exports.SVG
 					children.push(path)
 					if isTarget then targets[element.id] = path
 					continue
+				if element instanceof SVGDefsElement
+					defsResult = @constructSVGElements(root, element.childNodes, PathClass, GroupClass)
+					_.extend targets, defsResult.targets
+					children = children.concat(defsResult.children)
+					continue
 		return {targets, children}
 
 	@isPath: (path) ->
