@@ -1288,7 +1288,7 @@ describe "LayerAnimation", ->
 					time: 0.1
 			Utils.delay a.options.time / 2, ->
 				l.x.should.be.within(-5, 40)
-				l.y.should.be.within(50, 90)
+				l.y.should.be.within(40, 90)
 
 			a.onAnimationEnd ->
 				l.x.should.equal 45
