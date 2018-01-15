@@ -37,6 +37,7 @@ class exports.SVGBaseLayer extends Layer
 	@alias "borderColor", "stroke"
 	@alias "strokeColor", "stroke"
 	@alias "borderWidth", "strokeWidth"
+	@alias "backgroundColor", "fill"
 
 	# Overridden functions from Layer
 	_insertElement: ->
