@@ -855,7 +855,7 @@ class exports.Layer extends BaseClass
 		@_element = document.createElement "div"
 		@_element.classList.add("framerLayer")
 
-	_createBorderElement: ->		
+	_createBorderElement: ->
 		return if @_elementBorder?
 		@_elementBorder = document.createElement "div"
 		@_elementBorder.style.position = "absolute"

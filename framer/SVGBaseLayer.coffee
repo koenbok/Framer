@@ -10,23 +10,14 @@ class exports.SVGBaseLayer extends Layer
 		importable: false
 		get: ->
 			@_parent or null
-
-	@define "html",
-		get: ->
-			@_element.outerHTML or ""
-	
-	@define "width",
-		get: ->
-			@_width
-	
-	@define "height",
-		get: ->
-			@_height
+	@define "html",	get: ->	@_element.outerHTML or ""
+	@define "width", get: -> @_width
+	@define "height", get: -> @_height
 	
 	# Disabled properties
 	@undefine ["label", "blending", "image"]
 	@undefine ["blur", "brightness", "saturate", "hueRotate", "contrast", "invert", "grayscale", "sepia"] # webkitFilter properties
-	@undefine ["backgroundBlur","backgroundBrightness","backgroundSaturate","backgroundHueRotate","backgroundContrast","backgroundInvert","backgroundGrayscale","backgroundSepia"] # webkitBackdropFilter properties
+	@undefine ["backgroundBlur", "backgroundBrightness", "backgroundSaturate", "backgroundHueRotate", "backgroundContrast", "backgroundInvert", "backgroundGrayscale", "backgroundSepia"] # webkitBackdropFilter properties
 	for i in [0..8]
 		do (i) =>
 			@undefine "shadow#{i+1}"
@@ -91,4 +82,3 @@ class exports.SVGBaseLayer extends Layer
 			return undefined
 		set: (value) ->
 			console.warn "The gradient property is currently not supported on shapes"
-

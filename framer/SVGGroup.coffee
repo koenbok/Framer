@@ -11,7 +11,6 @@ areEqual = (a, b) ->
 	return a is b
 
 class SVGGroup extends SVGBaseLayer
-
 	constructor: (group, options) ->
 		options.element = group
 		super(options)

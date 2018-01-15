@@ -15,11 +15,7 @@ dashArrayTransform = (value) ->
 	return value
 
 class exports.SVGPath extends SVGBaseLayer
-
-
-
 	constructor: (path, options) ->
-
 		if path instanceof SVGPath
 			path = path.element
 
@@ -42,7 +38,6 @@ class exports.SVGPath extends SVGBaseLayer
 		@_svg.setAttribute("viewBox", "0,0,#{@width},#{@height}")
 		@_svg.removeAttribute("viewBox")
 
-
 	# Custom properties
 	@define "fill", layerProperty(@, "fill", "fill", null, SVG.validFill, SVG.toFill)
 	@define "stroke", layerProperty(@, "stroke", "stroke", null, SVG.validFill, SVG.toFill)
@@ -61,18 +56,9 @@ class exports.SVGPath extends SVGBaseLayer
 	@define "strokeFraction", layerProperty @, "strokeFraction", null, null, _.isNumber, null, {}, (path, value) ->
 		path.strokeLength = path.length * value
 
-	@define "length",
-		get: ->
-			@_length
-
-
-	@define "start",
-		get: ->
-			@pointAtFraction(0)
-
-	@define "end",
-		get: ->
-			@pointAtFraction(1)
+	@define "length", get: -> @_length
+	@define "start", get: -> @pointAtFraction(0)
+	@define "end", get: -> @pointAtFraction(1)
 
 	pointAtFraction: (fraction) ->
 		@_element.getPointAtLength(@length * fraction)

@@ -56,6 +56,4 @@ class exports.SVG
 					children.push(path)
 					if isTarget then targets[element.id] = path
 					continue
-
 		return {targets, children}
-
