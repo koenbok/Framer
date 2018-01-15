@@ -82,9 +82,16 @@ class exports.SVGBaseLayer extends Layer
 				@_svg = parent.svg
 				break
 
+		for prop in ["frame", "stroke", "strokeWidth", "strokeLinecap", "strokeLinejoin", "strokeMiterlimit", "strokeDasharray", "strokeDashoffset", "rotation"]
+			@on "change:#{prop}", @resetViewbox
+
 	@define "gradient",
 		get: ->
 			console.warn "The gradient property is currently not supported on shapes"
 			return undefined
 		set: (value) ->
 			console.warn "The gradient property is currently not supported on shapes"
+
+	resetViewbox: =>
+		@_svg.setAttribute("viewBox", "0,0,#{@width},#{@height}")
+		@_svg.removeAttribute("viewBox")

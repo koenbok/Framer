@@ -26,12 +26,6 @@ class exports.SVGPath extends SVGBaseLayer
 		rect = @_element.getBoundingClientRect()
 		@_width = rect.width
 		@_height = rect.height
-		for prop in ["frame", "stroke", "strokeWidth", "strokeLinecap", "strokeLinejoin", "strokeMiterlimit", "strokeDasharray", "strokeDashoffset"]
-			@on "change:#{prop}", @resetViewbox
-
-	resetViewbox: =>
-		@_svg.setAttribute("viewBox", "0,0,#{@width},#{@height}")
-		@_svg.removeAttribute("viewBox")
 
 	# Custom properties
 	@define "fill", layerProperty(@, "fill", "fill", null, SVG.validFill, SVG.toFill)
