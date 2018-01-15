@@ -13,7 +13,7 @@ class exports.SVGBaseLayer extends Layer
 	@define "html",	get: ->	@_element.outerHTML or ""
 	@define "width", get: -> @_width
 	@define "height", get: -> @_height
-	
+
 	# Disabled properties
 	@undefine ["label", "blending", "image"]
 	@undefine ["blur", "brightness", "saturate", "hueRotate", "contrast", "invert", "grayscale", "sepia"] # webkitFilter properties
@@ -25,8 +25,8 @@ class exports.SVGBaseLayer extends Layer
 	@undefine ["borderRadius", "cornerRadius", "borderStyle"]
 	@undefine ["constraintValues", "htmlIntrinsicSize"]
 
-	# Proxied helpers
-	@proxy = (propertyName, proxiedName) ->
+	# Aliassed helpers
+	@alias = (propertyName, proxiedName) ->
 		@define propertyName,
 			get: ->
 				@[proxiedName]
@@ -34,9 +34,9 @@ class exports.SVGBaseLayer extends Layer
 				return if @__applyingDefaults
 				@[proxiedName] = value
 
-	@proxy "borderColor", "stroke"
-	@proxy "strokeColor", "stroke"
-	@proxy "borderWidth", "strokeWidth"
+	@alias "borderColor", "stroke"
+	@alias "strokeColor", "stroke"
+	@alias "borderWidth", "strokeWidth"
 
 	# Overridden functions from Layer
 	_insertElement: ->
