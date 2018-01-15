@@ -1287,8 +1287,8 @@ describe "LayerAnimation", ->
 					curve: Bezier.linear
 					time: 0.1
 			Utils.delay a.options.time / 2, ->
-				l.x.should.be.within(5, 40)
-				l.y.should.be.within(55, 90)
+				l.x.should.be.within(-5, 40)
+				l.y.should.be.within(50, 90)
 
 			a.onAnimationEnd ->
 				l.x.should.equal 45
