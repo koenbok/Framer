@@ -77,6 +77,11 @@ class exports.SVGBaseLayer extends Layer
 
 		super(options)
 
+		for parent in @ancestors()
+			if parent instanceof SVGLayer
+				@_svg = parent.svg
+				break
+
 	@define "gradient",
 		get: ->
 			console.warn "The gradient property is currently not supported on shapes"

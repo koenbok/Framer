@@ -26,11 +26,6 @@ class exports.SVGPath extends SVGBaseLayer
 		rect = @_element.getBoundingClientRect()
 		@_width = rect.width
 		@_height = rect.height
-		for parent in @ancestors()
-			if parent instanceof SVGLayer
-				@_svg = parent.svg
-				break
-
 		for prop in ["frame", "stroke", "strokeWidth", "strokeLinecap", "strokeLinejoin", "strokeMiterlimit", "strokeDasharray", "strokeDashoffset"]
 			@on "change:#{prop}", @resetViewbox
 

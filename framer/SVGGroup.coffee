@@ -9,16 +9,9 @@ class SVGGroup extends SVGBaseLayer
 	constructor: (group, options) ->
 		options.element = group
 		super(options)
-
 		{children, targets} = SVG.constructSVGElements(@, @_element.childNodes, SVGPath, SVGGroup)
 		@_children = children
 		@elements = targets
-
-		for parent in @ancestors()
-			if parent instanceof SVGLayer
-				@_svg = parent.svg
-				break
-
 		SVG.updateGradientSVG(@)
 
 	@defineGroupProxyProp = (propertyName, validator, transformer) ->
