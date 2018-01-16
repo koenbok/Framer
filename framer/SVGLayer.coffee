@@ -33,8 +33,8 @@ class exports.SVGLayer extends Layer
 
 	@define "fill", layerProperty(@, "fill", "fill", null, SVG.validFill, SVG.toFill)
 	@define "stroke", layerProperty(@, "stroke", "stroke", null, SVG.validFill, SVG.toFill)
-	@define "strokeWidthMultiplier", @simpleProperty("strokeWidthMultiplier", 1)
-	@define "strokeWidth", layerProperty(@, "strokeWidth", "strokeWidth", null, _.isNumber)
+	@define "strokeWidthMultiplier", layerProperty(@, "strokeWidthMultiplier", null, null, _.isNumber)
+	@define "strokeWidth", layerProperty(@, "strokeWidth", "strokeWidth", null, _.isNumber, null, {depends: ["strokeWidthMultiplier"]})
 	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor, null, ((layer, value) -> layer.fill = value), "_elementHTML", true)
 
 	@define "gradient",
