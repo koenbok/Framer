@@ -1558,11 +1558,15 @@ describe "Layer", ->
 
 		it "should destroy", ->
 
+			before = Object.keys(Framer.CurrentContext.domEventManager._elements).length
+
 			layer = new Layer
 			layer.destroy()
 
 			(layer in Framer.CurrentContext.layers).should.be.false
 			assert.equal layer._element.parentNode, null
+
+			assert.equal before, Object.keys(Framer.CurrentContext.domEventManager._elements).length
 
 		it "should set text", ->
 
