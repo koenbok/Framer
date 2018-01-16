@@ -22,10 +22,12 @@ class exports.SVGPath extends SVGBaseLayer
 		options.element = path
 		super(options)
 
-		@_length = @_element.getTotalLength()
-		rect = @_element.getBoundingClientRect()
-		@_width = rect.width
-		@_height = rect.height
+		if path instanceof SVGPathElement
+			@_path = path
+		else if path instanceof SVGUseElement
+			link = path.getAttribute("xlink:href").replace("#", '')
+			@_path = @_svg.getElementById(link)
+		@_length = @_path.getTotalLength()
 
 	# Custom properties
 	@define "fill", layerProperty(@, "fill", "fill", null, SVG.validFill, SVG.toFill)
@@ -50,7 +52,7 @@ class exports.SVGPath extends SVGBaseLayer
 	@define "end", get: -> @pointAtFraction(1)
 
 	pointAtFraction: (fraction) ->
-		@_element.getPointAtLength(@length * fraction)
+		@_path.getPointAtLength(@length * fraction)
 
 	valueUpdater: (axis, target, offset) =>
 		switch axis

@@ -72,17 +72,21 @@ class exports.SVGBaseLayer extends Layer
 		delete options.parent
 		delete options.element
 
-		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset"]
+		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset", "name"]
 		_.defaults options, @constructor.attributesFromElement(pathProperties, element)
 
 		super(options)
+
+		rect = @_element.getBoundingClientRect()
+		@_width = rect.width * @context.pixelMultiplier
+		@_height = rect.height * @context.pixelMultiplier
 
 		for parent in @ancestors()
 			if parent instanceof SVGLayer
 				@_svg = parent.svg
 				break
 
-		for prop in ["frame", "stroke", "strokeWidth", "strokeLinecap", "strokeLinejoin", "strokeMiterlimit", "strokeDasharray", "strokeDashoffset", "rotation"]
+		for prop in ["frame", "stroke", "strokeWidth", "strokeLinecap", "strokeLinejoin", "strokeMiterlimit", "strokeDasharray", "strokeDashoffset", "rotation", "scale"]
 			@on "change:#{prop}", @resetViewbox
 
 	@define "gradient",

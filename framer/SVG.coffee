@@ -38,28 +38,32 @@ class exports.SVG
 
 		if elements?
 			for element in elements
-
-				isTarget = element.id?
+				name = element.getAttribute("name")
+				if not name?
+					if element instanceof SVGGElement
+						defsResult = @constructSVGElements(root, element.childNodes, PathClass, GroupClass)
+						_.extend targets, defsResult.targets
+						children = children.concat(defsResult.children)
+						continue
+					continue
 
 				options = {}
-				options.name = element.id if isTarget
+				options.name = name
 				options.parent = root
 
 				if element instanceof SVGGElement
 					group = new GroupClass(element, options)
 					children.push(group)
 					_.extend(targets, group.elements)
-					if isTarget then targets[element.id] = group
+					if element.id? and element.id isnt ""
+						targets[element.id] = group
 					continue
-				if element instanceof SVGPathElement
+				if element instanceof SVGPathElement or element instanceof SVGUseElement
 					path = new PathClass(element, options)
 					children.push(path)
-					if isTarget then targets[element.id] = path
-					continue
-				if element instanceof SVGDefsElement
-					defsResult = @constructSVGElements(root, element.childNodes, PathClass, GroupClass)
-					_.extend targets, defsResult.targets
-					children = children.concat(defsResult.children)
+					if path._path.id? and path._path.id isnt ""
+						id = path._path.id
+						targets[id] = path
 					continue
 		return {targets, children}
 
