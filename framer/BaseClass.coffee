@@ -74,6 +74,10 @@ class exports.BaseClass extends EventEmitter
 				for depend in descriptor.depends
 					if depend not in DefaultPropertyOrder
 						DefaultPropertyOrder.push(depend)
+				index = DefaultPropertyOrder.indexOf(propertyName)
+				if index isnt -1
+					DefaultPropertyOrder.splice(index, 1)
+					DefaultPropertyOrder.push(propertyName)
 			if propertyName not in DefaultPropertyOrder
 				DefaultPropertyOrder.push(propertyName)
 
