@@ -958,6 +958,7 @@ class exports.Layer extends BaseClass
 
 		@_context.removeLayer(@)
 		@_context.emit("layer:destroy", @)
+		@_context.domEventManager.remove(@_element)
 
 
 	##############################################################

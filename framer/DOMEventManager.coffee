@@ -3,7 +3,7 @@
 
 Utils = require "./Utils"
 
-EventManagerIdCounter = 0
+EventManagerIdCounter = 1
 
 class DOMEventManagerElement extends EventEmitter
 
@@ -41,6 +41,11 @@ class exports.DOMEventManager
 			@_elements[element._eventManagerId] = new DOMEventManagerElement(element)
 
 		@_elements[element._eventManagerId]
+
+	remove: (element) =>
+		return unless element._eventManagerId
+		delete @_elements[element._eventManagerId]
+		element._eventManagerId = 0
 
 	reset: ->
 		for element, elementEventManager of @_elements
