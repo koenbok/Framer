@@ -1529,6 +1529,8 @@ class exports.Layer extends BaseClass
 	onMouseDown: (cb) -> @on(Events.MouseDown, cb)
 	onMouseOver: (cb) -> @on(Events.MouseOver, cb)
 	onMouseOut: (cb) -> @on(Events.MouseOut, cb)
+	onMouseEnter: (cb) -> @on(Events.MouseEnter, cb)
+	onMouseLeave: (cb) -> @on(Events.MouseLeave, cb)
 	onMouseMove: (cb) -> @on(Events.MouseMove, cb)
 	onMouseWheel: (cb) -> @on(Events.MouseWheel, cb)
 
