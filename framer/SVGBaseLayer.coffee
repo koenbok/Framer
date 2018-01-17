@@ -97,15 +97,14 @@ class exports.SVGBaseLayer extends Layer
 					when 2 #SVG_TRANSFORM_TRANSLATE
 						options.x += matrix.e
 						options.y += matrix.f
-						#@_element.transform.baseVal.removeItem(i)
 						indicesToRemove.push(i)
 					when 4 #SVG_TRANSFORM_ROTATE
 						# We willingly ignore the translation from this matrix
-						options.rotation += - ((Math.atan2(matrix.c, matrix.d)) / Math.PI) * 180
+						options.rotation += - (Math.atan2(matrix.c, matrix.d) / Math.PI) * 180
 						indicesToRemove.push(i)
 
 			for index in indicesToRemove.reverse()
-				@_element.transform.baseVal.removeItem(0)
+				@_element.transform.baseVal.removeItem(index)
 
 		rect = @_element.getBoundingClientRect()
 		multiplier = Framer?.CurrentContext.pixelMultiplier ? 1
