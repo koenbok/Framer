@@ -82,17 +82,35 @@ class exports.SVGBaseLayer extends Layer
 		delete options.parent
 		delete options.element
 
+		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset", "name", "opacity"]
+		_.defaults options, @constructor.attributesFromElement(pathProperties, element)
+		if @_element.transform.baseVal.numberOfItems > 0
+			options.x ?= 0
+			options.y ?= 0
+			options.rotation ?= 0
+			indicesToRemove = []
+			for i in [0...@_element.transform.baseVal.numberOfItems]
+				console.log i
+				transform = @_element.transform.baseVal.getItem(i)
+				matrix = transform.matrix
+				switch transform.type
+					when 2 #SVG_TRANSFORM_TRANSLATE
+						options.x += matrix.e
+						options.y += matrix.f
+						#@_element.transform.baseVal.removeItem(i)
+						indicesToRemove.push(i)
+					when 4 #SVG_TRANSFORM_ROTATE
+						# We willingly ignore the translation from this matrix
+						options.rotation += - ((Math.atan2(matrix.c, matrix.d)) / Math.PI) * 180
+						indicesToRemove.push(i)
+
+			for index in indicesToRemove.reverse()
+				@_element.transform.baseVal.removeItem(0)
+
 		rect = @_element.getBoundingClientRect()
 		multiplier = Framer?.CurrentContext.pixelMultiplier ? 1
 		@_width = rect.width * multiplier
 		@_height = rect.height * multiplier
-
-		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset", "name", "opacity"]
-		_.defaults options, @constructor.attributesFromElement(pathProperties, element)
-		if @_element.transform.baseVal.numberOfItems > 0
-			translate = @_element.transform.baseVal.getItem(0).matrix
-			options.x ?= translate.e
-			options.y ?= translate.f
 
 		super(options)
 
