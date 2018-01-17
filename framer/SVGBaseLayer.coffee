@@ -72,6 +72,11 @@ class exports.SVGBaseLayer extends Layer
 		delete options.parent
 		delete options.element
 
+		rect = @_element.getBoundingClientRect()
+		multiplier = Framer?.CurrentContext.pixelMultiplier ? 1
+		@_width = rect.width * multiplier
+		@_height = rect.height * multiplier
+
 		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset", "name", "opacity"]
 		_.defaults options, @constructor.attributesFromElement(pathProperties, element)
 		if @_element.transform.baseVal.numberOfItems > 0
@@ -81,9 +86,6 @@ class exports.SVGBaseLayer extends Layer
 
 		super(options)
 
-		rect = @_element.getBoundingClientRect()
-		@_width = rect.width * @context.pixelMultiplier
-		@_height = rect.height * @context.pixelMultiplier
 		for parent in @ancestors()
 			if parent instanceof SVGLayer
 				@_svg = parent.svg
