@@ -72,7 +72,7 @@ class exports.SVGBaseLayer extends Layer
 		delete options.parent
 		delete options.element
 
-		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset", "name"]
+		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset", "name", "opacity"]
 		_.defaults options, @constructor.attributesFromElement(pathProperties, element)
 		if @_element.transform.baseVal.numberOfItems > 0
 			translate = @_element.transform.baseVal.getItem(0).matrix
