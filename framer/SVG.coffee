@@ -38,6 +38,9 @@ class exports.SVG
 
 		if elements?
 			for element in elements
+				unless element instanceof SVGElement
+					# Children can contain text nodes
+					continue
 				name = element.getAttribute("name")
 				if not name?
 					if element instanceof SVGGElement
