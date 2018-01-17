@@ -1,6 +1,14 @@
 {Layer, layerProperty} = require "./Layer"
 {Color} = require "./Color"
 
+originTransform = (value, layer, name) ->
+	sizeProp = undefined
+	switch name
+		when "originX" then sizeProp = "width"
+		when "originY" then sizeProp = "height"
+	return value unless sizeProp?
+	return (layer[sizeProp] / layer.parent[sizeProp]) * value
+
 class exports.SVGBaseLayer extends Layer
 	# Overridden Layer properties
 
@@ -13,6 +21,8 @@ class exports.SVGBaseLayer extends Layer
 	@define "html",	get: ->	@_element.outerHTML or ""
 	@define "width", get: -> @_width
 	@define "height", get: -> @_height
+	@define "originX", layerProperty(@, "originX", "webkitTransformOrigin", 0.5, _.isNumber, originTransform)
+	@define "originY", layerProperty(@, "originY", "webkitTransformOrigin", 0.5, _.isNumber, originTransform)
 
 	# Disabled properties
 	@undefine ["label", "blending", "image"]
