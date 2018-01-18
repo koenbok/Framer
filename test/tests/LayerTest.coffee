@@ -1544,6 +1544,46 @@ describe "Layer", ->
 				layerA.x.should.equal 137
 				layerA.y.should.equal 283
 
+	describe "midPoint", ->
+		it "should accept a midX/midY value", ->
+			l = new Layer
+				midPoint:
+					midX: 123
+					midY: 459
+			l.midX.should.equal 123
+			l.midY.should.equal 459
+		it "should accept a x/y value", ->
+			l = new Layer
+				midPoint:
+					x: 123
+					y: 459
+			l.midX.should.equal 123
+			l.midY.should.equal 459
+
+		it "should accept a single number", ->
+			l = new Layer
+				midPoint: 234
+			l.midX.should.equal 234
+			l.midY.should.equal 234
+		it "should pick midX/midY over x/y", ->
+			l = new Layer
+				midPoint:
+					midX: 123
+					midY: 459
+					x: 653
+					y: 97
+			l.midX.should.equal 123
+			l.midY.should.equal 459
+		it "should not change the object passed in", ->
+			l =
+				x: 100
+				y: 200
+			m = new Layer
+				midPoint: l
+			m.midX.should.equal l.x
+			m.midY.should.equal l.y
+			l.x.should.equal 100
+			l.y.should.equal 200
 	describe "CSS", ->
 
 		it "classList should work", ->
