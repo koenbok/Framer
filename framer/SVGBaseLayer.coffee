@@ -90,7 +90,6 @@ class exports.SVGBaseLayer extends Layer
 			options.rotation ?= 0
 			indicesToRemove = []
 			for i in [0...@_element.transform.baseVal.numberOfItems]
-				console.log i
 				transform = @_element.transform.baseVal.getItem(i)
 				matrix = transform.matrix
 				switch transform.type
