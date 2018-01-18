@@ -89,13 +89,14 @@ class exports.SVGBaseLayer extends Layer
 			options.y ?= 0
 			options.rotation ?= 0
 			indicesToRemove = []
+			pixelMultiplier = Framer?.CurrentContext.pixelMultiplier ? 1
 			for i in [0...@_element.transform.baseVal.numberOfItems]
 				transform = @_element.transform.baseVal.getItem(i)
 				matrix = transform.matrix
 				switch transform.type
 					when 2 #SVG_TRANSFORM_TRANSLATE
-						options.x += matrix.e
-						options.y += matrix.f
+						options.x += matrix.e / pixelMultiplier
+						options.y += matrix.f / pixelMultiplier
 						indicesToRemove.push(i)
 					when 4 #SVG_TRANSFORM_ROTATE
 						# We willingly ignore the translation from this matrix
