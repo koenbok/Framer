@@ -16,6 +16,7 @@ dashArrayTransform = (value) ->
 
 class exports.SVGPath extends SVGBaseLayer
 	constructor: (path, options) ->
+
 		if path instanceof SVGPath
 			path = path.element
 
@@ -25,8 +26,8 @@ class exports.SVGPath extends SVGBaseLayer
 		if path instanceof SVGPathElement
 			@_path = path
 		else if path instanceof SVGUseElement
-			link = path.getAttribute("xlink:href").replace("#", '')
-			@_path = @_svg.getElementById(link)
+			link = path.getAttribute("xlink:href")
+			@_path = @_svg.querySelector(link)
 		@_length = @_path.getTotalLength()
 
 	# Custom properties
