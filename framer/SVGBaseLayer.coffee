@@ -106,9 +106,8 @@ class exports.SVGBaseLayer extends Layer
 				@_element.transform.baseVal.removeItem(index)
 
 		rect = @_element.getBoundingClientRect()
-		multiplier = Framer?.CurrentContext.pixelMultiplier ? 1
-		@_width = rect.width * multiplier
-		@_height = rect.height * multiplier
+		@_width = rect.width / @_parent.canvasScaleX()
+		@_height = rect.height / @_parent.canvasScaleY()
 
 		super(options)
 
