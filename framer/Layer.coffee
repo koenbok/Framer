@@ -58,6 +58,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 				elementContainer = @
 				if cssProperty in @_stylesAppliedToParent
 					elementContainer = @parent
+					@_parent._properties[name] = fallback
 				mainElement = elementContainer._element if includeMainElement or not targetElement
 				subElement = elementContainer[targetElement] if targetElement?
 				if name is cssProperty and not LayerStyle[cssProperty]?
