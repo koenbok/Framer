@@ -1,3 +1,4 @@
+{LayerStyle} = require "./LayerStyle"
 {Layer, layerProperty} = require "./Layer"
 {Color} = require "./Color"
 
@@ -7,7 +8,10 @@ originTransform = (value, layer, name) ->
 		when "originX" then sizeProp = "width"
 		when "originY" then sizeProp = "height"
 	return value unless sizeProp?
-	return (layer[sizeProp] / layer.parent[sizeProp]) * value
+	layerSize = layer[sizeProp]
+	parentSize = layer.parent[sizeProp]
+	return value unless layerSize > 0 and parentSize > 0
+	return (layerSize / parentSize) * value
 
 class exports.SVGBaseLayer extends Layer
 	# Overridden Layer properties
@@ -106,9 +110,7 @@ class exports.SVGBaseLayer extends Layer
 			for index in indicesToRemove.reverse()
 				@_element.transform.baseVal.removeItem(index)
 
-		rect = @_element.getBoundingClientRect()
-		@_width = rect.width / @_parent.canvasScaleX()
-		@_height = rect.height / @_parent.canvasScaleY()
+		@calculateSize()
 
 		super(options)
 
@@ -127,6 +129,26 @@ class exports.SVGBaseLayer extends Layer
 			return undefined
 		set: (value) ->
 			console.warn "The gradient property is currently not supported on shapes"
+
+	elementInsertedIntoDocument: ->
+		super
+		@calculateSize()
+		@recalculateOrigin()
+
+	calculateSize:  ->
+		if Framer?.CurrentContext.elementInDOM
+			rect = @_element.getBoundingClientRect()
+			@_width = rect.width / @_parent.canvasScaleX()
+			@_height = rect.height / @_parent.canvasScaleY()
+		else
+			# No use in calculating, so set width and height to 0
+			@_width = 0
+			@_height = 0
+
+	recalculateOrigin: ->
+		@_properties.originX = originTransform(@originX, @, "originX")
+		@_properties.originY = originTransform(@originY, @, "originY")
+		@_element.style.webkitTransformOrigin = LayerStyle.webkitTransformOrigin(@)
 
 	resetViewbox: =>
 		@_svg.setAttribute("viewBox", "0,0,#{@width},#{@height}")
