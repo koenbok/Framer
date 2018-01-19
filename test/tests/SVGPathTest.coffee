@@ -29,10 +29,13 @@ describe "SVGPath", ->
 			point.y.should.be.closeTo 50, 0.01
 
 	describe "positioning", ->
-		it "should proxy the x and y property to the SVGLayer if that is it's direct parent", ->
-			path.x.should.equal 123
-			path.y.should.equal 456
+		it "should proxy the transform property to the SVGLayer if that is it's direct parent", ->
+			path.x.should.equal 0
+			path.y.should.equal 0
 			path.x = 23
 			path.y = 17
-			svg.x.should.equal 23
-			svg.y.should.equal 17
+			path.x.should.equal 23
+			path.y.should.equal 17
+			svg.x.should.equal 123
+			svg.y.should.equal 456
+			svg._element.style.webkitTransform.should.equal "translate3d(23px, 17px, 0px) scale3d(1, 1, 1) skew(0deg, 0deg) skewX(0deg) skewY(0deg) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px)"
