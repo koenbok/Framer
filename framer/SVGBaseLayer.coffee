@@ -23,6 +23,29 @@ class exports.SVGBaseLayer extends Layer
 		get: ->
 			@_parent or null
 	@define "html",	get: ->	@_element.outerHTML or ""
+
+	@parentAlias = (name, defaultValue = 0) ->
+		originalDescriptor = Object.getOwnPropertyDescriptor(Layer::, name)
+		@define name,
+			default: defaultValue
+			get: ->
+				if @_parent instanceof SVGLayer
+					return @_parent[name]
+				else
+					return originalDescriptor.get.call(@)
+			set: (value) ->
+				if @_parent instanceof SVGLayer
+					if @__applyingDefaults
+						@_properties[name] = value
+					else
+						@_parent[name] = value
+				else
+					originalDescriptor.set?.call(@, value)
+
+	@parentAlias "x"
+	@parentAlias "y"
+	@parentAlias "z"
+
 	@define "width", get: -> @_width
 	@define "height", get: -> @_height
 	@define "originX", layerProperty(@, "originX", "webkitTransformOrigin", 0.5, _.isNumber, originTransform)
