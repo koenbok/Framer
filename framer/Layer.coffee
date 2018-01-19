@@ -52,9 +52,12 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 
 			@_properties[name] = value
 
-			mainElement = @_element if includeMainElement or not targetElement
-			subElement = @[targetElement] if targetElement?
 			if cssProperty isnt null
+				elementContainer = @
+				if cssProperty in @_stylesAppliedToParent
+					elementContainer = @parent
+				mainElement = elementContainer._element if includeMainElement or not targetElement
+				subElement = elementContainer[targetElement] if targetElement?
 				if name is cssProperty and not LayerStyle[cssProperty]?
 					mainElement?.style[cssProperty] = @_properties[name]
 					subElement?.style[cssProperty] = @_properties[name]
@@ -158,6 +161,8 @@ class exports.Layer extends BaseClass
 		@_properties = {}
 		@_style = {}
 		@_children = []
+
+		@_stylesAppliedToParent ?= []
 
 		# Special power setting for 2d rendering path. Only enable this
 		# if you know what you are doing. See LayerStyle for more info.
