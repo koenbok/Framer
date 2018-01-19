@@ -139,7 +139,7 @@ class exports.SVGBaseLayer extends Layer
 		@calculateSize()
 		@recalculateOrigin()
 
-	calculateSize:  ->
+	calculateSize: ->
 		if Framer?.CurrentContext.elementInDOM
 			rect = @_element.getBoundingClientRect()
 			@_width = rect.width / @_parent.canvasScaleX()
