@@ -115,6 +115,8 @@ class exports.SVGBaseLayer extends Layer
 		@calculateSize()
 		if @_parent instanceof SVGLayer
 			@_stylesAppliedToParent = ["webkitTransform"]
+			for prop in ["x", "y", "z", "scaleX", "scaleY", "scaleZ", "scale", "skewX", "skewY", "skew", "rotationX", "rotationY", "rotationZ", "force2d"]
+				options[prop] ?= @_parent[prop]
 
 		super(options)
 
