@@ -10,7 +10,7 @@ originTransform = (value, layer, name) ->
 	return value unless sizeProp?
 	layerSize = layer[sizeProp]
 	parentSize = layer.parent[sizeProp]
-	return value unless layerSize > 0 and parentSize > 0
+	return value unless layerSize >= 0 and parentSize > 0
 	return (layerSize / parentSize) * value
 
 class exports.SVGBaseLayer extends Layer
@@ -87,13 +87,17 @@ class exports.SVGBaseLayer extends Layer
 		@_parent = options.parent
 		delete options.parent
 		delete options.element
+		if @_parent instanceof SVGLayer
+			@_stylesAppliedToParent = ["webkitTransform", "webkitTransformOrigin"]
+			for prop in ["x", "y", "z", "scaleX", "scaleY", "scaleZ", "scale", "skewX", "skewY", "skew", "rotationX", "rotationY", "rotationZ", "force2d", "originX", "originY"]
+				options[prop] ?= @_parent[prop]
 
 		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset", "name", "opacity"]
 		_.defaults options, @constructor.attributesFromElement(pathProperties, element)
 		if @_element.transform.baseVal.numberOfItems > 0
 			options.x ?= 0
 			options.y ?= 0
-			options.rotation ?= 0
+			options.rotationZ ?= 0
 			indicesToRemove = []
 			pixelMultiplier = Framer?.CurrentContext.pixelMultiplier ? 1
 			for i in [0...@_element.transform.baseVal.numberOfItems]
@@ -106,18 +110,12 @@ class exports.SVGBaseLayer extends Layer
 						indicesToRemove.push(i)
 					when 4 #SVG_TRANSFORM_ROTATE
 						# We willingly ignore the translation from this matrix
-						options.rotation += - (Math.atan2(matrix.c, matrix.d) / Math.PI) * 180
+						options.rotationZ += - (Math.atan2(matrix.c, matrix.d) / Math.PI) * 180
 						indicesToRemove.push(i)
 
 			for index in indicesToRemove.reverse()
 				@_element.transform.baseVal.removeItem(index)
-
 		@calculateSize()
-		if @_parent instanceof SVGLayer
-			@_stylesAppliedToParent = ["webkitTransform"]
-			for prop in ["x", "y", "z", "scaleX", "scaleY", "scaleZ", "scale", "skewX", "skewY", "skew", "rotationX", "rotationY", "rotationZ", "force2d"]
-				options[prop] ?= @_parent[prop]
-
 		super(options)
 
 		for parent in @ancestors()
