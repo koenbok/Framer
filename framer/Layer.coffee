@@ -892,6 +892,11 @@ class exports.Layer extends BaseClass
 		@bringToFront()
 		@_context.element.appendChild(@_element)
 
+	# This method is called as soon as the @_element is part of the DOM
+	# If layers are initialized before the DOM is complete,
+	# the contexts calls this methods on all Layers as soon as it appends itself to the document
+	elementInsertedIntoDocument: ->
+
 	_createHTMLElementIfNeeded: ->
 		if not @_elementHTML
 			@_elementHTML = document.createElement "div"

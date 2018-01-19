@@ -78,6 +78,7 @@ class exports.Context extends BaseClass
 		@perspectiveOriginX = options.perspectiveOriginX
 		@perspectiveOriginY = options.perspectiveOriginY
 
+		@elementInDOM = false
 		@reset()
 
 		if options.hasOwnProperty("index")
@@ -302,6 +303,8 @@ class exports.Context extends BaseClass
 			parentElement = @_parent?._element
 			parentElement ?= document.body
 			parentElement.appendChild(@_element)
+			@elementInDOM = true
+			@_layers?.map (l) -> l.elementInsertedIntoDocument()
 
 		Utils.domComplete(@__pendingElementAppend)
 
@@ -312,6 +315,7 @@ class exports.Context extends BaseClass
 
 		if @_element?.parentNode
 			@_element.parentNode.removeChild(@_element)
+			@elementInDOM = false
 
 		if @__pendingElementAppend
 			Utils.domCompleteCancel(@__pendingElementAppend)
