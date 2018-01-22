@@ -61,7 +61,8 @@ getShadowStrings = (layer, types, createString) ->
 				continue
 			if shadow.color is null
 				shadow.color = new Color(null)
-			shadowString = createString(shadow, layer.context.pixelMultiplier)
+			dpr = layer._pixelMultiplierOverride ? layer.context.pixelMultiplier
+			shadowString = createString(shadow, dpr)
 			result.push(shadowString)
 	return result
 
@@ -69,11 +70,13 @@ exports.LayerStyle =
 
 	width: (layer) ->
 		layer._updateHTMLScale()
-		(layer._properties.width * layer.context.pixelMultiplier) + "px"
+		dpr = layer._pixelMultiplierOverride ? layer.context.pixelMultiplier
+		(layer._properties.width * dpr) + "px"
 
 	height: (layer) ->
 		layer._updateHTMLScale()
-		(layer._properties.height * layer.context.pixelMultiplier) + "px"
+		dpr = layer._pixelMultiplierOverride ? layer.context.pixelMultiplier
+		(layer._properties.height * dpr) + "px"
 
 	display: (layer) ->
 		if layer._properties.visible is true
@@ -126,10 +129,10 @@ exports.LayerStyle =
 		# first and only add the ones that have a non default value.
 
 		css = []
-
+		dpr = layer._pixelMultiplierOverride ? layer.context.pixelMultiplier
 		for [cssName, layerPropertyName, fallback, unit] in _WebkitProperties
 			if layer._properties.hasOwnProperty(layerPropertyName) and layer[layerPropertyName] isnt fallback
-				filter = filterFormat(cssName, layer[layerPropertyName], unit, layer.context.pixelMultiplier)
+				filter = filterFormat(cssName, layer[layerPropertyName], unit, dpr)
 				css.push(filter)
 
 		# filter shadow
@@ -142,10 +145,10 @@ exports.LayerStyle =
 
 	webkitBackdropFilter: (layer) ->
 		css = []
-
+		dpr = layer._pixelMultiplierOverride ? layer.context.pixelMultiplier
 		for [cssName, layerPropertyName, fallback, unit] in _BackdropProperties
 			if layer._properties.hasOwnProperty(layerPropertyName) and layer[layerPropertyName] isnt fallback
-				filter = filterFormat(cssName, layer[layerPropertyName], unit, layer.context.pixelMultiplier)
+				filter = filterFormat(cssName, layer[layerPropertyName], unit, dpr)
 				css.push(filter)
 
 		return css.join(" ")
@@ -158,7 +161,7 @@ exports.LayerStyle =
 
 		if layer._prefer2d or layer._properties.force2d
 			return exports.LayerStyle.webkitTransformForce2d(layer)
-		dpr = layer.context.pixelMultiplier
+		dpr = layer._pixelMultiplierOverride ? layer.context.pixelMultiplier
 		"
 		translate3d(
 			#{roundToZero(layer._properties.x * dpr)}px,
@@ -189,7 +192,7 @@ exports.LayerStyle =
 			if layer._properties[p] isnt v
 				console.warn "Layer property '#{p}'' will be ignored with force2d enabled"
 
-		dpr = layer.context.pixelMultiplier
+		dpr = layer._pixelMultiplierOverride ? layer.context.pixelMultiplier
 		css.push "translate(#{roundToZero(layer._properties.x * dpr)}px,#{roundToZero(layer._properties.y * dpr)}px)"
 		css.push "scale(#{roundToZero(layer._properties.scaleX * layer._properties.scale)},	#{roundToZero(layer._properties.scaleY * layer._properties.scale)})"
 		css.push "skew(#{roundToZero(layer._properties.skew)}deg,#{roundToZero(layer._properties.skew)}deg)"
@@ -203,7 +206,8 @@ exports.LayerStyle =
 	webkitPerspective: (layer) ->
 		value = Utils.webkitPerspectiveForValue(layer._properties.perspective) ? ""
 		if _.isNumber(value)
-			return "#{value * Framer.CurrentContext.pixelMultiplier}"
+			dpr = layer._pixelMultiplierOverride ? layer.context.pixelMultiplier
+			return "#{value * dpr}"
 		else
 			return value
 
@@ -255,7 +259,7 @@ exports.LayerStyle =
 	borderRadius: (layer) ->
 
 		radius = layer._properties.borderRadius
-		dpr = layer.context.pixelMultiplier
+		dpr = layer._pixelMultiplierOverride ? layer.context.pixelMultiplier
 
 		if _.isNumber(radius)
 			return (radius * dpr) + "px"
@@ -269,7 +273,7 @@ exports.LayerStyle =
 	borderWidth: (layer) ->
 
 		borderWidth = layer._properties.borderWidth
-		dpr = layer.context.pixelMultiplier
+		dpr = layer._pixelMultiplierOverride ? layer.context.pixelMultiplier
 
 		if _.isNumber(borderWidth)
 			borderTopBottom = (Math.min(borderWidth, layer.height / 2) ? 0) * dpr
@@ -328,4 +332,5 @@ exports.LayerStyle =
 
 	padding: (layer) ->
 		padding = Utils.rectZero(Utils.parseRect(layer.padding))
-		return "#{padding.top * layer.context.pixelMultiplier}px #{padding.right * layer.context.pixelMultiplier}px #{padding.bottom * layer.context.pixelMultiplier}px #{padding.left * layer.context.pixelMultiplier}px"
+		dpr = layer._pixelMultiplierOverride ? layer.context.pixelMultiplier
+		return "#{padding.top * dpr}px #{padding.right * dpr}px #{padding.bottom * dpr}px #{padding.left * dpr}px"
