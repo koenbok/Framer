@@ -31,6 +31,16 @@ class exports.BaseClass extends EventEmitter
 
 		# Define the property on the prototype
 		Object.defineProperty(@prototype, propertyName, descriptor)
+	
+	@undefine = (propertyName) ->
+		if _.isArray propertyName
+			propertyName.map((prop) => @undefine(prop))
+		else
+			@define propertyName, @simpleProperty propertyName, undefined,
+				importable: false
+				exportable: false
+				enumerable: false
+
 
 	@_addDescriptor: (propertyName, descriptor) ->
 
@@ -64,6 +74,10 @@ class exports.BaseClass extends EventEmitter
 				for depend in descriptor.depends
 					if depend not in DefaultPropertyOrder
 						DefaultPropertyOrder.push(depend)
+				index = DefaultPropertyOrder.indexOf(propertyName)
+				if index isnt -1
+					DefaultPropertyOrder.splice(index, 1)
+					DefaultPropertyOrder.push(propertyName)
 			if propertyName not in DefaultPropertyOrder
 				DefaultPropertyOrder.push(propertyName)
 
@@ -100,7 +114,7 @@ class exports.BaseClass extends EventEmitter
 			@_getPropertyDefaultValue k
 
 	_getPropertyDefaultValue: (k) ->
-		@_propertyList()[k]["default"]
+		@_propertyList()[k]?["default"]
 
 	_propertyList: ->
 		if not @_propertyListCache or ObjectDescriptorsChanged

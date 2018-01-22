@@ -12,3 +12,4 @@ cp build/*.js build/builds.framerjs.com/$LATEST
 cp build/*.map build/builds.framerjs.com/$LATEST
 cp build/*.zip build/builds.framerjs.com/$LATEST
 cp -R build/builds.framerjs.com/$LATEST build/builds.framerjs.com/$GIT_HASH
+echo "$GIT_HASH" > build/builds.framerjs.com/$LATEST/hash

@@ -346,6 +346,13 @@ Utils.callAfterCount = (total, callback) ->
 		count += 1
 		callback?() if count is total
 
+Utils.equal = (a, b) ->
+	if _.isFunction a?.isEqual
+		return a.isEqual(b)
+	if _.isFunction b?.isEqual
+		return b.isEqual(a)
+	return _.isEqual a, b
+
 ######################################################
 # ENVIROMENT FUNCTIONS
 

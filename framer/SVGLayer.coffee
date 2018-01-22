@@ -1,16 +1,9 @@
 {_} = require "./Underscore"
 {Color} = require "./Color"
 {Layer, layerProperty, layerProxiedValue} = require "./Layer"
-{SVG, SVGPath} = require "./SVG"
-
-validFill = (value) ->
-	Color.validColorValue(value) or _.startsWith(value, "url(")
-
-toFill = (value) ->
-	if _.startsWith(value, "url(")
-		return value
-	else
-		return Color.toColor(value)
+{SVG} = require "./SVG"
+{SVGGroup} = require "./SVGGroup"
+{SVGPath} = require "./SVGPath"
 
 class exports.SVGLayer extends Layer
 
@@ -25,12 +18,23 @@ class exports.SVGLayer extends Layer
 		if options.svg? or options.html?
 			options.backgroundColor ?= null
 		super options
-		@updateGradientSVG()
 
-	@define "fill", layerProperty(@, "fill", "fill", null, validFill, toFill)
-	@define "stroke", layerProperty(@, "stroke", "stroke", null, validFill, toFill)
-	@define "strokeWidthMultiplier", @simpleProperty("strokeWidthMultiplier", 1)
-	@define "strokeWidth", layerProperty(@, "strokeWidth", "strokeWidth", null, _.isNumber)
+		svg = @svg
+		if svg?
+			{targets, children} = SVG.constructSVGElements(@, svg.childNodes, SVGPath, SVGGroup)
+			@elements = targets
+			@_children = children
+		else
+			@elements = []
+
+		SVG.updateGradientSVG(@)
+
+	@define "elements", @simpleProperty("elements", {})
+
+	@define "fill", layerProperty(@, "fill", "fill", null, SVG.validFill, SVG.toFill)
+	@define "stroke", layerProperty(@, "stroke", "stroke", null, SVG.validFill, SVG.toFill)
+	@define "strokeWidthMultiplier", layerProperty(@, "strokeWidthMultiplier", null, null, _.isNumber)
+	@define "strokeWidth", layerProperty(@, "strokeWidth", "strokeWidth", null, _.isNumber, null, {depends: ["strokeWidthMultiplier"]})
 	@define "color", layerProperty(@, "color", "color", null, Color.validColorValue, Color.toColor, null, ((layer, value) -> layer.fill = value), "_elementHTML", true)
 
 	@define "gradient",
@@ -42,11 +46,11 @@ class exports.SVGLayer extends Layer
 				@_gradient = new Gradient(value)
 			else if not value and Gradient.isGradientObject(@_gradient)
 				@_gradient = null
-			@updateGradientSVG()
+			SVG.updateGradientSVG(@)
 
 	@define "svg",
 		get: ->
-			svgNode = _.first(@_elementHTML.children)
+			svgNode = _.first(@_elementHTML?.children)
 			if svgNode instanceof SVGElement
 				return svgNode
 			else
@@ -61,48 +65,3 @@ class exports.SVGLayer extends Layer
 				if value.parentNode?
 					value = value.cloneNode(true)
 				@_elementHTML.appendChild(value)
-
-	@define "path",
-		get: ->
-			if @svg.children?.length isnt 1
-				error = "SVGLayer.path can only be used on SVG's that have a single child"
-				if Utils.isFramerStudio()
-					throw new Error(error)
-				else
-					console.error(error)
-			child = @svg.children[0]
-			if not SVGPath.isPath(child)
-				error = "SVGLayer.path can only be used on SVG's containing an SVGPathElement, not #{Utils.inspectObjectType(child)}"
-				if Utils.isFramerStudio()
-					throw new Error(error)
-				else
-					console.error(error)
-			return child
-
-	@define "pathStart",
-		get: ->
-			start = SVGPath.getStart(@path)
-			return null if not start?
-			point =
-				x: @x + start.x
-				y: @y + start.y
-			return point
-
-	updateGradientSVG: ->
-		return if @__constructor
-		if not Gradient.isGradient(@gradient)
-			@_elementGradientSVG?.innerHTML = ""
-			return
-
-		if not @_elementGradientSVG
-			@_elementGradientSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-			@_element.appendChild @_elementGradientSVG
-
-		id = "#{@id}-gradient"
-		@_elementGradientSVG.innerHTML = """
-			<linearGradient id='#{id}' gradientTransform='rotate(#{@gradient.angle - 90}, 0.5, 0.5)' >
-				<stop offset="0" stop-color='##{@gradient.start.toHex()}' stop-opacity='#{@gradient.start.a}' />
-				<stop offset="1" stop-color='##{@gradient.end.toHex()}' stop-opacity='#{@gradient.end.a}' />
-			</linearGradient>
-		"""
-		@fill = "url(##{id})"

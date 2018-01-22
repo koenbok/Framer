@@ -282,3 +282,41 @@ describe "BaseClass", ->
 			test: null
 		a.test.should.equal "a"
 		b.test.should.equal "a"
+	
+	it "should undefine a property", ->
+		class TestSuper extends Framer.BaseClass
+			@define "test",
+				get: ->
+					"a"
+				set: (value) ->
+					console.log "set", value
+		class TestSub extends TestSuper
+			@undefine "test"
+
+		a = new TestSuper
+		b = new TestSub
+		a.test.should.equal "a"
+		expect(b.test).to.equal undefined
+		# It should behave as a normal property
+		b.test = "bla"
+		expect(b.test).to.equal "bla"
+		# It shouldn't be part of props
+		a.props.hasOwnProperty("test").should.equal true
+		b.props.hasOwnProperty("test").should.equal false
+
+	it "should undefine an array of properties", ->
+		class TestSuper extends Framer.BaseClass
+			@define "test",
+				get: ->
+					"a"
+			@define "test2",
+				get: ->
+					"b"
+		class TestSub extends TestSuper
+			@undefine ["test", "test2"]
+
+		b = new TestSub
+		expect(b.test).to.equal undefined
+		expect(b.test2).to.equal undefined
+		b.props.hasOwnProperty("test").should.equal false
+		b.props.hasOwnProperty("test2").should.equal false
