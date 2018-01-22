@@ -111,12 +111,15 @@ class exports.SVGBaseLayer extends Layer
 		@_elementBorder = element
 		@_elementHTML = element
 		@_parent = options.parent
+
 		delete options.parent
 		delete options.element
 		if @_parent instanceof SVGLayer
 			@_stylesAppliedToParent = ["webkitTransform", "webkitTransformOrigin"]
 			for prop in ["x", "y", "z", "scaleX", "scaleY", "scaleZ", "scale", "skewX", "skewY", "skew", "rotationX", "rotationY", "rotationZ", "force2d", "originX", "originY"]
 				options[prop] ?= @_parent[prop]
+		else
+			@_pixelMultiplierOverride = 1
 		svgLayer = @_parent
 		while svgLayer? and not (svgLayer instanceof SVGLayer)
 			svgLayer = svgLayer.parent
@@ -129,14 +132,13 @@ class exports.SVGBaseLayer extends Layer
 			options.y ?= 0
 			options.rotationZ ?= 0
 			indicesToRemove = []
-			pixelMultiplier = Framer?.CurrentContext.pixelMultiplier ? 1
 			for i in [0...@_element.transform.baseVal.numberOfItems]
 				transform = @_element.transform.baseVal.getItem(i)
 				matrix = transform.matrix
 				switch transform.type
 					when 2 #SVG_TRANSFORM_TRANSLATE
-						options.x += matrix.e / pixelMultiplier
-						options.y += matrix.f / pixelMultiplier
+						options.x += matrix.e
+						options.y += matrix.f
 						indicesToRemove.push(i)
 					when 4 #SVG_TRANSFORM_ROTATE
 						# We willingly ignore the translation from this matrix
