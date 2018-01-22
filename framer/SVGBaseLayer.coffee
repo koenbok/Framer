@@ -35,9 +35,9 @@ originTransform = (value, layer, name) ->
 		when "originY" then sizeProp = "height"
 	return value unless sizeProp?
 	layerSize = layer[sizeProp]
-	parentSize = layer.parent[sizeProp]
-	return value unless layerSize >= 0 and parentSize > 0
-	return (layerSize / parentSize) * value
+	svgSize = layer._svgSize[sizeProp]
+	return value unless layerSize >= 0 and svgSize > 0
+	return (layerSize / svgSize) * value
 
 class exports.SVGBaseLayer extends Layer
 	# Overridden Layer properties
@@ -117,6 +117,10 @@ class exports.SVGBaseLayer extends Layer
 			@_stylesAppliedToParent = ["webkitTransform", "webkitTransformOrigin"]
 			for prop in ["x", "y", "z", "scaleX", "scaleY", "scaleZ", "scale", "skewX", "skewY", "skew", "rotationX", "rotationY", "rotationZ", "force2d", "originX", "originY"]
 				options[prop] ?= @_parent[prop]
+		svgLayer = @_parent
+		while svgLayer? and not (svgLayer instanceof SVGLayer)
+			svgLayer = svgLayer.parent
+		@_svgSize = svgLayer.size
 
 		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset", "name", "opacity"]
 		_.defaults options, @constructor.attributesFromElement(pathProperties, element)
