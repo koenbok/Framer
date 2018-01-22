@@ -2,6 +2,32 @@
 {Layer, layerProperty} = require "./Layer"
 {Color} = require "./Color"
 
+
+_svgMeasureElement = null
+
+
+getSVGMeasureElement = (constraints={}) ->
+	if not _svgMeasureElement?
+		_svgMeasureElement = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+		_svgMeasureElement.id = "_svgMeasure"
+		_svgMeasureElement.style.position = "fixed"
+		_svgMeasureElement.style.visibility = "hidden"
+		_svgMeasureElement.style.top = "-10000px"
+		_svgMeasureElement.style.left = "-10000px"
+
+		if not window.document.body
+			document.write(_svgMeasureElement.outerHTML)
+			_svgMeasureElement = document.getElementById("_svgMeasure")
+		else
+			window.document.body.appendChild(_svgMeasureElement)
+
+
+	while _svgMeasureElement.hasChildNodes()
+		_svgMeasureElement.removeChild(_svgMeasureElement.lastChild)
+
+	return _svgMeasureElement
+
+
 originTransform = (value, layer, name) ->
 	sizeProp = undefined
 	switch name
@@ -134,25 +160,26 @@ class exports.SVGBaseLayer extends Layer
 		set: (value) ->
 			console.warn "The gradient property is currently not supported on shapes"
 
-	elementInsertedIntoDocument: ->
-		super
-		@calculateSize()
-		@recalculateOrigin()
-
 	calculateSize: ->
-		if Framer?.CurrentContext.elementInDOM
-			rect = @_element.getBoundingClientRect()
-			@_width = rect.width / @_parent.canvasScaleX()
-			@_height = rect.height / @_parent.canvasScaleY()
-		else
-			# No use in calculating, so set width and height to 0
-			@_width = 0
-			@_height = 0
+		element = @_element
+		measuredElement = null
+		if not Framer?.CurrentContext.elementInDOM
+			parent = @_element.parentElement
+			reference = @_element.nextSibling
+			svgMeasure = getSVGMeasureElement()
+			svgMeasure.appendChild(@_element)
+			measuredElement = svgMeasure.firstChild
+			element = measuredElement
 
-	recalculateOrigin: ->
-		@_properties.originX = originTransform(@originX, @, "originX")
-		@_properties.originY = originTransform(@originY, @, "originY")
-		@_element.style.webkitTransformOrigin = LayerStyle.webkitTransformOrigin(@)
+		rect = element.getBoundingClientRect()
+		@_width = rect.width / @_parent.canvasScaleX()
+		@_height = rect.height / @_parent.canvasScaleY()
+
+		if measuredElement?
+			if reference?
+				parent.insertBefore(measuredElement, reference)
+			else
+				parent.appendChild(measuredElement)
 
 	resetViewbox: =>
 		@_svg.setAttribute("viewBox", "0,0,#{@width},#{@height}")
