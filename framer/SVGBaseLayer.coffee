@@ -69,6 +69,8 @@ class exports.SVGBaseLayer extends Layer
 	@undefine ["borderRadius", "cornerRadius", "borderStyle"]
 	@undefine ["constraintValues", "htmlIntrinsicSize"]
 
+	@undefine "gradient"
+
 	# Aliassed helpers
 	@alias = (propertyName, proxiedName) ->
 		@define propertyName,
@@ -82,6 +84,7 @@ class exports.SVGBaseLayer extends Layer
 	@alias "strokeColor", "stroke"
 	@alias "borderWidth", "strokeWidth"
 	@alias "backgroundColor", "fill"
+	@alias "color", "fill"
 
 	# Overridden functions from Layer
 	_insertElement: ->
@@ -160,13 +163,6 @@ class exports.SVGBaseLayer extends Layer
 
 		for prop in ["frame", "stroke", "strokeWidth", "strokeLinecap", "strokeLinejoin", "strokeMiterlimit", "strokeDasharray", "strokeDashoffset", "rotation", "scale"]
 			@on "change:#{prop}", @resetViewbox
-
-	@define "gradient",
-		get: ->
-			console.warn "The gradient property is currently not supported on shapes"
-			return undefined
-		set: (value) ->
-			console.warn "The gradient property is currently not supported on shapes"
 
 	calculateSize: ->
 		element = @_element
