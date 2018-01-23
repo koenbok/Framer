@@ -6,7 +6,7 @@ Utils = require "./Utils"
 _svgMeasureElement = null
 
 denyCopy = ->
-	return Utils.throwInStudioOrWarnInProduction("SVGLayer and SVGPath do not support the `copy` method")
+	return Utils.throwInStudioOrWarnInProduction("SVGGroup and SVGPath do not support the `copy` method")
 
 getSVGMeasureElement = (constraints={}) ->
 	if not _svgMeasureElement?
