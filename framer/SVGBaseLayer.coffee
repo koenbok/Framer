@@ -2,9 +2,14 @@
 {Layer, layerProperty} = require "./Layer"
 {Color} = require "./Color"
 
-
 _svgMeasureElement = null
 
+denyCopy = ->
+	if Utils.isFramerStudio()
+		throw new Error("SVGLayer and SVGPath do not support the `copy` method")
+	# else
+	console.warn("SVGLayer and SVGPath do not support the `copy` method")
+	return null
 
 getSVGMeasureElement = (constraints={}) ->
 	if not _svgMeasureElement?
@@ -190,3 +195,7 @@ class exports.SVGBaseLayer extends Layer
 	resetViewbox: =>
 		@_svg.setAttribute("viewBox", "0,0,#{@width},#{@height}")
 		@_svg.removeAttribute("viewBox")
+
+	copy: -> return denyCopy()
+
+	copySingle: -> return denyCopy()
