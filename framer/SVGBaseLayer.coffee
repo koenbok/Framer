@@ -92,8 +92,7 @@ class exports.SVGBaseLayer extends Layer
 	updateForDevicePixelRatioChange: =>
 		for cssProperty in ["width", "height", "webkitTransform"]
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
-	copy: undefined
-	copySingle: undefined
+
 	addChild: undefined
 	removeChild: undefined
 	addSubLayer: undefined
