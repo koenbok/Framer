@@ -1,10 +1,12 @@
 {LayerStyle} = require "./LayerStyle"
 {Layer, layerProperty} = require "./Layer"
 {Color} = require "./Color"
-
+Utils = require "./Utils"
 
 _svgMeasureElement = null
 
+denyCopy = ->
+	return Utils.throwInStudioOrWarnInProduction("SVGGroup and SVGPath do not support the `copy` method")
 
 getSVGMeasureElement = (constraints={}) ->
 	if not _svgMeasureElement?
@@ -190,3 +192,6 @@ class exports.SVGBaseLayer extends Layer
 	resetViewbox: =>
 		@_svg.setAttribute("viewBox", "0,0,#{@width},#{@height}")
 		@_svg.removeAttribute("viewBox")
+
+	copy: -> return denyCopy()
+	copySingle: -> return denyCopy()

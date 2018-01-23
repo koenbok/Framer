@@ -986,7 +986,7 @@ class exports.Layer extends BaseClass
 
 		for child in @children
 			copiedChild = child.copy()
-			copiedChild.parent = layer
+			copiedChild.parent = layer if copiedChild isnt null
 
 		return layer
 
