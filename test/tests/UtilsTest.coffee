@@ -781,3 +781,9 @@ describe "Utils", ->
 				Utils.equal(new Color("red"), 0).should.be.false
 			it "should return false when only right side is a Color", ->
 				Utils.equal(3, new Color("red")).should.be.false
+
+	describe "throw or warn message", ->
+		it "should warn when in production", ->
+			Utils.throwInStudioOrWarnInProduction("test")
+			# not throwing means a succesful test. There's no way to mock being in Framer Studio afaik, that
+			# is, without resorting to adding a mocking lib like sinon.js, which is overkill for just this method.

@@ -4,15 +4,11 @@
 {SVG} = require "./SVG"
 {SVGGroup} = require "./SVGGroup"
 {SVGPath} = require "./SVGPath"
-
-denyCopy = ->
-	if Utils.isFramerStudio()
-		throw new Error("SVGLayer does not support the `copy` method")
-	# else
-	console.warn("SVGLayer does not support the `copy` method")
-	return null
+Utils = require "./Utils"
 
 class exports.SVGLayer extends Layer
+
+	@DenyCopyMessage: "SVGLayer doesn't support `copy` when the layer has one more children"
 
 	constructor: (options={}) ->
 		# Ugly: detect Vekter export with html intrinsic size
@@ -75,12 +71,12 @@ class exports.SVGLayer extends Layer
 
 	copy: ->
 		if @children.length > 0
-			return denyCopy()
+			return Utils.throwInStudioOrWarnInProduction(SVGLayer.DenyCopyMessage)
 		else
 			return super()
 
 	copySingle: ->
 		if @children.length > 0
-			return denyCopy()
+			return Utils.throwInStudioOrWarnInProduction(SVGLayer.DenyCopyMessage)
 		else
 			return super()

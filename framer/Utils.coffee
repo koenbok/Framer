@@ -1415,4 +1415,11 @@ Utils.textSize = (text, style={}, constraints={}) ->
 		height: rect.bottom - rect.top
 
 
+Utils.throwInStudioOrWarnInProduction = (message) ->
+	if Utils.isFramerStudio()
+		throw new Error(message)
+	# else
+	console.warn(message)
+	return null
+
 _.extend exports, Utils
