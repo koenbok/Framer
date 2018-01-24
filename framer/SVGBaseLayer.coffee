@@ -49,6 +49,7 @@ class exports.SVGBaseLayer extends Layer
 		exportable: false
 		importable: false
 		get: ->
+			return @_parent.parent if @_parent instanceof SVGLayer
 			@_parent or null
 	@define "html",	get: ->	@_element.outerHTML or ""
 
@@ -126,7 +127,9 @@ class exports.SVGBaseLayer extends Layer
 			@_pixelMultiplierOverride = 1
 		svgLayer = @_parent
 		while svgLayer? and not (svgLayer instanceof SVGLayer)
-			svgLayer = svgLayer.parent
+			svgLayer = svgLayer._parent
+		@_svgLayer = svgLayer
+		@_svg = @_svgLayer.svg
 		@_svgSize = svgLayer.size
 
 		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset", "name", "opacity"]
@@ -154,10 +157,6 @@ class exports.SVGBaseLayer extends Layer
 		@calculateSize()
 		super(options)
 
-		for parent in @ancestors()
-			if parent instanceof SVGLayer
-				@_svg = parent.svg
-				break
 		@resetViewbox()
 
 		for prop in ["frame", "stroke", "strokeWidth", "strokeLinecap", "strokeLinejoin", "strokeMiterlimit", "strokeDasharray", "strokeDashoffset", "rotation", "scale"]
