@@ -503,14 +503,16 @@ class exports.Layer extends BaseClass
 		# If this is a number, we set everything to that number
 		if _.isNumber(input)
 			for k in keys
-				@[k] = input
+				if @[k] isnt input
+					@[k] = input
 		else
 			# If there is nothing to work with we exit
 			return unless input
 
 			# Set every numeric value for eacht key
 			for k in keys
-				@[k] = input[k] if _.isNumber(input[k])
+				if _.isNumber(input[k]) and @[k] isnt input[k]
+					@[k] = input[k]
 
 	@define "point",
 		importable: true
