@@ -62,6 +62,12 @@ class exports.SVGLayer extends Layer
 			if typeof value is "string"
 				@html = value
 			else if value instanceof SVGElement
+				idElements = value.querySelectorAll('[id]')
+				for element in idElements
+					existingElement = document.querySelector("[id='#{element.id}']")
+					if existingElement?
+						Utils.throwInStudioOrWarnInProduction(Layer.ExistingIdMessage("svg", element.id))
+						return
 				@_createHTMLElementIfNeeded()
 				while @_elementHTML.firstChild
 					@_elementHTML.removeChild(@_elementHTML.firstChild)
@@ -70,13 +76,5 @@ class exports.SVGLayer extends Layer
 				@_elementHTML.appendChild(value)
 
 	copy: ->
-		if @children.length > 0
-			return Utils.throwInStudioOrWarnInProduction(SVGLayer.DenyCopyMessage)
-		else
-			return super()
-
-	copySingle: ->
-		if @children.length > 0
-			return Utils.throwInStudioOrWarnInProduction(SVGLayer.DenyCopyMessage)
-		else
-			return super()
+		layer = @copySingle()
+		return layer

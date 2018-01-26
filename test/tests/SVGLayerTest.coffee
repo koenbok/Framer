@@ -26,14 +26,27 @@ describe "SVGLayer", ->
 			a.htmlIntrinsicSize.should.eql b.htmlIntrinsicSize
 			a.destroy()
 
-		it "should not copy SVGLayer that has children", ->
+		it "should copy a SVGLayer that has no id's but does have names", ->
+			svgWithNames = '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle"></path></svg>'
+			a = new SVGLayer
+				x: 123
+				y: 456
+				svg: svgWithNames
+
+			b = a.copy()
+			b.html.should.equal '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
+			b._elementHTML.should.not.be.equal a._elementHTML
+
+		# it "should change the id's to random id's"
+
+		it "should not copy SVGLayer that has ids", ->
 			a = new SVGLayer
 				x: 123
 				y: 456
 				svg: '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><path d="M 100 50 C 100 77.614 77.614 100 50 100 C 22.386 100 0 77.614 0 50 C 0 22.386 22.386 0 50 0" id="path" name="path" fill="transparent" stroke="#0AF"></path></svg>'
-
 			b = a.copy()
-			expect(b).to.be.null
+			expect(b.html).to.equal ''
+			a.destroy()
 
 	describe "initializing", ->
 		it "should set clip to true by default", ->
@@ -66,6 +79,28 @@ describe "SVGLayer", ->
 			a = new SVGLayer
 				html: svgString
 			expect(a.backgroundColor).to.be.null
+
+		it "should warn when adding an svg string with id's that already exist in the document", ->
+			svgWithIds = '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" id="test-bla/hoera"></path></svg>'
+			a = new SVGLayer
+				svg: svgWithIds
+			b = new SVGLayer
+				svg: svgWithIds
+			a.html.should.equal '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" id="test-bla/hoera" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
+			b.html.should.equal ''
+			a.destroy()
+			b.destroy()
+
+		it "should warn when adding an svg element with id's that already exist in the document", ->
+			svgWithIds = '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" id="test-bla/hoera"></path></svg>'
+			a = new SVGLayer
+				svg: svgWithIds
+			b = new SVGLayer
+				svg: a.svg
+			a.html.should.equal '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" id="test-bla/hoera" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
+			b.html.should.equal ''
+			a.destroy()
+
 
 	describe "svg", ->
 		describe "getter", ->
