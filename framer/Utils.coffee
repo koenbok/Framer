@@ -1431,5 +1431,15 @@ Utils.getIdAttributesFromString = (string) ->
 			matches.push(id)
 	matches
 
+Utils.getUniqueId = (prefix = 'id') ->
+	id = prefix
+	count = 1
+	existingElement = document.querySelector("[id='#{id}']")
+	while existingElement?
+		id = "#{prefix}#{count}"
+		existingElement = document.querySelector("[id='#{id}']")
+	return id
+
+
 
 _.extend exports, Utils

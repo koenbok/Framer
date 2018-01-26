@@ -78,3 +78,19 @@ class exports.SVGLayer extends Layer
 	copy: ->
 		layer = @copySingle()
 		return layer
+
+	copySingle: ->
+		props = @props
+		if props.html? and props.svg?
+			delete props.svg
+		ids = Utils.getIdAttributesFromString(props.html)
+		html = props.html
+		for id in ids
+			uniqueId = Utils.getUniqueId(id)
+			if id isnt uniqueId
+				html = html.replace(///((id|xlink:href)=["'']\#?)#{id}(["'])///g, "$1#{uniqueId}$3")
+				html = html.replace(///(["'']url\(\#)#{id}(\)["'])///g, "$1#{uniqueId}$2")
+		props.html = html
+		copy = new @constructor(props)
+		copy.style = @style
+		copy
