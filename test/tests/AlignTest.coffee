@@ -81,6 +81,8 @@ describe "Align", ->
 			rect.x.should.equal 414-66
 			rect.y.should.equal 0
 
+			svg.destroy()
+
 
 	describe "left", ->
 

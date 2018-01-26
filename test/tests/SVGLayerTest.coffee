@@ -24,6 +24,7 @@ describe "SVGLayer", ->
 
 			b = a.copy()
 			a.htmlIntrinsicSize.should.eql b.htmlIntrinsicSize
+			a.destroy()
 
 		it "should not copy SVGLayer that has children", ->
 			a = new SVGLayer

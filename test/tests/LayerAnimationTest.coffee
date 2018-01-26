@@ -1247,6 +1247,9 @@ describe "LayerAnimation", ->
 				autoSize: true
 				strokeWidth: 1
 
+		afterEach ->
+			layer.destroy()
+
 		it "should animate the fill property", (done) ->
 			layer.onAnimationEnd ->
 				layer.fill.should.equalColor "yellow"
@@ -1297,4 +1300,5 @@ describe "LayerAnimation", ->
 			a.onAnimationEnd ->
 				l.x.should.equal 45 + path.x
 				l.y.should.equal -5 + path.y
+				svg.destroy()
 				done()
