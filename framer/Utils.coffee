@@ -1422,4 +1422,14 @@ Utils.throwInStudioOrWarnInProduction = (message) ->
 	console.warn(message)
 	return null
 
+Utils.getIdAttributesFromString = (string) ->
+	regex = /id=['"]([^'"]+)["']/g
+	matches = []
+	while (m = regex.exec(string))
+		id = m[1]
+		if id?
+			matches.push(id)
+	matches
+
+
 _.extend exports, Utils
