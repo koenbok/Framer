@@ -236,6 +236,8 @@ class exports.Layer extends BaseClass
 
 		@onChange("size", @updateForSizeChange)
 
+	@ExistingIdMessage: (type, id) -> "Can not set #{type}: There's already an element with id '#{id}' in this document'"
+
 	##############################################################
 	# Properties
 
@@ -924,6 +926,12 @@ class exports.Layer extends BaseClass
 			# a child node to insert it in, so it won't mess with Framers
 			# layer hierarchy.
 			@_createHTMLElementIfNeeded()
+			ids = Utils.getIdAttributesFromString(value)
+			for id in ids
+				existingElement = document.querySelector("[id='#{id}']")
+				if existingElement?
+					Utils.throwInStudioOrWarnInProduction(Layer.ExistingIdMessage("html", id))
+					return
 
 			@_elementHTML.innerHTML = value
 			@_updateHTMLScale()
