@@ -136,14 +136,14 @@ describe "SVGLayer", ->
 				html: svgString
 			expect(a.backgroundColor).to.be.null
 
-		it "should warn when adding an svg string with id's that already exist in the document", ->
+		it "should unique the id's in a string that already exist in the document", ->
 			svgWithIds = '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" id="test-bla/hoera"></path></svg>'
 			a = new SVGLayer
 				svg: svgWithIds
 			b = new SVGLayer
 				svg: svgWithIds
 			a.html.should.equal '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" id="test-bla/hoera" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
-			b.html.should.equal ''
+			b.html.should.equal '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" id="test-bla/hoera1" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
 			a.destroy()
 			b.destroy()
 

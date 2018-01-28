@@ -6,6 +6,15 @@
 {SVGPath} = require "./SVGPath"
 Utils = require "./Utils"
 
+updateIdsToBeUnique = (htmlString) ->
+	ids = Utils.getIdAttributesFromString(htmlString)
+	for id in ids
+		uniqueId = Utils.getUniqueId(id)
+		if id isnt uniqueId
+			htmlString = htmlString.replace(///((id|xlink:href)=["'']\#?)#{id}(["'])///g, "$1#{uniqueId}$3")
+			htmlString = htmlString.replace(///(["'']url\(\#)#{id}(\)["'])///g, "$1#{uniqueId}$2")
+	return htmlString
+
 class exports.SVGLayer extends Layer
 
 	@DenyCopyMessage: "SVGLayer doesn't support `copy` when the layer has one more children"
@@ -60,7 +69,7 @@ class exports.SVGLayer extends Layer
 				return null
 		set: (value) ->
 			if typeof value is "string"
-				@html = value
+				@html = updateIdsToBeUnique(value)
 			else if value instanceof SVGElement
 				idElements = value.querySelectorAll('[id]')
 				for element in idElements
@@ -83,14 +92,7 @@ class exports.SVGLayer extends Layer
 		props = @props
 		if props.html? and props.svg?
 			delete props.svg
-		ids = Utils.getIdAttributesFromString(props.html)
-		html = props.html
-		for id in ids
-			uniqueId = Utils.getUniqueId(id)
-			if id isnt uniqueId
-				html = html.replace(///((id|xlink:href)=["'']\#?)#{id}(["'])///g, "$1#{uniqueId}$3")
-				html = html.replace(///(["'']url\(\#)#{id}(\)["'])///g, "$1#{uniqueId}$2")
-		props.html = html
+		props.html = updateIdsToBeUnique(props.html)
 		copy = new @constructor(props)
 		copy.style = @style
 		copy
