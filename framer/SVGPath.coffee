@@ -38,6 +38,18 @@ class exports.SVGPath extends SVGBaseLayer
 			@_path = @_svg.querySelector(link)
 		@_length = @_path.getTotalLength()
 
+	updateStroke: ->
+		startLength = @strokeStart ? 0
+		endLength = @strokeEnd ? @length
+		# print startLength, endLength
+		if endLength < startLength
+			gap = startLength - endLength
+			@strokeDasharray = [endLength, gap, @length - startLength, 0]
+		else
+			length = endLength - startLength
+			@strokeDasharray = [0, startLength, length, @length - endLength]
+		print @strokeDasharray
+
 	# Custom properties
 	@define "fill", layerProperty(@, "fill", "fill", null, SVG.validFill, SVG.toFill)
 	@define "stroke", layerProperty(@, "stroke", "stroke", null, SVG.validFill, SVG.toFill)
@@ -48,13 +60,25 @@ class exports.SVGPath extends SVGBaseLayer
 	@define "strokeOpacity", layerProperty(@, "strokeOpacity", "strokeOpacity", null, _.isNumber, parseFloat)
 	@define "strokeDasharray", layerProperty(@, "strokeDasharray", "strokeDasharray", [], _.isArray, dasharrayTransform)
 	@define "strokeDashoffset", layerProperty(@, "strokeDashoffset", "strokeDashoffset", null, _.isNumber, dashoffsetTransform)
-	@define "strokeLength", layerProperty @, "strokeLength", null, undefined, _.isNumber, null, {}, (path, value) ->
+	@define "strokeLength", layerProperty @, "strokeLength", null, undefined, _.isNumber, ((value, path) -> Math.max(0, Math.min(value, path.length))), {}, (path, value) ->
+		strokeStart = path.strokeStart ? 0
+		strokeEnd = strokeStart + value
+		path._properties.strokeEnd = strokeEnd
 		path._properties.strokeFraction = value / path.length
-		if _.isEmpty path.strokeDasharray
-			path.strokeDasharray = [path.length]
-		path.strokeDashoffset = path.length - value
-	@define "strokeFraction", layerProperty @, "strokeFraction", null, undefined, _.isNumber, null, {}, (path, value) ->
+		path.updateStroke()
+
+	@define "strokeFraction", layerProperty @, "strokeFraction", null, undefined, _.isNumber, ((value, path) -> Math.max(0, Math.min(value, 1))), {}, (path, value) ->
 		path.strokeLength = path.length * value
+
+	@define "strokeStart", layerProperty @, "strokeStart", null, undefined, _.isNumber, ((value, path) -> Math.max(0, Math.min(value, path.length))), {}, (path, value) ->
+		strokeEnd = path.strokeEnd ? @length
+		path._properties.strokeLength = Math.abs(strokeEnd - path.strokeStart)
+		path.updateStroke()
+
+	@define "strokeEnd", layerProperty @, "strokeEnd", null, undefined, _.isNumber, ((value, path) -> Math.max(0, Math.min(value, path.length))), {}, (path, value) ->
+		strokeStart = path.strokeStart ? 0
+		path._properties.strokeLength = Math.abs(path.strokeEnd - strokeStart)
+		path.updateStroke()
 
 	@define "length", get: -> @_length
 	@define "start", get: -> @pointAtFraction(0)
