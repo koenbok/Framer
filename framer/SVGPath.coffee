@@ -3,15 +3,23 @@
 {SVGBaseLayer} = require "./SVGBaseLayer"
 {SVG} = require "./SVG"
 
-dashArrayTransform = (value) ->
+dasharrayTransform = (value) ->
 	if _.isString value
 		values = []
 		if value.indexOf(",") isnt -1
 			values = value.split(',')
 		else
 			values = value.split(" ")
-		values = values.filter((v) -> v.length > 0).map((v) -> parseFloat(v.trim()))
+		values = values.map((v) -> v.trim())
+						.filter((v) -> v.length > 0)
+						.map((v) -> parseFloat(v))
 		return values
+	return value
+
+dashoffsetTransform = (value) ->
+	v = parseFloat(value)
+	if isNaN(v)
+		return null
 	return value
 
 class exports.SVGPath extends SVGBaseLayer
@@ -38,8 +46,8 @@ class exports.SVGPath extends SVGBaseLayer
 	@define "strokeLinejoin", layerProperty(@, "strokeLinejoin", "strokeLinejoin", null, _.isString)
 	@define "strokeMiterlimit", layerProperty(@, "strokeMiterlimit", "strokeMiterlimit", null, _.isNumber, parseFloat)
 	@define "strokeOpacity", layerProperty(@, "strokeOpacity", "strokeOpacity", null, _.isNumber, parseFloat)
-	@define "strokeDasharray", layerProperty(@, "strokeDasharray", "strokeDasharray", [], _.isArray, dashArrayTransform)
-	@define "strokeDashoffset", layerProperty(@, "strokeDashoffset", "strokeDashoffset", null, _.isNumber, parseFloat)
+	@define "strokeDasharray", layerProperty(@, "strokeDasharray", "strokeDasharray", [], _.isArray, dasharrayTransform)
+	@define "strokeDashoffset", layerProperty(@, "strokeDashoffset", "strokeDashoffset", null, _.isNumber, dashoffsetTransform)
 	@define "strokeLength", layerProperty @, "strokeLength", null, undefined, _.isNumber, null, {}, (path, value) ->
 		path._properties.strokeFraction = value / path.length
 		if _.isEmpty path.strokeDasharray

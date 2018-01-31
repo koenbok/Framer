@@ -1,3 +1,5 @@
+{expect} = require "chai"
+
 describe "SVGPath", ->
 	svg = null
 	path = null
@@ -34,9 +36,10 @@ describe "SVGPath", ->
 	describe "storkeDasharray", ->
 		it "should work when the dashArray is an empty string", ->
 			layer = new SVGLayer
-				svg: """<svg><path stroke-dasharray="" id='test' name='path' d='M 0 0 L 100 200'/>"""
+				svg: """<svg><path stroke-dasharray="" stroke-dashoffset="" id='test' name='path' d='M 0 0 L 100 200'/>"""
 				stroke: '#000'
 			layer.elements.test.strokeDasharray.should.eql []
+			expect(layer.elements.test.strokeDashoffset).to.be.null
 
 	describe "positioning", ->
 		it "should proxy the transform property to the SVGLayer if that is it's direct parent", ->
