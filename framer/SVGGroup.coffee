@@ -56,7 +56,6 @@ class SVGGroup extends SVGBaseLayer
 	@defineGroupProxyProp "stroke"
 	@defineGroupProxyProp "strokeWidth", _.isNumber, parseInt
 	@defineGroupProxyProp "strokeWidthMultiplier", _.isNumber, parseInt
-	@defineGroupProxyProp "color", Color.validColorValue, Color.toColor
 	# coffeelint: disable=prefer_english_operator
 	@defineGroupProxyProp "ignoreEvents", _.isBoolean, (value) -> !!value
 	# coffeelint: enable=prefer_english_operator
