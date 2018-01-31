@@ -10,7 +10,7 @@ dashArrayTransform = (value) ->
 			values = value.split(',')
 		else
 			values = value.split(" ")
-		values = values.map((v) -> parseFloat(v.trim()))
+		values = values.filter((v) -> v.length > 0).map((v) -> parseFloat(v.trim()))
 		return values
 	return value
 

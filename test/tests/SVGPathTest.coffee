@@ -31,6 +31,13 @@ describe "SVGPath", ->
 			point.x.should.be.closeTo 0, 0.01
 			point.y.should.be.closeTo 50, 0.01
 
+	describe "storkeDasharray", ->
+		it "should work when the dashArray is an empty string", ->
+			layer = new SVGLayer
+				svg: """<svg><path stroke-dasharray="" id='test' name='path' d='M 0 0 L 100 200'/>"""
+				stroke: '#000'
+			layer.elements.test.strokeDasharray.should.eql []
+
 	describe "positioning", ->
 		it "should proxy the transform property to the SVGLayer if that is it's direct parent", ->
 			path.x.should.equal 123
