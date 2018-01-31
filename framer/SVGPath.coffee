@@ -108,6 +108,12 @@ class exports.SVGPath extends SVGBaseLayer
 	pointAtFraction: (fraction) ->
 		@_path.getPointAtLength(@length * fraction)
 
+	convertStartToLayer: (layer) ->
+		@convertPointToLayer(@start, layer)
+
+	convertEndToLayer: (layer) ->
+		@convertPointToLayer(@end, layer)
+
 	valueUpdater: (axis, target, offset) =>
 		switch axis
 			when "horizontal"
