@@ -66,6 +66,24 @@ describe "SVGPath", ->
 			path.strokeDasharray.should.eql [100, path.length - 100]
 			expect(path.strokeDashoffset).to.be.null
 
+		it "-1", ->
+			path.strokeLength = -1
+			path.strokeLength.should.equal 0
+			path.strokeStart.should.equal 0
+			path.strokeEnd.should.equal 0
+			path.strokeDasharray.should.eql [0, path.length]
+			path.strokeFraction.should.equal 0
+			expect(path.strokeDashoffset).to.be.null
+
+		it "1000", ->
+			path.strokeLength = 1000
+			path.strokeLength.should.equal path.length
+			path.strokeStart.should.equal 0
+			path.strokeEnd.should.equal path.length
+			path.strokeDasharray.should.eql []
+			path.strokeFraction.should.equal 1
+			expect(path.strokeDashoffset).to.be.null
+
 	describe "strokeFraction", ->
 		it "0", ->
 			path.strokeFraction = 0
@@ -91,6 +109,25 @@ describe "SVGPath", ->
 			path.strokeDasharray.should.eql [path.length/2]
 			expect(path.strokeDashoffset).to.be.null
 
+		it "-1", ->
+			path.strokeFraction = -1
+			path.strokeFraction.should.equal 0
+			path.strokeStart.should.equal 0
+			path.strokeEnd.should.equal 0
+			path.strokeLength.should.equal 0
+			path.strokeDasharray.should.eql [0, path.length]
+			expect(path.strokeDashoffset).to.be.null
+
+
+		it "1000", ->
+			path.strokeFraction = 1000
+			path.strokeFraction.should.equal 1
+			path.strokeStart.should.equal 0
+			path.strokeEnd.should.equal path.length
+			path.strokeLength.should.equal path.length
+			path.strokeDasharray.should.eql []
+			expect(path.strokeDashoffset).to.be.null
+
 	describe "strokeStart", ->
 		it "0", ->
 			path.strokeStart = 0
@@ -99,7 +136,7 @@ describe "SVGPath", ->
 			path.strokeDasharray.should.eql []
 			expect(path.strokeDashoffset).to.be.null
 
-		it "1", ->
+		it "length", ->
 			path.strokeStart = path.length
 			path.strokeEnd.should.equal path.length
 			path.strokeLength.should.equal 0
@@ -134,6 +171,21 @@ describe "SVGPath", ->
 			path.strokeDasharray.should.eql [50, 150, path.length - 200, 0]
 			expect(path.strokeDashoffset).to.be.null
 
+		it "-1", ->
+			path.strokeStart = -1
+			path.strokeStart.should.equal 0
+			path.strokeEnd.should.equal path.length
+			path.strokeLength.should.equal path.length
+			path.strokeDasharray.should.eql []
+			expect(path.strokeDashoffset).to.be.null
+
+		it "1000", ->
+			path.strokeStart = 1000
+			path.strokeStart.should.equal path.length
+			path.strokeEnd.should.equal path.length
+			path.strokeLength.should.equal 0
+			path.strokeDasharray.should.eql [0, path.length]
+			expect(path.strokeDashoffset).to.be.null
 
 	describe "strokeEnd", ->
 		it "0", ->
@@ -152,6 +204,20 @@ describe "SVGPath", ->
 			path.strokeEnd = path.length / 2
 			path.strokeLength.should.equal path.length / 2
 			path.strokeDasharray.should.eql [path.length/2]
+			expect(path.strokeDashoffset).to.be.null
+
+		it "-1", ->
+			path.strokeEnd = -1
+			path.strokeEnd.should.equal 0
+			path.strokeLength.should.equal 0
+			path.strokeDasharray.should.eql [0, path.length]
+			expect(path.strokeDashoffset).to.be.null
+
+		it "1000", ->
+			path.strokeEnd = 1000
+			path.strokeEnd.should.equal path.length
+			path.strokeLength.should.equal path.length
+			path.strokeDasharray.should.eql []
 			expect(path.strokeDashoffset).to.be.null
 
 	describe "positioning", ->
