@@ -11,6 +11,7 @@ updateIdsToBeUnique = (htmlString) ->
 	for id in ids
 		uniqueId = Utils.getUniqueId(id)
 		if id isnt uniqueId
+			id = Utils.escapeForRegex(id)
 			htmlString = htmlString.replace(///((id|xlink:href)=["'']\#?)#{id}(["'])///g, "$1#{uniqueId}$3")
 			htmlString = htmlString.replace(///(["'']url\(\#)#{id}(\)["'])///g, "$1#{uniqueId}$2")
 	return htmlString

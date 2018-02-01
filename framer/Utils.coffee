@@ -1441,6 +1441,9 @@ Utils.getUniqueId = (prefix = 'id') ->
 		count++
 	return id
 
+Utils.escapeForRegex = (string) ->
+	return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+
 
 
 _.extend exports, Utils
