@@ -102,8 +102,6 @@ class exports.SVGPath extends SVGBaseLayer
 			path.strokeLength = (path.length - strokeStart) + strokeEnd
 
 	@define "length", get: -> @_length
-	@define "start", get: -> @pointAtFraction(0)
-	@define "end", get: -> @pointAtFraction(1)
 
 	pointAtFraction: (fraction) ->
 		@_path.getPointAtLength(@length * fraction)
@@ -116,21 +114,27 @@ class exports.SVGPath extends SVGBaseLayer
 		angle = Math.atan2(fromPoint.y - toPoint.y, fromPoint.x - toPoint.x) * 180 / Math.PI - 90
 		return angle
 
+	start: (relativeToLayer = null) =>
+		point = @pointAtFraction(0)
+		point = @convertPointToLayer(point, relativeToLayer?.parent)
+		point.rotation = @rotationAtFraction(0)
+		return point
 
-	convertStartToLayer: (layer) ->
-		@convertPointToLayer(@start, layer)
+	end: (relativeToLayer = null) =>
+		point = @pointAtFraction(0)
+		point = @convertPointToLayer(point, relativeToLayer?.parent)
+		point.rotation = @rotationAtFraction(1)
+		return point
 
-	convertEndToLayer: (layer) ->
-		@convertPointToLayer(@end, layer)
 
 	valueUpdater: (axis, target, offset) =>
 		switch axis
 			when "horizontal"
-				offset -= @start.x
+				offset -= @pointAtFraction(0).x
 				return (key, value) =>
 					target[key] = offset + @pointAtFraction(value).x
 			when "vertical"
-				offset -= @start.y
+				offset -= @pointAtFraction(0).y
 				return (key, value) =>
 					target[key] = offset + @pointAtFraction(value).y
 			when "angle"

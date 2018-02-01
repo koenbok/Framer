@@ -1281,8 +1281,8 @@ describe "LayerAnimation", ->
 			path = svg.elements.path
 			l = new Layer
 				size: 10
-				midX: path.start.x + path.x
-				midY: path.start.y + path.y
+				midPoint: path.start
+				rotation: path.start().rotation
 			l.x.should.equal 95 + path.x
 			l.y.should.equal 45 + path.y
 			a = l.animate
