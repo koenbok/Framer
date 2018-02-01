@@ -104,6 +104,24 @@ describe "SVGLayer", ->
 			expect(b.html).to.equal '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><path d="M 100 50 C 100 77.614 77.614 100 50 100 C 22.386 100 0 77.614 0 50 C 0 22.386 22.386 0 50 0" id="path1" name="path" fill="transparent" stroke="#0AF" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; fill: rgba(0, 0, 0, 0); stroke: #00aaff; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
 			a.destroy()
 
+		it "should be able to copy a layer twice", ->
+			string = '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" id="rect" name="Rectangle"></path></svg>'
+			a = new SVGLayer
+				width: 24
+				html: string
+				height: 24
+
+			b = a.copy()
+			c = a.copy()
+			b.html.should.not.equal ""
+			c.html.should.not.equal ""
+			a.html.should.not.equal b.html
+			a.html.should.not.equal c.html
+			b.html.should.not.equal c.html
+			a.destroy()
+			b.destroy()
+			c.destroy()
+
 	describe "initializing", ->
 		it "should set clip to true by default", ->
 			a = new SVGLayer

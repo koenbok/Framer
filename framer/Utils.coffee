@@ -1438,6 +1438,7 @@ Utils.getUniqueId = (prefix = 'id') ->
 	while existingElement?
 		id = "#{prefix}#{count}"
 		existingElement = document.querySelector("[id='#{id}']")
+		count++
 	return id
 
 
