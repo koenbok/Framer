@@ -40,6 +40,14 @@ describe "SVGPath", ->
 				stroke: '#000'
 			layer.elements.test.strokeDasharray.should.eql []
 			expect(layer.elements.test.strokeDashoffset).to.be.null
+			layer.destroy()
+
+		it "should work when the dashOffset is set", ->
+			layer = new SVGLayer
+				svg: """<svg><path stroke-dasharray="" stroke-dashoffset="3" id='test' name='path' d='M 0 0 L 100 200'/>"""
+				stroke: '#000'
+			layer.elements.test.strokeDashoffset.should.equal 3
+			layer.destroy()
 
 	describe "strokeLength", ->
 		it "0", ->

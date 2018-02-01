@@ -20,7 +20,7 @@ dashoffsetTransform = (value) ->
 	v = parseFloat(value)
 	if isNaN(v)
 		return null
-	return value
+	return v
 
 class exports.SVGPath extends SVGBaseLayer
 	constructor: (path, options) ->
