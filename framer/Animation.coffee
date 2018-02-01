@@ -214,6 +214,10 @@ class exports.Animation extends BaseClass
 	reverse: ->
 		# TODO: Add some tests
 		properties = _.clone(@_originalState)
+		for key, value of @properties
+			if SVG.isPath(value)
+				value.reversed = not value.reversed
+				properties[key] = value
 		options = _.clone(@options)
 		new Animation @layer, properties, options
 

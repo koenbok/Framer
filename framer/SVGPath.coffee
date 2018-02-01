@@ -42,7 +42,9 @@ class exports.SVGPath extends SVGBaseLayer
 		startLength = @strokeStart ? 0
 		endLength = @strokeEnd ? @length
 		dasharray = []
-		if endLength < startLength
+		if endLength is startLength
+			dasharray = [0, startLength, 0, @length - endLength]
+		else if endLength < startLength
 			gap = startLength - endLength
 			remaining = @length - startLength
 			dasharray.push(endLength)
@@ -60,6 +62,10 @@ class exports.SVGPath extends SVGBaseLayer
 				dasharray.push(length)
 				if length isnt remaining and remaining isnt 0
 					dasharray.push(remaining)
+		if @reversed
+			if dasharray.length % 2 is 0
+				dasharray.push(0)
+			dasharray.reverse()
 		@strokeDasharray = dasharray
 
 	# Custom properties
@@ -103,15 +109,23 @@ class exports.SVGPath extends SVGBaseLayer
 
 	@define "length", get: -> @_length
 
+	@define "reversed", @simpleProperty("reversed", false)
+
 	pointAtFraction: (fraction) ->
+		if @reversed
+			fraction = 1 - fraction
 		@_path.getPointAtLength(@length * fraction)
 
 	rotationAtFraction: (fraction, delta = 0.01) ->
+		if @reversed
+			fraction = 1 - fraction
 		if delta <= 0
 			delta = 0.01
 		fromPoint = @pointAtFraction(Math.max(fraction - delta, 0))
 		toPoint = @pointAtFraction(Math.min(fraction + delta, 1))
 		angle = Math.atan2(fromPoint.y - toPoint.y, fromPoint.x - toPoint.x) * 180 / Math.PI - 90
+		if @reversed
+			angle = 360 - angle
 		return angle
 
 	start: (relativeToLayer = null) =>
