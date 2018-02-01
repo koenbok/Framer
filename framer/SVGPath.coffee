@@ -108,6 +108,15 @@ class exports.SVGPath extends SVGBaseLayer
 	pointAtFraction: (fraction) ->
 		@_path.getPointAtLength(@length * fraction)
 
+	rotationAtFraction: (fraction, delta = 0.01) ->
+		if delta <= 0
+			delta = 0.01
+		fromPoint = @pointAtFraction(Math.max(fraction - delta, 0))
+		toPoint = @pointAtFraction(Math.min(fraction + delta, 1))
+		angle = Math.atan2(fromPoint.y - toPoint.y, fromPoint.x - toPoint.x) * 180 / Math.PI - 90
+		return angle
+
+
 	convertStartToLayer: (layer) ->
 		@convertPointToLayer(@start, layer)
 
@@ -125,9 +134,7 @@ class exports.SVGPath extends SVGBaseLayer
 				return (key, value) =>
 					target[key] = offset + @pointAtFraction(value).y
 			when "angle"
+				offset -= @rotationAtFraction(0)
 				return (key, value, delta = 0) =>
 					return if delta is 0
-					fromPoint = @pointAtFraction(Math.max(value - delta, 0))
-					toPoint = @pointAtFraction(Math.min(value + delta, 1))
-					angle = Math.atan2(fromPoint.y - toPoint.y, fromPoint.x - toPoint.x) * 180 / Math.PI - 90
-					target[key] = angle
+					target[key] = offset + @rotationAtFraction(value, delta)
