@@ -533,6 +533,7 @@ class exports.Layer extends BaseClass
 			x: @midX
 			y: @midY
 		set: (input) ->
+			input = layerPropertyPointTransformer(input, @, "midPoint")
 			if not _.isNumber input
 				input = _.pick(input, ["x", "y", "midX", "midY"])
 				if input.x? and not input.midX?
@@ -541,7 +542,6 @@ class exports.Layer extends BaseClass
 				if input.y? and not input.midY?
 					input.midY = input.y
 					delete input.y
-			input = layerPropertyPointTransformer(input, @, "midPoint")
 			@_setGeometryValues(input, ["midX", "midY"])
 
 	@define "size",
