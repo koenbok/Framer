@@ -43,7 +43,13 @@ class exports.SVGPath extends SVGBaseLayer
 		endLength = @strokeEnd ? @length
 		dasharray = []
 		if endLength is startLength
-			dasharray = [0, startLength, 0, @length - endLength]
+			if startLength isnt 0
+				dasharray.push(0)
+				dasharray.push(startLength)
+			remaining = @length - endLength
+			if remaining isnt 0
+				dasharray.push(0)
+				dasharray.push(remaining)
 		else if endLength < startLength
 			gap = startLength - endLength
 			remaining = @length - startLength
