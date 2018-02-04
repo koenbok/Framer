@@ -214,6 +214,10 @@ class exports.Animation extends BaseClass
 	reverse: ->
 		# TODO: Add some tests
 		properties = _.clone(@_originalState)
+		for key, value of @properties
+			if SVG.isPath(value)
+				value.reversed = not value.reversed
+				properties[key] = value
 		options = _.clone(@options)
 		new Animation @layer, properties, options
 
@@ -430,14 +434,17 @@ class exports.Animation extends BaseClass
 
 		# Only animate numeric properties for now
 		for k, v of properties
-			if k in ["frame", "size", "point", "midPoint"] # Derived properties
+			if k in ["frame", "size", "point", "midPoint", "path"] # Derived properties
 				switch k
 					when "frame" then derivedKeys = ["x", "y", "width", "height"]
 					when "size" then derivedKeys = ["width", "height"]
 					when "point" then derivedKeys = ["x", "y"]
 					when "midPoint" then derivedKeys = ["midX", "midY"]
+					when "path" then derivedKeys = ["x", "y", "rotation"]
 					else derivedKeys = []
 				if SVG.isPath(v)
+					if k is "path"
+						layer.midPoint = v.start
 					for derivedKey in derivedKeys
 						animatableProperties[derivedKey] = v
 				else if _.isObject(v)

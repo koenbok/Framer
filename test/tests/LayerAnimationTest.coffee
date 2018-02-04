@@ -1247,6 +1247,9 @@ describe "LayerAnimation", ->
 				autoSize: true
 				strokeWidth: 1
 
+		afterEach ->
+			layer.destroy()
+
 		it "should animate the fill property", (done) ->
 			layer.onAnimationEnd ->
 				layer.fill.should.equalColor "yellow"
@@ -1273,24 +1276,29 @@ describe "LayerAnimation", ->
 		it "should animate along a path", (done) ->
 			svg = new SVGLayer
 				svg: '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><path d="M 100 50 C 100 77.614 77.614 100 50 100 C 22.386 100 0 77.614 0 50 C 0 22.386 22.386 0 50 0" id="path" name="path" fill="transparent" stroke="#0AF"></path></svg>'
+				x: 123
+				y: 456
 			path = svg.elements.path
 			l = new Layer
 				size: 10
-				midX: path.start.x + path.parent.x
-				midY: path.start.y + path.parent.y
-			l.x.should.equal 95
-			l.y.should.equal 45
+				midPoint: path.start
+				rotation: path.start().rotation
+			l.x.should.equal 95 + path.x
+			l.y.should.equal 45 + path.y
 			a = l.animate
 				x: path
 				y: path
+				rotation: path
 				options:
 					curve: Bezier.linear
 					time: 0.1
 			Utils.delay a.options.time / 2, ->
-				l.x.should.be.within(-5, 40)
-				l.y.should.be.within(40, 90)
+				l.x.should.be.within(-5 + path.x, 40 + path.y)
+				l.y.should.be.within(40 + path.y, 90 + path.y)
+				l.rotation.should.be.within(-90, 1)
 
 			a.onAnimationEnd ->
-				l.x.should.equal 45
-				l.y.should.equal -5
+				l.x.should.equal 45 + path.x
+				l.y.should.equal -5 + path.y
+				svg.destroy()
 				done()

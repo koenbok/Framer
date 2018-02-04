@@ -1415,4 +1415,35 @@ Utils.textSize = (text, style={}, constraints={}) ->
 		height: rect.bottom - rect.top
 
 
+Utils.throwInStudioOrWarnInProduction = (message) ->
+	if Utils.isFramerStudio()
+		throw new Error(message)
+	# else
+	console.warn(message)
+	return null
+
+Utils.getIdAttributesFromString = (string) ->
+	regex = /id=['"]([^'"]+)["']/g
+	matches = []
+	while (m = regex.exec(string))
+		id = m[1]
+		if id?
+			matches.push(id)
+	matches
+
+Utils.getUniqueId = (prefix = 'id') ->
+	id = prefix
+	count = 1
+	existingElement = document.querySelector("[id='#{id}']")
+	while existingElement?
+		id = "#{prefix}#{count}"
+		existingElement = document.querySelector("[id='#{id}']")
+		count++
+	return id
+
+Utils.escapeForRegex = (string) ->
+	return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+
+
+
 _.extend exports, Utils

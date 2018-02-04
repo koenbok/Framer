@@ -1,10 +1,12 @@
 {LayerStyle} = require "./LayerStyle"
 {Layer, layerProperty} = require "./Layer"
 {Color} = require "./Color"
-
+Utils = require "./Utils"
 
 _svgMeasureElement = null
 
+denyCopy = ->
+	return Utils.throwInStudioOrWarnInProduction("SVGGroup and SVGPath do not support the `copy` method")
 
 getSVGMeasureElement = (constraints={}) ->
 	if not _svgMeasureElement?
@@ -47,6 +49,7 @@ class exports.SVGBaseLayer extends Layer
 		exportable: false
 		importable: false
 		get: ->
+			return @_parent.parent if @_parent instanceof SVGLayer
 			@_parent or null
 	@define "html",	get: ->	@_element.outerHTML or ""
 
@@ -67,6 +70,8 @@ class exports.SVGBaseLayer extends Layer
 	@undefine ["borderRadius", "cornerRadius", "borderStyle"]
 	@undefine ["constraintValues", "htmlIntrinsicSize"]
 
+	@undefine "gradient"
+
 	# Aliassed helpers
 	@alias = (propertyName, proxiedName) ->
 		@define propertyName,
@@ -80,6 +85,7 @@ class exports.SVGBaseLayer extends Layer
 	@alias "strokeColor", "stroke"
 	@alias "borderWidth", "strokeWidth"
 	@alias "backgroundColor", "fill"
+	@alias "color", "fill"
 
 	# Overridden functions from Layer
 	_insertElement: ->
@@ -87,8 +93,7 @@ class exports.SVGBaseLayer extends Layer
 	updateForDevicePixelRatioChange: =>
 		for cssProperty in ["width", "height", "webkitTransform"]
 			@_element.style[cssProperty] = LayerStyle[cssProperty](@)
-	copy: undefined
-	copySingle: undefined
+
 	addChild: undefined
 	removeChild: undefined
 	addSubLayer: undefined
@@ -122,7 +127,9 @@ class exports.SVGBaseLayer extends Layer
 			@_pixelMultiplierOverride = 1
 		svgLayer = @_parent
 		while svgLayer? and not (svgLayer instanceof SVGLayer)
-			svgLayer = svgLayer.parent
+			svgLayer = svgLayer._parent
+		@_svgLayer = svgLayer
+		@_svg = @_svgLayer.svg
 		@_svgSize = svgLayer.size
 
 		pathProperties = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset", "name", "opacity"]
@@ -150,21 +157,10 @@ class exports.SVGBaseLayer extends Layer
 		@calculateSize()
 		super(options)
 
-		for parent in @ancestors()
-			if parent instanceof SVGLayer
-				@_svg = parent.svg
-				break
 		@resetViewbox()
 
 		for prop in ["frame", "stroke", "strokeWidth", "strokeLinecap", "strokeLinejoin", "strokeMiterlimit", "strokeDasharray", "strokeDashoffset", "rotation", "scale"]
 			@on "change:#{prop}", @resetViewbox
-
-	@define "gradient",
-		get: ->
-			console.warn "The gradient property is currently not supported on shapes"
-			return undefined
-		set: (value) ->
-			console.warn "The gradient property is currently not supported on shapes"
 
 	calculateSize: ->
 		element = @_element
@@ -190,3 +186,6 @@ class exports.SVGBaseLayer extends Layer
 	resetViewbox: =>
 		@_svg.setAttribute("viewBox", "0,0,#{@width},#{@height}")
 		@_svg.removeAttribute("viewBox")
+
+	copy: -> return denyCopy()
+	copySingle: -> return denyCopy()

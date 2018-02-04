@@ -4,8 +4,21 @@
 {SVG} = require "./SVG"
 {SVGGroup} = require "./SVGGroup"
 {SVGPath} = require "./SVGPath"
+Utils = require "./Utils"
+
+updateIdsToBeUnique = (htmlString) ->
+	ids = Utils.getIdAttributesFromString(htmlString)
+	for id in ids
+		uniqueId = Utils.getUniqueId(id)
+		if id isnt uniqueId
+			id = Utils.escapeForRegex(id)
+			htmlString = htmlString.replace(///((id|xlink:href)=["'']\#?)#{id}(["'])///g, "$1#{uniqueId}$3")
+			htmlString = htmlString.replace(///(["'']url\(\#)#{id}(\)["'])///g, "$1#{uniqueId}$2")
+	return htmlString
 
 class exports.SVGLayer extends Layer
+
+	@DenyCopyMessage: "SVGLayer doesn't support `copy` when the layer has one more children"
 
 	constructor: (options={}) ->
 		# Ugly: detect Vekter export with html intrinsic size
@@ -57,11 +70,30 @@ class exports.SVGLayer extends Layer
 				return null
 		set: (value) ->
 			if typeof value is "string"
-				@html = value
+				@html = updateIdsToBeUnique(value)
 			else if value instanceof SVGElement
+				idElements = value.querySelectorAll('[id]')
+				for element in idElements
+					existingElement = document.querySelector("[id='#{element.id}']")
+					if existingElement?
+						Utils.throwInStudioOrWarnInProduction(Layer.ExistingIdMessage("svg", element.id))
+						return
 				@_createHTMLElementIfNeeded()
 				while @_elementHTML.firstChild
 					@_elementHTML.removeChild(@_elementHTML.firstChild)
 				if value.parentNode?
 					value = value.cloneNode(true)
 				@_elementHTML.appendChild(value)
+
+	copy: ->
+		layer = @copySingle()
+		return layer
+
+	copySingle: ->
+		props = @props
+		if props.html? and props.svg?
+			delete props.svg
+		props.html = updateIdsToBeUnique(props.html)
+		copy = new @constructor(props)
+		copy.style = @style
+		copy

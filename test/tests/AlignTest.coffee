@@ -38,6 +38,51 @@ describe "Align", ->
 			{child} = createAlignedLayers("y", Align.center, {borderWidth: 30})
 			child.y.should.equal 20
 
+		it "should work on shapes", ->
+			layer = new Layer
+				backgroundColor: "rgba(255,255,255,1)"
+				width: 414
+				height: 736
+				constraintValues:
+					height: 736
+					heightFactor: 1
+					width: 414
+					widthFactor: 1
+				blending: "normal"
+				clip: true
+				borderStyle: "solid"
+			svg = new SVGLayer
+				parent: layer
+				name: "rect"
+				backgroundColor: "#CCC"
+				width: 66
+				strokeWidth: 1
+				x: 314
+				html: '<svg xmlns="http://www.w3.org/2000/svg" width="66" height="66"><path d="M 0 0 L 66 0 L 66 66 L 0 66 Z" id="rect" fill="#CCC" name="rect"></path></svg>'
+				htmlIntrinsicSize: {height: 66, width: 66}
+				rotation: null
+				height: 66
+				fill: "#CCC"
+				opacity: null
+				y: 274
+
+			({rect} = svg.elements)
+
+			rect.x = Align.center
+			rect.y = Align.center
+			rect.x.should.equal 174
+			rect.y.should.equal 335
+			rect.x = Align.left
+			rect.y = Align.bottom
+			rect.x.should.equal 0
+			rect.y.should.equal 736-66
+			rect.x = Align.right
+			rect.y = Align.top
+			rect.x.should.equal 414-66
+			rect.y.should.equal 0
+
+			svg.destroy()
+
 
 	describe "left", ->
 

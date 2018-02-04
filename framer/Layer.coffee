@@ -57,7 +57,7 @@ layerProperty = (obj, name, cssProperty, fallback, validator, transformer, optio
 			if cssProperty isnt null
 				elementContainer = @
 				if cssProperty in @_stylesAppliedToParent
-					elementContainer = @parent
+					elementContainer = @_parent
 					@_parent._properties[name] = fallback
 				mainElement = elementContainer._element if includeMainElement or not targetElement
 				subElement = elementContainer[targetElement] if targetElement?
@@ -235,6 +235,8 @@ class exports.Layer extends BaseClass
 		@updateShadowStyle()
 
 		@onChange("size", @updateForSizeChange)
+
+	@ExistingIdMessage: (type, id) -> "Can not set #{type}: There's already an element with id '#{id}' in this document'"
 
 	##############################################################
 	# Properties
@@ -503,14 +505,16 @@ class exports.Layer extends BaseClass
 		# If this is a number, we set everything to that number
 		if _.isNumber(input)
 			for k in keys
-				@[k] = input
+				if @[k] isnt input
+					@[k] = input
 		else
 			# If there is nothing to work with we exit
 			return unless input
 
 			# Set every numeric value for eacht key
 			for k in keys
-				@[k] = input[k] if _.isNumber(input[k])
+				if _.isNumber(input[k]) and @[k] isnt input[k]
+					@[k] = input[k]
 
 	@define "point",
 		importable: true
@@ -529,6 +533,7 @@ class exports.Layer extends BaseClass
 			x: @midX
 			y: @midY
 		set: (input) ->
+			input = layerPropertyPointTransformer(input, @, "midPoint")
 			if not _.isNumber input
 				input = _.pick(input, ["x", "y", "midX", "midY"])
 				if input.x? and not input.midX?
@@ -537,7 +542,6 @@ class exports.Layer extends BaseClass
 				if input.y? and not input.midY?
 					input.midY = input.y
 					delete input.y
-			input = layerPropertyPointTransformer(input, @, "midPoint")
 			@_setGeometryValues(input, ["midX", "midY"])
 
 	@define "size",
@@ -922,6 +926,12 @@ class exports.Layer extends BaseClass
 			# a child node to insert it in, so it won't mess with Framers
 			# layer hierarchy.
 			@_createHTMLElementIfNeeded()
+			ids = Utils.getIdAttributesFromString(value)
+			for id in ids
+				existingElement = document.querySelector("[id='#{id}']")
+				if existingElement?
+					Utils.throwInStudioOrWarnInProduction(Layer.ExistingIdMessage("html", id))
+					return
 
 			@_elementHTML.innerHTML = value
 			@_updateHTMLScale()
@@ -986,7 +996,7 @@ class exports.Layer extends BaseClass
 
 		for child in @children
 			copiedChild = child.copy()
-			copiedChild.parent = layer
+			copiedChild.parent = layer if copiedChild isnt null
 
 		return layer
 
