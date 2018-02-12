@@ -165,7 +165,12 @@ class exports.SVGBaseLayer extends Layer
 	calculateSize: ->
 		element = @_element
 		measuredElement = null
-		if not Framer?.CurrentContext.elementInDOM
+		scaleX = 1
+		scaleY = 1
+		if Framer?.CurrentContext.elementInDOM
+			scaleX = @_parent.canvasScaleX()
+			scaleY = @_parent.canvasScaleY()
+		else
 			parent = @_element.parentElement
 			reference = @_element.nextSibling
 			svgMeasure = getSVGMeasureElement()
@@ -174,8 +179,8 @@ class exports.SVGBaseLayer extends Layer
 			element = measuredElement
 
 		rect = element.getBoundingClientRect()
-		@_width = rect.width / @_parent.canvasScaleX()
-		@_height = rect.height / @_parent.canvasScaleY()
+		@_width = rect.width / scaleX
+		@_height = rect.height / scaleY
 
 		if measuredElement?
 			if reference?
