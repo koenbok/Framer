@@ -704,8 +704,8 @@ class exports.Layer extends BaseClass
 			@frame = Utils.convertFrameFromContext(frame, @, false, false)
 
 	contentFrame: ->
-		return {x: 0, y: 0, width: 0, height: 0} unless @children.length
-		return Utils.frameMerge(_.map(@children, "frame"))
+		return {x: 0, y: 0, width: 0, height: 0} unless @_children.length
+		return Utils.frameMerge(_.map(@_children, "frame"))
 
 	totalFrame: ->
 		return Utils.frameMerge(@frame, @contentFrame())
@@ -994,7 +994,7 @@ class exports.Layer extends BaseClass
 
 		layer = @copySingle()
 
-		for child in @children
+		for child in @_children
 			copiedChild = child.copy()
 			copiedChild.parent = layer if copiedChild isnt null
 
@@ -1152,7 +1152,11 @@ class exports.Layer extends BaseClass
 		enumerable: false
 		exportable: false
 		importable: false
-		get: -> _.clone @_children
+		get: -> @_children.map (c) ->
+			if c instanceof SVGLayer and c.children.length is 1 and _.startsWith(c.name, '.')
+				return c.children[0]
+			else
+				return c
 
 	@define "siblings",
 		enumerable: false
@@ -1187,7 +1191,7 @@ class exports.Layer extends BaseClass
 
 	removeChild: (layer) ->
 
-		if layer not in @children
+		if layer not in @_children
 			return
 
 		layer.parent = null
@@ -1347,7 +1351,7 @@ class exports.Layer extends BaseClass
 
 	bringToFront: ->
 		maxIndex = null
-		siblings = @parent?.children ? @context._layers
+		siblings = @parent?._children ? @context._layers
 		return if siblings.count <= 1
 		for layer in siblings
 			continue if layer is @
@@ -1359,7 +1363,7 @@ class exports.Layer extends BaseClass
 
 	sendToBack: ->
 		minIndex = null
-		siblings = @parent?.children ? @context._layers
+		siblings = @parent?._children ? @context._layers
 		return if siblings.count <= 1
 		for layer in siblings
 			continue if layer is @
