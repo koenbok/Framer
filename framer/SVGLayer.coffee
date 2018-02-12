@@ -17,9 +17,6 @@ updateIdsToBeUnique = (htmlString) ->
 	return htmlString
 
 class exports.SVGLayer extends Layer
-
-	@DenyCopyMessage: "SVGLayer doesn't support `copy` when the layer has one more children"
-
 	constructor: (options={}) ->
 		# Ugly: detect Vekter export with html intrinsic size
 		if options.htmlIntrinsicSize? and options.backgroundColor?
