@@ -40,6 +40,7 @@ body {
 .framerLayer svg {
 	overflow: visible;
 	display: block;
+	-webkit-font-smoothing: antialiased;
 }
 
 .framerDebug {
