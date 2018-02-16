@@ -8,6 +8,24 @@ simpleStyledTextOptions = {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 5,
 exampleStyledTextOptions = {blocks: [{inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "48px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 800, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Heavy', '.SFUIText-Heavy', 'SF UI Text', 'Times New Roman'"}}], text: "Header"}, {inlineStyles: [{startIndex: 0, endIndex: 8, css: {fontSize: "20px", WebkitTextFillColor: "rgb(153, 153, 153)", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Subtitle"}, {inlineStyles: [{startIndex: 0, endIndex: 6, css: {fontSize: "16px", WebkitTextFillColor: "rgb(238, 68, 68)", letterSpacing: "0px", fontWeight: 200, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText-Light', 'SFUIText-Light', '.SFUIText-Light', 'SF UI Text', 'Times New Roman'"}}, {startIndex: 6, endIndex: 16, css: {fontSize: "12px", WebkitTextFillColor: "#000000", letterSpacing: "0px", fontWeight: 400, lineHeight: "1.2", tabSize: 4, fontFamily: "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', 'Times New Roman'"}}], text: "Leader Body text"}], alignment: "left"}
 differentFonts = {"blocks": [{"inlineStyles": [{"startIndex": 0, "endIndex": 14, "css": {"fontSize": "60px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'.SFNSText', 'SFUIText-Regular', '.SFUIText', 'SF UI Text', sans-serif"}}], "text": "This is Roboto"}, {"inlineStyles": [{"startIndex": 0, "endIndex": 0, "css": {"fontSize": "47px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Roboto-Regular', 'Roboto', sans-serif"}}], "text": ""}, {"inlineStyles": [{"startIndex": 0, "endIndex": 14, "css": {"fontSize": "60px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Roboto-Regular', 'Roboto', sans-serif"}}], "text": "This is Roboto"}, {"inlineStyles": [{"startIndex": 0, "endIndex": 27, "css": {"fontSize": "60px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'VesperLibre-Regular', 'Vesper Libre', serif"}}], "text": "With a little bit of Vesper"}, {"inlineStyles": [{"startIndex": 0, "endIndex": 0, "css": {"fontSize": "10px", "WebkitTextFillColor": "rgb(255, 0, 0)", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Lato-Regular', 'Lato', serif"}}], "text": ""}, {"inlineStyles": [{"startIndex": 0, "endIndex": 16, "css": {"fontSize": "12px", "WebkitTextFillColor": "#000000", "letterSpacing": "0px", "fontWeight": 400, "lineHeight": "1.2", "tabSize": 4, "fontFamily": "'Alcubierre', serif"}}], "text": "And some Raleway"}]}
 
+styledText =
+	blocks: [ {
+		inlineStyles: [
+			{
+			'startIndex': 0
+			'endIndex': 120
+			'css':
+				'fontSize': '16px'
+				'letterSpacing': '0px'
+				'lineHeight': '1.2'
+				'tabSize': 4
+				'fontFamily': 'Courier, Liberation Mono'
+				'WebkitTextFillColor': 'rgb(0, 0, 0)'
+			}
+		]
+		text: 'this is dummy text this is dummy text this is dummy text this is dummy text this is dummy text this is dummy text this i'
+	}]
+
 describe "TextLayer.template", ->
 	it "should work", ->
 		text = new TextLayer({text: "xxx {hello} xxx"})
@@ -253,13 +271,6 @@ describe "TextLayer", ->
 				text: shortText
 			text.size.should.eql width: 312, height: 50
 
-		it "should auto size the layer based on the Screen width", ->
-			text = new TextLayer
-				fontFamily: "Courier, Liberation Mono"
-				text: mediumText
-			text.width.should.be.lessThan Screen.width
-			text.height.should.equal 250
-
 		it "should auto size the layer if the width is set explicitly", ->
 			text = new TextLayer
 				fontFamily: "Courier, Liberation Mono"
@@ -316,27 +327,10 @@ describe "TextLayer", ->
 			text.text = longText
 			text.height.should.equal 456
 
-		it "should auto size the layer based on it's parent", ->
-			layer = new Layer width: 150
-			text = new TextLayer
-				fontFamily: "Courier, Liberation Mono"
-				text: mediumText
-				parent: layer
-			text.width.should.equal 144
-			text.height.should.equal 600
-
-		it "should auto size the layer when its parent is set afterwards", ->
-			layer = new Layer width: 150
-			text = new TextLayer
-				fontFamily: "Courier, Liberation Mono"
-				text: mediumText
-			text.parent = layer
-			text.width.should.equal 144
-			text.height.should.equal 600
-
 		it "should adjust its size on when a new text is set", (done) ->
 			text = new TextLayer
 				fontFamily: "Courier, Liberation Mono"
+				width: 400
 			text.on "change:height", ->
 				text.size.should.eql width: 400, height: 3500
 				done()
@@ -355,29 +349,6 @@ describe "TextLayer", ->
 				text: shortText
 				borderWidth: 5
 			text.size.should.eql width: 312, height: 50
-
-		it "should autosize with the right width when inside a parent", ->
-			text = new TextLayer
-				fontFamily: "Courier, Liberation Mono"
-				text: shortText
-				borderWidth: 5
-				padding: 3
-			parent = new Layer
-			text.parent = parent
-			text.size.width.should.be.lessThan 100
-			text.size.height.should.equal 256
-
-		it "should ignore the parents border when autosizing", ->
-			text = new TextLayer
-				fontFamily: "Courier, Liberation Mono"
-				text: shortText
-				borderWidth: 5
-				padding: 3
-			parent = new Layer
-				size: 200
-				borderWidth: 10
-			text.parent = parent
-			text.size.should.eql width: 198, height: 106
 
 		it "should work together with Align.center", ->
 			text = new TextLayer
@@ -401,23 +372,7 @@ describe "TextLayer", ->
 		it "should set clipping to true if the text is bigger than the size", ->
 			textLayer = new TextLayer
 				width: 356
-				styledText:
-					blocks: [ {
-						inlineStyles: [
-							{
-							'startIndex': 0
-							'endIndex': 120
-							'css':
-								'fontSize': '16px'
-								'letterSpacing': '0px'
-								'lineHeight': '1.2'
-								'tabSize': 4
-								'fontFamily': 'Courier, Liberation Mono'
-								'WebkitTextFillColor': 'rgb(0, 0, 0)'
-							}
-						]
-						text: 'this is dummy text this is dummy text this is dummy text this is dummy text this is dummy text this is dummy text this i'
-					} ]
+				styledText: styledText
 				height: 58
 				autoSize: false
 			textLayer.clip.should.equal true
@@ -425,26 +380,35 @@ describe "TextLayer", ->
 		it "should set clipping to false if the text is bigger than the size", ->
 			textLayer = new TextLayer
 				width: 356
-				styledText:
-					blocks: [ {
-						inlineStyles: [
-							{
-							'startIndex': 0
-							'endIndex': 120
-							'css':
-								'fontSize': '16px'
-								'letterSpacing': '0px'
-								'lineHeight': '1.2'
-								'tabSize': 4
-								'fontFamily': 'Courier, Liberation Mono'
-								'WebkitTextFillColor': 'rgb(0, 0, 0)'
-							}
-						]
-						text: 'this is dummy text this is dummy text this is dummy text this is dummy text this is dummy text this is dummy text this i'
-					} ]
+				styledText: styledText
 				height: 76
 				autoSize: false
 			textLayer.clip.should.equal false
+
+		it "autosizing should not soft wrap", ->
+			text = new TextLayer
+				styledText: styledText
+			text.frame.height.should.eql 19
+
+		it "fixed sizing should soft wrap and do grow height", ->
+			text = new TextLayer
+				styledText: styledText
+				width: 200
+			text.frame.height.should.eql 133
+
+		it "fixed sizing should soft wrap, but not grow in height if set explicitly", ->
+			text = new TextLayer
+				styledText: styledText
+				width: 200
+				height: 100
+			text.size.should.eql {width: 200, height: 100}
+
+		it "fixed sizing should soft wrap and do grow height", ->
+			text = new TextLayer
+				styledText: styledText
+				autoSize: false
+			text.size.should.eql {width: 100, height: 100}
+
 
 	describe "Padding", ->
 		it "should have no padding initially", ->
