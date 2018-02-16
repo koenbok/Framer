@@ -34,10 +34,14 @@ Events.enableEmulatedTouchEvents = (enable=true) ->
 		Events.TouchStart = Events.MouseDown
 		Events.TouchEnd = Events.MouseUp
 		Events.TouchMove = Events.MouseMove
+		# When we are simulating touch events, click should use the simulated touch-event
+		Events.Click = "touchend"
 	else
 		Events.TouchStart = "touchstart"
 		Events.TouchEnd = "touchend"
 		Events.TouchMove = "touchmove"
+		# When not simulating, click should be based on if touch is supported or not
+		Events.Click = if Utils.isTouch() then "touchend" else "mouseup"
 
 # Let's make sure the touch events work on desktop too
 Events.enableEmulatedTouchEvents(not Utils.isTouch())
@@ -51,8 +55,8 @@ if supportsPointerEvents
 	Events.TouchStart = Events.PointerDown
 	Events.TouchEnd = Events.PointerUp
 	Events.TouchMove = Events.PointerMove
-
-Events.Click = Events.TouchEnd
+	# Use pointerEvents for click
+	Events.Click = Events.PointerUp
 
 # Animation events
 Events.AnimationStart = "start"
