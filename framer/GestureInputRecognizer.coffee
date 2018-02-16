@@ -88,16 +88,24 @@ class exports.GestureInputRecognizer
 
 		event = @_getGestureEvent(event)
 
+		# TODO: base cancel click on how iOS handles it:
+		# - session no longer than 0.75 seconds
+		# - no more movement more than 45 points
+		fireTapEvent = true
 		for eventName, value of @session.started
-			@["#{eventName}end"](event) if value
+			if value
+				# Do not fire a tap event if we are ending another events session
+				fireTapEvent = false
+				@["#{eventName}end"](event)
 
-		# We only want to fire a tap event if the original target is the same
-		# as the release target, so buttons work the way you expect if you
-		# release the mouse outside.
-		if not @session?.startEvent
-			@tap(event)
-		else if @session.startEvent.target is event.target
-			@tap(event)
+		if fireTapEvent
+			# We only want to fire a tap event if the original target is the same
+			# as the release target, so buttons work the way you expect if you
+			# release the mouse outside.
+			if not @session?.startEvent
+				@tap(event)
+			else if @session.startEvent.target is event.target
+				@tap(event)
 
 		@tapend(event)
 		@cancel()
