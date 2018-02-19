@@ -107,23 +107,27 @@ class exports.LayerDraggable extends BaseClass
 		@attach()
 
 	attach: ->
-		@layer.on(Gestures.PanStart, @touchStart)
+		@layer.on(Gestures.PanStart, @panStart)
 		@layer.on("change:x", @_updateLayerPosition)
 		@layer.on("change:y", @_updateLayerPosition)
 
 	remove: ->
-		@layer.off(Gestures.PanStart, @touchStart)
-		@layer.off(Gestures.Pan, @_touchMove)
-		@layer.off(Gestures.PanEnd, @_touchEnd)
+		@layer.off(Gestures.PanStart, @panStart)
+		@layer.off(Gestures.Pan, @_panMove)
+		@layer.off(Gestures.TapEnd, @_tapEnd)
 
 	updatePosition: (point) ->
 		# Override this to add your own behaviour to the update position
 		return point
 
+	panStart: (event) =>
+		# For backwards compatibility, we still call touchStart here
+		@touchStart(event)
+
 	touchStart: (event) =>
 		# We expose this publicly so you can start the dragging from an external event
 		# this is for example needed with the slider.
-		@_touchStart(event)
+		@_panStart(event)
 
 	_updateLayerPosition: =>
 		# This updates the layer position if it's extrenally changed while
@@ -131,12 +135,12 @@ class exports.LayerDraggable extends BaseClass
 		return if @_ignoreUpdateLayerPosition is true
 		@_point = @layer.point
 
-	_touchStart: (event) =>
-
+	_panStart: (event) =>
 		LayerDraggable._globalDidDrag = false
 
-		Events.wrap(document).addEventListener(Gestures.Pan, @_touchMove)
-		Events.wrap(document).addEventListener(Gestures.PanEnd, @_touchEnd)
+		Events.wrap(document).addEventListener(Gestures.Pan, @_panMove)
+		# One would assume to use Gestures.PanEnd here, but we also want to animate back when we touched, but didn't pan
+		Events.wrap(document).addEventListener(Gestures.TapEnd, @_tapEnd)
 
 		# Only reset isMoving if this was not animating when we were clicking
 		# so we can use it to detect a click versus a drag.
@@ -188,7 +192,7 @@ class exports.LayerDraggable extends BaseClass
 
 		@emit(Events.DragSessionStart, event)
 
-	_touchMove: (event) =>
+	_panMove: (event) =>
 		return unless @enabled
 
 		# If we started dragging from another event we need to capture some initial values
@@ -258,12 +262,14 @@ class exports.LayerDraggable extends BaseClass
 
 		@emit(Events.DragSessionMove, event)
 
-	_touchEnd: (event) =>
+	_tapEnd: (event) =>
+		@_panEnd(event)
 
+	_panEnd: (event) =>
 		LayerDraggable._globalDidDrag = false
 
-		Events.wrap(document).removeEventListener(Gestures.Pan, @_touchMove)
-		Events.wrap(document).removeEventListener(Gestures.TapEnd, @_touchEnd)
+		Events.wrap(document).removeEventListener(Gestures.Pan, @_panMove)
+		Events.wrap(document).removeEventListener(Gestures.TapEnd, @_tapEnd)
 		event.stopPropagation()
 
 		event.stopPropagation() if @propagateEvents is false
