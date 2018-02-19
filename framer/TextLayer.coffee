@@ -93,14 +93,29 @@ class exports.TextLayer extends Layer
 		super options
 		@__constructor = true
 
-		# Keeps track if the width or height are explicitly set, so we shouldn't update it afterwards
-		if not options.autoSize? and not options.truncate
+		# the goal is:
+		# - autoSize elements should not soft wrap, only hard wrap (based on newlines)
+		# - fixed (given a box) elements should soft wrap
+		# - when the height is not fixed, it should be allowed to grow
+
+		if options.autoSize
+			@autoWidth = true
+			@autoHeight = true
+		else if options.autoSize isnt false and not options.truncate
+			# if not explicitly disabled auto sizing, auto size width/height, unless they were explicitly set
 			if not options.autoWidth?
-				explicitWidth = options.width? or _.isNumber(options?.size) or options?.size?.width? or options?.frame?.width?
+				explicitWidth = options.width? or _.isNumber(options.size) or options.size?.width? or options.frame?.width?
 				@autoWidth = not explicitWidth
 			if not options.autoHeight?
-				explicitHeight = options.height? or _.isNumber(options?.size) or options?.size?.height? or options?.frame?.height?
+				explicitHeight = options.height? or _.isNumber(options.size) or options.size?.height? or options.frame?.height?
 				@autoHeight = not explicitHeight
+
+		# if constraints from design, autoHeight depends on if the element is allowed to grow in height
+		constraintValues = options.constraintValues
+		if constraintValues
+			topAndBottom = _.isNumber(constraintValues.top) and _.isNumber(constraintValues.bottom)
+			heightFactor = _.isNumber(constraintValues.heightFactor)
+			@autoHeight = not (heightFactor or topAndBottom)
 
 		if not options.styledText?
 			@font ?= @fontFamily
@@ -267,10 +282,11 @@ class exports.TextLayer extends Layer
 			if @width < @_elementHTML.clientWidth or @height < @_elementHTML.clientHeight
 				@clip = true
 		return unless forceRender or @autoHeight or @autoWidth or @textOverflow isnt null
-		parentWidth = if @parent? then @parent.width else Screen.width
-		constrainedWidth = if @autoWidth then parentWidth else @size.width
 		padding = Utils.rectZero(Utils.parseRect(@padding))
-		constrainedWidth -= (padding.left + padding.right)
+		if @autoWidth
+			constrainedWidth = null
+		else
+			constrainedWidth = @size.width - (padding.left + padding.right)
 		if @autoHeight
 			constrainedHeight = null
 		else
