@@ -107,11 +107,13 @@ class exports.LayerDraggable extends BaseClass
 		@attach()
 
 	attach: ->
+		@layer.on(Gestures.TapStart, @tapStart)
 		@layer.on(Gestures.PanStart, @panStart)
 		@layer.on("change:x", @_updateLayerPosition)
 		@layer.on("change:y", @_updateLayerPosition)
 
 	remove: ->
+		@layer.off(Gestures.TapStart, @tapStart)
 		@layer.off(Gestures.PanStart, @panStart)
 		@layer.off(Gestures.Pan, @_panMove)
 		@layer.off(Gestures.TapEnd, @_tapEnd)
@@ -128,6 +130,12 @@ class exports.LayerDraggable extends BaseClass
 		# We expose this publicly so you can start the dragging from an external event
 		# this is for example needed with the slider.
 		@_panStart(event)
+
+	# Stop the simulation if we touch the layer again
+	tapStart: (event) =>
+		if @_isAnimating
+			Framer.GestureInputRecognizer?.session?.cancelTap = true
+			@_panStart(event)
 
 	_updateLayerPosition: =>
 		# This updates the layer position if it's extrenally changed while

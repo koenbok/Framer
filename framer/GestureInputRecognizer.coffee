@@ -54,6 +54,7 @@ class exports.GestureInputRecognizer
 			started: {}
 			events: []
 			eventCount: 0
+			cancelTap: false
 
 		event = @_getGestureEvent(event)
 
