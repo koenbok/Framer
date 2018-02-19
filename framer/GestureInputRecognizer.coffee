@@ -88,13 +88,11 @@ class exports.GestureInputRecognizer
 
 		event = @_getGestureEvent(event)
 
-		sessionEnded = false
 		for eventName, value of @session.started
 			if value
-				sessionEnded = true
 				@["#{eventName}end"](event)
 
-		if not sessionEnded and @shouldFireTapEvent(event)
+		if @shouldFireTapEvent(event)
 			@tap(event)
 
 		@tapend(event)
