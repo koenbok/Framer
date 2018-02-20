@@ -684,8 +684,8 @@ class exports.Layer extends BaseClass
 	convertPointToCanvas: (point) =>
 		return Utils.convertPointToContext(point, @, true)
 
-	convertPointToLayer: (point, layer) =>
-		return Utils.convertPoint(point, @, layer, true)
+	convertPointToLayer: (point, layer, rootContext=true) =>
+		return Utils.convertPoint(point, @, layer, rootContext)
 
 	@define "canvasFrame",
 		importable: true
