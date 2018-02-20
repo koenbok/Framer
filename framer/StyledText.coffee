@@ -99,7 +99,7 @@ class InlineStyle
 	replaceText: (search, replace) ->
 		regex = null
 		if _.isString search
-			regex = new RegExp(search, 'g')
+			regex = new RegExp(Utils.escapeForRegex(search), 'g')
 		else if search instanceof RegExp
 			regex = search
 		if regex?

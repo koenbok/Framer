@@ -1034,6 +1034,12 @@ describe "TextLayer", ->
 			subject.text.should.equal "Headier\nSubtitle\nLeadier Bodie text"
 			subject._styledText.validate().should.equal true
 
+		it "should escape regex characters in string", ->
+			subject.text = "This costs $123"
+			subject.textReplace("$123", "$456")
+			subject.text.should.equal "This costs $456"
+			subject._styledText.validate().should.equal true
+
 		it "should rerender the text when replacing it", ->
 			htmlBefore = subject.html
 			subject.textReplace("a", "b")
