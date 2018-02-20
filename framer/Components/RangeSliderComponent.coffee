@@ -97,10 +97,10 @@ class exports.RangeSliderComponent extends Layer
 			knob.on("change:frame", @_knobDidMove)
 			knob.on("change:frame", @_updateFrame)
 
-		@sliderOverlay.on(Events.TapStart, @_touchStart)
-		@sliderOverlay.on(Events.TapEnd, @_touchEnd)
+		@sliderOverlay.on(Events.TapStart, @_tapStart)
+		@sliderOverlay.on(Events.TapEnd, @_tapEnd)
 
-	_touchStart: (event) =>
+	_tapStart: (event) =>
 		event.preventDefault()
 
 		if @width > @height
@@ -110,12 +110,12 @@ class exports.RangeSliderComponent extends Layer
 
 			if clickedValue > @maxValue
 				@maxValue = clickedValue
-				@maxKnob.draggable._touchStart(event)
+				@maxKnob.draggable._panStart(event)
 				@emit(Events.SliderMaxValueChange, @maxValue)
 
 			if clickedValue < @minValue
 				@minValue = clickedValue
-				@minKnob.draggable._touchStart(event)
+				@minKnob.draggable._panStart(event)
 				@emit(Events.SliderMinValueChange, @minValue)
 
 		else
@@ -125,17 +125,17 @@ class exports.RangeSliderComponent extends Layer
 
 			if clickedValue > @maxValue
 				@maxValue = clickedValue
-				@maxKnob.draggable._touchStart(event)
+				@maxKnob.draggable._panStart(event)
 				@emit(Events.SliderMaxValueChange, @maxValue)
 
 			if clickedValue < @minValue
 				@minValue = clickedValue
-				@minKnob.draggable._touchStart(event)
+				@minKnob.draggable._panStart(event)
 				@emit(Events.SliderMinValueChange, @minValue)
 
 		@_updateValue()
 
-	_touchEnd: (event) =>
+	_tapEnd: (event) =>
 		@_updateValue()
 
 	_styleKnob: (knob) =>

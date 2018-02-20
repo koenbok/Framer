@@ -35,9 +35,9 @@ describe "Layer", ->
 							move.touches = [
 								{clientX: i, clientY: 0}
 							]
-							layerA.draggable._touchMove(move)
+							layerA.draggable._panMove(move)
 				Utils.delay i*time, ->
-					layerA.draggable._touchEnd(document.createEvent("MouseEvent"))
+					layerA.draggable._panEnd(document.createEvent("MouseEvent"))
 				layerA.onDragEnd ->
 					simulation = layerA.draggable._simulation.x
 					a = @animate

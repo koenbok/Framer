@@ -87,10 +87,10 @@ class exports.SliderComponent extends Layer
 		@knob.on("change:frame", @_updateFill)
 		@knob.on("change:frame", @_knobDidMove)
 
-		@sliderOverlay.on(Events.TapStart, @_touchStart)
-		@sliderOverlay.on(Events.TapEnd, @_touchEnd)
+		@sliderOverlay.on(Events.TapStart, @_tapStart)
+		@sliderOverlay.on(Events.TapEnd, @_tapEnd)
 
-	_touchStart: (event) =>
+	_tapStart: (event) =>
 		event.preventDefault()
 
 		if @width > @height
@@ -102,10 +102,10 @@ class exports.SliderComponent extends Layer
 			scaleY = @canvasScaleY()
 			@value = @valueForPoint(touchY / scaleY - @screenFrame.y)
 
-		@knob.draggable._touchStart(event)
+		@knob.draggable._panStart(event)
 		@_updateValue()
 
-	_touchEnd: (event) =>
+	_tapEnd: (event) =>
 		@_updateValue()
 
 	_updateFill: =>
