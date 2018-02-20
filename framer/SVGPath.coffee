@@ -136,13 +136,13 @@ class exports.SVGPath extends SVGBaseLayer
 
 	start: (relativeToLayer = null) =>
 		point = @pointAtFraction(0)
-		point = @convertPointToLayer(point, relativeToLayer?.parent)
+		point = @convertPointToLayer(point, relativeToLayer?.parent, false)
 		point.rotation = @rotationAtFraction(0)
 		return point
 
 	end: (relativeToLayer = null) =>
 		point = @pointAtFraction(0)
-		point = @convertPointToLayer(point, relativeToLayer?.parent)
+		point = @convertPointToLayer(point, relativeToLayer?.parent, false)
 		point.rotation = @rotationAtFraction(1)
 		return point
 
