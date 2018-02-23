@@ -144,6 +144,8 @@ class exports.LayerDraggable extends BaseClass
 		@_point = @layer.point
 
 	_panStart: (event) =>
+		return unless @enabled
+
 		LayerDraggable._globalDidDrag = false
 
 		Events.wrap(document).addEventListener(Gestures.Pan, @_panMove)
@@ -274,6 +276,8 @@ class exports.LayerDraggable extends BaseClass
 		@_panEnd(event)
 
 	_panEnd: (event) =>
+		return unless @enabled
+
 		LayerDraggable._globalDidDrag = false
 
 		Events.wrap(document).removeEventListener(Gestures.Pan, @_panMove)
