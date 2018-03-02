@@ -1033,7 +1033,7 @@ PixelBaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1080
 	screenHeight: 1920
-	devicePixelRatio: 2.627
+	devicePixelRatio: 2.625
 	deviceType: "phone"
 	minStudioVersion: googlePixelReleaseVersion
 	maxStudioVersion: iPhoneXReleaseVersion - 1
@@ -1053,7 +1053,7 @@ Pixel2BaseDevice =
 	deviceImageCompression: true
 	screenWidth: 1080
 	screenHeight: 1920
-	devicePixelRatio: 2.627
+	devicePixelRatio: 2.625
 	deviceType: "phone"
 	minStudioVersion: iPhoneXReleaseVersion
 	hands:
