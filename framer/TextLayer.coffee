@@ -56,8 +56,11 @@ class exports.TextLayer extends Layer
 			shadowType: "text"
 			clip: false
 			createHTMLElement: true
-
+		if options.styledTextOptions?
+			options.styledText = options.styledTextOptions
+			delete options.styledTextOptions
 		if options.styledText?
+			delete options.text
 			@styledTextOptions = options.styledText
 			options.color ?= @_styledText.getStyle("color")
 			options.fontSize ?= parseFloat(@_styledText.getStyle("fontSize"))
