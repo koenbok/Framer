@@ -243,6 +243,14 @@ exports.LayerStyle =
 	backgroundColor: (layer) ->
 		return layer._properties.backgroundColor
 
+	backgroundSize: (layer) ->
+		switch layer._properties.backgroundSize
+			when "fill" then return "cover"
+			when "fit" then return "contain"
+			when "stretch" then return "100% 100%"
+		return layer._properties.backgroundSize
+
+
 	fill: (layer) ->
 		return layer._properties.fill
 

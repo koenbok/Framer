@@ -355,6 +355,8 @@ class exports.Layer extends BaseClass
 	@define "backgroundGrayscale", layerProperty(@, "backgroundGrayscale", "webkitBackdropFilter", 0, _.isNumber)
 	@define "backgroundSepia", layerProperty(@, "backgroundSepia", "webkitBackdropFilter", 0, _.isNumber)
 
+	@define "backgroundSize", layerProperty(@, "backgroundSize", "backgroundSize", null, _.isString)
+
 	for i in [0..8]
 		do (i) =>
 			@define "shadow#{i+1}",

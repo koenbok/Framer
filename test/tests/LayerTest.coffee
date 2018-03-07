@@ -378,6 +378,37 @@ describe "Layer", ->
 			layer.image = imagePath
 			layer.backgroundColor.should.equalColor "red"
 
+		describe "should set the background size", ->
+			it "cover", ->
+				layer = new Layer backgroundSize: "cover"
+				layer.style["background-size"].should.equal "cover"
+
+			it "contain", ->
+				layer = new Layer backgroundSize: "contain"
+				layer.style["background-size"].should.equal "contain"
+
+			it "percentage", ->
+				layer = new Layer backgroundSize: "100%"
+				layer.style["background-size"].should.equal "100%"
+
+			it "other", ->
+				layer = new Layer backgroundSize: "300px, 5em 10%"
+				layer.style["background-size"].should.equal "300px, 5em 10%"
+
+			it "fill", ->
+				layer = new Layer backgroundSize: "fill"
+				layer.style["background-size"].should.equal "cover"
+
+			it "fit", ->
+				layer = new Layer backgroundSize: "fit"
+				layer.style["background-size"].should.equal "contain"
+
+			it "stretch", ->
+				layer = new Layer backgroundSize: "stretch"
+				# This should be "100% 100%", but phantomjs doest return that when you set it
+				layer.style["background-size"].should.equal "100%"
+
+
 		it "should set visible", ->
 
 			layer = new Layer
