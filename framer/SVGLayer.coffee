@@ -37,7 +37,10 @@ class exports.SVGLayer extends Layer
 		else
 			@elements = []
 
+		SVG.updateImagePatternSVG(@)
 		SVG.updateGradientSVG(@)
+
+		@onChange "backgroundSize", => SVG.updateImagePatternSVG(@)
 
 	@define "elements", @simpleProperty("elements", {})
 
@@ -57,6 +60,26 @@ class exports.SVGLayer extends Layer
 			else if not value and Gradient.isGradientObject(@_gradient)
 				@_gradient = null
 			SVG.updateGradientSVG(@)
+
+	@define "image",
+		get: ->
+			return @_image
+		set: (value) ->
+			@_image = value
+			SVG.updateImagePatternSVG(@)
+
+	@define "imageSize",
+		importable: true
+		exportable: true
+		default: null
+		get: -> @_getPropertyValue "imageSize"
+		set: (value) ->
+			if value is null
+				@_setPropertyValue "imageSize", value
+			else
+				return if not _.isFinite(value.width) or not _.isFinite(value.height)
+				@_setPropertyValue "imageSize", {width: value.width, height: value.height}
+				SVG.updateImagePatternSVG(@)
 
 	@define "svg",
 		get: ->

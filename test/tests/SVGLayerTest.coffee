@@ -34,7 +34,7 @@ describe "SVGLayer", ->
 				svg: svgWithNames
 
 			b = a.copy()
-			b.html.should.equal '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
+			b.html.should.equal '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; background-size: cover; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
 			b._elementHTML.should.not.be.equal a._elementHTML
 
 		it "should change the id's to random id's", ->
@@ -101,7 +101,7 @@ describe "SVGLayer", ->
 				y: 456
 				svg: '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><path d="M 100 50 C 100 77.614 77.614 100 50 100 C 22.386 100 0 77.614 0 50 C 0 22.386 22.386 0 50 0" id="path" name="path" fill="transparent" stroke="#0AF"></path></svg>'
 			b = a.copy()
-			expect(b.html).to.equal '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><path d="M 100 50 C 100 77.614 77.614 100 50 100 C 22.386 100 0 77.614 0 50 C 0 22.386 22.386 0 50 0" id="path1" name="path" fill="transparent" stroke="#0AF" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; fill: rgba(0, 0, 0, 0); stroke: #00aaff; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
+			expect(b.html).to.equal '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><path d="M 100 50 C 100 77.614 77.614 100 50 100 C 22.386 100 0 77.614 0 50 C 0 22.386 22.386 0 50 0" id="path1" name="path" fill="transparent" stroke="#0AF" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; background-size: cover; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; fill: rgba(0, 0, 0, 0); stroke: #00aaff; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
 			a.destroy()
 
 		it "should unique the id's even if theyre complex", ->
@@ -168,8 +168,8 @@ describe "SVGLayer", ->
 				svg: svgWithIds
 			b = new SVGLayer
 				svg: svgWithIds
-			a.html.should.equal '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" id="test-bla/hoera" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
-			b.html.should.equal '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" id="test-bla/hoera1" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
+			a.html.should.equal '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" id="test-bla/hoera" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; background-size: cover; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
+			b.html.should.equal '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" id="test-bla/hoera1" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; background-size: cover; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
 			a.destroy()
 			b.destroy()
 
@@ -179,7 +179,7 @@ describe "SVGLayer", ->
 				svg: svgWithIds
 			b = new SVGLayer
 				svg: a.svg
-			a.html.should.equal '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" id="test-bla/hoera" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
+			a.html.should.equal '<svg xmlns="http://www.w3.org/2000/svg" width="182" height="182"><path d="M 0 0 L 182 0 L 182 182 L 0 182 Z" name="Rectangle" id="test-bla/hoera" style="-webkit-perspective: none; pointer-events: none; display: block; opacity: 1; overflow: visible; background-size: cover; -webkit-transform-style: preserve-3d; -webkit-backface-visibility: visible; -webkit-perspective-origin-x: 50%; -webkit-perspective-origin-y: 50%;"></path></svg>'
 			b.html.should.equal ''
 			a.destroy()
 
