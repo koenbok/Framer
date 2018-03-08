@@ -58,6 +58,26 @@ class exports.SVGLayer extends Layer
 				@_gradient = null
 			SVG.updateGradientSVG(@)
 
+	@define "image",
+		get: ->
+			return @_image
+		set: (value) ->
+			return if @__constructor
+			@_image = value
+			SVG.updateImagePatternSVG(@)
+
+	@define "imageSize",
+		importable: true
+		exportable: true
+		default: null
+		get: -> @_getPropertyValue "imageSize"
+		set: (value) ->
+			if value is null
+				@_setPropertyValue "imageSize", value
+			else
+				return if not _.isFinite(value.width) or not _.isFinite(value.height)
+				@_setPropertyValue "imageSize", {width: value.width, height: value.height}
+
 	@define "svg",
 		get: ->
 			svgNode = _.first(@_elementHTML?.children)

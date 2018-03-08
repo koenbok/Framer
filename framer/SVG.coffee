@@ -31,6 +31,56 @@ class exports.SVG
 		"""
 		svgLayer.fill = "url(##{id})"
 
+	@updateImagePatternSVG: (svgLayer) ->
+		return if svgLayer.__constructor
+
+		if not svgLayer.image
+			svgLayer._elementImagePatternSVG?.innerHTML = ""
+			return
+
+		transform = ""
+
+		if svgLayer.backgroundSize in ["fill", "fit", "contain", "cover"] and svgLayer.imageSize
+			scaleX = 1
+			scaleY = 1
+			offsetX = 0
+			offsetY = 0
+
+			imageWidth = svgLayer.imageSize.width
+			imageHeight = svgLayer.imageSize.height
+
+			imageRatio = imageWidth / imageHeight
+			realWidth = svgLayer.height * imageRatio
+			realHeight = svgLayer.width / imageRatio
+			scX = realWidth / svgLayer.width
+			scY = realHeight / svgLayer.height
+
+			fillBackground = svgLayer.backgroundSize in ["fill", "cover"]
+
+			if fillBackground and scY > scX or not fillBackground and scY < scX
+				scaleY = scY
+				offsetY = (1 - scY) / 2
+			else
+				scaleX = scX
+				offsetX = (1 - scX) / 2
+
+			transform = """transform="translate(#{offsetX}, #{offsetY}) scale(#{scaleX}, #{scaleY})" """
+
+		if not svgLayer._elementImagePatternSVG
+			svgLayer._elementImagePatternSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+			svgLayer._elementImagePatternSVG.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+			svgLayer._elementImagePatternSVG.setAttribute("width", "100%")
+			svgLayer._elementImagePatternSVG.setAttribute("height", "100%")
+			svgLayer._element.appendChild svgLayer._elementImagePatternSVG
+
+		id = "#{svgLayer.id}-image-pattern"
+		svgLayer._elementImagePatternSVG.innerHTML = """
+			<pattern id="#{id}" width="100%" height="100%" patternContentUnits="objectBoundingBox">
+				<image width="1" height="1" xlink:href=#{svgLayer.image} preserveAspectRatio="none" #{transform} />
+			</pattern>
+		"""
+		svgLayer.fill = "url(##{id})"
+
 	@constructSVGElements: (root, elements, PathClass, GroupClass) ->
 
 		targets = {}
