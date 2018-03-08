@@ -79,6 +79,7 @@ class exports.SVGLayer extends Layer
 			else
 				return if not _.isFinite(value.width) or not _.isFinite(value.height)
 				@_setPropertyValue "imageSize", {width: value.width, height: value.height}
+				SVG.updateImagePatternSVG(@)
 
 	@define "svg",
 		get: ->
