@@ -52,17 +52,17 @@ class exports.SVG
 			imageRatio = imageWidth / imageHeight
 			realWidth = svgLayer.height * imageRatio
 			realHeight = svgLayer.width / imageRatio
-			scX = realWidth / svgLayer.width
-			scY = realHeight / svgLayer.height
+			validScaleX = realWidth / svgLayer.width
+			validScaleY = realHeight / svgLayer.height
 
 			fillBackground = svgLayer.backgroundSize in ["fill", "cover"]
 
-			if fillBackground and scY > scX or not fillBackground and scY < scX
-				scaleY = scY
-				offsetY = (1 - scY) / 2
+			if fillBackground and validScaleY > validScaleX or not fillBackground and validScaleY < validScaleX
+				scaleY = validScaleY
+				offsetY = (1 - validScaleY) / 2
 			else
-				scaleX = scX
-				offsetX = (1 - scX) / 2
+				scaleX = validScaleX
+				offsetX = (1 - validScaleX) / 2
 
 			transform = """transform="translate(#{offsetX}, #{offsetY}) scale(#{scaleX}, #{scaleY})" """
 
