@@ -37,6 +37,7 @@ class exports.SVGLayer extends Layer
 		else
 			@elements = []
 
+		SVG.updateImagePatternSVG(@)
 		SVG.updateGradientSVG(@)
 
 	@define "elements", @simpleProperty("elements", {})
@@ -62,7 +63,6 @@ class exports.SVGLayer extends Layer
 		get: ->
 			return @_image
 		set: (value) ->
-			return if @__constructor
 			@_image = value
 			SVG.updateImagePatternSVG(@)
 
