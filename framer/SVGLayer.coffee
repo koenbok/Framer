@@ -41,6 +41,7 @@ class exports.SVGLayer extends Layer
 		SVG.updateGradientSVG(@)
 
 		@onChange "backgroundSize", => SVG.updateImagePatternSVG(@)
+		@onChange "image", => SVG.updateImagePatternSVG(@)
 
 	@define "elements", @simpleProperty("elements", {})
 

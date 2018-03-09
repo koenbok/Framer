@@ -22,7 +22,7 @@ class exports.SVG
 			svgLayer._elementGradientSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg")
 			svgLayer._element.appendChild svgLayer._elementGradientSVG
 
-		id = "#{svgLayer.id}-gradient"
+		id = "gradient-#{svgLayer.id}"
 		svgLayer._elementGradientSVG.innerHTML = """
 			<linearGradient id='#{id}' gradientTransform='rotate(#{svgLayer.gradient.angle - 90}, 0.5, 0.5)' >
 				<stop offset="0" stop-color='##{svgLayer.gradient.start.toHex()}' stop-opacity='#{svgLayer.gradient.start.a}' />
@@ -69,17 +69,19 @@ class exports.SVG
 		if not svgLayer._elementImagePatternSVG
 			svgLayer._elementImagePatternSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg")
 			svgLayer._elementImagePatternSVG.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+			svgLayer._elementImagePatternSVG.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink")
 			svgLayer._elementImagePatternSVG.setAttribute("width", "100%")
 			svgLayer._elementImagePatternSVG.setAttribute("height", "100%")
 			svgLayer._element.appendChild svgLayer._elementImagePatternSVG
 
-		id = "#{svgLayer.id}-image-pattern"
+		id = "image-pattern-#{svgLayer.id}"
 		svgLayer._elementImagePatternSVG.innerHTML = """
 			<pattern id="#{id}" width="100%" height="100%" patternContentUnits="objectBoundingBox">
 				<image width="1" height="1" xlink:href=#{svgLayer.image} preserveAspectRatio="none" #{transform} />
 			</pattern>
 		"""
-		svgLayer.fill = "url(##{id})"
+		window.requestAnimationFrame -> window.requestAnimationFrame -> svgLayer.fill = "url(##{id})"
+		# Utils.delay 0.1, -> svgLayer.fill = "url(##{id})"
 
 	@constructSVGElements: (root, elements, PathClass, GroupClass) ->
 
