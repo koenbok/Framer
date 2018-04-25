@@ -432,12 +432,17 @@ class exports.DeviceComponent extends BaseClass
 
 	@define "hideBezel",
 		get: ->
-			return false if not Utils.isFramerStudio()
+			return true if @_forceHideBezel
+			return false if not Utils.isFramerStudio() and @_forceHide
 			return (@_hideBezel ? false)
 		set: (hideBezel) ->
 			return if not Utils.isFramerStudio()
 			@_hideBezel = hideBezel
 			@_update()
+
+	forceHideBezel: (forceHide = true) =>
+		@_forceHideBezel = forceHide
+		@_update()
 
 	###########################################################################
 	# DEVICE ZOOM
