@@ -16,4 +16,8 @@ WebKitCSSMatrix::point = (point = {}) ->
 		y: (@m12 * x + @m22 * y + @m32 * z + @m42) / w
 		z: (@m13 * x + @m23 * y + @m33 * z + @m43) / w
 
+
+WebKitCSSMatrix.identity3d = ->
+	return new WebKitCSSMatrix("matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1)")
+
 exports.Matrix = WebKitCSSMatrix

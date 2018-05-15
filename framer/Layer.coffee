@@ -447,7 +447,7 @@ class exports.Layer extends BaseClass
 		get: ->
 			if @force2d
 				return @_matrix2d
-			return new Matrix()
+			return Matrix.identity3d()
 				.translate(@x, @y, @z)
 				.scale(@scale)
 				.scale(@scaleX, @scaleY, @scaleZ)
@@ -463,7 +463,7 @@ class exports.Layer extends BaseClass
 	# matrix of layer transforms when 2d is forced
 	@define "_matrix2d",
 		get: ->
-			return new Matrix()
+			return Matrix.identity3d()
 				.translate(@x, @y)
 				.scale(@scale)
 				.scale(@scaleX, @scaleY)
@@ -474,7 +474,7 @@ class exports.Layer extends BaseClass
 	# matrix of layer transforms with transform origin applied
 	@define "transformMatrix",
 		get: ->
-			return new Matrix()
+			return Matrix.identity3d()
 				.translate(@originX * @width, @originY * @height)
 				.multiply(@matrix)
 				.translate(-@originX * @width, -@originY * @height)
@@ -484,7 +484,7 @@ class exports.Layer extends BaseClass
 		get: ->
 			parent = @parent or @context
 			ppm = Utils.perspectiveMatrix(parent)
-			return new Matrix()
+			return Matrix.identity3d()
 				.multiply(ppm)
 				.multiply(@transformMatrix)
 

@@ -1325,7 +1325,8 @@ Utils.boundingFrame = (layer, rootContext=true) ->
 
 Utils.perspectiveProjectionMatrix = (element) ->
 	p = element.perspective
-	m = new Matrix()
+
+	m = Matrix.identity3d()
 	m.m34 = -1 / p if p? and p isnt 0
 	return m
 
@@ -1334,7 +1335,7 @@ Utils.perspectiveMatrix = (element) ->
 	ox = element.perspectiveOriginX * element.width
 	oy = element.perspectiveOriginY * element.height
 	ppm = Utils.perspectiveProjectionMatrix(element)
-	return new Matrix()
+	return Matrix.identity3d()
 		.translate(ox, oy)
 		.multiply(ppm)
 		.translate(-ox, -oy)
