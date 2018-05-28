@@ -147,13 +147,22 @@ class exports.DeviceComponent extends BaseClass
 		contentScaleFactor = 1 if contentScaleFactor > 1
 		screenSizeChanged = false
 		if @_shouldRenderFullScreen()
+			clientWidth = document.documentElement.clientWidth
+			clientHeight = document.documentElement.clientHeight
 			if Utils.isMobile()
-				# This uses the actual screen size, which only make sense if the prototype takes up the whole screen of the device
+				# This uses the actual screen size, which only make sense if the prototype
+				# takes up the whole screen of the device
 				width = screen.width * window.devicePixelRatio
 				height = screen.height * window.devicePixelRatio
+				# If the width and height don't match up with the client width and height
+				# the device is rotated, so flip them
+				if clientWidth < clientHeight and width > height or clientWidth > clientHeight and width < height
+					newHeight = width
+					width = height
+					height = newHeight
 			else
-				width = document.documentElement.clientWidth / contentScaleFactor
-				height = document.documentElement.clientHeight / contentScaleFactor
+				width = clientWidth / contentScaleFactor
+				height = clientHeight / contentScaleFactor
 			screenSizeChanged = @content.width isnt width or @content.height isnt height
 			for layer in [@background, @hands, @phone, @viewport, @content, @screen, @screenMask]
 				layer.x = layer.y = 0
