@@ -87,6 +87,11 @@ class exports.FlowComponent extends Layer
 	@define "scroll",
 		get: -> return @current?._flowScroll
 
+	@define "mouseWheelEnabled",
+		default: false
+		get: -> return @_mouseWheelEnabled
+		set: (value) ->	@_mouseWheelEnabled = value
+
 	##############################################################
 	# Header and footer
 
@@ -265,6 +270,7 @@ class exports.FlowComponent extends Layer
 				inset.bottom = @footer?.height or 0 if scroll.maxY is @height
 				scroll.contentInset = inset
 				flowLayer._flowScroll = scroll
+				scroll.mouseWheelEnabled = @_mouseWheelEnabled
 
 		# Set the background color for he created scroll component
 		if layer instanceof ScrollComponent
