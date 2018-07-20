@@ -993,9 +993,8 @@ class exports.Layer extends BaseClass
 	## COPYING
 
 	copy: ->
-
 		layer = @copySingle()
-		
+
 		for child in @_children
 			copiedChild = child.copy()
 			if copiedChild
