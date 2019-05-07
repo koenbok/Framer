@@ -1,4 +1,8 @@
-[![wercker status](https://app.wercker.com/status/8e5d02248bfd387acebdf177fba5f6b1/s/master "wercker status")](https://app.wercker.com/project/bykey/8e5d02248bfd387acebdf177fba5f6b1)
+# Framer Library for React
+
+We are in the process of open sourcing our new [Framer Library for React](https://framer.com/api). Come back soon.
+
+---
 
 # Framer Library
 
