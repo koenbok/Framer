@@ -993,12 +993,13 @@ class exports.Layer extends BaseClass
 	## COPYING
 
 	copy: ->
-
 		layer = @copySingle()
 
 		for child in @_children
 			copiedChild = child.copy()
-			copiedChild.parent = layer if copiedChild isnt null
+			if copiedChild
+				copiedChild.parent = layer
+				copiedChild.constraintValues = child.constraintValues
 
 		return layer
 
