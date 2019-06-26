@@ -246,6 +246,26 @@ describe "Utils", ->
 			Utils.modulate(0, [1, 2], [100, 0], true).should.equal 100
 			Utils.modulate(0, [1, 2], [100, 0], false).should.equal 200
 
+			# Array support
+			Utils.modulate(0.5, [0, 1], [0, 100], [true, true]).should.equal 50
+			Utils.modulate(1, [0, 1], [0, 100], [true, true]).should.equal 100
+
+			Utils.modulate(2, [0, 1], [0, 100], [true, true]).should.equal 100
+			Utils.modulate(0, [1, 2], [0, 100], [true, true]).should.equal 0
+			Utils.modulate(0, [1, 2], [100, 0], [true, true]).should.equal 100
+
+			Utils.modulate(2, [0, 1], [0, 100], [false, false]).should.equal 200
+			Utils.modulate(0, [1, 2], [0, 100], [false, false]).should.equal -100
+			Utils.modulate(0, [1, 2], [100, 0], [false, false]).should.equal 200
+
+			Utils.modulate(2, [0, 1], [0, 100], [true, false]).should.equal 200
+			Utils.modulate(0, [1, 2], [0, 100], [true, false]).should.equal 0
+			Utils.modulate(0, [1, 2], [100, 0], [true, false]).should.equal 100
+
+			Utils.modulate(2, [0, 1], [0, 100], [false, true]).should.equal 100
+			Utils.modulate(0, [1, 2], [0, 100], [false, true]).should.equal -100
+			Utils.modulate(0, [1, 2], [100, 0], [false, true]).should.equal 200
+
 	describe "clamp", ->
 
 		it "should have the right results", ->
